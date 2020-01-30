@@ -1,8 +1,8 @@
 <template>
 <div class="home-container">
   <div class="header">
-    <ep-navigation :sticky="false" :tutoriaalistore="tutoriaalistore"></ep-navigation>
-    <div class="container">
+    <ep-navigation :sticky="true" :tutoriaalistore="tutoriaalistore"></ep-navigation>
+    <div class="container mt-5">
       <div class="container-fluid">
         <div class="row">
           <h1>{{ $t('tervetuloa', { nimi }) }}</h1>
@@ -10,7 +10,7 @@
         </div>
       </div>
       <div class="row">
-         <div class="col-md-4 mb-3">
+         <div class="col-md-4 mt-2 mb-5">
            <ep-search v-model="rajain"></ep-search>
          </div>
       </div>
@@ -117,8 +117,7 @@ export default class Home extends Mixins(EpRoute) {
 
   .tile-container {
     padding: 0;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 50px;
   }
 }
 </style>
