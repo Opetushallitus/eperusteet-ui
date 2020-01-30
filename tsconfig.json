@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "strict": true,
+    "strictPropertyInitialization": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    //"emitDecoratorMetadata": true, // https://github.com/vuejs/vue-cli/issues/1708
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "baseUrl": ".",
+    "types": [
+      "webpack-env",
+      "jest"
+    ],
+    "paths": {
+      "@shared/*": ["./eperusteet-frontend-utils/vue/src/*"],
+      "@/*": ["./src/*"],
+      "&/*": ["./tests/*"]
+    },
+    "lib": [
+      "esnext",
+      "es2015.promise",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
+  },
+  "include": [
+    "src/**/*.vue",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "eperusteet-frontend-utils/vue/src/**/*.vue",
+    "eperusteet-frontend-utils/vue/src/**/*.ts",
+    "eperusteet-frontend-utils/vue/src/**/*.tsx",
+    "tests/integration/**/*.ts",
+    "tests/integration/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "eperusteet-frontend-utils"
+  ]
+}
