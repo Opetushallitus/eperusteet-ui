@@ -1,11 +1,7 @@
 import _ from 'lodash';
 import { Store, Getter, State } from '@shared/stores/store';
 import { KayttajanTietoDto } from '@/tyypit';
-import {
-  Kayttajat as KayttajatApi,
-  Ulkopuoliset,
-} from '@/api';
-import { organizations } from '@/utils/organisaatiot';
+import { Kayttajat as KayttajatApi } from '@/api';
 import { createLogger } from '@shared/utils/logger';
 
 // FIXME: tyypitä backendiin

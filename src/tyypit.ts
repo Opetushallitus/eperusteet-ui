@@ -56,31 +56,14 @@ export interface RecursiveTreeItem {
 export type KayttajanTietoDto = GApi.KayttajanTietoDto;
 export type LiiteDto = GApi.LiiteDto;
 export type Lops2019ModuuliDto = GApi.Lops2019ModuuliDto;
-//export type Lops2019OpintojaksoDto = GApi.Lops2019OpintojaksoDto;
-//export type Lops2019OpintojaksonModuuliDto = GApi.Lops2019OpintojaksonModuuliDto;
-//export type Lops2019OpintojaksonOppiaineDto = GApi.Lops2019OpintojaksonOppiaineDto;
 export type Lops2019OppiaineDto = GApi.Lops2019OppiaineKaikkiDto;
-//export type Lops2019PaikallinenOppiaineDto = GApi.Lops2019PaikallinenOppiaineDto;
-//export type Lops2019PoistettuDto = GApi.Lops2019PoistettuDto;
-//export type Lops2019ValidointiDto = GApi.Lops2019ValidointiDto;
-//export type Lops2019PaikallinenLaajaAlainenDto = GApi.Lops2019PaikallinenLaajaAlainenDto;
 export type Matala = GApi.Matala;
-//export type OhjeDto = GApi.OhjeDto;
-//export type OpetussuunnitelmaDto = GApi.OpetussuunnitelmaDto;
-//export type OpetussuunnitelmaInfoDto = GApi.OpetussuunnitelmaInfoDto;
-//export type OpetussuunnitelmaKevytDto = GApi.OpetussuunnitelmaKevytDto;
-//export type OpetussuunnitelmaLuontiDto = GApi.OpetussuunnitelmaLuontiDto;
 export type PerusteInfoDto = GApi.PerusteInfoDto;
-//export type PerusteTekstiKappaleViiteDto = GApi.PerusteTekstiKappaleViiteDto;
-//export type Puu = GApi.Puu;
-//export type TekstiKappaleViiteKevytDto = GApi.TekstiKappaleViiteKevytDto;
 export type TekstiKappaleDto = GApi.TekstiKappaleDto;
 export type TermiDto = GApi.TermiDto;
-//export type TilaEnum = GApi.OpetussuunnitelmaInfoDto.TilaEnum;
-//export type UusiJulkaisuDto = GApi.UusiJulkaisuDto;
-//export type KysymysDto = GApi.KysymysDto;
-//export type MuokkaustietoKayttajallaDto = GApi.MuokkaustietoKayttajallaDto;
-//export type OpetussuunnitelmanAikatauluDto = GApi.OpetussuunnitelmanAikatauluDto;
-//export type PoistettuTekstiKappaleDto = GApi.PoistettuTekstiKappaleDto;
+
+export type PageTiedoteDto = GApi.PageTiedoteDto;
+export type TiedoteDto = GApi.TiedoteDto;
+export type PerusteHakuDto = GApi.PerusteHakuDto;
 
 export default GApi;

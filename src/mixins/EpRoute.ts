@@ -1,6 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import EpRoot from './EpRoot';
-import { Murupolku } from '@/stores/murupolku';
+import { Murupolku } from '@shared/stores/murupolku';
 import { Location } from 'vue-router';
 
 

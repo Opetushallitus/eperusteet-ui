@@ -28,10 +28,10 @@ import { Component, Vue } from 'vue-property-decorator';
 import { createLogger } from '@shared/utils/logger';
 
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpContent from '@/components/EpContent/EpContent.vue';
+import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpField from '@shared/components/forms/EpField.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
-import EpMainView from '@/components/EpMainView/EpMainView.vue';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import { SovellusVirhe } from '@shared/tyypit';
 
 const logger = createLogger('Virhe');

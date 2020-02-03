@@ -1,10 +1,10 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import Sticky from 'vue-sticky-directive';
 
-import { TutoriaaliStore } from '@/stores/tutoriaaliStore';
+import { TutoriaaliStore } from '@shared/stores/tutoriaali';
 import EpTutorial from '@shared/components/EpTutorial/EpTutorial.vue';
-import EpNavigation from'@/components/EpNavigation/EpNavigation.vue';
-import EpFooter from'@/components/EpFooter/EpFooter.vue';
+import EpNavigation from'@shared/components/EpNavigation/EpNavigation.vue';
+import EpFooter from'@shared/components/EpFooter/EpFooter.vue';
 
 
 @Component({

@@ -20,7 +20,7 @@
     <div class="d-flex flex-row flex-wrap justify-content-center">
       <tile-perusteprojektit />
       <tile-pohjat />
-      <tile-tiedotteet />
+      <tile-tiedotteet :tiedotteetStore="tiedotteetStore"/>
       <tile-virheelliset-perusteet />
       <tile-arviointiasteikot />
       <tile-koulutuskoodi-ongelmat />
@@ -36,12 +36,13 @@ import { Component, Mixins, Prop } from 'vue-property-decorator';
 
 import { Kayttajat } from '@/stores/kayttaja';
 import { oikeustarkastelu } from '@/directives/oikeustarkastelu';
-import { TutoriaaliStore } from '@/stores/tutoriaaliStore';
+import { TutoriaaliStore } from '@shared/stores/tutoriaali';
+import { TiedotteetStore } from '@/stores/tiedotteet';
 
 import EpRoute from '@/mixins/EpRoute';
 
-import EpNavigation from '@/components/EpNavigation/EpNavigation.vue';
-import EpContent from '@/components/EpContent/EpContent.vue';
+import EpNavigation from '@shared/components/EpNavigation/EpNavigation.vue';
+import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 
@@ -78,6 +79,9 @@ export default class Home extends Mixins(EpRoute) {
 
   @Prop()
   private tutoriaalistore!: TutoriaaliStore;
+
+  @Prop({ required: true })
+  private tiedotteetStore!: TiedotteetStore;
 
   private rajain: string = '';
 

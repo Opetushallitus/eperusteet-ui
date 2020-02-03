@@ -6,21 +6,11 @@ import {
   DokumentitApi,
   DokumentitApiAxiosParamCreator,
   KayttajatApi,
-  //KommentitApi,
-  //KysymyksetApi,
   LiitetiedostotApi,
   Lops2019Api,
-  //Lops2019OpintojaksotApi,
-  //Lops2019OppiaineetApi,
-  //Lops2019PerusteControllerApi,
-  //OhjeetApi,
-  //OpetussuunnitelmanSisaltoApi,
-  //OpetussuunnitelmatApi,
-  //OpetussuunnitelmatJulkisetApi,
-  //TermistoApi,
-  //UlkopuolisetApi,
-  //MuokkaustietoApi,
-  //AikatauluApi,
+  TiedotteetApi,
+  PerusteetApi,
+
 } from '@/generated/api';
 
 axios.defaults.headers.common['Caller-Id'] = '1.2.246.562.10.00000000001.eperusteet';
@@ -84,35 +74,8 @@ function initApi<T>(X: BaseAPIConstructor<T>): T {
 export const Api = ax;
 export const Dokumentit = initApi(DokumentitApi);
 export const Kayttajat = initApi(KayttajatApi);
-//export const Kommentit = initApi(KommentitApi);
-//export const Kysymykset = initApi(KysymyksetApi);
 export const Liitetiedostot = initApi(LiitetiedostotApi);
 export const Lops2019 = initApi(Lops2019Api);
-//export const Lops2019Perusteet = initApi(Lops2019PerusteControllerApi);
-//export const Ohjeet = initApi(OhjeetApi);
-//export const OpetussuunnitelmanSisalto = initApi(OpetussuunnitelmanSisaltoApi);
-//export const Opetussuunnitelmat = initApi(OpetussuunnitelmatApi);
-//export const OpetussuunnitelmatJulkiset = initApi(OpetussuunnitelmatJulkisetApi);
-//export const Opintojaksot = initApi(Lops2019OpintojaksotApi);
-//export const Oppiaineet = initApi(Lops2019OppiaineetApi);
-//export const Termisto = initApi(TermistoApi);
-//export const Ulkopuoliset = initApi(UlkopuolisetApi);
-//export const Muokkaustieto = initApi(MuokkaustietoApi);
-//export const Aikataulu = initApi(AikatauluApi);
-/*
-export const DokumentitParams = DokumentitApiAxiosParamCreator(configuration);
+export const Tiedotteet = initApi(TiedotteetApi);
+export const Perusteet = initApi(PerusteetApi);
 
-// FIXME: Genereoitua rajapintaa ei toimi multipart-pyyntöjen kanssa.
-Dokumentit.addImage = (opsId, tyyppi, kieli, formData) => {
-  return Api.post('/dokumentit/kuva', formData, {
-    params: {
-      opsId,
-      tyyppi,
-      kieli,
-    },
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
-*/
