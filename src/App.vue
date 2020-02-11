@@ -1,32 +1,32 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+<div v-if="!isInitializing">
+  <router-view />
+  <notifications style="margin-right: 6px; margin-top: 90px;"
+                 position="top right"
+                 :max="3" />
+</div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+// import { Kayttajat } from '@/stores/kayttaja';
+import { delay } from '@shared/utils/delay';
 
-#nav {
-  padding: 30px;
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+@Component
+export default class App extends Vue {
+  private isInitializing = true;
+  public async mounted() {
+    const loader = (this as any).$loading.show({
+      color: '#2E5FD1',
+    });
+    // await Kayttajat.init();
+    await delay(500);
+    this.isInitializing = false;
+    loader.hide();
   }
 }
+</script>
+
+<style lang="scss">
 </style>
