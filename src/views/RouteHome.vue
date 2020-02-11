@@ -1,7 +1,6 @@
 <template>
-  <div class="home-container">
-    <div class="header">
-      <EpNavbar :sticky="true" />
+  <div>
+    <Portal to="headerExtension">
       <div class="container mt-5">
         <div class="container-fluid">
           <div class="row">
@@ -15,7 +14,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </Portal>
     <div class="container tile-container">
       <div class="d-flex flex-row flex-wrap justify-content-center">
         <TilePerusteprojektit />
@@ -31,7 +30,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import TileArkistoidut from './tiles/TileArkistoidut.vue';
 import TileKoulutuskoodiOngelmat from './tiles/TileKoulutuskoodiOngelmat.vue';
@@ -45,7 +43,6 @@ import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 
 @Component({
   components: {
-    EpNavbar,
     EpSearch,
     TileArkistoidut,
     TileKoulutuskoodiOngelmat,
