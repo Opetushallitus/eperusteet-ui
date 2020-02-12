@@ -1,5 +1,5 @@
 <template>
-<base-tile icon="muistikirja" :route="{ name: 'tiedotteet' }">
+<EpHomeTile icon="muistikirja" :route="{ name: 'tiedotteet' }">
   <template slot="header">
     <span>{{ $t('tiedotteet') }}</span>
   </template>
@@ -15,22 +15,19 @@
       <p>{{ $t('ei-tiedotteita') }}</p>
     </div>
   </template>
-</base-tile>
+</EpHomeTile>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-
-import { delay } from '@shared/utils/delay'
-
-import BaseTile from './BaseTile.vue'
+import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
 import { TiedotteetStore } from '@/stores/tiedotteet'
 import _ from 'lodash'
 
 @Component({
   components: {
-    BaseTile,
+    EpHomeTile,
     EpSpinner
   }
 })

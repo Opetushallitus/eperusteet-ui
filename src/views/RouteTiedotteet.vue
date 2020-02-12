@@ -181,9 +181,8 @@ import EpSelect from '@shared/components/forms/EpSelect.vue'
 import EpToggle from '@shared/components/forms/EpToggle.vue'
 
 import { themes, ktToState } from '@shared/utils/perusteet'
-import { Perusteet, Kayttajat } from '@shared/api/perusteet'
 import { TutoriaaliStore } from '@shared/stores/tutoriaali'
-import { PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/tyypit'
+import { Perusteet, Kayttajat, PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/eperusteet'
 import { Kielet } from '@shared/stores/kieli'
 import { success, fail } from '@/utils/notifications'
 import { TiedotteetStore } from '@/stores/tiedotteet'
@@ -436,7 +435,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
     ]
 
     if (this.muokattavaTiedote.luotu) {
-      const kayttaja = (await Kayttajat.getKayttaja_1((this.muokattavaTiedote.muokkaaja as any))).data
+      const kayttaja = (await Kayttajat.getKayttaja((this.muokattavaTiedote.muokkaaja as any))).data
       if (kayttaja) {
         this.muokkaavanKayttajanNimi = parsiEsitysnimi(kayttaja)
       } else {

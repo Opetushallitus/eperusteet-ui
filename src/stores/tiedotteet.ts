@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api'
-import { TiedoteDto } from '@shared/api/tyypit'
-import { Tiedotteet } from '@shared/api/perusteet'
+import { TiedoteDto, Tiedotteet } from '@shared/api/eperusteet'
 import _ from 'lodash'
+
 Vue.use(VueCompositionApi)
 
 export class TiedotteetStore {
@@ -39,9 +39,11 @@ export class TiedotteetStore {
   }
 
   public async delete (tiedote: TiedoteDto) {
-    await Tiedotteet.deleteTiedote(tiedote.id)
-    this.state.tiedotteet = _.filter(this.state.tiedotteet, (listaTiedote) => listaTiedote.id !== tiedote.id)
+    if (tiedote.id) {
+      await Tiedotteet.deleteTiedote(tiedote.id)
+      this.state.tiedotteet = _.filter(this.state.tiedotteet, (listaTiedote) => listaTiedote.id !== tiedote.id)
+    }
   }
 }
 
-export const TiedoteStore = new TiedotteetStore()
+export const tiedotteetStore = new TiedotteetStore()

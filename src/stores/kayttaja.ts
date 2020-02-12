@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { Store, Getter, State } from '@shared/stores/store';
-import { KayttajanTietoDto } from '@/tyypit';
-import { Kayttajat as KayttajatApi } from '@/api';
+import { Kayttajat as KayttajatApi, KayttajanTietoDto } from '@shared/api/eperusteet';
 import { createLogger } from '@shared/utils/logger';
 
 // FIXME: tyypitä backendiin
@@ -56,7 +55,7 @@ class KayttajaStore {
   public async init() {
     try {
       logger.info('Haetaan käyttäjän tiedot');
-      this.tiedot = (await KayttajatApi.getKayttaja()).data;
+      this.tiedot = (await KayttajatApi.getKirjautunutKayttajat()).data;
       logger.info('Käyttäjän tiedot', this.tiedot);
     }
     catch (err) {

@@ -25,6 +25,8 @@ import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 
 Vue.use(VueRouter)
 
+import { tiedotteetStore } from '@/stores/tiedotteet';
+
 
 const router = new VueRouter({
   routes: [{
@@ -60,6 +62,9 @@ const router = new VueRouter({
       path: 'tiedotteet',
       name: 'tiedotteet',
       component: RouteTiedotteet,
+      props: {
+        tiedotteetStore,
+      },
     }, {
       path: 'arviointiasteikot',
       name: 'arviointiasteikot',

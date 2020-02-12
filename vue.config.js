@@ -71,7 +71,7 @@ module.exports = {
       errors: true,
     },
     clientLogLevel: 'none',
-    port: 9020,
+    port: 9000,
     proxy
   },
 }

@@ -1,4 +1,4 @@
-import { RevisionDto } from '@shared/api/tyypit';
+import { RevisionDto } from '@shared/api/eperusteet';
 
 import {
   editointi,
