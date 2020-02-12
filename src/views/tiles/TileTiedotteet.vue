@@ -1,33 +1,52 @@
 <template>
-<EpHomeTile icon="muistikirja" :route="{ name: 'tiedotteet' }">
+<base-tile icon="muistikirja" :route="{ name: 'tiedotteet' }">
   <template slot="header">
     <span>{{ $t('tiedotteet') }}</span>
   </template>
   <template slot="content">
-    <EpSpinner v-if="isLoading" />
+    <ep-spinner v-if="isLoading"></ep-spinner>
+    <div v-if="tiedotteetStore.state.tiedotteet">
+      <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
+        <div class="col-3">{{$sd(tiedote.muokattu)}}</div>
+        <div class="col-7 otsikko">{{$kaanna(tiedote.otsikko)}}</div>
+      </div>
+    </div>
     <div v-else>
-      <p>{{ $t('tile-tiedotteet-kuvaus') }}</p>
+      <p>{{ $t('ei-tiedotteita') }}</p>
     </div>
   </template>
-</EpHomeTile>
+</base-tile>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import { Vue, Component, Prop } from 'vue-property-decorator'
 
+import { delay } from '@shared/utils/delay'
+
+import BaseTile from './BaseTile.vue'
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
+import { TiedotteetStore } from '@/stores/tiedotteet'
+import _ from 'lodash'
 
 @Component({
   components: {
-    EpHomeTile,
-    EpSpinner,
-  },
+    BaseTile,
+    EpSpinner
+  }
 })
 export default class TileTiedotteet extends Vue {
-  private isLoading = false;
+  @Prop({ required: true })
+  private tiedotteetStore!: TiedotteetStore;
 
-  async mounted() {
+  private isLoading = true;
+
+  async mounted () {
+    await this.tiedotteetStore.fetch()
+    this.isLoading = false
+  }
+
+  get viimeisimmatTiedotteet () {
+    return _.take(this.tiedotteetStore.tiedotteet.value, 3)
   }
 }
 </script>
@@ -47,6 +66,12 @@ export default class TileTiedotteet extends Vue {
     }
   }
 
+}
+
+.otsikko {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 </style>
