@@ -21,7 +21,7 @@ export default class RouteRoot extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .home-container {
   .header {
     background-image: url('../../public/img/banners/header.svg');

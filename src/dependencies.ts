@@ -1,5 +1,4 @@
-// import '@shared/config/styles';
-import '@shared/styles/bootstrap.scss'
+import '@shared/config/styles'
 import '@shared/config/bootstrap'
 import '@shared/config/fontawesome'
 import 'animate.css/animate.min.css'
