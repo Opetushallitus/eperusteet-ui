@@ -9,13 +9,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
-
+import { Component, Vue } from 'vue-property-decorator'
+import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue'
 
 @Component({
   components: {
-    EpNavbar,
+    EpNavbar
   }
 })
 export default class RouteRoot extends Vue {

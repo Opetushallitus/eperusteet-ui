@@ -290,7 +290,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
   }
 
   @Watch('opintopolkuJulkaisu')
-  async onValueChanged (newVal: any) {
+  async onValueChanged (newVal: any) {
     if (!newVal) {
       this.opintopolkuJulkaisuEtusivu = false
     }

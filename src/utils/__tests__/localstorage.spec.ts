@@ -1,8 +1,8 @@
 import {
   setItem,
   getItem,
-  removeItem,
-} from '../localstorage';
+  removeItem
+} from '../localstorage'
 
 describe('Localstorage', () => {
   test('Typed set/get/remove', () => {
@@ -20,19 +20,19 @@ describe('Localstorage', () => {
       id: 42,
       name: 'foobar',
       vals: [{
-        value: 5,
-      }],
-    };
+        value: 5
+      }]
+    }
 
-    setItem('val', val);
-    const val2 = getItem<typeof val>('val');
-    expect(val2).toBeTruthy();
+    setItem('val', val)
+    const val2 = getItem<typeof val>('val')
+    expect(val2).toBeTruthy()
 
     if (val2) {
-      expect(val2.name).toEqual('foobar');
-      expect(val2.vals[0].value).toEqual(5);
-      removeItem('val');
-      expect(getItem('val')).toBeNull();
+      expect(val2.name).toEqual('foobar')
+      expect(val2.vals[0].value).toEqual(5)
+      removeItem('val')
+      expect(getItem('val')).toBeNull()
     }
-  });
-});
+  })
+})

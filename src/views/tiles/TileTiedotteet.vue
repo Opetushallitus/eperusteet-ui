@@ -4,23 +4,23 @@
     <span>{{ $t('tiedotteet') }}</span>
   </template>
   <template slot="content">
-    <ep-spinner v-if="isLoading"></ep-spinner>
-    <div v-if="tiedotteetStore.state.tiedotteet">
+    <div v-if="tiedotteet">
       <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
         <div class="col-3">{{$sd(tiedote.muokattu)}}</div>
         <div class="col-7 otsikko">{{$kaanna(tiedote.otsikko)}}</div>
       </div>
     </div>
-    <div v-else>
+    <div v-else-if="tiedotteet === []">
       <p>{{ $t('ei-tiedotteita') }}</p>
     </div>
+    <ep-spinner v-else />
   </template>
 </EpHomeTile>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
+import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue'
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
 import { TiedotteetStore } from '@/stores/tiedotteet'
 import _ from 'lodash'
@@ -35,15 +35,20 @@ export default class TileTiedotteet extends Vue {
   @Prop({ required: true })
   private tiedotteetStore!: TiedotteetStore;
 
-  private isLoading = true;
+  get isLoading () {
+    return !!this.tiedotteet
+  }
 
-  async mounted () {
-    await this.tiedotteetStore.fetch()
-    this.isLoading = false
+  get tiedotteet () {
+    return this.tiedotteetStore.tiedotteet.value
+  }
+
+  mounted () {
+    this.tiedotteetStore.fetch()
   }
 
   get viimeisimmatTiedotteet () {
-    return _.take(this.tiedotteetStore.tiedotteet.value, 3)
+    return _.take(this.tiedotteet, 3)
   }
 }
 </script>

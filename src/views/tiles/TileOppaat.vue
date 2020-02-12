@@ -12,27 +12,25 @@
 </EpHomeTile>
 </template>
 
-
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import { Vue, Component } from 'vue-property-decorator'
+import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue'
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
 
 @Component({
   components: {
     EpHomeTile,
-    EpSpinner,
-  },
+    EpSpinner
+  }
 })
 export default class TileOppaat extends Vue {
   private isLoading = false;
 
-  async mounted() {
-    this.isLoading = false;
+  async mounted () {
+    this.isLoading = false
   }
 }
 </script>
-
 
 <style scoped lang="scss">
 .tiedotteet {

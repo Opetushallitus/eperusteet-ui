@@ -8,22 +8,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator'
 // import { Kayttajat } from '@/stores/kayttaja';
-import { delay } from '@shared/utils/delay';
-
+import { delay } from '@shared/utils/delay'
 
 @Component
 export default class App extends Vue {
   private isInitializing = true;
-  public async mounted() {
+  public async mounted () {
     const loader = (this as any).$loading.show({
-      color: '#2E5FD1',
-    });
+      color: '#2E5FD1'
+    })
     // await Kayttajat.init();
-    await delay(500);
-    this.isInitializing = false;
-    loader.hide();
+    await delay(500)
+    this.isInitializing = false
+    loader.hide()
   }
 }
 </script>

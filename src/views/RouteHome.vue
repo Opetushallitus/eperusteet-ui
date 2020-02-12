@@ -19,7 +19,7 @@
       <div class="d-flex flex-row flex-wrap justify-content-center">
         <TilePerusteprojektit />
         <TilePohjat />
-        <TileTiedotteet />
+        <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileOppaat />
         <TileArviointiasteikot />
         <TileVirheellisetPerusteet />
@@ -29,17 +29,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import EpSearch from '@shared/components/forms/EpSearch.vue';
-import TileArkistoidut from './tiles/TileArkistoidut.vue';
-import TileKoulutuskoodiOngelmat from './tiles/TileKoulutuskoodiOngelmat.vue';
-import TileOppaat from './tiles/TileOppaat.vue';
-import TilePerusteprojektit from './tiles/TilePerusteprojektit.vue';
-import TilePohjat from './tiles/TilePohjat.vue';
-import TileTiedotteet from './tiles/TileTiedotteet.vue';
-import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue';
-import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
-
+import { Component, Vue, Prop } from 'vue-property-decorator'
+import EpSearch from '@shared/components/forms/EpSearch.vue'
+import TileArkistoidut from './tiles/TileArkistoidut.vue'
+import TileKoulutuskoodiOngelmat from './tiles/TileKoulutuskoodiOngelmat.vue'
+import TileOppaat from './tiles/TileOppaat.vue'
+import TilePerusteprojektit from './tiles/TilePerusteprojektit.vue'
+import TilePohjat from './tiles/TilePohjat.vue'
+import TileTiedotteet from './tiles/TileTiedotteet.vue'
+import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue'
+import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue'
+import { TiedotteetStore } from '@/stores/tiedotteet'
 
 @Component({
   components: {
@@ -51,10 +51,13 @@ import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
     TilePohjat,
     TileTiedotteet,
     TileVirheellisetPerusteet,
-    TileArviointiasteikot,
-  },
+    TileArviointiasteikot
+  }
 })
 export default class Home extends Vue {
+  @Prop({ required: true })
+  private tiedotteetStore!: TiedotteetStore;
+
   private rajain = '';
 }
 </script>

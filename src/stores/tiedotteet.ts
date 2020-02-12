@@ -7,7 +7,7 @@ Vue.use(VueCompositionApi)
 
 export class TiedotteetStore {
   private state = reactive({
-    tiedotteet: [] as TiedoteDto[]
+    tiedotteet: null as TiedoteDto[] | null
   })
 
   public readonly tiedotteet = computed(() => this.state.tiedotteet);
@@ -30,7 +30,7 @@ export class TiedotteetStore {
   public async save (tiedote: TiedoteDto) {
     if (_.isNil(tiedote.id)) {
       const tallennettu = (await Tiedotteet.addTiedote(tiedote) as any).data
-      this.state.tiedotteet.unshift(tallennettu)
+      this.state.tiedotteet = [tallennettu, ...this.state.tiedotteet || []]
     } else {
       await Tiedotteet.updateTiedote((tiedote as any).id, tiedote)
       const tallennettu = (await Tiedotteet.getTiedote((tiedote as any).id, tiedote) as any).data

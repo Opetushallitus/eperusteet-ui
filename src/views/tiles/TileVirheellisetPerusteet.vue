@@ -12,23 +12,21 @@
 </EpHomeTile>
 </template>
 
-
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-
+import { Vue, Component } from 'vue-property-decorator'
+import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue'
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
 
 @Component({
   components: {
     EpHomeTile,
-    EpSpinner,
-  },
+    EpSpinner
+  }
 })
 export default class TileVirheellisetPerusteet extends Vue {
   private isLoading = false;
 
-  async mounted() {
+  async mounted () {
   }
 }
 </script>
