@@ -183,7 +183,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue'
 import { themes, ktToState } from '@shared/utils/perusteet'
 import { Perusteet, Kayttajat } from '@shared/api/perusteet'
 import { TutoriaaliStore } from '@shared/stores/tutoriaali'
-import { PageTiedoteDto, TiedoteDto, PerusteHakuDto } from '@shared/api/tyypit'
+import { PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/tyypit'
 import { Kielet } from '@shared/stores/kieli'
 import { success, fail } from '@/utils/notifications'
 import { TiedotteetStore } from '@/stores/tiedotteet'
@@ -379,7 +379,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
 
     this.muokattavaTiedote.koulutustyypit = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'koulutustyyppi'), 'object')
     const perusteetIdlla = _.keyBy(this.perusteet, 'id')
-    this.muokattavaTiedote.perusteet = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'peruste'), (koulutustyyppitutkinto) => perusteetIdlla[koulutustyyppitutkinto.object])
+    this.muokattavaTiedote.perusteet = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'peruste'), (koulutustyyppitutkinto) => this.perusteHakuToInfo(perusteetIdlla[koulutustyyppitutkinto.object]))
 
     if (!(this.opintopolkuJulkaisuKoulutustyyppiTutkinto && !_.isEmpty(this.muokattavaTiedote.koulutustyypit))) {
       this.muokattavaTiedote.koulutustyypit = []
@@ -390,6 +390,12 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
 
     this.suljeTiedote()
     success('tiedote-tallennettu')
+  }
+
+  private perusteHakuToInfo (perusteHaku: PerusteHakuDto): PerusteKevytDto {
+    return {
+      id: perusteHaku.id
+    } as PerusteKevytDto
   }
 
   suljeTiedote () {
