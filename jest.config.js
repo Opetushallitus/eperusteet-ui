@@ -3,7 +3,7 @@ module.exports = {
   coverageReporters: [
     'text-summary',
     'json',
-    'lcov',
+    'lcov'
   ],
   collectCoverageFrom: [
     '<rootDir>/src/**/*.(ts|tsx|vue)',
@@ -11,7 +11,7 @@ module.exports = {
     '!<rootDir>/src/**/script.ts',
     '!<rootDir>/**/*.d.ts',
     '!<rootDir>/src/main.ts',
-    '!<rootDir>/src/registerServiceWorker.ts',
+    '!<rootDir>/src/registerServiceWorker.ts'
   ],
   transform: {
     '^.+\\.vue$': 'vue-jest',
@@ -23,7 +23,7 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^@shared/(.*)$': '<rootDir>/eperusteet-frontend-utils/vue/src/$1',
-    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@/(.*)$': '<rootDir>/src/$1'
   },
   snapshotSerializers: [
     'jest-serializer-vue'
@@ -40,5 +40,5 @@ module.exports = {
     'ts-jest': {
       babelConfig: true
     }
-  },
+  }
 }
