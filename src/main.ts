@@ -7,14 +7,15 @@ import Aikaleima from '@shared/plugins/aikaleima'
 import Kaannos from '@shared/plugins/kaannos'
 import { Kielet } from '@shared/stores/kieli'
 
-Vue.use(Aikaleima)
-Vue.use(Kaannos)
 Vue.use(Kielet, {
   messages: {
     fi: require('@/translations/locale-fi.json'),
     sv: require('@/translations/locale-sv.json')
   }
 })
+Vue.use(Kaannos)
+Vue.use(Aikaleima)
+
 
 Vue.config.productionTip = false
 

@@ -1,15 +1,7 @@
 <template>
-  <EpMainView>
-    <template slot="icon">
-      <EpIcon class="float-right" icon="tyoryhma" background-color="#82D4FF" />
-    </template>
+  <div>
 
-    <template slot="header">
-      <h1>{{ $route.name }}</h1>
-    </template>
-
-    Sisältö
-  </EpMainView>
+  </div>
 </template>
 
 <script lang="ts">

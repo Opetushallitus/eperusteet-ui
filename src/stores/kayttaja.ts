@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { Store, Getter, State } from '@shared/stores/store'
 import { Kayttajat as KayttajatApi, KayttajanTietoDto } from '@shared/api/eperusteet'
 import { createLogger } from '@shared/utils/logger'
+import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api'
 
 // FIXME: tyypitä backendiin
 export type Oikeus = 'luku' | 'kommentointi' | 'muokkaus' | 'luonti' | 'poisto' | 'tilanvaihto' | 'hallinta';
@@ -30,31 +31,28 @@ export function parsiEsitysnimi (tiedot: any): string {
 
 const logger = createLogger('Kayttaja')
 
-@Store
-class KayttajaStore {
-  @State()
-  public organisaatiot: any[] = [];
+export class KayttajaStore {
+  public state = reactive({
+    organisaatiot: [] as any[],
+    tiedot: {} as KayttajanTietoDto,
+    virkailijat: [] as any[],
+    oikeudet: {
+      opetussuunnitelma: [],
+      pohja: []
+    } as Oikeudet,
+  });
 
-  @State()
-  public tiedot: KayttajanTietoDto = { };
-
-  @State()
-  public virkailijat: any[] = []; // FIXME: tyyppi puuttuu
-
-  @State()
-  public oikeudet: Oikeudet = {
-    opetussuunnitelma: [],
-    pohja: []
-  };
-
-  @Getter(state => parsiEsitysnimi(state.tiedot))
-  public readonly nimi!: string;
+  public readonly organisaatiot = computed(() => this.state.organisaatiot);
+  public readonly tiedot = computed(() => this.state.tiedot);
+  public readonly virkailijat = computed(() => this.state.virkailijat);
+  public readonly oikeudet = computed(() => this.state.oikeudet);
+  public readonly nimi = computed(() => parsiEsitysnimi(this.state.tiedot));
 
   public async init () {
     try {
       logger.info('Haetaan käyttäjän tiedot')
-      this.tiedot = (await KayttajatApi.getKirjautunutKayttajat()).data
-      logger.info('Käyttäjän tiedot', this.tiedot)
+      this.state.tiedot = (await KayttajatApi.getKirjautunutKayttajat()).data
+      logger.info('Käyttäjän tiedot', this.tiedot.value)
     } catch (err) {
       logger.error('Käyttäjän tietojen lataus epäonnistui', err.message)
     }
@@ -75,13 +73,13 @@ class KayttajaStore {
     if (haettu === 0) {
       return false
     } else {
-      const korkein = _.max(_.map(this.oikeudet[kohde], getOikeusArvo)) || 0
+      const korkein = _.max(_.map(this.oikeudet.value[kohde], getOikeusArvo)) || 0
       return korkein >= haettu
     }
   }
 
   private hasHallintaoikeus (kohde) {
-    return _.includes(this.oikeudet[kohde], 'luonti')
+    return _.includes(this.oikeudet.value[kohde], 'luonti')
   }
 }
 

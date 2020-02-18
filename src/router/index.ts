@@ -24,10 +24,12 @@ import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue'
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue'
 
 import { tiedotteetStore } from '@/stores/tiedotteet'
+import { perusteStore } from '@/stores/PerusteStore'
+import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
+import { arviointiStore } from '@/stores/ArviointiStore'
+import { Kayttajat } from '@/stores/kayttaja'
 
 Vue.use(VueRouter)
-
-console.log(tiedotteetStore)
 
 const router = new VueRouter({
   routes: [{
@@ -41,6 +43,13 @@ const router = new VueRouter({
     component: RouteRoot,
     children: [{
       path: '',
+      name: 'root',
+      component: RouteHome,
+      props: {
+        tiedotteetStore
+      }
+    }, {
+      path: '',
       name: 'home',
       component: RouteHome,
       props: {
@@ -53,15 +62,18 @@ const router = new VueRouter({
     }, {
       path: 'perusteprojektit',
       name: 'perusteprojektit',
-      component: RoutePerusteprojektit
+      component: RoutePerusteprojektit,
+      props: {
+        perusteStore,
+      },
     }, {
       path: 'pohjat',
       name: 'pohjat',
-      component: RoutePohjat
+      component: RoutePohjat,
     }, {
       path: 'virhe',
       name: 'virhe',
-      component: RouteVirhe
+      component: RouteVirhe,
     }, {
       path: 'tiedotteet',
       name: 'tiedotteet',
@@ -72,11 +84,17 @@ const router = new VueRouter({
     }, {
       path: 'arviointiasteikot',
       name: 'arviointiasteikot',
-      component: RouteArviointiasteikot
+      component: RouteArviointiasteikot,
+      props: {
+        arviointiStore,
+      },
     }, {
       path: 'virheelliset',
       name: 'virheellisetperusteet',
-      component: RouteVirheellisetPerusteet
+      component: RouteVirheellisetPerusteet,
+      props: {
+        virheellisetPerusteetStore,
+      },
     }, {
       path: 'perusteprojektit/uusi',
       name: 'perusteprojektiLuonti',
