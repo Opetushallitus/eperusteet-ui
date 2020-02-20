@@ -23,12 +23,28 @@ import RouteVirhe from '@/views/RouteVirhe.vue'
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue'
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue'
 
-import { tutoriaaliStore } from '@shared/stores/tutoriaali'
-import { tiedotteetStore } from '@/stores/tiedotteet'
-import { perusteStore } from '@/stores/PerusteStore'
-import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
-import { arviointiStore } from '@/stores/ArviointiStore'
 import { Kayttajat } from '@/stores/kayttaja'
+import { PerusteStore } from '@/stores/PerusteStore'
+import { arviointiStore } from '@/stores/ArviointiStore'
+import { tiedotteetStore } from '@/stores/tiedotteet'
+import { tutoriaaliStore } from '@shared/stores/tutoriaali'
+import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
+
+
+function constructStores() {
+  return {
+    arviointiStore,
+    oppaatStore: new PerusteStore({ tyyppi: 'OPAS' } as any),
+    perusteetStore: new PerusteStore({ tyyppi: 'NORMAALI' } as any),
+    pohjatStore: new PerusteStore({ tyyppi: 'POHJA' } as any),
+    tiedotteetStore,
+    tutoriaaliStore,
+    virheellisetPerusteetStore,
+  }
+}
+
+const stores = constructStores();
+
 
 Vue.use(VueRouter)
 
@@ -46,31 +62,27 @@ const router = new VueRouter({
       path: '',
       name: 'root',
       component: RouteHome,
-      props: {
-        tiedotteetStore
-      }
+      props: { ...stores }
     }, {
       path: '',
       name: 'home',
       component: RouteHome,
-      props: {
-        tiedotteetStore
-      }
+      props: { ...stores }
     }, {
       path: 'oppaat',
       name: 'oppaat',
-      component: RouteOppaat
+      component: RouteOppaat,
+      props: { ...stores },
     }, {
       path: 'perusteprojektit',
       name: 'perusteprojektit',
       component: RoutePerusteprojektit,
-      props: {
-        perusteStore,
-      },
+      props: { ...stores },
     }, {
       path: 'pohjat',
       name: 'pohjat',
       component: RoutePohjat,
+      props: { ...stores },
     }, {
       path: 'virhe',
       name: 'virhe',
@@ -79,24 +91,17 @@ const router = new VueRouter({
       path: 'tiedotteet',
       name: 'tiedotteet',
       component: RouteTiedotteet,
-      props: {
-        tiedotteetStore,
-        tutoriaaliStore,
-      }
+      props: { ...stores }
     }, {
       path: 'arviointiasteikot',
       name: 'arviointiasteikot',
       component: RouteArviointiasteikot,
-      props: {
-        arviointiStore,
-      },
+      props: { ...stores },
     }, {
       path: 'virheelliset',
       name: 'virheellisetperusteet',
       component: RouteVirheellisetPerusteet,
-      props: {
-        virheellisetPerusteetStore,
-      },
+      props: { ...stores },
     }, {
       path: 'perusteprojektit/uusi',
       name: 'perusteprojektiLuonti',

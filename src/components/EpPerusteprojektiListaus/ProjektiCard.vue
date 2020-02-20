@@ -4,7 +4,7 @@
       <EpColorIndicator size="16" :kind="indicator" />
     </div>
     <div v-else></div>
-    <div class="flex-grow-1 mainslot">
+    <div class="flex-grow-1 mainslot h-100">
       <slot />
     </div>
     <div class="flex-shrink-1 lower d-flex align-items-center justify-content-center text-center" v-if="$slots.lower">

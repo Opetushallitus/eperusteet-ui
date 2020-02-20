@@ -9,18 +9,18 @@
     <div class="d-flex flex-wrap" v-if="items">
       <div class="card-wrapper">
         <ProjektiCard :full-background="true" :link="{ name: 'perusteprojektiLuonti' }">
-        <div class="d-flex align-items-center flex-column h-100">
-          <div class="h-50 text-center d-flex align-items-center pt-4">
-            <div class="ikoni">
-              <fas icon="plus" />
+          <div class="d-flex align-items-center flex-column h-100">
+            <div class="h-50 text-center d-flex align-items-center pt-4">
+              <div class="ikoni">
+                <fas icon="plus" />
+              </div>
+            </div>
+            <div class="h-50 text-center d-flex align-items-center pb-5">
+              <div class="teksti">
+                {{ $t('luo-uusi') }}
+              </div>
             </div>
           </div>
-          <div class="h-50 text-center d-flex align-items-center pb-5">
-            <div class="teksti">
-              {{ $t('luo-uusi') }}
-            </div>
-          </div>
-        </div>
         </ProjektiCard>
       </div>
       <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
@@ -99,26 +99,31 @@
           <EpSpinner v-if="isLoading" />
         </div>
       </div>
-      <b-table striped hover :items="items.data" :fields="fields">
-        <template v-slot:cell(nimi)="data">
-          <router-link :to="{ name: 'perusteprojekti', params: { projektiId: data.item.id } }">
-            {{ data.item.nimi }}
-          </router-link>
-        </template>
-        <template v-slot:cell(koulutustyyppi)="data">
-          <span class="text-nowrap">
-            <EpColorIndicator :size="10" :kind="data.item.koulutustyyppi" />
-            <span class="ml-1">
-              {{ $t(data.item.koulutustyyppi) }}
+      <div v-if="items.data.length > 0">
+        <b-table striped hover responsive :items="items.data" :fields="fields">
+          <template v-slot:cell(nimi)="data">
+            <router-link :to="{ name: 'perusteprojekti', params: { projektiId: data.item.id } }">
+              {{ data.item.nimi }}
+            </router-link>
+          </template>
+          <template v-slot:cell(koulutustyyppi)="data">
+            <span class="text-nowrap">
+              <EpColorIndicator :size="10" :kind="data.item.koulutustyyppi" />
+              <span class="ml-1">
+                {{ $t(data.item.koulutustyyppi) }}
+              </span>
             </span>
-          </span>
-        </template>
-      </b-table>
-      <b-pagination align="center"
-                    no-local-sorting
-                    v-model="sivu"
-                    :per-page="perPage"
-                    :total-rows="total"/>
+          </template>
+        </b-table>
+        <b-pagination align="center"
+                      no-local-sorting
+                      v-model="sivu"
+                      :per-page="perPage"
+                      :total-rows="total"/>
+      </div>
+      <div v-else class="m-2 alert alert-info">
+        {{ $t('ei-hakutuloksia') }}
+      </div>
     </div>
     <EpSpinner v-else />
   </div>
@@ -175,7 +180,10 @@ export default class EpPerusteprojektiListaus extends Vue {
     tuleva: true,
     poistunut: false,
     koulutusvienti: true,
+    tila: ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
     nimi: '',
+    jarjestysOrder: false,
+    jarjestysTapa: 'nimi',
   } as PerusteQuery;
 
   mounted() {
@@ -188,15 +196,59 @@ export default class EpPerusteprojektiListaus extends Vue {
     try {
       await this.provider.updateQuery({
         ...query,
-        koulutustyyppi: [this.koulutustyyppi!],
-        tila: this.tila
-        ? [this.tila]
-        : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
       });
     }
     finally {
       this.isLoading = false;
     }
+  }
+
+  @Watch('tila')
+  onTilaChange(tila: string) {
+    this.query = {
+      tila: tila
+        ? [tila]
+        : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
+    }
+  }
+
+  @Watch('voimassaolo')
+  onChangeVoimassaolo(tila: string) {
+    const defaults = {
+      voimassaolo: false,
+      siirtyma: false,
+      tuleva: false,
+      poistunut: false,
+    };
+
+    switch(tila) {
+      case 'tuleva':
+        this.query = { ...defaults, tuleva: true };
+        break;
+      case 'voimassaolo':
+        this.query = { ...defaults, voimassaolo: true };
+        break;
+      case 'siirtyma':
+        this.query = { ...defaults, siirtyma: true };
+        break;
+      case 'poistunut':
+        this.query = { ...defaults, poistunut: true };
+        break;
+      default:
+        this.query = {
+          ...defaults,
+          voimassaolo: true,
+          tuleva: true,
+          siirtyma: true,
+        };
+        break;
+    }
+
+  }
+
+  @Watch('koulutustyyppi')
+  onKoulutustyyppiChange(kt: string) {
+    this.query.koulutustyyppi = [kt];
   }
 
   get vaihtoehdotKoulutustyypit() {

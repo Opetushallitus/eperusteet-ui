@@ -1,31 +1,33 @@
 <template>
   <EpMainView>
-    <template slot="icon">
-      <EpIcon class="float-right" icon="tyoryhma" background-color="#82D4FF" />
-    </template>
-
-    <template slot="header">
-      <h1>{{ $route.name }}</h1>
-    </template>
-
-    Sisältö
+    <EpPerusteprojektiListaus :provider="oppaatStore">
+      <h2 slot="upperheader">{{ $t('oppaat') }}</h2>
+      <h2 slot="lowerheader">{{ $t('kaikki-oppaat') }}</h2>
+    </EpPerusteprojektiListaus>
   </EpMainView>
 </template>
 
+
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Prop, Component, Vue } from 'vue-property-decorator'
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
+import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue'
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
+import { PerusteStore } from '@/stores/PerusteStore'
 
 @Component({
   components: {
+    EpIcon,
     EpMainView,
-    EpIcon
+    EpPerusteprojektiListaus,
   }
 })
 export default class RouteOppaat extends Vue {
+  @Prop({ required: true })
+  oppaatStore!: PerusteStore;
 }
 </script>
+
 
 <style lang="scss">
 </style>

@@ -1,6 +1,6 @@
 <template>
   <EpMainView>
-    <EpPerusteprojektiListaus :provider="perusteStore">
+    <EpPerusteprojektiListaus :provider="perusteetStore">
       <h2 slot="upperheader">{{ $t('perusteprojektisi') }}</h2>
       <h2 slot="lowerheader">{{ $t('kaikki-perusteprojektit') }}</h2>
     </EpPerusteprojektiListaus>
@@ -24,7 +24,7 @@ import { PerusteStore } from '@/stores/PerusteStore'
 })
 export default class RoutePerusteprojektit extends Vue {
   @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  perusteetStore!: PerusteStore;
 }
 </script>
 
