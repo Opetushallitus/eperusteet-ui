@@ -1,5 +1,5 @@
 <template>
-  <ep-main-view :tutoriaalistore="tutoriaalistore">
+  <ep-main-view :tutoriaaliStore="tutoriaaliStore">
     <template slot="icon">
       <ep-icon class="float-right" icon="luo-uusi">
       </ep-icon>
@@ -234,7 +234,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
   private tiedotteetStore!: TiedotteetStore;
 
   @Prop({ required: true })
-  private tutoriaalistore!: TutoriaaliStore;
+  private tutoriaaliStore!: TutoriaaliStore;
 
   private currentPage = 1;
   private perPage = 10;
@@ -254,10 +254,17 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
   private opsJulkaisu: boolean = false;
   private amosaaJulkaisu: boolean = false;
 
-  async init () {
-    await this.tiedotteetStore.fetch()
+  async mounted() {
+    this.tiedotteetStore.fetch()
     const res = (await Perusteet.getAllPerusteet() as any).data
     this.perusteet = res.data
+  }
+
+  @Watch('opintopolkuJulkaisu')
+  async onValueChanged (newVal: any) {
+    if (!newVal) {
+      this.opintopolkuJulkaisuEtusivu = false
+    }
   }
 
   get tiedotteetFiltered () {
@@ -287,13 +294,6 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       { text: this.$t('tiedote-julkaisupaikka-ops'), value: 'ops' },
       { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: 'amosaa' }
     ]
-  }
-
-  @Watch('opintopolkuJulkaisu')
-  async onValueChanged (newVal: any) {
-    if (!newVal) {
-      this.opintopolkuJulkaisuEtusivu = false
-    }
   }
 
   get tableFields () {

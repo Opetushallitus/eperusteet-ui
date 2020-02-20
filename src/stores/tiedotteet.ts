@@ -12,7 +12,7 @@ export class TiedotteetStore {
 
   public readonly tiedotteet = computed(() => this.state.tiedotteet);
 
-  public async fetch () {
+  public async fetch() {
     const res = (await Tiedotteet.findTiedotteetBy(
       0,
       99999,

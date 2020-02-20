@@ -1,7 +1,7 @@
 <template>
   <router-link :to="link" tag="div" :class="classes">
     <div v-if="indicator" class="p-2 flex-shrink-1">
-      <EpColorIndicator :kind="indicator" />
+      <EpColorIndicator size="16" :kind="indicator" />
     </div>
     <div v-else></div>
     <div class="flex-grow-1 mainslot">
@@ -28,7 +28,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpColorIndicator,
   }
 })
-export default class EpPerusteprojektiListaus extends Vue {
+export default class ProjektiCard extends Vue {
 
   @Prop({ default: false })
   fullBackground!: boolean;
@@ -44,7 +44,7 @@ export default class EpPerusteprojektiListaus extends Vue {
       return 'project-card full-color h-100';
     }
     else {
-      return 'd-flex flex-column project-card h-100';
+      return 'project-card d-flex flex-column h-100';
     }
   }
 
@@ -68,6 +68,10 @@ export default class EpPerusteprojektiListaus extends Vue {
   max-width: 192px;
   min-height: 230px;
   min-width: 192px;
+
+  &:hover {
+    box-shadow: 5px 5px 20px 3px rgba(27,41,102,0.12);
+  }
 }
 
 .mainslot {

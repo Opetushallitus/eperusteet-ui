@@ -35,16 +35,16 @@ export default class TileTiedotteet extends Vue {
   @Prop({ required: true })
   private tiedotteetStore!: TiedotteetStore;
 
+  mounted () {
+    this.tiedotteetStore.fetch()
+  }
+
   get isLoading () {
     return !!this.tiedotteet
   }
 
   get tiedotteet () {
     return this.tiedotteetStore.tiedotteet.value
-  }
-
-  mounted () {
-    this.tiedotteetStore.fetch()
   }
 
   get viimeisimmatTiedotteet () {

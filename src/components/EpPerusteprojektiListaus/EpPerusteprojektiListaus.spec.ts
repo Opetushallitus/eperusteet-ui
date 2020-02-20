@@ -1,0 +1,96 @@
+import Vue from 'vue'
+import VueCompositionApi, { ref, computed, reactive } from '@vue/composition-api'
+Vue.use(VueCompositionApi)
+import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
+
+import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet'
+import EpPerusteprojektiListaus from './EpPerusteprojektiListaus.vue';
+import { IProjektiProvider } from './types';
+import * as _ from 'lodash';
+import { Page } from '@shared/tyypit'
+import '@shared/config/bootstrap'
+import '@shared/config/fontawesome'
+
+
+function map<T extends Vue, R>(wrapper: WrapperArray<T>, fn: (param: Wrapper<T>) => R): R[] {
+  const result = [] as R[];
+  for (let idx = 0; idx < wrapper.length; ++idx) {
+    result.push(fn(wrapper.at(idx)));
+  }
+  return result;
+}
+
+
+describe('Projektilistaus', () => {
+  const localVue = createLocalVue();
+
+  const data = reactive({
+    projects: null as Page<PerusteprojektiKevytDto[]> | null,
+    ownProjects: null as PerusteprojektiListausDto[] | null,
+  });
+
+  const store: IProjektiProvider = {
+    ownProjects: computed(() => data.ownProjects),
+    projects: computed(() => data.projects),
+    updateQuery: jest.fn(async (query: PerusteQuery) => {
+    }),
+    updateOwnProjects: jest.fn(async () => {
+    }),
+  };
+
+  test('Mounting', async () => {
+    const wrapper = mount(EpPerusteprojektiListaus, {
+      propsData: {
+        provider: store,
+      },
+      localVue,
+      mocks: {
+        $t: x => x,
+      },
+      stubs: {
+        RouterLink: RouterLinkStub,
+      },
+    });
+    expect(wrapper.findAll('.oph-spinner').length).toEqual(2);
+    expect(store.updateQuery).toBeCalledTimes(1);
+    expect(store.updateOwnProjects).toBeCalledTimes(1);
+    data.projects = {
+      sivu: 0,
+      sivukoko: 10,
+      sivuja: 1,
+      kokonaismäärä: 1,
+      data: [{
+        id: 42,
+        nimi: 'projekti 42',
+        koulutustyyppi: 'koulutustyyppi_11',
+        tila: 'valmis',
+      }] as any,
+    };
+
+    data.ownProjects = [{
+      id: 43,
+      nimi: 'perusteprojekti',
+      tila: 'laadinta' as any,
+    }];
+
+    expect(wrapper.findAll('.oph-spinner').length).toEqual(0);
+    expect(wrapper.html()).toContain('projekti 42');
+    expect(wrapper.html()).toContain('perusteprojekti');
+    expect(wrapper.html()).toContain('laadinta');
+    expect(wrapper.html()).toContain('valmis');
+    expect(map(wrapper.findAll(RouterLinkStub), v => v.props().to)).toEqual(expect.arrayContaining([{
+      name: 'perusteprojektiLuonti'
+    }, {
+      name: 'perusteprojekti',
+      params: {
+        projektiId: 42,
+      },
+    }, {
+      name: 'perusteprojekti',
+      params: {
+        projektiId: 43,
+      },
+    }]));
+  });
+
+});

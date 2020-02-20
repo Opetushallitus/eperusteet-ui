@@ -13,9 +13,9 @@ export class VirheellisetPerusteetStore {
   })
 
   public readonly validations = computed(() => this.state.validations);
-  public readonly sivu = computed(() => this.state.validations!.sivu || 0);
+  public readonly sivu = computed(() => this.state.validations?.sivu || 0);
   public readonly sivukoko = computed(() => 10);
-  public readonly kokonaismaara = computed(() => this.state.validations!.kokonaismäärä || 0);
+  public readonly kokonaismaara = computed(() => this.state.validations?.kokonaismäärä || 0);
 
   public readonly updateFilters = _.debounce(async (sivu = 0, sivukoko = 10) => {
     this.state.validations = null;

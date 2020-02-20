@@ -8,8 +8,7 @@
 
     <div class="d-flex flex-wrap" v-if="items">
       <div class="card-wrapper">
-        <ProjektiCard :full-background="true"
-        :link="{ name: 'perusteprojektiLuonti' }">
+        <ProjektiCard :full-background="true" :link="{ name: 'perusteprojektiLuonti' }">
         <div class="d-flex align-items-center flex-column h-100">
           <div class="h-50 text-center d-flex align-items-center pt-4">
             <div class="ikoni">
@@ -49,48 +48,77 @@
     <div class="filters" v-if="items">
       <div class="d-lg-flex align-items-end">
         <div class="m-2">
-          <EpSearch v-model="query.nimi"
-          :placeholder="$t('etsi-perusteprojektia')"/>
+          <EpSearch v-model="query.nimi" :placeholder="$t('etsi-perusteprojektia')"/>
         </div>
         <div class="m-2">
           <label>{{ $t('koulutustyyppi') }}</label>
-          <EpSelect v-model="koulutustyyppi" 
+          <EpMultiSelect v-model="koulutustyyppi" 
                     :enable-empty-option="true"
                     placeholder="kaikki"
                     :is-editing="true"
-                    :items="vaihtoehdotKoulutustyypit">
-          <template slot-scope="{ item }">
-            {{ $t(item) }}
+                    :options="vaihtoehdotKoulutustyypit">
+          <template slot="singleLabel" slot-scope="{ option }">
+            {{ $t(option) }}
           </template>
-          </EpSelect>
+          <template slot="option" slot-scope="{ option }">
+            {{ $t(option) }}
+          </template>
+          </EpMultiSelect>
         </div>
         <div class="m-2">
           <label>{{ $t('tila') }}</label>
-          <EpSelect v-model="tila"
+          <EpMultiSelect v-model="tila"
                     :enable-empty-option="true"
                     placeholder="kaikki"
                     :is-editing="true"
-                    :items="vaihtoehdotTilat">
-          <template slot-scope="{ item }">
-            {{ $t('tila-' + item.toLowerCase()) }}
-          </template>
-          </EpSelect>
+                    :options="vaihtoehdotTilat">
+            <template slot="singleLabel" slot-scope="{ option }">
+              {{ $t('tila-' + option.toLowerCase()) }}
+            </template>
+            <template slot="option" slot-scope="{ option }">
+              {{ $t('tila-' + option.toLowerCase()) }}
+            </template>
+          </EpMultiSelect>
         </div>
         <div class="m-2">
           <label>{{ $t('voimassaolo') }}</label>
-          <EpSelect v-model="voimassaolo"
+          <EpMultiSelect v-model="voimassaolo"
                     :enable-empty-option="true"
                     placeholder="kaikki"
                     :is-editing="true"
-                    :items="vaihtoehdotVoimassaolo">
-          <template slot-scope="{ item }">
-            {{ $t('ajoitus-' + item.toLowerCase()) }}
-          </template>
-          </EpSelect>
+                    :options="vaihtoehdotVoimassaolo">
+            <template slot="singleLabel" slot-scope="{ option }">
+              {{ $t('ajoitus-' + option.toLowerCase()) }}
+            </template>
+            <template slot="option" slot-scope="{ option }">
+              {{ $t('ajoitus-' + option.toLowerCase()) }}
+            </template>
+          </EpMultiSelect>
+        </div>
+        <div class="mb-3">
+          <EpSpinner v-if="isLoading" />
         </div>
       </div>
-      <b-table striped hover :items="items" :fields="fields">
+      <b-table striped hover :items="items.data" :fields="fields">
+        <template v-slot:cell(nimi)="data">
+          <router-link :to="{ name: 'perusteprojekti', params: { projektiId: data.item.id } }">
+            {{ data.item.nimi }}
+          </router-link>
+        </template>
+        <template v-slot:cell(koulutustyyppi)="data">
+          <span class="text-nowrap">
+            <EpColorIndicator :size="10" :kind="data.item.koulutustyyppi" />
+            <span class="ml-1">
+              {{ $t(data.item.koulutustyyppi) }}
+            </span>
+          </span>
+        </template>
       </b-table>
+      <b-pagination align="center"
+                    no-local-sorting
+                    v-model="sivu"
+                    :per-page="perPage"
+                    :total-rows="total"/>
     </div>
     <EpSpinner v-else />
   </div>
@@ -101,8 +129,9 @@ import { Watch, Prop, Component, Vue } from 'vue-property-decorator'
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
 import EpSearch from '@shared/components/forms/EpSearch.vue'
-import EpSelect from '@shared/components/forms/EpSelect.vue'
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue'
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
+import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue'
 import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
 import { Page } from '@shared/tyypit'
@@ -115,11 +144,12 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
 @Component({
   components: {
+    EpColorIndicator,
     EpIcon,
     EpMainView,
+    EpMultiSelect,
     EpSearch,
     EpSpinner,
-    EpSelect,
     ProjektiCard,
   }
 })
@@ -134,10 +164,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   private koulutustyyppi: string | null = null;
   private tila: string | null = null;
   private voimassaolo: string | null = null;
-
-  get isLoading() {
-    return !this.provider.ownProjects || !this.provider.projects;
-  }
+  private isLoading = false;
 
   query = {
     sivu: 0,
@@ -156,14 +183,20 @@ export default class EpPerusteprojektiListaus extends Vue {
   }
 
   @Watch('query', { deep: true, immediate: true })
-  onQueryChange(query: PerusteQuery) {
-    this.provider.updateQuery({
-      ...query,
-      koulutustyyppi: [this.koulutustyyppi!],
-      tila: this.tila
+  async onQueryChange(query: PerusteQuery) {
+    this.isLoading = true;
+    try {
+      await this.provider.updateQuery({
+        ...query,
+        koulutustyyppi: [this.koulutustyyppi!],
+        tila: this.tila
         ? [this.tila]
         : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
-    });
+      });
+    }
+    finally {
+      this.isLoading = false;
+    }
   }
 
   get vaihtoehdotKoulutustyypit() {
@@ -184,8 +217,24 @@ export default class EpPerusteprojektiListaus extends Vue {
     ];
   }
 
+  get sivu() {
+    return this.items?.sivu! + 1;
+  }
+
+  set sivu(value: number) {
+    this.query.sivu = value - 1;
+  }
+
+  get perPage() {
+    return this.items?.sivukoko || 10;
+  }
+
+  get total() {
+    return this.items?.kokonaismäärä || 0;
+  }
+
   get ownProjects() {
-    if (!this.provider.ownProjects) {
+    if (!this.provider.ownProjects.value) {
       return null;
     }
     return this.provider.ownProjects.value;
@@ -195,7 +244,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     if (!this.provider.projects.value) {
       return null;
     }
-    return this.provider.projects.value.data;
+    return this.provider.projects.value;
   }
 
   get fields(): BvTableFieldArray {
@@ -208,35 +257,39 @@ export default class EpPerusteprojektiListaus extends Vue {
     return [{
       key: 'nimi',
       label: this.$t('projektin-nimi') as string,
+      sortable: true,
       formatter(value: any, key: string, item: PerusteprojektiKevytDto) {
         return item.nimi;
       },
     }, {
       key: 'koulutustyyppi',
+      sortable: true,
       label: this.$t('koulutustyyppi') as string,
-      formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
-        return this.$t(item!.koulutustyyppi!);
-      },
     }, {
       key: 'tila',
+      sortable: true,
       label: this.$t('tila') as string,
       formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
         return this.$t('tila-' + item!.tila);
       },
     }, {
       key: 'luotu',
+      sortable: true,
       label: this.$t('luotu') as string,
       formatter: dateFormatter,
     }, {
       key: 'globalVersion.aikaleima',
+      sortable: true,
       label: this.$t('muokattu') as string,
       formatter: dateFormatter,
     }, {
       key: 'peruste.voimassaoloAlkaa',
+      sortable: true,
       label: this.$t('voimassaolo-alkaa') as string,
       formatter: dateFormatter,
     }, {
       key: 'peruste.voimassaoloLoppuu',
+      sortable: true,
       label: this.$t('voimassaolo-loppuu') as string,
       formatter: dateFormatter,
     }];

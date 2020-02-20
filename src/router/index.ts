@@ -23,6 +23,7 @@ import RouteVirhe from '@/views/RouteVirhe.vue'
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue'
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue'
 
+import { tutoriaaliStore } from '@shared/stores/tutoriaali'
 import { tiedotteetStore } from '@/stores/tiedotteet'
 import { perusteStore } from '@/stores/PerusteStore'
 import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
@@ -79,7 +80,8 @@ const router = new VueRouter({
       name: 'tiedotteet',
       component: RouteTiedotteet,
       props: {
-        tiedotteetStore
+        tiedotteetStore,
+        tutoriaaliStore,
       }
     }, {
       path: 'arviointiasteikot',

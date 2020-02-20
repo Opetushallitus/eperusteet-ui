@@ -3,6 +3,7 @@ import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composit
 import { getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet'
 import { Page } from '@shared/tyypit'
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
+import { asyncDebounce } from '@shared/utils/delay';
 import _ from 'lodash'
 
 Vue.use(VueCompositionApi)
@@ -19,13 +20,11 @@ export class PerusteStore implements IProjektiProvider {
   public readonly projects = computed(() => this.state.projects);
 
   public readonly updateOwnProjects = async () => {
-    this.state.ownProjects = null;
     const res = await Perusteprojektit.getOmatPerusteprojektit();
     this.state.ownProjects = res.data;
   }
 
-  public readonly updateQuery = _.debounce(async (query: PerusteQuery) => {
-    this.state.projects = null;
+  public readonly updateQuery = asyncDebounce(async (query: PerusteQuery) => {
     const queryWithDefaults = {
       ...query,
       jarjestysOrder: false,
