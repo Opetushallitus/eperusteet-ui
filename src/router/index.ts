@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
+import VueRouter, { RouteConfig } from 'vue-router'
 
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue'
 import RouteHome from '@/views/RouteHome.vue'
@@ -45,8 +45,47 @@ function constructStores() {
 
 const stores = constructStores();
 
-
 Vue.use(VueRouter)
+
+function perusteprojektiRoutes(name: string): RouteConfig {
+  return {
+    path: `${name}/:projektiId`,
+    component: RoutePerusteprojekti,
+    children: [{
+      path: '',
+      name,
+      component: RouteYleisnakyma
+    }, {
+      path: 'rakenne',
+      name: 'muodostuminen',
+      component: RouteMuodostuminen
+    }, {
+      path: 'tiedot',
+      name: 'tiedot',
+      component: RouteTiedot
+    }, {
+      path: 'termisto',
+      name: 'termisto',
+      component: RouteTermisto
+    }, {
+      path: 'tutkinnonosat',
+      name: 'tutkinnonosat',
+      component: RouteTutkinnonOsat
+    }, {
+      path: 'tekstikappale:tekstiKappaleId',
+      name: 'tekstikappale',
+      component: RouteTekstikappale
+    }, {
+      path: 'tutkinnonosa/:tutkinnonOsaId',
+      name: 'tutkinnonosa',
+      component: RouteTutkinnonOsa
+    }, {
+      path: 'tutkinnonosa/:tutkinnonOsaId/osaalue/:osaAlueId',
+      name: 'tutkinnonosaOsaAlue',
+      component: RouteTutkinnonOsanOsaAlue
+    }]
+  };
+}
 
 const router = new VueRouter({
   routes: [{
@@ -114,43 +153,10 @@ const router = new VueRouter({
       path: 'oppaat/uusi',
       name: 'opasLuonti',
       component: RouteOppaatLuonti
-    }, {
-      path: 'perusteprojekti/:projektiId',
-      component: RoutePerusteprojekti,
-      children: [{
-        path: '',
-        name: 'perusteprojekti',
-        component: RouteYleisnakyma
-      }, {
-        path: 'rakenne',
-        name: 'muodostuminen',
-        component: RouteMuodostuminen
-      }, {
-        path: 'tutkinnonosat',
-        name: 'tutkinnonosat',
-        component: RouteTutkinnonOsat
-      }, {
-        path: 'tekstikappale:tekstiKappaleId',
-        name: 'tekstikappale',
-        component: RouteTekstikappale
-      }, {
-        path: 'termisto',
-        name: 'termisto',
-        component: RouteTermisto
-      }, {
-        path: 'tiedot',
-        name: 'tiedot',
-        component: RouteTiedot
-      }, {
-        path: 'tutkinnonosa/:tutkinnonOsaId',
-        name: 'tutkinnonosa',
-        component: RouteTutkinnonOsa
-      }, {
-        path: 'tutkinnonosa/:tutkinnonOsaId/osaalue/:osaAlueId',
-        name: 'tutkinnonosaOsaAlue',
-        component: RouteTutkinnonOsanOsaAlue
-      }]
-    }]
+    },
+    perusteprojektiRoutes('perusteprojekti'),
+    perusteprojektiRoutes('pohja'),
+    perusteprojektiRoutes('opas')]
   }]
 })
 

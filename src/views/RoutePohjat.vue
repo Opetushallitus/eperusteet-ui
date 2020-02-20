@@ -1,6 +1,8 @@
 <template>
   <EpMainView>
-    <EpPerusteprojektiListaus :provider="pohjatStore">
+    <EpPerusteprojektiListaus :provider="pohjatStore"
+                              :edit-route="'pohja'"
+                              :new-route="{ name: 'pohjaLuonti' }">
       <h2 slot="upperheader">{{ $t('pohjasi') }}</h2>
       <h2 slot="lowerheader">{{ $t('kaikki-pohjat') }}</h2>
     </EpPerusteprojektiListaus>

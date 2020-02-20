@@ -42,6 +42,8 @@ describe('Projektilistaus', () => {
     const wrapper = mount(EpPerusteprojektiListaus, {
       propsData: {
         provider: store,
+        newRoute: { name: 'luonti' },
+        editRoute: 'asia',
       },
       localVue,
       mocks: {
@@ -51,6 +53,7 @@ describe('Projektilistaus', () => {
         RouterLink: RouterLinkStub,
       },
     });
+
     expect(wrapper.findAll('.oph-spinner').length).toEqual(2);
     expect(store.updateQuery).toBeCalledTimes(1);
     expect(store.updateOwnProjects).toBeCalledTimes(1);
@@ -73,20 +76,20 @@ describe('Projektilistaus', () => {
       tila: 'laadinta' as any,
     }];
 
-    expect(wrapper.findAll('.oph-spinner').length).toEqual(0);
+    expect(wrapper.findAll('.oph-spinner').length).toEqual(1);
     expect(wrapper.html()).toContain('projekti 42');
     expect(wrapper.html()).toContain('perusteprojekti');
     expect(wrapper.html()).toContain('laadinta');
     expect(wrapper.html()).toContain('valmis');
     expect(map(wrapper.findAll(RouterLinkStub), v => v.props().to)).toEqual(expect.arrayContaining([{
-      name: 'perusteprojektiLuonti'
+      name: 'luonti'
     }, {
-      name: 'perusteprojekti',
+      name: 'asia',
       params: {
         projektiId: 42,
       },
     }, {
-      name: 'perusteprojekti',
+      name: 'asia',
       params: {
         projektiId: 43,
       },

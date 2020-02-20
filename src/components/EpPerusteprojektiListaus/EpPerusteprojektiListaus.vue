@@ -8,7 +8,7 @@
 
     <div class="d-flex flex-wrap" v-if="items">
       <div class="card-wrapper">
-        <ProjektiCard :full-background="true" :link="{ name: 'perusteprojektiLuonti' }">
+        <ProjektiCard :full-background="true" :link="newRoute">
           <div class="d-flex align-items-center flex-column h-100">
             <div class="h-50 text-center d-flex align-items-center pt-4">
               <div class="ikoni">
@@ -24,7 +24,7 @@
         </ProjektiCard>
       </div>
       <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
-        <ProjektiCard :link="{ name: 'perusteprojekti', params: { projektiId: project.id } }"
+        <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
                       :indicator="project.tila">
           <template slot="lower" class="small-text">
             {{ $t('tila-' + project.tila) }}
@@ -102,7 +102,7 @@
       <div v-if="items.data.length > 0">
         <b-table striped hover responsive :items="items.data" :fields="fields">
           <template v-slot:cell(nimi)="data">
-            <router-link :to="{ name: 'perusteprojekti', params: { projektiId: data.item.id } }">
+            <router-link :to="{ name: editRoute, params: { projektiId: data.item.id } }">
               {{ data.item.nimi }}
             </router-link>
           </template>
@@ -163,15 +163,21 @@ export default class EpPerusteprojektiListaus extends Vue {
   @Prop({ required: true })
   provider!: IProjektiProvider;
 
-  @Prop({ default: () => ['koulutustyyppi', 'tila'] })
-  filters!: ProjektiFilter[];
+  @Prop({ required: true })
+  newRoute!: any;
+
+  @Prop({ required: true })
+  editRoute!: string;
+
+  // @Prop({ default: () => ['koulutustyyppi', 'tila'] })
+  // filters!: ProjektiFilter[];
 
   private koulutustyyppi: string | null = null;
   private tila: string | null = null;
   private voimassaolo: string | null = null;
   private isLoading = false;
 
-  query = {
+  private query = {
     sivu: 0,
     sivukoko: 10,
     koulutustyyppi: undefined,
