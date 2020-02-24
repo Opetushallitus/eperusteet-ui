@@ -4,6 +4,7 @@
   <notifications style="margin-right: 6px; margin-top: 90px;"
                  position="top right"
                  :max="3" />
+  <footer> </footer>
 </div>
 </template>
 
@@ -28,4 +29,7 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
+footer {
+  height: 20px;
+}
 </style>

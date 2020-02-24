@@ -57,12 +57,12 @@
                     placeholder="kaikki"
                     :is-editing="true"
                     :options="vaihtoehdotKoulutustyypit">
-          <template slot="singleLabel" slot-scope="{ option }">
-            {{ $t(option) }}
-          </template>
-          <template slot="option" slot-scope="{ option }">
-            {{ $t(option) }}
-          </template>
+            <template slot="singleLabel" slot-scope="{ option }">
+              {{ $t(option) }}
+            </template>
+            <template slot="option" slot-scope="{ option }">
+              {{ $t(option) }}
+            </template>
           </EpMultiSelect>
         </div>
         <div class="m-2">

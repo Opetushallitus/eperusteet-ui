@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api'
-import { getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet'
+import { Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet'
 import { Page } from '@shared/tyypit'
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { Debounced } from '@shared/utils/delay';
@@ -33,6 +33,11 @@ export class PerusteStore implements IProjektiProvider {
   public async updateOwnProjects() {
     const res = await Perusteprojektit.getOmatPerusteprojektit();
     this.state.ownProjects = res.data;
+  }
+
+  public clear() {
+    this.state.ownProjects = null;
+    this.state.projects = null;
   }
 
   @Debounced(300)
