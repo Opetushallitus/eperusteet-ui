@@ -1,15 +1,14 @@
-import Vue from 'vue'
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api'
-import { getPerusteprojektit, ValidationDto, Perusteprojektit, PerusteQuery } from '@shared/api/eperusteet'
-import { Page } from '@shared/tyypit'
-import _ from 'lodash'
+import Vue from 'vue';
+import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { getPerusteprojektit, ValidationDto, Perusteprojektit, PerusteQuery } from '@shared/api/eperusteet';
+import { Page } from '@shared/tyypit';
+import _ from 'lodash';
 
-Vue.use(VueCompositionApi)
-
+Vue.use(VueCompositionApi);
 
 export class VirheellisetPerusteetStore {
   private state = reactive({
-    validations: null as Page<ValidationDto> | null,
+    validations: null as Page<ValidationDto> | null
   })
 
   public readonly validations = computed(() => this.state.validations);
@@ -22,7 +21,6 @@ export class VirheellisetPerusteetStore {
     const res = await Perusteprojektit.getVirheellisetPerusteprojektit(sivu, sivukoko);
     this.state.validations = res.data as any;
   }, 300);
-
 }
 
-export const virheellisetPerusteetStore = new VirheellisetPerusteetStore()
+export const virheellisetPerusteetStore = new VirheellisetPerusteetStore();

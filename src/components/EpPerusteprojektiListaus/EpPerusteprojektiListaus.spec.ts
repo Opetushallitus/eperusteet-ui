@@ -1,16 +1,15 @@
-import Vue from 'vue'
-import VueCompositionApi, { ref, computed, reactive } from '@vue/composition-api'
-Vue.use(VueCompositionApi)
+import Vue from 'vue';
+import VueCompositionApi, { ref, computed, reactive } from '@vue/composition-api';
 import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
 
-import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet'
+import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import EpPerusteprojektiListaus from './EpPerusteprojektiListaus.vue';
 import { IProjektiProvider } from './types';
 import * as _ from 'lodash';
-import { Page } from '@shared/tyypit'
-import '@shared/config/bootstrap'
-import '@shared/config/fontawesome'
-
+import { Page } from '@shared/tyypit';
+import '@shared/config/bootstrap';
+import '@shared/config/fontawesome';
+Vue.use(VueCompositionApi);
 
 function map<T extends Vue, R>(wrapper: WrapperArray<T>, fn: (param: Wrapper<T>) => R): R[] {
   const result = [] as R[];
@@ -20,13 +19,12 @@ function map<T extends Vue, R>(wrapper: WrapperArray<T>, fn: (param: Wrapper<T>)
   return result;
 }
 
-
 describe('Projektilistaus', () => {
   const localVue = createLocalVue();
 
   const data = reactive({
     projects: null as Page<PerusteprojektiKevytDto[]> | null,
-    ownProjects: null as PerusteprojektiListausDto[] | null,
+    ownProjects: null as PerusteprojektiListausDto[] | null
   });
 
   const store: IProjektiProvider = {
@@ -35,7 +33,7 @@ describe('Projektilistaus', () => {
     updateQuery: jest.fn(async (query: PerusteQuery) => {
     }),
     updateOwnProjects: jest.fn(async () => {
-    }),
+    })
   };
 
   test('Mounting', async () => {
@@ -43,15 +41,15 @@ describe('Projektilistaus', () => {
       propsData: {
         provider: store,
         newRoute: { name: 'luonti' },
-        editRoute: 'asia',
+        editRoute: 'asia'
       },
       localVue,
       mocks: {
-        $t: x => x,
+        $t: x => x
       },
       stubs: {
-        RouterLink: RouterLinkStub,
-      },
+        RouterLink: RouterLinkStub
+      }
     });
 
     expect(wrapper.findAll('.oph-spinner').length).toEqual(2);
@@ -66,14 +64,14 @@ describe('Projektilistaus', () => {
         id: 42,
         nimi: 'projekti 42',
         koulutustyyppi: 'koulutustyyppi_11',
-        tila: 'valmis',
-      }] as any,
+        tila: 'valmis'
+      }] as any
     };
 
     data.ownProjects = [{
       id: 43,
       nimi: 'perusteprojekti',
-      tila: 'laadinta' as any,
+      tila: 'laadinta' as any
     }];
 
     expect(wrapper.findAll('.oph-spinner').length).toEqual(1);
@@ -86,14 +84,13 @@ describe('Projektilistaus', () => {
     }, {
       name: 'asia',
       params: {
-        projektiId: 42,
-      },
+        projektiId: 42
+      }
     }, {
       name: 'asia',
       params: {
-        projektiId: 43,
-      },
+        projektiId: 43
+      }
     }]));
   });
-
 });

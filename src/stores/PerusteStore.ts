@@ -1,24 +1,23 @@
-import Vue from 'vue'
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api'
-import { Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet'
-import { Page } from '@shared/tyypit'
+import Vue from 'vue';
+import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { Debounced } from '@shared/utils/delay';
-import _ from 'lodash'
+import _ from 'lodash';
 
-Vue.use(VueCompositionApi)
-
+Vue.use(VueCompositionApi);
 
 export class PerusteStore implements IProjektiProvider {
   constructor(
-    private overrides = {} as PerusteQuery & any,
+    private overrides = {} as PerusteQuery & any
   ) {
   }
 
   private state = reactive({
     ownProjects: null as PerusteprojektiListausDto[] | null,
     projects: null as Page<PerusteprojektiKevytDto> | null,
-    perusteQuery: {} as PerusteQuery,
+    perusteQuery: {} as PerusteQuery
   })
 
   public readonly ownProjects = computed(() => {
@@ -44,9 +43,8 @@ export class PerusteStore implements IProjektiProvider {
   public async updateQuery(query: PerusteQuery) {
     const res = await getPerusteprojektit({
       ...query,
-      ...this.overrides,
+      ...this.overrides
     });
     this.state.projects = res.data as any;
   }
-
 }

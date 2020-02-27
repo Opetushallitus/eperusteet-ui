@@ -43,17 +43,16 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
-import EpSearch from '@shared/components/forms/EpSearch.vue'
-import EpButton from '@shared/components/EpButton/EpButton.vue'
-import ArviointiSelector from './ArviointiSelector.vue'
-import { ArviointiStore } from '@/stores/ArviointiStore'
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet'
-import GeneerinenArviointi from './GeneerinenArviointi.vue'
-import * as _ from 'lodash'
-
+import { Prop, Component, Vue } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import ArviointiSelector from './ArviointiSelector.vue';
+import { ArviointiStore } from '@/stores/ArviointiStore';
+import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
+import GeneerinenArviointi from './GeneerinenArviointi.vue';
+import * as _ from 'lodash';
 
 @Component({
   components: {
@@ -62,7 +61,7 @@ import * as _ from 'lodash'
     EpIcon,
     EpMainView,
     EpSearch,
-    GeneerinenArviointi,
+    GeneerinenArviointi
   }
 })
 export default class RouteGeneerinenArviointi extends Vue {
@@ -103,14 +102,13 @@ export default class RouteGeneerinenArviointi extends Vue {
 
   async addGeneerinen(arviointiAsteikko: number) {
     await this.arviointiStore.add({
-      _arviointiAsteikko: arviointiAsteikko,
+      _arviointiAsteikko: arviointiAsteikko
     } as any);
   }
 
   toggle(value?: GeneerinenArviointiasteikkoDto) {
     this.arviointiStore.toggleAll();
   }
-
 }
 </script>
 
@@ -125,4 +123,3 @@ h2 {
 }
 
 </style>
-

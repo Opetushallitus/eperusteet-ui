@@ -1,21 +1,20 @@
 import { mock } from '@/utils/tests';
-import { ref, computed, reactive } from '@vue/composition-api'
+import { ref, computed, reactive } from '@vue/composition-api';
 import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
 import { getMockGeneeriset } from './data';
 
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet'
+import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
 import RouteGeneerinenArviointi from '../RouteGeneerinenArviointi.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import * as _ from 'lodash';
-import { Page } from '@shared/tyypit'
-import '@shared/config/bootstrap'
-import '@shared/config/fontawesome'
+import { Page } from '@shared/tyypit';
+import '@shared/config/bootstrap';
+import '@shared/config/fontawesome';
 
 describe('RouteGeneerinenArviointi', () => {
   const localVue = createLocalVue();
 
   test('Mounting', async () => {
-
     const arviointiStore = mock(ArviointiStore);
     const { geneeriset, arviointiasteikot } = getMockGeneeriset();
     arviointiStore.state.arviointiasteikot = arviointiasteikot;
@@ -23,16 +22,16 @@ describe('RouteGeneerinenArviointi', () => {
 
     const wrapper = mount(RouteGeneerinenArviointi, {
       propsData: {
-        arviointiStore,
+        arviointiStore
       },
       localVue,
       mocks: {
         $t: x => x,
-        $kaanna: x => '[' + x?.fi + ']',
+        $kaanna: x => '[' + x?.fi + ']'
       },
       stubs: {
-        RouterLink: RouterLinkStub,
-      },
+        RouterLink: RouterLinkStub
+      }
     });
 
     expect(wrapper.text()).toContain('Opiskelija');
@@ -48,5 +47,4 @@ describe('RouteGeneerinenArviointi', () => {
     expect(wrapper.text()).toContain('Hyvä H4');
     expect(wrapper.text()).toContain('Kiitettävä K5');
   });
-
 });

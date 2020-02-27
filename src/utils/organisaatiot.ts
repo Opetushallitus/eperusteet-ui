@@ -1,16 +1,16 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-export function metadataToTeksti (field: string, metadata: any[]) {
-  const result: { [lang: string]: string } = {}
+export function metadataToTeksti(field: string, metadata: any[]) {
+  const result: { [lang: string]: string } = {};
   for (const data of metadata) {
     if (data[field]) {
-      result[_.toLower(data.kieli)] = data[field]
+      result[_.toLower(data.kieli)] = data[field];
     }
   }
-  return result
+  return result;
 }
 
-export const OphOid = '1.2.246.562.10.00000000001'
+export const OphOid = '1.2.246.562.10.00000000001';
 
 export const organizations = Object.freeze({
   oph: {
@@ -21,4 +21,4 @@ export const organizations = Object.freeze({
     },
     oid: OphOid
   }
-})
+});

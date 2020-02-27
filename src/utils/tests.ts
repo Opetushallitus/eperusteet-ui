@@ -1,10 +1,9 @@
-import Vue from 'vue'
-import * as _ from 'lodash'
-import VueCompositionApi from '@vue/composition-api'
-import { ref, computed, reactive } from '@vue/composition-api'
-import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
-Vue.use(VueCompositionApi)
+import Vue from 'vue';
+import * as _ from 'lodash';
+import VueCompositionApi, { ref, computed, reactive } from '@vue/composition-api';
 
+import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
+Vue.use(VueCompositionApi);
 
 type Constructable<T> = new(...params: any[]) => T;
 
@@ -20,10 +19,9 @@ export function mock<T>(X: Constructable<T>, overrides: Partial<T> = {}): T {
   }
   return {
     ...mocks,
-    ...overrides,
+    ...overrides
   };
 }
-
 
 /**
  * Allows iterating WrapperArray easily
@@ -37,5 +35,3 @@ export function map<T extends Vue, R>(wrapper: WrapperArray<T>, fn: (param: Wrap
   }
   return result;
 }
-
-

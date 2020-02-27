@@ -9,19 +9,18 @@
   </EpMainView>
 </template>
 
-
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue'
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
-import { PerusteStore } from '@/stores/PerusteStore'
+import { Prop, Component, Vue } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import { PerusteStore } from '@/stores/PerusteStore';
 
 @Component({
   components: {
     EpIcon,
     EpMainView,
-    EpPerusteprojektiListaus,
+    EpPerusteprojektiListaus
   }
 })
 export default class RouteOppaat extends Vue {
@@ -29,7 +28,6 @@ export default class RouteOppaat extends Vue {
   oppaatStore!: PerusteStore;
 }
 </script>
-
 
 <style lang="scss">
 </style>

@@ -49,18 +49,17 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
+import { Prop, Component, Vue } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore';
-
 
 @Component({
   components: {
     EpMainView,
     EpIcon,
-    EpSpinner,
+    EpSpinner
   }
 })
 export default class RouteVirheellisetPerusteet extends Vue {
@@ -88,7 +87,6 @@ export default class RouteVirheellisetPerusteet extends Vue {
       this.virheellisetPerusteetStore.updateFilters(value - 1, 10);
     }
   }
-
 }
 </script>
 

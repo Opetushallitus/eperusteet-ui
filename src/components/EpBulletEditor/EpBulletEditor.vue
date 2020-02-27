@@ -35,16 +35,14 @@ import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 
-
 @Component({
   components: {
     draggable,
     EpButton,
-    EpInput,
-  },
+    EpInput
+  }
 })
 export default class EpPrefixList extends Vue {
-
   @Prop({ required: true })
   private value!: { [lang: string]: string }[];
 
@@ -69,7 +67,6 @@ export default class EpPrefixList extends Vue {
   onInput(value: any, idx: number) {
     Vue.set(this.state, idx, value);
   }
-
 }
 </script>
 
@@ -80,4 +77,3 @@ ul {
   padding: 10px;
 }
 </style>
-

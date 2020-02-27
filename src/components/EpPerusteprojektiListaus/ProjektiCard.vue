@@ -14,22 +14,20 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator'
-import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue'
-import { Page } from '@shared/tyypit'
-import { BvTableFieldArray } from 'bootstrap-vue'
-import { IProjektiProvider } from './types'
-
+import { Prop, Component, Vue } from 'vue-property-decorator';
+import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
+import { Page } from '@shared/tyypit';
+import { BvTableFieldArray } from 'bootstrap-vue';
+import { IProjektiProvider } from './types';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
 @Component({
   components: {
-    EpColorIndicator,
+    EpColorIndicator
   }
 })
 export default class ProjektiCard extends Vue {
-
   @Prop({ default: false })
   fullBackground!: boolean;
 
@@ -47,7 +45,6 @@ export default class ProjektiCard extends Vue {
       return 'project-card d-flex flex-column h-100';
     }
   }
-
 }
 </script>
 
@@ -87,4 +84,3 @@ export default class ProjektiCard extends Vue {
 }
 
 </style>
-

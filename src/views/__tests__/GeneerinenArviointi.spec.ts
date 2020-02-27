@@ -1,22 +1,21 @@
 import { mock } from '@/utils/tests';
-import { ref, computed, reactive } from '@vue/composition-api'
+import { ref, computed, reactive } from '@vue/composition-api';
 import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
 import { getMockGeneeriset } from './data';
 
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet'
+import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
 import GeneerinenArviointi from '../GeneerinenArviointi.vue';
 import RouteGeneerinenArviointi from '../RouteGeneerinenArviointi.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import * as _ from 'lodash';
-import { Page } from '@shared/tyypit'
-import '@shared/config/bootstrap'
-import '@shared/config/fontawesome'
+import { Page } from '@shared/tyypit';
+import '@shared/config/bootstrap';
+import '@shared/config/fontawesome';
 
 describe('GeneerinenArviointi', () => {
   const localVue = createLocalVue();
 
   test('Mounting', async () => {
-
     const arviointiStore = mock(ArviointiStore);
     const { geneeriset, arviointiasteikot } = getMockGeneeriset();
     const value: GeneerinenArviointiasteikkoDto = geneeriset[0];
@@ -26,16 +25,16 @@ describe('GeneerinenArviointi', () => {
     const wrapper = mount(GeneerinenArviointi, {
       propsData: {
         value,
-        arviointiStore,
+        arviointiStore
       },
       localVue,
       mocks: {
         $t: x => x,
-        $kaanna: x => '[' + x?.fi + ']',
+        $kaanna: x => '[' + x?.fi + ']'
       },
       stubs: {
-        RouterLink: RouterLinkStub,
-      },
+        RouterLink: RouterLinkStub
+      }
     });
 
     expect(wrapper.text()).toContain('Opiskelija');
@@ -51,5 +50,4 @@ describe('GeneerinenArviointi', () => {
     expect(wrapper.text()).toContain('Hyvä H4');
     expect(wrapper.text()).toContain('Kiitettävä K5');
   });
-
 });

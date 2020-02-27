@@ -52,7 +52,7 @@
         </div>
         <div class="m-2">
           <label>{{ $t('koulutustyyppi') }}</label>
-          <EpMultiSelect v-model="koulutustyyppi" 
+          <EpMultiSelect v-model="koulutustyyppi"
                     :enable-empty-option="true"
                     placeholder="kaikki"
                     :is-editing="true"
@@ -130,20 +130,19 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
-import EpSearch from '@shared/components/forms/EpSearch.vue'
-import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue'
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
-import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue'
+import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
-import { Page } from '@shared/tyypit'
-import { BvTableFieldArray } from 'bootstrap-vue'
-import { IProjektiProvider } from './types'
+import { Page } from '@shared/tyypit';
+import { BvTableFieldArray } from 'bootstrap-vue';
+import { IProjektiProvider } from './types';
 import ProjektiCard from './ProjektiCard.vue';
-
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -155,11 +154,10 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpMultiSelect,
     EpSearch,
     EpSpinner,
-    ProjektiCard,
+    ProjektiCard
   }
 })
 export default class EpPerusteprojektiListaus extends Vue {
-
   @Prop({ required: true })
   provider!: IProjektiProvider;
 
@@ -189,7 +187,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     tila: ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
     nimi: '',
     jarjestysOrder: false,
-    jarjestysTapa: 'nimi',
+    jarjestysTapa: 'nimi'
   } as PerusteQuery;
 
   mounted() {
@@ -201,7 +199,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     this.isLoading = true;
     try {
       await this.provider.updateQuery({
-        ...query,
+        ...query
       });
     }
     finally {
@@ -214,8 +212,8 @@ export default class EpPerusteprojektiListaus extends Vue {
     this.query = {
       tila: tila
         ? [tila]
-        : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
-    }
+        : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU']
+    };
   }
 
   @Watch('voimassaolo')
@@ -224,32 +222,31 @@ export default class EpPerusteprojektiListaus extends Vue {
       voimassaolo: false,
       siirtyma: false,
       tuleva: false,
-      poistunut: false,
+      poistunut: false
     };
 
-    switch(tila) {
-      case 'tuleva':
-        this.query = { ...defaults, tuleva: true };
-        break;
-      case 'voimassaolo':
-        this.query = { ...defaults, voimassaolo: true };
-        break;
-      case 'siirtyma':
-        this.query = { ...defaults, siirtyma: true };
-        break;
-      case 'poistunut':
-        this.query = { ...defaults, poistunut: true };
-        break;
-      default:
-        this.query = {
-          ...defaults,
-          voimassaolo: true,
-          tuleva: true,
-          siirtyma: true,
-        };
-        break;
+    switch (tila) {
+    case 'tuleva':
+      this.query = { ...defaults, tuleva: true };
+      break;
+    case 'voimassaolo':
+      this.query = { ...defaults, voimassaolo: true };
+      break;
+    case 'siirtyma':
+      this.query = { ...defaults, siirtyma: true };
+      break;
+    case 'poistunut':
+      this.query = { ...defaults, poistunut: true };
+      break;
+    default:
+      this.query = {
+        ...defaults,
+        voimassaolo: true,
+        tuleva: true,
+        siirtyma: true
+      };
+      break;
     }
-
   }
 
   @Watch('koulutustyyppi')
@@ -271,7 +268,7 @@ export default class EpPerusteprojektiListaus extends Vue {
       'tuleva',
       'voimassaolo',
       'siirtyma',
-      'poistunut',
+      'poistunut'
     ];
   }
 
@@ -318,41 +315,40 @@ export default class EpPerusteprojektiListaus extends Vue {
       sortable: true,
       formatter(value: any, key: string, item: PerusteprojektiKevytDto) {
         return item.nimi;
-      },
+      }
     }, {
       key: 'koulutustyyppi',
       sortable: true,
-      label: this.$t('koulutustyyppi') as string,
+      label: this.$t('koulutustyyppi') as string
     }, {
       key: 'tila',
       sortable: true,
       label: this.$t('tila') as string,
       formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
         return this.$t('tila-' + item!.tila);
-      },
+      }
     }, {
       key: 'luotu',
       sortable: true,
       label: this.$t('luotu') as string,
-      formatter: dateFormatter,
+      formatter: dateFormatter
     }, {
       key: 'globalVersion.aikaleima',
       sortable: true,
       label: this.$t('muokattu') as string,
-      formatter: dateFormatter,
+      formatter: dateFormatter
     }, {
       key: 'peruste.voimassaoloAlkaa',
       sortable: true,
       label: this.$t('voimassaolo-alkaa') as string,
-      formatter: dateFormatter,
+      formatter: dateFormatter
     }, {
       key: 'peruste.voimassaoloLoppuu',
       sortable: true,
       label: this.$t('voimassaolo-loppuu') as string,
-      formatter: dateFormatter,
+      formatter: dateFormatter
     }];
   }
-
 }
 </script>
 

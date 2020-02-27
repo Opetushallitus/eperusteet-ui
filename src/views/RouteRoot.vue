@@ -9,9 +9,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue'
-import { Kayttajat } from '@/stores/kayttaja'
+import { Component, Vue } from 'vue-property-decorator';
+import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
+import { Kayttajat } from '@/stores/kayttaja';
 
 @Component({
   components: {

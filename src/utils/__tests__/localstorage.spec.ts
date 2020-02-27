@@ -2,7 +2,7 @@ import {
   setItem,
   getItem,
   removeItem
-} from '../localstorage'
+} from '../localstorage';
 
 describe('Localstorage', () => {
   test('Typed set/get/remove', () => {
@@ -22,17 +22,17 @@ describe('Localstorage', () => {
       vals: [{
         value: 5
       }]
-    }
+    };
 
-    setItem('val', val)
-    const val2 = getItem<typeof val>('val')
-    expect(val2).toBeTruthy()
+    setItem('val', val);
+    const val2 = getItem<typeof val>('val');
+    expect(val2).toBeTruthy();
 
     if (val2) {
-      expect(val2.name).toEqual('foobar')
-      expect(val2.vals[0].value).toEqual(5)
-      removeItem('val')
-      expect(getItem('val')).toBeNull()
+      expect(val2.name).toEqual('foobar');
+      expect(val2.vals[0].value).toEqual(5);
+      removeItem('val');
+      expect(getItem('val')).toBeNull();
     }
-  })
-})
+  });
+});

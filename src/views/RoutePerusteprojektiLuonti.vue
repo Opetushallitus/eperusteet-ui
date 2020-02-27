@@ -9,7 +9,7 @@
             <div v-if="tyyppi === 'pohjasta'">
               <EpMultiSelect
                 v-if="pohjat"
-                v-model="data.peruste" 
+                v-model="data.peruste"
                 :placeholder="$t('valitse-pohja')"
                 :is-editing="true"
                 :options="pohjat">
@@ -27,7 +27,7 @@
             <div v-if="tyyppi === 'perusteesta'">
               <EpMultiSelect
                 v-if="perusteet"
-                v-model="data.peruste" 
+                v-model="data.peruste"
                 :placeholder="$t('valitse-peruste')"
                 :is-editing="true"
                 :options="perusteet">
@@ -62,7 +62,7 @@
           </b-form-group>
 
           <b-form-group :label="$t('koulutus-tutkintotyyppi') + '*'" required>
-            <EpMultiSelect v-model="data.koulutustyyppi" 
+            <EpMultiSelect v-model="data.koulutustyyppi"
                            :placeholder="$t('valitse-koulutustyyppi')"
                            :search-identity="tyoryhmaSearchIdentity"
                            :is-editing="true"
@@ -83,7 +83,7 @@
           </b-form-group>
 
           <b-form-group :label="$t('perustetyoryhma') + '*'" required>
-            <EpMultiSelect v-model="data.tyoryhma" 
+            <EpMultiSelect v-model="data.tyoryhma"
                            v-if="tyoryhmat"
                            :placeholder="$t('valitse-tyoryhma')"
                            :search-identity="tyoryhmaSearchIdentity"
@@ -135,7 +135,7 @@
               </b-form-group>
             </div>
             <div>
-              <b-form-group :label="' '">
+              <b-form-group :label="tavoiteHeading">
                 <ep-button @click="poistaTavoite(idx)" variant="link" icon="roskalaatikko"></ep-button>
               </b-form-group>
             </div>
@@ -192,27 +192,26 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
-import EpSearch from '@shared/components/forms/EpSearch.vue'
-import EpSelect from '@shared/components/forms/EpSelect.vue'
-import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue'
-import EpInput from '@shared/components/forms/EpInput.vue'
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
-import EpButton from '@shared/components/EpButton/EpButton.vue'
-import EpSteps from '@shared/components/EpSteps/EpSteps.vue'
-import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue'
-import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue'
+import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpSelect from '@shared/components/forms/EpSelect.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpSteps from '@shared/components/EpSteps/EpSteps.vue';
+import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
+import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
-import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore'
+import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
-import { Page } from '@shared/tyypit'
-import { BvTableFieldArray } from 'bootstrap-vue'
-import * as _ from 'lodash'
-
+import { Page } from '@shared/tyypit';
+import { BvTableFieldArray } from 'bootstrap-vue';
+import * as _ from 'lodash';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -228,11 +227,10 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSearch,
     EpSelect,
     EpSpinner,
-    EpSteps,
+    EpSteps
   }
 })
 export default class RoutePerusteprojektiLuonti extends Vue {
-
   @Prop({ required: true })
   pohjatStore!: PerusteStore;
 
@@ -246,7 +244,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   ulkopuolisetStore!: UlkopuolisetStore;
 
   private data: any = {
-    tavoitepaivamaarat: [] as any[],
+    tavoitepaivamaarat: [] as any[]
   };
   private tyyppi: 'pohjasta' | 'perusteesta' | 'uusi' | null = null;
 
@@ -254,7 +252,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     this.ulkopuolisetStore.fetchTyoryhmat();
     await Promise.all([
       this.perusteprojektiStore.fetchPohjat(),
-      this.perusteprojektiStore.fetchPohjaProjektit(),
+      this.perusteprojektiStore.fetchPohjaProjektit()
     ]);
 
     if (this.pohjat && this.pohjat?.length > 0) {
@@ -272,7 +270,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   onTyyppiChange() {
     this.data = {
       ...this.data,
-      pohja: null,
+      pohja: null
     };
   }
 
@@ -295,15 +293,15 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     }, {
       key: 'tiedot',
       name: this.$t('projektin-tiedot'),
-      description: this.$t('projektin-tiedot-kuvaus'),
+      description: this.$t('projektin-tiedot-kuvaus')
     }, {
       key: 'aikataulu',
       name: this.$t('aikataulu'),
-      description: this.$t('aikataulu-kuvaus'),
+      description: this.$t('aikataulu-kuvaus')
     }, {
       key: 'yhteenveto',
       name: this.$t('yhteenveto'),
-      description: this.$t('yhteenveto-kuvaus'),
+      description: this.$t('yhteenveto-kuvaus')
     }];
   }
 
@@ -322,28 +320,32 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   get tapahtumat() {
     return [{
       tapahtuma: 'luominen',
-      tapahtumapaiva: new Date(),
+      tapahtumapaiva: new Date()
     }, {
       tapahtuma: 'tavoite',
       tavoite: 'peruste-astuu-voimaan',
-      tapahtumapaiva: this.data.voimassaoloAlkaa && new Date(this.data.voimassaoloAlkaa),
+      tapahtumapaiva: this.data.voimassaoloAlkaa && new Date(this.data.voimassaoloAlkaa)
     }, {
       tapahtuma: 'julkaisu',
       tavoite: 'perusteen-arvioitu-julkaisupaiva',
-      tapahtumapaiva: this.data.paatosPvm && new Date(this.data.paatosPvm),
+      tapahtumapaiva: this.data.paatosPvm && new Date(this.data.paatosPvm)
     }, {
       tapahtuma: 'tavoite',
       tavoite: 'lausuntokierros-alkaa',
-      tapahtumapaiva: this.data.lausuntakierrosAlkaa && new Date(this.data.lausuntakierrosAlkaa),
+      tapahtumapaiva: this.data.lausuntakierrosAlkaa && new Date(this.data.lausuntakierrosAlkaa)
     }, {
       tapahtuma: 'tavoite',
       tavoite: 'johtokunnan-kasittely',
-      tapahtumapaiva: this.data.johtokunnanKasittely && new Date(this.data.johtokunnanKasittely),
+      tapahtumapaiva: this.data.johtokunnanKasittely && new Date(this.data.johtokunnanKasittely)
     }, ...this.data.tavoitepaivamaarat];
   }
 
   poistaTavoite(idx: number) {
     this.data.tavoitepaivamaarat = _.without(this.data.tavoitepaivamaarat, idx);
+  }
+
+  get tavoiteHeading() {
+    return ' ';
   }
 
   async onSave() {
@@ -358,14 +360,14 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       laajuusYksikko: 'OSAAMISPISTE' as any,
       ryhmaOid: this.data.tyoryhma.oid,
       voimassaoloAlkaa: this.data.voimassaoloAlkaa,
-      yhteistyotaho: this.data.paatosPvm,
+      yhteistyotaho: this.data.paatosPvm
     });
     console.log('saving ', this.data);
     this.$router.push({
       name: 'perusteprojekti',
       params: {
-        projektiId: '' + luotu.id,
-      },
+        projektiId: '' + luotu.id
+      }
     });
   }
 
@@ -374,12 +376,10 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       ...this.data.tavoitepaivamaarat, {
         tapahtuma: 'tavoite',
         tavoite: '',
-        tapahtumapaiva: new Date(),
-      },
+        tapahtumapaiva: new Date()
+      }
     ];
-
   }
-
 }
 </script>
 
@@ -394,4 +394,3 @@ export default class RoutePerusteprojektiLuonti extends Vue {
 }
 
 </style>
-

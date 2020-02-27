@@ -21,16 +21,15 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
-import { ArviointiStore } from '@/stores/ArviointiStore'
-
+import { Prop, Component, Vue } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import { ArviointiStore } from '@/stores/ArviointiStore';
 
 @Component({
   components: {
     EpMainView,
-    EpIcon,
+    EpIcon
   }
 })
 export default class RouteArviointiasteikot extends Vue {
@@ -49,10 +48,8 @@ export default class RouteArviointiasteikot extends Vue {
   get geneeriset() {
     return this.arviointiStore.geneeriset.value;
   }
-
 }
 </script>
 
 <style lang="scss">
 </style>
-

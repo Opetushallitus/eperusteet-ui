@@ -1,17 +1,16 @@
-import Vue from 'vue'
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api'
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet'
-import { Page } from '@shared/tyypit'
-import { KieliStore } from '@shared/stores/kieli'
-import { Debounced } from '@shared/utils/delay'
-import _ from 'lodash'
+import Vue from 'vue';
+import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
+import { Page } from '@shared/tyypit';
+import { KieliStore } from '@shared/stores/kieli';
+import { Debounced } from '@shared/utils/delay';
+import _ from 'lodash';
 
-Vue.use(VueCompositionApi)
-
+Vue.use(VueCompositionApi);
 
 export class ArviointiStore {
   constructor(
-    private kieliStore: KieliStore,
+    private kieliStore: KieliStore
   ) {
   }
 
@@ -19,7 +18,7 @@ export class ArviointiStore {
     arviointiasteikot: null as ArviointiAsteikkoDto[] | null,
     geneeriset: null as GeneerinenArviointiasteikkoDto[] | null,
     closed: {} as { [id: number]: boolean },
-    filterStr: '',
+    filterStr: ''
   })
 
   public readonly arviointiasteikot = computed(() => this.state.arviointiasteikot);
@@ -106,7 +105,7 @@ export class ArviointiStore {
     try {
       const res = await GeneerinenArviointiasteikko.updateGeneerinenArviontiasteikko(value.id!, {
         ...value,
-        julkaistu: true,
+        julkaistu: true
       });
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
       Vue.set(this.state.geneeriset!, idx, res.data);
@@ -128,5 +127,4 @@ export class ArviointiStore {
       // Vue.$fail(Vue.$t('geneerinen-arviointiasteikko-poistettu-fail'));
     }
   }
-
 }

@@ -26,23 +26,22 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
-import EpButton from '@shared/components/EpButton/EpButton.vue'
-import { ArviointiStore } from '@/stores/ArviointiStore'
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet'
-import { BvTableFieldArray } from 'bootstrap-vue'
+import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import { ArviointiStore } from '@/stores/ArviointiStore';
+import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
+import { BvTableFieldArray } from 'bootstrap-vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import * as _ from 'lodash'
-
+import * as _ from 'lodash';
 
 @Component({
   components: {
     EpButton,
     EpInput,
     EpMainView,
-    EpSpinner,
+    EpSpinner
   }
 })
 export default class GeneerinenArviointi extends Vue {
@@ -81,10 +80,8 @@ export default class GeneerinenArviointi extends Vue {
   onOpen() {
     (this.$refs.modal as any).show();
   }
-
 }
 </script>
 
 <style lang="scss" scoped>
 </style>
-

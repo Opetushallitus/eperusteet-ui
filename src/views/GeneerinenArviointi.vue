@@ -31,7 +31,7 @@
             :fields="fields">
 
           <template v-slot:table-colgroup="scope">
-            <col v-for="field in scope.fields" :key="field.key" :style="{ width: field.key === 'osaamistaso' && '160px' }"></col>
+            <col v-for="field in scope.fields" :key="field.key" :style="{ width: field.key === 'osaamistaso' && '160px' }" />
           </template>
 
           <template v-slot:cell(osaamistaso)="data">
@@ -70,17 +70,16 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
-import EpBulletEditor from '@/components/EpBulletEditor/EpBulletEditor.vue'
-import EpButton from '@shared/components/EpButton/EpButton.vue'
-import { ArviointiStore } from '@/stores/ArviointiStore'
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet'
-import { BvTableFieldArray } from 'bootstrap-vue'
+import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpBulletEditor from '@/components/EpBulletEditor/EpBulletEditor.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import { ArviointiStore } from '@/stores/ArviointiStore';
+import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
+import { BvTableFieldArray } from 'bootstrap-vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import * as _ from 'lodash'
-
+import * as _ from 'lodash';
 
 @Component({
   components: {
@@ -88,7 +87,7 @@ import * as _ from 'lodash'
     EpButton,
     EpInput,
     EpMainView,
-    EpSpinner,
+    EpSpinner
   }
 })
 export default class GeneerinenArviointi extends Vue {
@@ -120,7 +119,7 @@ export default class GeneerinenArviointi extends Vue {
       return _.map(asteikko.osaamistasot, ot => ({
         ...ot,
         kriteerit: _.find(this.value.osaamistasonKriteerit,
-          k => '' + (k as any)._osaamistaso === '' + ot.id)?.kriteerit || [],
+          k => '' + (k as any)._osaamistaso === '' + ot.id)?.kriteerit || []
       }));
     }
     return null;
@@ -130,11 +129,11 @@ export default class GeneerinenArviointi extends Vue {
     return [{
       key: 'osaamistaso',
       label: this.$t('osaamistaso') as string,
-      sortable: false,
+      sortable: false
     }, {
       key: 'kriteerit',
       label: this.$t('kriteerit') as string,
-      sortable: false,
+      sortable: false
     }];
   }
 
@@ -172,7 +171,7 @@ export default class GeneerinenArviointi extends Vue {
         title: this.$t('julkaistaanko-geneerinen-arviointi') as any,
         okTitle: this.$t('julkaise') as any,
         cancelTitle: this.$t('peruuta') as any,
-        size: 'lg',
+        size: 'lg'
       });
     this.isEditing = false;
     await this.arviointiStore.publish(this.inner!);
@@ -184,7 +183,7 @@ export default class GeneerinenArviointi extends Vue {
         title: this.$t('poistetaanko-geneerinen-arviointi') as any,
         okTitle: this.$t('poista') as any,
         cancelTitle: this.$t('peruuta') as any,
-        size: 'lg',
+        size: 'lg'
       });
     await this.arviointiStore.remove(this.inner!);
   }
@@ -195,15 +194,14 @@ export default class GeneerinenArviointi extends Vue {
         title: this.$t('kopioi-geneerinen-arviointi') as any,
         okTitle: this.$t('kopioi') as any,
         cancelTitle: this.$t('peruuta') as any,
-        size: 'lg',
+        size: 'lg'
       });
     await this.arviointiStore.add({
       ...this.inner!,
       julkaistu: false,
-      id: undefined,
+      id: undefined
     });
   }
-
 }
 </script>
 

@@ -19,11 +19,11 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue'
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
-import { TiedotteetStore } from '@/stores/tiedotteet'
-import _ from 'lodash'
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import { TiedotteetStore } from '@/stores/tiedotteet';
+import _ from 'lodash';
 
 @Component({
   components: {
@@ -35,20 +35,20 @@ export default class TileTiedotteet extends Vue {
   @Prop({ required: true })
   private tiedotteetStore!: TiedotteetStore;
 
-  mounted () {
-    this.tiedotteetStore.fetch()
+  mounted() {
+    this.tiedotteetStore.fetch();
   }
 
-  get isLoading () {
-    return !!this.tiedotteet
+  get isLoading() {
+    return !!this.tiedotteet;
   }
 
-  get tiedotteet () {
-    return this.tiedotteetStore.tiedotteet.value
+  get tiedotteet() {
+    return this.tiedotteetStore.tiedotteet.value;
   }
 
-  get viimeisimmatTiedotteet () {
-    return _.take(this.tiedotteet, 3)
+  get viimeisimmatTiedotteet() {
+    return _.take(this.tiedotteet, 3);
   }
 }
 </script>

@@ -1,3 +1,5 @@
+const { rules } = require('./eperusteet-frontend-utils/vue/eslint-rules');
+
 module.exports = {
   root: true,
   env: {
@@ -9,8 +11,9 @@ module.exports = {
     '@vue/typescript'
   ],
   rules: {
+    ...rules,
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
   parserOptions: {
     parser: '@typescript-eslint/parser'

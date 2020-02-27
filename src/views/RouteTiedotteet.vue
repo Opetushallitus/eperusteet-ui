@@ -162,33 +162,33 @@
 </template>
 
 <script lang="ts">
-import { Prop, Vue, Component, Mixins, Watch } from 'vue-property-decorator'
-import _ from 'lodash'
+import { Prop, Vue, Component, Mixins, Watch } from 'vue-property-decorator';
+import _ from 'lodash';
 
-import EpButton from '@shared/components/EpButton/EpButton.vue'
-import EpContent from '@shared/components/EpContent/EpContent.vue'
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue'
-import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue'
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue'
-import EpSearch from '@shared/components/forms/EpSearch.vue'
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue'
-import EpFormContent from '@shared/components/forms/EpFormContent.vue'
-import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue'
-import EpInput from '@shared/components/forms/EpInput.vue'
-import EpField from '@shared/components/forms/EpField.vue'
-import EpMultiListSelect from '@shared/components/forms/EpMultiListSelect.vue'
-import EpSelect from '@shared/components/forms/EpSelect.vue'
-import EpToggle from '@shared/components/forms/EpToggle.vue'
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpContent from '@shared/components/EpContent/EpContent.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpFormContent from '@shared/components/forms/EpFormContent.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
+import EpField from '@shared/components/forms/EpField.vue';
+import EpMultiListSelect from '@shared/components/forms/EpMultiListSelect.vue';
+import EpSelect from '@shared/components/forms/EpSelect.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 
-import { themes, ktToState } from '@shared/utils/perusteet'
-import { TutoriaaliStore } from '@shared/stores/tutoriaali'
-import { Perusteet, Kayttajat, PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/eperusteet'
-import { Kielet } from '@shared/stores/kieli'
-import { success, fail } from '@/utils/notifications'
-import { TiedotteetStore } from '@/stores/tiedotteet'
-import { required } from 'vuelidate/lib/validators'
-import { validationMixin } from 'vuelidate'
-import { parsiEsitysnimi } from '@/stores/kayttaja'
+import { themes, ktToState } from '@shared/utils/perusteet';
+import { TutoriaaliStore } from '@shared/stores/tutoriaali';
+import { Perusteet, Kayttajat, PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/eperusteet';
+import { Kielet } from '@shared/stores/kieli';
+import { success, fail } from '@/utils/notifications';
+import { TiedotteetStore } from '@/stores/tiedotteet';
+import { required } from 'vuelidate/lib/validators';
+import { validationMixin } from 'vuelidate';
+import { parsiEsitysnimi } from '@/stores/kayttaja';
 
 interface KoulutustyyppiTaiTutkinto {
   type: string,
@@ -199,7 +199,7 @@ const julkaisupaikkaSort = {
   'opintopolku': 1,
   'ops': 2,
   'amosaa': 3
-}
+};
 
 @Component({
   components: {
@@ -255,19 +255,19 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
   private amosaaJulkaisu: boolean = false;
 
   async mounted() {
-    this.tiedotteetStore.fetch()
-    const res = (await Perusteet.getAllPerusteet() as any).data
-    this.perusteet = res.data
+    this.tiedotteetStore.fetch();
+    const res = (await Perusteet.getAllPerusteet() as any).data;
+    this.perusteet = res.data;
   }
 
   @Watch('opintopolkuJulkaisu')
-  async onValueChanged (newVal: any) {
+  async onValueChanged(newVal: any) {
     if (!newVal) {
-      this.opintopolkuJulkaisuEtusivu = false
+      this.opintopolkuJulkaisuEtusivu = false;
     }
   }
 
-  get tiedotteetFiltered () {
+  get tiedotteetFiltered() {
     return _.chain(this.tiedotteetStore.tiedotteet.value)
       .filter(tiedote => !this.nimiFilter || (!_.isEmpty(tiedote.otsikko) && Kielet.search(this.nimiFilter, tiedote.otsikko)))
       .filter(tiedote => _.isEmpty(this.valitutJulkaisuPaikatValues) || _.some(this.valitutJulkaisuPaikatValues, (filter) => _.includes(tiedote.julkaisupaikat, filter)))
@@ -279,30 +279,30 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
             .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
             .value(),
           opintopolkuEtusivu: _.includes((tiedote.julkaisupaikat as any), 'opintopolku_etusivu')
-        }
+        };
       })
-      .value()
+      .value();
   }
 
-  get valitutJulkaisuPaikatValues () {
-    return _.map(this.valitutJulkaisupaikat, 'value')
+  get valitutJulkaisuPaikatValues() {
+    return _.map(this.valitutJulkaisupaikat, 'value');
   }
 
-  get julkaisupaikatItems () {
+  get julkaisupaikatItems() {
     return [
       { text: this.$t('tiedote-julkaisupaikka-opintopolku'), value: 'opintopolku' },
       { text: this.$t('tiedote-julkaisupaikka-ops'), value: 'ops' },
       { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: 'amosaa' }
-    ]
+    ];
   }
 
-  get tableFields () {
+  get tableFields() {
     return [{
       key: 'luotu',
       label: this.$t('julkaistu'),
       sortable: true,
       formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sdt(value)
+        return (this as any).$sdt(value);
       }
     }, {
       key: 'muokattu',
@@ -310,10 +310,10 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       sortable: true,
       formatter: (value: any, key: any, item: any) => {
         if (item.luotu !== item.muokattu) {
-          return (this as any).$sdt(value)
+          return (this as any).$sdt(value);
         }
 
-        return ''
+        return '';
       }
     }, {
       key: 'otsikko',
@@ -322,7 +322,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       sortByFormatted: true,
       thStyle: { width: '35%' },
       formatter: (value: any, key: any, item: any) => {
-        return (this as any).$kaanna(value)
+        return (this as any).$kaanna(value);
       }
     }, {
       key: 'filteredJulkaisupaikat',
@@ -331,12 +331,12 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       thStyle: { width: '35%' },
       sortByFormatted: true,
       formatter: (value: any, key: any, item: any) => {
-        return _.join(_.map(value, (julkaisupaikka) => this.$t(julkaisupaikka)), ', ')
+        return _.join(_.map(value, (julkaisupaikka) => this.$t(julkaisupaikka)), ', ');
       }
-    }]
+    }];
   }
 
-  get koulutustyyppiTaiTutkintoItems () {
+  get koulutustyyppiTaiTutkintoItems() {
     return [
       ..._.chain(_.keys(ktToState))
         .map((koulutustyyppi) => {
@@ -358,104 +358,105 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
                     object: peruste.id
                   },
                   child: true
-                }
+                };
               })
               .value()
-          ]
+          ];
         })
         .flatten()
         .value()
-    ]
+    ];
   }
 
-  async tallennaTiedote () {
+  async tallennaTiedote() {
     this.muokattavaTiedote.julkaisupaikat = _.chain(['opintopolku', 'opintopolku_etusivu', 'ops', 'amosaa'])
       .filter(value => value !== 'opintopolku' || this.opintopolkuJulkaisu)
       .filter(value => value !== 'opintopolku_etusivu' || this.opintopolkuJulkaisuEtusivu)
       .filter(value => value !== 'ops' || this.opsJulkaisu)
       .filter(value => value !== 'amosaa' || this.amosaaJulkaisu)
-      .value() as any
+      .value() as any;
 
-    this.muokattavaTiedote.koulutustyypit = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'koulutustyyppi'), 'object')
-    const perusteetIdlla = _.keyBy(this.perusteet, 'id')
-    this.muokattavaTiedote.perusteet = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'peruste'), (koulutustyyppitutkinto) => this.perusteHakuToInfo(perusteetIdlla[koulutustyyppitutkinto.object]))
+    this.muokattavaTiedote.koulutustyypit = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'koulutustyyppi'), 'object');
+    const perusteetIdlla = _.keyBy(this.perusteet, 'id');
+    this.muokattavaTiedote.perusteet = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'peruste'), (koulutustyyppitutkinto) => this.perusteHakuToInfo(perusteetIdlla[koulutustyyppitutkinto.object]));
 
     if (!(this.opintopolkuJulkaisuKoulutustyyppiTutkinto && !_.isEmpty(this.muokattavaTiedote.koulutustyypit))) {
-      this.muokattavaTiedote.koulutustyypit = []
-      this.muokattavaTiedote.perusteet = []
+      this.muokattavaTiedote.koulutustyypit = [];
+      this.muokattavaTiedote.perusteet = [];
     }
 
-    await this.tiedotteetStore.save(this.muokattavaTiedote)
+    await this.tiedotteetStore.save(this.muokattavaTiedote);
 
-    this.suljeTiedote()
-    success('tiedote-tallennettu')
+    this.suljeTiedote();
+    success('tiedote-tallennettu');
   }
 
-  private perusteHakuToInfo (perusteHaku: PerusteHakuDto): PerusteKevytDto {
+  private perusteHakuToInfo(perusteHaku: PerusteHakuDto): PerusteKevytDto {
     return {
       id: perusteHaku.id
-    } as PerusteKevytDto
+    } as PerusteKevytDto;
   }
 
-  suljeTiedote () {
+  suljeTiedote() {
     this.editing = false;
-    (this as any).$refs.tiedoteMuokkausModal.hide()
+    (this as any).$refs.tiedoteMuokkausModal.hide();
   }
 
-  aloitaMuokkaus () {
-    this.editing = true
+  aloitaMuokkaus() {
+    this.editing = true;
   }
 
-  lisaaTiedote () {
-    this.muokkaa({})
-    this.aloitaMuokkaus()
+  lisaaTiedote() {
+    this.muokkaa({});
+    this.aloitaMuokkaus();
   }
 
-  async muokkaa (rivi: any) {
-    this.muokattavaTiedote = _.cloneDeep(rivi)
-    this.opintopolkuJulkaisu = _.includes(rivi.julkaisupaikat, 'opintopolku')
-    this.opsJulkaisu = _.includes(rivi.julkaisupaikat, 'ops')
-    this.amosaaJulkaisu = _.includes(rivi.julkaisupaikat, 'amosaa')
-    this.opintopolkuJulkaisuEtusivu = _.includes(rivi.julkaisupaikat, 'opintopolku_etusivu')
-    this.opintopolkuJulkaisuKoulutustyyppiTutkinto = !_.isEmpty(rivi.koulutustyypit)
+  async muokkaa(rivi: any) {
+    this.muokattavaTiedote = _.cloneDeep(rivi);
+    this.opintopolkuJulkaisu = _.includes(rivi.julkaisupaikat, 'opintopolku');
+    this.opsJulkaisu = _.includes(rivi.julkaisupaikat, 'ops');
+    this.amosaaJulkaisu = _.includes(rivi.julkaisupaikat, 'amosaa');
+    this.opintopolkuJulkaisuEtusivu = _.includes(rivi.julkaisupaikat, 'opintopolku_etusivu');
+    this.opintopolkuJulkaisuKoulutustyyppiTutkinto = !_.isEmpty(rivi.koulutustyypit);
 
     this.koulutustyypitTaiTutkinnot = [
       ..._.map(rivi.koulutustyypit, (koulutustyyppi) => {
         return {
           type: 'koulutustyyppi',
           object: koulutustyyppi
-        }
+        };
       }),
       ..._.map(rivi.perusteet, (peruste) => {
         return {
           type: 'peruste',
           object: peruste.id
-        }
+        };
       })
-    ]
+    ];
 
     if (this.muokattavaTiedote.luotu) {
-      const kayttaja = (await Kayttajat.getKayttaja((this.muokattavaTiedote.muokkaaja as any))).data
+      const kayttaja = (await Kayttajat.getKayttaja((this.muokattavaTiedote.muokkaaja as any))).data;
       if (kayttaja) {
-        this.muokkaavanKayttajanNimi = parsiEsitysnimi(kayttaja)
-      } else {
-        this.muokkaavanKayttajanNimi = (this.muokattavaTiedote.muokkaaja as any)
+        this.muokkaavanKayttajanNimi = parsiEsitysnimi(kayttaja);
+      }
+      else {
+        this.muokkaavanKayttajanNimi = (this.muokattavaTiedote.muokkaaja as any);
       }
     }
 
-    (this as any).$refs.tiedoteMuokkausModal.show()
+    (this as any).$refs.tiedoteMuokkausModal.show();
   }
 
-  async poista () {
-    this.suljeTiedote()
+  async poista() {
+    this.suljeTiedote();
 
     if (await this.vahvistaPoisto()) {
-      await this.tiedotteetStore.delete(this.muokattavaTiedote)
-      success('tiedote-poistettu')
+      await this.tiedotteetStore.delete(this.muokattavaTiedote);
+      success('tiedote-poistettu');
     }
   }
 
-  public async vahvistaPoisto () {
+  public async vahvistaPoisto() {
     const vahvistusSisalto = this.$createElement('div', {},
       [
         this.$createElement('div', this.$t('poista-tiedote-vahvistus') as string),
@@ -463,7 +464,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
         this.$createElement('br', ''),
         this.$createElement('div', this.$t('poista-tiedote-varmistus') as string)
       ]
-    ).children
+    ).children;
 
     return this.$bvModal.msgBoxConfirm((vahvistusSisalto as any), {
       title: this.$t('poista-tiedote-kysymys'),
@@ -473,7 +474,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       cancelTitle: this.$t('peruuta') as any,
       centered: true,
       ...{} as any
-    })
+    });
   }
 }
 </script>
