@@ -22,7 +22,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import { TiedotteetStore } from '@/stores/tiedotteet';
+import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import _ from 'lodash';
 
 @Component({

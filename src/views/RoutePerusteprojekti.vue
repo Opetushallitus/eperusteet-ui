@@ -113,9 +113,13 @@ export default class RoutePerusteprojekti extends Vue {
 
   private naviStore: EpTreeNavibarStore | null = null;
 
+  private loading = false;
+
   @Watch('projektiId', { immediate: true })
   async onProjektiChange(value: number) {
+    this.loading = true;
     await this.perusteStore.init(value);
+    this.loading = false;
     this.naviStore = new EpTreeNavibarStore(this.perusteStore.navigation);
   }
 

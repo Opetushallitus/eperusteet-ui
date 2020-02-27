@@ -8,9 +8,29 @@ Vue.use(VueCompositionApi);
 export class TiedotteetStore {
   private state = reactive({
     tiedotteet: null as TiedoteDto[] | null,
+    perusteenTiedotteet: null as TiedoteDto[] | null,
   })
 
   public readonly tiedotteet = computed(() => this.state.tiedotteet);
+  public readonly perusteenTiedotteet = computed(() => this.state.perusteenTiedotteet);
+
+  async init(perusteId: number) {
+    this.state.perusteenTiedotteet = null;
+    const res = (await Tiedotteet.findTiedotteetBy(
+      0,
+      99999,
+      undefined, // kieli
+      undefined, // nimi
+      undefined, // perusteId
+      undefined, // perusteeton
+      undefined, // julkinen
+      undefined, // yleinen
+      undefined, // julkaisupaikat
+      [perusteId] // perusteet
+    )).data as any;
+
+    this.state.perusteenTiedotteet = res.data;
+  }
 
   public async fetch() {
     const res = (await Tiedotteet.findTiedotteetBy(
@@ -46,5 +66,3 @@ export class TiedotteetStore {
     }
   }
 }
-
-export const tiedotteetStore = new TiedotteetStore();

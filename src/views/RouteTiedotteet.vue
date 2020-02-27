@@ -185,7 +185,7 @@ import { TutoriaaliStore } from '@shared/stores/tutoriaali';
 import { Perusteet, Kayttajat, PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
 import { success, fail } from '@/utils/notifications';
-import { TiedotteetStore } from '@/stores/tiedotteet';
+import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { required } from 'vuelidate/lib/validators';
 import { validationMixin } from 'vuelidate';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
@@ -380,7 +380,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
     const perusteetIdlla = _.keyBy(this.perusteet, 'id');
     this.muokattavaTiedote.perusteet = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'peruste'), (koulutustyyppitutkinto) => this.perusteHakuToInfo(perusteetIdlla[koulutustyyppitutkinto.object]));
 
-    if (!(this.opintopolkuJulkaisuKoulutustyyppiTutkinto && !_.isEmpty(this.muokattavaTiedote.koulutustyypit))) {
+    if (!this.opintopolkuJulkaisuKoulutustyyppiTutkinto) {
       this.muokattavaTiedote.koulutustyypit = [];
       this.muokattavaTiedote.perusteet = [];
     }
