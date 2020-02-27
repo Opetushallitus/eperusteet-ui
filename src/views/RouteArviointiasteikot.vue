@@ -1,6 +1,13 @@
 <template>
   <div>
-    asteikot
+    <div class="asteikko mt-4" v-for="(asteikko, idx) in arviointiasteikot" :key="idx">
+      <span class="text-nowrap">
+        <span v-for="(taso, idx) in asteikko.osaamistasot" :key="'taso-' + taso.id">
+          <span v-if="idx !== 0" class="text-muted">/</span>
+          {{ $kaanna(taso.otsikko) }}
+        </span>
+      </span>
+    </div>
   </div>
 </template>
 
@@ -36,4 +43,10 @@ export default class RouteArviointiasteikot extends Vue {
 </script>
 
 <style lang="scss">
+.asteikko {
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  box-shadow: 3px 3px 10px #eee;
+}
 </style>
