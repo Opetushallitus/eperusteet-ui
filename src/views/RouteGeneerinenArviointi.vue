@@ -102,7 +102,9 @@ export default class RouteGeneerinenArviointi extends Vue {
   }
 
   async addGeneerinen(arviointiAsteikko: number) {
-    await this.arviointiStore.addGeneerinenArviointi({ _arviointiAsteikko: arviointiAsteikko } as any);
+    await this.arviointiStore.add({
+      _arviointiAsteikko: arviointiAsteikko,
+    } as any);
   }
 
   toggle(value?: GeneerinenArviointiasteikkoDto) {

@@ -174,6 +174,7 @@ export default class GeneerinenArviointi extends Vue {
         cancelTitle: this.$t('peruuta') as any,
         size: 'lg',
       });
+    this.isEditing = false;
     await this.arviointiStore.publish(this.inner!);
   }
 
@@ -199,7 +200,7 @@ export default class GeneerinenArviointi extends Vue {
     await this.arviointiStore.add({
       ...this.inner!,
       julkaistu: false,
-      id: null,
+      id: undefined,
     });
   }
 

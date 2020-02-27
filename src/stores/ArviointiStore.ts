@@ -94,7 +94,7 @@ export class ArviointiStore {
     try {
       const res = await GeneerinenArviointiasteikko.updateGeneerinenArviontiasteikko(value.id!, value);
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      this.state.geneeriset![idx] = res.data;
+      Vue.set(this.state.geneeriset!, idx, res.data);
       // Vue.$success(Vue.$t('geneerinen-arviointiasteikko-tallennettu'));
     }
     catch (err) {
@@ -109,7 +109,7 @@ export class ArviointiStore {
         julkaistu: true,
       });
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      this.state.geneeriset![idx] = res.data;
+      Vue.set(this.state.geneeriset!, idx, res.data);
       // Vue.$success(Vue.$t('geneerinen-arviointiasteikko-julkaistu'));
     }
     catch (err) {
