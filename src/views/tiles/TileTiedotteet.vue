@@ -28,8 +28,8 @@ import _ from 'lodash';
 @Component({
   components: {
     EpHomeTile,
-    EpSpinner
-  }
+    EpSpinner,
+  },
 })
 export default class TileTiedotteet extends Vue {
   @Prop({ required: true })

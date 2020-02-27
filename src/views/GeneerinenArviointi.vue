@@ -87,8 +87,8 @@ import * as _ from 'lodash';
     EpButton,
     EpInput,
     EpMainView,
-    EpSpinner
-  }
+    EpSpinner,
+  },
 })
 export default class GeneerinenArviointi extends Vue {
   @Prop({ required: true })
@@ -119,7 +119,7 @@ export default class GeneerinenArviointi extends Vue {
       return _.map(asteikko.osaamistasot, ot => ({
         ...ot,
         kriteerit: _.find(this.value.osaamistasonKriteerit,
-          k => '' + (k as any)._osaamistaso === '' + ot.id)?.kriteerit || []
+          k => '' + (k as any)._osaamistaso === '' + ot.id)?.kriteerit || [],
       }));
     }
     return null;
@@ -129,11 +129,11 @@ export default class GeneerinenArviointi extends Vue {
     return [{
       key: 'osaamistaso',
       label: this.$t('osaamistaso') as string,
-      sortable: false
+      sortable: false,
     }, {
       key: 'kriteerit',
       label: this.$t('kriteerit') as string,
-      sortable: false
+      sortable: false,
     }];
   }
 
@@ -171,7 +171,7 @@ export default class GeneerinenArviointi extends Vue {
         title: this.$t('julkaistaanko-geneerinen-arviointi') as any,
         okTitle: this.$t('julkaise') as any,
         cancelTitle: this.$t('peruuta') as any,
-        size: 'lg'
+        size: 'lg',
       });
     this.isEditing = false;
     await this.arviointiStore.publish(this.inner!);
@@ -183,7 +183,7 @@ export default class GeneerinenArviointi extends Vue {
         title: this.$t('poistetaanko-geneerinen-arviointi') as any,
         okTitle: this.$t('poista') as any,
         cancelTitle: this.$t('peruuta') as any,
-        size: 'lg'
+        size: 'lg',
       });
     await this.arviointiStore.remove(this.inner!);
   }
@@ -194,12 +194,12 @@ export default class GeneerinenArviointi extends Vue {
         title: this.$t('kopioi-geneerinen-arviointi') as any,
         okTitle: this.$t('kopioi') as any,
         cancelTitle: this.$t('peruuta') as any,
-        size: 'lg'
+        size: 'lg',
       });
     await this.arviointiStore.add({
       ...this.inner!,
       julkaistu: false,
-      id: undefined
+      id: undefined,
     });
   }
 }

@@ -24,8 +24,8 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
 @Component({
   components: {
-    EpColorIndicator
-  }
+    EpColorIndicator,
+  },
 })
 export default class ProjektiCard extends Vue {
   @Prop({ default: false })

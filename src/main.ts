@@ -27,13 +27,13 @@ Vue.use(PortalVue);
 Vue.use(Loading, {
   fullPage: true,
   color: '#159ecb',
-  loader: 'dots'
+  loader: 'dots',
 });
 Vue.use(Kielet, {
   messages: {
     fi: require('@/translations/locale-fi.json'),
-    sv: require('@/translations/locale-sv.json')
-  }
+    sv: require('@/translations/locale-sv.json'),
+  },
 });
 Vue.use(Kaannos);
 Vue.use(Aikaleima);
@@ -45,7 +45,7 @@ async function main() {
   new Vue({
     router,
     i18n: Kielet.i18n,
-    render: h => h(App)
+    render: h => h(App),
   }).$mount('#app');
 }
 

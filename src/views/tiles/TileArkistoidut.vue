@@ -17,8 +17,8 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 @Component({
   components: {
     EpHomeTile,
-    EpSpinner
-  }
+    EpSpinner,
+  },
 })
 export default class TileArkistoidut extends Vue {
 }

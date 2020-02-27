@@ -6,7 +6,7 @@ describe('Kayttajat', () => {
   beforeEach(() => {
     kayttajaStore.state.oikeudet = {
       opetussuunnitelma: [],
-      pohja: []
+      pohja: [],
     };
   });
 
@@ -21,7 +21,7 @@ describe('Kayttajat', () => {
   test('Hallintaoikeudet', async () => {
     kayttajaStore.state.oikeudet = {
       opetussuunnitelma: [],
-      pohja: ['luonti']
+      pohja: ['luonti'],
     };
 
     expect(await kayttajaStore.hasOikeus('hallinta', 'pohja')).toEqual(true);
@@ -38,7 +38,7 @@ describe('Kayttajat', () => {
   test('Opetussuunnitelman lukuoikeudet', async () => {
     kayttajaStore.state.oikeudet = {
       opetussuunnitelma: ['luku'],
-      pohja: []
+      pohja: [],
     };
     expect(await kayttajaStore.hasOikeus('luku', 'pohja')).toEqual(false);
     expect(await kayttajaStore.hasOikeus('luku', 'opetussuunnitelma')).toEqual(true);
@@ -48,7 +48,7 @@ describe('Kayttajat', () => {
   test('Opetussuunnitelman muokkausoikeus', async () => {
     kayttajaStore.state.oikeudet = {
       opetussuunnitelma: ['muokkaus'],
-      pohja: []
+      pohja: [],
     };
 
     expect(await kayttajaStore.hasOikeus('luku', 'pohja')).toEqual(false);

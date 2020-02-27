@@ -15,8 +15,8 @@ import { Kayttajat } from '@/stores/kayttaja';
 
 @Component({
   components: {
-    EpNavbar
-  }
+    EpNavbar,
+  },
 })
 export default class RouteRoot extends Vue {
   async mounted() {

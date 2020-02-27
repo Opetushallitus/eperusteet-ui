@@ -227,8 +227,8 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSearch,
     EpSelect,
     EpSpinner,
-    EpSteps
-  }
+    EpSteps,
+  },
 })
 export default class RoutePerusteprojektiLuonti extends Vue {
   @Prop({ required: true })
@@ -244,7 +244,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   ulkopuolisetStore!: UlkopuolisetStore;
 
   private data: any = {
-    tavoitepaivamaarat: [] as any[]
+    tavoitepaivamaarat: [] as any[],
   };
   private tyyppi: 'pohjasta' | 'perusteesta' | 'uusi' | null = null;
 
@@ -252,7 +252,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     this.ulkopuolisetStore.fetchTyoryhmat();
     await Promise.all([
       this.perusteprojektiStore.fetchPohjat(),
-      this.perusteprojektiStore.fetchPohjaProjektit()
+      this.perusteprojektiStore.fetchPohjaProjektit(),
     ]);
 
     if (this.pohjat && this.pohjat?.length > 0) {
@@ -270,7 +270,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   onTyyppiChange() {
     this.data = {
       ...this.data,
-      pohja: null
+      pohja: null,
     };
   }
 
@@ -289,19 +289,19 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       description: this.$t('pohjan-valinta-kuvaus'),
       isValid() {
         return true;
-      }
+      },
     }, {
       key: 'tiedot',
       name: this.$t('projektin-tiedot'),
-      description: this.$t('projektin-tiedot-kuvaus')
+      description: this.$t('projektin-tiedot-kuvaus'),
     }, {
       key: 'aikataulu',
       name: this.$t('aikataulu'),
-      description: this.$t('aikataulu-kuvaus')
+      description: this.$t('aikataulu-kuvaus'),
     }, {
       key: 'yhteenveto',
       name: this.$t('yhteenveto'),
-      description: this.$t('yhteenveto-kuvaus')
+      description: this.$t('yhteenveto-kuvaus'),
     }];
   }
 
@@ -320,23 +320,23 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   get tapahtumat() {
     return [{
       tapahtuma: 'luominen',
-      tapahtumapaiva: new Date()
+      tapahtumapaiva: new Date(),
     }, {
       tapahtuma: 'tavoite',
       tavoite: 'peruste-astuu-voimaan',
-      tapahtumapaiva: this.data.voimassaoloAlkaa && new Date(this.data.voimassaoloAlkaa)
+      tapahtumapaiva: this.data.voimassaoloAlkaa && new Date(this.data.voimassaoloAlkaa),
     }, {
       tapahtuma: 'julkaisu',
       tavoite: 'perusteen-arvioitu-julkaisupaiva',
-      tapahtumapaiva: this.data.paatosPvm && new Date(this.data.paatosPvm)
+      tapahtumapaiva: this.data.paatosPvm && new Date(this.data.paatosPvm),
     }, {
       tapahtuma: 'tavoite',
       tavoite: 'lausuntokierros-alkaa',
-      tapahtumapaiva: this.data.lausuntakierrosAlkaa && new Date(this.data.lausuntakierrosAlkaa)
+      tapahtumapaiva: this.data.lausuntakierrosAlkaa && new Date(this.data.lausuntakierrosAlkaa),
     }, {
       tapahtuma: 'tavoite',
       tavoite: 'johtokunnan-kasittely',
-      tapahtumapaiva: this.data.johtokunnanKasittely && new Date(this.data.johtokunnanKasittely)
+      tapahtumapaiva: this.data.johtokunnanKasittely && new Date(this.data.johtokunnanKasittely),
     }, ...this.data.tavoitepaivamaarat];
   }
 
@@ -360,14 +360,14 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       laajuusYksikko: 'OSAAMISPISTE' as any,
       ryhmaOid: this.data.tyoryhma.oid,
       voimassaoloAlkaa: this.data.voimassaoloAlkaa,
-      yhteistyotaho: this.data.paatosPvm
+      yhteistyotaho: this.data.paatosPvm,
     });
     console.log('saving ', this.data);
     this.$router.push({
       name: 'perusteprojekti',
       params: {
-        projektiId: '' + luotu.id
-      }
+        projektiId: '' + luotu.id,
+      },
     });
   }
 
@@ -376,8 +376,8 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       ...this.data.tavoitepaivamaarat, {
         tapahtuma: 'tavoite',
         tavoite: '',
-        tapahtumapaiva: new Date()
-      }
+        tapahtumapaiva: new Date(),
+      },
     ];
   }
 }

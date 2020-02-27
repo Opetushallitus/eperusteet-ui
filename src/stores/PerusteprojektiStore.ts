@@ -11,7 +11,7 @@ Vue.use(VueCompositionApi);
 export class PerusteprojektiStore {
   private state = reactive({
     pohjat: null as Page<PerusteHakuInternalDto> | null,
-    perusteet: null as Page<PerusteHakuInternalDto> | null
+    perusteet: null as Page<PerusteHakuInternalDto> | null,
   })
 
   public readonly perusteet = computed(() => this.state.perusteet);
@@ -25,8 +25,8 @@ export class PerusteprojektiStore {
         perusteTyyppi: 'pohja',
         sivu: 0,
         sivukoko: 1000,
-        tila: 'valmis'
-      }
+        tila: 'valmis',
+      },
     });
     this.state.pohjat = res.data as any;
   }
@@ -39,8 +39,8 @@ export class PerusteprojektiStore {
         perusteTyyppi: 'normaali',
         sivu: 0,
         sivukoko: 1000,
-        tila: 'valmis'
-      }
+        tila: 'valmis',
+      },
     });
     this.state.perusteet = res.data as any;
   }

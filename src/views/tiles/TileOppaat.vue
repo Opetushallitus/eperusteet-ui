@@ -20,8 +20,8 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 @Component({
   components: {
     EpHomeTile,
-    EpSpinner
-  }
+    EpSpinner,
+  },
 })
 export default class TileOppaat extends Vue {
   private isLoading = false;

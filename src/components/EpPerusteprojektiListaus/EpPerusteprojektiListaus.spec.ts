@@ -24,7 +24,7 @@ describe('Projektilistaus', () => {
 
   const data = reactive({
     projects: null as Page<PerusteprojektiKevytDto[]> | null,
-    ownProjects: null as PerusteprojektiListausDto[] | null
+    ownProjects: null as PerusteprojektiListausDto[] | null,
   });
 
   const store: IProjektiProvider = {
@@ -33,7 +33,7 @@ describe('Projektilistaus', () => {
     updateQuery: jest.fn(async (query: PerusteQuery) => {
     }),
     updateOwnProjects: jest.fn(async () => {
-    })
+    }),
   };
 
   test('Mounting', async () => {
@@ -41,15 +41,15 @@ describe('Projektilistaus', () => {
       propsData: {
         provider: store,
         newRoute: { name: 'luonti' },
-        editRoute: 'asia'
+        editRoute: 'asia',
       },
       localVue,
       mocks: {
-        $t: x => x
+        $t: x => x,
       },
       stubs: {
-        RouterLink: RouterLinkStub
-      }
+        RouterLink: RouterLinkStub,
+      },
     });
 
     expect(wrapper.findAll('.oph-spinner').length).toEqual(2);
@@ -64,14 +64,14 @@ describe('Projektilistaus', () => {
         id: 42,
         nimi: 'projekti 42',
         koulutustyyppi: 'koulutustyyppi_11',
-        tila: 'valmis'
-      }] as any
+        tila: 'valmis',
+      }] as any,
     };
 
     data.ownProjects = [{
       id: 43,
       nimi: 'perusteprojekti',
-      tila: 'laadinta' as any
+      tila: 'laadinta' as any,
     }];
 
     expect(wrapper.findAll('.oph-spinner').length).toEqual(1);
@@ -80,17 +80,17 @@ describe('Projektilistaus', () => {
     expect(wrapper.html()).toContain('laadinta');
     expect(wrapper.html()).toContain('valmis');
     expect(map(wrapper.findAll(RouterLinkStub), v => v.props().to)).toEqual(expect.arrayContaining([{
-      name: 'luonti'
+      name: 'luonti',
     }, {
       name: 'asia',
       params: {
-        projektiId: 42
-      }
+        projektiId: 42,
+      },
     }, {
       name: 'asia',
       params: {
-        projektiId: 43
-      }
+        projektiId: 43,
+      },
     }]));
   });
 });

@@ -17,7 +17,7 @@ export const EperusteetKoulutustyypit = Object.freeze([
   'koulutustyyppi_20',
   'koulutustyyppi_22',
   'koulutustyyppi_23',
-  'koulutustyyppi_999907'
+  'koulutustyyppi_999907',
 ]);
 
 export const YlopsKoulutustyypit = Object.freeze([
@@ -26,7 +26,7 @@ export const YlopsKoulutustyypit = Object.freeze([
   'koulutustyyppi_20', // VARHAISKASVATUS
   'koulutustyyppi_6', // LISAOPETUS
   'koulutustyyppi_14', // AIKUISLUKIOKOULUTUS
-  'koulutustyyppi_23' // LUKIOVALMISTAVAKOULUTUS
+  'koulutustyyppi_23', // LUKIOVALMISTAVAKOULUTUS
   // 'koulutustyyppi_999907', // TPO
   // 'koulutustyyppi_17', // AIKUISTENPERUSOPETUS
   // 'koulutustyyppi_16', // PERUSOPETUS
@@ -40,7 +40,7 @@ const koulutustyyppiToOppilaitos = {
   'koulutustyyppi_14': [...Perusoppilaitokset, 15],
   'koulutustyyppi_23': [...Perusoppilaitokset, 15],
   'koulutustyyppi_20': [...Perusoppilaitokset],
-  'koulutustyyppi_6': Perusoppilaitokset
+  'koulutustyyppi_6': Perusoppilaitokset,
 };
 
 export function koulutustyypinOppilaitokset(koulutustyyppi: string | undefined | null) {
@@ -65,7 +65,7 @@ export function paikallisestiSallitutLaajennokset() {
     'oppiaineetjaoppimaaratlops2021_ai12',
     'oppiaineetjaoppimaaratlops2021_ux',
     'oppiaineetjaoppimaaratlops2021_vka',
-    'oppiaineetjaoppimaaratlops2021_vkb'
+    'oppiaineetjaoppimaaratlops2021_vkb',
   ];
 }
 

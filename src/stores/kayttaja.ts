@@ -42,8 +42,8 @@ export class KayttajaStore {
     virkailijat: [] as any[],
     oikeudet: {
       opetussuunnitelma: [],
-      pohja: []
-    } as Oikeudet
+      pohja: [],
+    } as Oikeudet,
   });
 
   public readonly organisaatiot = computed(() => this.state.organisaatiot);

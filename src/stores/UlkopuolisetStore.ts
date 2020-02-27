@@ -10,7 +10,7 @@ Vue.use(VueCompositionApi);
 
 export class UlkopuolisetStore {
   private state = reactive({
-    tyoryhmat: null as any[] | null
+    tyoryhmat: null as any[] | null,
   });
 
   public readonly tyoryhmat = computed(() => this.state.tyoryhmat);

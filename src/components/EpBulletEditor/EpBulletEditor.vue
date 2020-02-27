@@ -39,8 +39,8 @@ import EpInput from '@shared/components/forms/EpInput.vue';
   components: {
     draggable,
     EpButton,
-    EpInput
-  }
+    EpInput,
+  },
 })
 export default class EpPrefixList extends Vue {
   @Prop({ required: true })

@@ -17,7 +17,7 @@ export class PerusteStore implements IProjektiProvider {
   private state = reactive({
     ownProjects: null as PerusteprojektiListausDto[] | null,
     projects: null as Page<PerusteprojektiKevytDto> | null,
-    perusteQuery: {} as PerusteQuery
+    perusteQuery: {} as PerusteQuery,
   })
 
   public readonly ownProjects = computed(() => {
@@ -43,7 +43,7 @@ export class PerusteStore implements IProjektiProvider {
   public async updateQuery(query: PerusteQuery) {
     const res = await getPerusteprojektit({
       ...query,
-      ...this.overrides
+      ...this.overrides,
     });
     this.state.projects = res.data as any;
   }

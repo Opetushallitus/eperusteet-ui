@@ -7,7 +7,7 @@ Vue.use(VueCompositionApi);
 
 export class TiedotteetStore {
   private state = reactive({
-    tiedotteet: null as TiedoteDto[] | null
+    tiedotteet: null as TiedoteDto[] | null,
   })
 
   public readonly tiedotteet = computed(() => this.state.tiedotteet);

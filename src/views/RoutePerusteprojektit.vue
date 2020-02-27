@@ -20,8 +20,8 @@ import { PerusteStore } from '@/stores/PerusteStore';
   components: {
     EpIcon,
     EpMainView,
-    EpPerusteprojektiListaus
-  }
+    EpPerusteprojektiListaus,
+  },
 })
 export default class RoutePerusteprojektit extends Vue {
   @Prop({ required: true })

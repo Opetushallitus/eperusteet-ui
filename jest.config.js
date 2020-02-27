@@ -3,7 +3,7 @@ module.exports = {
   coverageReporters: [
     'text-summary',
     'json',
-    'lcov'
+    'lcov',
   ],
   collectCoverageFrom: [
     '<rootDir>/src/**/*.(ts|tsx|vue)',
@@ -11,34 +11,34 @@ module.exports = {
     '!<rootDir>/src/**/script.ts',
     '!<rootDir>/**/*.d.ts',
     '!<rootDir>/src/main.ts',
-    '!<rootDir>/src/registerServiceWorker.ts'
+    '!<rootDir>/src/registerServiceWorker.ts',
   ],
   transform: {
     '^.+\\.vue$': 'vue-jest',
     '.+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.tsx?$': 'ts-jest',
   },
   transformIgnorePatterns: [
-    '/node_modules/'
+    '/node_modules/',
   ],
   moduleNameMapper: {
     '^@shared/(.*)$': '<rootDir>/eperusteet-frontend-utils/vue/src/$1',
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   snapshotSerializers: [
-    'jest-serializer-vue'
+    'jest-serializer-vue',
   ],
   testMatch: [
-    '<rootDir>/src/**/*.spec.ts'
+    '<rootDir>/src/**/*.spec.ts',
   ],
   testURL: 'http://localhost/',
   watchPlugins: [
     'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname'
+    'jest-watch-typeahead/testname',
   ],
   globals: {
     'ts-jest': {
-      babelConfig: true
-    }
-  }
+      babelConfig: true,
+    },
+  },
 };

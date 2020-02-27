@@ -22,16 +22,16 @@ describe('RouteGeneerinenArviointi', () => {
 
     const wrapper = mount(RouteGeneerinenArviointi, {
       propsData: {
-        arviointiStore
+        arviointiStore,
       },
       localVue,
       mocks: {
         $t: x => x,
-        $kaanna: x => '[' + x?.fi + ']'
+        $kaanna: x => '[' + x?.fi + ']',
       },
       stubs: {
-        RouterLink: RouterLinkStub
-      }
+        RouterLink: RouterLinkStub,
+      },
     });
 
     expect(wrapper.text()).toContain('Opiskelija');

@@ -19,7 +19,7 @@ export function mock<T>(X: Constructable<T>, overrides: Partial<T> = {}): T {
   }
   return {
     ...mocks,
-    ...overrides
+    ...overrides,
   };
 }
 

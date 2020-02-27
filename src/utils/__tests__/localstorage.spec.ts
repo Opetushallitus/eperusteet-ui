@@ -1,7 +1,7 @@
 import {
   setItem,
   getItem,
-  removeItem
+  removeItem,
 } from '../localstorage';
 
 describe('Localstorage', () => {
@@ -20,8 +20,8 @@ describe('Localstorage', () => {
       id: 42,
       name: 'foobar',
       vals: [{
-        value: 5
-      }]
+        value: 5,
+      }],
     };
 
     setItem('val', val);

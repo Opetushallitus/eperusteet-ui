@@ -59,8 +59,8 @@ import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
   components: {
     EpMainView,
     EpIcon,
-    EpSpinner
-  }
+    EpSpinner,
+  },
 })
 export default class RouteVirheellisetPerusteet extends Vue {
   @Prop({ required: true })

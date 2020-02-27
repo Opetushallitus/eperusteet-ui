@@ -51,8 +51,8 @@ import { TiedotteetStore } from '@/stores/tiedotteet';
     TilePohjat,
     TileTiedotteet,
     TileVirheellisetPerusteet,
-    TileArviointiasteikot
-  }
+    TileArviointiasteikot,
+  },
 })
 export default class Home extends Vue {
   @Prop({ required: true })

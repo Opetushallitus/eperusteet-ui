@@ -41,8 +41,8 @@ import * as _ from 'lodash';
     EpButton,
     EpInput,
     EpMainView,
-    EpSpinner
-  }
+    EpSpinner,
+  },
 })
 export default class GeneerinenArviointi extends Vue {
   @Prop({ default: null })

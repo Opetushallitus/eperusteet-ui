@@ -45,7 +45,7 @@ function constructStores() {
     tiedotteetStore,
     ulkopuolisetStore: new UlkopuolisetStore(),
     tutoriaaliStore,
-    virheellisetPerusteetStore
+    virheellisetPerusteetStore,
   };
 }
 
@@ -56,10 +56,10 @@ Vue.use(VueRouter);
 const router = new VueRouter({
   routes: [{
     path: '',
-    redirect: () => '/fi'
+    redirect: () => '/fi',
   }, {
     path: '/',
-    redirect: () => '/fi'
+    redirect: () => '/fi',
   }, {
     path: '/:lang',
     component: RouteRoot,
@@ -67,36 +67,36 @@ const router = new VueRouter({
       path: '',
       name: 'root',
       component: RouteHome,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: '',
       name: 'home',
       component: RouteHome,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'virhe',
       name: 'virhe',
-      component: RouteVirhe
+      component: RouteVirhe,
     }, {
       path: 'oppaat',
       name: 'oppaat',
       component: RouteOppaat,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'perusteprojektit',
       name: 'perusteprojektit',
       component: RoutePerusteprojektit,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'pohjat',
       name: 'pohjat',
       component: RoutePohjat,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'tiedotteet',
       name: 'tiedotteet',
       component: RouteTiedotteet,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'arviointi',
       name: 'arviointi',
@@ -106,33 +106,33 @@ const router = new VueRouter({
         path: 'geneerinen',
         name: 'geneerinen',
         component: RouteGeneerinenArviointi,
-        props: { ...stores }
+        props: { ...stores },
       }, {
         path: 'arviointiasteikot',
         name: 'arviointiasteikot',
         component: RouteArviointiasteikot,
-        props: { ...stores }
-      }]
+        props: { ...stores },
+      }],
     }, {
       path: 'virheelliset',
       name: 'virheellisetperusteet',
       component: RouteVirheellisetPerusteet,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'perusteprojektit/uusi',
       name: 'perusteprojektiLuonti',
       component: RoutePerusteprojektiLuonti,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'pohjat/uusi',
       name: 'pohjaLuonti',
       component: RoutePohjatLuonti,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'oppaat/uusi',
       name: 'opasLuonti',
       component: RouteOppaatLuonti,
-      props: { ...stores }
+      props: { ...stores },
     }, {
       path: 'perusteprojekti/:projektiId',
       component: RoutePerusteprojekti,
@@ -140,45 +140,45 @@ const router = new VueRouter({
         path: '',
         name: 'perusteprojekti',
         component: RouteYleisnakyma,
-        props: { ...stores }
+        props: { ...stores },
       }, {
         path: 'rakenne',
         name: 'muodostuminen',
         component: RouteMuodostuminen,
-        props: { ...stores }
+        props: { ...stores },
       }, {
         path: 'tutkinnonosat',
         name: 'tutkinnonosat',
         component: RouteTutkinnonOsat,
-        props: { ...stores }
+        props: { ...stores },
       }, {
         path: 'tekstikappale:tekstiKappaleId',
         name: 'tekstikappale',
         component: RouteTekstikappale,
-        props: { ...stores }
+        props: { ...stores },
       }, {
         path: 'termisto',
         name: 'termisto',
         component: RouteTermisto,
-        props: { ...stores }
+        props: { ...stores },
       }, {
         path: 'tiedot',
         name: 'tiedot',
         component: RouteTiedot,
-        props: { ...stores }
+        props: { ...stores },
       }, {
         path: 'tutkinnonosa/:tutkinnonOsaId',
         name: 'tutkinnonosa',
         component: RouteTutkinnonOsa,
-        props: { ...stores }
+        props: { ...stores },
       }, {
         path: 'tutkinnonosa/:tutkinnonOsaId/osaalue/:osaAlueId',
         name: 'tutkinnonosaOsaAlue',
         component: RouteTutkinnonOsanOsaAlue,
-        props: { ...stores }
-      }]
-    }]
-  }]
+        props: { ...stores },
+      }],
+    }],
+  }],
 });
 
 export default router;

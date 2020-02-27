@@ -198,7 +198,7 @@ interface KoulutustyyppiTaiTutkinto {
 const julkaisupaikkaSort = {
   'opintopolku': 1,
   'ops': 2,
-  'amosaa': 3
+  'amosaa': 3,
 };
 
 @Component({
@@ -216,18 +216,18 @@ const julkaisupaikkaSort = {
     EpMultiListSelect,
     EpSelect,
     EpToggle,
-    EpKielivalinta
+    EpKielivalinta,
   },
   validations: {
     muokattavaTiedote: {
       otsikko: {
-        required
+        required,
       },
       sisalto: {
-        required
-      }
-    }
-  }
+        required,
+      },
+    },
+  },
 } as any)
 export default class RouteTiedotteet extends Mixins(validationMixin) {
   @Prop({ required: true })
@@ -278,7 +278,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
             .filter((julkaisupaikka) => (julkaisupaikka as any) !== 'opintopolku_etusivu')
             .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
             .value(),
-          opintopolkuEtusivu: _.includes((tiedote.julkaisupaikat as any), 'opintopolku_etusivu')
+          opintopolkuEtusivu: _.includes((tiedote.julkaisupaikat as any), 'opintopolku_etusivu'),
         };
       })
       .value();
@@ -292,7 +292,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
     return [
       { text: this.$t('tiedote-julkaisupaikka-opintopolku'), value: 'opintopolku' },
       { text: this.$t('tiedote-julkaisupaikka-ops'), value: 'ops' },
-      { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: 'amosaa' }
+      { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: 'amosaa' },
     ];
   }
 
@@ -303,7 +303,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       sortable: true,
       formatter: (value: any, key: any, item: any) => {
         return (this as any).$sdt(value);
-      }
+      },
     }, {
       key: 'muokattu',
       label: this.$t('muokattu'),
@@ -314,7 +314,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
         }
 
         return '';
-      }
+      },
     }, {
       key: 'otsikko',
       label: this.$t('tiedotteen-otsikko'),
@@ -323,7 +323,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       thStyle: { width: '35%' },
       formatter: (value: any, key: any, item: any) => {
         return (this as any).$kaanna(value);
-      }
+      },
     }, {
       key: 'filteredJulkaisupaikat',
       label: this.$t('tiedote-julkaistu'),
@@ -332,7 +332,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       sortByFormatted: true,
       formatter: (value: any, key: any, item: any) => {
         return _.join(_.map(value, (julkaisupaikka) => this.$t(julkaisupaikka)), ', ');
-      }
+      },
     }];
   }
 
@@ -345,8 +345,8 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
               text: this.$t(koulutustyyppi),
               value: {
                 type: 'koulutustyyppi',
-                object: koulutustyyppi
-              }
+                object: koulutustyyppi,
+              },
             },
             ..._.chain(this.perusteet)
               .filter((peruste) => peruste.koulutustyyppi === koulutustyyppi)
@@ -355,16 +355,16 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
                   text: (this as any).$kaanna(peruste.nimi),
                   value: {
                     type: 'peruste',
-                    object: peruste.id
+                    object: peruste.id,
                   },
-                  child: true
+                  child: true,
                 };
               })
-              .value()
+              .value(),
           ];
         })
         .flatten()
-        .value()
+        .value(),
     ];
   }
 
@@ -393,7 +393,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
 
   private perusteHakuToInfo(perusteHaku: PerusteHakuDto): PerusteKevytDto {
     return {
-      id: perusteHaku.id
+      id: perusteHaku.id,
     } as PerusteKevytDto;
   }
 
@@ -423,15 +423,15 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       ..._.map(rivi.koulutustyypit, (koulutustyyppi) => {
         return {
           type: 'koulutustyyppi',
-          object: koulutustyyppi
+          object: koulutustyyppi,
         };
       }),
       ..._.map(rivi.perusteet, (peruste) => {
         return {
           type: 'peruste',
-          object: peruste.id
+          object: peruste.id,
         };
-      })
+      }),
     ];
 
     if (this.muokattavaTiedote.luotu) {
@@ -462,7 +462,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
         this.$createElement('div', this.$t('poista-tiedote-vahvistus') as string),
         this.$createElement('div', '"' + (this as any).$kaanna(this.muokattavaTiedote.otsikko) + '"'),
         this.$createElement('br', ''),
-        this.$createElement('div', this.$t('poista-tiedote-varmistus') as string)
+        this.$createElement('div', this.$t('poista-tiedote-varmistus') as string),
       ]
     ).children;
 
@@ -473,7 +473,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
       cancelVariant: 'link',
       cancelTitle: this.$t('peruuta') as any,
       centered: true,
-      ...{} as any
+      ...{} as any,
     });
   }
 }

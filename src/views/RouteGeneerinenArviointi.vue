@@ -61,8 +61,8 @@ import * as _ from 'lodash';
     EpIcon,
     EpMainView,
     EpSearch,
-    GeneerinenArviointi
-  }
+    GeneerinenArviointi,
+  },
 })
 export default class RouteGeneerinenArviointi extends Vue {
   @Prop({ required: true })
@@ -102,7 +102,7 @@ export default class RouteGeneerinenArviointi extends Vue {
 
   async addGeneerinen(arviointiAsteikko: number) {
     await this.arviointiStore.add({
-      _arviointiAsteikko: arviointiAsteikko
+      _arviointiAsteikko: arviointiAsteikko,
     } as any);
   }
 

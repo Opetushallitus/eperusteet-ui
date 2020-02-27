@@ -6,7 +6,7 @@ import { RevisionDto } from '@shared/api/eperusteet';
 import {
   editointi,
   EditointiKontrolli,
-  EditointiKontrolliConfig
+  EditointiKontrolliConfig,
 } from '../editointi';
 Vue.use(VueCompositionApi);
 
@@ -14,7 +14,7 @@ describe('Editointi', () => {
   describe('Hooks', () => {
     test('All hooks are called', async () => {
       let data = {
-        field: 'foo'
+        field: 'foo',
       };
 
       const config: EditointiKontrolliConfig = {
@@ -25,25 +25,25 @@ describe('Editointi', () => {
           async load() {
             return data;
           },
-          async cancel() {}
+          async cancel() {},
         },
         locks: {
           async acquire() {
             return true;
           },
-          async release() {}
+          async release() {},
         },
         history: {
           async revisions() {
             return [];
           },
-          async restore(rev: RevisionDto) { }
+          async restore(rev: RevisionDto) { },
         },
         async start() {},
         async remove() {},
         validate: async () => ({
-          valid: true
-        })
+          valid: true,
+        }),
       };
 
       const removeSpy = jest.spyOn(config, 'remove');

@@ -29,8 +29,8 @@ import { ArviointiStore } from '@/stores/ArviointiStore';
 @Component({
   components: {
     EpMainView,
-    EpIcon
-  }
+    EpIcon,
+  },
 })
 export default class RouteArviointiasteikot extends Vue {
   @Prop({ required: true })

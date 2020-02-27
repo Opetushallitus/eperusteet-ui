@@ -56,8 +56,8 @@ const DefaultConfig = {
   start: async () => {},
   remove: async () => {},
   validate: async () => ({
-    valid: true
-  })
+    valid: true,
+  }),
 };
 
 export class EditointiKontrolli {
@@ -73,7 +73,7 @@ export class EditointiKontrolli {
     revisions: [] as RevisionDto[],
     backup: null,
     disabled: true,
-    isSaving: false
+    isSaving: false,
   });
   private backup: any = null;
 
@@ -95,13 +95,13 @@ export class EditointiKontrolli {
       validation: !!config.validate,
       history: !!config.history,
       restore: !!config.history && !!config.history.restore,
-      preview: !!config.preview
+      preview: !!config.preview,
     };
 
     this.logger.debug('Initing editointikontrollit with: ', _.keys(config));
     this.config = {
       ...DefaultConfig,
-      ...config
+      ...config,
     };
   }
 
@@ -161,7 +161,7 @@ export class EditointiKontrolli {
       this.isEditingState = true;
       EditointiKontrolli.allEditingEditors = [
         ...EditointiKontrolli.allEditingEditors,
-        this
+        this,
       ];
     }
     catch (err) {
@@ -177,7 +177,7 @@ export class EditointiKontrolli {
         VueScrollTo.scrollTo('#scroll-anchor', {
           offset: navbarHeight,
           x: false,
-          y: true
+          y: true,
         });
       }
     }

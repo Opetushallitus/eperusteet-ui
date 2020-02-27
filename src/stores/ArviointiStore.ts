@@ -18,7 +18,7 @@ export class ArviointiStore {
     arviointiasteikot: null as ArviointiAsteikkoDto[] | null,
     geneeriset: null as GeneerinenArviointiasteikkoDto[] | null,
     closed: {} as { [id: number]: boolean },
-    filterStr: ''
+    filterStr: '',
   })
 
   public readonly arviointiasteikot = computed(() => this.state.arviointiasteikot);
@@ -105,7 +105,7 @@ export class ArviointiStore {
     try {
       const res = await GeneerinenArviointiasteikko.updateGeneerinenArviontiasteikko(value.id!, {
         ...value,
-        julkaistu: true
+        julkaistu: true,
       });
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
       Vue.set(this.state.geneeriset!, idx, res.data);

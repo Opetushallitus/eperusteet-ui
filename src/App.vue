@@ -18,7 +18,7 @@ export default class App extends Vue {
   private isInitializing = true;
   public async mounted() {
     const loader = (this as any).$loading.show({
-      color: '#2E5FD1'
+      color: '#2E5FD1',
     });
     // await Kayttajat.init();
     await delay(500);

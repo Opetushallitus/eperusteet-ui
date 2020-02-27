@@ -154,8 +154,8 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpMultiSelect,
     EpSearch,
     EpSpinner,
-    ProjektiCard
-  }
+    ProjektiCard,
+  },
 })
 export default class EpPerusteprojektiListaus extends Vue {
   @Prop({ required: true })
@@ -187,7 +187,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     tila: ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
     nimi: '',
     jarjestysOrder: false,
-    jarjestysTapa: 'nimi'
+    jarjestysTapa: 'nimi',
   } as PerusteQuery;
 
   mounted() {
@@ -199,7 +199,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     this.isLoading = true;
     try {
       await this.provider.updateQuery({
-        ...query
+        ...query,
       });
     }
     finally {
@@ -212,7 +212,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     this.query = {
       tila: tila
         ? [tila]
-        : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU']
+        : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
     };
   }
 
@@ -222,7 +222,7 @@ export default class EpPerusteprojektiListaus extends Vue {
       voimassaolo: false,
       siirtyma: false,
       tuleva: false,
-      poistunut: false
+      poistunut: false,
     };
 
     switch (tila) {
@@ -243,7 +243,7 @@ export default class EpPerusteprojektiListaus extends Vue {
         ...defaults,
         voimassaolo: true,
         tuleva: true,
-        siirtyma: true
+        siirtyma: true,
       };
       break;
     }
@@ -268,7 +268,7 @@ export default class EpPerusteprojektiListaus extends Vue {
       'tuleva',
       'voimassaolo',
       'siirtyma',
-      'poistunut'
+      'poistunut',
     ];
   }
 
@@ -315,38 +315,38 @@ export default class EpPerusteprojektiListaus extends Vue {
       sortable: true,
       formatter(value: any, key: string, item: PerusteprojektiKevytDto) {
         return item.nimi;
-      }
+      },
     }, {
       key: 'koulutustyyppi',
       sortable: true,
-      label: this.$t('koulutustyyppi') as string
+      label: this.$t('koulutustyyppi') as string,
     }, {
       key: 'tila',
       sortable: true,
       label: this.$t('tila') as string,
       formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
         return this.$t('tila-' + item!.tila);
-      }
+      },
     }, {
       key: 'luotu',
       sortable: true,
       label: this.$t('luotu') as string,
-      formatter: dateFormatter
+      formatter: dateFormatter,
     }, {
       key: 'globalVersion.aikaleima',
       sortable: true,
       label: this.$t('muokattu') as string,
-      formatter: dateFormatter
+      formatter: dateFormatter,
     }, {
       key: 'peruste.voimassaoloAlkaa',
       sortable: true,
       label: this.$t('voimassaolo-alkaa') as string,
-      formatter: dateFormatter
+      formatter: dateFormatter,
     }, {
       key: 'peruste.voimassaoloLoppuu',
       sortable: true,
       label: this.$t('voimassaolo-loppuu') as string,
-      formatter: dateFormatter
+      formatter: dateFormatter,
     }];
   }
 }

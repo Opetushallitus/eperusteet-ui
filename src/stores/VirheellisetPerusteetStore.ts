@@ -8,7 +8,7 @@ Vue.use(VueCompositionApi);
 
 export class VirheellisetPerusteetStore {
   private state = reactive({
-    validations: null as Page<ValidationDto> | null
+    validations: null as Page<ValidationDto> | null,
   })
 
   public readonly validations = computed(() => this.state.validations);
