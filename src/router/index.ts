@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+import RouteArviointi from '@/views/RouteArviointi.vue'
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue'
+import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue'
 import RouteHome from '@/views/RouteHome.vue'
 import RouteMuodostuminen from '@/views/RouteMuodostuminen.vue'
 import RouteOppaat from '@/views/RouteOppaat.vue'
@@ -27,15 +29,16 @@ import { Kayttajat } from '@/stores/kayttaja'
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore'
 import { PerusteStore } from '@/stores/PerusteStore'
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore'
-import { arviointiStore } from '@/stores/ArviointiStore'
+import { ArviointiStore } from '@/stores/ArviointiStore'
 import { tiedotteetStore } from '@/stores/tiedotteet'
+import { Kielet } from '@shared/stores/kieli'
 import { tutoriaaliStore } from '@shared/stores/tutoriaali'
 import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
 
 
 function constructStores() {
   return {
-    arviointiStore,
+    arviointiStore: new ArviointiStore(Kielet),
     oppaatStore: new PerusteStore({ tyyppi: 'OPAS' } as any),
     perusteetStore: new PerusteStore({ tyyppi: 'NORMAALI' } as any),
     pohjatStore: new PerusteStore({ tyyppi: 'POHJA' } as any),
@@ -96,10 +99,21 @@ const router = new VueRouter({
       component: RouteTiedotteet,
       props: { ...stores }
     }, {
-      path: 'arviointiasteikot',
-      name: 'arviointiasteikot',
-      component: RouteArviointiasteikot,
+      path: 'arviointi',
+      name: 'arviointi',
+      component: RouteArviointi,
       props: { ...stores },
+      children: [{
+        path: 'geneerinen',
+        name: 'geneerinen',
+        component: RouteGeneerinenArviointi,
+        props: { ...stores },
+      }, {
+        path: 'arviointiasteikot',
+        name: 'arviointiasteikot',
+        component: RouteArviointiasteikot,
+        props: { ...stores },
+      }],
     }, {
       path: 'virheelliset',
       name: 'virheellisetperusteet',

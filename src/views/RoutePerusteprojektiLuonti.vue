@@ -257,10 +257,10 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       this.perusteprojektiStore.fetchPohjaProjektit(),
     ]);
 
-    if (this.pohjat.length > 0) {
+    if (this.pohjat && this.pohjat?.length > 0) {
       this.tyyppi = 'pohjasta';
     }
-    else if (this.perusteet) {
+    else if (this.perusteet && this.perusteet?.length > 0) {
       this.tyyppi = 'perusteesta';
     }
     else {
@@ -355,7 +355,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       nimi: this.data.nimi,
       paatosPvm: this.data.paatosPvm,
       perusteId: this.data.peruste?.id,
-      laajuusYksikko: 'OSAAMISPISTE',
+      laajuusYksikko: 'OSAAMISPISTE' as any,
       ryhmaOid: this.data.tyoryhma.oid,
       voimassaoloAlkaa: this.data.voimassaoloAlkaa,
       yhteistyotaho: this.data.paatosPvm,

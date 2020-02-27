@@ -1,8 +1,11 @@
 import _ from 'lodash'
+import Vue from 'vue'
 import { Store, Getter, State } from '@shared/stores/store'
 import { Kayttajat as KayttajatApi, KayttajanTietoDto } from '@shared/api/eperusteet'
 import { createLogger } from '@shared/utils/logger'
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api'
+
+Vue.use(VueCompositionApi);
 
 // FIXME: tyypitä backendiin
 export type Oikeus = 'luku' | 'kommentointi' | 'muokkaus' | 'luonti' | 'poisto' | 'tilanvaihto' | 'hallinta';

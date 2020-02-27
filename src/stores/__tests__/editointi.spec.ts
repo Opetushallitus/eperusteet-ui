@@ -10,8 +10,8 @@ import {
   EditointiKontrolliConfig
 } from '../editointi'
 
-describe('Editointi', async () => {
-  describe('Hooks', async () => {
+describe('Editointi', () => {
+  describe('Hooks', () => {
     test('All hooks are called', async () => {
       let data = {
         field: 'foo'

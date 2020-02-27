@@ -1,7 +1,23 @@
 <template>
-  <div>
-    asteikot
-  </div>
+  <EpMainView>
+    <template slot="icon">
+      <EpIcon class="float-right" icon="tyoryhma" background-color="#82D4FF" />
+    </template>
+
+    <b-container>
+      <h1 class="mb-4">{{ $t('arviointi') }}</h1>
+
+      <b-nav tabs>
+        <b-nav-item to="geneerinen">
+          {{ $t('geneerinen-arviointi') }}
+        </b-nav-item>
+        <b-nav-item to="arviointiasteikot">
+          {{ $t('arviointiasteikot') }}
+        </b-nav-item>
+      </b-nav>
+      <router-view />
+    </b-container>
+  </EpMainView>
 </template>
 
 <script lang="ts">
@@ -39,3 +55,4 @@ export default class RouteArviointiasteikot extends Vue {
 
 <style lang="scss">
 </style>
+

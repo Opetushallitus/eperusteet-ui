@@ -1,5 +1,5 @@
 <template>
-<EpHomeTile icon="muistikirja" :route="{ name: 'arviointiasteikot' }">
+<EpHomeTile icon="muistikirja" :route="{ name: 'geneerinen' }">
   <template slot="header">
     <span>{{ $t('arviointiasteikot') }}</span>
   </template>

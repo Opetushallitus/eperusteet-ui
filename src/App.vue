@@ -30,6 +30,5 @@ export default class App extends Vue {
 
 <style lang="scss">
 footer {
-  height: 20px;
 }
 </style>

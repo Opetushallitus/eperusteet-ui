@@ -15,8 +15,8 @@ export class PerusteprojektiStore {
   }
 
   private state = reactive({
-    pohjat: null as PerusteHakuInternalDto[] | null,
-    perusteet: null as PerusteHakuInternalDto[] | null,
+    pohjat: null as Page<PerusteHakuInternalDto> | null,
+    perusteet: null as Page<PerusteHakuInternalDto> | null,
   })
 
   public readonly perusteet = computed(() => this.state.perusteet);
