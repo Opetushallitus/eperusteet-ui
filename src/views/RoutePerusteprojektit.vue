@@ -28,6 +28,3 @@ export default class RoutePerusteprojektit extends Vue {
   perusteetStore!: PerusteStore;
 }
 </script>
-
-<style lang="scss">
-</style>

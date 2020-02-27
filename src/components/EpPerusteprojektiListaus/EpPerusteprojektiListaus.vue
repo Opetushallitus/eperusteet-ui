@@ -289,16 +289,10 @@ export default class EpPerusteprojektiListaus extends Vue {
   }
 
   get ownProjects() {
-    if (!this.provider.ownProjects.value) {
-      return null;
-    }
     return this.provider.ownProjects.value;
   }
 
   get items() {
-    if (!this.provider.projects.value) {
-      return null;
-    }
     return this.provider.projects.value;
   }
 
