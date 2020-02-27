@@ -28,6 +28,7 @@ import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import { Kayttajat } from '@/stores/kayttaja';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { PerusteStore } from '@/stores/PerusteStore';
+import { PerusteetStore } from '@/stores/PerusteetStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import { tiedotteetStore } from '@/stores/tiedotteet';
@@ -38,13 +39,14 @@ import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
 function constructStores() {
   return {
     arviointiStore: new ArviointiStore(Kielet),
-    oppaatStore: new PerusteStore({ tyyppi: 'OPAS' } as any),
-    perusteetStore: new PerusteStore({ tyyppi: 'NORMAALI' } as any),
-    pohjatStore: new PerusteStore({ tyyppi: 'POHJA' } as any),
+    oppaatStore: new PerusteetStore({ tyyppi: 'OPAS' } as any),
+    perusteStore: new PerusteStore(),
+    perusteetStore: new PerusteetStore({ tyyppi: 'NORMAALI' } as any),
     perusteprojektiStore: new PerusteprojektiStore(),
+    pohjatStore: new PerusteetStore({ tyyppi: 'POHJA' } as any),
     tiedotteetStore,
-    ulkopuolisetStore: new UlkopuolisetStore(),
     tutoriaaliStore,
+    ulkopuolisetStore: new UlkopuolisetStore(),
     virheellisetPerusteetStore,
   };
 }
@@ -136,6 +138,7 @@ const router = new VueRouter({
     }, {
       path: 'perusteprojekti/:projektiId',
       component: RoutePerusteprojekti,
+      props: { ...stores },
       children: [{
         path: '',
         name: 'perusteprojekti',
@@ -152,7 +155,7 @@ const router = new VueRouter({
         component: RouteTutkinnonOsat,
         props: { ...stores },
       }, {
-        path: 'tekstikappale:tekstiKappaleId',
+        path: 'tekstikappale/:tekstiKappaleId',
         name: 'tekstikappale',
         component: RouteTekstikappale,
         props: { ...stores },

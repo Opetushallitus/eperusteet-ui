@@ -206,7 +206,7 @@ import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
-import { PerusteStore } from '@/stores/PerusteStore';
+import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
 import { Page } from '@shared/tyypit';
@@ -232,10 +232,10 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 })
 export default class RoutePerusteprojektiLuonti extends Vue {
   @Prop({ required: true })
-  pohjatStore!: PerusteStore;
+  pohjatStore!: PerusteetStore;
 
   @Prop({ required: true })
-  perusteetStore!: PerusteStore;
+  perusteetStore!: PerusteetStore;
 
   @Prop({ required: true })
   perusteprojektiStore!: PerusteprojektiStore;

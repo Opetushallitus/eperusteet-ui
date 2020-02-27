@@ -1,5 +1,5 @@
 <template>
-  <div class="home-container">
+  <div class="home-container minfull">
     <div class="header">
       <EpNavbar :sticky="true" />
       <PortalTarget name="headerExtension" />

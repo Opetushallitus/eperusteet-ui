@@ -68,6 +68,7 @@ export default class Home extends Vue {
 .home-container {
   background-color: $etusivu-background;
   overflow: auto;
+  min-height: 100vh;
 
   .header {
     background-color: $etusivu-header-background;

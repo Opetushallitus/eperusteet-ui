@@ -1,5 +1,5 @@
 <template>
-<div v-if="!isInitializing">
+<div v-if="!isInitializing" class="minfull h-100">
   <router-view />
   <notifications style="margin-right: 6px; margin-top: 90px;"
                  position="top right"
@@ -29,6 +29,7 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-footer {
+.minfull {
+  min-height: 100vh;
 }
 </style>

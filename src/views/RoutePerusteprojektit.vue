@@ -14,7 +14,7 @@ import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
-import { PerusteStore } from '@/stores/PerusteStore';
+import { PerusteetStore } from '@/stores/PerusteetStore';
 
 @Component({
   components: {
@@ -25,6 +25,6 @@ import { PerusteStore } from '@/stores/PerusteStore';
 })
 export default class RoutePerusteprojektit extends Vue {
   @Prop({ required: true })
-  perusteetStore!: PerusteStore;
+  perusteetStore!: PerusteetStore;
 }
 </script>

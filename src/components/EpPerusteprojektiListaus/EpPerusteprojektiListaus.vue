@@ -146,6 +146,7 @@ import ProjektiCard from './ProjektiCard.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
+
 @Component({
   components: {
     EpColorIndicator,

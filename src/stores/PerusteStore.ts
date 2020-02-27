@@ -1,50 +1,31 @@
 import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
-import { Page } from '@shared/tyypit';
-import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
-import { Debounced } from '@shared/utils/delay';
+import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
 
-export class PerusteStore implements IProjektiProvider {
-  constructor(
-    private overrides = {} as PerusteQuery & any
-  ) {
-  }
+
+export class PerusteStore {
 
   private state = reactive({
-    ownProjects: null as PerusteprojektiListausDto[] | null,
-    projects: null as Page<PerusteprojektiKevytDto> | null,
-    perusteQuery: {} as PerusteQuery,
-  })
-
-  public readonly ownProjects = computed(() => {
-    return _.filter(this.state.ownProjects, p => {
-      const tyyppi = this.overrides?.tyyppi;
-      return !tyyppi || _.includes(tyyppi, _.toUpper(p.peruste?.tyyppi));
-    });
+    projekti: null as PerusteprojektiDto | null,
+    peruste: null as PerusteDto | null,
+    navigation: null as NavigationNodeDto | null,
   });
 
-  public readonly projects = computed(() => this.state.projects);
+  public readonly projekti = computed(() => this.state.projekti);
+  public readonly peruste = computed(() => this.state.peruste);
+  public readonly navigation = computed(() => this.state.navigation);
 
-  public async updateOwnProjects() {
-    const res = await Perusteprojektit.getOmatPerusteprojektit();
-    this.state.ownProjects = res.data;
+  async init(projektiId: number) {
+    const projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
+    const perusteId = Number((projekti as any)._peruste);
+    const peruste = (await Perusteet.getPerusteenTiedot(perusteId)).data;
+    const navigation = (await Perusteet.getNavigation(perusteId)).data;
+    this.state.projekti = projekti;
+    this.state.peruste = peruste;
+    this.state.navigation = navigation;
   }
 
-  public clear() {
-    this.state.ownProjects = null;
-    this.state.projects = null;
-  }
-
-  @Debounced(300)
-  public async updateQuery(query: PerusteQuery) {
-    const res = await getPerusteprojektit({
-      ...query,
-      ...this.overrides,
-    });
-    this.state.projects = res.data as any;
-  }
 }
