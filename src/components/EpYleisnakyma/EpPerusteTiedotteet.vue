@@ -2,19 +2,15 @@
   <div class="content">
     <div class="d-flex justify-content-between">
       <h3 class="mb-4">{{$t('tiedotteet')}}</h3>
-      <ep-button icon="plussa" variant="outline" v-b-modal.tiedoteMuokkausModal @click="lisaaTiedote">
-          {{ $t('lisaa-tiedote') }}
-      </ep-button>
+      <ep-tiedote-modal ref="eptiedotemodal" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
     </div>
 
     <ep-spinner v-if="!tiedotteet" />
 
     <div v-else>
-      <div v-for="(tiedote, index) in tiedotteetFiltered" :key="index" class="tiedote p-2 pl-3">
-        <div>
-          <div class="otsikko">{{$kaanna(tiedote.otsikko)}}</div>
-          <div class="muokkausaika">{{$sdt(tiedote.muokattu)}}</div>
-        </div>
+      <div v-for="(tiedote, index) in tiedotteetFiltered" :key="index" class="tiedote p-2 pl-3" @click="avaaTiedote(tiedote)">
+        <div class="otsikko" :class="{'uusi': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}} <span class="uusi" v-if="tiedote.uusi">Uusi</span></div>
+        <div class="muokkausaika">{{$sdt(tiedote.muokattu)}}</div>
       </div>
 
       <div class="text-center">
@@ -31,13 +27,16 @@ import { Vue, Component, Prop, Mixins, Watch } from 'vue-property-decorator';
 import _ from 'lodash';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
-import { PerusteDto } from '@shared/api/eperusteet';
+import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
+import { PerusteDto, TiedoteDto } from '@shared/api/eperusteet';
 
 @Component({
   components: {
     EpSpinner,
     EpButton,
+    EpTiedoteModal,
   },
 })
 export default class EpPerusteTiedotteet extends Vue {
@@ -49,7 +48,8 @@ export default class EpPerusteTiedotteet extends Vue {
 
   private tiedoteMaara = 3;
 
-  async mounted() {
+  @Watch('peruste', { immediate: true })
+  async onPerusteChange(value: PerusteDto) {
     if (this.peruste && this.peruste.id) {
       await this.tiedotteetStore.init(this.peruste.id);
     }
@@ -65,26 +65,63 @@ export default class EpPerusteTiedotteet extends Vue {
 
   get tiedotteetFiltered() {
     return _.chain(this.tiedotteetStore.perusteenTiedotteet.value)
+      .map(tiedote => {
+        return {
+          ...tiedote,
+          uusi: this.tuntisitten(tiedote.luotu),
+        };
+      })
       .take(this.tiedoteMaara)
       .value();
   }
 
-  lisaaTiedote() {
+  avaaTiedote(tiedote: TiedoteDto) {
+    (this as any).$refs['eptiedotemodal'].muokkaa(tiedote);
+  }
 
+  tuntisitten(aika) {
+    const tunti = 1000 * 60 * 60;
+    const tuntisitten = Date.now() - tunti;
+
+    return aika > tuntisitten;
   }
 }
 </script>
 
 <style scoped lang="scss">
-@import "@/styles/_variables.scss";
+@import "@shared/styles/_variables.scss";
 
   .content {
 
-    .tiedote:nth-child(even) {
-      background-color: $gray-lighten-5;
+    .tiedote:nth-of-type(even) {
+      background-color: $table-even-row-bg-color;
+    }
+
+    .tiedote:nth-of-type(odd) {
+      background-color: $table-odd-row-bg-color;
     }
 
     .tiedote {
+
+      &:hover{
+        background-color: $table-hover-row-bg-color;
+        cursor: pointer;
+      }
+
+      .otsikko {
+
+        &.uusi {
+          font-weight: bold;
+        }
+
+        .uusi {
+          background-color: $blue-lighten-3;
+          border-radius: 5px;
+          padding: 2px 4px;
+          font-size: 0.7rem;
+          margin-left: 5px;
+        }
+      }
 
       .muokkausaika {
         color: $gray-lighten-1;

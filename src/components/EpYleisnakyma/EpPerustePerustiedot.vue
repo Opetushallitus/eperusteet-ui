@@ -121,7 +121,6 @@ export default class EpPerustePerustiedot extends Vue {
 
       .topic {
         font-weight: bold;
-        line-height: 1;
       }
     }
 

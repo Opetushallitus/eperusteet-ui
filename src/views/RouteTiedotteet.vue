@@ -8,115 +8,7 @@
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tiedotteet') }}</h1>
 
-        <ep-button icon="plussa" variant="outline" v-b-modal.tiedoteMuokkausModal @click="lisaaTiedote">
-          {{ $t('lisaa-tiedote') }}
-        </ep-button>
-
-        <b-modal ref="tiedoteMuokkausModal"
-           id="tiedoteMuokkausModal"
-           size="lg">
-
-          <template v-slot:modal-header>
-            <div class="row w-100">
-              <div class="col">
-                <h2 v-if="!editing">{{$t('tiedote')}}</h2>
-                <h2 v-else>{{ muokattavaTiedote.id ? $t('muokkaa-tiedotetta') : $t('lisaa-tiedote') }}</h2>
-              </div>
-              <div class="col text-right">
-                <ep-kielivalinta />
-              </div>
-            </div>
-          </template>
-
-          <div v-if="editing">
-            <ep-form-content name="tiedotteen-otsikko">
-              <ep-input v-model="muokattavaTiedote.otsikko" :is-editing="editing" :validation="$v.muokattavaTiedote.otsikko"/>
-            </ep-form-content>
-
-            <ep-form-content name="tiedoteteksti">
-              <ep-content v-model="muokattavaTiedote.sisalto" :is-editable="editing" layout="normal" :validation="$v.muokattavaTiedote.sisalto"> </ep-content>
-            </ep-form-content>
-
-            <ep-form-content name="valitse-missa-tiedote-julkaistaan">
-
-              <ep-toggle class="pb-2" v-model="opintopolkuJulkaisuKoulutustyyppiTutkinto" :isSWitch="false" :is-editing="editing"> {{ $t('koulutustyyppi-tai-tutkintokohtainen-sivu')}} </ep-toggle>
-
-              <ep-multi-list-select
-                v-if="opintopolkuJulkaisuKoulutustyyppiTutkinto"
-                class="pl-5 pb-2"
-                tyyppi="koulutustyyppi-tai-tutkinto"
-                :items="koulutustyyppiTaiTutkintoItems"
-                v-model="koulutustyypitTaiTutkinnot"
-                :is-editing="editing"
-                :required="true"/>
-
-              <ep-toggle class="pb-2 mt-3" v-model="opintopolkuJulkaisu" :isSWitch="false" :is-editing="editing"> {{ $t('tiedote-julkaisupaikka-opintopolku')}} </ep-toggle>
-              <ep-toggle class="ml-5 pb-2" v-if="opintopolkuJulkaisu" v-model="opintopolkuJulkaisuEtusivu" :isSWitch="false" :is-editing="editing"> {{ $t('eperusteet-etusivu')}} </ep-toggle>
-
-              <ep-toggle class="pb-2" v-model="opsJulkaisu" :isSWitch="false" :is-editing="editing"> {{ $t('tiedote-julkaisupaikka-ops')}} </ep-toggle>
-              <ep-toggle class="pb-2" v-model="amosaaJulkaisu" :isSWitch="false" :is-editing="editing"> {{ $t('tiedote-julkaisupaikka-amosaa')}} </ep-toggle>
-
-            </ep-form-content>
-
-          </div>
-
-          <div v-else>
-            <div><h3>{{$kaanna(muokattavaTiedote.otsikko)}}</h3></div>
-            <div class="tiedote-muokkaustieto">
-              {{$sdt(muokattavaTiedote.muokattu)}}
-              <span class="pl-3">{{muokkaavanKayttajanNimi}}</span>
-            </div>
-
-            <div class="mb-5 mt-4" v-html="$kaanna(muokattavaTiedote.sisalto)"></div>
-
-            <h6>{{$t('tiedote-julkaistu')}}</h6>
-
-            <ul>
-              <li v-if="muokattavaTiedote.koulutustyypit && muokattavaTiedote.koulutustyypit.length > 0">
-                {{$t('koulutustyypit')}}
-                <ul>
-                  <li v-for="(koulutustyyppi, index) in muokattavaTiedote.koulutustyypit" :key="index">
-                    {{$t(koulutustyyppi)}}
-                  </li>
-                </ul>
-              </li>
-               <li v-if="muokattavaTiedote.perusteet && muokattavaTiedote.perusteet.length > 0">
-                {{$t('perusteet')}}
-                <ul>
-                  <li v-for="(peruste, index) in muokattavaTiedote.perusteet" :key="index">
-                    {{$kaanna(peruste.nimi)}}
-                  </li>
-                </ul>
-              </li>
-              <li v-for="(paikka, index) in muokattavaTiedote.filteredJulkaisupaikat" :key="index">
-                {{$t('tiedote-julkaisupaikka-' + paikka)}}
-                <ul v-if="paikka === 'opintopolku'">
-                  <li v-if="muokattavaTiedote.opintopolkuEtusivu">{{ $t('eperusteet-etusivu')}}</li>
-                </ul>
-
-              </li>
-            </ul>
-          </div>
-
-          <template v-slot:modal-footer>
-
-            <div v-if="editing">
-              <ep-button @click="suljeTiedote" variant="link">{{ $t('peruuta') }}</ep-button>
-              <ep-button @click="tallennaTiedote" class="ml-3" :disabled="$v.$invalid">{{ muokattavaTiedote.id ? $t('tallenna') : $t('julkaise-tiedote') }}</ep-button>
-            </div>
-
-            <div v-else class="d-flex justify-content-between w-100">
-              <div>
-                <ep-button icon="kyna" variant="link" @click="editing = true">{{ $t('muokkaa') }}</ep-button>
-                <ep-button icon="roskalaatikko" variant="link" @click="poista">{{ $t('poista') }}</ep-button>
-              </div>
-
-              <ep-button @click="suljeTiedote">{{ $t('sulje') }}</ep-button>
-            </div>
-
-          </template>
-
-        </b-modal>
+        <ep-tiedote-modal ref="eptiedotemodal" :perusteet="perusteet" :tiedotteetStore="tiedotteetStore" :koulutustyyppiTaiTutkintoItems="koulutustyyppiTaiTutkintoItems"/>
 
       </div>
     </template>
@@ -148,7 +40,7 @@
       :fields="tableFields"
       :per-page="perPage"
       :current-page="currentPage"
-      @row-clicked="muokkaa"/>
+      @row-clicked="avaaTiedote"/>
 
     <b-pagination
       v-model="currentPage"
@@ -179,8 +71,9 @@ import EpField from '@shared/components/forms/EpField.vue';
 import EpMultiListSelect from '@shared/components/forms/EpMultiListSelect.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
 
-import { themes, ktToState } from '@shared/utils/perusteet';
+import { themes, ktToState, perustetila } from '@shared/utils/perusteet';
 import { TutoriaaliStore } from '@shared/stores/tutoriaali';
 import { Perusteet, Kayttajat, PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
@@ -217,19 +110,10 @@ const julkaisupaikkaSort = {
     EpSelect,
     EpToggle,
     EpKielivalinta,
-  },
-  validations: {
-    muokattavaTiedote: {
-      otsikko: {
-        required,
-      },
-      sisalto: {
-        required,
-      },
-    },
+    EpTiedoteModal,
   },
 } as any)
-export default class RouteTiedotteet extends Mixins(validationMixin) {
+export default class RouteTiedotteet extends Vue {
   @Prop({ required: true })
   private tiedotteetStore!: TiedotteetStore;
 
@@ -271,6 +155,7 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
     return _.chain(this.tiedotteetStore.tiedotteet.value)
       .filter(tiedote => !this.nimiFilter || (!_.isEmpty(tiedote.otsikko) && Kielet.search(this.nimiFilter, tiedote.otsikko)))
       .filter(tiedote => _.isEmpty(this.valitutJulkaisuPaikatValues) || _.some(this.valitutJulkaisuPaikatValues, (filter) => _.includes(tiedote.julkaisupaikat, filter)))
+      .filter(tiedote => _.isEmpty(tiedote.perusteet) || !_.some(tiedote.perusteet, (peruste) => (peruste.tila as any) !== perustetila.valmis))
       .map(tiedote => {
         return {
           ...tiedote,
@@ -368,113 +253,8 @@ export default class RouteTiedotteet extends Mixins(validationMixin) {
     ];
   }
 
-  async tallennaTiedote() {
-    this.muokattavaTiedote.julkaisupaikat = _.chain(['opintopolku', 'opintopolku_etusivu', 'ops', 'amosaa'])
-      .filter(value => value !== 'opintopolku' || this.opintopolkuJulkaisu)
-      .filter(value => value !== 'opintopolku_etusivu' || this.opintopolkuJulkaisuEtusivu)
-      .filter(value => value !== 'ops' || this.opsJulkaisu)
-      .filter(value => value !== 'amosaa' || this.amosaaJulkaisu)
-      .value() as any;
-
-    this.muokattavaTiedote.koulutustyypit = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'koulutustyyppi'), 'object');
-    const perusteetIdlla = _.keyBy(this.perusteet, 'id');
-    this.muokattavaTiedote.perusteet = _.map(_.filter(this.koulutustyypitTaiTutkinnot, (ktt) => ktt.type === 'peruste'), (koulutustyyppitutkinto) => this.perusteHakuToInfo(perusteetIdlla[koulutustyyppitutkinto.object]));
-
-    if (!this.opintopolkuJulkaisuKoulutustyyppiTutkinto) {
-      this.muokattavaTiedote.koulutustyypit = [];
-      this.muokattavaTiedote.perusteet = [];
-    }
-
-    await this.tiedotteetStore.save(this.muokattavaTiedote);
-
-    this.suljeTiedote();
-    success('tiedote-tallennettu');
-  }
-
-  private perusteHakuToInfo(perusteHaku: PerusteHakuDto): PerusteKevytDto {
-    return {
-      id: perusteHaku.id,
-    } as PerusteKevytDto;
-  }
-
-  suljeTiedote() {
-    this.editing = false;
-    (this as any).$refs.tiedoteMuokkausModal.hide();
-  }
-
-  aloitaMuokkaus() {
-    this.editing = true;
-  }
-
-  lisaaTiedote() {
-    this.muokkaa({});
-    this.aloitaMuokkaus();
-  }
-
-  async muokkaa(rivi: any) {
-    this.muokattavaTiedote = _.cloneDeep(rivi);
-    this.opintopolkuJulkaisu = _.includes(rivi.julkaisupaikat, 'opintopolku');
-    this.opsJulkaisu = _.includes(rivi.julkaisupaikat, 'ops');
-    this.amosaaJulkaisu = _.includes(rivi.julkaisupaikat, 'amosaa');
-    this.opintopolkuJulkaisuEtusivu = _.includes(rivi.julkaisupaikat, 'opintopolku_etusivu');
-    this.opintopolkuJulkaisuKoulutustyyppiTutkinto = !_.isEmpty(rivi.koulutustyypit);
-
-    this.koulutustyypitTaiTutkinnot = [
-      ..._.map(rivi.koulutustyypit, (koulutustyyppi) => {
-        return {
-          type: 'koulutustyyppi',
-          object: koulutustyyppi,
-        };
-      }),
-      ..._.map(rivi.perusteet, (peruste) => {
-        return {
-          type: 'peruste',
-          object: peruste.id,
-        };
-      }),
-    ];
-
-    if (this.muokattavaTiedote.luotu) {
-      const kayttaja = (await Kayttajat.getKayttaja((this.muokattavaTiedote.muokkaaja as any))).data;
-      if (kayttaja) {
-        this.muokkaavanKayttajanNimi = parsiEsitysnimi(kayttaja);
-      }
-      else {
-        this.muokkaavanKayttajanNimi = (this.muokattavaTiedote.muokkaaja as any);
-      }
-    }
-
-    (this as any).$refs.tiedoteMuokkausModal.show();
-  }
-
-  async poista() {
-    this.suljeTiedote();
-
-    if (await this.vahvistaPoisto()) {
-      await this.tiedotteetStore.delete(this.muokattavaTiedote);
-      success('tiedote-poistettu');
-    }
-  }
-
-  public async vahvistaPoisto() {
-    const vahvistusSisalto = this.$createElement('div', {},
-      [
-        this.$createElement('div', this.$t('poista-tiedote-vahvistus') as string),
-        this.$createElement('div', '"' + (this as any).$kaanna(this.muokattavaTiedote.otsikko) + '"'),
-        this.$createElement('br', ''),
-        this.$createElement('div', this.$t('poista-tiedote-varmistus') as string),
-      ]
-    ).children;
-
-    return this.$bvModal.msgBoxConfirm((vahvistusSisalto as any), {
-      title: this.$t('poista-tiedote-kysymys'),
-      okVariant: 'primary',
-      okTitle: this.$t('poista') as any,
-      cancelVariant: 'link',
-      cancelTitle: this.$t('peruuta') as any,
-      centered: true,
-      ...{} as any,
-    });
+  avaaTiedote(tiedote: TiedoteDto) {
+    (this as any).$refs['eptiedotemodal'].muokkaa(tiedote);
   }
 }
 </script>

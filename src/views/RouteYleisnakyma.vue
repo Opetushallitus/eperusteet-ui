@@ -4,18 +4,18 @@
 
     <div class="row">
       <div class="col">
-        <ep-peruste-aikataulu class="info-box" />
+        <ep-peruste-aikataulu class="info-box" :aikatauluStore="aikatauluStore" :peruste="peruste"/>
       </div>
     </div>
 
     <div class="row">
       <div class="col">
-        <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
+        <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore" :perusteprojektiStore="perusteprojektiStore"/>
         <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti"/>
         <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore"/>
       </div>
       <div class="col">
-        <ep-peruste-viimeaikainen-toiminta class="info-box"/>
+        <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore"/>
       </div>
     </div>
 
@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import _ from 'lodash';
-import { Prop, Mixins, Component, Vue } from 'vue-property-decorator';
+import { Prop, Mixins, Component, Vue, Watch } from 'vue-property-decorator';
 import EpPerusteAikataulu from '@/components/EpYleisnakyma/EpPerusteAikataulu.vue';
 import EpPerustePerustiedot from '@/components/EpYleisnakyma/EpPerustePerustiedot.vue';
 import EpPerusteViimeaikainenToiminta from '@/components/EpYleisnakyma/EpPerusteViimeaikainenToiminta.vue';
@@ -34,6 +34,9 @@ import EpPerusteTiedotteet from '@/components/EpYleisnakyma/EpPerusteTiedotteet.
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
+import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
+import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
+import { AikatauluStore } from '@/stores/AikatauluStore';
 
 @Component({
   components: {
@@ -53,6 +56,23 @@ export default class RouteYleisnakyma extends Vue {
 
   @Prop({ required: true })
   private tutkinnonOsaStore!: TutkinnonOsaStore;
+
+  @Prop({ required: true })
+  private muokkaustietoStore!: MuokkaustietoStore;
+
+  @Prop({ required: true })
+  private perusteprojektiStore!: PerusteprojektiStore;
+
+  @Prop({ required: true })
+  private aikatauluStore!: AikatauluStore;
+
+  @Watch('peruste', { immediate: true })
+  async onPerusteChange(val) {
+    if (this.peruste && this.peruste.id) {
+      await this.muokkaustietoStore.init(this.peruste.id);
+      await this.aikatauluStore.init(this.peruste);
+    }
+  }
 
   get projekti() {
     return this.perusteStore.projekti.value;

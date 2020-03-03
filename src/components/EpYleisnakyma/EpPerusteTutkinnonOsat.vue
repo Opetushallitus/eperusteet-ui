@@ -19,7 +19,7 @@
 
 <script lang="ts">
 
-import { Vue, Component, Prop, Mixins } from 'vue-property-decorator';
+import { Vue, Component, Prop, Mixins, Watch } from 'vue-property-decorator';
 import _ from 'lodash';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
@@ -37,7 +37,8 @@ export default class EpPerusteTutkinnonOsat extends Vue {
   @Prop({ required: true })
   private peruste!: PerusteDto;
 
-  async mounted() {
+  @Watch('peruste', { immediate: true })
+  async onPerusteChange(value: PerusteDto) {
     if (this.peruste && this.peruste.id) {
       this.tutkinnonOsaStore.init(this.peruste.id, _.map(this.peruste.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)));
     }

@@ -1,12 +1,12 @@
 <template>
   <div class="content">
 
-    <div class="row">
-      <div class="col">
-        <h3>{{$t('aikataulu')}}</h3>
-      </div>
-
+    <div class="d-flex justify-content-between">
+      <h3>{{$t('aikataulu')}}</h3>
+      <!-- <ep-aikataulu-modal :aikataulut="aikataulut" /> -->
     </div>
+
+    <ep-aikataulu :aikataulut="aikataulut" />
 
   </div>
 </template>
@@ -18,6 +18,8 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpAikatauluModal from '@shared/components/EpAikataulu/EpAikatauluModal.vue';
 import { success } from '@/utils/notifications';
+import { PerusteprojektiDto, PerusteDto } from '@shared/api/eperusteet';
+import { AikatauluStore } from '@/stores/AikatauluStore';
 
 @Component({
   components: {
@@ -28,64 +30,21 @@ import { success } from '@/utils/notifications';
   },
 })
 export default class EpPerusteAikataulu extends Vue {
+  @Prop({ required: true })
+  private aikatauluStore!: AikatauluStore;
 
+  get aikataulut() {
+    return this.aikatauluStore.aikataulutapahtumat.value;
+  }
+
+  async tallenna(aikataulut) {
+    await this.aikatauluStore.saveAikataulut(aikataulut);
+    success('aikataulu-tallennettu');
+  }
 }
 </script>
 
 <style scoped lang="scss">
 @import "@/styles/_variables.scss";
-
-  .pohja {
-    margin: 10px 0px;
-    background-color: $gray-lighten-8;
-    border-radius: 15px;
-    height: 15px;
-    position: relative;
-
-    .kulunut-aika {
-      background-color: $green-lighten-3;
-      border-radius: 15px;
-      height: 15px;
-      position: absolute;
-    }
-
-    .aikataulu {
-      height: 15px;
-      width: 15px;
-      border-radius: 30px;
-      position: absolute;
-
-      &.tavoite {
-        background-color: $blue;
-      }
-
-      &.julkaisu {
-        background-color: $blue-lighten-2;
-      }
-    }
-
-  }
-
-  .alainfo {
-    position: relative;
-
-    .julkaisu {
-      position: absolute;
-    }
-  }
-
-  .luomispaiva {
-    border-left: 1px solid $gray-lighten-3;
-    padding-left: 5px;
-  }
-
-  .julkaisupaiva {
-    border-right: 1px solid $gray-lighten-3;
-    padding-right: 5px;
-  }
-
-  .paiva-alatieto {
-    color: $gray-lighten-1;
-  }
 
 </style>
