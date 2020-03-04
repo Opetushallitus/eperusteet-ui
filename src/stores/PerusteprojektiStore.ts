@@ -50,4 +50,16 @@ export class PerusteprojektiStore {
     const res = await Perusteprojektit.addPerusteprojekti(luontiDto);
     return res.data;
   }
+
+  @Debounced(300)
+  public async getPerusteprojekti(perusteProjektiId: number) {
+    const res = await Perusteprojektit.getPerusteprojekti(perusteProjektiId);
+    return res.data;
+  }
+
+  @Debounced(300)
+  public async getPerusteprojektiTyoryhma(perusteProjektiId: number) {
+    const res = await Perusteprojektit.getPerusteprojektiTyoryhmat(perusteProjektiId);
+    return res.data;
+  }
 }

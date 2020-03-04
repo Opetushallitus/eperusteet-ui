@@ -39,7 +39,7 @@ import TilePohjat from './tiles/TilePohjat.vue';
 import TileTiedotteet from './tiles/TileTiedotteet.vue';
 import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
-import { TiedotteetStore } from '@/stores/tiedotteet';
+import { TiedotteetStore } from '@/stores/TiedotteetStore';
 
 @Component({
   components: {
