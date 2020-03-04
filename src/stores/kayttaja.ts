@@ -1,15 +1,16 @@
 import _ from 'lodash';
 import Vue from 'vue';
 import { Store, Getter, State } from '@shared/stores/store';
-import { Kayttajat as KayttajatApi, KayttajanTietoDto } from '@shared/api/eperusteet';
+import { Kayttajat as KayttajatApi, KayttajanTietoDto, Perusteprojektit } from '@shared/api/eperusteet';
 import { createLogger } from '@shared/utils/logger';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { IOikeusProvider } from '@shared/plugins/oikeustarkastelu';
 
 Vue.use(VueCompositionApi);
 
 // FIXME: tyypitä backendiin
 export type Oikeus = 'luku' | 'kommentointi' | 'muokkaus' | 'luonti' | 'poisto' | 'tilanvaihto' | 'hallinta';
-export type OikeusKohde = 'opetussuunnitelma' | 'pohja';
+export type OikeusKohde = 'perusteprojekti' | 'peruste' | 'pohja';
 export interface Oikeudet { [kohde: string]: Oikeus[]; }
 
 function getOikeusArvo(oikeus: Oikeus) {
@@ -35,19 +36,19 @@ export function parsiEsitysnimi(tiedot: any): string {
 
 const logger = createLogger('Kayttaja');
 
-export class KayttajaStore {
+export class KayttajaStore implements IOikeusProvider {
   public state = reactive({
+    projektiId: null as number | null,
     organisaatiot: [] as any[],
     tiedot: {} as KayttajanTietoDto,
     virkailijat: [] as any[],
     oikeudet: {
-      opetussuunnitelma: [],
-      pohja: [],
     } as Oikeudet,
   });
 
   public readonly organisaatiot = computed(() => this.state.organisaatiot);
   public readonly tiedot = computed(() => this.state.tiedot);
+  public readonly userOid = computed(() => this.state.tiedot.oidHenkilo);
   public readonly virkailijat = computed(() => this.state.virkailijat);
   public readonly oikeudet = computed(() => this.state.oikeudet);
   public readonly nimi = computed(() => parsiEsitysnimi(this.state.tiedot));
@@ -63,7 +64,29 @@ export class KayttajaStore {
     }
   }
 
-  public async hasOikeus(oikeus: Oikeus, kohde: OikeusKohde = 'opetussuunnitelma') {
+  public async clear() {
+    try {
+      this.state.projektiId = null;
+      this.state.oikeudet = {};
+    }
+    catch (err) {
+      logger.error('Ei oikeuksia', err.message);
+    }
+  }
+
+  public async setPerusteprojekti(perusteprojektiId: number) {
+    try {
+      const res = await Perusteprojektit.getPerusteprojektiOikeudet(perusteprojektiId);
+      this.state.projektiId = perusteprojektiId;
+      this.state.oikeudet = res.data as any;
+      console.log('setting perusteprojekti', this.state);
+    }
+    catch (err) {
+      logger.error('Ei oikeuksia', err.message);
+    }
+  }
+
+  public async hasOikeus(oikeus: Oikeus, kohde: OikeusKohde = 'peruste') {
     if (!oikeus) {
       return false;
     }
@@ -75,7 +98,7 @@ export class KayttajaStore {
     }
   }
 
-  private vertaa(oikeus: Oikeus, kohde: OikeusKohde = 'opetussuunnitelma') {
+  private vertaa(oikeus: Oikeus, kohde: OikeusKohde = 'peruste') {
     const haettu = getOikeusArvo(oikeus);
     if (haettu === 0) {
       return false;

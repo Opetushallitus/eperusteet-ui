@@ -5,7 +5,7 @@ describe('Kayttajat', () => {
 
   beforeEach(() => {
     kayttajaStore.state.oikeudet = {
-      opetussuunnitelma: [],
+      perusteprojekti: [],
       pohja: [],
     };
   });
@@ -15,12 +15,12 @@ describe('Kayttajat', () => {
     expect(await kayttajaStore.hasOikeus('hallinta')).toEqual(false);
     expect(await kayttajaStore.hasOikeus('hallinta', 'pohja')).toEqual(false);
     expect(await kayttajaStore.hasOikeus('luku', 'pohja')).toEqual(false);
-    expect(await kayttajaStore.hasOikeus('tilanvaihto', 'opetussuunnitelma')).toEqual(false);
+    expect(await kayttajaStore.hasOikeus('tilanvaihto', 'perusteprojekti')).toEqual(false);
   });
 
   test('Hallintaoikeudet', async () => {
     kayttajaStore.state.oikeudet = {
-      opetussuunnitelma: [],
+      perusteprojekti: [],
       pohja: ['luonti'],
     };
 
@@ -29,33 +29,33 @@ describe('Kayttajat', () => {
   });
 
   test('Rikkinäisillä parametreilla ei oikeuksia', async () => {
-    expect(await kayttajaStore.hasOikeus(null as any, 'opetussuunnitelma')).toEqual(false);
+    expect(await kayttajaStore.hasOikeus(null as any, 'perusteprojekti')).toEqual(false);
     expect(await kayttajaStore.hasOikeus('luku', null as any)).toEqual(false);
     expect(await kayttajaStore.hasOikeus(null as any, null as any)).toEqual(false);
     expect(await kayttajaStore.hasOikeus('keksitty' as any)).toEqual(false);
   });
 
-  test('Opetussuunnitelman lukuoikeudet', async () => {
+  test('perusteprojekti lukuoikeudet', async () => {
     kayttajaStore.state.oikeudet = {
-      opetussuunnitelma: ['luku'],
+      perusteprojekti: ['luku'],
       pohja: [],
     };
     expect(await kayttajaStore.hasOikeus('luku', 'pohja')).toEqual(false);
-    expect(await kayttajaStore.hasOikeus('luku', 'opetussuunnitelma')).toEqual(true);
-    expect(await kayttajaStore.hasOikeus('kommentointi', 'opetussuunnitelma')).toEqual(false);
+    expect(await kayttajaStore.hasOikeus('luku', 'perusteprojekti')).toEqual(true);
+    expect(await kayttajaStore.hasOikeus('kommentointi', 'perusteprojekti')).toEqual(false);
   });
 
-  test('Opetussuunnitelman muokkausoikeus', async () => {
+  test('perusteprojekti muokkausoikeus', async () => {
     kayttajaStore.state.oikeudet = {
-      opetussuunnitelma: ['muokkaus'],
+      perusteprojekti: ['muokkaus'],
       pohja: [],
     };
 
     expect(await kayttajaStore.hasOikeus('luku', 'pohja')).toEqual(false);
-    expect(await kayttajaStore.hasOikeus('luku', 'opetussuunnitelma')).toEqual(true);
-    expect(await kayttajaStore.hasOikeus('kommentointi', 'opetussuunnitelma')).toEqual(true);
-    expect(await kayttajaStore.hasOikeus('muokkaus', 'opetussuunnitelma')).toEqual(true);
-    expect(await kayttajaStore.hasOikeus('luonti', 'opetussuunnitelma')).toEqual(false);
-    expect(await kayttajaStore.hasOikeus('poisto', 'opetussuunnitelma')).toEqual(false);
+    expect(await kayttajaStore.hasOikeus('luku', 'perusteprojekti')).toEqual(true);
+    expect(await kayttajaStore.hasOikeus('kommentointi', 'perusteprojekti')).toEqual(true);
+    expect(await kayttajaStore.hasOikeus('muokkaus', 'perusteprojekti')).toEqual(true);
+    expect(await kayttajaStore.hasOikeus('luonti', 'perusteprojekti')).toEqual(false);
+    expect(await kayttajaStore.hasOikeus('poisto', 'perusteprojekti')).toEqual(false);
   });
 });

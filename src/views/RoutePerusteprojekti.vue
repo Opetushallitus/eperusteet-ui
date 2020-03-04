@@ -16,12 +16,13 @@
     </Portal>
 
     <EpSpinner v-if="!navigation" />
-    <div v-else class="d-flex align-items-stretch">
-      <div class="sidenav minfull">
+    <EpSidebar>
+      <template v-slot:bar>
         <div class="m-3">
           <EpSearch v-model="query" />
         </div>
-        <EpTreeNavibar :store="naviStore">
+        <div class="navigation">
+          <EpTreeNavibar :store="naviStore">
           <template v-slot:padding="{ item }">
             <div :style="{ 'margin-left': item.depth * 20 + 'px' }">
             </div>
@@ -61,12 +62,25 @@
               </router-link>
             </div>
           </template>
-        </EpTreeNavibar>
-      </div>
-      <div class="actual flex-grow-1">
+          </EpTreeNavibar>
+        </div>
+      </template>
+
+      <template v-slot:view>
         <router-view />
-      </div>
-    </div>
+      </template>
+
+      <template v-slot:bottom>
+        <div class="menu-item bottom-menu-item">
+          <router-link :to="{ name: 'jarjesta' }">
+            <span class="text-nowrap">
+              <fas icon="jarjesta" fixed-width />
+              {{ $t('muokkaa-rakennetta') }}
+            </span>
+          </router-link>
+        </div>
+      </template>
+    </EpSidebar>
   </div>
 </template>
 
@@ -76,10 +90,10 @@ import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpSidebar from '@shared/components/EpSidebar/EpSidebar.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpTreeNavibar from '@shared/components/EpTreeNavibar/EpTreeNavibar.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
-
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -88,6 +102,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpIcon,
     EpMultiSelect,
     EpSearch,
+    EpSidebar,
     EpSpinner,
     EpTreeNavibar,
   },
@@ -116,7 +131,7 @@ export default class RoutePerusteprojekti extends Vue {
   }
 
   get projekti() {
-    return this.perusteStore.projekti.value
+    return this.perusteStore.projekti.value;
   }
 
   get navigation() {
@@ -126,19 +141,11 @@ export default class RoutePerusteprojekti extends Vue {
   get peruste() {
     return this.perusteStore.peruste.value;
   }
-
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/_variables';
-
-.sidenav {
-  min-width: $sidebar-width;
-  max-width: $sidebar-width;
-  background: #fff;
-  padding-left: 10px;
-}
 
 .portal-menu {
   height: 140px;
@@ -154,13 +161,26 @@ export default class RoutePerusteprojekti extends Vue {
   }
 }
 
-.actual {
-  background: #f2f2f2;
+.navigation {
+  min-height: 1200px;
 }
 
 .menu-item {
-  margin-top: 12px;
+  padding: 6px;
   font-size: 0.8rem;
+
+  a {
+    color: #000;
+
+    &.router-link-active {
+      font-weight: 600;
+    }
+  }
+}
+
+.bottom-menu-item {
+  margin-left: 20px;
+  margin-bottom: 10px;
 }
 
 </style>

@@ -7,7 +7,6 @@
 <script lang="ts">
 import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
 
-
 @Component
 export default class RouteTutkinnonosat extends Vue {
 }

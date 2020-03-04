@@ -24,34 +24,9 @@ import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
 import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
+import RouteJarjesta from '@/views/RouteJarjesta.vue';
 
-import { Kayttajat } from '@/stores/kayttaja';
-import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { PerusteStore } from '@/stores/PerusteStore';
-import { PerusteetStore } from '@/stores/PerusteetStore';
-import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
-import { ArviointiStore } from '@/stores/ArviointiStore';
-import { tiedotteetStore } from '@/stores/tiedotteet';
-import { Kielet } from '@shared/stores/kieli';
-import { tutoriaaliStore } from '@shared/stores/tutoriaali';
-import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore';
-
-function constructStores() {
-  return {
-    arviointiStore: new ArviointiStore(Kielet),
-    oppaatStore: new PerusteetStore({ tyyppi: 'OPAS' } as any),
-    perusteStore: new PerusteStore(),
-    perusteetStore: new PerusteetStore({ tyyppi: 'NORMAALI' } as any),
-    perusteprojektiStore: new PerusteprojektiStore(),
-    pohjatStore: new PerusteetStore({ tyyppi: 'POHJA' } as any),
-    tiedotteetStore,
-    tutoriaaliStore,
-    ulkopuolisetStore: new UlkopuolisetStore(),
-    virheellisetPerusteetStore,
-  };
-}
-
-const stores = constructStores();
+import { stores } from '@/stores';
 
 Vue.use(VueRouter);
 
@@ -145,6 +120,11 @@ const router = new VueRouter({
         component: RouteYleisnakyma,
         props: { ...stores },
       }, {
+        path: 'jarjesta',
+        name: 'jarjesta',
+        component: RouteJarjesta,
+        props: { ...stores },
+      }, {
         path: 'rakenne',
         name: 'muodostuminen',
         component: RouteMuodostuminen,
@@ -182,6 +162,27 @@ const router = new VueRouter({
       }],
     }],
   }],
+});
+
+router.beforeEach(async (to, from, next) => {
+  const perusteprojektiId = Number(to.params.projektiId);
+  const oldId = Number(from.params.projektiId);
+  if (!perusteprojektiId) {
+    stores.kayttajatStore.clear();
+    next();
+  }
+  else if (perusteprojektiId === oldId) {
+    next();
+  }
+  else {
+    try {
+      await stores.kayttajatStore.setPerusteprojekti(perusteprojektiId);
+      next();
+    }
+    catch (err) {
+      throw new Error(err);
+    }
+  }
 });
 
 export default router;
