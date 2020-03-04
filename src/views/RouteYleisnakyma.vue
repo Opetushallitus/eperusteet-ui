@@ -10,12 +10,12 @@
 
     <div class="row">
       <div class="col">
-        <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore" :perusteprojektiStore="perusteprojektiStore"/>
+        <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
         <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti"/>
         <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore"/>
       </div>
       <div class="col">
-        <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore"/>
+        <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
       </div>
     </div>
 
@@ -67,11 +67,17 @@ export default class RouteYleisnakyma extends Vue {
   private aikatauluStore!: AikatauluStore;
 
   @Watch('peruste', { immediate: true })
-  async onPerusteChange(val) {
+  onPerusteChange(val) {
     if (this.peruste && this.peruste.id) {
-      await this.muokkaustietoStore.init(this.peruste.id);
-      await this.aikatauluStore.init(this.peruste);
+      this.muokkaustietoStore.init(this.peruste.id);
+      this.aikatauluStore.init(this.peruste);
+      this.tutkinnonOsaStore.init(this.peruste.id, _.map(this.peruste.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)));
+      this.tiedotteetStore.init(this.peruste.id);
     }
+  }
+
+  get projektiId() {
+    return this.$route.params.projektiId;
   }
 
   get projekti() {

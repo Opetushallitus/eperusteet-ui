@@ -2,7 +2,7 @@
   <div class="content">
     <h3>{{$t('tutkinnon-osat')}}</h3>
 
-    <ep-spinner v-if="!tutkinnonOsat" />
+    <ep-spinner v-if="!tutkinnonOsat || !peruste" />
 
     <div class="box d-inline-flex flex-column align-items-center justify-content-center text-center" v-if="tutkinnonOsat">
       <div class="count">{{tutkinnonOsiaTuotu}}</div>
@@ -36,13 +36,6 @@ export default class EpPerusteTutkinnonOsat extends Vue {
 
   @Prop({ required: true })
   private peruste!: PerusteDto;
-
-  @Watch('peruste', { immediate: true })
-  async onPerusteChange(value: PerusteDto) {
-    if (this.peruste && this.peruste.id) {
-      this.tutkinnonOsaStore.init(this.peruste.id, _.map(this.peruste.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)));
-    }
-  }
 
   get tutkinnonOsat() {
     return this.tutkinnonOsaStore.tutkinnonOsat.value;

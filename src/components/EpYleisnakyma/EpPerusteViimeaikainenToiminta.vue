@@ -2,7 +2,7 @@
   <div class="content text-left">
     <h3>{{$t('viimeaikainen-toiminta')}}</h3>
 
-    <ep-spinner v-if="!muokkaustiedot"/>
+    <ep-spinner v-if="!muokkaustiedot || !peruste"/>
 
     <div class="container text-center" v-else>
       <div v-for="(muokkaustieto, index) in muokkaustiedotRouted" :key="index" class="row muokkaustieto">
@@ -35,11 +35,8 @@
           </router-link>
         </div>
       </div>
-    </div>
 
-    <div class="text-center">
-
-      <span class="tyhja" v-if="muokkaustiedot && muokkaustiedot.length === 0">{{$t('viimeaikainen-toiminta-tyhja')}}</span>
+       <span class="tyhja" v-if="muokkaustiedot && muokkaustiedot.length === 0">{{$t('viimeaikainen-toiminta-tyhja')}}</span>
 
       <div v-else>
         <ep-button @click="haeLisaa" variant="link" v-if="!lisahaku && muokkaustiedotRouted.length % hakuLukumaara == 0 && muokkaustiedot && (!viimeinenHaku || viimeinenHaku.length > 0)">
@@ -48,6 +45,7 @@
 
         <ep-spinner v-if="lisahaku"></ep-spinner>
       </div>
+
     </div>
 
   </div>
@@ -55,12 +53,12 @@
 
 <script lang="ts">
 import _ from 'lodash';
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { muokkaustietoRoute, muokkaustietoIcon } from '@/utils/tapahtuma';
-import { MuokkaustietoKayttajallaDto } from '@shared/api/eperusteet';
+import { MuokkaustietoKayttajallaDto, PerusteDto } from '@shared/api/eperusteet';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
 
 @Component({
@@ -74,6 +72,9 @@ export default class EpPerusteViimeaikainenToiminta extends Vue {
   private muokkaustietoStore!: MuokkaustietoStore;
 
   private lisahaku: boolean = false;
+
+  @Prop({ required: true })
+  private peruste!: PerusteDto;
 
   get muokkaustiedot() {
     return this.muokkaustietoStore.muokkaustiedot.value;
