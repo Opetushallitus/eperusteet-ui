@@ -5,7 +5,7 @@
       <ep-tiedote-modal ref="eptiedotemodal" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
     </div>
 
-    <ep-spinner v-if="!tiedotteet" />
+    <ep-spinner v-if="!tiedotteet || !peruste" />
 
     <div v-else>
       <div v-for="(tiedote, index) in tiedotteetFiltered" :key="index" class="tiedote p-2 pl-3" @click="avaaTiedote(tiedote)">
@@ -47,13 +47,6 @@ export default class EpPerusteTiedotteet extends Vue {
   private peruste!: PerusteDto;
 
   private tiedoteMaara = 3;
-
-  @Watch('peruste', { immediate: true })
-  async onPerusteChange(value: PerusteDto) {
-    if (this.peruste && this.peruste.id) {
-      await this.tiedotteetStore.init(this.peruste.id);
-    }
-  }
 
   get tiedotteet() {
     return this.tiedotteetStore.perusteenTiedotteet.value;
