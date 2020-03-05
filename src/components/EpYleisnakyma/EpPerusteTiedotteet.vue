@@ -9,7 +9,7 @@
 
     <div v-else>
       <div v-for="(tiedote, index) in tiedotteetFiltered" :key="index" class="tiedote p-2 pl-3" @click="avaaTiedote(tiedote)">
-        <div class="otsikko" :class="{'uusi': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}} <span class="uusi" v-if="tiedote.uusi">Uusi</span></div>
+        <div class="otsikko" :class="{'uusi': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}} <span class="uusi" v-if="tiedote.uusi">{{$t('uusi')}}</span></div>
         <div class="muokkausaika">{{$sdt(tiedote.muokattu)}}</div>
       </div>
 

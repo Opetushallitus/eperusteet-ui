@@ -7,9 +7,7 @@
     <template slot="header">
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tiedotteet') }}</h1>
-
-        <ep-tiedote-modal ref="eptiedotemodal" :perusteet="perusteet" :tiedotteetStore="tiedotteetStore"/>
-
+        <ep-tiedote-modal ref="eptiedotemodal" :perusteet="julkaistutPerusteet" :tiedotteetStore="tiedotteetStore"/>
       </div>
     </template>
 
@@ -57,49 +55,27 @@
 import { Prop, Vue, Component, Mixins, Watch } from 'vue-property-decorator';
 import _ from 'lodash';
 
-import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
-import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import EpInput from '@shared/components/forms/EpInput.vue';
-import EpField from '@shared/components/forms/EpField.vue';
-import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms/EpMultiListSelect.vue';
-import EpSelect from '@shared/components/forms/EpSelect.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
 
-import { themes, ktToState, perustetila, koulutustyyppiRyhmat } from '@shared/utils/perusteet';
+import { perustetila, perusteprojektitila } from '@shared/utils/perusteet';
 import { TutoriaaliStore } from '@shared/stores/tutoriaali';
-import { Perusteet, Kayttajat, PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/eperusteet';
+import { Perusteet, PerusteHakuDto, PerusteHakuInternalDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
-import { success, fail } from '@/utils/notifications';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
-import { required } from 'vuelidate/lib/validators';
-import { validationMixin } from 'vuelidate';
-import { parsiEsitysnimi } from '@/stores/kayttaja';
-import { julkaisupaikka, KoulutustyyppiTaiTutkinto, julkaisupaikkaSort } from '../../eperusteet-frontend-utils/vue/src/utils/tiedote';
+import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 
 @Component({
   components: {
     EpIcon,
-    EpButton,
-    EpContent,
     EpMainView,
     EpSearch,
-    EpSpinner,
     EpFormContent,
     EpMultiSelect,
-    EpInput,
-    EpField,
-    EpMultiListSelect,
-    EpSelect,
-    EpToggle,
-    EpKielivalinta,
     EpTiedoteModal,
   },
 } as any)
@@ -114,18 +90,22 @@ export default class RouteTiedotteet extends Vue {
   private perPage = 10;
   private totalRows = 0;
   private nimiFilter = ''
-  private koulutustyypitTaiTutkinnot: KoulutustyyppiTaiTutkinto[] = [];
   private valitutJulkaisupaikat: [] = [];
-  private editing: boolean = false;
-  private perusteet: PerusteHakuDto[] = [];
-
-  private muokattavaTiedote: TiedoteDto = {};
-  private muokkaavanKayttajanNimi = '';
+  private perusteet: PerusteHakuInternalDto[] = [];
 
   async mounted() {
     this.tiedotteetStore.fetch();
-    const res = (await Perusteet.getAllPerusteet() as any).data;
+    const res = (await Perusteet.getAllPerusteetInternal() as any).data;
     this.perusteet = res.data;
+  }
+
+  get julkaistutPerusteet() {
+    return _.chain(this.perusteet)
+      .filter(peruste => peruste.perusteprojekti?.tila === perusteprojektitila.julkaistu)
+      .filter(peruste => peruste.tila === perustetila.valmis)
+      .filter(peruste => (!peruste.voimassaoloAlkaa || new Date(peruste.voimassaoloAlkaa) < new Date()))
+      .filter(peruste => (!peruste.voimassaoloLoppuu || new Date(peruste.voimassaoloLoppuu) > new Date()))
+      .value();
   }
 
   get tiedotteetFiltered() {
@@ -139,7 +119,6 @@ export default class RouteTiedotteet extends Vue {
           julkaisupaikat: _.chain(tiedote.julkaisupaikat)
             .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
             .value(),
-          opintopolkuEtusivu: _.includes((tiedote.julkaisupaikat as any), 'opintopolku_etusivu'),
         };
       })
       .value();
