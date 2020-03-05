@@ -61,7 +61,7 @@ export default class EpPerusteTiedotteet extends Vue {
       .map(tiedote => {
         return {
           ...tiedote,
-          uusi: this.tuntisitten(tiedote.luotu),
+          uusi: this.onkoUusi(tiedote.luotu),
         };
       })
       .take(this.tiedoteMaara)
@@ -72,11 +72,11 @@ export default class EpPerusteTiedotteet extends Vue {
     (this as any).$refs['eptiedotemodal'].muokkaa(tiedote);
   }
 
-  tuntisitten(aika) {
-    const tunti = 1000 * 60 * 60;
-    const tuntisitten = Date.now() - tunti;
+  onkoUusi(aika) {
+    const paiva = 1000 * 60 * 60 * 24;
+    const paivaSitten = Date.now() - paiva;
 
-    return aika > tuntisitten;
+    return aika > paivaSitten;
   }
 }
 </script>

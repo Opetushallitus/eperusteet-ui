@@ -8,7 +8,7 @@
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tiedotteet') }}</h1>
 
-        <ep-tiedote-modal ref="eptiedotemodal" :perusteet="perusteet" :tiedotteetStore="tiedotteetStore" :koulutustyyppiTaiTutkintoItems="koulutustyyppiTaiTutkintoItems"/>
+        <ep-tiedote-modal ref="eptiedotemodal" :perusteet="perusteet" :tiedotteetStore="tiedotteetStore"/>
 
       </div>
     </template>
@@ -68,12 +68,12 @@ import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpField from '@shared/components/forms/EpField.vue';
-import EpMultiListSelect from '@shared/components/forms/EpMultiListSelect.vue';
+import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms/EpMultiListSelect.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
 
-import { themes, ktToState, perustetila } from '@shared/utils/perusteet';
+import { themes, ktToState, perustetila, koulutustyyppiRyhmat } from '@shared/utils/perusteet';
 import { TutoriaaliStore } from '@shared/stores/tutoriaali';
 import { Perusteet, Kayttajat, PageTiedoteDto, TiedoteDto, PerusteHakuDto, PerusteKevytDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
@@ -82,17 +82,7 @@ import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { required } from 'vuelidate/lib/validators';
 import { validationMixin } from 'vuelidate';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
-
-interface KoulutustyyppiTaiTutkinto {
-  type: string,
-  object: any,
-}
-
-const julkaisupaikkaSort = {
-  'opintopolku': 1,
-  'ops': 2,
-  'amosaa': 3,
-};
+import { julkaisupaikka, KoulutustyyppiTaiTutkinto, julkaisupaikkaSort } from '../../eperusteet-frontend-utils/vue/src/utils/tiedote';
 
 @Component({
   components: {
@@ -132,23 +122,10 @@ export default class RouteTiedotteet extends Vue {
   private muokattavaTiedote: TiedoteDto = {};
   private muokkaavanKayttajanNimi = '';
 
-  private opintopolkuJulkaisu: boolean = false;
-  private opintopolkuJulkaisuEtusivu: boolean = false;
-  private opintopolkuJulkaisuKoulutustyyppiTutkinto: boolean = false;
-  private opsJulkaisu: boolean = false;
-  private amosaaJulkaisu: boolean = false;
-
   async mounted() {
     this.tiedotteetStore.fetch();
     const res = (await Perusteet.getAllPerusteet() as any).data;
     this.perusteet = res.data;
-  }
-
-  @Watch('opintopolkuJulkaisu')
-  async onValueChanged(newVal: any) {
-    if (!newVal) {
-      this.opintopolkuJulkaisuEtusivu = false;
-    }
   }
 
   get tiedotteetFiltered() {
@@ -159,8 +136,7 @@ export default class RouteTiedotteet extends Vue {
       .map(tiedote => {
         return {
           ...tiedote,
-          filteredJulkaisupaikat: _.chain(tiedote.julkaisupaikat)
-            .filter((julkaisupaikka) => (julkaisupaikka as any) !== 'opintopolku_etusivu')
+          julkaisupaikat: _.chain(tiedote.julkaisupaikat)
             .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
             .value(),
           opintopolkuEtusivu: _.includes((tiedote.julkaisupaikat as any), 'opintopolku_etusivu'),
@@ -175,9 +151,10 @@ export default class RouteTiedotteet extends Vue {
 
   get julkaisupaikatItems() {
     return [
-      { text: this.$t('tiedote-julkaisupaikka-opintopolku'), value: 'opintopolku' },
-      { text: this.$t('tiedote-julkaisupaikka-ops'), value: 'ops' },
-      { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: 'amosaa' },
+      { text: this.$t('tiedote-julkaisupaikka-opintopolku'), value: julkaisupaikka.opintopolku_etusivu },
+      { text: this.$t('tiedote-julkaisupaikka-ops'), value: julkaisupaikka.lops },
+      { text: this.$t('tiedote-julkaisupaikka-lops'), value: julkaisupaikka.lops },
+      { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: julkaisupaikka.amosaa },
     ];
   }
 
@@ -210,47 +187,19 @@ export default class RouteTiedotteet extends Vue {
         return (this as any).$kaanna(value);
       },
     }, {
-      key: 'filteredJulkaisupaikat',
+      key: 'julkaisupaikat',
       label: this.$t('tiedote-julkaistu'),
       sortable: true,
       thStyle: { width: '35%' },
       sortByFormatted: true,
       formatter: (value: any, key: any, item: any) => {
-        return _.join(_.map(value, (julkaisupaikka) => this.$t(julkaisupaikka)), ', ');
+        return _.chain(value)
+          .sortBy(julkaisupaikka => julkaisupaikkaSort[julkaisupaikka])
+          .map((julkaisupaikka) => this.$t('tiedote-julkaisupaikka-' + julkaisupaikka))
+          .join(', ')
+          .value();
       },
     }];
-  }
-
-  get koulutustyyppiTaiTutkintoItems() {
-    return [
-      ..._.chain(_.keys(ktToState))
-        .map((koulutustyyppi) => {
-          return [
-            {
-              text: this.$t(koulutustyyppi),
-              value: {
-                type: 'koulutustyyppi',
-                object: koulutustyyppi,
-              },
-            },
-            ..._.chain(this.perusteet)
-              .filter((peruste) => peruste.koulutustyyppi === koulutustyyppi)
-              .map(peruste => {
-                return {
-                  text: (this as any).$kaanna(peruste.nimi),
-                  value: {
-                    type: 'peruste',
-                    object: peruste.id,
-                  },
-                  child: true,
-                };
-              })
-              .value(),
-          ];
-        })
-        .flatten()
-        .value(),
-    ];
   }
 
   avaaTiedote(tiedote: TiedoteDto) {
