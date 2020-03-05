@@ -23,6 +23,7 @@ import { VueTutorial } from '@shared/plugins/tutoriaali';
 import { tutoriaaliStore } from '@shared/stores/tutoriaali';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
+import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 
 import router from './router';
 import { stores } from '@/stores';
@@ -54,6 +55,11 @@ Vue.use(BrowserStore);
 Vue.config.productionTip = false;
 
 TekstikappaleStore.install({
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+TutkinnonOsaEditStore.install({
   perusteStore: stores.perusteStore,
   router,
 });
