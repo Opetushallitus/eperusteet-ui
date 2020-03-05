@@ -10,6 +10,7 @@ module.exports = {
     '!<rootDir>/src/api/eperusteet.ts',
     '!<rootDir>/src/**/script.ts',
     '!<rootDir>/**/*.d.ts',
+    '!<rootDir>/eperusteet-frontend-utils/**',
     '!<rootDir>/src/main.ts',
     '!<rootDir>/src/registerServiceWorker.ts',
   ],

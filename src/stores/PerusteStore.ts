@@ -1,30 +1,35 @@
 import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
 import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
 
 export class PerusteStore {
+  private blocklist = [] as (() => void)[];
+
   private state = reactive({
     projekti: null as PerusteprojektiDto | null,
     peruste: null as PerusteDto | null,
     navigation: null as NavigationNodeDto | null,
     tyoryhma: null as any | null,
+    perusteId: null as number | null,
+    isInitialized: false,
   });
 
   public readonly projekti = computed(() => this.state.projekti);
   public readonly peruste = computed(() => this.state.peruste);
   public readonly navigation = computed(() => this.state.navigation);
   public readonly tyoryhma = computed(() => this.state.tyoryhma);
-  public readonly perusteId = computed(() => this.state.peruste?.id);
+  public readonly perusteId = computed(() => this.state.perusteId);
 
   async init(projektiId: number) {
+    this.state.isInitialized = false;
     this.state.peruste = null;
     this.state.projekti = null;
-
     this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
     const perusteId = Number((this.state.projekti as any)._peruste);
+    this.state.perusteId = perusteId;
 
     [
       this.state.peruste,
@@ -35,6 +40,8 @@ export class PerusteStore {
       Perusteet.getNavigation(perusteId),
       Ulkopuoliset.getOrganisaatioRyhmatByOid(this.state.projekti.ryhmaOid!),
     ]), 'data');
+
+    this.state.isInitialized = true;
   }
 
   public removeNavigationEntry(item: { id: number, type: string }) {
@@ -50,4 +57,26 @@ export class PerusteStore {
       .value();
     return node;
   }
+
+  public async blockUntilInitialized() {
+    return new Promise(resolve => {
+      if (this.state.isInitialized) {
+        resolve();
+      }
+      else {
+        this.blocklist.push(resolve);
+      }
+    });
+  }
+
+  private readonly blockResolver = watch(() => {
+    if (this.state.isInitialized) {
+      while (this.blocklist.length > 0) {
+        const fn = this.blocklist.shift();
+        if (fn) {
+          fn();
+        }
+      }
+    }
+  });
 }

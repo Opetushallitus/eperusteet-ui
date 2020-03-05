@@ -41,10 +41,6 @@ export default class RouteTekstikappale extends Vue {
 
   private store: EditointiStore | null = null;
 
-  get tk() {
-    return this.store?.data.value;
-  }
-
   get projektiId() {
     return this.$route.params.projektiId;
   }
@@ -53,17 +49,19 @@ export default class RouteTekstikappale extends Vue {
     return this.$route.params.tekstiKappaleId;
   }
 
+  get perusteId() {
+    return this.perusteStore.perusteId.value;
+  }
+
   @Watch('tekstikappaleId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
     if (!id || id === oldId) {
       return;
     }
 
-    if (this.perusteStore.perusteId.value) {
-      console.log('updating store');
-      const tkstore = new TekstikappaleStore(this.perusteStore.perusteId.value, Number(id));
-      this.store = new EditointiStore(tkstore);
-    }
+    await this.perusteStore.blockUntilInitialized();
+    const tkstore = new TekstikappaleStore(this.perusteId!, Number(id));
+    this.store = new EditointiStore(tkstore);
   }
 }
 </script>
