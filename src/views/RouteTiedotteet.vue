@@ -95,7 +95,7 @@ export default class RouteTiedotteet extends Vue {
 
   async mounted() {
     this.tiedotteetStore.fetch();
-    const res = (await Perusteet.getAllPerusteetInternal() as any).data;
+    const res = (await Perusteet.getAllPerusteetInternal(0, 9999) as any).data;
     this.perusteet = res.data;
   }
 

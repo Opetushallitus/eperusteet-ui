@@ -71,6 +71,9 @@ export class TiedotteetStore implements ITiedotteetProvider {
       if (_.includes(_.map(tiedote.perusteet, 'id'), this.state.perusteId)) {
         this.state.perusteenTiedotteet = _.map(this.state.perusteenTiedotteet, (listaTiedote) => listaTiedote.id === tallennettu.id ? tallennettu : listaTiedote);
       }
+      else {
+        this.state.perusteenTiedotteet = _.filter(this.state.perusteenTiedotteet, (listaTiedote) => listaTiedote.id !== tallennettu.id);
+      }
     }
   }
 
