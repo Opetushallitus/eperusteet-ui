@@ -94,6 +94,7 @@ import EpSidebar from '@shared/components/EpSidebar/EpSidebar.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpTreeNavibar from '@shared/components/EpTreeNavibar/EpTreeNavibar.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
+import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -107,17 +108,15 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpTreeNavibar,
   },
 })
-export default class RoutePerusteprojekti extends Vue {
+export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
   private naviStore: EpTreeNavibarStore | null = null;
-
   private loading = false;
 
-  @Watch('projektiId', { immediate: true })
-  async onProjektiChange(value: number) {
-    await this.perusteStore.init(value);
+  async onProjektiChange(projektiId: number) {
+    await this.perusteStore.init(projektiId);
     this.naviStore = new EpTreeNavibarStore(this.perusteStore.navigation);
   }
 

@@ -11,57 +11,57 @@ import { PerusteStore } from '@/stores/PerusteStore';
 
 Vue.use(VueCompositionApi);
 
-interface TekstikappaleStoreConfig {
+interface TekstiRakenneStoreConfig {
   // notifikaatiotStore: NotifikaatiotStore;
   perusteStore: PerusteStore;
   router: VueRouter;
 }
 
-export class TekstikappaleStore implements IEditoitava {
+export class TekstiRakenneStore implements IEditoitava {
   private state = reactive({
     tekstikappale: null as Matala | null,
   });
 
-  private static config: TekstikappaleStoreConfig;
+  private static config: TekstiRakenneStoreConfig;
 
-  public static install(vue: typeof Vue, config: TekstikappaleStoreConfig) {
-    TekstikappaleStore.config = config;
+  public static install(vue: typeof Vue, config: TekstiRakenneStoreConfig) {
+    TekstiRakenneStore.config = config;
   }
 
   public readonly tekstikappale = computed(() => this.state.tekstikappale);
   public readonly id = computed(() => this.state.tekstikappale?.id);
 
-  constructor(
-    private readonly perusteId: number,
-    private readonly tekstiKappaleId: number,
-  ) {
-    // if (!TekstikappaleStore.config?.notifikaatiotStore) {
+  constructor(private readonly perusteId: number) {
+    // if (!TekstiRakenneStore.config?.notifikaatiotStore) {
     //   throw new Error('NotifikaatiotStore missing');
     // }
-    if (!TekstikappaleStore.config?.perusteStore) {
+    if (!TekstiRakenneStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
     }
-    if (!TekstikappaleStore.config?.router) {
+    if (!TekstiRakenneStore.config?.router) {
       throw new Error('VueRouter missing');
     }
   }
 
-  public async fetch() {
-    try {
-      this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleId)).data;
-    }
-    catch (err) {
-    }
-  }
-
   public async load() {
-    await this.fetch();
-    return this.tekstikappale.value;
+    const res = await Sisallot.getSuoritustapaSisaltoUUSI(this.perusteId, 'REFORMI');
+    return res.data;
   }
 
   public async save(data: Matala) {
-    const res = await Perusteenosat.updatePerusteenOsa(this.id.value!, data);
-    return res.data;
+    function pick(obj: Matala) {
+      return {
+        id: obj.id,
+        lapset: _.map(obj.lapset, pick),
+        perusteenOsa: null,
+      };
+    }
+
+    const filtered = pick(data);
+    if (data.id) {
+      await Sisallot.updateSisaltoViiteWithPut(this.perusteId, 'REFORMI', data.id!, filtered);
+      await TekstiRakenneStore.config.perusteStore.updateNavigation();
+    }
   }
 
   public async history() {
@@ -72,31 +72,17 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId, 'REFORMI', this.tekstiKappaleId);
-    TekstikappaleStore.config!.perusteStore!.removeNavigationEntry({
-      id: this.tekstiKappaleId,
-      type: 'viite',
-    });
-    TekstikappaleStore.config.router.push({ name: 'perusteprojekti' });
   }
 
   public async lock() {
-    try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.id.value!);
-      return res.data;
-    }
-    catch (err) {
-      return null;
-    }
+    return null;
   }
 
   public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.id.value!);
-    return res.data;
+    return null;
   }
 
   public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.id.value!);
   }
 
   public async preview() {
@@ -108,16 +94,13 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async start() {
-    // Noop
   }
 
   public async revisions() {
-    const res = await Perusteenosat.getPerusteenOsaVersiot(this.id.value!);
-    return res.data as Revision[];
+    return [];
   }
 
   public async restore(rev: number) {
-    await Perusteenosat.revertPerusteenOsaToVersio(this.id.value!, rev);
   }
 
   public async validate() {
@@ -126,3 +109,4 @@ export class TekstikappaleStore implements IEditoitava {
     };
   }
 }
+

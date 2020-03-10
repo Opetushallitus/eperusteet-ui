@@ -15,6 +15,7 @@ export class PerusteStore {
     tyoryhma: null as any | null,
     perusteId: null as number | null,
     isInitialized: false,
+    initializing: false,
   });
 
   public readonly projekti = computed(() => this.state.projekti);
@@ -24,24 +25,44 @@ export class PerusteStore {
   public readonly perusteId = computed(() => this.state.perusteId);
 
   async init(projektiId: number) {
-    this.state.isInitialized = false;
-    this.state.peruste = null;
-    this.state.projekti = null;
-    this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
-    const perusteId = Number((this.state.projekti as any)._peruste);
-    this.state.perusteId = perusteId;
+    if (this.state.initializing
+        || !projektiId
+        || projektiId === this.state.projekti?.id) {
+      return;
+    }
 
-    [
-      this.state.peruste,
-      this.state.navigation,
-      this.state.tyoryhma,
-    ] = _.map(await Promise.all([
-      Perusteet.getPerusteenTiedot(perusteId),
-      Perusteet.getNavigation(perusteId),
-      Ulkopuoliset.getOrganisaatioRyhmatByOid(this.state.projekti.ryhmaOid!),
-    ]), 'data');
+    try {
+      this.state.initializing = true;
+      this.state.isInitialized = false;
+      this.state.peruste = null;
+      this.state.projekti = null;
+      this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
+      const perusteId = Number((this.state.projekti as any)._peruste);
+      this.state.perusteId = perusteId;
 
-    this.state.isInitialized = true;
+      [
+        this.state.peruste,
+        this.state.navigation,
+        this.state.tyoryhma,
+      ] = _.map(await Promise.all([
+        Perusteet.getPerusteenTiedot(perusteId),
+        Perusteet.getNavigation(perusteId),
+        Ulkopuoliset.getOrganisaatioRyhmatByOid(this.state.projekti.ryhmaOid!),
+      ]), 'data');
+
+      this.state.isInitialized = true;
+    }
+    finally {
+      this.state.initializing = false;
+    }
+  }
+
+  public async updateNavigation() {
+    if (!this.state.perusteId) {
+      return;
+    }
+    const res = await Perusteet.getNavigation(this.state.perusteId);
+    this.state.navigation = res.data;
   }
 
   public removeNavigationEntry(item: { id: number, type: string }) {

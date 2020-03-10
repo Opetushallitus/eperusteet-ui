@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, TutkinnonOsat, Perusteenosat, Sisallot, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Tutkinnonosat, Perusteenosat, } from '@shared/api/eperusteet';
 import { Revision, Page } from '@shared/tyypit';
 import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
@@ -13,7 +13,6 @@ Vue.use(VueCompositionApi);
 
 
 interface TutkinnonOsaEditStoreConfig {
-  // notifikaatiotStore: NotifikaatiotStore;
   perusteStore: PerusteStore;
   router: VueRouter;
 }
@@ -22,7 +21,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   private static config: TutkinnonOsaEditStoreConfig;
   private tutkinnonOsaId: number | null = null;
 
-  public static install(config: TutkinnonOsaEditStoreConfig) {
+  public static install(vue: typeof Vue, config: TutkinnonOsaEditStoreConfig) {
     TutkinnonOsaEditStore.config = config;
   }
 
@@ -30,9 +29,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     private readonly perusteId: number,
     private readonly tutkinnonOsaViiteId: number,
   ) {
-    // if (!TutkinnonOsaEditStore.config?.notifikaatiotStore) {
-    //   throw new Error('NotifikaatiotStore missing');
-    // }
     if (!TutkinnonOsaEditStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
     }

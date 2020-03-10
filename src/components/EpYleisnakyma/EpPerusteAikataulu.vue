@@ -17,7 +17,6 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpAikatauluModal from '@shared/components/EpAikataulu/EpAikatauluModal.vue';
-import { success } from '@/utils/notifications';
 import { PerusteprojektiDto, PerusteDto } from '@shared/api/eperusteet';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 
@@ -39,7 +38,7 @@ export default class EpPerusteAikataulu extends Vue {
 
   async tallenna(aikataulut) {
     await this.aikatauluStore.saveAikataulut(aikataulut);
-    success('aikataulu-tallennettu');
+    this.$success('aikataulu-tallennettu');
   }
 }
 </script>
