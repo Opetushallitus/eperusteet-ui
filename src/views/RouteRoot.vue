@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { Watch, Component, Vue } from 'vue-property-decorator';
+import { Prop, Watch, Component, Vue } from 'vue-property-decorator';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
 import { Kayttajat } from '@/stores/kayttaja';
 import { BrowserStore } from '@shared/stores/BrowserStore';
@@ -25,7 +25,9 @@ import Sticky from 'vue-sticky-directive';
   },
 })
 export default class RouteRoot extends Vue {
-  private browserStore = new BrowserStore();
+  @Prop({ required: true })
+  private browserStore!: BrowserStore;
+
   private isSticky = false;
   private height = null as number | null;
 

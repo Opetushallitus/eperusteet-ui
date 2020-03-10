@@ -23,10 +23,10 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { Kayttajat } from '@/stores/kayttaja';
 import { VueTutorial } from '@shared/plugins/tutoriaali';
 import { tutoriaaliStore } from '@shared/stores/tutoriaali';
-import { BrowserStore } from '@shared/stores/BrowserStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
+import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
 
 import router from './router';
 
@@ -52,7 +52,7 @@ Vue.use(Notifikaatiot);
 Vue.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
 Vue.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
 Vue.use(VueTutorial, { tutoriaaliStore });
-Vue.use(BrowserStore);
+
 
 import { stores } from '@/stores';
 
@@ -72,6 +72,11 @@ Vue.use(TutkinnonOsaEditStore, {
 });
 
 Vue.use(TutkinnonOsaEditStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(MuodostuminenStore, {
   perusteStore: stores.perusteStore,
   router,
 });

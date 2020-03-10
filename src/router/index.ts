@@ -40,6 +40,7 @@ const router = new VueRouter({
   }, {
     path: '/:lang',
     component: RouteRoot,
+    props: { ...stores },
     children: [{
       path: '',
       name: 'root',

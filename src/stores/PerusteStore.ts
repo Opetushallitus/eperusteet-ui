@@ -22,7 +22,10 @@ export class PerusteStore {
   public readonly peruste = computed(() => this.state.peruste);
   public readonly navigation = computed(() => this.state.navigation);
   public readonly tyoryhma = computed(() => this.state.tyoryhma);
+  public readonly suoritustavat = computed(() => _.map(this.state.peruste?.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)) as string[]);
   public readonly perusteId = computed(() => this.state.perusteId);
+  public readonly projektiId = computed(() => this.state.projekti?.id);
+  public readonly tutkinnonOsat = computed(() => this.state.perusteId);
 
   async init(projektiId: number) {
     if (this.state.initializing
