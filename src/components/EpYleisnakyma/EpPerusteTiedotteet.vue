@@ -121,6 +121,10 @@ export default class EpPerusteTiedotteet extends Vue {
       }
     }
 
+    ::v-deep .btn {
+      padding: 0px;
+    }
+
   }
 
 </style>
