@@ -26,6 +26,7 @@ import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 
+import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
 
 Vue.use(VueRouter);
@@ -163,6 +164,12 @@ const router = new VueRouter({
       }],
     }],
   }],
+});
+
+
+router.beforeEach((to, from, next) => {
+  changeLang(to, from);
+  next();
 });
 
 router.beforeEach(async (to, from, next) => {

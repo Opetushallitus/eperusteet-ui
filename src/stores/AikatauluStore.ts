@@ -3,7 +3,6 @@ import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composit
 import { Tapahtuma, aikataulutapahtuma } from '@shared/utils/aikataulu';
 import _ from 'lodash';
 import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
-import { PerusteetApi } from '@shared/generated/eperusteet';
 
 Vue.use(VueCompositionApi);
 

@@ -1,47 +1,58 @@
 <template>
-  <div class="mt-2 d-flex align-items-center moduuli ryhma" tabindex="0">
-    <div class="colorblock" :style="style"></div>
-    <div class="pl-2 nimi flex-grow-1">
-      {{ $kaanna(nimi) }}
-      <!-- <div v-if="isRyhma">                    -->
-      <!--   <b-button variant="link">             -->
-      <!--     <fas icon="ellipsis-h" size="sm" /> -->
-      <!--   </b-button>                           -->
-      <!-- </div>                                  -->
-    </div>
-    <div style="width: 100px" class="text-center">
-      <b-button variant="none" :class="{ 'text-danger': !validity.isValid }" v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu">
-        <span v-if="laajuusMinimi > 0">
-          {{ laajuusMinimi }}
-        </span>
-        <span v-if="laajuusMaksimi > 0">
-          -
-          {{ laajuusMaksimi }}
-        </span>
-      </b-button>
-    </div>
-    <div style="width: 80px" class="clearfix">
-      <div class="float-right">
-        <b-dropdown
-          v-if="isEditing"
-          size="lg"
-          variant="link"
-          toggle-class="text-decoration-none"
-          no-caret>
-          <template v-slot:button-content>
-            <fas icon="ellipsis-h" /><span class="sr-only">{{ $t('muokkaa-ryhmaa') }}</span>
-          </template>
-          <b-dropdown-item-button @click="edit">{{ $t('muokkaa') }}</b-dropdown-item-button>
-          <b-dropdown-item-button @click="remove">{{ $t('poista') }}</b-dropdown-item-button>
-          <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
-          <b-dropdown-text v-if="isRyhma">
-            <ep-button icon="plus" variant="outline">{{ $t('liita-tutkinnon-osa') }}</ep-button>
-            <ep-button icon="plus" variant="outline">{{ $t('lisaa-ryhma') }}</ep-button>
-          </b-dropdown-text>
-        </b-dropdown>
+  <div class="d-flex flex-column h-100 moduuli" :style="style">
+    <div class="d-flex align-items-center flex-grow-1 h-100">
+      <div class="pl-1" v-if="hasChildren">
+        <b-button variant="link" @click="toggleOpen">
+          <fas v-if="isOpen" icon="chevron-up" />
+          <fas v-else icon="chevron-down" />
+        </b-button>
+      </div>
+      <div class="flex-grow-1 h-100 p-2 nimi">
+        {{ $kaanna(nimi) }}
+      </div>
+      <div style="width: 100px;" class="text-center">
+        <b-button variant="none" :class="{ 'text-danger': !validity.isValid }" v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu">
+          <span v-if="laajuusMinimi > 0">
+            {{ laajuusMinimi }}
+          </span>
+          <span v-if="laajuusMaksimi > 0">
+            -
+            {{ laajuusMaksimi }}
+          </span>
+        </b-button>
+      </div>
+      <div style="width: 80px" class="clearfix">
+        <div class="float-right">
+          <b-dropdown
+            v-if="isEditing"
+            size="lg"
+            variant="link"
+            toggle-class="text-decoration-none"
+            no-caret>
+            <template v-slot:button-content>
+              <fas icon="ellipsis-h" /><span class="sr-only">{{ $t('muokkaa-ryhmaa') }}</span>
+            </template>
+            <b-dropdown-item-button @click="edit">{{ $t('muokkaa') }}</b-dropdown-item-button>
+            <b-dropdown-item-button @click="remove">{{ $t('poista') }}</b-dropdown-item-button>
+            <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
+            <b-dropdown-text v-if="isRyhma">
+              <ep-button icon="plus" variant="outline">{{ $t('liita-tutkinnon-osa') }}</ep-button>
+              <ep-button icon="plus" variant="outline">{{ $t('lisaa-ryhma') }}</ep-button>
+            </b-dropdown-text>
+          </b-dropdown>
+        </div>
       </div>
     </div>
-
+    <div v-if="value.kuvaus" class="text-muted kuvaus-wrapper">
+      <div v-if="showDescription" class="kuvaus">
+        <ep-content v-model="value.kuvaus" :is-editable="false" layout="normal"></ep-content>
+      </div>
+      <div class="text-center description-button">
+        <b-button variant="link" @click="toggleDescription">
+          <fas icon="ellipsis-h" />
+        </b-button>
+      </div>
+    </div>
     <b-modal ref="editModal" size="lg">
       <template #modal-header>
         <h2>{{ $t('muokkaa') }}: {{ $kaanna(nimi) }}</h2>
@@ -147,6 +158,19 @@ export default class MuodostumisItem extends Vue {
   @Prop({ required: true })
   private tutkinnonOsatMap!: any;
 
+  @Prop({ default: true })
+  private isOpen!: boolean;
+
+  private showDescription = false;
+
+  get hasChildren() {
+    return this.value.osat?.length > 0;
+  }
+
+  toggleOpen() {
+    this.$emit('toggle');
+  }
+
   get tosa() {
     if (!this.value._tutkinnonOsaViite) {
       return null;
@@ -155,7 +179,27 @@ export default class MuodostumisItem extends Vue {
   }
 
   get tyyppi() {
-    return null;
+    if (this.value.rooli === 'osaamisala') {
+      return 'osaamisala';
+    }
+    else if (this.value.rooli === 'tutkinnonosa') {
+      return 'tutkinnonosa';
+    }
+    
+    const rakennetyypit = [
+      'rakenne-moduuli-valinnainen',
+      'rakenne-moduuli-ammatilliset',
+      'rakenne-moduuli-yhteiset',
+      'rakenne-moduuli-paikalliset',
+      'rakenne-moduuli-pakollinen'
+    ];
+    for (const rt of rakennetyypit) {
+      if (this.value?.name?.fi === this.$t(rt, 'fi')) {
+        return rt;
+      }
+    }
+    console.log('?');
+    return 'rakenne-moduuli-pakollinen';
   }
 
   get laskettu() {
@@ -163,7 +207,8 @@ export default class MuodostumisItem extends Vue {
       return _(this.value.osat)
           .map(osa =>
             osa.muodostumisSaanto?.laajuus?.maksimi
-            || this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
+            || (osa._tutkinnonOsaViite && this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
+            || 0)
           .filter()
           .sum();
     }
@@ -251,13 +296,15 @@ export default class MuodostumisItem extends Vue {
 
   get style() {
     return {
-      height: (this.isRyhma ? 52 : 52) + 'px',
-      background: this.color,
+      'min-height': (this.isRyhma ? 52 : 42) + 'px',
+      'border-left': "9px solid " + this.color,
+      'border-bottom-left-radius': '4px',
+      'border-top-left-radius': '4px',
     };
   }
 
   get color() {
-    if (this.value.rooli) {
+    if (this.isRyhma) {
       const mapped = RooliToTheme[this.value.rooli];
       if (mapped) {
         return ColorMap[mapped];
@@ -275,6 +322,9 @@ export default class MuodostumisItem extends Vue {
     else {
       if (this.value.pakollinen) {
         return ColorMap.pakollinen;
+      }
+      else {
+        return ColorMap.valinnainen;
       }
     }
     return '#fff';
@@ -301,6 +351,10 @@ export default class MuodostumisItem extends Vue {
     }
   }
 
+  toggleDescription() {
+    this.showDescription = !this.showDescription;
+  }
+
 }
 </script>
 
@@ -315,25 +369,33 @@ export default class MuodostumisItem extends Vue {
 
 .moduuli {
   background: #fff;
-}
-
-.osa {
-  height: 42px;
-}
-
-.ryhma {
-  height: 52px;
 
   .nimi {
     font-weight: 600;
   }
 }
 
+.kuvaus-wrapper {
+  .kuvaus {
+    padding: 0.5rem 1rem 0 1rem;
+    margin-bottom: -20px;
+  }
+
+  .description-button {
+    max-height: 20px;
+    margin-top: -8px;
+    .btn {
+      padding: 0;
+      margin: 0;
+    }
+  }
+}
+
 .colorblock {
-  border-bottom-left-radius: 4px;
-  border-top-left-radius: 4px;
-  width: 8px;
+  content: " ";
   display: block;
+  height: 100%;
+  width: 8px;
 }
 
 </style>

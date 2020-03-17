@@ -3,17 +3,18 @@
     v-if="value"
     v-bind="options"
     tag="div"
-    class="rakenne-moduuli"
+    :class="classes"
     v-model="model">
     <div v-for="(node, idx) in model" :key="idx" class="muodostumisnode">
       <MuodostumisItem v-model="model[idx]"
                        :depth="depth"
                        :is-editing="isEditing"
                        :tutkinnonOsatMap="tutkinnonOsatMap"
+                       @toggle="toggleOpen"
                        @remove="remove(idx)">
       </MuodostumisItem>
 
-      <div class="children" :style="{ 'padding-left': 30 + 'px' }">
+      <div class="children" :class="{ muodostumisryhma: !!node.rooli && depth > 0 }" :style="{ 'padding-left': 30 + 'px' }">
         <MuodostumisNode
           :tutkinnonOsatMap="tutkinnonOsatMap"
           :depth="depth + 1"
@@ -97,6 +98,25 @@ export default class MuodostumisNode extends Vue {
   @Prop({ required: true })
   private tutkinnonOsatMap!: any;
 
+  private isOpen = true;
+
+  get classes() {
+    if (this.depth === 0) {
+      return '';
+    }
+    else if (this.depth === 1) {
+      return 'rakenne-moduuli-root'
+    }
+    else {
+      return 'rakenne-moduuli'
+    }
+  }
+
+  toggleOpen() {
+    console.log('toggling');
+    this.isOpen = !this.isOpen;
+  }
+
   nodeColor(node: any) {
     if (node.rooli) {
       const mapped = RooliToTheme[node.rooli];
@@ -132,6 +152,7 @@ export default class MuodostumisNode extends Vue {
   get options() {
     return {
       animation: 300,
+      emptyInsertThreshold: 10,
       group: {
         name: 'rakennepuu',
       },
@@ -145,8 +166,8 @@ export default class MuodostumisNode extends Vue {
       return;
     }
 
-    const idx = _.findIndex(this.nodes, n => n.uuid === uuid);
-    const nodes = _.map(this.nodes, 'node');
+    const idx = _.findIndex(this.value, n => n.uuid === uuid);
+    const nodes = _.map(this.value, 'node');
     if (idx >= 0) {
       switch (dir) {
         case 'up':
@@ -197,29 +218,75 @@ export default class MuodostumisNode extends Vue {
 </script>
 
 <style scoped lang="scss">
+$ryhma-height: 52px;
+$linecolor: #ccc;
+
 .children {
   background: #f2f2f2;
 }
 
-.muodostumisnode {
-  background: #f0f4fb;
+.muodostumisryhma {
 }
 
-.moduuli {
-  background: #fff;
-}
+// .rakenne-moduuli:before {
+//   background: red;
+//   border-bottom: 1px solid red;
+//   content: ' ';
+//   display: block;
+//   width: 26px;
+//   position: absolute;
+//   margin-left: -56px;
+//   margin-top: -$ryhma-height / 2;
+// }
 
-.osa {
-  height: 42px;
-}
+// .rakenne-moduuli-root:after {
+//   border-left: 1px solid $linecolor;
+//   height: 100%;
+//   // margin-left: -26px;
+//   // margin-top: 30px;
+//   content: ' ';
+//   // height: 100px;
+//   position: absolute;
+// }
+
+// .muodostumisryhma:before {
+//   border-top: 1px solid $linecolor;
+//   margin-left: -56px;
+//   margin-top: -$ryhma-height / 2;
+//   content: ' ';
+//   width: 26px;
+//   position: absolute;
+// }
 
 .ryhma {
-  height: 52px;
-
+  // height: $ryhma-height;
   .nimi {
     font-weight: 600;
+    font-size: 80%;
   }
 }
+
+.rakenne-moduuli-root {
+  padding: 18px 0 12px 0;
+}
+
+.muodostumisnode {
+  padding: 8px 0 8px 0;
+}
+
+.rakenne-moduuli {
+  padding: 8px 0 0 0;
+}
+
+// .children:before {
+//   background: gray;
+//   content: '';
+//   display: block;
+//   position: absolute;
+//   height: 100%;
+//   margin-top: $ryhma-height;
+//   width: 1px;
+// }
 
 .colorblock {
   border-bottom-left-radius: 4px;

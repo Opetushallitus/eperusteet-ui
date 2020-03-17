@@ -1,172 +1,250 @@
 <template>
-  <ep-spinner v-if="!store || !peruste" />
-  <EpEditointi v-else :store="store" :key="new Date()">
-    <template #header="{ data }">
-      <h2>{{ $t('tutkinnon-muodostuminen') }}</h2>
-    </template>
-    <template #default="{ data, isEditing }">
-      <div>
-        <div class="upper mb-3">
-          <!-- <b-form-group :label="$t('rakenteen-kuvaus')">                                             -->
-          <!--   <ep-content v-model="data.kuvaus" layout="normal" :is-editable="isEditing"></ep-content> -->
-          <!-- </b-form-group>                                                                            -->
-        </div>
-        <div class="lower">
-          <h5>
-            <span>{{ $kaanna(peruste.nimi) }}</span>
-            <span class="ml-2 text-nowrap">{{ laskettuLaajuus }} / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
-            <ep-button variant="link" icon="pen" @click="editMuodostuminen" v-if="isEditing"></ep-button>
-          </h5>
-          <div class="filters">
-            <ep-search v-model="query" :placeholder="$t('etsi-rakenteesta')" />
+  <div>
+    <ep-spinner v-if="!store || !peruste" />
+    <EpEditointi v-else :store="store" :key="'' + new Date()">
+      <template #header="{ data }">
+        <h2>{{ $t('tutkinnon-muodostuminen') }}</h2>
+      </template>
+      <template #default="{ data, isEditing }">
+        <div>
+          <div class="upper mb-3">
+            <!-- <b-form-group :label="$t('rakenteen-kuvaus')">                                             -->
+            <!--   <ep-content v-model="data.kuvaus" layout="normal" :is-editable="isEditing"></ep-content> -->
+            <!-- </b-form-group>                                                                            -->
           </div>
-          <div class="tree mt-3">
-            <div class="actions p-2">
-              <ep-button @click="notImplemented" variant="link" icon="plus">
-                {{ $t('lisaa-ryhma-rakenteeseen') }}
-              </ep-button>
-              <ep-button @click="notImplemented" variant="link">
-                {{ $t('nayta-ryhmien-kuvaukset') }}
-              </ep-button>
+          <div class="lower">
+            <h5>
+              <span>{{ $kaanna(peruste.nimi) }}</span>
+              <span class="ml-2 text-nowrap">
+                <span :class="{ 'text-danger': laskettuLaajuus < vaadittuLaajuus }">
+                  {{ laskettuLaajuus }}
+                </span>
+                / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
+              <ep-button variant="link" icon="pen" @click="editMuodostuminen" v-if="isEditing"></ep-button>
+            </h5>
+            <div class="filters">
+              <ep-search v-model="query" :placeholder="$t('etsi-rakenteesta')" />
             </div>
-            <div class="drag-area p-3 d-flex">
-              <div class="drag-area-left mr-3 flex-grow-1">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-1 font-weight-bold">
-                    {{ $t('rakenne') }}
-                  </div>
-                  <div class="flex-grow-1">
-                    <b-button variant="link" @click="notImplemented">{{ $t('avaa-sulje') }}</b-button>
-                  </div>
-                  <div style="width: 100px" class="text-center font-weight-bold">
-                    osp
-                  </div>
-                  <div style="width: 80px">
-                  </div>
-                </div>
-                <ep-spinner v-if="!data" />
-                <div class="p-3 helptext text-muted text-center" v-else-if="data.osat.length === 0">
-                  {{ $t('luo-tutkinnolle-rakenne-ohje') }}
-                </div>
-                <MuodostumisNode v-else v-model="data.osat" ref="root" :is-editing="isEditing" :tutkinnonOsatMap="tutkinnonOsatMap">
-                  <template #moduuli="{ depth, node, color, uuid }">
-                    <div class="mt-2 d-flex align-items-center moduuli ryhma" tabindex="0" :moduuli="uuid">
-                      <div class="colorblock" :style="{ height: '52px', background: color }"></div>
-                      <div class="ml-2 nimi flex-grow-1">{{ $kaanna(node.nimi) }}</div>
-                    </div>
-                  </template>
-
-                  <template #osa="{ depth, node, color, uuid }">
-                    <div class="mt-2 moduuli osa d-flex align-items-center" tabindex="0" :moduuli="uuid">
-                      <div class="colorblock" :style="{ height: '42px', background: color }"></div>
-                      <div class="ml-2 nimi flex-grow-1 text-truncate">{{ $kaanna(tutkinnonOsatMap[node._tutkinnonOsaViite].nimi) }}</div>
-                    </div>
-                  </template>
-                </MuodostumisNode>
+            <div class="tree mt-3">
+              <div class="actions p-2" v-if="isEditing">
+                <ep-button @click="addRyhma" variant="outline" icon="plus">
+                  {{ $t('lisaa-ryhma-rakenteeseen') }}
+                </ep-button>
+                <ep-button @click="toggleKuvaukset" variant="outline">
+                  {{ $t('nayta-ryhmien-kuvaukset') }}
+                </ep-button>
               </div>
-              <div class="drag-area-right">
-                <div class="menu p-3">
-                  <h5>{{ $t('paaryhmat') }}</h5>
-                  <div class="mt-3">
-                  <draggable :value="paaryhmat" v-bind="optionsPaaryhma" tag="div">
-                    <div v-for="(ryhma, idx) in paaryhmat" :key="ryhma.uuid" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
-                      <div class="colorblock" :style="{ height: '44px', background: colorMap[ryhma.kind] }"></div>
-                      <div class="flex-grow-1 paaryhma-label pl-2 noselect">
-                        {{ $t(ryhma.label) }}
-                      </div>
+              <div class="drag-area p-3 d-flex">
+                <div class="drag-area-left mr-3 flex-grow-1">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-shrink-1 font-weight-bold">
+                      {{ $t('rakenne') }}
                     </div>
-                  </draggable>
+                    <div class="flex-grow-1">
+                      <!-- <b-button variant="link" @click="notImplemented">{{ $t('avaa-sulje') }}</b-button> -->
+                    </div>
+                    <div style="width: 100px" class="text-center font-weight-bold">
+                      osp
+                    </div>
+                    <div style="width: 80px">
+                    </div>
                   </div>
+                  <ep-spinner v-if="!data" />
+                  <div class="p-3 helptext text-muted text-center" v-else-if="data.osat.length === 0">
+                    {{ $t('luo-tutkinnolle-rakenne-ohje') }}
+                  </div>
+                  <MuodostumisNode v-model="data.osat" ref="root" :is-editing="isEditing" :tutkinnonOsatMap="tutkinnonOsatMap">
+                    <template #moduuli="{ depth, node, color, uuid }">
+                      <div class="mt-2 d-flex align-items-center moduuli ryhma" tabindex="0" :moduuli="uuid">
+                        <div class="colorblock" :style="{ height: '52px', background: color }"></div>
+                        <div class="ml-2 nimi flex-grow-1">{{ $kaanna(node.nimi) }}</div>
+                      </div>
+                    </template>
 
-                  <h5 class="mt-4">{{ $t('tutkinnon-osat') }}</h5>
-                  <div class="mt-3">
-                    <ep-search v-model="queryTutkinnonOsa" :placeholder="$t('etsi-tutkinnon-osaa')" />
-                    <div class="ml-1 mt-1">
-                      <ep-toggle v-model="showUnusedTutkinnonOsat" switch>
-                        <span class="noselect">
-                          {{ $t('nayta-kayttamattomat') }}
-                        </span>
-                      </ep-toggle>
-                    </div>
-                    <draggable :value="tutkinnonOsat" v-bind="optionsTutkinnonOsat" tag="div">
-                      <div v-for="(tosa, idx) in tutkinnonOsat" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pl-3 pr-3 m-1 tosa">
-                        <div class="flex-grow-1">
-                          {{ $kaanna(tosa.nimi) }}
-                        </div>
-                        <div class="laajuus">
-                          {{ tosa.laajuus }}
+                    <template #osa="{ depth, node, color, uuid }">
+                      <div class="mt-2 moduuli osa d-flex align-items-center" tabindex="0" :moduuli="uuid">
+                        <div class="colorblock" :style="{ height: '42px', background: color }"></div>
+                        <div class="ml-2 nimi flex-grow-1 text-truncate">{{ $kaanna(tutkinnonOsatMap[node._tutkinnonOsaViite].nimi) }}</div>
+                      </div>
+                    </template>
+                  </MuodostumisNode>
+                </div>
+                <div class="drag-area-right">
+                  <div class="menu p-3">
+                    <h5>{{ $t('paaryhmat') }}</h5>
+                    <div class="mt-3">
+                    <draggable :value="paaryhmat" v-bind="optionsPaaryhma" tag="div">
+                      <div v-for="(ryhma, idx) in paaryhmat" :key="ryhma.uuid" class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable">
+                        <div class="colorblock" :style="{ height: '44px', background: colorMap[ryhma.kind] }"></div>
+                        <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                          {{ $t(ryhma.label) }}
                         </div>
                       </div>
                     </draggable>
-                  </div>
+                    </div>
 
-                  <h5 class="mt-4">{{ $t('ryhma-osaamisalat') }}</h5>
-                  <div>
-                    <ep-button @click="notImplemented" icon="plus" variant="outline">
-                      {{ $t('lisaa-osaamisala') }}
-                    </ep-button>
-                    <div v-for="(ryhma, idx) in osaamisalat" :key="ryhma.koodi.uri" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
-                      <div class="colorblock" :style="{ background: colorMap['osaamisala'] }"></div>
-                      <div class="flex-grow-1 paaryhma-label pl-2 noselect">
-                        not implemented
+                    <h5 class="mt-4">{{ $t('tutkinnon-osat') }}</h5>
+                    <div class="mt-3">
+                      <ep-search v-model="queryTutkinnonOsa" :placeholder="$t('etsi-tutkinnon-osaa')" />
+                      <div class="ml-1 mt-1">
+                        <ep-toggle v-model="showUnusedTutkinnonOsat" switch>
+                          <span class="noselect">
+                            {{ $t('nayta-kayttamattomat') }}
+                          </span>
+                        </ep-toggle>
                       </div>
-                      <div class="flex-shrink paaryhma-label pl-2">
-                        <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
+                      <draggable :value="tutkinnonOsat" v-bind="optionsTutkinnonOsat" tag="div">
+                        <div v-for="(tosa, idx) in tutkinnonOsat" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pl-3 pr-3 m-1 tosa draggable">
+                          <div class="flex-grow-1">
+                            {{ $kaanna(tosa.nimi) }}
+                          </div>
+                          <div class="laajuus">
+                            {{ tosa.laajuus }}
+                          </div>
+                        </div>
+                      </draggable>
+                    </div>
+
+                    <h5 class="mt-4">{{ $t('ryhma-osaamisalat') }}</h5>
+                    <div>
+                      <ep-koodisto-select :store="osaamisalaStore" @add="addOsaamisala">
+                        <template #default="{ open }">
+                          <ep-button @click="open" icon="plus" variant="outline">
+                            {{ $t('lisaa-osaamisala') }}
+                          </ep-button>
+                        </template>
+                      </ep-koodisto-select>
+                      <div v-for="(ryhma, idx) in osaamisalat" :key="ryhma.koodi.uri" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
+                        <div class="colorblock" :style="{ background: colorMap['osaamisala'] }"></div>
+                        <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                          not implemented
+                        </div>
+                        <div class="flex-shrink paaryhma-label pl-2">
+                          <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <h5 class="mt-4">{{ $t('ryhma-tutkintonimikkeet') }}</h5>
-                  <div>
-                    <ep-button @click="notImplemented" icon="plus" variant="outline">
-                      {{ $t('lisaa-tutkintonimike') }}
-                    </ep-button>
-                    <div v-for="(ryhma, idx) in tutkintonimikkeet" :key="ryhma.koodi.uri" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
-                      <div class="colorblock" :style="{ background: colorMap['tutkintonimike'] }"></div>
-                      <div class="flex-grow-1 paaryhma-label pl-2 noselect">
-                        not implemented
-                      </div>
-                      <div class="flex-shrink paaryhma-label pl-2">
-                        <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
+                    <h5 class="mt-4">{{ $t('ryhma-tutkintonimikkeet') }}</h5>
+                    <div>
+                      <ep-koodisto-select :store="tutkintonimikeStore" @add="addTutkintonimike">
+                        <template #default="{ open }">
+                          <ep-button @click="open" icon="plus" variant="outline">
+                            {{ $t('lisaa-tutkintonimike') }}
+                          </ep-button>
+                        </template>
+                      </ep-koodisto-select>
+                      <div v-for="(ryhma, idx) in tutkintonimikkeet" :key="ryhma.koodi.uri" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
+                        <div class="colorblock" :style="{ background: colorMap['tutkintonimike'] }"></div>
+                        <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                          not implemented
+                        </div>
+                        <div class="flex-shrink paaryhma-label pl-2">
+                          <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <b-modal ref="editModal" size="lg">
-        <template #modal-header>
-          <h2>{{ $t('muokkaa') }}: {{ $kaanna({}) }}</h2>
-        </template>
+        <b-modal ref="editModal" size="lg">
+          <template #modal-header>
+            <h2>{{ $t('muokkaa') }}: {{ $kaanna({}) }}</h2>
+          </template>
 
-        <template #default>
-          <div>
-            <b-form-group :label="$t('laajuus')">
-              <div class="d-flex align-items-center">
-                <div>
-                  <ep-input type="number" is-editing v-model="data.muodostumisSaanto.laajuus.minimi">
-                  </ep-input>
+          <template #default>
+            <div>
+              <b-form-group :label="$t('laajuus')">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <ep-input type="number" is-editing v-model="data.muodostumisSaanto.laajuus.minimi">
+                    </ep-input>
+                  </div>
+                  <div class="ml-2">
+                    osp
+                  </div>
                 </div>
-                <div class="ml-2">
-                  osp
+              </b-form-group>
+            </div>
+          </template>
+        </b-modal>
+        <pre>{{ data }}</pre>
+
+        <b-modal ref="addModal" size="lg" @ok="addUusi(data)">
+          <template #modal-header>
+            <h2>{{ $t('lisaa-ryhma') }}</h2>
+          </template>
+
+          <template #default>
+            <div>
+              <b-form-group :label="$t('pakollisuus')">
+                <b-form-radio class="ml-1" v-model="uusi.tyyppi" value="osaamisala" name="tyyppi">
+                  {{ $t('osaamisala') }}
+                </b-form-radio>
+                <b-form-radio class="ml-1" v-model="uusi.tyyppi" value="tutkintonimike" name="tyyppi">
+                  {{ $t('tutkintonimike') }}
+                </b-form-radio>
+                <b-form-radio class="ml-1 mt-2" v-model="uusi.tyyppi" value="rakenne-moduuli-pakollinen" name="tyyppi">
+                  {{ $t('rakenne-moduuli-pakollinen') }}
+                </b-form-radio>
+                <b-form-radio class="ml-1" v-model="uusi.tyyppi" value="rakenne-moduuli-valinnainen" name="tyyppi">
+                  {{ $t('rakenne-moduuli-valinnainen') }}
+                </b-form-radio>
+                <b-form-radio class="ml-1" v-model="uusi.tyyppi" value="rakenne-moduuli-ammatilliset" name="tyyppi">
+                  {{ $t('rakenne-moduuli-ammatilliset') }}
+                </b-form-radio>
+                <b-form-radio class="ml-1" v-model="uusi.tyyppi" value="rakenne-moduuli-yhteiset" name="tyyppi">
+                  {{ $t('rakenne-moduuli-yhteiset') }}
+                </b-form-radio>
+                <b-form-radio class="ml-1 mt-2" v-model="uusi.tyyppi" value="rakenne-moduuli-paikalliset" name="tyyppi">
+                  {{ $t('rakenne-moduuli-paikalliset') }}
+                </b-form-radio>
+              </b-form-group>
+              <b-form-group :label="$t('laajuus')">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <ep-input type="number" is-editing v-model="uusi.ryhma.muodostumisSaanto.laajuus.minimi">
+                    </ep-input>
+                  </div>
+                  <div class="ml-2" v-if="uusi.useRange">
+                    -
+                  </div>
+                  <div class="ml-2" v-if="uusi.useRange">
+                    <ep-input type="number" is-editing v-model="uusi.ryhma.muodostumisSaanto.laajuus.maksimi">
+                    </ep-input>
+                  </div>
+                  <div class="ml-2">
+                    osp
+                  </div>
                 </div>
-              </div>
-            </b-form-group>
-          </div>
-        </template>
-      </b-modal>
-      <pre>{{ data }}</pre>
-    </template>
-  </EpEditointi>
+                <ep-toggle
+                  :value="uusi.useRange"
+                  @input="toggleRange"
+                  switch>
+                  {{ $t('aseta-myos-maksimiarvo') }}
+                </ep-toggle>
+              </b-form-group>
+              <b-form-group :label="$t('kuvaus')">
+                <ep-content v-model="uusi.ryhma.kuvaus" :is-editable="true" layout="normal"></ep-content>
+              </b-form-group>
+            </div>
+          </template>
+        </b-modal>
+      </template>
+    </EpEditointi>
+
+  </div>
 </template>
 
 
 <script lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
+import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
@@ -180,6 +258,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import MuodostumisNode from './MuodostumisNode.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
+import { Koodisto } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
 import { ColorMap, RakenneMainType, RakenneModuuliType } from './muodostuminen/utils';
@@ -191,6 +270,19 @@ import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { v4 as genUuid } from 'uuid';
 
 
+const DefaultRyhma = {
+  useRange: false,
+  ryhma: {
+    muodostumisSaanto: {
+      laajuus: {
+        minimi: 0,
+      },
+    },
+  } as any,
+  tyyppi: null as string | null,
+};
+
+
 @Component({
   components: {
     EpButton,
@@ -199,6 +291,7 @@ import { v4 as genUuid } from 'uuid';
     EpIcon,
     EpInput,
     EpJarjesta,
+    EpKoodistoSelect,
     EpMainView,
     EpPerusteprojektiListaus,
     EpSearch,
@@ -219,6 +312,30 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   private queryTutkinnonOsa = '';
   private showUnusedTutkinnonOsat = false;
   private store: EditointiStore | null = null;
+  private uusi: any | null = DefaultRyhma;
+  private tutkintonimikkeet = [] as any[];
+  private osaamisalat = [] as any[];
+
+  private osaamisalaStore = new KoodistoSelectStore({
+    async query(query: string, sivu: number) {
+      return (await Koodisto.kaikkiSivutettuna('osaamisala', query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        },
+      })).data as any;
+    },
+  });
+  private tutkintonimikeStore = new KoodistoSelectStore({
+    async query(query: string, sivu: number) {
+      return (await Koodisto.kaikkiSivutettuna('tutkintonimikkeet', query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        }
+      })).data as any;
+    },
+  });
 
   get peruste() {
     return this.perusteStore.peruste.value;
@@ -276,69 +393,78 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     }
   }
 
-  get paaryhmat(): RakenneMainType[] {
-    const Defaults = {
+  getNimi(key: string) {
+    return {
+      fi: this.$t(key, Kieli.fi),
+      sv: this.$t(key, Kieli.sv),
+      en: this.$t(key, Kieli.en),
+    };
+  }
+
+  ryhmaTemplate(kind: string) {
+    const result = {
       kuvaus: null,
       vieras: null,
       pakollinen: false,
-      nimi: null,
       rooli: "määritelty",
       tunniste: null,
       muodostumisSaanto: null,
       osaamisala: null,
       tutkintonimike: null,
       osat: [],
+      nimi: this.getNimi(kind),
     };
 
-    const getNimi =(key: string) => {
-      return {
-        fi: this.$t(key, Kieli.fi),
-        sv: this.$t(key, Kieli.sv),
-        en: this.$t(key, Kieli.en),
-      };
+    if (kind === 'rakenne-moduuli-yhteiset') {
+      result.rooli = 'vieras';
     }
+    else if (kind === 'rakenne-moduuli-paikalliset') {
+      result.rooli = 'määrittelemätön';
+    }
+    else if (kind === 'osaamisala') {
+      result.rooli = 'osaamisala';
+    }
+    else if (kind === 'tutkintonimike') {
+      result.rooli = 'tutkintonimike';
+    }
+    return result;
+  }
 
+  get paaryhmat(): RakenneMainType[] {
     return [{
       kind: 'pakollinen',
       label: 'rakenne-moduuli-pakollinen',
       uuid: genUuid(),
       create: () => ({
-        ...Defaults,
-        nimi: getNimi('rakenne-moduuli-pakollinen'),
+        ...this.ryhmaTemplate('rakenne-moduuli-pakollinen'),
       }),
     }, {
       kind: 'valinnainen',
       label: 'rakenne-moduuli-valinnainen',
       uuid: genUuid(),
       create: () => ({
-        ...Defaults,
-        nimi: getNimi('rakenne-moduuli-valinnainen'),
+        ...this.ryhmaTemplate('rakenne-moduuli-valinnainen'),
       }),
     }, {
       kind: 'ammatilliset',
       label: 'rakenne-moduuli-ammatilliset',
       uuid: genUuid(),
       create: () => ({
-        ...Defaults,
-        nimi: getNimi('rakenne-moduuli-ammatilliset'),
+        ...this.ryhmaTemplate('rakenne-moduuli-ammatilliset'),
       }),
     }, {
       kind: 'yhteiset',
       label: 'rakenne-moduuli-yhteiset',
       uuid: genUuid(),
       create: () => ({
-        ...Defaults,
-        nimi: getNimi('rakenne-moduuli-yhteiset'),
-        rooli: 'vieras',
+        ...this.ryhmaTemplate('rakenne-moduuli-yhteiset'),
       }),
     }, {
       kind: 'paikalliset',
       label: 'rakenne-moduuli-paikalliset',
       uuid: genUuid(),
       create: () => ({
-        ...Defaults,
-        nimi: getNimi('rakenne-moduuli-paikalliset'),
-        rooli: 'määrittelemätön',
+        ...this.ryhmaTemplate('rakenne-moduuli-paikalliset'),
       }),
     // }, {
     //   kind: 'osaamisala',
@@ -351,6 +477,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 
   get optionsTutkinnonOsat() {
     return {
+      disabled: !this.isEditing,
       group: {
         name: 'rakennepuu',
         pull: 'clone',
@@ -370,8 +497,13 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     };
   }
 
+  get isEditing() {
+    return !!this.store?.isEditing;
+  }
+
   get optionsPaaryhma() {
     return {
+      disabled: !this.isEditing,
       group: {
         name: 'rakennepuu',
         pull: 'clone',
@@ -386,20 +518,35 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     };
   }
 
+  get liitetytOsat() {
+    if (!this.store) {
+      return null;
+    }
+    const osat = [] as any[];
+    const walk = (node) => {
+      if (node._tutkinnonOsaViite) {
+        osat.push(node);
+      }
+      _.forEach(node.osat, walk);
+    };
+    walk(this.store.data.value);
+    return _.keyBy(osat, '_tutkinnonOsaViite');
+  }
+
+  get kayttamattomatTutkinnonOsat() {
+    if (!this.liitetytOsat) {
+      return null;
+    }
+    return _.filter(this.tutkinnonOsatRaw, osa => !this.liitetytOsat![osa.id!]);
+  }
+
   get tutkinnonOsat() {
-    // const suodatin = this.$suodatin(this.queryTutkinnonOsa);
-    return _(this.tutkinnonOsatRaw)
+    return _(this.showUnusedTutkinnonOsat
+      ? this.tutkinnonOsatRaw
+      : this.kayttamattomatTutkinnonOsat)
       .filter(this.$filterBy('nimi', this.queryTutkinnonOsa))
       .sortBy(tosa => this.$kaanna(tosa.nimi as any))
       .value();
-  }
-
-  get tutkintonimikkeet() {
-    return [];
-  }
-
-  get osaamisalat() {
-    return [];
   }
 
   editMuodostuminen() {
@@ -412,6 +559,56 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       this.store = new EditointiStore(store);
       this.tutkinnonOsaStore.fetch();
     }
+  }
+
+  toggleKuvaukset() {
+  }
+
+  toggleRange() {
+    this.uusi.useRange = !this.uusi.useRange;
+    if (this.uusi.useRange) {
+      this.uusi.ryhma.muodostumisSaanto.laajuus.maksimi = 0;
+    }
+    else {
+      delete this.uusi.ryhma.muodostumisSaanto.laajuus.maksimi;
+    }
+  }
+
+  addUusi(root) {
+    try {
+      const template = this.ryhmaTemplate(this.uusi.tyyppi);
+      console.log(root, { ...template, ...this.uusi.ryhma });
+      if (this.uusi) {
+        root.osat = [{
+          ...template,
+          ...this.uusi.ryhma
+        }, ...root.osat];
+      }
+    }
+    finally {
+      (this.$refs.addModal as any).hide();
+    }
+  }
+
+  addRyhma() {
+    this.uusi = DefaultRyhma;
+    (this.$refs.addModal as any).show();
+  }
+
+  lisaaTutkintonimike(koodi: any) {
+    this.tutkintonimikkeet = [...this.tutkintonimikkeet, {
+      ...this.ryhmaTemplate('tutkintonimike'),
+      nimi: koodi.nimi,
+      tutkintonimike: koodi.koodiUri,
+    }];
+  }
+
+  lisaaOsaamisala(koodi: any) {
+    this.osaamisalat = [...this.osaamisalat, {
+      ...this.ryhmaTemplate('osaamisala'),
+      nimi: koodi.nimi,
+      osaamisala: koodi.koodiUri,
+    }];
   }
 
   notImplemented() {
@@ -461,6 +658,10 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   border-top-left-radius: 4px;
   width: 8px;
   display: block;
+}
+
+.draggable {
+  cursor: grab;
 }
 
 </style>

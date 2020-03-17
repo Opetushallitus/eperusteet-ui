@@ -100,7 +100,7 @@ export class MuodostuminenStore implements IEditoitava {
 
   public async revisions() {
     const res = await TutkinnonRakenne.getRakenneVersiot(this.perusteId, 'REFORMI');
-    return res.data;
+    return res.data as any;
   }
 
   public async restore(rev: number) {
