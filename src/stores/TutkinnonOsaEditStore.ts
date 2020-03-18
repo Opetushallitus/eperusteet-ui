@@ -27,7 +27,8 @@ export class TutkinnonOsaEditStore implements IEditoitava {
 
   constructor(
     private readonly perusteId: number,
-    private readonly tutkinnonOsaViiteId: number,
+    // Jos undefined, luodaan uusi
+    private readonly tutkinnonOsaViiteId?: number,
   ) {
     if (!TutkinnonOsaEditStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -38,18 +39,48 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public async load() {
+    if (!this.tutkinnonOsaViiteId) {
+      return {
+        tyyppi: 'normaali',
+        tutkinnonOsa: {
+          nimi: {},
+          geneerinenArviointiasteikko: null,
+          koodi: null,
+          osaAlueet: [],
+          tyyppi: 'normaali',
+          osanTyyppi: 'tutkinnonosa',
+          vapaatTekstit: [],
+        },
+      };
+    }
     const res = await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, 'REFORMI', this.tutkinnonOsaViiteId);
     this.tutkinnonOsaId = Number((res.data as any)._tutkinnonOsa);
     return res.data;
   }
 
   public async save(data: TutkinnonOsaViiteUpdateDto) {
-    const res = await TutkinnonRakenne.updateTutkinnonOsa(
-      this.perusteId,
-      'REFORMI',
-      this.tutkinnonOsaViiteId,
-      data);
-    return res.data;
+    if (this.tutkinnonOsaViiteId) {
+      const res = await TutkinnonRakenne.updateTutkinnonOsa(
+        this.perusteId,
+        'REFORMI',
+        this.tutkinnonOsaViiteId,
+        data);
+      return res.data;
+    }
+    else {
+      const res = await TutkinnonRakenne.addTutkinnonOsa(
+        this.perusteId,
+        'REFORMI',
+        data as any);
+      setTimeout(() => {
+        TutkinnonOsaEditStore.config.router.replace({
+          name: 'tutkinnonosa',
+          params: {
+            tutkinnonOsaId: '' + res.data.id,
+          },
+        });
+      });
+    }
   }
 
   public async history() {
@@ -60,6 +91,9 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public async remove() {
+    if (!this.tutkinnonOsaViiteId) {
+      return;
+    }
     await TutkinnonRakenne.removeTutkinnonOsa(this.perusteId, 'REFORMI', this.tutkinnonOsaViiteId);
     TutkinnonOsaEditStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tutkinnonOsaViiteId,
@@ -79,12 +113,19 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.tutkinnonOsaId!);
-    return res.data;
+    if (this.tutkinnonOsaId) {
+      const res = await Perusteenosat.lockPerusteenOsa(this.tutkinnonOsaId);
+      return res.data;
+    }
+    else {
+      return null;
+    }
   }
 
   public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.tutkinnonOsaId!);
+    if (this.tutkinnonOsaId) {
+      await Perusteenosat.unlockPerusteenOsa(this.tutkinnonOsaId);
+    }
   }
 
   public async preview() {
@@ -92,7 +133,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public async editAfterLoad() {
-    return false;
+    return !this.tutkinnonOsaViiteId;
   }
 
   public async start() {
@@ -100,11 +141,17 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public async revisions() {
+    if (!this.tutkinnonOsaViiteId) {
+      return [];
+    }
     const res = await TutkinnonosatPrivate.getViiteVersiot(this.tutkinnonOsaViiteId);
     return res.data as Revision[];
   }
 
   public async restore(rev: number) {
+    if (!this.tutkinnonOsaViiteId) {
+      return;
+    }
     await TutkinnonosatPrivate.revertToVersio(this.tutkinnonOsaViiteId, rev);
   }
 

@@ -107,42 +107,46 @@
 
                     <h5 class="mt-4">{{ $t('ryhma-osaamisalat') }}</h5>
                     <div>
-                      <ep-koodisto-select :store="osaamisalaStore" @add="addOsaamisala">
+                      <ep-koodisto-select :store="osaamisalaStore" @add="lisaaOsaamisala">
                         <template #default="{ open }">
                           <ep-button @click="open" icon="plus" variant="outline">
                             {{ $t('lisaa-osaamisala') }}
                           </ep-button>
                         </template>
                       </ep-koodisto-select>
-                      <div v-for="(ryhma, idx) in osaamisalat" :key="ryhma.koodi.uri" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
-                        <div class="colorblock" :style="{ background: colorMap['osaamisala'] }"></div>
-                        <div class="flex-grow-1 paaryhma-label pl-2 noselect">
-                          not implemented
+                      <draggable :value="osaamisalat" v-bind="optionsKoodit" tag="div">
+                        <div v-for="(ryhma, idx) in osaamisalat" :key="ryhma.osaamisala" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
+                          <div class="colorblock" :style="{ background: colorMap['osaamisala'] }"></div>
+                          <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                            {{ $kaanna(ryhma.nimi) }}
+                          </div>
+                          <div class="flex-shrink paaryhma-label pl-2">
+                            <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
+                          </div>
                         </div>
-                        <div class="flex-shrink paaryhma-label pl-2">
-                          <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
-                        </div>
-                      </div>
+                      </draggable>
                     </div>
 
                     <h5 class="mt-4">{{ $t('ryhma-tutkintonimikkeet') }}</h5>
                     <div>
-                      <ep-koodisto-select :store="tutkintonimikeStore" @add="addTutkintonimike">
+                      <ep-koodisto-select :store="tutkintonimikeStore" @add="lisaaTutkintonimike">
                         <template #default="{ open }">
                           <ep-button @click="open" icon="plus" variant="outline">
                             {{ $t('lisaa-tutkintonimike') }}
                           </ep-button>
                         </template>
                       </ep-koodisto-select>
-                      <div v-for="(ryhma, idx) in tutkintonimikkeet" :key="ryhma.koodi.uri" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
-                        <div class="colorblock" :style="{ background: colorMap['tutkintonimike'] }"></div>
-                        <div class="flex-grow-1 paaryhma-label pl-2 noselect">
-                          not implemented
+                      <draggable :value="tutkintonimikkeet" v-bind="optionsKoodit" tag="div">
+                        <div v-for="(ryhma, idx) in tutkintonimikkeet" :key="ryhma.tutkintonimike" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
+                          <div class="colorblock" :style="{ background: colorMap['tutkintonimike'] }"></div>
+                          <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                            {{ $kaanna(ryhma.nimi) }}
+                          </div>
+                          <div class="flex-shrink paaryhma-label pl-2">
+                            <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
+                          </div>
                         </div>
-                        <div class="flex-shrink paaryhma-label pl-2">
-                          <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
-                        </div>
-                      </div>
+                      </draggable>
                     </div>
 
                   </div>
@@ -172,7 +176,6 @@
             </div>
           </template>
         </b-modal>
-        <pre>{{ data }}</pre>
 
         <b-modal ref="addModal" size="lg" @ok="addUusi(data)">
           <template #modal-header>
@@ -317,7 +320,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   private osaamisalat = [] as any[];
 
   private osaamisalaStore = new KoodistoSelectStore({
-    async query(query: string, sivu: number) {
+    async query(query: string, sivu = 0) {
       return (await Koodisto.kaikkiSivutettuna('osaamisala', query, {
         params: {
           sivu,
@@ -327,7 +330,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     },
   });
   private tutkintonimikeStore = new KoodistoSelectStore({
-    async query(query: string, sivu: number) {
+    async query(query: string, sivu = 0) {
       return (await Koodisto.kaikkiSivutettuna('tutkintonimikkeet', query, {
         params: {
           sivu,
@@ -473,6 +476,26 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     //   kind: 'tutkintonimike',
     //   label: 'rakenne-moduuli-tutkintonimike',
     }];
+  }
+
+  get optionsKoodit() {
+    return {
+      disabled: !this.isEditing,
+      group: {
+        name: 'rakennepuu',
+        pull: 'clone',
+        put: false,
+      },
+      clone(original) {
+        return {
+          ...original,
+          muodostumisSaanto: {
+            laajuus: {},
+          },
+        };
+      },
+      sort: false,
+    };
   }
 
   get optionsTutkinnonOsat() {
