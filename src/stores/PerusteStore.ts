@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
+import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
@@ -16,6 +16,7 @@ export class PerusteStore {
     perusteId: null as number | null,
     isInitialized: false,
     initializing: false,
+    projektiStatus: null as TilaUpdateStatus | null,
   });
 
   public readonly projekti = computed(() => this.state.projekti);
@@ -26,11 +27,13 @@ export class PerusteStore {
   public readonly perusteId = computed(() => this.state.perusteId);
   public readonly projektiId = computed(() => this.state.projekti?.id);
   public readonly tutkinnonOsat = computed(() => this.state.perusteId);
+  public readonly projektiStatus = computed(() => this.state.projektiStatus);
+
 
   async init(projektiId: number) {
     if (this.state.initializing
-        || !projektiId
-        || projektiId === this.state.projekti?.id) {
+      || !projektiId
+      || projektiId === this.state.projekti?.id) {
       return;
     }
 
@@ -39,6 +42,7 @@ export class PerusteStore {
       this.state.isInitialized = false;
       this.state.peruste = null;
       this.state.projekti = null;
+
       this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
       const perusteId = Number((this.state.projekti as any)._peruste);
       this.state.perusteId = perusteId;
@@ -47,10 +51,12 @@ export class PerusteStore {
         this.state.peruste,
         this.state.navigation,
         this.state.tyoryhma,
+        this.state.projektiStatus,
       ] = _.map(await Promise.all([
         Perusteet.getPerusteenTiedot(perusteId),
         Perusteet.getNavigation(perusteId),
         Ulkopuoliset.getOrganisaatioRyhmatByOid(this.state.projekti.ryhmaOid!),
+        Perusteprojektit.getPerusteprojektiValidointi(projektiId),
       ]), 'data');
 
       this.state.isInitialized = true;

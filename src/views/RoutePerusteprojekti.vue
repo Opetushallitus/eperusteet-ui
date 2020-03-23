@@ -2,7 +2,42 @@
   <div class="minfull p-0 m-0">
     <Portal to="headerExtension">
       <div class="portal-menu d-flex">
-        <div class="upper-left"></div>
+        <div class="upper-left">
+          <ep-progress-popover :slices="progressSlices">
+
+            <template v-slot:header>
+              <div class="pt-1 row justify-content-center" v-if="validationStats">
+                <div v-if="validationStats.ok < validationStats.total">
+                  {{ validationStats.ok }} / {{ validationStats.total }} {{$t('valmis')}}
+                </div>
+                <div v-else-if="validationCategories">
+                  <b-button variant="primary"
+                      :to="{ name: 'perusteprojekti' }">{{ $t('julkaise') }}</b-button>
+                </div>
+              </div>
+            </template>
+
+            <div v-if="validationStats" class="row justify-content-center">
+              <b-button v-if="validationStats.ok < validationStats.total"
+                        variant="primary"
+                        :to="{ name: 'perusteprojekti' }">{{ $t('siirry-julkaisunakymaan') }}</b-button>
+              <div v-if="validationCategories">
+                <div class="pl-3 pt-2 pb-1 row" v-for="c in validationStats.categories" :key="c.category">
+                  <div class="col-1">
+                    <fas class="text-success" icon="check-circle" v-if="c.failcount === 0"/>
+                    <fas class="text-danger" icon="info-circle" v-if="c.failcount > 0"/>
+                  </div>
+                  <div class="col">
+                    <span v-if="c.failcount === 0">{{ $t(c.category + "-validation-ok") }}</span>
+                    <span v-if="c.failcount > 0">{{ $t(c.category + "-validation-error") }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ep-spinner v-else />
+
+          </ep-progress-popover>
+        </div>
         <div class="flex-grow-1 align-self-center">
           <div class="mb-5 p-2" v-if="peruste && projekti">
             <h1>{{ $kaanna(peruste.nimi) || projekti.nimi }}</h1>
@@ -93,8 +128,23 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import EpTreeNavibar from '@shared/components/EpTreeNavibar/EpTreeNavibar.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
+import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
+import * as _ from 'lodash';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
+
+interface ValidationCategory {
+  category: string;
+  ok: number;
+  failcount: number;
+  total: number;
+}
+
+interface ValidationStats {
+  categories: ValidationCategory[];
+  ok: number;
+  total: number;
+}
 
 @Component({
   components: {
@@ -104,6 +154,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSidebar,
     EpSpinner,
     EpTreeNavibar,
+    EpProgressPopover,
   },
 })
 export default class RoutePerusteprojekti extends PerusteprojektiRoute {
@@ -139,6 +190,44 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get peruste() {
     return this.perusteStore.peruste.value;
+  }
+
+  get validationStats() {
+    if (this.validationCategories) {
+      const kategoriat = _.chain(this.validationCategories)
+        .map(kategoria => {
+          return {
+            category: _.lowerCase(kategoria),
+            ok: 0,
+            failcount: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiKategoria === kategoria)),
+            total: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiKategoria === kategoria)),
+          } as ValidationCategory;
+        })
+        .value();
+
+      return {
+        categories: kategoriat,
+        ok: 0,
+        total: _.size(kategoriat),
+      } as ValidationStats;
+    }
+  }
+
+  get validationCategories() {
+    if (this.perusteStore.projektiStatus.value) {
+      return _.chain(this.perusteStore.projektiStatus.value.infot)
+        .keyBy('validointiKategoria')
+        .keys()
+        .value();
+    }
+  }
+
+  get progressSlices() {
+    if (this.validationCategories) {
+      return _.chain(this.validationCategories)
+        .map(kategoria => 0.5)
+        .value();
+    }
   }
 }
 </script>
