@@ -9,7 +9,7 @@
 
     <div v-else>
       <div v-for="(tiedote, index) in tiedotteetFiltered" :key="index" class="tiedote p-2 pl-3" @click="avaaTiedote(tiedote)">
-        <div class="otsikko" :class="{'uusi': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}} <span class="uusi" v-if="tiedote.uusi">Uusi</span></div>
+        <div class="otsikko" :class="{'uusi': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}} <span class="uusi" v-if="tiedote.uusi">{{$t('uusi')}}</span></div>
         <div class="muokkausaika">{{$sdt(tiedote.muokattu)}}</div>
       </div>
 
@@ -61,7 +61,7 @@ export default class EpPerusteTiedotteet extends Vue {
       .map(tiedote => {
         return {
           ...tiedote,
-          uusi: this.tuntisitten(tiedote.luotu),
+          uusi: this.onkoUusi(tiedote.luotu),
         };
       })
       .take(this.tiedoteMaara)
@@ -72,11 +72,11 @@ export default class EpPerusteTiedotteet extends Vue {
     (this as any).$refs['eptiedotemodal'].muokkaa(tiedote);
   }
 
-  tuntisitten(aika) {
-    const tunti = 1000 * 60 * 60;
-    const tuntisitten = Date.now() - tunti;
+  onkoUusi(aika) {
+    const paiva = 1000 * 60 * 60 * 24;
+    const paivaSitten = Date.now() - paiva;
 
-    return aika > tuntisitten;
+    return aika > paivaSitten;
   }
 }
 </script>
