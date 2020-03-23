@@ -10,13 +10,11 @@
               {{ peruste.diaarinumero }}
             </div>
           </div>
-          <EpSpinner v-else />
         </div>
       </div>
     </Portal>
 
-    <EpSpinner v-if="!navigation" />
-    <EpSidebar>
+    <EpSidebar v-if="navigation">
       <template v-slot:bar>
         <div class="m-3">
           <EpSearch v-model="query" />

@@ -24,10 +24,10 @@
           </b-form-group>
         </div>
 
-        <b-row v-if="isEditing">
+        <b-row>
           <b-col md="8">
             <b-form-group :label="$t('tutkinnon-osan-nimi')">
-              <ep-input v-model="data.tutkinnonOsa.nimi" :is-editing="true" />
+              <ep-input v-model="data.tutkinnonOsa.nimi" :is-editing="isEditing" />
             </b-form-group>
           </b-col>
 
@@ -42,6 +42,8 @@
           <ep-collapse tyyppi="ammattitaitovaatimukset" :border-bottom="false" :border-top="isEditing">
             <h2 slot="header">{{ $t('ammattitaitovaatimukset') }}</h2>
             <b-form-group>
+              <EpAmmattitaitovaatimukset v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
+                                         :is-editing="isEditing" />
             </b-form-group>
           </ep-collapse>
 
@@ -109,6 +111,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
+import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
@@ -130,6 +133,7 @@ interface YhdistettyGeneerinen {
 
 @Component({
   components: {
+    EpAmmattitaitovaatimukset,
     EpCollapse,
     EpContent,
     EpEditointi,

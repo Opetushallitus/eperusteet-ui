@@ -94,7 +94,7 @@ export default class RouteTutkinnonosat extends PerusteprojektiRoute {
   get fields() {
     return [{
       key: 'idx',
-      thStyle: { width: '5%' },
+      thStyle: { width: '4rem' },
       label: this.$t('no'),
       sortable: true,
     }, {

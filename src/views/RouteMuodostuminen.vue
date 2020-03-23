@@ -329,6 +329,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       })).data as any;
     },
   });
+
   private tutkintonimikeStore = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {
       return (await Koodisto.kaikkiSivutettuna('tutkintonimikkeet', query, {
