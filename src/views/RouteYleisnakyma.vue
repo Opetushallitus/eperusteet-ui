@@ -39,7 +39,6 @@ import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 
-
 @Component({
   components: {
     EpPerusteAikataulu,

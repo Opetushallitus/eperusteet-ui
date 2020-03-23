@@ -29,7 +29,6 @@ export class PerusteStore {
   public readonly tutkinnonOsat = computed(() => this.state.perusteId);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
 
-
   async init(projektiId: number) {
     if (this.state.initializing
       || !projektiId

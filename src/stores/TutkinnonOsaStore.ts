@@ -39,5 +39,4 @@ export class TutkinnonOsaStore {
       this.state.tutkinnonOsat = [];
     }
   }
-
 }

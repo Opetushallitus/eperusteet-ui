@@ -37,7 +37,6 @@ import { v4 as genUuid } from 'uuid';
 import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType } from './muodostuminen/utils';
 import MuodostumisItem from './muodostuminen/MuodostumisItem.vue';
 
-
 function disassoc<T>(array: T[], idx: number): T[] {
   if (!_.isNumber(idx)) {
     throw new Error('not numbers');
@@ -48,7 +47,6 @@ function disassoc<T>(array: T[], idx: number): T[] {
   return [...array.slice(0, idx), ...array.slice(idx + 1)];
 }
 
-
 function assoc<T>(array: T[], element: T, idx: number): T[] {
   if (!_.isNumber(idx)) {
     throw new Error('not numbers');
@@ -58,7 +56,6 @@ function assoc<T>(array: T[], element: T, idx: number): T[] {
   }
   return [...array.slice(0, idx), element, ...array.slice(idx)];
 }
-
 
 function swapped<T>(array: T[], a: number, b: number): T[] {
   if (!_.isNumber(a) || !_.isNumber(b)) {
@@ -75,7 +72,6 @@ function swapped<T>(array: T[], a: number, b: number): T[] {
   result[b] = array[a];
   return result;
 }
-
 
 @Component({
   name: 'MuodostumisNode',
@@ -105,10 +101,10 @@ export default class MuodostumisNode extends Vue {
       return '';
     }
     else if (this.depth === 1) {
-      return 'rakenne-moduuli-root'
+      return 'rakenne-moduuli-root';
     }
     else {
-      return 'rakenne-moduuli'
+      return 'rakenne-moduuli';
     }
   }
 
@@ -170,16 +166,16 @@ export default class MuodostumisNode extends Vue {
     const nodes = _.map(this.value, 'node');
     if (idx >= 0) {
       switch (dir) {
-        case 'up':
-          this.$emit('input', swapped(nodes, idx, idx - 1));
-          break;
-        case 'down':
-          break;
-        case 'left':
-          break;
-        case 'right':
-          break;
-        default: break;
+      case 'up':
+        this.$emit('input', swapped(nodes, idx, idx - 1));
+        break;
+      case 'down':
+        break;
+      case 'left':
+        break;
+      case 'right':
+        break;
+      default: break;
       }
     }
   }
@@ -213,7 +209,6 @@ export default class MuodostumisNode extends Vue {
   //   }
   //   console.log('done');
   // }
-
 }
 </script>
 

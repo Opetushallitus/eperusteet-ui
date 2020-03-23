@@ -9,7 +9,6 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
-
 Vue.use(VueCompositionApi);
 
 interface MuodostuminenStoreConfig {
@@ -113,4 +112,3 @@ export class MuodostuminenStore implements IEditoitava {
     };
   }
 }
-

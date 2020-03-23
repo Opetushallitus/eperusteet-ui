@@ -72,7 +72,6 @@ import { validationMixin } from 'vuelidate';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
 import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 
-
 @Component({
   components: {
     EpIcon,

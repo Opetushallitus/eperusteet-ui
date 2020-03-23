@@ -123,13 +123,11 @@ interface YhdistettyOsaamistaso {
   kriteerit: any[];
 }
 
-
 interface YhdistettyGeneerinen {
   nimi: any;
   kohde: any;
   osaamistasot: YhdistettyOsaamistaso[],
 }
-
 
 @Component({
   components: {
@@ -181,7 +179,7 @@ export default class RouteTutkinnonosa extends Vue {
 
     const geneerinen = _.first(_.filter(this.kaikkiGeneeriset,
       g => g.id === Number(this.tov!.tutkinnonOsa._geneerinenArviointiasteikko)));
-    
+
     if (!geneerinen) {
       return null;
     }
@@ -226,7 +224,7 @@ export default class RouteTutkinnonosa extends Vue {
     await this.perusteStore.blockUntilInitialized();
     const tkstore = new TutkinnonOsaEditStore(
       this.perusteId!,
-        id ? Number(id!)
+      id ? Number(id!)
         : undefined);
     this.store = new EditointiStore(tkstore);
   }

@@ -7,7 +7,6 @@ export type RakenneModuuliType =
   | 'valinnainen'
   | 'yhteiset';
 
-
 export interface RakenneMainType {
   kind: RakenneModuuliType;
   label: string;

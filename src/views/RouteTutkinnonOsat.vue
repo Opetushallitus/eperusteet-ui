@@ -51,7 +51,6 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import _ from 'lodash';
 
-
 @Component({
   components: {
     EpMainView,
@@ -75,16 +74,16 @@ export default class RouteTutkinnonosat extends PerusteprojektiRoute {
 
   get raw() {
     return _.map(this.tutkinnonOsaStore.tutkinnonOsat.value,
-        (item, idx) => ({
-          ...item,
-          idx: idx + 1,
-          to: {
-            name: 'tutkinnonosa',
-            params: {
-              tutkinnonOsaId: item.id,
-            },
+      (item, idx) => ({
+        ...item,
+        idx: idx + 1,
+        to: {
+          name: 'tutkinnonosa',
+          params: {
+            tutkinnonOsaId: item.id,
           },
-        }));
+        },
+      }));
   }
 
   get items() {
@@ -136,7 +135,6 @@ export default class RouteTutkinnonosat extends PerusteprojektiRoute {
   tuoTutkinnonOsa() {
     throw new Error('todo');
   }
-
 }
 </script>
 

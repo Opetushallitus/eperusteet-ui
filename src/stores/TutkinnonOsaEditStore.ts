@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Tutkinnonosat, Perusteenosat, } from '@shared/api/eperusteet';
+import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Tutkinnonosat, Perusteenosat } from '@shared/api/eperusteet';
 import { Revision, Page } from '@shared/tyypit';
 import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
@@ -10,7 +10,6 @@ import { PerusteStore } from '@/stores/PerusteStore';
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
-
 
 interface TutkinnonOsaEditStoreConfig {
   perusteStore: PerusteStore;

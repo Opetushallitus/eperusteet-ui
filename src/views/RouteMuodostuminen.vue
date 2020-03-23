@@ -74,7 +74,7 @@
                     <h5>{{ $t('paaryhmat') }}</h5>
                     <div class="mt-3">
                     <draggable :value="paaryhmat" v-bind="optionsPaaryhma" tag="div">
-                      <div v-for="(ryhma, idx) in paaryhmat" :key="ryhma.uuid" class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable">
+                      <div v-for="ryhma in paaryhmat" :key="ryhma.uuid" class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable">
                         <div class="colorblock" :style="{ height: '44px', background: colorMap[ryhma.kind] }"></div>
                         <div class="flex-grow-1 paaryhma-label pl-2 noselect">
                           {{ $t(ryhma.label) }}
@@ -94,7 +94,7 @@
                         </ep-toggle>
                       </div>
                       <draggable :value="tutkinnonOsat" v-bind="optionsTutkinnonOsat" tag="div">
-                        <div v-for="(tosa, idx) in tutkinnonOsat" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pl-3 pr-3 m-1 tosa draggable">
+                        <div v-for="tosa in tutkinnonOsat" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pl-3 pr-3 m-1 tosa draggable">
                           <div class="flex-grow-1">
                             {{ $kaanna(tosa.nimi) }}
                           </div>
@@ -115,7 +115,7 @@
                         </template>
                       </ep-koodisto-select>
                       <draggable :value="osaamisalat" v-bind="optionsKoodit" tag="div">
-                        <div v-for="(ryhma, idx) in osaamisalat" :key="ryhma.osaamisala" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
+                        <div v-for="ryhma in osaamisalat" :key="ryhma.osaamisala" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
                           <div class="colorblock" :style="{ background: colorMap['osaamisala'] }"></div>
                           <div class="flex-grow-1 paaryhma-label pl-2 noselect">
                             {{ $kaanna(ryhma.nimi) }}
@@ -137,7 +137,7 @@
                         </template>
                       </ep-koodisto-select>
                       <draggable :value="tutkintonimikkeet" v-bind="optionsKoodit" tag="div">
-                        <div v-for="(ryhma, idx) in tutkintonimikkeet" :key="ryhma.tutkintonimike" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
+                        <div v-for="ryhma in tutkintonimikkeet" :key="ryhma.tutkintonimike" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
                           <div class="colorblock" :style="{ background: colorMap['tutkintonimike'] }"></div>
                           <div class="flex-grow-1 paaryhma-label pl-2 noselect">
                             {{ $kaanna(ryhma.nimi) }}
@@ -243,7 +243,6 @@
   </div>
 </template>
 
-
 <script lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -272,7 +271,6 @@ import { Kieli } from '@shared/tyypit';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { v4 as genUuid } from 'uuid';
 
-
 const DefaultRyhma = {
   useRange: false,
   ryhma: {
@@ -284,7 +282,6 @@ const DefaultRyhma = {
   } as any,
   tyyppi: null as string | null,
 };
-
 
 @Component({
   components: {
@@ -336,7 +333,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
         params: {
           sivu,
           sivukoko: 10,
-        }
+        },
       })).data as any;
     },
   });
@@ -363,9 +360,9 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 
   get laskettuLaajuus() {
     return _(this.store?.data.value?.osat)
-        .map(osa => osa.muodostumisSaanto?.laajuus?.maksimi || osa.muodostumisSaanto?.laajuus?.minimi || this.tutkinnonOsatMap[osa._tutkinnonOsaViite]?.laajuus || 0)
-        .filter()
-        .sum();
+      .map(osa => osa.muodostumisSaanto?.laajuus?.maksimi || osa.muodostumisSaanto?.laajuus?.minimi || this.tutkinnonOsatMap[osa._tutkinnonOsaViite]?.laajuus || 0)
+      .filter()
+      .sum();
   }
 
   get colorMap() {
@@ -376,7 +373,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     return {
       focused: this.browserStore.activeElement.value,
       key: this.browserStore.latestKeypress.value,
-    }
+    };
   }
 
   @Watch('browserEvents')
@@ -410,7 +407,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       kuvaus: null,
       vieras: null,
       pakollinen: false,
-      rooli: "määritelty",
+      rooli: 'määritelty',
       tunniste: null,
       muodostumisSaanto: null,
       osaamisala: null,
@@ -605,7 +602,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       if (this.uusi) {
         root.osat = [{
           ...template,
-          ...this.uusi.ryhma
+          ...this.uusi.ryhma,
         }, ...root.osat];
       }
     }
@@ -638,10 +635,8 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   notImplemented() {
     throw new Error('not implemented yet.');
   }
-
 }
 </script>
-
 
 <style scoped lang="scss">
 .tree {

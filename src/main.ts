@@ -1,5 +1,4 @@
 import Vue from 'vue';
-Vue.config.productionTip = false;
 
 import App from './App.vue';
 import '@shared/config/bootstrap';
@@ -30,6 +29,9 @@ import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
 
 import router from './router';
 
+import { stores } from '@/stores';
+Vue.config.productionTip = false;
+
 Vue.use(VueI18n);
 Vue.use(VueCompositionApi);
 Vue.use(VueScrollTo);
@@ -52,9 +54,6 @@ Vue.use(Notifikaatiot);
 Vue.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
 Vue.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
 Vue.use(VueTutorial, { tutoriaaliStore });
-
-
-import { stores } from '@/stores';
 
 Vue.use(TekstikappaleStore, {
   perusteStore: stores.perusteStore,

@@ -32,7 +32,6 @@ import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 
-
 @Component({
   components: {
     EpEditointi,
@@ -44,7 +43,6 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
   },
 })
 export default class RouteJarjesta extends PerusteprojektiRoute {
-
   private store: EditointiStore | null = null;
 
   async onProjektiChange(projektiId: number) {
@@ -53,7 +51,5 @@ export default class RouteJarjesta extends PerusteprojektiRoute {
       this.store = new EditointiStore(tkstore);
     }
   }
-
 }
 </script>
-

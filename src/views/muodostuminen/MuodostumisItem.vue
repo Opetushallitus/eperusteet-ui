@@ -135,7 +135,6 @@ import { RakenneModuuliDto } from '@shared/api/eperusteet';
 import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType } from './utils';
 import { v4 as genUuid } from 'uuid';
 
-
 @Component({
   name: 'MuodostumisItem',
   components: {
@@ -185,13 +184,13 @@ export default class MuodostumisItem extends Vue {
     else if (this.value.rooli === 'tutkinnonosa') {
       return 'tutkinnonosa';
     }
-    
+
     const rakennetyypit = [
       'rakenne-moduuli-valinnainen',
       'rakenne-moduuli-ammatilliset',
       'rakenne-moduuli-yhteiset',
       'rakenne-moduuli-paikalliset',
-      'rakenne-moduuli-pakollinen'
+      'rakenne-moduuli-pakollinen',
     ];
     for (const rt of rakennetyypit) {
       if (this.value?.name?.fi === this.$t(rt, 'fi')) {
@@ -205,12 +204,12 @@ export default class MuodostumisItem extends Vue {
   get laskettu() {
     if (this.isRyhma) {
       return _(this.value.osat)
-          .map(osa =>
-            osa.muodostumisSaanto?.laajuus?.maksimi
+        .map(osa =>
+          osa.muodostumisSaanto?.laajuus?.maksimi
             || (osa._tutkinnonOsaViite && this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
             || 0)
-          .filter()
-          .sum();
+        .filter()
+        .sum();
     }
     else {
       return this.laajuusMinimi;
@@ -297,7 +296,7 @@ export default class MuodostumisItem extends Vue {
   get style() {
     return {
       'min-height': (this.isRyhma ? 52 : 42) + 'px',
-      'border-left': "9px solid " + this.color,
+      'border-left': '9px solid ' + this.color,
       'border-bottom-left-radius': '4px',
       'border-top-left-radius': '4px',
     };
@@ -327,7 +326,6 @@ export default class MuodostumisItem extends Vue {
         return ColorMap.valinnainen;
       }
     }
-    return '#fff';
   }
 
   get isRyhma() {
@@ -354,7 +352,6 @@ export default class MuodostumisItem extends Vue {
   toggleDescription() {
     this.showDescription = !this.showDescription;
   }
-
 }
 </script>
 
@@ -399,4 +396,3 @@ export default class MuodostumisItem extends Vue {
 }
 
 </style>
-
