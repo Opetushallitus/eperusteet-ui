@@ -5,6 +5,7 @@ import RouteArviointi from '@/views/RouteArviointi.vue';
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue';
 import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';
 import RouteHome from '@/views/RouteHome.vue';
+import RouteJarjesta from '@/views/RouteJarjesta.vue';
 import RouteMuodostuminen from '@/views/RouteMuodostuminen.vue';
 import RouteOppaat from '@/views/RouteOppaat.vue';
 import RouteOppaatLuonti from '@/views/RouteOppaatLuonti.vue';
@@ -24,8 +25,8 @@ import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
 import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
-import RouteJarjesta from '@/views/RouteJarjesta.vue';
 
+import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
 
 Vue.use(VueRouter);
@@ -40,6 +41,7 @@ const router = new VueRouter({
   }, {
     path: '/:lang',
     component: RouteRoot,
+    props: { ...stores },
     children: [{
       path: '',
       name: 'root',
@@ -162,6 +164,11 @@ const router = new VueRouter({
       }],
     }],
   }],
+});
+
+router.beforeEach((to, from, next) => {
+  changeLang(to, from);
+  next();
 });
 
 router.beforeEach(async (to, from, next) => {

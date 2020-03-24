@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { PerusteHakuInternalDto, PerusteprojektiLuontiDto, Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteet, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { getAllPerusteetInternal, PerusteHakuInternalDto, PerusteprojektiLuontiDto, Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteet, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { Debounced } from '@shared/utils/delay';
@@ -18,30 +18,26 @@ export class PerusteprojektiStore {
   public readonly pohjat = computed(() => this.state.pohjat);
 
   public async fetchPohjat() {
-    const res = await Perusteet.getAllPerusteetInternal({
-      params: {
-        koulutusvienti: 'kaikki',
-        nimi: '',
-        perusteTyyppi: 'pohja',
-        sivu: 0,
-        sivukoko: 1000,
-        tila: 'valmis',
-      },
-    });
+    const res = await getAllPerusteetInternal({
+      koulutusvienti: false,
+      nimi: '',
+      perusteTyyppi: 'pohja',
+      sivu: 0,
+      sivukoko: 1000,
+      tila: ['valmis'],
+    } as any);
     this.state.pohjat = res.data as any;
   }
 
   public async fetchPohjaProjektit() {
-    const res = await Perusteet.getAllPerusteetInternal({
-      params: {
-        koulutusvienti: 'kaikki',
-        nimi: '',
-        perusteTyyppi: 'normaali',
-        sivu: 0,
-        sivukoko: 1000,
-        tila: 'valmis',
-      },
-    });
+    const res = await getAllPerusteetInternal({
+      koulutusvienti: false,
+      nimi: '',
+      perusteTyyppi: 'normaali',
+      sivu: 0,
+      sivukoko: 1000,
+      tila: ['valmis'],
+    } as any);
     this.state.perusteet = res.data as any;
   }
 

@@ -37,6 +37,7 @@ import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
+import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 
 @Component({
   components: {
@@ -47,10 +48,7 @@ import { AikatauluStore } from '@/stores/AikatauluStore';
     EpPerusteTiedotteet,
   },
 })
-export default class RouteYleisnakyma extends Vue {
-  @Prop({ required: true })
-  private perusteStore!: PerusteStore;
-
+export default class RouteYleisnakyma extends PerusteprojektiRoute {
   @Prop({ required: true })
   private tiedotteetStore!: TiedotteetStore;
 
@@ -66,12 +64,11 @@ export default class RouteYleisnakyma extends Vue {
   @Prop({ required: true })
   private aikatauluStore!: AikatauluStore;
 
-  @Watch('peruste', { immediate: true })
-  onPerusteChange(val) {
+  async onProjektiChange() {
     if (this.peruste && this.peruste.id) {
       this.muokkaustietoStore.init(this.peruste.id);
       this.aikatauluStore.init(this.peruste);
-      this.tutkinnonOsaStore.init(this.peruste.id, _.map(this.peruste.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)));
+      this.tutkinnonOsaStore.fetch();
       this.tiedotteetStore.init(this.peruste.id);
     }
   }

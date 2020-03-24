@@ -1,4 +1,5 @@
 import Vue from 'vue';
+
 import App from './App.vue';
 import '@shared/config/bootstrap';
 import '@shared/config/styles';
@@ -21,11 +22,15 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { Kayttajat } from '@/stores/kayttaja';
 import { VueTutorial } from '@shared/plugins/tutoriaali';
 import { tutoriaaliStore } from '@shared/stores/tutoriaali';
-import { BrowserStore } from '@shared/stores/BrowserStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
+import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
+import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
+import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
 
 import router from './router';
+
 import { stores } from '@/stores';
+Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
 Vue.use(VueCompositionApi);
@@ -49,11 +54,28 @@ Vue.use(Notifikaatiot);
 Vue.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
 Vue.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
 Vue.use(VueTutorial, { tutoriaaliStore });
-Vue.use(BrowserStore);
 
-Vue.config.productionTip = false;
+Vue.use(TekstikappaleStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
 
-TekstikappaleStore.install({
+Vue.use(TekstiRakenneStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(TutkinnonOsaEditStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(TutkinnonOsaEditStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(MuodostuminenStore, {
   perusteStore: stores.perusteStore,
   router,
 });

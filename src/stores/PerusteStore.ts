@@ -15,6 +15,7 @@ export class PerusteStore {
     tyoryhma: null as any | null,
     perusteId: null as number | null,
     isInitialized: false,
+    initializing: false,
     projektiStatus: null as TilaUpdateStatus | null,
   });
 
@@ -22,32 +23,54 @@ export class PerusteStore {
   public readonly peruste = computed(() => this.state.peruste);
   public readonly navigation = computed(() => this.state.navigation);
   public readonly tyoryhma = computed(() => this.state.tyoryhma);
+  public readonly suoritustavat = computed(() => _.map(this.state.peruste?.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)) as string[]);
   public readonly perusteId = computed(() => this.state.perusteId);
+  public readonly projektiId = computed(() => this.state.projekti?.id);
+  public readonly tutkinnonOsat = computed(() => this.state.perusteId);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
 
   async init(projektiId: number) {
-    this.state.isInitialized = false;
-    this.state.peruste = null;
-    this.state.projekti = null;
-    this.state.projektiStatus = null;
+    if (this.state.initializing
+      || !projektiId
+      || projektiId === this.state.projekti?.id) {
+      return;
+    }
 
-    this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
-    const perusteId = Number((this.state.projekti as any)._peruste);
-    this.state.perusteId = perusteId;
+    try {
+      this.state.initializing = true;
+      this.state.isInitialized = false;
+      this.state.peruste = null;
+      this.state.projekti = null;
 
-    [
-      this.state.peruste,
-      this.state.navigation,
-      this.state.tyoryhma,
-      this.state.projektiStatus,
-    ] = _.map(await Promise.all([
-      Perusteet.getPerusteenTiedot(perusteId),
-      Perusteet.getNavigation(perusteId),
-      Ulkopuoliset.getOrganisaatioRyhmatByOid(this.state.projekti.ryhmaOid!),
-      Perusteprojektit.getPerusteprojektiValidointi(projektiId),
-    ]), 'data');
+      this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
+      const perusteId = Number((this.state.projekti as any)._peruste);
+      this.state.perusteId = perusteId;
 
-    this.state.isInitialized = true;
+      [
+        this.state.peruste,
+        this.state.navigation,
+        this.state.tyoryhma,
+        this.state.projektiStatus,
+      ] = _.map(await Promise.all([
+        Perusteet.getPerusteenTiedot(perusteId),
+        Perusteet.getNavigation(perusteId),
+        Ulkopuoliset.getOrganisaatioRyhmatByOid(this.state.projekti.ryhmaOid!),
+        Perusteprojektit.getPerusteprojektiValidointi(projektiId),
+      ]), 'data');
+
+      this.state.isInitialized = true;
+    }
+    finally {
+      this.state.initializing = false;
+    }
+  }
+
+  public async updateNavigation() {
+    if (!this.state.perusteId) {
+      return;
+    }
+    const res = await Perusteet.getNavigation(this.state.perusteId);
+    this.state.navigation = res.data;
   }
 
   public removeNavigationEntry(item: { id: number, type: string }) {

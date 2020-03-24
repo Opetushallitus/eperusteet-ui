@@ -1,18 +1,32 @@
 import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
 import { TutkinnonOsaViiteDto, TutkinnonRakenne } from '@shared/api/eperusteet';
+import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
 
 export class TutkinnonOsaStore {
+  constructor(
+    private perusteStore: PerusteStore,
+  ) {
+  }
+
   private state = reactive({
     tutkinnonOsat: null as TutkinnonOsaViiteDto[] | null,
   });
 
   public readonly tutkinnonOsat = computed(() => this.state.tutkinnonOsat);
 
-  async init(projektiId: number, suoritustapakoodit: string[]) {
+  public async fetch() {
+    const perusteId = this.perusteStore.perusteId.value;
+    const st = this.perusteStore.suoritustavat.value;
+    if (perusteId && st) {
+      this.init(perusteId, st);
+    }
+  }
+
+  public async init(projektiId: number, suoritustapakoodit: readonly string[]) {
     if (!_.isEmpty(suoritustapakoodit)) {
       const tutkinnonosat = _.chain(await Promise.all(
         _.map(suoritustapakoodit, suoritustapakoodi => TutkinnonRakenne.getPerusteenTutkinnonOsat(projektiId, (suoritustapakoodi as any)))))

@@ -67,6 +67,9 @@ import { TutoriaaliStore } from '@shared/stores/tutoriaali';
 import { Perusteet, PerusteHakuDto, PerusteHakuInternalDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
+import { required } from 'vuelidate/lib/validators';
+import { validationMixin } from 'vuelidate';
+import { parsiEsitysnimi } from '@/stores/kayttaja';
 import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 
 @Component({

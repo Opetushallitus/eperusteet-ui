@@ -45,13 +45,11 @@
               {{ peruste.diaarinumero }}
             </div>
           </div>
-          <EpSpinner v-else />
         </div>
       </div>
     </Portal>
 
-    <EpSpinner v-if="!navigation" />
-    <EpSidebar>
+    <EpSidebar v-if="navigation">
       <template v-slot:bar>
         <div class="m-3">
           <EpSearch v-model="query" />
@@ -129,6 +127,7 @@ import EpSidebar from '@shared/components/EpSidebar/EpSidebar.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpTreeNavibar from '@shared/components/EpTreeNavibar/EpTreeNavibar.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
+import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
 import * as _ from 'lodash';
 
@@ -158,17 +157,15 @@ interface ValidationStats {
     EpProgressPopover,
   },
 })
-export default class RoutePerusteprojekti extends Vue {
+export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
   private naviStore: EpTreeNavibarStore | null = null;
-
   private loading = false;
 
-  @Watch('projektiId', { immediate: true })
-  async onProjektiChange(value: number) {
-    await this.perusteStore.init(value);
+  async onProjektiChange(projektiId: number) {
+    await this.perusteStore.init(projektiId);
     this.naviStore = new EpTreeNavibarStore(this.perusteStore.navigation);
   }
 
