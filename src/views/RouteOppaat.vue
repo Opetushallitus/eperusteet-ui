@@ -1,6 +1,6 @@
 <template>
   <EpMainView>
-    <EpPerusteprojektiListaus :provider="oppaatStore"
+    <EpPerusteprojektiListaus :provider="perusteOppaatStore"
                               :edit-route="'opas'"
                               :new-route="{ name: 'opasLuonti' }">
       <h2 slot="upperheader">{{ $t('oppaat') }}</h2>
@@ -25,7 +25,7 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 })
 export default class RouteOppaat extends Vue {
   @Prop({ required: true })
-  oppaatStore!: PerusteetStore;
+  perusteOppaatStore!: PerusteetStore;
 }
 </script>
 
