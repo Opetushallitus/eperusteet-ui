@@ -54,6 +54,11 @@ export class MuodostuminenStore implements IEditoitava {
     await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, 'REFORMI', data as any);
   }
 
+  public readonly validator = computed(() => {
+    return {
+    };
+  });
+
   public async history() {
   }
 

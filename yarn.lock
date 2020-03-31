@@ -1220,10 +1220,10 @@
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-7.0.0.tgz#9f6993ccc8210efa90bda7e1afabbb06a9f860cd"
   integrity sha512-RiX1I0lK9WFLFqy2xOxke396f0wKIzk5sAll0tL4J4XDYJXURI7JOs96XQb3nP+2gEpQ/LutBb66jgiT5oQshQ==
 
-"@types/vuelidate@^0.7.10":
-  version "0.7.10"
-  resolved "https://registry.yarnpkg.com/@types/vuelidate/-/vuelidate-0.7.10.tgz#bb4f8cbe1e48c7fe3a294dd15dc0ac7a97b896dd"
-  integrity sha512-gQ82mjTxniDCZGBfCYnpfMnZOYB+e0dhIW5ftWDR5p5AwXLdsQEk2ByAqe40Gm7XA4OtQZKEIJ2xAgTdZCVz6A==
+"@types/vuelidate@^0.7.11":
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/@types/vuelidate/-/vuelidate-0.7.11.tgz#e69acec009ed2f6c4a7e42d39ff8794bc1537d90"
+  integrity sha512-mcDN2ff2gFtHSUqVW8ObMYPxsAk0WUeH3VihPmv16zYdeopftxveaJ6oXQzaMVeQeOjl9iGjwGpq2aXSAOMCgA==
   dependencies:
     vue "^2.6.11"
 

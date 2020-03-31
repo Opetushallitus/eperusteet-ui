@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
 import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
+import { Kieli } from '@shared/tyypit';
 import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
@@ -27,6 +28,7 @@ export class PerusteStore {
   public readonly perusteId = computed(() => this.state.perusteId);
   public readonly projektiId = computed(() => this.state.projekti?.id);
   public readonly tutkinnonOsat = computed(() => this.state.perusteId);
+  public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
 
   async init(projektiId: number) {

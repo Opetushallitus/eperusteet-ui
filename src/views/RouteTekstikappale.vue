@@ -4,9 +4,9 @@
       <template v-slot:header="{ data }">
         <h2 class="m-0">{{ $kaanna(data.nimi) }}</h2>
       </template>
-      <template v-slot:default="{ data, isEditing }">
+      <template v-slot:default="{ data, isEditing, validation }">
         <div class="mt-1">
-          <ep-input v-model="data.nimi" v-if="isEditing" :is-editing="true"></ep-input>
+          <ep-input v-model="data.nimi" v-if="isEditing" :is-editing="true" :validation="validation.nimi"></ep-input>
         </div>
         <div :class="{ 'mt-4': isEditing }">
           <ep-content v-model="data.teksti" layout="normal" :is-editable="isEditing"></ep-content>

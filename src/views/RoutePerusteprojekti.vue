@@ -40,7 +40,39 @@
         </div>
         <div class="flex-grow-1 align-self-center">
           <div class="mb-5 p-2" v-if="peruste && projekti">
-            <h1>{{ $kaanna(peruste.nimi) || projekti.nimi }}</h1>
+            <h1>
+              <span>{{ $kaanna(peruste.nimi) || projekti.nimi }}</span>
+              <b-dropdown size="lg" variant="link" toggle-class="text-decoration-none" no-caret>
+                <template v-slot:button-content>
+                  <fas icon="ratas" class="hallinta" />
+                </template>
+                <b-dropdown-item to="projektinTiedot">
+                  <fas icon="info" />
+                  {{ $t('projektin-tiedot') }}
+                </b-dropdown-item>
+                <b-dropdown-item to="perusteenTiedot">
+                  <fas icon="info" />
+                  {{ $t('perusteen-tiedot') }}
+                </b-dropdown-item>
+                <b-dropdown-item to="dokumentti">
+                  <fas icon="file-pdf" />
+                  {{ $t('luo-pdf') }}
+                </b-dropdown-item>
+                <b-dropdown-item to="termisto">
+                  <fas icon="bookmark" />
+                  {{ $t('kasitteet') }}
+                </b-dropdown-item>
+                <b-dropdown-item to="poistetut">
+                  <fas icon="trash" />
+                  {{ $t('poistetut-sisallot') }}
+                </b-dropdown-item>
+                <b-dropdown-divider />
+                <b-dropdown-item>
+                  <fas icon="folder" />
+                  {{ $t('arkistoi-peruste') }}
+                </b-dropdown-item>
+              </b-dropdown>
+            </h1>
             <div class="diaarinumero">
               {{ peruste.diaarinumero }}
             </div>
@@ -56,45 +88,54 @@
         </div>
         <div class="navigation">
           <EpTreeNavibar :store="naviStore">
-          <template v-slot:padding="{ item }">
-            <div :style="{ 'margin-left': item.depth * 20 + 'px' }">
-            </div>
-          </template>
-          <template v-slot:viite="{ item }">
-            <div class="menu-item">
-              <router-link :to="{ name: 'tekstikappale', params: { tekstiKappaleId: item.id } }">
-                {{ $kaanna(item.label) }}
-              </router-link>
-            </div>
-          </template>
-          <template v-slot:tutkinnonosaviite="{ item }">
-            <div class="menu-item">
-              <router-link :to="{ name: 'tutkinnonosa', params: { tutkinnonOsaId: item.id } }">
-                {{ $kaanna(item.label) }}
-              </router-link>
-            </div>
-          </template>
-          <template v-slot:liite="{ item }">
-            <div class="menu-item">
-              <router-link :to="{ name: 'tekstikappale', params: { tekstiKappaleId: item.id } }">
-                {{ $kaanna(item.label) }}
-              </router-link>
-            </div>
-          </template>
-          <template v-slot:tutkinnonosat="{ item }">
-            <div class="menu-item">
-              <router-link :to="{ name: 'tutkinnonosat' }">
-                {{ $t('tutkinnonosat') }}
-              </router-link>
-            </div>
-          </template>
-          <template v-slot:muodostuminen="{ item }">
-            <div class="menu-item">
-              <router-link :to="{ name: 'muodostuminen' }">
-                {{ $t('tutkinnon-rakenne') }}
-              </router-link>
-            </div>
-          </template>
+            <template v-slot:header>
+              <div class="heading">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'perusteprojekti' }" exact>
+                    {{ $t('yleisnakyma') }}
+                  </router-link>
+                </div>
+              </div>
+            </template>
+            <template v-slot:padding="{ item }">
+              <div :style="{ 'margin-left': item.depth * 20 + 'px' }">
+              </div>
+            </template>
+            <template v-slot:viite="{ item }">
+              <div class="menu-item">
+                <router-link :to="{ name: 'tekstikappale', params: { tekstiKappaleId: item.id } }">
+                  {{ $kaanna(item.label) }}
+                </router-link>
+              </div>
+            </template>
+            <template v-slot:tutkinnonosaviite="{ item }">
+              <div class="menu-item">
+                <router-link :to="{ name: 'tutkinnonosa', params: { tutkinnonOsaId: item.id } }">
+                  {{ $kaanna(item.label) }}
+                </router-link>
+              </div>
+            </template>
+            <template v-slot:liite="{ item }">
+              <div class="menu-item">
+                <router-link :to="{ name: 'tekstikappale', params: { tekstiKappaleId: item.id } }">
+                  {{ $kaanna(item.label) }}
+                </router-link>
+              </div>
+            </template>
+            <template v-slot:tutkinnonosat="{ item }">
+              <div class="menu-item">
+                <router-link :to="{ name: 'tutkinnonosat' }">
+                  {{ $t('tutkinnonosat') }}
+                </router-link>
+              </div>
+            </template>
+            <template v-slot:muodostuminen="{ item }">
+              <div class="menu-item">
+                <router-link :to="{ name: 'muodostuminen' }">
+                  {{ $t('tutkinnon-rakenne') }}
+                </router-link>
+              </div>
+            </template>
           </EpTreeNavibar>
         </div>
       </template>
@@ -241,6 +282,9 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   h1 {
     margin: 0;
     padding: 0;
+    .hallinta {
+      color: white;
+    }
   }
 
   .upper-left {
@@ -251,6 +295,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
 .navigation {
   min-height: 1200px;
+}
+
+.heading {
+  margin-left: 20px;
 }
 
 .menu-item {

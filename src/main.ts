@@ -26,6 +26,7 @@ import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
+import Vuelidate from 'vuelidate';
 
 import router from './router';
 
@@ -34,6 +35,7 @@ Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
 Vue.use(VueCompositionApi);
+Vue.use(Vuelidate)
 Vue.use(VueScrollTo);
 Vue.use(Notifications);
 Vue.use(PortalVue);

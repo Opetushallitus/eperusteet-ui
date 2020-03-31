@@ -64,7 +64,7 @@ import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue
 
 import { perustetila, perusteprojektitila } from '@shared/utils/perusteet';
 import { TutoriaaliStore } from '@shared/stores/tutoriaali';
-import { Perusteet, PerusteHakuDto, PerusteHakuInternalDto } from '@shared/api/eperusteet';
+import { TiedoteDto, Perusteet, PerusteHakuDto, PerusteHakuInternalDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { required } from 'vuelidate/lib/validators';

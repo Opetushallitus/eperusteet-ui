@@ -12,7 +12,7 @@
         </h2>
       </template>
 
-      <template v-slot:default="{ data, isEditing }">
+      <template v-slot:default="{ data, isEditing, validation }">
         <div class="mt-1" v-if="isEditing && isNew">
           <b-form-group :label="$t('tyyppi')">
             <b-form-radio v-model="data.tyyppi" name="tyyppi" value="normaali">
@@ -27,13 +27,15 @@
         <b-row>
           <b-col md="8">
             <b-form-group :label="$t('tutkinnon-osan-nimi')">
-              <ep-input v-model="data.tutkinnonOsa.nimi" :is-editing="isEditing" />
+              <ep-input v-model="data.tutkinnonOsa.nimi"
+                        :is-editing="isEditing"
+                        :validation="validation.tutkinnonOsa.nimi" />
             </b-form-group>
           </b-col>
 
           <b-col md="4">
             <b-form-group :label="$t('laajuus')">
-              <ep-laajuus-input v-model="data.laajuus" :is-editing="isEditing" />
+              <ep-laajuus-input v-model="data.laajuus" :is-editing="isEditing" :validation="validation.laajuus" />
             </b-form-group>
           </b-col>
         </b-row>
@@ -42,7 +44,9 @@
           <ep-collapse tyyppi="ammattitaitovaatimukset" :border-bottom="false" :border-top="isEditing">
             <h2 slot="header">{{ $t('ammattitaitovaatimukset') }}</h2>
             <b-form-group>
-              <EpAmmattitaitovaatimukset v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
+              <EpAmmattitaitovaatimukset v-if="data.tutkinnonOsa.ammattitaitovaatimukset2019"
+                                         v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
+                                         :validation="validation.tutkinnonOsa.ammattitaitovaatimukset2019"
                                          :is-editing="isEditing" />
             </b-form-group>
           </ep-collapse>
@@ -91,7 +95,10 @@
           <ep-collapse tyyppi="ammattitaidon-osoittamistavat" :border-bottom="false" :border-top="true">
             <h2 slot="header">{{ $t('ammattitaidonOsoittamistavat') }}</h2>
             <b-form-group>
-              <ep-content v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat" layout="normal" :is-editable="isEditing"></ep-content>
+              <ep-content v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
+                          :validation="validation"
+                          layout="normal"
+                          :is-editable="isEditing"></ep-content>
             </b-form-group>
           </ep-collapse>
         </div>
@@ -113,20 +120,22 @@ import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
+import { LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import _ from 'lodash';
 
+
 interface YhdistettyOsaamistaso {
-  otsikko: any;
-  kriteerit: any[];
+  otsikko?: LokalisoituTekstiDto;
+  kriteerit?: any[];
 }
 
 interface YhdistettyGeneerinen {
-  nimi: any;
-  kohde: any;
-  osaamistasot: YhdistettyOsaamistaso[],
+  nimi?: LokalisoituTekstiDto;
+  kohde?: LokalisoituTekstiDto;
+  osaamistasot?: YhdistettyOsaamistaso[],
 }
 
 @Component({
@@ -194,11 +203,11 @@ export default class RouteTutkinnonosa extends Vue {
     const kriteeriMap = _.keyBy(geneerinen.osaamistasonKriteerit, '_osaamistaso');
 
     return {
-      nimi: geneerinen.nimi,
-      kohde: geneerinen.kohde,
-      osaamistasot: _.map(_.reverse(asteikko.osaamistasot), ot => {
+      nimi: geneerinen.nimi as any,
+      kohde: geneerinen.kohde as any,
+      osaamistasot: _.map(_.reverse(asteikko?.osaamistasot || []), (ot: any) => {
         return {
-          otsikko: ot.otsikko,
+          otsikko: ot.otsikko as any,
           kriteerit: kriteeriMap[ot.id!]!.kriteerit!,
         };
       }),

@@ -3,10 +3,11 @@ import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
 import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Tutkinnonosat, Perusteenosat } from '@shared/api/eperusteet';
 import { Revision, Page } from '@shared/tyypit';
-import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
+import { minValue, translated, warning } from '@shared/validators/required';
+import { Kieli } from '@shared/tyypit';
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
@@ -48,6 +49,11 @@ export class TutkinnonOsaEditStore implements IEditoitava {
           osaAlueet: [],
           tyyppi: 'normaali',
           osanTyyppi: 'tutkinnonosa',
+          ammattitaitovaatimukset2019: {
+            kohde: null,
+            vaatimukset: [],
+            kohdealueet: [],
+          },
           vapaatTekstit: [],
         },
       };
@@ -88,6 +94,35 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   public async cancel() {
     // Noop
   }
+
+  public readonly validator = computed(() => {
+    const julkaisukielet = TutkinnonOsaEditStore.config.perusteStore.julkaisukielet.value;
+    return {
+      laajuus: _.mapValues(minValue(1), warning),
+      tutkinnonOsa: {
+        nimi: translated(julkaisukielet),
+        ammattitaidonOsoittamistavat: translated(julkaisukielet),
+        ammattitaitovaatimukset2019: {
+          kohde: translated(julkaisukielet),
+          vaatimukset: {
+            $each: {
+              vaatimus: translated(julkaisukielet),
+            },
+          },
+          kohdealueet: {
+            $each: {
+              kuvaus: translated(julkaisukielet),
+              vaatimukset: {
+                $each: {
+                  vaatimus: translated(julkaisukielet)
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+  });
 
   public async remove() {
     if (!this.tutkinnonOsaViiteId) {
@@ -159,4 +194,5 @@ export class TutkinnonOsaEditStore implements IEditoitava {
       valid: true,
     };
   }
+
 }

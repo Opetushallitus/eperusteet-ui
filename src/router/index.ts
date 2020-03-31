@@ -147,8 +147,23 @@ const router = new VueRouter({
         component: RouteTermisto,
         props: { ...stores },
       }, {
-        path: 'tiedot',
-        name: 'tiedot',
+        path: 'peruste',
+        name: 'perusteenTiedot',
+        component: RouteTiedot,
+        props: { ...stores },
+      }, {
+        path: 'projekti',
+        name: 'projektinTiedot',
+        component: RouteTiedot,
+        props: { ...stores },
+      }, {
+        path: 'dokumentti',
+        name: 'dokumentti',
+        component: RouteTiedot,
+        props: { ...stores },
+      }, {
+        path: 'poistetut',
+        name: 'poistetut',
         component: RouteTiedot,
         props: { ...stores },
       }, {
