@@ -1,7 +1,7 @@
 <template>
   <EpMainView>
     <b-container>
-      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave">
+      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel" :valid="valid" @stepChange="stepChange">
 
         <template v-slot:pohja>
 
@@ -13,7 +13,7 @@
                 <div v-if="tyyppi === 'oppaasta'" class="ml-2">
                   <EpMultiSelect
                     v-if="oppaat"
-                    v-model="data.peruste"
+                    v-model="data.pohja"
                     :placeholder="$t('valitse-opas')"
                     :is-editing="true"
                     :options="oppaat">
@@ -93,8 +93,10 @@
 
         </template>
 
+        <template slot="luo">
+          {{$t('luo-opas')}}
+        </template>
       </EpSteps>
-
     </b-container>
   </EpMainView>
 </template>
@@ -157,6 +159,7 @@ export default class RouteOppaatLuonti extends Vue {
 
   private data: any = {};
   private tyyppi: 'oppaasta' | 'uusi' | null = null;
+  private currentStep: string | null = null;
 
   async mounted() {
     await Promise.all([
@@ -171,6 +174,26 @@ export default class RouteOppaatLuonti extends Vue {
     else {
       this.tyyppi = 'uusi';
     }
+  }
+
+  get valid() {
+    if (this.currentStep === 'pohja') {
+      if (this.tyyppi === 'oppaasta' && !this.data.pohja) {
+        return false;
+      }
+    }
+
+    if (this.currentStep === 'tiedot') {
+      if (!this.data.nimi) {
+        return false;
+      }
+
+      if (!this.data.tyoryhma) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   @Watch('tyyppi')
@@ -197,6 +220,10 @@ export default class RouteOppaatLuonti extends Vue {
       name: this.$t('oppaan-tiedot'),
     },
     ];
+  }
+
+  stepChange(step) {
+    this.currentStep = step;
   }
 
   tyoryhmaSearchIdentity(tr: any) {
@@ -241,25 +268,19 @@ export default class RouteOppaatLuonti extends Vue {
       ryhmaOid: this.data.tyoryhma.oid,
       oppaanKoulutustyypit: this.data.koulutustyypit,
       oppaanPerusteet: this.data.perusteet,
+      pohjaId: this.data.pohja?.peruste.id,
     });
-    // const luotu = await this.perusteprojektiStore.addPerusteprojekti({
-    //   diaarinumero: this.data.diaarinumero,
-    //   johtokunnanKasittely: this.data.johtokunnanKasittely,
-    //   koulutustyyppi: this.data.koulutustyyppi,
-    //   lausuntakierrosAlkaa: this.data.lausuntakierrosAlkaa,
-    //   nimi: this.data.nimi,
-    //   paatosPvm: this.data.paatosPvm,
-    //   perusteId: this.data.peruste?.id,
-    //   laajuusYksikko: 'OSAAMISPISTE' as any,
-    //   ryhmaOid: this.data.tyoryhma.oid,
-    //   voimassaoloAlkaa: this.data.voimassaoloAlkaa,
-    //   yhteistyotaho: this.data.paatosPvm,
-    // });
     this.$router.push({
       name: 'perusteprojekti',
       params: {
         projektiId: '' + luotu.id,
       },
+    });
+  }
+
+  onCancel() {
+    this.$router.push({
+      name: 'oppaat',
     });
   }
 }

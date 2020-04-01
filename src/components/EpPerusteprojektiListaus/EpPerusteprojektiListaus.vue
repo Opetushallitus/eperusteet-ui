@@ -101,18 +101,23 @@
       </div>
       <div v-if="items.data.length > 0">
         <b-table striped hover responsive :items="items.data" :fields="fields">
+          <template v-slot:head(nimi)>
+            <slot name="nimiotsikko"></slot>
+          </template>
           <template v-slot:cell(nimi)="data">
             <router-link :to="{ name: editRoute, params: { projektiId: data.item.id } }">
               {{ data.item.nimi }}
             </router-link>
           </template>
           <template v-slot:cell(koulutustyyppi)="data">
-            <span class="text-nowrap">
-              <EpColorIndicator :size="10" :kind="data.item.koulutustyyppi" />
-              <span class="ml-1">
-                {{ $t(data.item.koulutustyyppi) }}
+            <slot name="koulutustyyppisarake" :perusteProjekti="data.item">
+              <span class="text-nowrap">
+                <EpColorIndicator :size="10" :kind="data.item.koulutustyyppi" v-if="data.item.koulutustyyppi"/>
+                <span class="ml-1">
+                  {{ $t(data.item.koulutustyyppi) }}
+                </span>
               </span>
-            </span>
+            </slot>
           </template>
         </b-table>
         <b-pagination align="center"
