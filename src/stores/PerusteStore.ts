@@ -3,10 +3,12 @@ import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-a
 import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import _ from 'lodash';
+import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+
 
 Vue.use(VueCompositionApi);
 
-export class PerusteStore {
+export class PerusteStore implements IEditoitava {
   private blocklist = [] as (() => void)[];
 
   private state = reactive({
@@ -109,5 +111,54 @@ export class PerusteStore {
         }
       }
     }
+  });
+
+  async acquire() {
+    return null;
+  }
+
+  async cancel() {
+  }
+
+  async editAfterLoad() {
+    return false;
+  }
+
+  async history() {
+  }
+
+  async load() {
+  }
+
+  async preview() {
+    return null;
+  }
+
+  async release() {
+  }
+
+  async lock() {
+    return null;
+  }
+
+  async remove() {
+  }
+
+  async restore() {
+  }
+
+  async revisions() {
+    return [];
+  }
+
+  async save() {
+  }
+
+  async start() {
+  }
+
+  public readonly validator = computed(() => {
+    return {
+    };
   });
 }

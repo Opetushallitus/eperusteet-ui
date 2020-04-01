@@ -17,7 +17,8 @@ import RoutePohjatLuonti from '@/views/RoutePohjatLuonti.vue';
 import RouteRoot from '@/views/RouteRoot.vue';
 import RouteTekstikappale from '@/views/RouteTekstikappale.vue';
 import RouteTermisto from '@/views/RouteTermisto.vue';
-import RouteTiedot from '@/views/RouteTiedot.vue';
+import RouteProjektiTiedot from '@/views/RouteProjektiTiedot.vue';
+import RoutePerusteenTiedot from '@/views/RoutePerusteenTiedot.vue';
 import RouteTiedotteet from '@/views/RouteTiedotteet.vue';
 import RouteTutkinnonOsa from '@/views/RouteTutkinnonOsa.vue';
 import RouteTutkinnonOsanOsaAlue from '@/views/RouteTutkinnonOsanOsaAlue.vue';
@@ -149,22 +150,22 @@ const router = new VueRouter({
       }, {
         path: 'peruste',
         name: 'perusteenTiedot',
-        component: RouteTiedot,
+        component: RoutePerusteenTiedot,
         props: { ...stores },
       }, {
         path: 'projekti',
         name: 'projektinTiedot',
-        component: RouteTiedot,
+        component: RouteProjektiTiedot,
         props: { ...stores },
       }, {
         path: 'dokumentti',
         name: 'dokumentti',
-        component: RouteTiedot,
+        component: RoutePerusteenTiedot,
         props: { ...stores },
       }, {
         path: 'poistetut',
         name: 'poistetut',
-        component: RouteTiedot,
+        component: RoutePerusteenTiedot,
         props: { ...stores },
       }, {
         path: 'tutkinnonosa/:tutkinnonOsaId',

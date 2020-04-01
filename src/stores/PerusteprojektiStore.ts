@@ -4,11 +4,12 @@ import { getAllPerusteetInternal, PerusteHakuInternalDto, PerusteprojektiLuontiD
 import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { Debounced } from '@shared/utils/delay';
+import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
 
-export class PerusteprojektiStore {
+export class PerusteprojektiStore implements IEditoitava {
   private state = reactive({
     pohjat: null as Page<PerusteHakuInternalDto> | null,
     perusteet: null as Page<PerusteHakuInternalDto> | null,
@@ -58,4 +59,5 @@ export class PerusteprojektiStore {
     const res = await Perusteprojektit.getPerusteprojektiTyoryhmat(perusteProjektiId);
     return res.data;
   }
+
 }

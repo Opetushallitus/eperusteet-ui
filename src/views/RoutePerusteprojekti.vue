@@ -46,23 +46,23 @@
                 <template v-slot:button-content>
                   <fas icon="ratas" class="hallinta" />
                 </template>
-                <b-dropdown-item to="projektinTiedot">
+                <b-dropdown-item :to="{ name: 'projektinTiedot' }">
                   <fas icon="info" />
                   {{ $t('projektin-tiedot') }}
                 </b-dropdown-item>
-                <b-dropdown-item to="perusteenTiedot">
+                <b-dropdown-item :to="{ name: 'perusteenTiedot' }">
                   <fas icon="info" />
                   {{ $t('perusteen-tiedot') }}
                 </b-dropdown-item>
-                <b-dropdown-item to="dokumentti">
+                <b-dropdown-item :to="{ name: 'dokumentti' }">
                   <fas icon="file-pdf" />
                   {{ $t('luo-pdf') }}
                 </b-dropdown-item>
-                <b-dropdown-item to="termisto">
+                <b-dropdown-item :to="{ name: 'termisto' }">
                   <fas icon="bookmark" />
                   {{ $t('kasitteet') }}
                 </b-dropdown-item>
-                <b-dropdown-item to="poistetut">
+                <b-dropdown-item :to="{ name: 'poistetut' }">
                   <fas icon="trash" />
                   {{ $t('poistetut-sisallot') }}
                 </b-dropdown-item>
