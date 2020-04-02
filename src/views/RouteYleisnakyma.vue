@@ -69,10 +69,7 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
   private tyoryhmaStore!: TyoryhmaStore;
 
   async onProjektiChange() {
-    console.log('onProjektiChange');
-    console.log(this.peruste);
     if (this.peruste && this.peruste.id) {
-      console.log('peruste on');
       this.muokkaustietoStore.init(this.peruste.id);
       this.aikatauluStore.init(this.peruste);
       this.tutkinnonOsaStore.fetch();
