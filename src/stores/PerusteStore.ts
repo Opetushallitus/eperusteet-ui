@@ -33,8 +33,14 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
 
+  public async updateValidointi(projektiId: number) {
+      const res = await Perusteprojektit.getPerusteprojektiValidointi(projektiId);
+      this.state.projektiStatus = res.data;
+  }
+
   async init(projektiId: number) {
     if (this.state.initializing
+      || this.state.isInitialized
       || !projektiId
       || projektiId === this.state.projekti?.id) {
       return;
@@ -54,14 +60,12 @@ export class PerusteStore implements IEditoitava {
         this.state.peruste,
         this.state.navigation,
         this.state.tyoryhma,
-        this.state.projektiStatus,
       ] = _.map(await Promise.all([
         Perusteet.getPerusteenTiedot(perusteId),
         Perusteet.getNavigation(perusteId),
         Ulkopuoliset.getOrganisaatioRyhmatByOid(this.state.projekti.ryhmaOid!),
-        Perusteprojektit.getPerusteprojektiValidointi(projektiId),
       ]), 'data');
-
+      this.updateValidointi(this.state.projekti.id!);
       this.state.isInitialized = true;
     }
     finally {
