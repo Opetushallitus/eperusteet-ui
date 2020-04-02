@@ -24,6 +24,7 @@ export class MuokkaustietoStore {
   public readonly hakuLukumaara = computed(() => this.state.hakuLukumaara);
 
   public async update() {
+    console.log('update');
     if (this.state.perusteId) {
       if (this.state.muokkaustiedot && !_.isEmpty(this.state.muokkaustiedot)) {
         this.state.viimeinenHaku = (await Muokkaustiedot.getPerusteenMuokkausTiedotWithLuomisaika(this.state.perusteId, (_.last(this.state.muokkaustiedot) as any).luotu, this.state.hakuLukumaara) as any).data;

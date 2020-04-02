@@ -3,26 +3,22 @@
   <div class="perustiedot-content">
     <h3>{{$t('projektin-tiedot')}}</h3>
 
-    <ep-perustieto-data icon="info" :topic="$t('projektin-kuvaus')">
-      {{projektinKuvaus}}
-    </ep-perustieto-data>
+    <div class="d-flex flex-wrap">
 
-    <div class="row">
-      <div class="col-7">
+      <ep-perustieto-data icon="info" :topic="$t('projektin-kuvaus')" class="w-100">
+        {{projektinKuvaus}}
+      </ep-perustieto-data>
 
-        <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')">
-          <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
-            {{ virkailija.esitysnimi }}
-          </p>
-          <ep-button v-if="!naytaLisaaTyoryhmaa && virkailijat.length > tyoryhmaAlkuMaara" @click="naytaLisaaTyoryhmaa = true" variant="link" buttonClass="pl-0 mt-2">
-            {{$t('nayta-lisaa')}}
-          </ep-button>
-        </ep-perustieto-data>
+      <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" class="w-60">
+        <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
+          {{ virkailija.esitysnimi }}
+        </p>
+        <ep-button v-if="!naytaLisaaTyoryhmaa && virkailijat.length > tyoryhmaAlkuMaara" @click="naytaLisaaTyoryhmaa = true" variant="link" buttonClass="pl-0 mt-2">
+          {{$t('nayta-lisaa')}}
+        </ep-button>
+      </ep-perustieto-data>
 
-      </div>
-
-      <div class="col-5">
-
+      <div>
         <ep-perustieto-data icon="comment" :topic="$t('yhteyshenkilo')">
           {{yhteyshenkilo}}
         </ep-perustieto-data>
@@ -30,7 +26,6 @@
         <ep-perustieto-data icon="kielet" :topic="$t('julkaisukielet')">
           {{julkaisukielet}}
         </ep-perustieto-data>
-
       </div>
     </div>
 
@@ -46,6 +41,8 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpPerustietoData from './EpPerustietoData.vue';
 import { Kielet } from '@shared/stores/kieli';
 import { PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
+import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
+import { parsiEsitysnimi } from '../../../eperusteet-frontend-utils/vue/src/utils/kayttaja';
 
 @Component({
   components: {
@@ -64,8 +61,8 @@ export default class EpPerustePerustiedot extends Vue {
   @Prop({ required: true })
   protected peruste!: PerusteDto;
 
-  @Prop({ required: false })
-  protected tyoryhma!: any;
+  @Prop({ required: true })
+  private tyoryhmaStore!: TyoryhmaStore;
 
   get projektinKuvaus() {
     if (this.peruste) {
@@ -74,7 +71,7 @@ export default class EpPerustePerustiedot extends Vue {
   }
 
   get yhteyshenkilo() {
-    return 'teppo testaaja';
+    return '';
   }
 
   get julkaisukielet() {
@@ -83,13 +80,19 @@ export default class EpPerustePerustiedot extends Vue {
     }
   }
 
+  get tyoryhma() {
+    return this.tyoryhmaStore.perusteenTyoryhma.value;
+  }
+
   get virkailijat() {
-    return [
-      {
-        esitysnimi: 'teppo testaaja',
-        oid: '123',
-      },
-    ];
+    return _.chain(this.tyoryhmaStore.tyoryhmanVirkailiijat.value)
+      .map(virkailija => {
+        return {
+          ...virkailija,
+          esitysnimi: parsiEsitysnimi(virkailija),
+        };
+      })
+      .value();
   }
 }
 </script>

@@ -11,7 +11,7 @@
     <div class="row">
       <div class="col">
         <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
-        <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti"/>
+        <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
         <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore"/>
       </div>
       <div class="col">
@@ -38,7 +38,7 @@ import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
-import { UlkopuolisetStore } from '../stores/UlkopuolisetStore';
+import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 
 @Component({
   components: {
@@ -66,18 +66,18 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
   private aikatauluStore!: AikatauluStore;
 
   @Prop({ required: true })
-  private ulkopuolisetStore!: UlkopuolisetStore;
-
-  private tyoryhma: any | null = null;
+  private tyoryhmaStore!: TyoryhmaStore;
 
   async onProjektiChange() {
+    console.log('onProjektiChange');
+    console.log(this.peruste);
     if (this.peruste && this.peruste.id) {
+      console.log('peruste on');
       this.muokkaustietoStore.init(this.peruste.id);
       this.aikatauluStore.init(this.peruste);
       this.tutkinnonOsaStore.fetch();
       this.tiedotteetStore.init(this.peruste.id);
-      this.tyoryhma = await this.ulkopuolisetStore.getTyoryhmaByOid(this.projekti?.ryhmaOid);
-      console.log(this.tyoryhma);
+      this.tyoryhmaStore.init(this.projekti?.ryhmaOid);
     }
   }
 

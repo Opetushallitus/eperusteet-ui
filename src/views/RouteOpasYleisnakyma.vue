@@ -4,7 +4,7 @@
 
     <div class="row">
       <div class="col">
-        <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhma="tyoryhma"/>
+        <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
       </div>
       <div class="col">
         <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>

@@ -265,7 +265,7 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
       pohjaId: this.data.pohja?.peruste.id,
     });
     this.$router.push({
-      name: 'perusteprojekti',
+      name: 'opas',
       params: {
         projektiId: '' + luotu.id,
       },

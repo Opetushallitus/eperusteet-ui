@@ -4,8 +4,8 @@
     <h3>{{$t('oppaan-tiedot')}}</h3>
 
     <ep-spinner v-if="!(peruste && projekti)" />
-    <div class="row" v-else>
-      <div class="col-5">
+    <div class="d-flex flex-wrap" v-else>
+      <div class="w-40">
 
         <ep-perustieto-data icon="kielet" :topic="$t('julkaisukielet')">
           {{julkaisukielet}}
@@ -15,22 +15,20 @@
           {{$sdt(peruste.luotu)}}
         </ep-perustieto-data>
 
-        <ep-perustieto-data icon="hallitus" :topic="$t('koulutustyyppi')" v-if="koulutustyypit" >
-          <div v-for="(koulutustyyppi, index) in koulutustyypit" :key="'kt'+index">{{$t(koulutustyyppi)}}</div>
+        <ep-perustieto-data icon="hallitus" :topic="$t('koulutustyyppi')" v-if="peruste.oppaanKoulutustyypit" >
+          <div v-for="(koulutustyyppi, index) in peruste.oppaanKoulutustyypit" :key="'kt'+index">{{$t(koulutustyyppi)}}</div>
         </ep-perustieto-data>
 
-        <ep-perustieto-data icon="opetussuunnitelma" :topic="$t('peruste')">
-          {{ $kaanna(peruste.nimi) || projekti.nimi }}
+        <ep-perustieto-data icon="opetussuunnitelma" :topic="$t('peruste')" v-if="peruste.oppaanPerusteet">
+          <div v-for="(peruste, index) in peruste.oppaanPerusteet" :key="'peruste'+index">{{$kaanna(peruste.nimi)}}</div>
         </ep-perustieto-data>
 
       </div>
 
-      <div class="col-7">
+      <div>
 
-        <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')">
-
+        <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" v-if="tyoryhma">
           <h4>{{$kaanna(tyoryhma.nimi)}}</h4>
-
           <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
             {{ virkailija.esitysnimi }}
           </p>
@@ -64,9 +62,7 @@ import EpPerustePerustiedot from './EpPerustePerustiedot.vue';
   },
 })
 export default class EpOpasPerustiedot extends EpPerustePerustiedot {
-  get koulutustyypit() {
-    return this.peruste.oppaanKoulutustyypit;
-  }
+
 }
 </script>
 
