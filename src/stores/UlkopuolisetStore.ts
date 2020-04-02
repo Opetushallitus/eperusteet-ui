@@ -20,4 +20,10 @@ export class UlkopuolisetStore {
     const res = await Ulkopuoliset.getOrganisaatioRyhmat();
     this.state.tyoryhmat = res.data as any;
   }
+
+  @Debounced(100)
+  public async getTyoryhmaByOid(oid) {
+    const res = await Ulkopuoliset.getOrganisaatioRyhmatByOid(oid);
+    return res.data as any;
+  }
 }

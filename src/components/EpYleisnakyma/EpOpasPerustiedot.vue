@@ -1,34 +1,42 @@
 <template>
 
   <div class="perustiedot-content">
-    <h3>{{$t('projektin-tiedot')}}</h3>
+    <h3>{{$t('oppaan-tiedot')}}</h3>
 
-    <ep-perustieto-data icon="info" :topic="$t('projektin-kuvaus')">
-      {{projektinKuvaus}}
-    </ep-perustieto-data>
+    <ep-spinner v-if="!(peruste && projekti)" />
+    <div class="row" v-else>
+      <div class="col-5">
 
-    <div class="row">
+        <ep-perustieto-data icon="kielet" :topic="$t('julkaisukielet')">
+          {{julkaisukielet}}
+        </ep-perustieto-data>
+
+        <ep-perustieto-data icon="kalenteri" :topic="$t('luotu')">
+          {{$sdt(peruste.luotu)}}
+        </ep-perustieto-data>
+
+        <ep-perustieto-data icon="hallitus" :topic="$t('koulutustyyppi')" v-if="koulutustyypit" >
+          <div v-for="(koulutustyyppi, index) in koulutustyypit" :key="'kt'+index">{{$t(koulutustyyppi)}}</div>
+        </ep-perustieto-data>
+
+        <ep-perustieto-data icon="opetussuunnitelma" :topic="$t('peruste')">
+          {{ $kaanna(peruste.nimi) || projekti.nimi }}
+        </ep-perustieto-data>
+
+      </div>
+
       <div class="col-7">
 
         <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')">
+
+          <h4>{{$kaanna(tyoryhma.nimi)}}</h4>
+
           <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
             {{ virkailija.esitysnimi }}
           </p>
           <ep-button v-if="!naytaLisaaTyoryhmaa && virkailijat.length > tyoryhmaAlkuMaara" @click="naytaLisaaTyoryhmaa = true" variant="link" buttonClass="pl-0 mt-2">
             {{$t('nayta-lisaa')}}
           </ep-button>
-        </ep-perustieto-data>
-
-      </div>
-
-      <div class="col-5">
-
-        <ep-perustieto-data icon="comment" :topic="$t('yhteyshenkilo')">
-          {{yhteyshenkilo}}
-        </ep-perustieto-data>
-
-        <ep-perustieto-data icon="kielet" :topic="$t('julkaisukielet')">
-          {{julkaisukielet}}
         </ep-perustieto-data>
 
       </div>
@@ -46,6 +54,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpPerustietoData from './EpPerustietoData.vue';
 import { Kielet } from '@shared/stores/kieli';
 import { PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
+import EpPerustePerustiedot from './EpPerustePerustiedot.vue';
 
 @Component({
   components: {
@@ -54,42 +63,9 @@ import { PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@sh
     EpPerustietoData,
   },
 })
-export default class EpPerustePerustiedot extends Vue {
-  private tyoryhmaAlkuMaara = 5;
-  private naytaLisaaTyoryhmaa: boolean = false;
-
-  @Prop({ required: true })
-  protected projekti!: PerusteprojektiDto;
-
-  @Prop({ required: true })
-  protected peruste!: PerusteDto;
-
-  @Prop({ required: false })
-  protected tyoryhma!: any;
-
-  get projektinKuvaus() {
-    if (this.peruste) {
-      return this.peruste.kuvaus;
-    }
-  }
-
-  get yhteyshenkilo() {
-    return 'teppo testaaja';
-  }
-
-  get julkaisukielet() {
-    if (this.peruste) {
-      return _.map(this.peruste.kielet, (kieli) => Kielet.kaannaOlioTaiTeksti(kieli)).join(', ');
-    }
-  }
-
-  get virkailijat() {
-    return [
-      {
-        esitysnimi: 'teppo testaaja',
-        oid: '123',
-      },
-    ];
+export default class EpOpasPerustiedot extends EpPerustePerustiedot {
+  get koulutustyypit() {
+    return this.peruste.oppaanKoulutustyypit;
   }
 }
 </script>

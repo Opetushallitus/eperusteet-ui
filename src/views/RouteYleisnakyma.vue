@@ -38,6 +38,7 @@ import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
+import { UlkopuolisetStore } from '../stores/UlkopuolisetStore';
 
 @Component({
   components: {
@@ -64,12 +65,19 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
   @Prop({ required: true })
   private aikatauluStore!: AikatauluStore;
 
+  @Prop({ required: true })
+  private ulkopuolisetStore!: UlkopuolisetStore;
+
+  private tyoryhma: any | null = null;
+
   async onProjektiChange() {
     if (this.peruste && this.peruste.id) {
       this.muokkaustietoStore.init(this.peruste.id);
       this.aikatauluStore.init(this.peruste);
       this.tutkinnonOsaStore.fetch();
       this.tiedotteetStore.init(this.peruste.id);
+      this.tyoryhma = await this.ulkopuolisetStore.getTyoryhmaByOid(this.projekti?.ryhmaOid);
+      console.log(this.tyoryhma);
     }
   }
 
@@ -89,32 +97,7 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
 
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
-
-  .yleisnakyma {
-
-    height: 100%;
-    background-color: $gray-lighten-5;
-    padding: 10px;
-
-    .row {
-      margin: 0px;
-      padding-top: 10px;
-
-      .col {
-        padding: 0px;
-        padding-left: 10px;
-      }
-    }
-
-    .info-box {
-      margin-bottom: 10px;
-      padding:20px;
-      background-color: #fff;
-      border-radius: 0.5rem;
-      box-shadow: 1px 1px 5px 0px rgba(0,26,88,0.1);
-      min-width: 370px;
-    }
-
-  }
+@import "@/styles/_mixins.scss";
+@include yleisnakyma;
 
 </style>

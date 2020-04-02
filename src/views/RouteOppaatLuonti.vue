@@ -1,7 +1,7 @@
 <template>
   <EpMainView>
     <b-container>
-      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel" :valid="valid" @stepChange="stepChange">
+      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel">
 
         <template v-slot:pohja>
 
@@ -37,7 +37,8 @@
         <template v-slot:tiedot>
 
           <b-form-group :label="$t('oppaan-nimi') + ' *'" required class="pl-0">
-            <ep-input v-model="data.nimi" type="string" :is-editing="true" :placeholder="$t('kirjoita-oppaan-nimi')" />
+            <ep-input v-model="data.nimi" :is-editing="true" :placeholder="$t('kirjoita-oppaan-nimi')"
+                :validation="$v.data.nimi" />
           </b-form-group>
 
           <b-form-group :label="$t('opastyoryhma') + ' *'" required class="pl-0">
@@ -102,7 +103,7 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Watch, Prop, Component, Vue, Mixins } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -121,10 +122,15 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { OppaatStore } from '@/stores/OppaatStore';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
-import { Page } from '@shared/tyypit';
+import { Page, Kieli } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
 import { themes, koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
+import { validationMixin } from 'vuelidate';
+import { required } from 'vuelidate/lib/validators';
+import { computed } from '@vue/composition-api';
+import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
+import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -143,8 +149,13 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSteps,
     EpMultiListSelect,
   },
+  validations() {
+    return {
+      data: this.validator,
+    };
+  },
 })
-export default class RouteOppaatLuonti extends Vue {
+export default class RouteOppaatLuonti extends Mixins(validationMixin) {
   @Prop({ required: true })
   perusteOppaatStore!: PerusteetStore;
 
@@ -176,26 +187,6 @@ export default class RouteOppaatLuonti extends Vue {
     }
   }
 
-  get valid() {
-    if (this.currentStep === 'pohja') {
-      if (this.tyyppi === 'oppaasta' && !this.data.pohja) {
-        return false;
-      }
-    }
-
-    if (this.currentStep === 'tiedot') {
-      if (!this.data.nimi) {
-        return false;
-      }
-
-      if (!this.data.tyoryhma) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   @Watch('tyyppi')
   onTyyppiChange() {
     this.data = {
@@ -209,15 +200,19 @@ export default class RouteOppaatLuonti extends Vue {
   }
 
   get steps() {
+    const self = this;
     return [{
       key: 'pohja',
       name: this.$t('pohjan-valinta'),
       isValid() {
-        return true;
+        return !(self.tyyppi === 'oppaasta' && !self.data.pohja);
       },
     }, {
       key: 'tiedot',
       name: this.$t('oppaan-tiedot'),
+      isValid() {
+        return !self.$v.$invalid && !_.isEmpty(self.data.tyoryhma);
+      },
     },
     ];
   }
@@ -262,9 +257,8 @@ export default class RouteOppaatLuonti extends Vue {
   }
 
   async onSave() {
-    console.log('saving ', this.data);
     const luotu = await this.oppaatStore.saveOpas({
-      nimi: this.data.nimi,
+      nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
       ryhmaOid: this.data.tyoryhma.oid,
       oppaanKoulutustyypit: this.data.koulutustyypit,
       oppaanPerusteet: this.data.perusteet,
@@ -282,6 +276,12 @@ export default class RouteOppaatLuonti extends Vue {
     this.$router.push({
       name: 'oppaat',
     });
+  }
+
+  get validator() {
+    return {
+      nimi: requiredOneLang(),
+    };
   }
 }
 </script>
