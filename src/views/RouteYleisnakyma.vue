@@ -94,10 +94,6 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
     }
   }
 
-  get projektiId() {
-    return this.$route.params.projektiId;
-  }
-
   get projekti() {
     return this.perusteStore.projekti.value;
   }

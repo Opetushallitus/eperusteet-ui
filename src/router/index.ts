@@ -191,6 +191,14 @@ const router = new VueRouter({
           ...stores,
           tyyppi: 'opas',
         },
+      }, {
+        path: 'tekstikappale/:tekstiKappaleId',
+        name: 'oppaanTekstikappale',
+        component: RouteTekstikappale,
+        props: {
+          ...stores,
+          tyyppi: 'opas',
+        },
       },
       ],
     },

@@ -103,7 +103,7 @@
             </template>
             <template v-slot:viite="{ item }">
               <div class="menu-item">
-                <router-link :to="{ name: 'tekstikappale', params: { tekstiKappaleId: item.id } }">
+                <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
                   {{ $kaanna(item.label) }}
                 </router-link>
               </div>
@@ -117,7 +117,7 @@
             </template>
             <template v-slot:liite="{ item }">
               <div class="menu-item">
-                <router-link :to="{ name: 'tekstikappale', params: { tekstiKappaleId: item.id } }">
+                <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
                   {{ $kaanna(item.label) }}
                 </router-link>
               </div>
@@ -239,6 +239,14 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     }
 
     return 'perusteprojekti';
+  }
+
+  get tekstikappaleRoute() {
+    if (this.peruste && (this.peruste.tyyppi as any) === 'opas') {
+      return 'oppaanTekstikappale';
+    }
+
+    return 'tekstikappale';
   }
 
   get validationStats() {
