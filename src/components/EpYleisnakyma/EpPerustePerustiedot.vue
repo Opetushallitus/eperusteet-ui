@@ -85,14 +85,16 @@ export default class EpPerustePerustiedot extends Vue {
   }
 
   get virkailijat() {
-    return _.chain(this.tyoryhmaStore.tyoryhmanVirkailiijat.value)
-      .map(virkailija => {
-        return {
-          ...virkailija,
-          esitysnimi: parsiEsitysnimi(virkailija),
-        };
-      })
-      .value();
+    if (this.tyoryhmaStore.tyoryhmanVirkailiijat.value) {
+      return _.chain(this.tyoryhmaStore.tyoryhmanVirkailiijat.value)
+        .map(virkailija => {
+          return {
+            ...virkailija,
+            esitysnimi: parsiEsitysnimi(virkailija),
+          };
+        })
+        .value();
+    }
   }
 }
 </script>

@@ -3,7 +3,7 @@
   <div class="perustiedot-content">
     <h3>{{$t('oppaan-tiedot')}}</h3>
 
-    <ep-spinner v-if="!(peruste && projekti)" />
+    <ep-spinner v-if="!(peruste && projekti) || !tyoryhma || !virkailijat" />
     <div class="d-flex flex-wrap" v-else>
       <div class="w-40">
 
@@ -25,19 +25,16 @@
 
       </div>
 
-      <div>
+      <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" >
+        <h4>{{$kaanna(tyoryhma.nimi)}}</h4>
+        <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
+          {{ virkailija.esitysnimi }}
+        </p>
+        <ep-button v-if="!naytaLisaaTyoryhmaa && virkailijat.length > tyoryhmaAlkuMaara" @click="naytaLisaaTyoryhmaa = true" variant="link" buttonClass="pl-0 mt-2">
+          {{$t('nayta-lisaa')}}
+        </ep-button>
+      </ep-perustieto-data>
 
-        <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" v-if="tyoryhma">
-          <h4>{{$kaanna(tyoryhma.nimi)}}</h4>
-          <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
-            {{ virkailija.esitysnimi }}
-          </p>
-          <ep-button v-if="!naytaLisaaTyoryhmaa && virkailijat.length > tyoryhmaAlkuMaara" @click="naytaLisaaTyoryhmaa = true" variant="link" buttonClass="pl-0 mt-2">
-            {{$t('nayta-lisaa')}}
-          </ep-button>
-        </ep-perustieto-data>
-
-      </div>
     </div>
 
   </div>
