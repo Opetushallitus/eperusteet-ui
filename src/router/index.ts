@@ -186,8 +186,11 @@ const router = new VueRouter({
       children: [{
         path: '',
         name: 'opas',
-        component: RouteOpasYleisnakyma,
-        props: { ...stores },
+        component: RouteYleisnakyma,
+        props: {
+          ...stores,
+          tyyppi: 'opas',
+        },
       },
       ],
     },
