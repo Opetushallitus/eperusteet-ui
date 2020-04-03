@@ -169,7 +169,7 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
   oppaatStore!: OppaatStore;
 
   private data: any = {};
-  private tyyppi: 'oppaasta' | 'uusi' | null = null;
+  private tyyppi: 'oppaasta' | 'uusi' = 'uusi';
   private currentStep: string | null = null;
 
   async mounted() {
@@ -178,13 +178,6 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
       this.perusteOppaatStore.updateQuery({}),
       this.perusteprojektiStore.fetchPohjaProjektit(),
     ]);
-
-    if (this.oppaat && this.oppaat?.length > 0) {
-      this.tyyppi = 'oppaasta';
-    }
-    else {
-      this.tyyppi = 'uusi';
-    }
   }
 
   @Watch('tyyppi')

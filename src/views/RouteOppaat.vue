@@ -14,8 +14,8 @@
           <span class="ml-1">
             {{ $t(ensimmainenKoulutustyyppi(perusteProjekti)) }}
           </span>
-          <span :id="'koulutustyypit'+perusteProjekti.id" class="lukumaara" v-if="oppaanKoulutustyypit(perusteProjekti) && oppaanKoulutustyypit(perusteProjekti).length > 1">
-            +{{oppaanKoulutustyypit(perusteProjekti).length -1}}
+          <span :id="'koulutustyypit'+perusteProjekti.id" class="lukumaara" v-if="koulutustyypit(perusteProjekti) && koulutustyypit(perusteProjekti).length > 1">
+            +{{koulutustyypit(perusteProjekti).length -1}}
             <b-popover
               triggers="hover click focus"
               :target="'koulutustyypit'+perusteProjekti.id"
@@ -68,14 +68,8 @@ export default class RouteOppaat extends Vue {
     }
   }
 
-  oppaanKoulutustyypit(perusteProjekti) {
-    if (perusteProjekti.peruste.oppaanKoulutustyypit && perusteProjekti.peruste.oppaanKoulutustyypit.length > 0) {
-      return perusteProjekti.peruste.oppaanKoulutustyypit;
-    }
-  }
-
   koulutustyypit(perusteProjekti) {
-    return _.chain(this.oppaanKoulutustyypit(perusteProjekti))
+    return _.chain(perusteProjekti.peruste.oppaanKoulutustyypit)
       .map(koulutustyyppi => {
         return {
           otsikko: koulutustyyppi,

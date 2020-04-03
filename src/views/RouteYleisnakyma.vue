@@ -1,25 +1,23 @@
 <template>
-<div>
-  <div class="yleisnakyma">
+<div class="yleisnakyma">
 
-    <div class="row">
-      <div class="col">
-        <ep-peruste-aikataulu class="info-box" :aikatauluStore="aikatauluStore" :peruste="peruste"/>
-      </div>
+  <div class="row">
+    <div class="col">
+      <ep-peruste-aikataulu class="info-box" :aikatauluStore="aikatauluStore" :peruste="peruste"/>
     </div>
-
-    <div class="row">
-      <div class="col">
-        <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
-        <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
-        <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore"/>
-      </div>
-      <div class="col">
-        <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
-      </div>
-    </div>
-
   </div>
+
+  <div class="row">
+    <div class="col">
+      <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
+      <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
+      <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore"/>
+    </div>
+    <div class="col">
+      <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+    </div>
+  </div>
+
 </div>
 </template>
 

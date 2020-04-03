@@ -18,7 +18,6 @@ export class TyoryhmaStore {
   public readonly tyoryhmanVirkailiijat = computed(() => this.state.tyoryhmanVirkailiijat);
 
   async init(oid) {
-    console.log('tyoryhmastore init');
     this.state.perusteenTyoryhma = (await Ulkopuoliset.getOrganisaatioRyhmatByOid(oid)).data as any;
     this.state.tyoryhmanVirkailiijat = (await Ulkopuoliset.getOrganisaatioVirkailijat(oid)).data as any;
   }

@@ -56,11 +56,9 @@ export class PerusteStore implements IEditoitava {
       [
         this.state.peruste,
         this.state.navigation,
-        this.state.projektiStatus,
       ] = _.map(await Promise.all([
         Perusteet.getPerusteenTiedot(perusteId),
         Perusteet.getNavigation(perusteId),
-        Perusteprojektit.getPerusteprojektiValidointi(projektiId),
       ]), 'data');
       this.updateValidointi(this.state.projekti.id!);
       this.state.isInitialized = true;

@@ -1,17 +1,15 @@
 <template>
-<div>
-  <div class="yleisnakyma">
+<div class="yleisnakyma">
 
-    <div class="row">
-      <div class="col">
-        <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
-      </div>
-      <div class="col">
-        <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
-      </div>
+  <div class="row">
+    <div class="col">
+      <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
     </div>
-
+    <div class="col">
+      <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+    </div>
   </div>
+
 </div>
 </template>
 
