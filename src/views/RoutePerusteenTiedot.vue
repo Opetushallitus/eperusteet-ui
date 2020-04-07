@@ -13,6 +13,17 @@
                     :validation="validation.nimi"></ep-input>
         </b-form-group>
 
+        <b-form-group :label="$t('diaarinumero')">
+          <ep-input v-model="data.diaarinumero"
+                    type="string"
+                    :is-editing="isEditing"
+                    :validation="validation.diaarinumero"></ep-input>
+        </b-form-group>
+
+        <b-form-group :label="$t('maarayksen-paatospaivamaara')">
+          <ep-datepicker v-model="data.paatospvm" :is-editing="isEditing" />
+        </b-form-group>
+
         <b-form-group :label="$t('voimassaolo')">
           <div class="d-flex align-items-center">
             <ep-datepicker v-model="data.voimassaoloAlkaa" :is-editing="isEditing" />
@@ -91,17 +102,6 @@
 
         <b-form-group :label="$t('liitteet')">
           TBD
-        </b-form-group>
-
-        <b-form-group :label="$t('maarayksen-paatospaivamaara')">
-          <ep-datepicker v-model="data.paatospvm" :is-editing="isEditing" />
-        </b-form-group>
-
-        <b-form-group :label="$t('diaarinumero')">
-          <ep-input v-model="data.diaarinumero"
-                    type="string"
-                    :is-editing="isEditing"
-                    :validation="validation.diaarinumero"></ep-input>
         </b-form-group>
 
         <b-form-group :label="$t('maarayskirje')">

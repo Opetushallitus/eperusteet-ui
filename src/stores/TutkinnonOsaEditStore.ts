@@ -189,10 +189,4 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     await TutkinnonosatPrivate.revertToVersio(this.tutkinnonOsaViiteId, rev);
   }
 
-  public async validate() {
-    return {
-      valid: true,
-    };
-  }
-
 }

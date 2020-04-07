@@ -1,6 +1,7 @@
 import { Watch, Prop, Vue } from 'vue-property-decorator';
 import { PerusteStore } from '@/stores/PerusteStore';
 
+
 export abstract class PerusteprojektiRoute extends Vue {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
@@ -23,7 +24,7 @@ export abstract class PerusteprojektiRoute extends Vue {
 
   @Watch('projektiId', { immediate: true })
   async onProjektiChangeImpl(newValue: number, oldValue: number) {
-    if (newValue && newValue !== oldValue) {
+    if (newValue && newValue !== oldValue && !this.isInitingProjekti) {
       this.isInitingProjekti = true;
       try {
         await this.perusteStore.init(newValue);

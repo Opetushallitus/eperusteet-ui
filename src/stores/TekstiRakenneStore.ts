@@ -103,9 +103,6 @@ export class TekstiRakenneStore implements IEditoitava {
   public async restore(rev: number) {
   }
 
-  public async validate() {
-    return {
-      valid: true,
-    };
-  }
+  public readonly validator = computed(() => ({}));
+
 }

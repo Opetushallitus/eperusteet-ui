@@ -27,7 +27,7 @@ export class PerusteStore implements IEditoitava {
   public readonly perusteId = computed(() => this.state.perusteId);
   public readonly projektiId = computed(() => this.state.projekti?.id);
   public readonly tutkinnonOsat = computed(() => this.state.perusteId);
-  public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as Kieli[]);
+  public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
 
   public async updateValidointi(projektiId: number) {

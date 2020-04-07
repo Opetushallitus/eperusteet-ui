@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { getPerusteprojektit, ValidationDto, Perusteprojektit, PerusteQuery } from '@shared/api/eperusteet';
+import { getPerusteprojektit, Perusteprojektit, TilaUpdateStatus, PerusteQuery } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
 import _ from 'lodash';
 
@@ -8,7 +8,7 @@ Vue.use(VueCompositionApi);
 
 export class VirheellisetPerusteetStore {
   private state = reactive({
-    validations: null as Page<ValidationDto> | null,
+    validations: null as Page<TilaUpdateStatus> | null,
   })
 
   public readonly validations = computed(() => this.state.validations);

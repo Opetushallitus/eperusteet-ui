@@ -9,7 +9,7 @@ import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
 
-export class PerusteprojektiStore implements IEditoitava {
+export class PerusteprojektiStore {
   private state = reactive({
     pohjat: null as Page<PerusteHakuInternalDto> | null,
     perusteet: null as Page<PerusteHakuInternalDto> | null,
