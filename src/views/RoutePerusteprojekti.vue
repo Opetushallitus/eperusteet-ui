@@ -206,7 +206,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   private loading = false;
 
   async onProjektiChange(projektiId: number) {
-    await this.perusteStore.init(projektiId);
     this.naviStore = new EpTreeNavibarStore(this.perusteStore.navigation);
   }
 

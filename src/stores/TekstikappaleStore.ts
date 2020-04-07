@@ -104,16 +104,16 @@ export class TekstikappaleStore implements IEditoitava {
     return null;
   }
 
-  public async editAfterLoad() {
-    return false;
-  }
-
   public readonly validator = computed(() => {
-    const julkaisukielet = TekstikappaleStore.config.perusteStore.julkaisukielet.value;
+    const julkaisukielet = TekstikappaleStore.config!.perusteStore.julkaisukielet.value;
     return {
       nimi: translated(julkaisukielet),
     };
   });
+
+  public async editAfterLoad() {
+    return false;
+  }
 
   public async start() {
     // Noop

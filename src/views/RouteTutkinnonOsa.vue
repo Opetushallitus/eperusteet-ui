@@ -64,7 +64,6 @@
               </b-form-radio>
             </b-form-group>
             <b-form-group v-else-if="valittuGeneerinen">
-              <h3>{{ $kaanna(valittuGeneerinen.nimi) }}</h3>
               <div class="mt-3 mb-4">
                 <div class="font-weight-bold">{{ $t('arvioinnin-kohde') }}</div>
                 <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>

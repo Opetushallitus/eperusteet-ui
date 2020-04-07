@@ -66,7 +66,7 @@ export default class PerustetyoryhmaSelect extends Vue {
     return _.find(this.tyoryhmat, { oid: this.value });
   }
 
-  set inner(value: string) {
+  set inner(value: any) {
     this.$emit('input', value.oid);
   }
 
