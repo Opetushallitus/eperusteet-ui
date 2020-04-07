@@ -1,0 +1,8 @@
+@mixin perustiedot-content {
+  .perustiedot-content {
+    .data-content {
+      padding:10px;
+      min-width: 160px;
+    }
+  }
+}

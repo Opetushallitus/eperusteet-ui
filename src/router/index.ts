@@ -26,6 +26,7 @@ import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
 import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
+import RouteOpasYleisnakyma from '@/views/RouteOpasYleisnakyma.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -178,7 +179,30 @@ const router = new VueRouter({
         component: RouteTutkinnonOsanOsaAlue,
         props: { ...stores },
       }],
-    }],
+    }, {
+      path: 'opas/:projektiId',
+      component: RoutePerusteprojekti,
+      props: { ...stores },
+      children: [{
+        path: '',
+        name: 'opas',
+        component: RouteYleisnakyma,
+        props: {
+          ...stores,
+          tyyppi: 'opas',
+        },
+      }, {
+        path: 'tekstikappale/:tekstiKappaleId',
+        name: 'oppaanTekstikappale',
+        component: RouteTekstikappale,
+        props: {
+          ...stores,
+          tyyppi: 'opas',
+        },
+      },
+      ],
+    },
+    ],
   }],
 });
 
