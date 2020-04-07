@@ -183,7 +183,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   private query = {
     sivu: 0,
     sivukoko: 10,
-    koulutustyyppi: undefined,
+    koulutustyyppi: null as unknown,
     voimassaolo: true,
     siirtyma: true,
     tuleva: true,
@@ -294,6 +294,9 @@ export default class EpPerusteprojektiListaus extends Vue {
   }
 
   get ownProjects() {
+    if (this.$isAdmin.value) {
+      return [];
+    }
     return this.provider.ownProjects.value;
   }
 
