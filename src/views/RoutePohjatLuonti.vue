@@ -1,0 +1,253 @@
+<template>
+  <EpMainView>
+    <b-container>
+      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel">
+
+        <template v-slot:pohja>
+
+          <div class="row">
+            <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
+            <div class="col-sm-10 mb-4">
+              <b-form-group class="mt-0 pt-0">
+                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('toinen-pohja') }}</b-form-radio>
+                <div v-if="tyyppi === 'oppaasta'" class="ml-2">
+                  <EpMultiSelect
+                    v-if="oppaat"
+                    v-model="data.pohja"
+                    :placeholder="$t('valitse-pohja')"
+                    :is-editing="true"
+                    :options="pohjat">
+                    <template slot="singleLabel" slot-scope="{ option }">
+                      {{ option.nimi }}
+                    </template>
+                    <template slot="option" slot-scope="{ option }">
+                      {{ option.nimi }}
+                    </template>
+                  </EpMultiSelect>
+                  <EpSpinner v-else />
+                </div>
+
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
+
+              </b-form-group>
+            </div>
+          </div>
+        </template>
+
+        <template v-slot:tiedot>
+
+          <b-form-group :label="$t('pohjan-nimi') + ' *'" required class="pl-0">
+            <ep-input v-model="data.nimi" :is-editing="true" :placeholder="$t('kirjoita-pohjan-nimi')"
+                :validation="$v.data.nimi" />
+          </b-form-group>
+
+          <b-form-group :label="$t('perustetyoryhma') + ' *'" required class="pl-0">
+            <EpMultiSelect v-model="data.tyoryhma"
+                           v-if="tyoryhmat"
+                           :placeholder="$t('valitse-tyoryhma')"
+                           :search-identity="tyoryhmaSearchIdentity"
+                           :is-editing="true"
+                           :options="tyoryhmat">
+              <template slot="singleLabel" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
+              </template>
+              <template slot="option" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
+              </template>
+            </EpMultiSelect>
+            <EpSpinner v-else />
+          </b-form-group>
+
+          <b-form-group :label="$t('koulutus-tutkintotyyppi') + '*'" required>
+            <EpMultiSelect v-model="data.koulutustyyppi"
+                            :placeholder="$t('valitse-koulutustyyppi')"
+                            :search-identity="tyoryhmaSearchIdentity"
+                            :is-editing="true"
+                            :options="vaihtoehdotKoulutustyypit">
+              <template slot="singleLabel" slot-scope="{ option }">
+                <span class="text-nowrap">
+                  <EpColorIndicator :size="10" :kind="option" />
+                  <span class="ml-2">{{ $t(option) }}</span>
+                </span>
+              </template>
+              <template slot="option" slot-scope="{ option }">
+                <span class="text-nowrap">
+                  <EpColorIndicator :size="10" :kind="option" />
+                  <span class="ml-2">{{ $t(option) }}</span>
+                </span>
+              </template>
+            </EpMultiSelect>
+          </b-form-group>
+
+        </template>
+
+        <template slot="luo">
+          {{$t('luo-pohja')}}
+        </template>
+      </EpSteps>
+    </b-container>
+  </EpMainView>
+</template>
+
+<script lang="ts">
+import { Watch, Prop, Component, Vue, Mixins } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpSelect from '@shared/components/forms/EpSelect.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms/EpMultiListSelect.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpSteps from '@shared/components/EpSteps/EpSteps.vue';
+import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
+import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
+import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
+import { PerusteetStore } from '@/stores/PerusteetStore';
+import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
+import { OppaatStore } from '@/stores/OppaatStore';
+import { EperusteetKoulutustyypit } from '@/utils/perusteet';
+import { Page, Kieli, PerusteprojektiLuontiDtoTyyppiEnum } from '@shared/tyypit';
+import { BvTableFieldArray } from 'bootstrap-vue';
+import * as _ from 'lodash';
+import { themes, koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
+import { validationMixin } from 'vuelidate';
+import { required } from 'vuelidate/lib/validators';
+import { computed } from '@vue/composition-api';
+import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
+import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
+
+@Component({
+  components: {
+    EpAikataulu,
+    EpButton,
+    EpColorIndicator,
+    EpIcon,
+    EpInput,
+    EpMainView,
+    EpMultiSelect,
+    EpSearch,
+    EpSelect,
+    EpSpinner,
+    EpSteps,
+    EpMultiListSelect,
+  },
+  validations() {
+    return {
+      data: this.validator,
+    };
+  },
+})
+export default class RoutePohjatLuonti extends Mixins(validationMixin) {
+  @Prop({ required: true })
+  pohjatStore!: PerusteetStore;
+
+  @Prop({ required: true })
+  ulkopuolisetStore!: UlkopuolisetStore;
+
+  @Prop({ required: true })
+  perusteprojektiStore!: PerusteprojektiStore;
+
+  private data: any = {};
+  private tyyppi: 'pohjasta' | 'uusi' = 'uusi';
+  private currentStep: string | null = null;
+
+  async mounted() {
+    await Promise.all([
+      this.pohjatStore.updateQuery({}),
+    ]);
+  }
+
+  @Watch('tyyppi')
+  onTyyppiChange() {
+    this.data = {
+      ...this.data,
+      pohja: null,
+    };
+  }
+
+  get pohjat() {
+    return this.pohjatStore.projects.value?.data;
+  }
+
+  get steps() {
+    const self = this;
+    return [{
+      key: 'pohja',
+      name: this.$t('pohjan-valinta'),
+      isValid() {
+        return !(self.tyyppi === 'pohjasta' && !self.data.pohja);
+      },
+    }, {
+      key: 'tiedot',
+      name: this.$t('pohjan-tiedot'),
+      isValid() {
+        return !self.$v.$invalid && !_.isEmpty(self.data.tyoryhma);
+      },
+    },
+    ];
+  }
+
+  stepChange(step) {
+    this.currentStep = step;
+  }
+
+  tyoryhmaSearchIdentity(tr: any) {
+    return _.toLower(this.$kaanna(tr.nimi));
+  }
+
+  ktToRyhma(koulutustyyppi) {
+    return themes[koulutustyyppi];
+  }
+
+  get tyoryhmat() {
+    return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.tyoryhmaSearchIdentity);
+  }
+
+  get vaihtoehdotKoulutustyypit() {
+    return _.sortBy(EperusteetKoulutustyypit, x => koulutustyyppiRyhmaSort[this.ktToRyhma(x)]);
+  }
+
+  async onSave() {
+    const luotu = await this.perusteprojektiStore.addPerusteprojekti({
+      nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
+      ryhmaOid: this.data.tyoryhma.oid,
+      koulutustyyppi: this.data.koulutustyyppi,
+      perusteId: this.data.pohja?.peruste.id,
+      tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.POHJA,
+    });
+    this.$router.push({
+      name: 'perusteprojekti',
+      params: {
+        projektiId: '' + luotu.id,
+      },
+    });
+  }
+
+  onCancel() {
+    this.$router.push({
+      name: 'pohjat',
+    });
+  }
+
+  get validator() {
+    return {
+      nimi: requiredOneLang(),
+    };
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+
+.tieto {
+  padding: 20px;
+
+  .nimi {
+    font-weight: 600;
+  }
+}
+
+</style>
