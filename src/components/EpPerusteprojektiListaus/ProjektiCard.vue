@@ -51,7 +51,7 @@ export default class ProjektiCard extends Vue {
 <style lang="scss" scoped>
 
 .full-color {
-  background: linear-gradient(180deg, rgba(71,151,183,1) 0%, rgba(60,131,159,1) 100%);
+  background: linear-gradient(180deg, #3C839F 0%, #4797B7 100%);
   color: white;
 }
 
@@ -72,7 +72,8 @@ export default class ProjektiCard extends Vue {
 }
 
 .mainslot {
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 90%;
 }
 
 .lower {
@@ -81,6 +82,8 @@ export default class ProjektiCard extends Vue {
   height: 62px;
   min-height: 62px;
   max-height: 62px;
+  font-size: 80%;
+  color: #2b4174;
 }
 
 </style>

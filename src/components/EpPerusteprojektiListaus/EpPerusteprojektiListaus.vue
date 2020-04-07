@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-container>
     <div class="upper">
       <slot name="upperheader">
         <h1 class="bg-danger">slot: upperheader</h1>
@@ -25,7 +25,7 @@
       </div>
       <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
         <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                      :indicator="project.tila">
+                      :indicator="project.peruste.koulutustyyppi">
           <template slot="lower" class="small-text">
             {{ $t('tila-' + project.tila) }}
           </template>
@@ -120,18 +120,16 @@
             </slot>
           </template>
         </b-table>
-        <b-pagination align="center"
-                      no-local-sorting
-                      v-model="sivu"
-                      :per-page="perPage"
-                      :total-rows="total"/>
+        <ep-pagination v-model="sivu"
+                       :per-page="perPage"
+                       :total-rows="total"/>
       </div>
       <div v-else class="m-2 alert alert-info">
         {{ $t('ei-hakutuloksia') }}
       </div>
     </div>
     <EpSpinner v-else />
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -139,6 +137,7 @@ import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
@@ -154,6 +153,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 @Component({
   components: {
     EpColorIndicator,
+    EpPagination,
     EpIcon,
     EpMainView,
     EpMultiSelect,
