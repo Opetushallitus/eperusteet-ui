@@ -59,14 +59,13 @@
 
         <b-form-group :label="$t('tutkinnon-suorittaneen-osaaminen')">
           <ep-content v-model="data.suorittaneenOsaaminen"
-                      layout="normal" 
+                      layout="normal"
                       :is-editable="isEditing"></ep-content>
         </b-form-group>
 
-
         <b-form-group :label="$t('tyotehtavat-joissa-voi-toimia')">
           <ep-content v-model="data.tyotehtavatJoissaVoiToimia"
-                      layout="normal" 
+                      layout="normal"
                       :is-editable="isEditing"></ep-content>
         </b-form-group>
 
@@ -86,7 +85,7 @@
               {{ $kaanna(data.item.nimi) }}
             </template>
           </b-table>
-          <ep-koodisto-select @add="addKoulutuskoodi(data, $event)" 
+          <ep-koodisto-select @add="addKoulutuskoodi(data, $event)"
                               :store="koulutuskoodisto"
                               v-if="isEditing">
             <template v-slot:default="{ open }">
@@ -180,7 +179,6 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import { UiKielet } from '@shared/stores/kieli';
 import _ from 'lodash';
 
-
 @Component({
   components: {
     EpButton,
@@ -249,7 +247,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
         params: {
           sivu,
           sivukoko: 10,
-        }
+        },
       })).data as any;
     },
   });
@@ -263,7 +261,6 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
     }];
     console.log(data);
   }
-
 }
 </script>
 

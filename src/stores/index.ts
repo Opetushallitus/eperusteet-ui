@@ -12,10 +12,12 @@ import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { tutoriaaliStore } from '@shared/stores/tutoriaali';
 import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore';
 import { BrowserStore } from '@shared/stores/BrowserStore';
+import { OppaatStore } from '@/stores/OppaatStore';
+import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 
 const arviointiStore = new ArviointiStore(Kielet);
 const kayttajatStore = Kayttajat;
-const oppaatStore = new PerusteetStore({ tyyppi: 'OPAS' } as any);
+const perusteOppaatStore = new PerusteetStore({ tyyppi: 'OPAS' } as any);
 const perusteStore = new PerusteStore();
 const perusteetStore = new PerusteetStore({ tyyppi: 'NORMAALI' } as any);
 const perusteprojektiStore = new PerusteprojektiStore();
@@ -26,6 +28,8 @@ const muokkaustietoStore = new MuokkaustietoStore();
 const aikatauluStore = new AikatauluStore();
 const tiedotteetStore = new TiedotteetStore();
 const browserStore = new BrowserStore();
+const oppaatStore = new OppaatStore();
+const tyoryhmaStore = new TyoryhmaStore();
 
 export const stores = Object.freeze({
   aikatauluStore,
@@ -33,7 +37,7 @@ export const stores = Object.freeze({
   browserStore,
   kayttajatStore,
   muokkaustietoStore,
-  oppaatStore,
+  perusteOppaatStore,
   perusteStore,
   perusteetStore,
   perusteprojektiStore,
@@ -43,4 +47,6 @@ export const stores = Object.freeze({
   tutoriaaliStore,
   ulkopuolisetStore,
   virheellisetPerusteetStore,
+  oppaatStore,
+  tyoryhmaStore,
 });

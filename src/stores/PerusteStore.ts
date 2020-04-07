@@ -5,7 +5,6 @@ import { Kieli } from '@shared/tyypit';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 
-
 Vue.use(VueCompositionApi);
 
 export class PerusteStore implements IEditoitava {
@@ -15,7 +14,6 @@ export class PerusteStore implements IEditoitava {
     projekti: null as PerusteprojektiDto | null,
     peruste: null as PerusteDto | null,
     navigation: null as NavigationNodeDto | null,
-    tyoryhma: null as any | null,
     perusteId: null as number | null,
     isInitialized: false,
     initializing: false,
@@ -25,7 +23,6 @@ export class PerusteStore implements IEditoitava {
   public readonly projekti = computed(() => this.state.projekti);
   public readonly peruste = computed(() => this.state.peruste);
   public readonly navigation = computed(() => this.state.navigation);
-  public readonly tyoryhma = computed(() => this.state.tyoryhma);
   public readonly suoritustavat = computed(() => _.map(this.state.peruste?.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)) as string[]);
   public readonly perusteId = computed(() => this.state.perusteId);
   public readonly projektiId = computed(() => this.state.projekti?.id);
@@ -33,8 +30,14 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
 
+  public async updateValidointi(projektiId: number) {
+    const res = await Perusteprojektit.getPerusteprojektiValidointi(projektiId);
+    this.state.projektiStatus = res.data;
+  }
+
   async init(projektiId: number) {
     if (this.state.initializing
+      || this.state.isInitialized
       || !projektiId
       || projektiId === this.state.projekti?.id) {
       return;
@@ -53,15 +56,11 @@ export class PerusteStore implements IEditoitava {
       [
         this.state.peruste,
         this.state.navigation,
-        this.state.tyoryhma,
-        this.state.projektiStatus,
       ] = _.map(await Promise.all([
         Perusteet.getPerusteenTiedot(perusteId),
         Perusteet.getNavigation(perusteId),
-        Ulkopuoliset.getOrganisaatioRyhmatByOid(this.state.projekti.ryhmaOid!),
-        Perusteprojektit.getPerusteprojektiValidointi(projektiId),
       ]), 'data');
-
+      this.updateValidointi(this.state.projekti.id!);
       this.state.isInitialized = true;
     }
     finally {

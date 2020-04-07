@@ -11,7 +11,7 @@
                   {{ validationStats.ok }} / {{ validationStats.total }} {{$t('valmis')}}
                 </div>
                 <div v-else-if="validationCategories">
-                  <b-button variant="primary"
+                  <b-button class="px-3 py-1" variant="primary"
                       :to="{ name: 'perusteprojekti' }">{{ $t('julkaise') }}</b-button>
                 </div>
               </div>
@@ -91,7 +91,7 @@
             <template v-slot:header>
               <div class="heading">
                 <div class="menu-item">
-                  <router-link :to="{ name: 'perusteprojekti' }" exact>
+                  <router-link :to="{ name: yleisnakymaRoute }" exact>
                     {{ $t('yleisnakyma') }}
                   </router-link>
                 </div>
@@ -103,7 +103,7 @@
             </template>
             <template v-slot:viite="{ item }">
               <div class="menu-item">
-                <router-link :to="{ name: 'tekstikappale', params: { tekstiKappaleId: item.id } }">
+                <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
                   {{ $kaanna(item.label) }}
                 </router-link>
               </div>
@@ -117,7 +117,7 @@
             </template>
             <template v-slot:liite="{ item }">
               <div class="menu-item">
-                <router-link :to="{ name: 'tekstikappale', params: { tekstiKappaleId: item.id } }">
+                <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
                   {{ $kaanna(item.label) }}
                 </router-link>
               </div>
@@ -230,6 +230,22 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get peruste() {
     return this.perusteStore.peruste.value;
+  }
+
+  get yleisnakymaRoute() {
+    if (this.peruste && (this.peruste.tyyppi as any) === 'opas') {
+      return 'opas';
+    }
+
+    return 'perusteprojekti';
+  }
+
+  get tekstikappaleRoute() {
+    if (this.peruste && (this.peruste.tyyppi as any) === 'opas') {
+      return 'oppaanTekstikappale';
+    }
+
+    return 'tekstikappale';
   }
 
   get validationStats() {

@@ -1,0 +1,292 @@
+<template>
+  <EpMainView>
+    <b-container>
+      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel">
+
+        <template v-slot:pohja>
+
+          <div class="row">
+            <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
+            <div class="col-sm-10 mb-4">
+              <b-form-group class="mt-0 pt-0">
+                <b-form-radio class="p-2" v-model="tyyppi" value="oppaasta" name="tyyppi" :disabled="!oppaat || oppaat.length === 0">{{ $t('toinen-opas') }}</b-form-radio>
+                <div v-if="tyyppi === 'oppaasta'" class="ml-2">
+                  <EpMultiSelect
+                    v-if="oppaat"
+                    v-model="data.pohja"
+                    :placeholder="$t('valitse-opas')"
+                    :is-editing="true"
+                    :options="oppaat">
+                    <template slot="singleLabel" slot-scope="{ option }">
+                      {{ option.nimi }}
+                    </template>
+                    <template slot="option" slot-scope="{ option }">
+                      {{ option.nimi }}
+                    </template>
+                  </EpMultiSelect>
+                  <EpSpinner v-else />
+                </div>
+
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
+
+              </b-form-group>
+            </div>
+          </div>
+        </template>
+
+        <template v-slot:tiedot>
+
+          <b-form-group :label="$t('oppaan-nimi') + ' *'" required class="pl-0">
+            <ep-input v-model="data.nimi" :is-editing="true" :placeholder="$t('kirjoita-oppaan-nimi')"
+                :validation="$v.data.nimi" />
+          </b-form-group>
+
+          <b-form-group :label="$t('opastyoryhma') + ' *'" required class="pl-0">
+            <EpMultiSelect v-model="data.tyoryhma"
+                           v-if="tyoryhmat"
+                           :placeholder="$t('valitse-tyoryhma')"
+                           :search-identity="tyoryhmaSearchIdentity"
+                           :is-editing="true"
+                           :options="tyoryhmat">
+              <template slot="singleLabel" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
+              </template>
+              <template slot="option" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
+              </template>
+            </EpMultiSelect>
+            <EpSpinner v-else />
+          </b-form-group>
+
+          <b-form-group :label="$t('koulutus-tutkintotyyppi')" required class="pl-0">
+            <EpMultiListSelect v-model="data.koulutustyypit"
+                           :is-editing="true"
+                           :items="koulutustyypit"
+                           :required="true">
+              <template slot="singleLabel" slot-scope="{ option }">
+                <span class="text-nowrap">
+                  <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
+                  <span class="ml-2">{{ option.text }}</span>
+                </span>
+              </template>
+              <template slot="option" slot-scope="{ option }">
+                <span class="text-nowrap">
+                  <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
+                  <span class="ml-2">{{ option.text }}</span>
+                </span>
+              </template>
+              <template slot="lisaaTeksti">
+                {{$t('lisaa-koulutus-tutkintotyyppi')}}
+              </template>
+            </EpMultiListSelect>
+          </b-form-group>
+
+          <b-form-group :label="$t('peruste')" required class="pl-0">
+            <EpMultiListSelect v-model="data.perusteet"
+                           :is-editing="true"
+                           :items="perusteet"
+                           :required="true">
+              <template slot="lisaaTeksti">
+                {{$t('lisaa-peruste')}}
+              </template>
+            </EpMultiListSelect>
+          </b-form-group>
+
+        </template>
+
+        <template slot="luo">
+          {{$t('luo-opas')}}
+        </template>
+      </EpSteps>
+    </b-container>
+  </EpMainView>
+</template>
+
+<script lang="ts">
+import { Watch, Prop, Component, Vue, Mixins } from 'vue-property-decorator';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpSelect from '@shared/components/forms/EpSelect.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms/EpMultiListSelect.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpSteps from '@shared/components/EpSteps/EpSteps.vue';
+import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
+import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
+import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
+import { PerusteetStore } from '@/stores/PerusteetStore';
+import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
+import { OppaatStore } from '@/stores/OppaatStore';
+import { EperusteetKoulutustyypit } from '@/utils/perusteet';
+import { Page, Kieli } from '@shared/tyypit';
+import { BvTableFieldArray } from 'bootstrap-vue';
+import * as _ from 'lodash';
+import { themes, koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
+import { validationMixin } from 'vuelidate';
+import { required } from 'vuelidate/lib/validators';
+import { computed } from '@vue/composition-api';
+import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
+import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
+
+export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
+
+@Component({
+  components: {
+    EpAikataulu,
+    EpButton,
+    EpColorIndicator,
+    EpIcon,
+    EpInput,
+    EpMainView,
+    EpMultiSelect,
+    EpSearch,
+    EpSelect,
+    EpSpinner,
+    EpSteps,
+    EpMultiListSelect,
+  },
+  validations() {
+    return {
+      data: this.validator,
+    };
+  },
+})
+export default class RouteOppaatLuonti extends Mixins(validationMixin) {
+  @Prop({ required: true })
+  perusteOppaatStore!: PerusteetStore;
+
+  @Prop({ required: true })
+  perusteprojektiStore!: PerusteprojektiStore;
+
+  @Prop({ required: true })
+  ulkopuolisetStore!: UlkopuolisetStore;
+
+  @Prop({ required: true })
+  oppaatStore!: OppaatStore;
+
+  private data: any = {};
+  private tyyppi: 'oppaasta' | 'uusi' = 'uusi';
+  private currentStep: string | null = null;
+
+  async mounted() {
+    await Promise.all([
+      this.ulkopuolisetStore.fetchTyoryhmat(),
+      this.perusteOppaatStore.updateQuery({}),
+      this.perusteprojektiStore.fetchPohjaProjektit(),
+    ]);
+  }
+
+  @Watch('tyyppi')
+  onTyyppiChange() {
+    this.data = {
+      ...this.data,
+      pohja: null,
+    };
+  }
+
+  get oppaat() {
+    return this.perusteOppaatStore.projects.value?.data;
+  }
+
+  get steps() {
+    const self = this;
+    return [{
+      key: 'pohja',
+      name: this.$t('pohjan-valinta'),
+      isValid() {
+        return !(self.tyyppi === 'oppaasta' && !self.data.pohja);
+      },
+    }, {
+      key: 'tiedot',
+      name: this.$t('oppaan-tiedot'),
+      isValid() {
+        return !self.$v.$invalid && !_.isEmpty(self.data.tyoryhma);
+      },
+    },
+    ];
+  }
+
+  stepChange(step) {
+    this.currentStep = step;
+  }
+
+  tyoryhmaSearchIdentity(tr: any) {
+    return _.toLower(this.$kaanna(tr.nimi));
+  }
+
+  ktToRyhma(koulutustyyppi) {
+    return themes[koulutustyyppi];
+  }
+
+  get tyoryhmat() {
+    return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.tyoryhmaSearchIdentity);
+  }
+
+  get koulutustyypit() {
+    return _.chain(EperusteetKoulutustyypit)
+      .map(koulutustyyppi => {
+        return {
+          value: koulutustyyppi,
+          text: this.$t(koulutustyyppi),
+        } as MultiListSelectItem;
+      })
+      .sortBy(item => koulutustyyppiRyhmaSort[this.ktToRyhma(item.value)])
+      .value();
+  }
+
+  get perusteet() {
+    return _.chain(this.perusteprojektiStore.perusteet.value?.data)
+      .map(peruste => {
+        return {
+          value: peruste,
+          text: this.$kaanna((peruste as any).nimi),
+        } as MultiListSelectItem;
+      })
+      .value();
+  }
+
+  async onSave() {
+    const luotu = await this.oppaatStore.saveOpas({
+      nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
+      ryhmaOid: this.data.tyoryhma.oid,
+      oppaanKoulutustyypit: this.data.koulutustyypit,
+      oppaanPerusteet: this.data.perusteet,
+      pohjaId: this.data.pohja?.peruste.id,
+    });
+    this.$router.push({
+      name: 'opas',
+      params: {
+        projektiId: '' + luotu.id,
+      },
+    });
+  }
+
+  onCancel() {
+    this.$router.push({
+      name: 'oppaat',
+    });
+  }
+
+  get validator() {
+    return {
+      nimi: requiredOneLang(),
+    };
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+
+.tieto {
+  padding: 20px;
+
+  .nimi {
+    font-weight: 600;
+  }
+}
+
+</style>
