@@ -35,7 +35,7 @@ Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
 Vue.use(VueCompositionApi);
-Vue.use(Vuelidate)
+Vue.use(Vuelidate);
 Vue.use(VueScrollTo);
 Vue.use(Notifications);
 Vue.use(PortalVue);
@@ -46,8 +46,14 @@ Vue.use(Loading, {
 });
 Vue.use(Kielet, {
   messages: {
-    fi: require('@/translations/locale-fi.json'),
-    sv: require('@/translations/locale-sv.json'),
+    fi: {
+      ...require('@shared/translations/locale-fi.json'),
+      ...require('@/translations/locale-fi.json'),
+    },
+    sv: {
+      ...require('@shared/translations/locale-sv.json'),
+      ...require('@/translations/locale-sv.json'),
+    },
   },
 });
 Vue.use(Kaannos);
