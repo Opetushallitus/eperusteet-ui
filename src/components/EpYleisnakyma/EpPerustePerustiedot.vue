@@ -9,11 +9,11 @@
         {{projektinKuvaus}}
       </ep-perustieto-data>
 
-      <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" class="w-60">
+      <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" class="w-60" v-if="virkailijat">
         <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
           {{ virkailija.esitysnimi }}
         </p>
-        <ep-button v-if="!naytaLisaaTyoryhmaa && virkailijat.length > tyoryhmaAlkuMaara" @click="naytaLisaaTyoryhmaa = true" variant="link" buttonClass="pl-0 mt-2">
+        <ep-button v-if="!naytaLisaaTyoryhmaa && virkailijat && virkailijat.length > tyoryhmaAlkuMaara" @click="naytaLisaaTyoryhmaa = true" variant="link" buttonClass="pl-0 mt-2">
           {{$t('nayta-lisaa')}}
         </ep-button>
       </ep-perustieto-data>
@@ -94,6 +94,9 @@ export default class EpPerustePerustiedot extends Vue {
           };
         })
         .value();
+    }
+    else {
+      return null;
     }
   }
 }

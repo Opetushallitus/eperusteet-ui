@@ -8,13 +8,15 @@
         <h3>{{ $t('perustiedot') }}</h3>
         <b-container fluid>
           <b-row no-gutters>
-            <b-col>
-              <b-form-group :label="$t('projektin-nimi')">
+            <b-col lg="6">
+              <b-form-group :label="$t('projektin-nimi') + '*'">
                 <ep-input v-model="data.nimi"
                           type="string"
                           :is-editing="isEditing"
                           :validation="validation.nimi"></ep-input>
               </b-form-group>
+            </b-col>
+            <b-col lg="6">
             </b-col>
           </b-row>
           <b-row no-gutters>
@@ -37,24 +39,43 @@
           <b-row no-gutters>
             <b-col>
               <b-form-group :label="$t('kuvaus')">
-                <ep-content v-model="data.teksti" layout="normal" :is-editable="isEditing"></ep-content>
+                <div v-if="isEditing">
+                  <div class="text-muted mb-3">
+                    {{ $t('perusteprojekti-ohje-kuvaus') }}
+                  </div>
+                  <b-form-radio-group stacked v-model="data.tyyppi" class="mb-3">
+                    <b-form-radio value="PERUSTEEN_KORJAUS">{{ $t('perusteen-korjaus') }}</b-form-radio>
+                    <b-form-radio value="PERUSTEEN_UUDISTUS">{{ $t('perusteen-uudistus') }}</b-form-radio>
+                  </b-form-radio-group>
+                </div>
+                <ep-content v-model="data.kuvaus" layout="normal" :is-editable="isEditing"></ep-content>
               </b-form-group>
             </b-col>
           </b-row>
         </b-container>
         <h3>{{ $t('esikatselu-ja-lataus') }}</h3>
         <b-container fluid>
-          <b-row no-gutters>
+          <b-row no-gutters v-if="!isEditing">
             <b-col lg="6">
               <b-form-group :label="$t('salli-perusteen-esikatselu')">
-                <ep-toggle v-model="data.esikatseltavissa"
-                           :is-editing="isEditing"></ep-toggle>
+                <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing"></ep-toggle>
               </b-form-group>
             </b-col>
             <b-col lg="6">
-              <b-form-group :label="$t('perusteen-lataus')">
+              <b-form-group :label="$t('perusteen-lataus')" v-if="!isEditing">
                 <ep-button variant="primary" icon="file">{{ $t('lataa-peruste-json') }}</ep-button>
               </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row no-gutters v-else>
+            <b-col lg="6">
+              <b-form-group>
+                <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing">
+                  {{ $t('salli-perusteen-esikatselu') }}
+                </ep-toggle>
+              </b-form-group>
+            </b-col>
+            <b-col lg="6">
             </b-col>
           </b-row>
         </b-container>
@@ -109,4 +130,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
 </script>
 
 <style lang="scss" scoped>
+/deep/ .form-group {
+  padding-right: 30px !important;
+}
 </style>

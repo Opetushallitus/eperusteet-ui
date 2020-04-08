@@ -58,10 +58,11 @@
                   <fas icon="file-pdf" />
                   {{ $t('luo-pdf') }}
                 </b-dropdown-item>
-                <b-dropdown-item :to="{ name: 'termisto' }">
-                  <fas icon="bookmark" />
-                  {{ $t('kasitteet') }}
-                </b-dropdown-item>
+                <!-- Ei tarvetta toistaiseksi -->
+                <!-- <b-dropdown-item :to="{ name: 'termisto' }"> -->
+                <!--   <fas icon="bookmark" />                    -->
+                <!--   {{ $t('kasitteet') }}                      -->
+                <!-- </b-dropdown-item>                           -->
                 <b-dropdown-item :to="{ name: 'poistetut' }">
                   <fas icon="trash" />
                   {{ $t('poistetut-sisallot') }}
@@ -95,10 +96,6 @@
                     {{ $t('yleisnakyma') }}
                   </router-link>
                 </div>
-              </div>
-            </template>
-            <template v-slot:padding="{ item }">
-              <div :style="{ 'margin-left': item.depth * 20 + 'px' }">
               </div>
             </template>
             <template v-slot:viite="{ item }">
@@ -313,11 +310,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 }
 
 .heading {
-  margin-left: 20px;
+  margin-left: 22px;
 }
 
 .menu-item {
-  padding: 6px;
   font-size: 0.8rem;
 
   a {
