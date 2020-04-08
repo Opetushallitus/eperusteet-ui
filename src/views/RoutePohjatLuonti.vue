@@ -10,9 +10,9 @@
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
                 <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('toinen-pohja') }}</b-form-radio>
-                <div v-if="tyyppi === 'oppaasta'" class="ml-2">
+                <div v-if="tyyppi === 'pohjasta'" class="ml-2">
                   <EpMultiSelect
-                    v-if="oppaat"
+                    v-if="pohjat"
                     v-model="data.pohja"
                     :placeholder="$t('valitse-pohja')"
                     :is-editing="true"
@@ -36,15 +36,15 @@
 
         <template v-slot:tiedot>
 
-          <b-form-group :label="$t('pohjan-nimi') + ' *'" required class="pl-0">
-            <ep-input v-model="data.nimi" :is-editing="true" :placeholder="$t('kirjoita-pohjan-nimi')"
+          <b-form-group :label="$t('projektin-nimi-label') + ' *'" required class="pl-0">
+            <ep-input v-model="data.nimi" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')"
                 :validation="$v.data.nimi" />
           </b-form-group>
 
           <b-form-group :label="$t('perustetyoryhma') + ' *'" required class="pl-0">
             <EpMultiSelect v-model="data.tyoryhma"
                            v-if="tyoryhmat"
-                           :placeholder="$t('valitse-tyoryhma')"
+                           :placeholder="$t('valitse')"
                            :search-identity="tyoryhmaSearchIdentity"
                            :is-editing="true"
                            :options="tyoryhmat">
@@ -58,9 +58,9 @@
             <EpSpinner v-else />
           </b-form-group>
 
-          <b-form-group :label="$t('koulutus-tutkintotyyppi') + '*'" required>
+          <b-form-group :label="$t('koulutus-tutkintotyyppi') + ' *'" required>
             <EpMultiSelect v-model="data.koulutustyyppi"
-                            :placeholder="$t('valitse-koulutustyyppi')"
+                            :placeholder="$t('valitse')"
                             :search-identity="tyoryhmaSearchIdentity"
                             :is-editing="true"
                             :options="vaihtoehdotKoulutustyypit">
@@ -82,7 +82,7 @@
         </template>
 
         <template slot="luo">
-          {{$t('luo-pohja')}}
+          {{$t('luo-perustepohja')}}
         </template>
       </EpSteps>
     </b-container>
@@ -107,7 +107,6 @@ import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, Perust
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { OppaatStore } from '@/stores/OppaatStore';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
 import { Page, Kieli, PerusteprojektiLuontiDtoTyyppiEnum } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
@@ -156,6 +155,7 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
 
   async mounted() {
     await Promise.all([
+      this.ulkopuolisetStore.fetchTyoryhmat(),
       this.pohjatStore.updateQuery({}),
     ]);
   }
@@ -182,7 +182,7 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
       },
     }, {
       key: 'tiedot',
-      name: this.$t('pohjan-tiedot'),
+      name: this.$t('projektin-tiedot'),
       isValid() {
         return !self.$v.$invalid && !_.isEmpty(self.data.tyoryhma);
       },

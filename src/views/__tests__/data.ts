@@ -168,7 +168,7 @@ export function mockPerusteet() {
   };
 }
 
-export function mockPohjaProjektit() {
+export function mockPohjaPerusteet() {
   return {
     'data': [
       {
