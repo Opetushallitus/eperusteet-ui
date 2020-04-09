@@ -2,12 +2,12 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
 import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Tutkinnonosat, Perusteenosat } from '@shared/api/eperusteet';
-import { Revision, Page } from '@shared/tyypit';
+import { Revision, Page, Kieli } from '@shared/tyypit';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { minValue, translated, warning } from '@shared/validators/required';
-import { Kieli } from '@shared/tyypit';
+
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
@@ -114,7 +114,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
               kuvaus: translated(julkaisukielet),
               vaatimukset: {
                 $each: {
-                  vaatimus: translated(julkaisukielet)
+                  vaatimus: translated(julkaisukielet),
                 },
               },
             },
@@ -188,5 +188,4 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     }
     await TutkinnonosatPrivate.revertToVersio(this.tutkinnonOsaViiteId, rev);
   }
-
 }

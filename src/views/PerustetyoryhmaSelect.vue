@@ -41,7 +41,6 @@ import { Page } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
 
-
 @Component({
   components: {
     EpColorIndicator,
@@ -81,7 +80,6 @@ export default class PerustetyoryhmaSelect extends Vue {
   get tyoryhmat() {
     return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.tyoryhmaSearchIdentity);
   }
-
 }
 </script>
 
@@ -96,4 +94,3 @@ export default class PerustetyoryhmaSelect extends Vue {
 }
 
 </style>
-

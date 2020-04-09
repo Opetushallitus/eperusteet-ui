@@ -82,7 +82,6 @@ import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import _ from 'lodash';
 
-
 @Component({
   components: {
     EpButton,
@@ -104,7 +103,6 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
   async onProjektiChange(projektiId: number) {
     this.store = new EditointiStore(new PerusteprojektiEditStore(projektiId));
   }
-
 }
 </script>
 
