@@ -9,7 +9,7 @@ import _ from 'lodash';
 Vue.use(VueCompositionApi);
 
 export class UlkopuolisetStore {
-  private state = reactive({
+  public state = reactive({
     tyoryhmat: null as any[] | null,
   });
 

@@ -1,64 +1,75 @@
 <template>
   <EpMainView>
     <b-container>
-      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave">
+      <EpSteps ref="epsteps" :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel" @stepChange="onStepChange">
 
         <template v-slot:pohja>
-          <b-form-group>
-            <b-form-radio class="mt-2 p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('tuo-perustepohja') }}</b-form-radio>
-            <div v-if="tyyppi === 'pohjasta'">
-              <EpMultiSelect
-                v-if="pohjat"
-                v-model="data.peruste"
-                :placeholder="$t('valitse-pohja')"
-                :is-editing="true"
-                :options="pohjat">
-                <template slot="singleLabel" slot-scope="{ option }">
-                  {{ option.perusteprojekti.nimi }}
-                </template>
-                <template slot="option" slot-scope="{ option }">
-                  {{ option.perusteprojekti.nimi }}
-                </template>
-              </EpMultiSelect>
-              <EpSpinner v-else />
+
+           <div class="row">
+            <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
+            <div class="col-sm-10 mb-4">
+              <b-form-group class="mt-0 pt-0">
+                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('oletuspohja') }}</b-form-radio>
+                <div v-if="tyyppi === 'pohjasta'">
+                  <EpMultiSelect
+                    v-if="pohjat"
+                    v-model="data.peruste"
+                    :placeholder="$t('valitse-pohja')"
+                    :is-editing="true"
+                    :options="pohjat">
+                    <template slot="singleLabel" slot-scope="{ option }">
+                      {{ option.perusteprojekti.nimi }}
+                    </template>
+                    <template slot="option" slot-scope="{ option }">
+                      {{ option.perusteprojekti.nimi }}
+                    </template>
+                  </EpMultiSelect>
+                  <EpSpinner v-else />
+                </div>
+
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">{{ $t('toinen-perusteprojekti') }}</b-form-radio>
+                <div v-if="tyyppi === 'perusteesta'">
+                  <EpMultiSelect
+                    v-if="perusteet"
+                    v-model="data.peruste"
+                    :placeholder="$t('valitse-peruste')"
+                    :is-editing="true"
+                    :options="perusteet">
+                    <template slot="singleLabel" slot-scope="{ option }">
+                      {{ $kaanna(option.nimi) }}
+                    </template>
+                    <template slot="option" slot-scope="{ option }">
+                      {{ $kaanna(option.nimi) }}
+                    </template>
+                  </EpMultiSelect>
+                  <EpSpinner v-else />
+                </div>
+
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="tiedostosta" name="tyyppi">{{ $t('tuo-tiedostosta') }}</b-form-radio>
+                <div v-if="tyyppi === 'tiedostosta'">
+                  <ep-tiedosto-lataus :fileTypes="['application/json']" v-model="data.tiedosto" />
+                </div>
+
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
+
+              </b-form-group>
             </div>
-
-            <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">{{ $t('tuo-peruste') }}</b-form-radio>
-            <div v-if="tyyppi === 'perusteesta'">
-              <EpMultiSelect
-                v-if="perusteet"
-                v-model="data.peruste"
-                :placeholder="$t('valitse-peruste')"
-                :is-editing="true"
-                :options="perusteet">
-                <template slot="singleLabel" slot-scope="{ option }">
-                  {{ $kaanna(option.nimi) }}
-                </template>
-                <template slot="option" slot-scope="{ option }">
-                  {{ $kaanna(option.nimi) }}
-                </template>
-              </EpMultiSelect>
-              <EpSpinner v-else />
-            </div>
-
-            <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
-
-          </b-form-group>
+           </div>
         </template>
 
         <template v-slot:tiedot>
           <b-form-group :label="$t('projektin-nimi') + '*'" required>
-            <ep-input v-model="data.nimi" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')" />
+            <ep-input v-model="data.nimi" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')" :validation="$v.data.nimi"/>
           </b-form-group>
 
           <b-form-group :label="$t('projektin-diaarinumero') + '*'" required>
-            <ep-input v-model="data.diaarinumero" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-diaarinumero')" />
+            <ep-input v-model="data.diaarinumero" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-diaarinumero')" :validation="$v.data.diaarinumero"/>
           </b-form-group>
 
           <b-form-group :label="$t('projektin-kuvaus')" required>
             <b-form-radio class="ml-1" v-model="data.muutos" value="iso" name="tyyppi">{{ $t('perusteen-uudistaminen') }}</b-form-radio>
             <b-form-radio class="ml-1" v-model="data.muutos" value="pieni" name="tyyppi">{{ $t('perusteen-korjaus') }}</b-form-radio>
-            <ep-input class="mt-1" v-model="data.kuvaus" type="string" :is-editing="true" :placeholder="$t('projektin-vapaamuotoinen-kuvaus')" />
+            <ep-input class="mt-1" v-model="data.kuvaus" type="localized" :is-editing="true" :placeholder="$t('projektin-vapaamuotoinen-kuvaus')" />
           </b-form-group>
 
           <b-form-group :label="$t('koulutus-tutkintotyyppi') + '*'" required>
@@ -85,8 +96,6 @@
           <b-form-group :label="$t('perustetyoryhma') + '*'" required>
             <EpMultiSelect v-model="data.tyoryhma"
                            v-if="tyoryhmat"
-                           :placeholder="$t('valitse-tyoryhma')"
-                           :search-identity="tyoryhmaSearchIdentity"
                            :is-editing="true"
                            :options="tyoryhmat">
               <template slot="singleLabel" slot-scope="{ option }">
@@ -107,38 +116,33 @@
         <template v-slot:aikataulu>
           <EpAikataulu :aikataulut="tapahtumat" />
 
-          <b-form-group :label="$t('peruste-astuu-voimaan') + '*'" required>
-            <b-form-datepicker v-model="data.voimassaoloAlkaa" class="mb-2" />
+          <b-form-group :label="$t('peruste-astuu-voimaan') + '*'" required class="col-md-4 col-12">
+            <ep-datepicker v-model="data.voimassaoloAlkaa" class="mb-2" :isEditing="true" :validation="$v.data.voimassaoloAlkaa" :showValidValidation="false"/>
           </b-form-group>
 
-          <b-form-group :label="$t('perusteen-arvioitu-julkaisupaiva')" required>
-            <b-form-datepicker v-model="data.paatosPvm" class="mb-2" />
+          <b-form-group :label="$t('perusteen-arvioitu-julkaisupaiva')" required class="col-md-4 col-12">
+            <ep-datepicker v-model="data.paatosPvm" class="mb-2" :isEditing="true"/>
           </b-form-group>
 
-          <b-form-group :label="$t('lausuntokierros-alkaa')" required>
-            <b-form-datepicker v-model="data.lausuntakierrosAlkaa" class="mb-2" />
+          <b-form-group :label="$t('lausuntokierros-alkaa')" required class="col-md-4 col-12">
+            <ep-datepicker v-model="data.lausuntakierrosAlkaa" class="mb-2" :isEditing="true"/>
           </b-form-group>
 
-          <b-form-group :label="$t('johtokunnan-kasittely')" required>
-            <b-form-datepicker v-model="data.johtokunnanKasittely" class="mb-2" />
+          <b-form-group :label="$t('johtokunnan-kasittely')" required class="col-md-4 col-12">
+            <ep-datepicker v-model="data.johtokunnanKasittely" class="mb-2" :isEditing="true"/>
           </b-form-group>
 
-          <div class="d-md-flex" v-for="(tpvm, idx) in data.tavoitepaivamaarat" :key="idx">
-            <div class="flex-grow-1">
-              <b-form-group :label="$t('tavoitteen-pvm')">
-                <b-form-datepicker v-model="tpvm.tapahtumapaiva" class="mb-2" />
-              </b-form-group>
-            </div>
-            <div class="flex-grow-1">
-              <b-form-group :label="$t('tavoitteen-nimi-kuvaus')">
-                <ep-input v-model="tpvm.tavoite" type="string" :is-editing="true" :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')" />
-              </b-form-group>
-            </div>
-            <div>
-              <b-form-group :label="tavoiteHeading">
-                <ep-button @click="poistaTavoite(idx)" variant="link" icon="roskalaatikko"></ep-button>
-              </b-form-group>
-            </div>
+          <div v-for="(tpvm, idx) in data.tavoitepaivamaarat" :key="idx" class="row p-0 m-0" >
+            <b-form-group :label="$t('tavoitteen-pvm')" class="col-md-4 col-12">
+              <ep-datepicker v-model="tpvm.tapahtumapaiva" class="mb-2" :isEditing="true" :validation="$v.data.tavoitepaivamaarat.$each.$iter[idx].tapahtumapaiva"/>
+            </b-form-group>
+            <b-form-group :label="$t('tavoitteen-nimi-kuvaus') + '*'" class="col-md-7 col-11">
+              <ep-input v-model="tpvm.tavoite" type="localized" :is-editing="true" :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')" :validation="$v.data.tavoitepaivamaarat.$each.$iter[idx].tavoite" />
+            </b-form-group>
+            <b-form-group class="col-1 col-sm-1 text-center">
+              <template v-slot:label><br/></template>
+              <ep-button @click="poistaTavoite(tpvm)" variant="link" icon="roskalaatikko"></ep-button>
+            </b-form-group>
           </div>
           <ep-button variant="link" icon="plus" @click="lisaaTavoite()">
             {{ $t('lisaa-tavoite') }}
@@ -159,7 +163,7 @@
                 {{ $t('koulutus-tutkintotyyppi') }}
               </div>
               <span class="text-nowrap">
-                <EpColorIndicator :size="10" :kind="data.koulutustyyppi" />
+                <EpColorIndicator :kind="data.koulutustyyppi" />
                 <span class="ml-2">{{ $t(data.koulutustyyppi) }}</span>
               </span>
             </div>
@@ -169,7 +173,7 @@
               <div class="nimi">
                 {{ $t('kuvaus') }}
               </div>
-              <p>{{ data.kuvaus }}</p>
+              <ep-input type="localized" :value="data.kuvaus" />
             </div>
             <div class="tieto w-50">
               <div>
@@ -184,6 +188,18 @@
               </div>
             </div>
           </div>
+          <div class="d-flex">
+            <div class="tieto w-100">
+              <div class="nimi">
+                {{ $t('aikataulu') }}
+              </div>
+              <EpAikataulu :aikataulut="tapahtumat" />
+            </div>
+          </div>
+        </template>
+
+        <template v-slot:luo>
+          {{$t('luo-perusteprojekti')}}
         </template>
 
       </EpSteps>
@@ -199,11 +215,13 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpSteps from '@shared/components/EpSteps/EpSteps.vue';
+import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
+import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
@@ -212,6 +230,8 @@ import { EperusteetKoulutustyypit } from '@/utils/perusteet';
 import { Page } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
+import { Kielet } from '@shared/stores/kieli';
+import { requiredOneLang, minValue, notNull } from '@shared/validators/required';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -228,15 +248,16 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSelect,
     EpSpinner,
     EpSteps,
+    EpTiedostoLataus,
+    EpDatepicker,
+  },
+  validations() {
+    return {
+      data: this.validator,
+    };
   },
 })
 export default class RoutePerusteprojektiLuonti extends Vue {
-  @Prop({ required: true })
-  pohjatStore!: PerusteetStore;
-
-  @Prop({ required: true })
-  perusteetStore!: PerusteetStore;
-
   @Prop({ required: true })
   perusteprojektiStore!: PerusteprojektiStore;
 
@@ -244,9 +265,14 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   ulkopuolisetStore!: UlkopuolisetStore;
 
   private data: any = {
+    voimassaoloAlkaa: null,
     tavoitepaivamaarat: [] as any[],
+    koulutustyyppi: null,
+    tyoryhma: null,
+    peruste: null,
   };
-  private tyyppi: 'pohjasta' | 'perusteesta' | 'uusi' | null = null;
+  private tyyppi: 'pohjasta' | 'perusteesta' | 'tiedostosta' | 'uusi' | null = null;
+  private currentStep: Step | null = null;
 
   async mounted() {
     this.ulkopuolisetStore.fetchTyoryhmat();
@@ -271,6 +297,8 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     this.data = {
       ...this.data,
       pohja: null,
+      tiedosto: null,
+      peruste: null,
     };
   }
 
@@ -283,25 +311,55 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   }
 
   get steps() {
+    const self = this;
     return [{
       key: 'pohja',
       name: this.$t('pohjan-valinta'),
-      description: this.$t('pohjan-valinta-kuvaus'),
       isValid() {
+        if (self.tyyppi === 'pohjasta' && !self.data.pohja) {
+          return false;
+        }
+
+        if (self.tyyppi === 'perusteesta' && !self.data.peruste) {
+          return false;
+        }
+
+        if (self.tyyppi === 'tiedostosta' && !self.data.tiedosto) {
+          return false;
+        }
+
         return true;
+      },
+      onNext() {
+        if (self.data.tiedosto && !_.isEmpty(self.data.tiedosto.content.projekti)) {
+          self.data.nimi = self.data.tiedosto.content.projekti.nimi;
+          self.data.diaarinumero = self.data.tiedosto.content.projekti.diaarinumero;
+          self.data.koulutustyyppi = self.data.tiedosto.content.projekti.koulutustyyppi;
+          self.data.kuvaus = self.data.tiedosto.content.peruste.kuvaus;
+
+          if (self.data.tiedosto.content.projekti.ryhmaOid) {
+            self.data.tyoryhma = _.head(_.filter(self.tyoryhmat, tyoryhma => tyoryhma.oid === self.data.tiedosto.content.projekti.ryhmaOid));
+          }
+        }
       },
     }, {
       key: 'tiedot',
       name: this.$t('projektin-tiedot'),
       description: this.$t('projektin-tiedot-kuvaus'),
+      isValid() {
+        return !self.$v.$invalid;
+      },
     }, {
       key: 'aikataulu',
       name: this.$t('aikataulu'),
       description: this.$t('aikataulu-kuvaus'),
+      isValid() {
+        return !self.$v.$invalid;
+      },
     }, {
       key: 'yhteenveto',
-      name: this.$t('yhteenveto'),
-      description: this.$t('yhteenveto-kuvaus'),
+      name: this.$t('tietojen-tarkistus'),
+      description: this.$t('yhteenveto-kuvaus-tallenna-tiedot'),
     }];
   }
 
@@ -318,30 +376,33 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   }
 
   get tapahtumat() {
-    return [{
+    return _.chain([{
       tapahtuma: 'luominen',
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('peruste-luotu') },
       tapahtumapaiva: new Date(),
     }, {
       tapahtuma: 'tavoite',
-      tavoite: 'peruste-astuu-voimaan',
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('peruste-astuu-voimaan') },
       tapahtumapaiva: this.data.voimassaoloAlkaa && new Date(this.data.voimassaoloAlkaa),
     }, {
       tapahtuma: 'julkaisu',
-      tavoite: 'perusteen-arvioitu-julkaisupaiva',
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('perusteen-arvioitu-julkaisupaiva') },
       tapahtumapaiva: this.data.paatosPvm && new Date(this.data.paatosPvm),
     }, {
       tapahtuma: 'tavoite',
-      tavoite: 'lausuntokierros-alkaa',
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('lausuntokierros-alkaa') },
       tapahtumapaiva: this.data.lausuntakierrosAlkaa && new Date(this.data.lausuntakierrosAlkaa),
     }, {
       tapahtuma: 'tavoite',
-      tavoite: 'johtokunnan-kasittely',
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('johtokunnan-kasittely') },
       tapahtumapaiva: this.data.johtokunnanKasittely && new Date(this.data.johtokunnanKasittely),
-    }, ...this.data.tavoitepaivamaarat];
+    }, ...this.data.tavoitepaivamaarat])
+      .filter('tapahtumapaiva')
+      .value();
   }
 
-  poistaTavoite(idx: number) {
-    this.data.tavoitepaivamaarat = _.without(this.data.tavoitepaivamaarat, idx);
+  poistaTavoite(tavoitepaivamaara) {
+    this.data.tavoitepaivamaarat = _.without(this.data.tavoitepaivamaarat, tavoitepaivamaara);
   }
 
   get tavoiteHeading() {
@@ -349,7 +410,8 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   }
 
   async onSave() {
-    const luotu = await this.perusteprojektiStore.addPerusteprojekti({
+    let luotu;
+    const projekti = {
       diaarinumero: this.data.diaarinumero,
       johtokunnanKasittely: this.data.johtokunnanKasittely,
       koulutustyyppi: this.data.koulutustyyppi,
@@ -360,9 +422,29 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       laajuusYksikko: 'OSAAMISPISTE' as any,
       ryhmaOid: this.data.tyoryhma.oid,
       voimassaoloAlkaa: this.data.voimassaoloAlkaa,
-      yhteistyotaho: this.data.paatosPvm,
-    });
-    console.log('saving ', this.data);
+      yhteistyotaho: this.data.yhteyshenkilo,
+      perusteenAikataulut: this.tapahtumat,
+      kuvaus: this.data.kuvaus,
+    };
+
+    if (this.data.tiedosto) {
+      luotu = await this.perusteprojektiStore.importPerusteprojekti({
+        ...this.data.tiedosto.content,
+        projekti: {
+          ...this.data.tiedosto.content.projekti,
+          ...projekti,
+        },
+        peruste: {
+          ...this.data.tiedosto.content.peruste,
+          perusteenAikataulut: this.tapahtumat,
+          kuvaus: this.data.kuvaus,
+        },
+      });
+    }
+    else {
+      luotu = await this.perusteprojektiStore.addPerusteprojekti(projekti);
+    }
+
     this.$router.push({
       name: 'perusteprojekti',
       params: {
@@ -375,10 +457,47 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     this.data.tavoitepaivamaarat = [
       ...this.data.tavoitepaivamaarat, {
         tapahtuma: 'tavoite',
-        tavoite: '',
+        tavoite: { [Kielet.getSisaltoKieli.value]: '' },
         tapahtumapaiva: new Date(),
       },
     ];
+  }
+
+  onCancel() {
+    this.$router.push({
+      name: 'perusteprojektit',
+    });
+  }
+
+  onStepChange(step) {
+    this.currentStep = step;
+  }
+
+  get validator() {
+    if (this.currentStep && this.currentStep.key === 'tiedot') {
+      return {
+        nimi: notNull(),
+        diaarinumero: notNull(),
+        koulutustyyppi: notNull(),
+        tyoryhma: notNull(),
+      };
+    }
+
+    if (this.currentStep && this.currentStep.key === 'aikataulu') {
+      return {
+        voimassaoloAlkaa: notNull(),
+        tavoitepaivamaarat: {
+          $each: {
+            tapahtumapaiva: notNull(),
+            tavoite: {
+              [Kielet.getSisaltoKieli.value]: notNull(),
+            },
+          },
+        },
+      };
+    }
+
+    return {};
   }
 }
 </script>
@@ -386,7 +505,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
 <style lang="scss" scoped>
 
 .tieto {
-  padding: 20px;
+  padding: 20px 20px 20px 0px;
 
   .nimi {
     font-weight: 600;
