@@ -19,6 +19,7 @@ import RouteTekstikappale from '@/views/RouteTekstikappale.vue';
 import RouteTermisto from '@/views/RouteTermisto.vue';
 import RouteProjektiTiedot from '@/views/RouteProjektiTiedot.vue';
 import RoutePerusteenTiedot from '@/views/RoutePerusteenTiedot.vue';
+import RouteKvliite from '@/views/RouteKvliite.vue';
 import RouteTiedotteet from '@/views/RouteTiedotteet.vue';
 import RouteTutkinnonOsa from '@/views/RouteTutkinnonOsa.vue';
 import RouteTutkinnonOsanOsaAlue from '@/views/RouteTutkinnonOsanOsaAlue.vue';
@@ -152,6 +153,11 @@ const router = new VueRouter({
         path: 'peruste',
         name: 'perusteenTiedot',
         component: RoutePerusteenTiedot,
+        props: { ...stores },
+      }, {
+        path: 'kvliite',
+        name: 'kvliite',
+        component: RouteKvliite,
         props: { ...stores },
       }, {
         path: 'projekti',
