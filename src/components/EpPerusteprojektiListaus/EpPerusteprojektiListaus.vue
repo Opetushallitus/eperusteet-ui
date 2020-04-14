@@ -1,45 +1,47 @@
 <template>
   <div>
-    <div class="upper">
-      <slot name="upperheader">
-        <h1 class="bg-danger">slot: upperheader</h1>
-      </slot>
-    </div>
+    <div v-if="showCards">
+      <div class="upper">
+        <slot name="upperheader">
+          <h1 class="bg-danger">slot: upperheader</h1>
+        </slot>
+      </div>
 
-    <div class="d-flex flex-wrap" v-if="items">
-      <div class="card-wrapper">
-        <ProjektiCard :full-background="true" :link="newRoute">
-          <div class="d-flex align-items-center flex-column h-100">
-            <div class="h-50 text-center d-flex align-items-center pt-4">
-              <div class="ikoni">
-                <fas icon="plus" />
+      <div class="d-flex flex-wrap" v-if="items">
+        <div class="card-wrapper">
+          <ProjektiCard :full-background="true" :link="newRoute">
+            <div class="d-flex align-items-center flex-column h-100">
+              <div class="h-50 text-center d-flex align-items-center pt-4">
+                <div class="ikoni">
+                  <fas icon="plus" />
+                </div>
+              </div>
+              <div class="h-50 text-center d-flex align-items-center pb-5">
+                <div class="teksti">
+                  {{ $t('luo-uusi') }}
+                </div>
               </div>
             </div>
-            <div class="h-50 text-center d-flex align-items-center pb-5">
-              <div class="teksti">
-                {{ $t('luo-uusi') }}
+          </ProjektiCard>
+        </div>
+        <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
+          <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
+                        :indicator="project.tila">
+            <template slot="lower" class="small-text">
+              {{ $t('tila-' + project.tila) }}
+            </template>
+            <div class="h-100 w-100 d-flex align-items-center justify-content-center">
+              <div>
+                {{ project.nimi }}
               </div>
             </div>
-          </div>
-        </ProjektiCard>
+          </ProjektiCard>
+        </div>
       </div>
-      <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
-        <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                      :indicator="project.tila">
-          <template slot="lower" class="small-text">
-            {{ $t('tila-' + project.tila) }}
-          </template>
-          <div class="h-100 w-100 d-flex align-items-center justify-content-center">
-            <div>
-              {{ project.nimi }}
-            </div>
-          </div>
-        </ProjektiCard>
-      </div>
+      <EpSpinner v-else />
     </div>
-    <EpSpinner v-else />
 
-    <div class="lower">
+    <div class="lower" :class="{'mt-0': !showCards}">
       <slot name="lowerheader">
         <h1 class="bg-danger">slot: lowerheader</h1>
       </slot>
@@ -47,10 +49,10 @@
 
     <div class="filters" v-if="items">
       <div class="d-lg-flex align-items-end">
-        <div class="m-2">
+        <div class="mt-2 mb-2 mr-2 flex-fill">
           <EpSearch v-model="query.nimi" :placeholder="$t('etsi-perusteprojektia')"/>
         </div>
-        <div class="m-2">
+        <div class="m-2 flex-fill" v-if="filtersInclude('koulutustyyppi')">
           <label>{{ $t('koulutustyyppi') }}</label>
           <EpMultiSelect v-model="koulutustyyppi"
                     :enable-empty-option="true"
@@ -65,7 +67,22 @@
             </template>
           </EpMultiSelect>
         </div>
-        <div class="m-2">
+        <div class="m-2 flex-fill" v-if="filtersInclude('peruste')">
+          <label>{{ $t('peruste') }}</label>
+          <EpMultiSelect v-model="peruste"
+                    :enable-empty-option="true"
+                    placeholder="kaikki"
+                    :is-editing="true"
+                    :options="perusteet">
+            <template slot="singleLabel" slot-scope="{ option }">
+              {{ $kaanna(option.nimi) }}
+            </template>
+            <template slot="option" slot-scope="{ option }">
+              {{ $kaanna(option.nimi) }}
+            </template>
+          </EpMultiSelect>
+        </div>
+        <div class="m-2 flex-fill" v-if="filtersInclude('tila')">
           <label>{{ $t('tila') }}</label>
           <EpMultiSelect v-model="tila"
                     :enable-empty-option="true"
@@ -80,7 +97,7 @@
             </template>
           </EpMultiSelect>
         </div>
-        <div class="m-2">
+        <div class="m-2 flex-fill" v-if="filtersInclude('voimassaolo')">
           <label>{{ $t('voimassaolo') }}</label>
           <EpMultiSelect v-model="voimassaolo"
                     :enable-empty-option="true"
@@ -142,12 +159,13 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
-import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto, Perusteet, PerusteKevytDto } from '@shared/api/eperusteet';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
 import { Page } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import { IProjektiProvider } from './types';
 import ProjektiCard from './ProjektiCard.vue';
+import * as _ from 'lodash';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -172,10 +190,17 @@ export default class EpPerusteprojektiListaus extends Vue {
   @Prop({ required: true })
   editRoute!: string;
 
-  // @Prop({ default: () => ['koulutustyyppi', 'tila'] })
-  // filters!: ProjektiFilter[];
+  @Prop({ required: false, default: true })
+  showCards!: boolean;
+
+  @Prop({ required: false })
+  fieldKeys!: string[];
+
+  @Prop({ required: false, default: () => ['koulutustyyppi', 'tila', 'voimassaolo'] })
+  filters!: ProjektiFilter[];
 
   private koulutustyyppi: string | null = null;
+  private peruste: PerusteKevytDto | null = null;
   private tila: string | null = null;
   private voimassaolo: string | null = null;
   private isLoading = false;
@@ -193,10 +218,17 @@ export default class EpPerusteprojektiListaus extends Vue {
     nimi: '',
     jarjestysOrder: false,
     jarjestysTapa: 'nimi',
+    perusteet: [],
   } as PerusteQuery;
 
-  mounted() {
+  private perusteet: PerusteKevytDto[] = [];
+
+  async mounted() {
     this.provider.updateOwnProjects();
+
+    if (this.filtersInclude('peruste')) {
+      this.perusteet = (await Perusteet.getAllOppaidenPerusteet()).data;
+    }
   }
 
   @Watch('query', { deep: true, immediate: true })
@@ -215,6 +247,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   @Watch('tila')
   onTilaChange(tila: string) {
     this.query = {
+      ...this.query,
       tila: tila
         ? [tila]
         : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
@@ -259,6 +292,11 @@ export default class EpPerusteprojektiListaus extends Vue {
     this.query.koulutustyyppi = [kt];
   }
 
+  @Watch('peruste')
+  onPerusteChange(peruste: PerusteKevytDto) {
+    this.query.perusteet = [peruste.id as number];
+  }
+
   get vaihtoehdotKoulutustyypit() {
     return EperusteetKoulutustyypit;
   }
@@ -301,10 +339,14 @@ export default class EpPerusteprojektiListaus extends Vue {
     return this.provider.projects.value;
   }
 
-  get fields(): BvTableFieldArray {
+  get fields() {
+    return _.filter(this.initialFields, (field: any) => !this.fieldKeys || _.includes(this.fieldKeys, field.key));
+  }
+
+  get initialFields(): BvTableFieldArray {
     const dateFormatter = (value: Date) => {
       return value
-        ? this.$date(value)
+        ? this.$sd(value)
         : '-';
     };
 
@@ -347,6 +389,10 @@ export default class EpPerusteprojektiListaus extends Vue {
       label: this.$t('voimassaolo-loppuu') as string,
       formatter: dateFormatter,
     }];
+  }
+
+  filtersInclude(filter) {
+    return !this.filters || _.includes(this.filters, filter);
   }
 }
 </script>
