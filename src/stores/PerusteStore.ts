@@ -37,7 +37,7 @@ export class PerusteStore implements IEditoitava {
 
   async init(projektiId: number) {
     if (this.state.initializing
-      || this.state.isInitialized
+      || (this.state.isInitialized && projektiId === this.projektiId.value)
       || !projektiId
       || projektiId === this.state.projekti?.id) {
       return;

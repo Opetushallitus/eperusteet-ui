@@ -42,7 +42,7 @@
 
         <div v-if="data.tyyppi === 'normaali'">
           <ep-collapse tyyppi="ammattitaitovaatimukset" :border-bottom="false" :border-top="isEditing">
-            <h2 slot="header">{{ $t('ammattitaitovaatimukset') }}</h2>
+            <h3 slot="header">{{ $t('ammattitaitovaatimukset') }}</h3>
             <b-form-group>
               <EpAmmattitaitovaatimukset v-if="data.tutkinnonOsa.ammattitaitovaatimukset2019"
                                          v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
@@ -52,7 +52,7 @@
           </ep-collapse>
 
           <ep-collapse tyyppi="osaamisen-arviointi" :border-bottom="false" :border-top="true">
-            <h2 slot="header">{{ $t('osaamisen-arviointi') }}</h2>
+            <h3 slot="header">{{ $t('osaamisen-arviointi') }}</h3>
             <b-form-group v-if="isEditing">
               <b-form-radio
                 v-for="geneerinen in geneeriset"
@@ -92,7 +92,7 @@
           </ep-collapse>
 
           <ep-collapse tyyppi="ammattitaidon-osoittamistavat" :border-bottom="false" :border-top="true">
-            <h2 slot="header">{{ $t('ammattitaidonOsoittamistavat') }}</h2>
+            <h4 slot="header">{{ $t('ammattitaidonOsoittamistavat') }}</h4>
             <b-form-group>
               <ep-content v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
                           :validation="validation"
