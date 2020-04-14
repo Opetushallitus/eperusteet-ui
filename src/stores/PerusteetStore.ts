@@ -47,5 +47,4 @@ export class PerusteetStore implements IProjektiProvider {
     });
     this.state.projects = res.data as any;
   }
-
 }

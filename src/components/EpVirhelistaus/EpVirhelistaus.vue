@@ -47,7 +47,6 @@ import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
 import { TilaUpdateStatus } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
-
 @Component({
   components: {
     EpCollapse,
@@ -64,7 +63,7 @@ export default class EpVirhelistaus extends Vue {
     return nimi ? this.$kaanna(nimi) : this.validation?.perusteprojekti?.nimi;
   }
 
-  get categories() {
+  get categories() {
     return _.groupBy(this.validation.infot, 'validointiKategoria');
   }
 

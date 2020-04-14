@@ -59,5 +59,4 @@ export class PerusteprojektiStore {
     const res = await Perusteprojektit.getPerusteprojektiTyoryhmat(perusteProjektiId);
     return res.data;
   }
-
 }

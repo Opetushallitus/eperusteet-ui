@@ -104,5 +104,4 @@ export class TekstiRakenneStore implements IEditoitava {
   }
 
   public readonly validator = computed(() => ({}));
-
 }
