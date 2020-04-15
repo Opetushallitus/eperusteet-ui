@@ -55,12 +55,9 @@
         </div>
         <div class="d-flex justify-content-between" v-else>
           <div>
-            <ep-button variant="link" @click="onCancel()">{{ $t('peruuta') }}</ep-button>
+            <ep-button variant="link" @click="onRemove()">{{ $t('poista') }}</ep-button>
             <ep-button class="ml-2" variant="primary" @click="onSave()">{{ $t('tallenna') }}</ep-button>
             <ep-button class="ml-2" variant="primary" @click="onPublish()">{{ $t('julkaise') }}</ep-button>
-          </div>
-          <div>
-            <ep-button variant="danger" @click="onRemove()">{{ $t('poista') }}</ep-button>
           </div>
         </div>
       </div>
@@ -97,9 +94,17 @@ export default class GeneerinenArviointi extends Vue {
   @Prop({ required: true })
   private arviointiStore!: ArviointiStore;
 
+  @Prop({ required: false, default: false })
+  private editing!: boolean;
+
   private isEditing = false;
   private inner: GeneerinenArviointiasteikkoDto | null = null;
   private isLoading = false;
+
+  @Watch('editing', { immediate: true })
+  onEditingChange(value) {
+    this.isEditing = value;
+  }
 
   @Watch('value', { immediate: true })
   onValueChange(value) {
@@ -156,6 +161,13 @@ export default class GeneerinenArviointi extends Vue {
 
   async onSave() {
     try {
+      this.inner!.osaamistasonKriteerit = _.map(this.inner!.osaamistasonKriteerit, osaamiskriteeri => {
+        return {
+          ...osaamiskriteeri,
+          kriteerit: _.reject(osaamiskriteeri.kriteerit, _.isEmpty),
+        };
+      });
+
       this.isLoading = true;
       await this.arviointiStore.save(this.inner!);
     }
@@ -178,14 +190,19 @@ export default class GeneerinenArviointi extends Vue {
   }
 
   async onRemove() {
-    await this.$bvModal.msgBoxConfirm(
+    const poistosuccess = this.$t('arvioinnin-poisto-onnistui') as any;
+    const poisto = await this.$bvModal.msgBoxConfirm(
       this.$t('poistetaanko-geneerinen-arviointi-kuvaus') as any, {
-        title: this.$t('poistetaanko-geneerinen-arviointi') as any,
+        title: this.$t('vahvista-poisto') as any,
         okTitle: this.$t('poista') as any,
         cancelTitle: this.$t('peruuta') as any,
-        size: 'lg',
+        size: 'md',
       });
-    await this.arviointiStore.remove(this.inner!);
+
+    if (poisto) {
+      await this.arviointiStore.remove(this.inner!);
+      this.$success(poistosuccess);
+    }
   }
 
   async onCopy() {
