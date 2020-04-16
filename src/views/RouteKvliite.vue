@@ -33,12 +33,12 @@
         </b-form-group>
 
         <b-form-group :label="$t('arvosana-asteikko')">
-          <div v-if="data.kvliite._arvosanaAsteikko && !isEditing">
+          <div v-if="(!isEditing || data.kvliite.periytynyt) && data.kvliite._arvosanaAsteikko">
             <span v-for="(taso, idx) in data.arviointiasteikot[data.kvliite._arvosanaAsteikko].osaamistasot" :key="idx">
                 {{ $kaannaOlioTaiTeksti(taso.otsikko) }} {{ (data.arviointiasteikot[data.kvliite._arvosanaAsteikko].osaamistasot.length - 1) !== idx ? '/' : '' }}
             </span>
           </div>
-          <div v-if="isEditing">
+          <div v-if="isEditing && !data.kvliite.periytynyt">
             <b-form-radio v-for="(asteikko , idx) in data.arviointiasteikot" :key="idx"
                           v-model="data.kvliite._arvosanaAsteikko"
                           :value="asteikko.id">
@@ -52,37 +52,37 @@
         <b-form-group :label="$t('jatkoopinto-kelpoisuus')">
           <ep-content v-model="data.kvliite.jatkoopintoKelpoisuus"
                       layout="simplified"
-                      :is-editable="isEditing"></ep-content>
+                      :is-editable="isEditing && !data.kvliite.periytynyt"></ep-content>
         </b-form-group>
 
         <b-form-group :label="$t('kansainvaliset-sopimukset')">
           <ep-content v-model="data.kvliite.kansainvalisetSopimukset"
                       layout="simplified"
-                      :is-editable="isEditing"></ep-content>
+                      :is-editable="isEditing && !data.kvliite.periytynyt"></ep-content>
         </b-form-group>
 
         <b-form-group :label="$t('saadosperusta')">
           <ep-content v-model="data.kvliite.saadosPerusta"
                       layout="simplified"
-                      :is-editable="isEditing"></ep-content>
+                      :is-editable="isEditing && !data.kvliite.periytynyt"></ep-content>
         </b-form-group>
 
         <h3>{{ $t('tutkintotodistuksen-saaminen') }}</h3>
 
         <ep-content v-model="data.kvliite.tutkintotodistuksenSaaminen"
                     layout="simplified"
-                    :is-editable="isEditing"></ep-content>
+                    :is-editable="isEditing && !data.kvliite.periytynyt"></ep-content>
 
         <b-form-group :label="$t('pohjakoulutusvaatimukset')">
           <ep-content v-model="data.kvliite.pohjakoulutusvaatimukset"
                       layout="simplified"
-                      :is-editable="isEditing"></ep-content>
+                      :is-editable="isEditing && !data.kvliite.periytynyt"></ep-content>
         </b-form-group>
 
         <b-form-group :label="$t('lisatietoja')">
           <ep-content v-model="data.kvliite.lisatietoja"
                       layout="simplified"
-                      :is-editable="isEditing"></ep-content>
+                      :is-editable="isEditing && !data.kvliite.periytynyt"></ep-content>
         </b-form-group>
       </template>
     </EpEditointi>
