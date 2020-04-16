@@ -77,7 +77,7 @@ export default class Home extends Vue {
     background-position: 100% 0;
     background-repeat: no-repeat;
     @media only screen and (min-width: 2503px)  {
-      background-size: cover;
+      background-size: 100%;
     }
 
     h1 {
