@@ -5,8 +5,22 @@
         <h2 class="m-0">{{ $kaanna(data.nimi) }}</h2>
       </template>
       <template v-slot:default="{ data, isEditing, validation }">
-        <div class="mt-1">
-          <ep-input v-model="data.nimi" v-if="isEditing" :is-editing="true" :validation="validation.nimi"></ep-input>
+        <div class="mt-1" v-if="isEditing">
+
+          <div v-if="osaamisalat.length > 0" class="mb-4">
+            <h3>{{$t('osaamisalat')}}</h3>
+            <ep-select :items="osaamisalat" v-model="data.osaamisala" :is-editing="true">
+              <template #default="{ item }">
+                {{$kaanna(item.nimi)}}
+              </template>
+            </ep-select>
+          </div>
+
+          <h3>{{$t('otsikko')}}</h3>
+          <ep-input v-model="data.nimi" :is-editing="true" :validation="validation.nimi" :disabled="data.osaamisala"></ep-input>
+          <!-- <ep-input v-else v-model="data.osaamisala.nimi" :is-editing="true" :disabled="true"></ep-input> -->
+
+          <ep-toggle class="mt-4" v-model="data.liite">{{$t('nayta-tekstikappale-liitteena')}}</ep-toggle>
         </div>
         <div :class="{ 'mt-4': isEditing }">
           <ep-content v-model="data.teksti" layout="normal" :is-editable="isEditing"></ep-content>
@@ -77,6 +91,8 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpSelect from '@shared/components/forms/EpSelect.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
@@ -100,6 +116,8 @@ interface koodistoryhma {
     EpSpinner,
     EpKoodistoSelect,
     EpButton,
+    EpToggle,
+    EpSelect,
   },
 })
 export default class RouteTekstikappale extends Vue {
@@ -111,6 +129,7 @@ export default class RouteTekstikappale extends Vue {
 
   private store: EditointiStore | null = null;
   private storet = {};
+  private oldNimi: Object | null = null;
 
   mounted() {
     this.storet = _.chain(this.koodistoryhmat)
@@ -136,6 +155,10 @@ export default class RouteTekstikappale extends Vue {
     return this.perusteStore.perusteId.value;
   }
 
+  get osaamisalat() {
+    return this.perusteStore.peruste.value?.osaamisalat;
+  }
+
   get koodistot() {
     return _.chain(this.koodistoryhmat)
       .map(koodistoRyhma => {
@@ -150,6 +173,22 @@ export default class RouteTekstikappale extends Vue {
         };
       })
       .value();
+  }
+
+  @Watch('store.data.value.osaamisala', { immediate: true })
+  async onOsaamisalaChange(val, oldVal) {
+    if (!oldVal) {
+      this.oldNimi = this.store?.data.value.nimi;
+    }
+    if (!val) {
+      val = { nimi: this.oldNimi };
+    }
+    if (!_.isEqual(val, oldVal)) {
+      this.store?.setData({
+        ...this.store?.data.value,
+        nimi: val.nimi,
+      });
+    }
   }
 
   @Watch('tekstikappaleId', { immediate: true })

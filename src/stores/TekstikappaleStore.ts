@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Matala, Perusteenosat, Sisallot, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { Matala, Perusteenosat, Sisallot, PerusteprojektiListausDto, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Revision, Page } from '@shared/tyypit';
 import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
@@ -132,5 +132,47 @@ export class TekstikappaleStore implements IEditoitava {
     return {
       valid: true,
     };
+  }
+
+  public async create(otsikko, tekstikappaleIsa) {
+    let suoritustapakoodi;
+    if (_.lowerCase(TekstikappaleStore.config.perusteStore.peruste.value?.tyyppi) === _.lowerCase(PerusteDtoTyyppiEnum.OPAS)) {
+      suoritustapakoodi = 'opas';
+    }
+    else {
+      suoritustapakoodi = _.get(_.head(TekstikappaleStore.config.perusteStore.peruste.value?.suoritustavat), 'suoritustapakoodi');
+    }
+
+    if (TekstikappaleStore.config.perusteStore.perusteId.value && suoritustapakoodi) {
+      if (_.isEmpty(tekstikappaleIsa)) {
+        if (TekstikappaleStore.config.perusteStore.perusteId.value && suoritustapakoodi) {
+          const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
+            TekstikappaleStore.config.perusteStore.perusteId.value,
+            suoritustapakoodi,
+            {
+              perusteenOsa: {
+                nimi: otsikko,
+                osanTyyppi: 'tekstikappale',
+              } as any,
+            }
+          ));
+          return tallennettu.data;
+        }
+      }
+      else {
+        const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
+          TekstikappaleStore.config.perusteStore.perusteId.value,
+          suoritustapakoodi,
+          tekstikappaleIsa.id,
+          {
+            perusteenOsa: {
+              nimi: otsikko,
+              osanTyyppi: 'tekstikappale',
+            } as any,
+          }));
+
+        return tallennettu.data;
+      }
+    }
   }
 }
