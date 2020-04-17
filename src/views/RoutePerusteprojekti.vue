@@ -136,6 +136,14 @@
                 </router-link>
               </div>
             </template>
+
+            <template v-slot:new>
+              <ep-tekstikappale-lisays @save="tallennaUusiTekstikappale" :tekstikappaleet="tekstikappaleet" :paatasovalinta="true">
+                <template v-slot:default="{tekstikappale}">
+                  {{$kaanna(tekstikappale.label)}}
+                </template>
+              </ep-tekstikappale-lisays>
+            </template>
           </EpTreeNavibar>
         </div>
       </template>
@@ -171,6 +179,9 @@ import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavib
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
 import * as _ from 'lodash';
+import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
+import { NavigationNodeDtoTypeEnum, Sisallot } from '@shared/api/eperusteet';
+import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -196,6 +207,7 @@ interface ValidationStats {
     EpSpinner,
     EpTreeNavibar,
     EpProgressPopover,
+    EpTekstikappaleLisays,
   },
 })
 export default class RoutePerusteprojekti extends PerusteprojektiRoute {
@@ -230,6 +242,28 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get peruste() {
     return this.perusteStore.peruste.value;
+  }
+
+  get tekstikappaleet() {
+    if (this.navigation) {
+      return _.chain(this.navigation.children)
+        .filter(child => child.type === NavigationNodeDtoTypeEnum.Viite)
+        .map(child => this.flatten(child))
+        .flatMap()
+        .value();
+    }
+
+    return [];
+  }
+
+  flatten(parent) {
+    if (!_.isEmpty(parent.children)) {
+      return _.flatMap([
+        parent,
+        ..._.map(parent.children, child => this.flatten(child)),
+      ]);
+    }
+    return [parent];
   }
 
   get yleisnakymaRoute() {
@@ -285,6 +319,20 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
         .value();
     }
   }
+
+  async tallennaUusiTekstikappale(otsikko, tekstikappaleIsa) {
+    const tkstore = new TekstikappaleStore(this.peruste!.id!, 0);
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+
+    this.perusteStore.updateNavigation();
+
+    this.$router.push({
+      name: this.tekstikappaleRoute,
+      params: {
+        tekstiKappaleId: '' + tallennettu!.id,
+      },
+    });
+  }
 }
 </script>
 
@@ -327,6 +375,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       font-weight: 600;
     }
   }
+}
+
+::v-deep .ep-button .btn{
+  font-size: 0.8rem;
 }
 
 .bottom-menu-item {
