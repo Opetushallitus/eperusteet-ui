@@ -81,7 +81,14 @@ export class ArviointiStore {
   public async add(value: GeneerinenArviointiasteikkoDto) {
     try {
       const res = await GeneerinenArviointiasteikko.addGeneerinenArviointiasteikko(value);
+      res.data.osaamistasonKriteerit = _.map(res.data.osaamistasonKriteerit, osaamiskriteeri => {
+        return {
+          ...osaamiskriteeri,
+          kriteerit: [{}],
+        };
+      });
       this.state.geneeriset = [...(this.state.geneeriset || []), res.data];
+      return res.data;
       // Vue.$success(Vue.$t('geneerinen-arviointiasteikko-luotu'));
     }
     catch (err) {
