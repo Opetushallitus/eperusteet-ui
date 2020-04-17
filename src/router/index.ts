@@ -27,7 +27,6 @@ import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
 import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
-import RouteOpasYleisnakyma from '@/views/RouteOpasYleisnakyma.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
