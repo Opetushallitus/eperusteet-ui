@@ -373,7 +373,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 }
 
-::v-deep .ep-button .btn{
+.navigation ::v-deep .ep-button .btn{
   font-size: 0.8rem;
 }
 
