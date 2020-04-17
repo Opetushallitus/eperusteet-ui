@@ -1,7 +1,7 @@
 <template>
-<EpHomeTile icon="muistikirja" :route="{ name: 'geneerinen' }">
+<EpHomeTile icon="pylvas-asteikko" :route="{ name: 'geneerinen' }">
   <template slot="header">
-    <span>{{ $t('arviointiasteikot') }}</span>
+    <span>{{ $t('arviointi') }}</span>
   </template>
   <template slot="content">
     <p>{{ $t('tile-arviointiasteikot-kuvaus') }}</p>
