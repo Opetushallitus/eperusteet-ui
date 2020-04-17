@@ -69,7 +69,6 @@ export default class RouteRoot extends Vue {
   }
 
   async mounted() {
-    console.log(this.$refs.header);
     await Kayttajat.init();
   }
 }
