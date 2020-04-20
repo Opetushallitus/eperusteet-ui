@@ -1,11 +1,10 @@
 <template>
-  <div>
+  <div class="mt-5">
+    <h2>{{ $t('arviointiasteikot') }}</h2>
     <div class="asteikko mt-4" v-for="(asteikko, idx) in arviointiasteikot" :key="idx">
       <span class="text-nowrap">
-        <span v-for="(taso, idx) in asteikko.osaamistasot" :key="'taso-' + taso.id">
-          <span v-if="idx !== 0" class="text-muted">/</span>
-          {{ $kaanna(taso.otsikko) }}
-        </span>
+        <h3>{{$t('arviointiasteikko') + ' ' + (idx+1)}}</h3>
+        <ep-julki-lista :tiedot="asteikko.osaamistasot" :tietoMaara="10"/>
       </span>
     </div>
   </div>
@@ -15,12 +14,14 @@
 import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 
 @Component({
   components: {
     EpMainView,
     EpIcon,
+    EpJulkiLista,
   },
 })
 export default class RouteArviointiasteikot extends Vue {

@@ -1,15 +1,5 @@
 <template>
   <div class="mt-5">
-    <div class="rajaimet">
-      <div class="d-flex justify-content-between">
-        <div>
-          <ep-search v-model="query" />
-        </div>
-        <div>
-          <ep-button variant="link" @click="toggle()">{{ $t(allClosed ? 'avaa-kaikki' : 'sulje-kaikki') }}</ep-button>
-        </div>
-      </div>
-    </div>
 
     <div class="mt-5 mb-5">
       <div>
@@ -29,13 +19,16 @@
           <h2 class="m-0">{{ $t('keskeneraiset-arvioinnit') }}</h2>
         </div>
         <div>
-          <arviointi-selector @input="addGeneerinen" :arviointi-store="arviointiStore"> </arviointi-selector>
+          <arviointi-selector @input="addGeneerinen" :arviointi-store="arviointiStore">
+            <template v-slot:valinta>{{$t('luo-uusi-arviointi')}}</template>
+          </arviointi-selector>
         </div>
       </div>
       <div class="arviointi-wrapper" v-for="(geneerinen, idx) in keskeneraiset" :key="idx + '-keskeneraiset'">
         <GeneerinenArviointi
-        :value="geneerinen"
-          :arviointi-store="arviointiStore">
+          :value="geneerinen"
+          :arviointi-store="arviointiStore"
+          :editing="geneerinen.editing">
         </GeneerinenArviointi>
       </div>
     </div>
@@ -97,13 +90,21 @@ export default class RouteGeneerinenArviointi extends Vue {
   }
 
   get keskeneraiset() {
-    return _.reject(this.geneeriset, 'julkaistu');
+    return _.chain(this.geneeriset)
+      .reject('julkaistu')
+      .map(geneerinen => {
+        return {
+          ...geneerinen,
+          editing: _.isEqual(geneerinen, this.muokattava),
+        };
+      })
+      .value();
   }
 
   async addGeneerinen(arviointiAsteikko: number) {
-    await this.arviointiStore.add({
+    this.muokattava = await this.arviointiStore.add({
       _arviointiAsteikko: arviointiAsteikko,
-    } as any);
+    } as any) as any;
   }
 
   toggle(value?: GeneerinenArviointiasteikkoDto) {

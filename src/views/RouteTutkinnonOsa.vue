@@ -125,7 +125,6 @@ import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import _ from 'lodash';
 
-
 interface YhdistettyOsaamistaso {
   otsikko?: LokalisoituTekstiDto;
   kriteerit?: any[];

@@ -71,11 +71,14 @@ export default class Home extends Vue {
   min-height: 100vh;
 
   .header {
+    color: white;
     background-color: $etusivu-header-background;
     background-image: url('../../public/img/banners/header.svg');
     background-position: 100% 0;
     background-repeat: no-repeat;
-    color: white;
+    @media only screen and (min-width: 2503px)  {
+      background-size: 100%;
+    }
 
     h1 {
       font-weight: 300;

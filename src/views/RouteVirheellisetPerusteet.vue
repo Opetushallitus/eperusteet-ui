@@ -24,7 +24,6 @@
       <ep-spinner v-else />
     </b-container>
 
-
   </EpMainView>
 </template>
 

@@ -14,7 +14,7 @@ export class PerusteetStore implements IProjektiProvider {
   ) {
   }
 
-  private state = reactive({
+  public state = reactive({
     ownProjects: null as PerusteprojektiListausDto[] | null,
     projects: null as Page<PerusteprojektiKevytDto> | null,
     perusteQuery: {} as PerusteQuery,
@@ -47,5 +47,4 @@ export class PerusteetStore implements IProjektiProvider {
     });
     this.state.projects = res.data as any;
   }
-
 }

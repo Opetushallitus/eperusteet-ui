@@ -79,3 +79,242 @@ export function getMockGeneeriset() {
     } as any],
   };
 }
+
+export function mockPerusteet() {
+  return {
+    'data': [
+      {
+        'id': 9960,
+        'globalVersion': {
+          'aikaleima': 1579608259200,
+        },
+        'nimi': {
+          '_tunniste': '9a6652b7-8b3a-4b25-ad16-fb47a62d3395',
+          'fi': 'hevosia',
+          'sv': 'hevosia',
+          '_id': '9915',
+        },
+        'koulutustyyppi': 'koulutustyyppi_1',
+        'toteutus': 'ammatillinen',
+        'koulutukset': [],
+        'kielet': [
+          'sv',
+          'fi',
+        ],
+        'kuvaus': null,
+        'maarayskirje': {
+          'id': 10020,
+          'url': {},
+          'liitteet': {},
+        },
+        'muutosmaaraykset': [],
+        'diaarinumero': null,
+        'voimassaoloAlkaa': null,
+        'siirtymaPaattyy': null,
+        'voimassaoloLoppuu': null,
+        'paatospvm': null,
+        'luotu': 1579608176289,
+        'muokattu': 1579608262842,
+        'tila': 'valmis',
+        'tyyppi': 'pohja',
+        'koulutusvienti': false,
+        'korvattavatDiaarinumerot': [],
+        'osaamisalat': [],
+        'tyotehtavatJoissaVoiToimia': null,
+        'suorittaneenOsaaminen': null,
+        'perusteenAikataulut': [],
+        'suoritustavat': [
+          {
+            'suoritustapakoodi': 'reformi',
+            'laajuusYksikko': 'OSAAMISPISTE',
+          },
+        ],
+        'kvliite': {
+          'id': 9990,
+          'suorittaneenOsaaminen': null,
+          'tyotehtavatJoissaVoiToimia': null,
+          'tutkintotodistuksenAntaja': null,
+          '_arvosanaAsteikko': null,
+          'jatkoopintoKelpoisuus': null,
+          'kansainvalisetSopimukset': null,
+          'saadosPerusta': null,
+          'pohjakoulutusvaatimukset': null,
+          'lisatietoja': null,
+          'tutkintotodistuksenSaaminen': null,
+          'tutkinnostaPaattavaViranomainen': null,
+        },
+        'perusteprojekti': {
+          'id': 9980,
+          'nimi': 'hevosia',
+          '_peruste': '9960',
+          'diaarinumero': null,
+          'paatosPvm': null,
+          'toimikausiAlku': null,
+          'toimikausiLoppu': null,
+          'tehtavaluokka': null,
+          'tehtava': null,
+          'yhteistyotaho': null,
+          'tila': 'valmis',
+          'ryhmaOid': '1.2.246.562.28.34270220873',
+          'esikatseltavissa': false,
+          'tavoitepaivamaarat': [],
+        },
+      } as any,
+    ],
+    'sivukoko': 100,
+    'sivu': 0,
+    'sivuja': 1,
+    'kokonaismäärä': 1,
+  };
+}
+
+export function mockPohjaPerusteet() {
+  return {
+    'data': [
+      {
+        'id': 9980,
+        'nimi': 'hevosia',
+        'tila': 'valmis',
+        'perusteendiaarinumero': '123/1234',
+        'diaarinumero': '123/1234',
+        'koulutustyyppi': 'koulutustyyppi_1',
+        'toteutus': 'ammatillinen',
+        'tyyppi': 'pohja',
+        'suoritustavat': [
+          'reformi',
+        ],
+        'luotu': 1579608176592,
+        'globalVersion': {
+          'aikaleima': 1579608259200,
+        },
+        'peruste': {
+          'id': 9960,
+          'globalVersion': {
+            'aikaleima': 1579608259200,
+          },
+          'nimi': {
+            '_tunniste': '9a6652b7-8b3a-4b25-ad16-fb47a62d3395',
+            'fi': 'hevosia',
+            'sv': 'hevosia',
+            '_id': '9915',
+          },
+          'koulutustyyppi': 'koulutustyyppi_1',
+          'toteutus': 'ammatillinen',
+          'koulutukset': [],
+          'kielet': [
+            'sv',
+            'fi',
+          ],
+          'kuvaus': null,
+          'maarayskirje': {
+            'id': 10020,
+            'url': {},
+            'liitteet': {},
+          },
+          'muutosmaaraykset': [],
+          'diaarinumero': null,
+          'voimassaoloAlkaa': null,
+          'siirtymaPaattyy': null,
+          'voimassaoloLoppuu': null,
+          'paatospvm': null,
+          'luotu': 1579608176289,
+          'muokattu': 1579608262842,
+          'tila': 'valmis',
+          'tyyppi': 'pohja',
+          'koulutusvienti': false,
+          'korvattavatDiaarinumerot': [],
+          'osaamisalat': [],
+          'tyotehtavatJoissaVoiToimia': null,
+          'suorittaneenOsaaminen': null,
+          'suoritustavat': [
+            {
+              'suoritustapakoodi': 'reformi',
+              'laajuusYksikko': 'OSAAMISPISTE',
+            },
+          ],
+          'kvliite': {
+            'id': 9990,
+            'suorittaneenOsaaminen': null,
+            'tyotehtavatJoissaVoiToimia': null,
+            'tutkintotodistuksenAntaja': null,
+            '_arvosanaAsteikko': null,
+            'jatkoopintoKelpoisuus': null,
+            'kansainvalisetSopimukset': null,
+            'saadosPerusta': null,
+            'pohjakoulutusvaatimukset': null,
+            'lisatietoja': null,
+            'tutkintotodistuksenSaaminen': null,
+            'tutkinnostaPaattavaViranomainen': null,
+          },
+        },
+      } as any,
+    ],
+    'sivukoko': 20,
+    'sivu': 0,
+    'sivuja': 1,
+    'kokonaismäärä': 5,
+  };
+}
+
+export function mockTyoryhmat() {
+  return [
+    {
+      'nimi': {
+        'fi': 'ePerusteet_johtamisen ja yritysjohtamisen eat',
+      },
+      'oid': '1.2.246.562.28.17660042445',
+      'parentOid': '1.2.246.562.10.00000000001',
+      'kuvaus2': {
+        'kieli_fi#1': 'ePerusteet_johtamisen ja yritysjohtamisen eat',
+      },
+      'tyypit': [
+        'Ryhma',
+      ],
+      'yhteystietoArvos': [],
+      'yhteystiedot': [],
+      'nimet': [],
+      'postiosoite': {},
+      'ryhmatyypit': [
+        'perustetyoryhma',
+      ],
+      'kayttoryhmat': [
+        'perusteiden_laadinta',
+      ],
+      'vuosiluokat': [],
+      'parentOidPath': '|1.2.246.562.10.00000000001|',
+      'toimipistekoodi': '',
+      'kieletUris': [],
+      'kayntiosoite': {},
+      'version': 0,
+      'status': 'AKTIIVINEN',
+    },
+    {
+      'nimi': {
+        'fi': 'ePerusteet Rakennusalan työmaajohdon eat, perusteryhmä',
+      },
+      'oid': '1.2.246.562.28.17899043958',
+      'parentOid': '1.2.246.562.10.00000000001',
+      'kuvaus2': {},
+      'tyypit': [
+        'Ryhma',
+      ],
+      'yhteystietoArvos': [],
+      'yhteystiedot': [],
+      'nimet': [],
+      'postiosoite': {},
+      'ryhmatyypit': [
+        'perustetyoryhma',
+      ],
+      'kayttoryhmat': [
+        'perusteiden_laadinta',
+      ],
+      'vuosiluokat': [],
+      'parentOidPath': '|1.2.246.562.10.00000000001|',
+      'toimipistekoodi': '',
+      'kieletUris': [],
+      'kayntiosoite': {},
+      'version': 0,
+      'status': 'AKTIIVINEN',
+    },
+  ];
+}

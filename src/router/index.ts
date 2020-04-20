@@ -19,6 +19,7 @@ import RouteTekstikappale from '@/views/RouteTekstikappale.vue';
 import RouteTermisto from '@/views/RouteTermisto.vue';
 import RouteProjektiTiedot from '@/views/RouteProjektiTiedot.vue';
 import RoutePerusteenTiedot from '@/views/RoutePerusteenTiedot.vue';
+import RouteKvliite from '@/views/RouteKvliite.vue';
 import RouteTiedotteet from '@/views/RouteTiedotteet.vue';
 import RouteTutkinnonOsa from '@/views/RouteTutkinnonOsa.vue';
 import RouteTutkinnonOsanOsaAlue from '@/views/RouteTutkinnonOsanOsaAlue.vue';
@@ -26,7 +27,6 @@ import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
 import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
-import RouteOpasYleisnakyma from '@/views/RouteOpasYleisnakyma.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -154,6 +154,11 @@ const router = new VueRouter({
         component: RoutePerusteenTiedot,
         props: { ...stores },
       }, {
+        path: 'kvliite',
+        name: 'kvliite',
+        component: RouteKvliite,
+        props: { ...stores },
+      }, {
         path: 'projekti',
         name: 'projektinTiedot',
         component: RouteProjektiTiedot,
@@ -197,7 +202,12 @@ const router = new VueRouter({
         component: RouteTekstikappale,
         props: {
           ...stores,
-          tyyppi: 'opas',
+          koodistoryhmat: [
+            {
+              ryhma: 'ammatillinen-koulutus',
+              koodistot: ['tutkinnonosat', 'osaamisala'],
+            },
+          ],
         },
       },
       ],

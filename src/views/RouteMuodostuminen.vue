@@ -121,7 +121,7 @@
                             {{ $kaanna(ryhma.nimi) }}
                           </div>
                           <div class="flex-shrink paaryhma-label pl-2">
-                            <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
+                            <ep-button @click="notImplemented" variant="link" icon="roskalaatikko"></ep-button>
                           </div>
                         </div>
                       </draggable>
@@ -143,7 +143,7 @@
                             {{ $kaanna(ryhma.nimi) }}
                           </div>
                           <div class="flex-shrink paaryhma-label pl-2">
-                            <ep-button @click="notImplemented" variant="link" icon="roskakori"></ep-button>
+                            <ep-button @click="notImplemented" variant="link" icon="roskalaatikko"></ep-button>
                           </div>
                         </div>
                       </draggable>

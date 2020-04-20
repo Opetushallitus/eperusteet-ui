@@ -6,7 +6,7 @@
     <div class="d-flex flex-wrap">
 
       <ep-perustieto-data icon="info" :topic="$t('projektin-kuvaus')" class="w-100">
-        {{projektinKuvaus}}
+        <ep-input type="localized" :value="projektinKuvaus" />
       </ep-perustieto-data>
 
       <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" class="w-60" v-if="virkailijat">
@@ -38,6 +38,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
 import EpPerustietoData from './EpPerustietoData.vue';
 import { Kielet } from '@shared/stores/kieli';
 import { PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
@@ -49,6 +50,7 @@ import { parsiEsitysnimi } from '../../../eperusteet-frontend-utils/vue/src/util
     EpSpinner,
     EpButton,
     EpPerustietoData,
+    EpInput,
   },
 })
 export default class EpPerustePerustiedot extends Vue {
@@ -71,7 +73,7 @@ export default class EpPerustePerustiedot extends Vue {
   }
 
   get yhteyshenkilo() {
-    return '';
+    return this.projekti.yhteistyotaho;
   }
 
   get julkaisukielet() {

@@ -3,7 +3,6 @@ import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composit
 import { Perusteprojektit } from '@shared/api/eperusteet';
 import { required } from 'vuelidate/lib/validators';
 
-
 export class PerusteprojektiEditStore implements IEditoitava {
   constructor(private projektiId: number) {
   }

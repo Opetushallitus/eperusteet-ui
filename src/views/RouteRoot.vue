@@ -69,19 +69,24 @@ export default class RouteRoot extends Vue {
   }
 
   async mounted() {
-    console.log(this.$refs.header);
     await Kayttajat.init();
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/_variables.scss';
+
 .home-container {
   .header {
-    background-image: url('../../public/img/banners/header.svg');
     color: white;
+    background-color: $etusivu-header-background;
+    background-image: url('../../public/img/banners/header.svg');
     background-position: 100% 0;
     background-repeat: no-repeat;
+    @media only screen and (min-width: 2503px)  {
+      background-size: 100%;
+    }
   }
 }
 
