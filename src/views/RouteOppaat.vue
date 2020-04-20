@@ -2,9 +2,18 @@
   <EpMainView>
     <EpPerusteprojektiListaus :provider="perusteOppaatStore"
                               :edit-route="'opas'"
-                              :new-route="{ name: 'opasLuonti' }">
-      <h2 slot="upperheader">{{ $t('oppaat') }}</h2>
-      <h2 slot="lowerheader">{{ $t('kaikki-oppaat') }}</h2>
+                              :new-route="{ name: 'opasLuonti' }"
+                              :show-cards="false"
+                              :fieldKeys="['nimi','koulutustyyppi','tila','luotu', 'globalVersion.aikaleima']"
+                              :filters="['koulutustyyppi', 'peruste', 'tila']">
+      <template v-slot:lowerheader>
+        <div class="d-flex">
+          <h2 class="pt-2 flex-grow-1">{{ $t('oppaat') }}</h2>
+          <router-link :to="{ name: 'opasLuonti' }">
+            <ep-button class="m-0 p-0" variant="outline" icon="plus">{{$t('lisaa-opas')}}</ep-button>
+          </router-link>
+        </div>
+      </template>
       <template slot="nimiotsikko">
         {{$t('oppaan-nimi')}}
       </template>
@@ -42,12 +51,14 @@ import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import * as _ from 'lodash';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import { Kielet } from '@shared/stores/kieli';
 import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
+import { Perusteet, PerusteHakuInternalDto } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -56,6 +67,7 @@ import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
     EpPerusteprojektiListaus,
     EpColorIndicator,
     EpJulkiLista,
+    EpButton,
   },
 })
 export default class RouteOppaat extends Vue {
