@@ -142,7 +142,7 @@
               <ep-spinner v-if="!liitteet" />
               <div v-else>
                 <b-table :items="liitteet"
-                         :fields="liitetableFields" 
+                         :fields="liitetableFields"
                          responsive
                          borderless
                          striped
@@ -171,7 +171,7 @@
                     </b-input-group>
                   </b-form-group>
                 </div>
-                
+
               </div>
             </b-form-group>
           </b-col>
@@ -255,7 +255,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { Liitetiedostot } from '@shared/api/eperusteet';
+import { Liitetiedostot, Koodisto } from '@shared/api/eperusteet';
 import { SallitutKoulutustyyppisiirtymat, LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
@@ -264,7 +264,7 @@ import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import { Koodisto } from '@shared/api/eperusteet';
+
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { UiKielet } from '@shared/stores/kieli';
 import _ from 'lodash';
@@ -384,7 +384,6 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
 
   async poistaLiite(item: any) {
   }
-
 }
 
 </script>

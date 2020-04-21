@@ -332,7 +332,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   }
 
   get ownProjects() {
-    if (this.$isAdmin.value) {
+    if (this.$isAdmin?.value) {
       return [];
     }
     return this.provider.ownProjects.value;

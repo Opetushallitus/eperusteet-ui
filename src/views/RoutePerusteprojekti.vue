@@ -82,7 +82,7 @@
       </div>
     </Portal>
 
-    <EpSidebar v-if="navigation">
+    <EpSidebar v-if="navigation" :show-social="false">
       <template v-slot:bar>
         <div class="m-3">
           <EpSearch v-model="query" />

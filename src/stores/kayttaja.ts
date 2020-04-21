@@ -54,7 +54,6 @@ export class KayttajaStore implements IOikeusProvider {
   public readonly nimi = computed(() => parsiEsitysnimi(this.state.tiedot));
   public readonly isAdmin = computed(() => _.includes(this.state.tiedot?.oikeudet || [], 'ROLE_EPERUSTEET_ADMIN'));
 
-
   public async init() {
     try {
       logger.info('Haetaan käyttäjän tiedot');
