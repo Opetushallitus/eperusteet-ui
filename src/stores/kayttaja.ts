@@ -52,6 +52,7 @@ export class KayttajaStore implements IOikeusProvider {
   public readonly virkailijat = computed(() => this.state.virkailijat);
   public readonly oikeudet = computed(() => this.state.oikeudet);
   public readonly nimi = computed(() => parsiEsitysnimi(this.state.tiedot));
+  public readonly isAdmin = computed(() => _.includes(this.state.tiedot?.oikeudet || [], 'ROLE_EPERUSTEET_ADMIN'));
 
   public async init() {
     try {
@@ -86,7 +87,7 @@ export class KayttajaStore implements IOikeusProvider {
     }
   }
 
-  public async hasOikeus(oikeus: Oikeus, kohde: OikeusKohde = 'peruste') {
+  public hasOikeus(oikeus: Oikeus, kohde: OikeusKohde = 'peruste') {
     if (!oikeus) {
       return false;
     }

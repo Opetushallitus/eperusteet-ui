@@ -46,6 +46,7 @@ describe('Projektilistaus', () => {
       localVue,
       mocks: {
         $t: x => x,
+        $isAdmin: { value: false },
       },
       stubs: {
         RouterLink: RouterLinkStub,
@@ -92,5 +93,45 @@ describe('Projektilistaus', () => {
         projektiId: 43,
       },
     }]));
+  });
+
+  test('Oma projekti', async () => {
+    const wrapper = mount(EpPerusteprojektiListaus, {
+      propsData: {
+        provider: store,
+        newRoute: { name: 'luonti' },
+        editRoute: 'asia',
+      },
+      localVue,
+      mocks: {
+        $t: x => x,
+        $isAdmin: { value: true },
+      },
+      stubs: {
+        RouterLink: RouterLinkStub,
+      },
+    });
+
+    data.projects = {
+      sivu: 0,
+      sivukoko: 10,
+      sivuja: 1,
+      kokonaismäärä: 1,
+      data: [{
+        id: 42,
+        nimi: 'projekti 42',
+        koulutustyyppi: 'koulutustyyppi_11',
+        tila: 'valmis',
+      }] as any,
+    };
+
+    data.ownProjects = [{
+      id: 43,
+      nimi: 'oma projekti',
+      tila: 'laadinta' as any,
+    }];
+
+    expect(wrapper.html()).toContain('projekti 42');
+    expect(wrapper.html()).not.toContain('oma projekti');
   });
 });

@@ -144,7 +144,7 @@
               <ep-button @click="poistaTavoite(tpvm)" variant="link" icon="roskalaatikko"></ep-button>
             </b-form-group>
           </div>
-          <ep-button variant="link" icon="plus" @click="lisaaTavoite()">
+          <ep-button variant="outline" icon="plus" @click="lisaaTavoite()">
             {{ $t('lisaa-tavoite') }}
           </ep-button>
 

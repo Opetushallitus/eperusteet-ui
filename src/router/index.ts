@@ -174,7 +174,7 @@ const router = new VueRouter({
         component: RoutePerusteenTiedot,
         props: { ...stores },
       }, {
-        path: 'tutkinnonosa/:tutkinnonOsaId',
+        path: 'tutkinnonosat/:tutkinnonOsaId',
         name: 'tutkinnonosa',
         component: RouteTutkinnonOsa,
         props: { ...stores },

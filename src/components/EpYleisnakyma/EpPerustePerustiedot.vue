@@ -9,7 +9,7 @@
         <ep-input type="localized" :value="projektinKuvaus" />
       </ep-perustieto-data>
 
-      <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" class="w-60">
+      <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" class="w-60" v-if="virkailijat">
         <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
           {{ virkailija.esitysnimi }}
         </p>
@@ -96,6 +96,9 @@ export default class EpPerustePerustiedot extends Vue {
           };
         })
         .value();
+    }
+    else {
+      return null;
     }
   }
 }
