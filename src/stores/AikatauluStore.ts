@@ -1,8 +1,8 @@
 import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Tapahtuma, aikataulutapahtuma } from '@shared/utils/aikataulu';
+import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { Tapahtuma } from '@shared/utils/aikataulu';
 import _ from 'lodash';
-import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
+import { PerusteDto, Aikataulut } from '@shared/api/eperusteet';
 
 Vue.use(VueCompositionApi);
 
@@ -13,22 +13,25 @@ export class AikatauluStore {
   })
 
   public readonly aikataulutapahtumat = computed(() => {
-    return [
-      {
-        tapahtuma: aikataulutapahtuma.luominen,
-        tapahtumapaiva: this.state.peruste?.luotu,
-      } as Tapahtuma,
-      this.state.aikataulutapahtumat ? this.state.aikataulutapahtumat : [],
-    ];
+    return _.map(this.state.peruste?.perusteenAikataulut, tapahtuma => {
+      return {
+        id: tapahtuma.id,
+        tapahtuma: tapahtuma.tapahtuma?.toLowerCase().toString(),
+        tapahtumapaiva: tapahtuma.tapahtumapaiva,
+        tavoite: tapahtuma.tavoite,
+      } as Tapahtuma;
+    });
   });
 
   async init(peruste) {
     this.state.peruste = peruste;
-
-    // this.state.aikataulutapahtumat = await aikataulut.haeaikataulut(peruste);
   }
 
   async saveAikataulut(aikataulut) {
-    // save;
+    const tallennetut = await Aikataulut.updatePerusteenAikataulut((this.state.peruste as any).id, aikataulut);
+    this.state.peruste = {
+      ...(this.state.peruste as any),
+      perusteenAikataulut: tallennetut.data,
+    };
   }
 }
