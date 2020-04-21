@@ -42,20 +42,20 @@
           <div class="mb-5 p-2" v-if="peruste && projekti">
             <h1>
               <span>{{ $kaanna(peruste.nimi) || projekti.nimi }}</span>
-              <b-dropdown size="lg" variant="link" toggle-class="text-decoration-none" no-caret>
+              <b-dropdown class="asetukset" size="lg" variant="link" toggle-class="text-decoration-none" no-caret>
                 <template v-slot:button-content>
                   <fas icon="ratas" class="hallinta" />
                 </template>
-                <b-dropdown-item :to="{ name: 'projektinTiedot' }">
-                  <fas icon="info" />
-                  {{ $t('projektin-tiedot') }}
-                </b-dropdown-item>
                 <b-dropdown-item :to="{ name: 'perusteenTiedot' }">
                   <fas icon="info" />
                   {{ $t('perusteen-tiedot') }}
                 </b-dropdown-item>
+                <b-dropdown-item :to="{ name: 'projektinTiedot' }">
+                  <fas icon="info" />
+                  {{ $t('projektin-tiedot') }}
+                </b-dropdown-item>
                 <b-dropdown-item :to="{ name: 'dokumentti' }">
-                  <fas icon="file-pdf" />
+                  <fas :icon="['far','file-pdf']" />
                   {{ $t('luo-pdf') }}
                 </b-dropdown-item>
                 <!-- Ei tarvetta toistaiseksi -->
@@ -64,12 +64,12 @@
                 <!--   {{ $t('kasitteet') }}                      -->
                 <!-- </b-dropdown-item>                           -->
                 <b-dropdown-item :to="{ name: 'poistetut' }">
-                  <fas icon="trash" />
+                  <fas icon="roskalaatikko" />
                   {{ $t('poistetut-sisallot') }}
                 </b-dropdown-item>
                 <b-dropdown-divider />
                 <b-dropdown-item>
-                  <fas icon="folder" />
+                  <fas :icon="['far','folder']" />
                   {{ $t('arkistoi-peruste') }}
                 </b-dropdown-item>
               </b-dropdown>
@@ -342,8 +342,20 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   h1 {
     margin: 0;
     padding: 0;
-    .hallinta {
-      color: white;
+
+    .asetukset {
+      .hallinta {
+        color: white;
+      }
+
+      ::v-deep .dropdown-item {
+        padding-left: 1rem;
+        padding-right: 2rem;
+      }
+
+      svg:not(.hallinta) {
+        width: 25px;
+      }
     }
   }
 
