@@ -55,7 +55,7 @@ export default class EpPerusteAikataulu extends Vue {
 
   async tallenna(aikataulut) {
     await this.aikatauluStore.saveAikataulut(aikataulut);
-    this.$success((this as any).$t('aikataulu-tallennettu'));
+    this.$success(this.$t('aikataulu-tallennettu') as string);
   }
 }
 </script>
