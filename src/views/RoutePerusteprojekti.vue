@@ -46,32 +46,16 @@
                 <template v-slot:button-content>
                   <fas icon="ratas" class="hallinta" />
                 </template>
-                <b-dropdown-item :to="{ name: 'perusteenTiedot' }">
-                  <fas icon="info" />
-                  {{ $t('perusteen-tiedot') }}
-                </b-dropdown-item>
-                <b-dropdown-item :to="{ name: 'projektinTiedot' }">
-                  <fas icon="info" />
-                  {{ $t('projektin-tiedot') }}
-                </b-dropdown-item>
-                <b-dropdown-item :to="{ name: 'dokumentti' }">
-                  <fas :icon="['far','file-pdf']" />
-                  {{ $t('luo-pdf') }}
-                </b-dropdown-item>
-                <!-- Ei tarvetta toistaiseksi -->
-                <!-- <b-dropdown-item :to="{ name: 'termisto' }"> -->
-                <!--   <fas icon="bookmark" />                    -->
-                <!--   {{ $t('kasitteet') }}                      -->
-                <!-- </b-dropdown-item>                           -->
-                <b-dropdown-item :to="{ name: 'poistetut' }">
-                  <fas icon="roskalaatikko" />
-                  {{ $t('poistetut-sisallot') }}
-                </b-dropdown-item>
-                <b-dropdown-divider />
-                <b-dropdown-item>
-                  <fas :icon="['far','folder']" />
-                  {{ $t('arkistoi-peruste') }}
-                </b-dropdown-item>
+
+                <div v-for="(ratasvalinta, index) in ratasvalinnat" :key="'ratasvalinta'+index">
+
+                  <hr v-if="ratasvalinta.separator" class="mt-2 mb-2" />
+
+                  <b-dropdown-item v-else :to="{ name: ratasvalinta.route }">
+                    <fas :icon="ratasvalinta.icon" />
+                    {{ $t(ratasvalinta.text) }}
+                  </b-dropdown-item>
+                </div>
               </b-dropdown>
             </h1>
             <div class="diaarinumero">
@@ -210,6 +194,9 @@ interface ValidationStats {
 export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
+
+  @Prop()
+  ratasvalinnat!: any[];
 
   private naviStore: EpTreeNavibarStore | null = null;
   private loading = false;
