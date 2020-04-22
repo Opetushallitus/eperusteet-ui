@@ -113,7 +113,7 @@
             </b-col>
             <b-col lg="6" v-if="!isEditing">
               <b-form-group :label="$t('oppaan-lataus')">
-                <ep-button variant="primary" icon="file">{{ $t('lataa-opas-json') }}</ep-button>
+                <ep-button variant="primary" @click="lataa">{{ $t('lataa-opas-json') }}</ep-button>
               </b-form-group>
             </b-col>
           </b-row>
@@ -148,6 +148,7 @@ import { EperusteetKoulutustyypit } from '@/utils/perusteet';
 import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms/EpMultiListSelect.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { UiKielet } from '@shared/stores/kieli';
+import { MaintenanceStore } from '@/stores/MaintenanceStore';
 
 @Component({
   components: {
@@ -173,6 +174,7 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   perusteprojektiStore!: PerusteprojektiStore;
 
   private store: EditointiStore | null = null;
+  private maintenanceStore: MaintenanceStore | null = null;
 
   async mounted() {
     await this.perusteprojektiStore.fetchPohjaProjektit();
@@ -180,6 +182,7 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
 
   async onProjektiChange(projektiId: number, perusteId: number) {
     this.store = new EditointiStore(new OpasEditStore(projektiId, perusteId));
+    this.maintenanceStore = new MaintenanceStore(projektiId, perusteId);
   }
 
   get kielet() {
@@ -213,6 +216,10 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
         } as MultiListSelectItem;
       })
       .value();
+  }
+
+  async lataa() {
+    await this.maintenanceStore?.exportPeruste();
   }
 }
 </script>
