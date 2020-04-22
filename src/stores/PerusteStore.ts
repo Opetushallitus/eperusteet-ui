@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
+import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
@@ -29,6 +29,16 @@ export class PerusteStore implements IEditoitava {
   public readonly tutkinnonOsat = computed(() => this.state.perusteId);
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
+  public readonly perusteSuoritustapa = computed(() => {
+    if (this.state.peruste) {
+      if (_.lowerCase((this.state.peruste as PerusteDto).tyyppi) === _.lowerCase(PerusteDtoTyyppiEnum.OPAS)) {
+        return 'opas';
+      }
+      else {
+        return _.head(this.suoritustavat.value);
+      }
+    }
+  });
 
   public async updateValidointi(projektiId: number) {
     const res = await Perusteprojektit.getPerusteprojektiValidointi(projektiId);

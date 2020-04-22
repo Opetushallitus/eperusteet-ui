@@ -28,6 +28,7 @@ import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
+import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -132,7 +133,7 @@ const router = new VueRouter({
             text: 'perusteen-tiedot',
           },
           {
-            route: 'dokumentti',
+            route: 'perusteenPdfLuonti',
             icon: ['far', 'file-pdf'],
             text: 'luo-pdf',
           },
@@ -221,6 +222,11 @@ const router = new VueRouter({
         name: 'tutkinnonosaOsaAlue',
         component: RouteTutkinnonOsanOsaAlue,
         props: { ...stores },
+      }, {
+        path: 'pdfluonti',
+        name: 'perusteenPdfLuonti',
+        component: RoutePdfLuonti,
+        props: { ...stores },
       }],
     }, {
       path: 'opas/:projektiId',
@@ -234,7 +240,7 @@ const router = new VueRouter({
             text: 'oppaan-tiedot',
           },
           {
-            route: 'dokumentti',
+            route: 'oppaanPdfLuonti',
             icon: ['far', 'file-pdf'],
             text: 'luo-pdf',
           },
@@ -284,6 +290,14 @@ const router = new VueRouter({
         name: 'oppaanTiedot',
         component: RouteOppaanTiedot,
         props: { ...stores },
+      }, {
+        path: 'pdfluonti',
+        name: 'oppaanPdfLuonti',
+        component: RoutePdfLuonti,
+        props: {
+          ...stores,
+          selitteenteksti: 'luo-opas-pdf-selite',
+        },
       },
       ],
     },
