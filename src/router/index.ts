@@ -32,6 +32,7 @@ import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
+import { arkistoiPeruste } from '@/utils/arkistointi';
 
 Vue.use(VueRouter);
 
@@ -151,9 +152,14 @@ const router = new VueRouter({
             separator: true,
           },
           {
-            route: 'arkistoi',
             icon: ['far', 'folder'],
             text: 'arkistoi-peruste',
+            click: arkistoiPeruste,
+            meta: {
+              title: 'arkistoi-peruste',
+              confirm: 'arkistoi-peruste-vahvistus',
+              reroute: 'perusteprojektit',
+            },
           },
         ],
       },
@@ -258,9 +264,14 @@ const router = new VueRouter({
             separator: true,
           },
           {
-            route: 'arkistoi',
             icon: ['far', 'folder'],
             text: 'arkistoi-opas',
+            click: arkistoiPeruste,
+            meta: {
+              title: 'arkistoi-opas',
+              confirm: 'arkistoi-opas-vahvistus',
+              reroute: 'oppaat',
+            },
           },
         ],
       },

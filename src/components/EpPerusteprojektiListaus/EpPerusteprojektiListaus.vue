@@ -82,21 +82,6 @@
             </template>
           </EpMultiSelect>
         </div>
-        <div class="m-2 flex-fill" v-if="filtersInclude('tila')">
-          <label>{{ $t('tila') }}</label>
-          <EpMultiSelect v-model="tila"
-                    :enable-empty-option="true"
-                    placeholder="kaikki"
-                    :is-editing="true"
-                    :options="vaihtoehdotTilat">
-            <template slot="singleLabel" slot-scope="{ option }">
-              {{ $t('tila-' + option.toLowerCase()) }}
-            </template>
-            <template slot="option" slot-scope="{ option }">
-              {{ $t('tila-' + option.toLowerCase()) }}
-            </template>
-          </EpMultiSelect>
-        </div>
         <div class="m-2 flex-fill" v-if="filtersInclude('voimassaolo')">
           <label>{{ $t('voimassaolo') }}</label>
           <EpMultiSelect v-model="voimassaolo"
@@ -116,6 +101,17 @@
           <EpSpinner v-if="isLoading" />
         </div>
       </div>
+
+      <div class="d-lg-flex align-items-end">
+        <div class="m-2" v-if="filtersInclude('tila')">
+          <b-form-checkbox-group v-model="tila">
+            <b-form-checkbox v-for="tila in vaihtoehdotTilat" :key="tila" :value="tila">
+              {{ $t('tila-' + tila.toLowerCase()) }}
+            </b-form-checkbox>
+          </b-form-checkbox-group>
+        </div>
+      </div>
+
       <div v-if="items.data.length > 0">
         <b-table striped hover responsive :items="items.data" :fields="fields">
           <template v-slot:head(nimi)>
@@ -201,7 +197,7 @@ export default class EpPerusteprojektiListaus extends Vue {
 
   private koulutustyyppi: string | null = null;
   private peruste: PerusteKevytDto | null = null;
-  private tila: string | null = null;
+  private tila: string[] | null = null;
   private voimassaolo: string | null = null;
   private isLoading = false;
 
@@ -214,7 +210,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     tuleva: true,
     poistunut: false,
     koulutusvienti: true,
-    tila: ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
+    tila: ['LAADINTA', 'JULKAISTU'],
     nimi: '',
     jarjestysOrder: false,
     jarjestysTapa: 'nimi',
@@ -224,6 +220,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   private perusteet: PerusteKevytDto[] = [];
 
   async mounted() {
+    this.tila = ['LAADINTA', 'JULKAISTU'];
     this.provider.updateOwnProjects();
 
     if (this.filtersInclude('peruste')) {
@@ -250,7 +247,7 @@ export default class EpPerusteprojektiListaus extends Vue {
       ...this.query,
       tila: tila
         ? [tila]
-        : ['LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'],
+        : ['LAADINTA', 'JULKAISTU', 'POISTETTU'],
     };
   }
 
@@ -302,7 +299,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   }
 
   get vaihtoehdotTilat() {
-    return ['POISTETTU', 'LAADINTA', 'KOMMENTOINTI', 'VIIMEISTELY', 'VALMIS', 'JULKAISTU'];
+    return ['LAADINTA', 'JULKAISTU', 'POISTETTU'];
   }
 
   get vaihtoehdotVoimassaolo() {
