@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
 import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
+import { isAmmatillinenKoulutustyyppi } from '@shared/utils/perusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 
@@ -22,13 +23,32 @@ export class PerusteStore implements IEditoitava {
 
   public readonly projekti = computed(() => this.state.projekti);
   public readonly peruste = computed(() => this.state.peruste);
-  public readonly navigation = computed(() => this.state.navigation);
   public readonly suoritustavat = computed(() => _.map(this.state.peruste?.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)) as string[]);
   public readonly perusteId = computed(() => this.state.perusteId);
   public readonly projektiId = computed(() => this.state.projekti?.id);
   public readonly tutkinnonOsat = computed(() => this.state.perusteId);
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
+
+  public readonly navigation = computed(() => {
+    if (!this.state.peruste || !this.state.navigation) {
+      return null;
+    }
+
+    if (isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi)) {
+      return {
+        ...this.state.navigation,
+        children: [
+          ...(this.state.navigation.children || []), {
+            type: 'kvliite',
+            children: [],
+          }
+        ],
+      };
+    }
+
+    return this.state.navigation;
+  });
 
   public async updateValidointi(projektiId: number) {
     const res = await Perusteprojektit.getPerusteprojektiValidointi(projektiId);

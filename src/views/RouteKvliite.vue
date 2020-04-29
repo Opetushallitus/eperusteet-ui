@@ -28,7 +28,7 @@
 
         <b-form-group :label="$t('tutkinnon-taso')">
           <ul v-for="(taso, idx) in data.kvliite.tasot" :key="idx">
-            <li v-if="$t(taso.nimi)">{{ $t(taso.nimi) }}</li>
+            <li v-if="$t(taso.nimi)">{{ $kaanna(taso.nimi) }}</li>
           </ul>
         </b-form-group>
 

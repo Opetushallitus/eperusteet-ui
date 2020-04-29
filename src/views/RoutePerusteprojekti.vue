@@ -103,6 +103,13 @@
                 </router-link>
               </div>
             </template>
+            <template v-slot:kvliite="{ item }">
+              <div class="menu-item">
+                <router-link :to="{ name: 'kvliite' }">
+                  {{ $t('kvliite') }}
+                </router-link>
+              </div>
+            </template>
             <template v-slot:tutkinnonosat="{ item }">
               <div class="menu-item">
                 <router-link :to="{ name: 'tutkinnonosat' }">
