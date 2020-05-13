@@ -3,6 +3,7 @@ import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composit
 import { Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
 import { required } from 'vuelidate/lib/validators';
 import * as _ from 'lodash';
+import { Kielet } from '@shared/stores/kieli';
 
 export class OpasEditStore implements IEditoitava {
   constructor(private projektiId: number, private perusteId: number) {
@@ -35,6 +36,7 @@ export class OpasEditStore implements IEditoitava {
   }
 
   async save(data: any) {
+    data.peruste.nimi = { [Kielet.getSisaltoKieli.value]: data.nimi };
     await Perusteet.updatePeruste(this.perusteId, data.peruste);
     await Perusteprojektit.updatePerusteprojekti(this.projektiId, data);
 
