@@ -85,6 +85,7 @@
             <template v-slot:viite="{ item }">
               <div class="menu-item">
                 <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
+                  <span class="text-muted mr-1">{{ item.chapter }}</span>
                   {{ $kaanna(item.label) }}
                 </router-link>
               </div>
@@ -92,20 +93,23 @@
             <template v-slot:tutkinnonosaviite="{ item }">
               <div class="menu-item">
                 <router-link :to="{ name: 'tutkinnonosa', params: { tutkinnonOsaId: item.id } }">
-                  {{ $kaanna(item.label) }}
+                  <span class="text-muted mr-1">{{ item.chapter }}</span>
+                  {{ $kaanna(item.label) || $t('nimeton-tutkinnon-osa') }}
                 </router-link>
               </div>
             </template>
             <template v-slot:liite="{ item }">
               <div class="menu-item">
                 <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
-                  {{ $kaanna(item.label) }}
+                  <span class="text-muted mr-1">{{ item.chapter }}</span>
+                  {{ $kaanna(item.label) || $t('nimeton-tekstikappale') }}
                 </router-link>
               </div>
             </template>
             <template v-slot:kvliite="{ item }">
               <div class="menu-item">
                 <router-link :to="{ name: 'kvliite' }">
+                  <span class="text-muted mr-1">{{ item.chapter }}</span>
                   {{ $t('kvliite') }}
                 </router-link>
               </div>
@@ -113,6 +117,7 @@
             <template v-slot:tutkinnonosat="{ item }">
               <div class="menu-item">
                 <router-link :to="{ name: 'tutkinnonosat' }">
+                  <span class="text-muted mr-1">{{ item.chapter }}</span>
                   {{ $t('tutkinnonosat') }}
                 </router-link>
               </div>
@@ -120,17 +125,21 @@
             <template v-slot:muodostuminen="{ item }">
               <div class="menu-item">
                 <router-link :to="{ name: 'muodostuminen' }">
+                  <span class="text-muted mr-1">{{ item.chapter }}</span>
                   {{ $t('tutkinnon-rakenne') }}
                 </router-link>
               </div>
             </template>
 
             <template v-slot:new>
-              <ep-tekstikappale-lisays @save="tallennaUusiTekstikappale" :tekstikappaleet="tekstikappaleet" :paatasovalinta="true">
-                <template v-slot:default="{tekstikappale}">
-                  {{$kaanna(tekstikappale.label)}}
-                </template>
-              </ep-tekstikappale-lisays>
+              <div class="ml-2">
+                <ep-tekstikappale-lisays @save="tallennaUusiTekstikappale" :tekstikappaleet="tekstikappaleet" :paatasovalinta="true">
+                  <template v-slot:default="{tekstikappale}">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(tekstikappale.label) }}
+                  </template>
+                </ep-tekstikappale-lisays>
+              </div>
             </template>
           </EpTreeNavibar>
         </div>
@@ -168,8 +177,10 @@ import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
 import * as _ from 'lodash';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
+import { NavigationNodeDto } from '@shared/tyypit';
 import { NavigationNodeDtoTypeEnum, Sisallot } from '@shared/api/eperusteet';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
+import { Location } from 'vue-router';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -184,6 +195,45 @@ interface ValidationStats {
   categories: ValidationCategory[];
   ok: number;
   total: number;
+}
+
+function routeToNode(route: Location): NavigationNodeDto | null {
+  if (!route) {
+    return null;
+  }
+
+  if (route.name === 'tekstikappale') {
+    return {
+      type: 'viite',
+      id: Number(route.params?.tekstiKappaleId!),
+    };
+  }
+  else if (route.name === 'muodostuminen') {
+    return {
+      type: 'muodostuminen',
+    };
+  }
+  else if (route.name === 'tutkinnonosa') {
+    return {
+      type: 'tutkinnonosaviite',
+      id: Number(route.params?.tutkinnonOsaId!),
+    };
+  }
+  else if (route.name === 'kvliite') {
+    return {
+      type: 'kvliite',
+    };
+  }
+  else if (route.name === 'tutkinnonosat') {
+    return {
+      type: 'tutkinnonosat',
+    };
+  }
+  else {
+    console.error('Unknown route', route.name, route);
+  }
+
+  return null;
 }
 
 @Component({
@@ -209,7 +259,9 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   private loading = false;
 
   async onProjektiChange(projektiId: number) {
-    this.naviStore = new EpTreeNavibarStore(this.perusteStore.navigation);
+    this.naviStore = new EpTreeNavibarStore(
+      this.perusteStore.navigation,
+      routeToNode);
   }
 
   get query() {
@@ -364,23 +416,26 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 }
 
 .heading {
-  margin-left: 22px;
+  margin-left: 28px;
+  margin-right: 28px;
+  border-bottom: 1px solid rgb(216, 216, 216);
 }
 
 .menu-item {
-  font-size: 0.8rem;
+  font-size: 14px;
+  padding: 7px 10px 7px 10px;
 
   a {
     color: #000;
 
-    &.router-link-active {
+    &.router-link-exact-active {
       font-weight: 600;
     }
   }
 }
 
-.navigation ::v-deep .ep-button .btn{
-  font-size: 0.8rem;
+.navigation ::v-deep .ep-button .btn {
+  font-size: 14px;
 }
 
 .bottom-menu-item {

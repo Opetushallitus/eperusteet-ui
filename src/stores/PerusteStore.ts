@@ -8,6 +8,7 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 
 Vue.use(VueCompositionApi);
 
+
 export class PerusteStore implements IEditoitava {
   private blocklist = [] as (() => void)[];
 
@@ -29,6 +30,7 @@ export class PerusteStore implements IEditoitava {
   public readonly tutkinnonOsat = computed(() => this.state.perusteId);
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
+  public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
 
   public readonly navigation = computed(() => {
     if (!this.state.peruste || !this.state.navigation) {
@@ -79,6 +81,9 @@ export class PerusteStore implements IEditoitava {
       ]), 'data');
       this.updateValidointi(this.state.projekti.id!);
       this.state.isInitialized = true;
+    }
+    catch (err) {
+      console.error(err);
     }
     finally {
       this.state.initializing = false;

@@ -92,7 +92,7 @@
           </ep-collapse>
 
           <ep-collapse tyyppi="ammattitaidon-osoittamistavat" :border-bottom="false" :border-top="true">
-            <h4 slot="header">{{ $t('ammattitaidonOsoittamistavat') }}</h4>
+            <h3 slot="header">{{ $t('ammattitaidonOsoittamistavat') }}</h3>
             <b-form-group>
               <ep-content v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
                           :validation="validation"
@@ -229,11 +229,11 @@ export default class RouteTutkinnonosa extends Vue {
     this.arviointiStore.fetchArviointiasteikot();
     this.arviointiStore.fetchGeneeriset();
     await this.perusteStore.blockUntilInitialized();
-    const tkstore = new TutkinnonOsaEditStore(
+    const store = new TutkinnonOsaEditStore(
       this.perusteId!,
       id ? Number(id!)
         : undefined);
-    this.store = new EditointiStore(tkstore);
+    this.store = new EditointiStore(store);
   }
 }
 </script>

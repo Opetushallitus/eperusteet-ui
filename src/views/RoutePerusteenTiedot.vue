@@ -540,7 +540,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
     this.store!.setData({
       ...data,
       korvattavatDiaarinumerot: [
-        ...data.korvattavatDiaarinumerot || [],
+        ...data?.korvattavatDiaarinumerot || [],
         this.korvattavaDiaarinumero,
       ],
     });
@@ -551,7 +551,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
     const data = this.store?.data?.value;
     this.store!.setData({
       ...data,
-      korvattavatDiaarinumerot: _.reject(data.korvattavatDiaarinumerot, x => x === diaarinumero),
+      korvattavatDiaarinumerot: _.reject(data?.korvattavatDiaarinumerot, x => x === diaarinumero),
     });
   }
 

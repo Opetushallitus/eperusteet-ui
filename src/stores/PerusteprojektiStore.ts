@@ -6,7 +6,6 @@ import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { Debounced } from '@shared/utils/delay';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import _ from 'lodash';
-import { PerusteprojektiImportDto } from '@shared/generated/eperusteet';
 
 Vue.use(VueCompositionApi);
 
@@ -43,14 +42,12 @@ export class PerusteprojektiStore {
     this.state.perusteet = res.data as any;
   }
 
-  @Debounced(300)
   public async addPerusteprojekti(luontiDto: PerusteprojektiLuontiDto) {
     const res = await Perusteprojektit.addPerusteprojekti(luontiDto);
     return res.data;
   }
 
-  @Debounced(300)
-  public async importPerusteprojekti(importDto: PerusteprojektiImportDto) {
+  public async importPerusteprojekti(importDto: any) {
     const res = await Maintenance.tuoPeruste(importDto);
     return res.data;
   }
