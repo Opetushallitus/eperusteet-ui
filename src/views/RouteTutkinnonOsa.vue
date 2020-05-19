@@ -1,6 +1,7 @@
 <template>
-  <div v-if="store">
-    <EpEditointi :store="store">
+  <div>
+    <div v-if="store">
+      <EpEditointi :store="store">
       <template v-slot:header="{ data }">
         <h2 class="m-0">
           <span>
@@ -15,10 +16,10 @@
       <template v-slot:default="{ data, isEditing, validation }">
         <div class="mt-1" v-if="isEditing && isNew">
           <b-form-group :label="$t('tyyppi')">
-            <b-form-radio v-model="data.tyyppi" name="tyyppi" value="normaali">
+            <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="normaali">
               {{ $t('tutkintokohtainen') }}
             </b-form-radio>
-            <b-form-radio v-model="data.tyyppi" name="tyyppi" value="reformi-tutke2">
+            <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="reformi_tutke2">
               {{ $t('yhteinen') }}
             </b-form-radio>
           </b-form-group>
@@ -40,12 +41,11 @@
           </b-col>
         </b-row>
 
-        <div v-if="data.tyyppi === 'normaali'">
+        <div v-if="data.tutkinnonOsa.tyyppi === 'normaali'">
           <ep-collapse tyyppi="ammattitaitovaatimukset" :border-bottom="false" :border-top="isEditing">
             <h3 slot="header">{{ $t('ammattitaitovaatimukset') }}</h3>
             <b-form-group>
-              <EpAmmattitaitovaatimukset v-if="data.tutkinnonOsa.ammattitaitovaatimukset2019"
-                                         v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
+              <EpAmmattitaitovaatimukset v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
                                          :validation="validation.tutkinnonOsa.ammattitaitovaatimukset2019"
                                          :is-editing="isEditing" />
             </b-form-group>
@@ -89,24 +89,43 @@
                 </tbody>
               </table>
             </b-form-group>
+            <EpAlert :text="$t('arviointia-ei-asetettu')" v-else />
           </ep-collapse>
 
           <ep-collapse tyyppi="ammattitaidon-osoittamistavat" :border-bottom="false" :border-top="true">
             <h3 slot="header">{{ $t('ammattitaidonOsoittamistavat') }}</h3>
             <b-form-group>
               <ep-content v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
-                          :validation="validation"
+                          :validation="validation.tutkinnonOsa.ammattitaidonOsoittamistavat"
                           layout="normal"
                           :is-editable="isEditing"></ep-content>
             </b-form-group>
           </ep-collapse>
+
         </div>
         <div v-else>
+          <ep-collapse tyyppi="kuvaus" :border-bottom="false" :border-top="true">
+            <h3 slot="header">{{ $t('kuvaus') }}</h3>
+            <b-form-group>
+              <ep-content v-model="data.tutkinnonOsa.kuvaus"
+                          :validation="validation.tutkinnonOsa.kuvaus"
+                          layout="normal"
+                          :is-editable="isEditing"></ep-content>
+            </b-form-group>
+          </ep-collapse>
+
+          <ep-collapse tyyppi="osa-alueet" :border-bottom="false" :border-top="true">
+            <h3 slot="header">{{ $t('osa-alueet') }}</h3>
+            <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" icon="plus">
+              {{ $t('lisaa-osa-alue') }}
+            </ep-button>
+          </ep-collapse>
         </div>
       </template>
-    </EpEditointi>
+      </EpEditointi>
+    </div>
+    <EpSpinner v-else />
   </div>
-  <EpSpinner v-else />
 </template>
 
 <script lang="ts">
@@ -117,28 +136,23 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
 import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
+import { YhdistettyGeneerinen } from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
 import { LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import _ from 'lodash';
-
-interface YhdistettyOsaamistaso {
-  otsikko?: LokalisoituTekstiDto;
-  kriteerit?: any[];
-}
-
-interface YhdistettyGeneerinen {
-  nimi?: LokalisoituTekstiDto;
-  kohde?: LokalisoituTekstiDto;
-  osaamistasot?: YhdistettyOsaamistaso[],
-}
+import { Murupolku } from '@shared/stores/murupolku';
 
 @Component({
   components: {
+    EpAlert,
     EpAmmattitaitovaatimukset,
+    EpButton,
     EpCollapse,
     EpContent,
     EpEditointi,
@@ -165,6 +179,15 @@ export default class RouteTutkinnonosa extends Vue {
       return null;
     }
     return this.store.data.value;
+  }
+
+  @Watch('tov')
+  onDataChange(tov) {
+    if (tov && tov.tutkinnonOsa) {
+      Murupolku.aseta('tutkinnonosa', this.$kaanna(tov.tutkinnonOsa.nimi), {
+        name: 'tutkinnonosa',
+      });
+    }
   }
 
   get tutkinnonOsaId() {
@@ -234,6 +257,15 @@ export default class RouteTutkinnonosa extends Vue {
       id ? Number(id!)
         : undefined);
     this.store = new EditointiStore(store);
+  }
+
+  async lisaaOsaAlue(tutkinnonOsa) {
+    this.$router.push({
+      name: 'osaalue',
+      params: {
+        osaalueId: 'uusi',
+      },
+    });
   }
 }
 </script>

@@ -3,8 +3,7 @@
     <Portal to="headerExtension">
       <div class="portal-menu d-flex">
         <div class="upper-left">
-          <ep-progress-popover :slices="progressSlices">
-
+          <ep-progress-popover :slices="progressSlices" :popup-style="popupStyle">
             <template v-slot:header>
               <div class="pt-1 row justify-content-center" v-if="validationStats">
                 <div v-if="validationStats.ok < validationStats.total">
@@ -12,7 +11,7 @@
                 </div>
                 <div v-else-if="validationCategories">
                   <b-button class="px-3 py-1" variant="primary"
-                      :to="{ name: 'perusteprojekti' }">{{ $t('julkaise') }}</b-button>
+                      :to="{ name: 'julkaise' }">{{ $t('julkaise') }}</b-button>
                 </div>
               </div>
             </template>
@@ -20,7 +19,7 @@
             <div v-if="validationStats" class="row justify-content-center">
               <b-button v-if="validationStats.ok < validationStats.total"
                         variant="primary"
-                        :to="{ name: 'perusteprojekti' }">{{ $t('siirry-julkaisunakymaan') }}</b-button>
+                        :to="{ name: 'julkaise' }">{{ $t('siirry-julkaisunakymaan') }}</b-button>
               <div v-if="validationCategories">
                 <div class="pl-3 pt-2 pb-1 row" v-for="c in validationStats.categories" :key="c.category">
                   <div class="col-1">
@@ -58,108 +57,122 @@
                 </div>
               </b-dropdown>
             </h1>
-            <div class="diaarinumero">
-              {{ peruste.diaarinumero }}
+            <div class="diaarinumero" v-if="showNavigation">
+              {{ $t(peruste.koulutustyyppi) }} | {{ peruste.diaarinumero }}
             </div>
           </div>
         </div>
       </div>
     </Portal>
 
-    <EpSidebar v-if="navigation" :show-social="false">
-      <template v-slot:bar>
-        <div class="m-3">
-          <EpSearch v-model="query" />
-        </div>
-        <div class="navigation">
-          <EpTreeNavibar :store="naviStore">
-            <template v-slot:header>
-              <div class="heading">
+    <div class="sidebar-container">
+      <EpSidebar v-if="navigation">
+        <template v-slot:bar>
+          <div class="m-3">
+            <EpSearch v-model="query" />
+          </div>
+          <div class="navigation">
+            <EpTreeNavibar :store="naviStore">
+              <template v-slot:header>
+                <div class="heading">
+                  <div class="menu-item">
+                    <router-link :to="{ name: yleisnakymaRoute }" exact>
+                      {{ $t('yleisnakyma') }}
+                    </router-link>
+                  </div>
+                </div>
+              </template>
+              <template v-slot:viite="{ item }">
                 <div class="menu-item">
-                  <router-link :to="{ name: yleisnakymaRoute }" exact>
-                    {{ $t('yleisnakyma') }}
+                  <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) }}
                   </router-link>
                 </div>
-              </div>
-            </template>
-            <template v-slot:viite="{ item }">
-              <div class="menu-item">
-                <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
-                  <span class="text-muted mr-1">{{ item.chapter }}</span>
-                  {{ $kaanna(item.label) }}
-                </router-link>
-              </div>
-            </template>
-            <template v-slot:tutkinnonosaviite="{ item }">
-              <div class="menu-item">
-                <router-link :to="{ name: 'tutkinnonosa', params: { tutkinnonOsaId: item.id } }">
-                  <span class="text-muted mr-1">{{ item.chapter }}</span>
-                  {{ $kaanna(item.label) || $t('nimeton-tutkinnon-osa') }}
-                </router-link>
-              </div>
-            </template>
-            <template v-slot:liite="{ item }">
-              <div class="menu-item">
-                <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
-                  <span class="text-muted mr-1">{{ item.chapter }}</span>
-                  {{ $kaanna(item.label) || $t('nimeton-tekstikappale') }}
-                </router-link>
-              </div>
-            </template>
-            <template v-slot:kvliite="{ item }">
-              <div class="menu-item">
-                <router-link :to="{ name: 'kvliite' }">
-                  <span class="text-muted mr-1">{{ item.chapter }}</span>
-                  {{ $t('kvliite') }}
-                </router-link>
-              </div>
-            </template>
-            <template v-slot:tutkinnonosat="{ item }">
-              <div class="menu-item">
-                <router-link :to="{ name: 'tutkinnonosat' }">
-                  <span class="text-muted mr-1">{{ item.chapter }}</span>
-                  {{ $t('tutkinnonosat') }}
-                </router-link>
-              </div>
-            </template>
-            <template v-slot:muodostuminen="{ item }">
-              <div class="menu-item">
-                <router-link :to="{ name: 'muodostuminen' }">
-                  <span class="text-muted mr-1">{{ item.chapter }}</span>
-                  {{ $t('tutkinnon-rakenne') }}
-                </router-link>
-              </div>
-            </template>
-
-            <template v-slot:new>
-              <div class="ml-2">
-                <ep-tekstikappale-lisays @save="tallennaUusiTekstikappale" :tekstikappaleet="tekstikappaleet" :paatasovalinta="true">
-                  <template v-slot:default="{tekstikappale}">
+              </template>
+              <template v-slot:tutkinnonosaviite="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'tutkinnonosa', params: { tutkinnonOsaId: item.id } }">
                     <span class="text-muted mr-1">{{ item.chapter }}</span>
-                    {{ $kaanna(tekstikappale.label) }}
-                  </template>
-                </ep-tekstikappale-lisays>
-              </div>
-            </template>
-          </EpTreeNavibar>
-        </div>
-      </template>
+                    {{ $kaanna(item.label) || $t('nimeton-tutkinnon-osa') }}
+                  </router-link>
+                </div>
+              </template>
+              <template v-slot:osaalueet>
+                <div class="menu-item text-muted">
+                  {{ $t('osa-alueet') }}
+                </div>
+              </template>
+              <template v-slot:osaalue="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'osaalue', params: { osaalueId: item.id } }">
+                    {{ $kaanna(item.label) || $t('nimeton') }}
+                  </router-link>
+                </div>
+              </template>
+              <template v-slot:liite="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-tekstikappale') }}
+                  </router-link>
+                </div>
+              </template>
+              <template v-slot:kvliite="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'kvliite' }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $t('kvliite') }}
+                  </router-link>
+                </div>
+              </template>
+              <template v-slot:tutkinnonosat="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'tutkinnonosat' }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $t('tutkinnonosat') }}
+                  </router-link>
+                </div>
+              </template>
+              <template v-slot:muodostuminen="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'muodostuminen' }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $t('tutkinnon-rakenne') }}
+                  </router-link>
+                </div>
+              </template>
 
-      <template v-slot:view>
-        <router-view />
-      </template>
+              <template v-slot:new>
+                <div class="ml-2">
+                  <ep-tekstikappale-lisays @save="tallennaUusiTekstikappale" :tekstikappaleet="tekstikappaleet" :paatasovalinta="true">
+                    <template v-slot:default="{tekstikappale}">
+                      <span class="text-muted mr-1">{{ item.chapter }}</span>
+                      {{ $kaanna(tekstikappale.label) }}
+                    </template>
+                  </ep-tekstikappale-lisays>
+                </div>
+              </template>
+            </EpTreeNavibar>
+          </div>
+        </template>
 
-      <template v-slot:bottom>
-        <div class="menu-item bottom-menu-item">
-          <router-link :to="{ name: 'jarjesta' }">
-            <span class="text-nowrap">
-              <fas icon="jarjesta" fixed-width />
-              {{ $t('muokkaa-rakennetta') }}
-            </span>
-          </router-link>
-        </div>
-      </template>
-    </EpSidebar>
+        <template v-slot:view>
+          <router-view />
+        </template>
+
+        <template v-slot:bottom>
+          <div class="menu-item bottom-menu-item">
+            <router-link :to="{ name: 'jarjesta' }">
+              <span class="text-nowrap">
+                <fas icon="jarjesta" fixed-width />
+                {{ $t('muokkaa-rakennetta') }}
+              </span>
+            </router-link>
+          </div>
+        </template>
+      </EpSidebar>
+    </div>
   </div>
 </template>
 
@@ -213,6 +226,12 @@ function routeToNode(route: Location): NavigationNodeDto | null {
       type: 'muodostuminen',
     };
   }
+  else if (route.name === 'osaalue') {
+    return {
+      type: 'osaalue',
+      id: Number(route.params?.osaalueId!),
+    };
+  }
   else if (route.name === 'tutkinnonosa') {
     return {
       type: 'tutkinnonosaviite',
@@ -261,7 +280,17 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   async onProjektiChange(projektiId: number) {
     this.naviStore = new EpTreeNavibarStore(
       this.perusteStore.navigation,
-      routeToNode);
+      routeToNode, {
+        osaalueet: {
+          disableNesting: true,
+        },
+      });
+  }
+
+  get popupStyle() {
+    return {
+      background: '#1d7599',
+    };
   }
 
   get query() {
@@ -406,8 +435,13 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   .upper-left {
-    min-width: $sidebar-width;
-    max-width: $sidebar-width;
+    @media (max-width: 991.98px) {
+      padding: 10px 30px;
+    }
+    @media (min-width: 992px) {
+      min-width: $sidebar-width;
+      max-width: $sidebar-width;
+    }
   }
 }
 

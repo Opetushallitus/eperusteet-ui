@@ -7,7 +7,6 @@ import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
 
-
 export class TutkinnonOsaStore implements IEditoitava {
   constructor(
     private perusteStore: PerusteStore,
@@ -70,5 +69,4 @@ export class TutkinnonOsaStore implements IEditoitava {
       editable: false,
     }));
   }
-
 }

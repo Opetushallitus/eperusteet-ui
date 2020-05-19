@@ -1,8 +1,7 @@
 <template>
   <div class="home-container minfull">
     <div class="header" ref="header">
-      <EpNavbar />
-        <!-- :class="{ 'animate-in': !isSticky, 'animate-out': isSticky }"> -->
+      <EpNavbar :kayttaja="kayttaja" />
       <PortalTarget ref="innerPortal" name="headerExtension" />
     </div>
     <RouterView />
@@ -12,9 +11,11 @@
 <script lang="ts">
 import { Prop, Watch, Component, Vue } from 'vue-property-decorator';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
-import { Kayttajat } from '@/stores/kayttaja';
+import { Kayttajat, KayttajaStore } from '@/stores/kayttaja';
 import { BrowserStore } from '@shared/stores/BrowserStore';
+
 import Sticky from 'vue-sticky-directive';
+import { PerusteStore } from '@/stores/PerusteStore';
 
 @Component({
   components: {
@@ -27,6 +28,16 @@ import Sticky from 'vue-sticky-directive';
 export default class RouteRoot extends Vue {
   @Prop({ required: true })
   private browserStore!: BrowserStore;
+
+  @Prop({ required: true })
+  private kayttajaStore!: KayttajaStore;
+
+  @Prop({ required: true })
+  private perusteStore!: PerusteStore;
+
+  get kayttaja() {
+    return this.kayttajaStore?.tiedot?.value || null;
+  }
 
   private isSticky = false;
   private height = null as number | null;
@@ -80,13 +91,13 @@ export default class RouteRoot extends Vue {
 .home-container {
   .header {
     color: white;
-    background-color: $etusivu-header-background;
     background-image: url('../../public/img/banners/header.svg');
     background-position: 100% 0;
-    background-repeat: no-repeat;
+    background-repeat: none;
+    background-size: cover;
     @media only screen and (min-width: 2503px)  {
-      background-size: 100%;
     }
+    /* background-size: 100%; */
   }
 }
 

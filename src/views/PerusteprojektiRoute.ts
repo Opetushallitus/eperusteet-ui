@@ -1,11 +1,17 @@
 import { Watch, Prop, Vue } from 'vue-property-decorator';
 import { PerusteStore } from '@/stores/PerusteStore';
 import _ from 'lodash';
+import { BrowserStore } from '@shared/stores/BrowserStore';
 
+const browserStore = new BrowserStore();
 
-export abstract class PerusteprojektiRoute extends Vue {
+export class PerusteprojektiRoute extends Vue {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
+
+  protected get showNavigation() {
+    return browserStore.navigationVisible.value;
+  }
 
   private isInitingProjekti = false;
 
@@ -25,7 +31,8 @@ export abstract class PerusteprojektiRoute extends Vue {
     return this.perusteStore.isAmmatillinen.value;
   }
 
-  protected abstract onProjektiChange(projektiId: number, perusteId: number): Promise<any>;
+  protected async onProjektiChange(projektiId: number, perusteId: number) {
+  }
 
   @Watch('projektiId', { immediate: true })
   async onProjektiChangeImpl(newValue: string, oldValue: string) {

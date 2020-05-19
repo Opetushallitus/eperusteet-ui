@@ -7,7 +7,6 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
-
 Vue.use(VueCompositionApi);
 
 interface JarjestysStoreConfig {
@@ -26,10 +25,13 @@ export class JarjestysStore implements IEditoitava {
   }
 
   public async load() {
-    const data = _.assign(...await Promise.all(_.map(this.stores, async (v, k) => ({
-      [k]: await v.load(),
-    }))));
-    return data;
+    if (!_.isEmpty(this.stores)) {
+      const data = _.assign(...await Promise.all(_.map(this.stores, async (v, k) => ({
+        [k]: await v.load(),
+      })) as any));
+      return data;
+    }
+    return {};
   }
 
   public async save(data) {
@@ -50,4 +52,3 @@ export class JarjestysStore implements IEditoitava {
 
   public readonly validator = computed(() => ({}));
 }
-

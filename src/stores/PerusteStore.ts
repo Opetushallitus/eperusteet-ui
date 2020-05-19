@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
+import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
+import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi } from '@shared/utils/perusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 
 Vue.use(VueCompositionApi);
-
 
 export class PerusteStore implements IEditoitava {
   private blocklist = [] as (() => void)[];
@@ -18,6 +18,7 @@ export class PerusteStore implements IEditoitava {
     navigation: null as NavigationNodeDto | null,
     perusteId: null as number | null,
     isInitialized: false,
+    julkaisut: null,
     initializing: false,
     projektiStatus: null as TilaUpdateStatus | null,
   });
@@ -31,6 +32,7 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
   public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
+  public readonly julkaisut = computed(() => this.state.julkaisut);
 
   public readonly navigation = computed(() => {
     if (!this.state.peruste || !this.state.navigation) {
@@ -44,7 +46,7 @@ export class PerusteStore implements IEditoitava {
           ...(this.state.navigation.children || []), {
             type: 'kvliite',
             children: [],
-          }
+          },
         ],
       };
     }
@@ -52,9 +54,11 @@ export class PerusteStore implements IEditoitava {
     return this.state.navigation;
   });
 
-  public async updateValidointi(projektiId: number) {
-    const res = await Perusteprojektit.getPerusteprojektiValidointi(projektiId);
-    this.state.projektiStatus = res.data;
+  public async updateValidointi() {
+    if (this.state.projekti?.id) {
+      const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
+      this.state.projektiStatus = res.data;
+    }
   }
 
   async init(projektiId: number) {
@@ -72,6 +76,10 @@ export class PerusteStore implements IEditoitava {
       const perusteId = Number((this.state.projekti as any)._peruste);
       this.state.perusteId = perusteId;
 
+      Murupolku.aseta('projekti', this.state.projekti?.nimi, {
+        name: 'perusteprojekti',
+      });
+
       [
         this.state.peruste,
         this.state.navigation,
@@ -79,7 +87,7 @@ export class PerusteStore implements IEditoitava {
         Perusteet.getPerusteenTiedot(perusteId),
         Perusteet.getNavigation(perusteId),
       ]), 'data');
-      this.updateValidointi(this.state.projekti.id!);
+      this.updateValidointi();
       this.state.isInitialized = true;
     }
     catch (err) {
@@ -133,6 +141,15 @@ export class PerusteStore implements IEditoitava {
       }
     }
   });
+
+  async julkaise(tiedote: any) {
+    const res = await Julkaisut.teeJulkaisu(this.state.perusteId, tiedot);
+    this.state.julkaisut = [...this.state.julkaisut, res.data];
+  }
+
+  async fetchJulkaisut() {
+    this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId)).data;
+  }
 
   async acquire() {
     return null;

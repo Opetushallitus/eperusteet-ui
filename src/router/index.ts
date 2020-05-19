@@ -13,6 +13,7 @@ import RoutePerusteprojekti from '@/views/RoutePerusteprojekti.vue';
 import RoutePerusteprojektiLuonti from '@/views/RoutePerusteprojektiLuonti.vue';
 import RoutePerusteprojektit from '@/views/RoutePerusteprojektit.vue';
 import RoutePohjat from '@/views/RoutePohjat.vue';
+import RouteJulkaise from '@/views/RouteJulkaise.vue';
 import RoutePohjatLuonti from '@/views/RoutePohjatLuonti.vue';
 import RouteRoot from '@/views/RouteRoot.vue';
 import RouteTekstikappale from '@/views/RouteTekstikappale.vue';
@@ -22,7 +23,7 @@ import RoutePerusteenTiedot from '@/views/RoutePerusteenTiedot.vue';
 import RouteKvliite from '@/views/RouteKvliite.vue';
 import RouteTiedotteet from '@/views/RouteTiedotteet.vue';
 import RouteTutkinnonOsa from '@/views/RouteTutkinnonOsa.vue';
-import RouteTutkinnonOsanOsaAlue from '@/views/RouteTutkinnonOsanOsaAlue.vue';
+import RouteTutkinnonOsanOsaalue from '@/views/tutkinnonosat/RouteTutkinnonOsanOsaalue.vue';
 import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
 import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
@@ -117,43 +118,38 @@ const router = new VueRouter({
       props: { ...stores },
     }, {
       path: 'perusteprojekti/:projektiId',
+      name: 'projekti',
       component: RoutePerusteprojekti,
       props: {
         ...stores,
-        ratasvalinnat: [
-          {
-            route: 'projektinTiedot',
-            icon: 'info',
-            text: 'projektin-tiedot',
-          },
-          {
-            route: 'perusteenTiedot',
-            icon: 'info',
-            text: 'perusteen-tiedot',
-          },
-          {
-            route: 'dokumentti',
-            icon: ['far', 'file-pdf'],
-            text: 'luo-pdf',
-          },
-          // {
+        ratasvalinnat: [{
+          route: 'projektinTiedot',
+          icon: 'info',
+          text: 'projektin-tiedot',
+        }, {
+          route: 'perusteenTiedot',
+          icon: 'info',
+          text: 'perusteen-tiedot',
+        }, {
+          route: 'dokumentti',
+          icon: ['far', 'file-pdf'],
+          text: 'luo-pdf',
+          // }, {
           //   route: 'termisto',
           //   icon: 'bookmark',
           //   text: 'kasitteet',
           // },
-          {
-            route: 'poistetut',
-            icon: 'roskalaatikko',
-            text: 'poistetut-sisallot',
-          },
-          {
-            separator: true,
-          },
-          {
-            route: 'arkistoi',
-            icon: ['far', 'folder'],
-            text: 'arkistoi-peruste',
-          },
+        }, {
+          route: 'poistetut',
+          icon: 'roskalaatikko',
+          text: 'poistetut-sisallot',
+        }, {
+          separator: true,
+        }, {
+          route: 'arkistoi',
+          icon: ['far', 'folder'],
+          text: 'arkistoi-peruste',
+        },
         ],
       },
       children: [{
@@ -165,6 +161,11 @@ const router = new VueRouter({
         path: 'jarjesta',
         name: 'jarjesta',
         component: RouteJarjesta,
+        props: { ...stores },
+      }, {
+        path: 'julkaise',
+        name: 'julkaise',
+        component: RouteJulkaise,
         props: { ...stores },
       }, {
         path: 'rakenne',
@@ -217,9 +218,9 @@ const router = new VueRouter({
         component: RouteTutkinnonOsa,
         props: { ...stores },
       }, {
-        path: 'tutkinnonosa/:tutkinnonOsaId/osaalue/:osaAlueId',
-        name: 'tutkinnonosaOsaAlue',
-        component: RouteTutkinnonOsanOsaAlue,
+        path: 'tutkinnonosat/:tutkinnonOsaId/osaalueet/:osaalueId',
+        name: 'osaalue',
+        component: RouteTutkinnonOsanOsaalue,
         props: { ...stores },
       }],
     }, {
@@ -300,7 +301,7 @@ router.beforeEach(async (to, from, next) => {
   const perusteprojektiId = Number(to.params.projektiId);
   const oldId = Number(from.params.projektiId);
   if (!perusteprojektiId) {
-    stores.kayttajatStore.clear();
+    stores.kayttajaStore.clear();
     next();
   }
   else if (perusteprojektiId === oldId) {
@@ -308,7 +309,7 @@ router.beforeEach(async (to, from, next) => {
   }
   else {
     try {
-      await stores.kayttajatStore.setPerusteprojekti(perusteprojektiId);
+      await stores.kayttajaStore.setPerusteprojekti(perusteprojektiId);
       next();
     }
     catch (err) {

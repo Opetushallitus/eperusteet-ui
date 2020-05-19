@@ -54,5 +54,4 @@ export class PerusteetStore implements IProjektiProvider {
     });
     return res.data as Page<PerusteHakuDto>;
   }
-
 }

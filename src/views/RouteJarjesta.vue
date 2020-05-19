@@ -46,12 +46,11 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { JarjestysStore } from '@/stores/JarjestysStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
-import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
+import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
-import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { PerusteStore } from '@/stores/PerusteStore';
 
+import { PerusteStore } from '@/stores/PerusteStore';
 
 @Component({
   components: {

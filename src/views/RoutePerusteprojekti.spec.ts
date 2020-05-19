@@ -9,7 +9,6 @@ import { Page } from '@shared/tyypit';
 import '@shared/config/bootstrap';
 import '@shared/config/fontawesome';
 
-
 describe('RoutePerusteprojekti', () => {
   const localVue = createLocalVue();
 
@@ -32,6 +31,4 @@ describe('RoutePerusteprojekti', () => {
 
     expect(wrapper.text()).not.toBeFalsy();
   });
-
 });
-

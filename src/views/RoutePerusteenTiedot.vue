@@ -5,6 +5,7 @@
       <template v-slot:header="{ }">
         <h2 class="m-0">{{ $t('perusteen-tiedot') }}</h2>
       </template>
+
       <template v-slot:default="{ data, isEditing, validation }">
         <h3>{{ $t('perustiedot') }}</h3>
         <b-container fluid>
@@ -237,7 +238,7 @@
         <b-row no-gutters>
           <b-col>
             <b-form-group :label="$t('muutosmaaraykset')">
-              <EpMuutosmaaraykset v-model="data.muutosmaaraykset" 
+              <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
                                   :is-editing="isEditing"
                                   :liitteet="liitteet" />
             </b-form-group>
@@ -323,7 +324,6 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import { UiKielet } from '@shared/stores/kieli';
 import _ from 'lodash';
 
-
 @Component({
   components: {
     EpButton,
@@ -356,7 +356,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
   get maarayskirje() {
     return this.store?.data.value?.maarayskirje?.liitteet[this.$slang.value] || null;
   }
-  
+
   get maarayskirjeUrl() {
     if (this.maarayskirje) {
       return `/eperusteet-service/api/perusteet/${this.perusteId!}/liitteet/${this.maarayskirje.id}`;
@@ -518,7 +518,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
       url: `perusteet/${this.perusteId!}/liitteet`,
       data,
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
       },
     });
     this.fetchLiitteet();
@@ -554,7 +554,6 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
       korvattavatDiaarinumerot: _.reject(data?.korvattavatDiaarinumerot, x => x === diaarinumero),
     });
   }
-
 }
 
 </script>
@@ -579,4 +578,3 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
 }
 
 </style>
-

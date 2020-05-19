@@ -6,22 +6,25 @@
       </div>
     </template>
 
-    <template v-slot:default="{ isEditing, data }">
+    <template v-slot:default="{ isEditing }">
       <div v-if="!isEditing" class="d-md-flex justify-content-between align-items-center">
         <div>
           <ep-search v-model="query" />
         </div>
         <div>
           <ep-button @click="lisaaTutkinnonOsa" variant="outline" icon="plus">
-            {{ $t('lisaa-tutkinnon-osa') }}                                    
+            {{ $t('lisaa-tutkinnon-osa') }}
           </ep-button>
           <ep-button @click="tuoTutkinnonOsa" variant="outline" icon="plus">
-            {{ $t('tuo-tutkinnon-osa') }}                                      
+            {{ $t('tuo-tutkinnon-osa') }}
           </ep-button>
         </div>
       </div>
 
       <ep-spinner v-if="!items" />
+      <div v-else-if="items.length === 0" class="p-4">
+        <EpAlert :text="$t('tutkinnon-osia-ei-luotu')" />
+      </div>
       <div v-else>
         <div class="table-responsive" v-if="isEditing">
           <table class="table table-borderless table-striped table-hover" role="table">
@@ -41,7 +44,7 @@
                   <fas icon="dragindicator"></fas>
                   {{ idx + 1 }}
                 </td>
-                <td>{{ $kaanna(item.nimi) }}</td>
+                <td>{{ $kaanna(item.nimi) || $t('nimeton-tutkinnonosa') }}</td>
                 <td>{{ item.laajuus }}</td>
                 <td>{{ $ago(item.muokattu) }}</td>
               </tr>
@@ -60,10 +63,10 @@
           :fields="fields">
           <template v-slot:cell(nimi)="{ item }">
             <router-link :to="item.to">
-              {{ $kaanna(item.nimi) }}                                           
+              {{ $kaanna(item.nimi) || $t('nimeton-tutkinnonosa') }}
             </router-link>
           </template>
-        </b-table>                                                               
+        </b-table>
       </div>
     </template>
   </EpEditointi>
@@ -76,6 +79,7 @@ import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
@@ -83,14 +87,14 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import draggable from 'vuedraggable';
 import _ from 'lodash';
 
-
 @Component({
   components: {
-    draggable,
+    EpAlert,
+    EpButton,
     EpEditointi,
     EpSearch,
     EpSpinner,
-    EpButton,
+    draggable,
   },
 })
 export default class RouteTutkinnonosat extends PerusteprojektiRoute {
@@ -111,7 +115,7 @@ export default class RouteTutkinnonosat extends PerusteprojektiRoute {
   get options() {
     return {
       animation: 300,
-      handle: ".handle",
+      handle: '.handle',
       disabled: false,
       ghostClass: 'placeholder',
       forceFallback: true,
@@ -193,7 +197,6 @@ export default class RouteTutkinnonosat extends PerusteprojektiRoute {
   tuoTutkinnonOsa() {
     throw new Error('todo');
   }
-
 }
 </script>
 

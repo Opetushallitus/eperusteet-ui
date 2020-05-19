@@ -8,7 +8,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(muutos, idx) in value">
+        <tr v-for="(muutos, idx) in value" :key="'muutos' + idx">
           <td>
             <ep-input v-model="muutos.nimi"
                       :is-editing="isEditing"></ep-input>
@@ -51,7 +51,6 @@ import { UiKielet } from '@shared/stores/kieli';
 import { LiiteDto } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
-
 @Component({
   components: {
     EpButton,
@@ -72,11 +71,11 @@ export default class RouteProjektiTiedot extends Vue {
   lisaa() {
     this.$emit('input', [
       ...this.value, {
-      nimi: {},
-      liitteet: {
-        fi: '',
-      },
-    }]);
+        nimi: {},
+        liitteet: {
+          fi: '',
+        },
+      }]);
   }
 
   poista(idx) {
@@ -90,11 +89,8 @@ export default class RouteProjektiTiedot extends Vue {
     Vue.set(temp[idx].liitteet, this.$slang.value, { ...liite });
     this.$emit('input', temp);
   }
-
 }
 </script>
 
 <style lang="scss" scoped>
 </style>
-
-
