@@ -1,12 +1,11 @@
 import Vue from 'vue';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { getAllPerusteetInternal, PerusteHakuInternalDto, PerusteprojektiLuontiDto, Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteet, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto, Maintenance } from '@shared/api/eperusteet';
+import { getAllPerusteetInternal, PerusteHakuInternalDto, PerusteprojektiLuontiDto, Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteet, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto, Maintenance, PerusteprojektiImportDto } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { Debounced } from '@shared/utils/delay';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import _ from 'lodash';
-import { PerusteprojektiImportDto } from '@shared/generated/eperusteet';
 
 Vue.use(VueCompositionApi);
 
