@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { getAllPerusteetInternal, PerusteHakuInternalDto, PerusteprojektiLuontiDto, Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteet, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto, Maintenance, PerusteprojektiImportDto } from '@shared/api/eperusteet';
+import { getAllPerusteetInternal, PerusteHakuInternalDto, PerusteprojektiLuontiDto, Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteet, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto, Maintenance } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { Debounced } from '@shared/utils/delay';
@@ -49,7 +49,7 @@ export class PerusteprojektiStore {
   }
 
   @Debounced(300)
-  public async importPerusteprojekti(importDto: PerusteprojektiImportDto) {
+  public async importPerusteprojekti(importDto: any) {
     const res = await Maintenance.tuoPeruste(importDto);
     return res.data;
   }
