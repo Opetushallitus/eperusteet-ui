@@ -45,9 +45,11 @@ export default class TileTiedotteet extends Vue {
   }
 
   get tiedotteet() {
-    return _.chain(this.tiedotteetStore.tiedotteet.value)
-      .filter(tiedote => _.isEmpty(tiedote.perusteet) || !_.some(tiedote.perusteet, (peruste) => (peruste.tila as any) !== perustetila.valmis))
-      .value();
+    if (this.tiedotteetStore.tiedotteet.value) {
+      return _.chain(this.tiedotteetStore.tiedotteet.value)
+        .filter(tiedote => _.isEmpty(tiedote.perusteet) || !_.some(tiedote.perusteet, (peruste) => (peruste.tila as any) !== perustetila.valmis))
+        .value();
+    }
   }
 
   get viimeisimmatTiedotteet() {

@@ -325,7 +325,7 @@ router.beforeEach(async (to, from, next) => {
   const perusteprojektiId = Number(to.params.projektiId);
   const oldId = Number(from.params.projektiId);
   if (!perusteprojektiId) {
-    stores.kayttajatStore.clear();
+    stores.kayttajaStore.clear();
     next();
   }
   else if (perusteprojektiId === oldId) {
@@ -333,7 +333,7 @@ router.beforeEach(async (to, from, next) => {
   }
   else {
     try {
-      await stores.kayttajatStore.setPerusteprojekti(perusteprojektiId);
+      await stores.kayttajaStore.setPerusteprojekti(perusteprojektiId);
       next();
     }
     catch (err) {

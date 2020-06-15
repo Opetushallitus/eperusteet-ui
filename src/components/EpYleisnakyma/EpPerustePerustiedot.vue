@@ -73,7 +73,9 @@ export default class EpPerustePerustiedot extends Vue {
   }
 
   get yhteyshenkilo() {
-    return this.projekti.yhteistyotaho;
+    if (this.projekti) {
+      return this.projekti.yhteistyotaho;
+    }
   }
 
   get julkaisukielet() {
