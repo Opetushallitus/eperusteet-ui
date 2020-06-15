@@ -16,7 +16,7 @@ import { OppaatStore } from '@/stores/OppaatStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 
 const arviointiStore = new ArviointiStore(Kielet);
-const kayttajatStore = Kayttajat;
+const kayttajaStore = Kayttajat;
 const perusteOppaatStore = new PerusteetStore({ tyyppi: 'OPAS' } as any);
 const perusteStore = new PerusteStore();
 const perusteetStore = new PerusteetStore({ tyyppi: 'NORMAALI' } as any);
@@ -35,7 +35,7 @@ export const stores = Object.freeze({
   aikatauluStore,
   arviointiStore,
   browserStore,
-  kayttajatStore,
+  kayttajaStore,
   muokkaustietoStore,
   perusteOppaatStore,
   perusteStore,

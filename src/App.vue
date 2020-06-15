@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-// import { Kayttajat } from '@/stores/kayttaja';
+import { Kayttajat } from '@/stores/kayttaja';
 import { delay } from '@shared/utils/delay';
 
 @Component
@@ -20,7 +20,7 @@ export default class App extends Vue {
     const loader = (this as any).$loading.show({
       color: '#2E5FD1',
     });
-    // await Kayttajat.init();
+    await Kayttajat.init();
     await delay(500);
     this.isInitializing = false;
     loader.hide();
