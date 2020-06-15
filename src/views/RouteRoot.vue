@@ -1,8 +1,7 @@
 <template>
   <div class="home-container minfull">
     <div class="header" ref="header">
-      <EpNavbar />
-        <!-- :class="{ 'animate-in': !isSticky, 'animate-out': isSticky }"> -->
+      <EpNavbar :kayttaja="kayttaja" />
       <PortalTarget ref="innerPortal" name="headerExtension" />
     </div>
     <RouterView />
@@ -13,7 +12,7 @@
 <script lang="ts">
 import { Prop, Watch, Component, Vue } from 'vue-property-decorator';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
-import { Kayttajat } from '@/stores/kayttaja';
+import { KayttajaStore } from '@/stores/kayttaja';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import Sticky from 'vue-sticky-directive';
 import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
@@ -30,6 +29,13 @@ import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
 export default class RouteRoot extends Vue {
   @Prop({ required: true })
   private browserStore!: BrowserStore;
+
+  @Prop({ required: true })
+  private kayttajaStore!: KayttajaStore;
+
+  get kayttaja() {
+    return this.kayttajaStore?.tiedot?.value || null;
+  }
 
   private isSticky = false;
   private height = null as number | null;
@@ -69,10 +75,6 @@ export default class RouteRoot extends Vue {
         }, 100);
       }
     }
-  }
-
-  async mounted() {
-    await Kayttajat.init();
   }
 }
 </script>

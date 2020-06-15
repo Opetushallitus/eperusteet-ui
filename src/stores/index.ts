@@ -35,7 +35,7 @@ export const stores = Object.freeze({
   aikatauluStore,
   arviointiStore,
   browserStore,
-  kayttajaStore,
+  kayttajaStore: Kayttajat,
   muokkaustietoStore,
   perusteOppaatStore,
   perusteStore,
