@@ -6,6 +6,7 @@
       <PortalTarget ref="innerPortal" name="headerExtension" />
     </div>
     <RouterView />
+    <ep-footer />
   </div>
 </template>
 
@@ -15,10 +16,12 @@ import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
 import { Kayttajat } from '@/stores/kayttaja';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import Sticky from 'vue-sticky-directive';
+import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
 
 @Component({
   components: {
     EpNavbar,
+    EpFooter,
   },
   directives: {
     Sticky,
