@@ -1,18 +1,22 @@
 <template>
   <div>
     <Portal to="headerExtension">
-      <div class="container mt-5">
+      <div class="container">
         <div class="container-fluid">
-          <div class="row">
-            <!-- <h1>{{ $t('tervetuloa', { nimi }) }}</h1> -->
-            <p>{{ $t('tervetuloa-kuvaus') }}</p>
+          <div class="row no-gutters">
+            <div class="col my-4 px-3 px-md-0">
+              <h1>{{ $t('tervetuloa', { nimi }) }}</h1>
+              <p>{{ $t('tervetuloa-kuvaus') }}</p>
+            </div>
           </div>
         </div>
+        <!--
         <div class="row">
           <div class="col-md-4 mt-2 mb-5">
             <EpSearch v-model="rajain" />
           </div>
         </div>
+        -->
       </div>
     </Portal>
     <div class="container tile-container">
@@ -40,6 +44,7 @@ import TileTiedotteet from './tiles/TileTiedotteet.vue';
 import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
+import { KayttajaStore } from '@/stores/kayttaja';
 
 @Component({
   components: {
@@ -55,10 +60,18 @@ import { TiedotteetStore } from '@/stores/TiedotteetStore';
   },
 })
 export default class Home extends Vue {
+
   @Prop({ required: true })
   private tiedotteetStore!: TiedotteetStore;
 
+  @Prop({ required: true })
+  private kayttajaStore!: KayttajaStore;
+
   private rajain = '';
+
+  get nimi() {
+    return this.kayttajaStore?.nimi?.value || null;
+  }
 }
 </script>
 

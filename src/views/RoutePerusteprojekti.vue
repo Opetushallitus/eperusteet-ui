@@ -50,7 +50,12 @@
 
                   <hr v-if="ratasvalinta.separator" class="mt-2 mb-2" />
 
-                  <b-dropdown-item v-else :to="{ name: ratasvalinta.route }">
+                  <b-dropdown-item v-if="ratasvalinta.route " :to="{ name: ratasvalinta.route }">
+                    <fas :icon="ratasvalinta.icon" />
+                    {{ $t(ratasvalinta.text) }}
+                  </b-dropdown-item>
+
+                  <b-dropdown-item v-if="ratasvalinta.click" @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)">
                     <fas :icon="ratasvalinta.icon" />
                     {{ $t(ratasvalinta.text) }}
                   </b-dropdown-item>
@@ -404,6 +409,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
         tekstiKappaleId: '' + tallennettu!.id,
       },
     });
+  }
+
+  ratasClick(clickFn, meta) {
+    clickFn(this, meta);
   }
 }
 </script>

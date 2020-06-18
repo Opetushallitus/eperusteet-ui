@@ -29,9 +29,11 @@ import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
+import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
+import { arkistoiPeruste } from '@/utils/arkistointi';
 
 Vue.use(VueRouter);
 
@@ -134,11 +136,10 @@ const router = new VueRouter({
           route: 'dokumentti',
           icon: ['far', 'file-pdf'],
           text: 'luo-pdf',
-          // }, {
-          //   route: 'termisto',
-          //   icon: 'bookmark',
-          //   text: 'kasitteet',
-          // },
+        }, {
+          route: 'perusteenPdfLuonti',
+          icon: ['far', 'file-pdf'],
+          text: 'luo-pdf',
         }, {
           route: 'poistetut',
           icon: 'roskalaatikko',
@@ -146,11 +147,15 @@ const router = new VueRouter({
         }, {
           separator: true,
         }, {
-          route: 'arkistoi',
           icon: ['far', 'folder'],
           text: 'arkistoi-peruste',
-        },
-        ],
+          click: arkistoiPeruste,
+          meta: {
+            title: 'arkistoi-peruste',
+            confirm: 'arkistoi-peruste-vahvistus',
+            reroute: 'perusteprojektit',
+          },
+        }],
       },
       children: [{
         path: '',
@@ -222,42 +227,41 @@ const router = new VueRouter({
         name: 'osaalue',
         component: RouteTutkinnonOsanOsaalue,
         props: { ...stores },
+      }, {
+        path: 'pdfluonti',
+        name: 'perusteenPdfLuonti',
+        component: RoutePdfLuonti,
+        props: { ...stores },
       }],
     }, {
       path: 'opas/:projektiId',
       component: RoutePerusteprojekti,
       props: {
         ...stores,
-        ratasvalinnat: [
-          {
-            route: 'oppaanTiedot',
-            icon: 'info',
-            text: 'oppaan-tiedot',
+        ratasvalinnat: [{
+          route: 'oppaanTiedot',
+          icon: 'info',
+          text: 'oppaan-tiedot',
+        }, {
+          route: 'oppaanPdfLuonti',
+          icon: ['far', 'file-pdf'],
+          text: 'luo-pdf',
+        }, {
+          route: 'poistetut',
+          icon: 'roskalaatikko',
+          text: 'poistetut-sisallot',
+        }, {
+          separator: true,
+        }, {
+          icon: ['far', 'folder'],
+          text: 'arkistoi-opas',
+          click: arkistoiPeruste,
+          meta: {
+            title: 'arkistoi-opas',
+            confirm: 'arkistoi-opas-vahvistus',
+            reroute: 'oppaat',
           },
-          {
-            route: 'dokumentti',
-            icon: ['far', 'file-pdf'],
-            text: 'luo-pdf',
-          },
-          // {
-          //   route: 'termisto',
-          //   icon: 'bookmark',
-          //   text: 'kasitteet',
-          // },
-          {
-            route: 'poistetut',
-            icon: 'roskalaatikko',
-            text: 'poistetut-sisallot',
-          },
-          {
-            separator: true,
-          },
-          {
-            route: 'arkistoi',
-            icon: ['far', 'folder'],
-            text: 'arkistoi-opas',
-          },
-        ],
+        }],
       },
       children: [{
         path: '',
@@ -285,6 +289,14 @@ const router = new VueRouter({
         name: 'oppaanTiedot',
         component: RouteOppaanTiedot,
         props: { ...stores },
+      }, {
+        path: 'pdfluonti',
+        name: 'oppaanPdfLuonti',
+        component: RoutePdfLuonti,
+        props: {
+          ...stores,
+          selitteenteksti: 'luo-opas-pdf-selite',
+        },
       },
       ],
     },

@@ -4,13 +4,12 @@
   <notifications style="margin-right: 6px; margin-top: 90px;"
                  position="top right"
                  :max="3" />
-  <footer> </footer>
 </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-// import { Kayttajat } from '@/stores/kayttaja';
+import { Kayttajat } from '@/stores/kayttaja';
 import { delay } from '@shared/utils/delay';
 
 @Component
@@ -20,7 +19,7 @@ export default class App extends Vue {
     const loader = (this as any).$loading.show({
       color: '#2E5FD1',
     });
-    // await Kayttajat.init();
+    await Kayttajat.init();
     await delay(500);
     this.isInitializing = false;
     loader.hide();

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
+// import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
+import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi } from '@shared/utils/perusteet';
@@ -33,6 +34,23 @@ export class PerusteStore implements IEditoitava {
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
   public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly julkaisut = computed(() => this.state.julkaisut);
+
+  public readonly isOpas = computed(() => {
+    if (this.state.peruste) {
+      return _.lowerCase((this.state.peruste as PerusteDto).tyyppi) === _.lowerCase(PerusteDtoTyyppiEnum.OPAS);
+    }
+  });
+
+  public readonly perusteSuoritustapa = computed(() => {
+    if (this.state.peruste) {
+      if (this.isOpas.value) {
+        return 'opas';
+      }
+      else {
+        return _.head(this.suoritustavat.value);
+      }
+    }
+  });
 
   public readonly navigation = computed(() => {
     if (!this.state.peruste || !this.state.navigation) {

@@ -75,7 +75,9 @@ describe('Projektilistaus', () => {
       tila: 'laadinta' as any,
     }];
 
-    expect(wrapper.findAll('.oph-spinner').length).toEqual(1);
+    await localVue.nextTick();
+
+    expect(wrapper.findAll('.oph-spinner').length).toEqual(0);
     expect(wrapper.html()).toContain('projekti 42');
     expect(wrapper.html()).toContain('perusteprojekti');
     expect(wrapper.html()).toContain('laadinta');
