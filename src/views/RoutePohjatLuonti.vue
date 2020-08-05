@@ -61,7 +61,7 @@
           <b-form-group :label="$t('koulutus-tutkintotyyppi') + ' *'" required>
             <EpMultiSelect v-model="data.koulutustyyppi"
                             :placeholder="$t('valitse')"
-                            :search-identity="tyoryhmaSearchIdentity"
+                            :search-identity="koulutustyyppiSearchIdentity"
                             :is-editing="true"
                             :options="vaihtoehdotKoulutustyypit">
               <template slot="singleLabel" slot-scope="{ option }">
@@ -196,6 +196,10 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
 
   tyoryhmaSearchIdentity(tr: any) {
     return _.toLower(this.$kaanna(tr.nimi));
+  }
+
+  koulutustyyppiSearchIdentity(kt) {
+    return _.toLower(this.$kaannaOlioTaiTeksti(kt));
   }
 
   ktToRyhma(koulutustyyppi) {
