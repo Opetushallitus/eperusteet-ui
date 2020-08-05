@@ -30,10 +30,8 @@
             <template slot="lower" class="small-text">
               {{ $t('tila-' + project.tila) }}
             </template>
-            <div class="h-100 w-100 d-flex align-items-center justify-content-center">
-              <div>
-                {{ project.nimi }}
-              </div>
+            <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
+              {{ project.nimi }}
             </div>
           </ProjektiCard>
         </div>
