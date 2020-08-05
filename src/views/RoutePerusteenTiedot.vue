@@ -75,7 +75,7 @@
           </b-row>
         </b-container>
 
-        <b-row no-gutters>
+        <b-row no-gutters v-if="data.kvliite">
           <b-col>
             <b-form-group :label="$t('tutkinnon-suorittaneen-osaaminen')">
               <ep-content
@@ -86,7 +86,7 @@
           </b-col>
         </b-row>
 
-        <b-row no-gutters>
+        <b-row no-gutters v-if="data.kvliite">
           <b-col>
             <b-form-group :label="$t('tyotehtavat-joissa-voi-toimia')">
               <ep-content
@@ -237,7 +237,6 @@
           </b-col>
         </b-row>
 
-        <pre>{{ data }}</pre>
       </template>
     </EpEditointi>
   </div>

@@ -187,6 +187,9 @@ export default class EpPerusteprojektiListaus extends Vue {
   @Prop({ required: false, default: true })
   showCards!: boolean;
 
+  @Prop({ required: false, default: false })
+  isPohja!: boolean;
+
   @Prop({ required: false })
   fieldKeys!: string[];
 
@@ -208,7 +211,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     tuleva: true,
     poistunut: false,
     koulutusvienti: true,
-    tila: ['LAADINTA', 'JULKAISTU'],
+    tila: this.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU'],
     nimi: '',
     jarjestysOrder: false,
     jarjestysTapa: 'nimi',
@@ -218,7 +221,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   private perusteet: PerusteKevytDto[] = [];
 
   async mounted() {
-    this.tila = ['LAADINTA', 'JULKAISTU'];
+    this.tila = this.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU'];
     this.provider.updateOwnProjects();
 
     if (this.filtersInclude('peruste')) {
@@ -245,7 +248,7 @@ export default class EpPerusteprojektiListaus extends Vue {
       ...this.query,
       tila: tila
         ? [tila]
-        : ['LAADINTA', 'JULKAISTU', 'POISTETTU'],
+        : ( this.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] :['LAADINTA', 'JULKAISTU', 'POISTETTU']),
     };
   }
 
@@ -297,7 +300,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   }
 
   get vaihtoehdotTilat() {
-    return ['LAADINTA', 'JULKAISTU', 'POISTETTU'];
+    return this.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU'];
   }
 
   get vaihtoehdotVoimassaolo() {
