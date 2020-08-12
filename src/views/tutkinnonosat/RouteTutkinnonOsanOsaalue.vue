@@ -18,7 +18,7 @@
         <div v-else>
           <b-row>
             <b-col md="6">
-              <b-form-group :label="$t('osaalue-nimi')">
+              <b-form-group :label="$t('osaalue-nimi') + '*'">
                 <ep-input v-model="data.nimi"
                           :is-editing="isEditing"
                           :validation="validation.nimi" />
@@ -26,9 +26,8 @@
             </b-col>
 
             <b-col md="6">
-              <b-form-group :label="$t('koodi')">
-                <ep-koodisto-select :store="koodisto"
-                  v-model="data.koodi">
+              <b-form-group :label="$t('koodi') + '*'">
+                <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing">
                   <template #default="{ open }">
                     <b-input-group>
                       <b-form-input
@@ -51,30 +50,31 @@
           <h3 slot="header">{{ $t('pakolliset-osaamistavoitteet') }}</h3>
           <Osaamistavoite v-model="data.pakollisetOsaamistavoitteet"
                           :arviointi-store="arviointiStore"
-                          :validation="validation.osaamistavoitteet && validation.osaamistavoitteet[0]"
+                          :is-valinnainen="false"
                           :is-editing="isEditing">
           </Osaamistavoite>
         </ep-collapse>
 
-        <ep-collapse tyyppi="valinnaiset-osaamistavoitteet" :border-bottom="false" :border-top="true">
+        <ep-collapse tyyppi="valinnaiset-osaamistavoitteet" :border-bottom="false" :border-top="true" v-if="isEditing || !data.piilotaValinnaiset">
           <h3 slot="header">{{ $t('valinnaiset-osaamistavoitteet') }}</h3>
+          <ep-toggle class="mb-4" v-model="data.piilotaValinnaiset" v-if="isEditing">
+            {{ $t('piilota-valinnaiset-osaamistavoitteet') }}
+          </ep-toggle>
           <Osaamistavoite v-model="data.valinnaisetOsaamistavoitteet"
+                          v-if="!data.piilotaValinnaiset"
                           :arviointi-store="arviointiStore"
-                          :validation="validation.osaamistavoitteet && validation.osaamistavoitteet[1]"
+                          :is-valinnainen="true"
                           :is-editing="isEditing">
           </Osaamistavoite>
         </ep-collapse>
 
         <ep-collapse tyyppi="arviointi" :border-bottom="false" :border-top="true">
           <h3 slot="header">{{ $t('arviointi') }}</h3>
-          <EpGeneerinenAsteikko v-if="data"
-                                v-model="data.arviointi.id"
+          <EpGeneerinenAsteikko v-model="arviointi"
                                 :arviointi-store="arviointiStore"
                                 :is-editing="isEditing" />
         </ep-collapse>
-
-        <pre>{{ data }}</pre>
-
+        
       </template>
       </EpEditointi>
     </div>
@@ -88,6 +88,7 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -118,6 +119,7 @@ import _ from 'lodash';
     EpKoodistoSelect,
     EpLaajuusInput,
     EpSpinner,
+    EpToggle,
     Osaamistavoite,
   },
 })
@@ -136,6 +138,17 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
       return null;
     }
     return this.store.data.value;
+  }
+
+  set arviointi(id) {
+    this.store?.setData({
+      ...this.store?.data.value,
+      arviointi: { id },
+    });
+  }
+
+  get arviointi() {
+    return this.store?.data.value.arviointi?.id || null;
   }
 
   get tutkinnonOsaId() {
@@ -168,7 +181,8 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
     },
   });
 
-  @Watch('this.$route.path', { immediate: true })
+  // @Watch('this.$route.path', { immediate: true })
+  @Watch('osaalueId', { immediate: true })
   async onParamChange() {
     if (!this.tutkinnonOsaId || !this.osaalueId) {
       return;

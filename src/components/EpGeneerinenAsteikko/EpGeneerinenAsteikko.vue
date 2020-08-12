@@ -1,15 +1,17 @@
 <template>
   <div>
     <b-form-group v-if="isEditing">
-      <b-form-radio
-        v-for="geneerinen in geneeriset"
-        v-model="inner"
-        name="geneerinen"
-        :key="'geneerinen-' + inner">
-        {{ $kaanna(geneerinen.nimi) }}
-      </b-form-radio>
+      <b-form-radio-group v-model="inner">
+        <b-form-radio
+          v-for="geneerinen in geneeriset"
+          name="geneerinen"
+          :value="geneerinen.id"
+          :key="'geneerinen-' + inner">
+          {{ $kaanna(geneerinen.nimi) }}
+        </b-form-radio>
+      </b-form-radio-group>
     </b-form-group>
-    <div v-else>
+    <div v-else-if="valittuGeneerinen">
       <div class="mt-3 mb-4">
         <div class="font-weight-bold">{{ $t('arvioinnin-kohde') }}</div>
         <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
@@ -35,6 +37,9 @@
         </tbody>
       </table>
     </div>
+    <div v-else>
+      <EpAlert :text="$t('ei-valittu')" />
+    </div>
   </div>
 </template>
 
@@ -43,6 +48,7 @@ import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
+import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
@@ -68,6 +74,7 @@ export interface YhdistettyGeneerinen {
 
 @Component({
   components: {
+    EpAlert,
   },
 })
 export default class EpGeneerinenAsteikko extends Vue {

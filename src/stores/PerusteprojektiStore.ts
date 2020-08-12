@@ -47,7 +47,7 @@ export class PerusteprojektiStore {
     return res.data;
   }
 
-  public async importPerusteprojekti(importDto: PerusteprojektiImportDto) {
+  public async importPerusteprojekti(importDto: any) {
     const res = await Maintenance.tuoPeruste(importDto);
     return res.data;
   }

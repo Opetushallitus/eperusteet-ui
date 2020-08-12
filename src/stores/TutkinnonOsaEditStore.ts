@@ -3,10 +3,18 @@ import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
 import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Tutkinnonosat, Perusteenosat } from '@shared/api/eperusteet';
 import { Revision, Page, Kieli } from '@shared/tyypit';
+import { Computed } from '@shared/utils/interfaces';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { minValue, translated, warning } from '@shared/validators/required';
+import { required } from 'vuelidate/lib/validators';
+
+export function notNull() {
+  return {
+    'not-null': (value: any) => !!value,
+  };
+}
 
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
@@ -45,6 +53,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
         tutkinnonOsa: {
           nimi: {},
           geneerinenArviointiasteikko: null,
+          ammattitaidonOsoittamistavat: null,
           koodi: null,
           osaAlueet: [],
           tyyppi: 'normaali',
@@ -96,32 +105,54 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public readonly validator = computed(() => {
-    const julkaisukielet = TutkinnonOsaEditStore.config.perusteStore.julkaisukielet.value;
     return {
-      laajuus: _.mapValues(minValue(1), warning),
-      tutkinnonOsa: {
-        nimi: translated(julkaisukielet),
-        ammattitaidonOsoittamistavat: translated(julkaisukielet),
-        ammattitaitovaatimukset2019: {
-          kohde: translated(julkaisukielet),
-          vaatimukset: {
-            $each: {
-              vaatimus: translated(julkaisukielet),
-            },
-          },
-          kohdealueet: {
-            $each: {
-              kuvaus: translated(julkaisukielet),
-              vaatimukset: {
-                $each: {
-                  vaatimus: translated(julkaisukielet),
-                },
-              },
-            },
-          },
-        },
-      },
+      tutkinnonOsa: {},
     };
+
+    // console.log('Initing validator', data.value);
+    // const julkaisukielet = TutkinnonOsaEditStore.config.perusteStore.julkaisukielet.value;
+    // const common = {
+    //   laajuus: _.mapValues(minValue(1), warning),
+    //   tutkinnonOsa: {
+    //     nimi: translated(julkaisukielet),
+    //     tyyppi: required,
+    //     ammattitaidonOsoittamistavat: translated(julkaisukielet),
+    //   },
+    // };
+    //
+    // if (!data.tyyppi) {
+    //   return { ...common };
+    // }
+    // else if (data.tyyppi === 'normaali') {
+    //   return {
+    //     ...common,
+    //     tutkinnonOsa: {
+    //       ammattitaitovaatimukset2019: {
+    //         kohde: translated(julkaisukielet),
+    //         vaatimukset: {
+    //           $each: {
+    //             vaatimus: translated(julkaisukielet),
+    //           },
+    //         },
+    //         kohdealueet: {
+    //           $each: {
+    //             kuvaus: translated(julkaisukielet),
+    //             vaatimukset: {
+    //               $each: {
+    //                 vaatimus: translated(julkaisukielet),
+    //               },
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   };
+    // }
+    // else {
+    //   return {
+    //     ...common,
+    //   };
+    // }
   });
 
   public async remove() {

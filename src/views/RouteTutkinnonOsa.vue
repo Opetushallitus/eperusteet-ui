@@ -15,14 +15,16 @@
 
       <template v-slot:default="{ data, isEditing, validation }">
         <div class="mt-1" v-if="isEditing && isNew">
-          <b-form-group :label="$t('tyyppi')">
-            <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="normaali">
-              {{ $t('tutkintokohtainen') }}
-            </b-form-radio>
-            <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="reformi_tutke2">
-              {{ $t('yhteinen') }}
-            </b-form-radio>
-          </b-form-group>
+          <ep-error-wrapper>
+            <b-form-group :label="$t('tyyppi')">
+              <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="normaali">
+                {{ $t('tutkintokohtainen') }}
+              </b-form-radio>
+              <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="reformi_tutke2">
+                {{ $t('yhteinen') }}
+              </b-form-radio>
+            </b-form-group>
+          </ep-error-wrapper>
         </div>
 
         <b-row>
@@ -37,6 +39,15 @@
           <b-col md="4">
             <b-form-group :label="$t('laajuus')">
               <ep-laajuus-input v-model="data.laajuus" :is-editing="isEditing" :validation="validation.laajuus" />
+            </b-form-group>
+          </b-col>
+
+          <b-col>
+            <b-form-group :label="$t('kuvaus')">
+              <ep-content v-model="data.tutkinnonOsa.kuvaus"
+                          :validation="validation.tutkinnonOsa.kuvaus"
+                          layout="normal"
+                          :is-editable="isEditing"></ep-content>
             </b-form-group>
           </b-col>
         </b-row>
@@ -104,23 +115,22 @@
 
         </div>
         <div v-else>
-          <ep-collapse tyyppi="kuvaus" :border-bottom="false" :border-top="true">
-            <h3 slot="header">{{ $t('kuvaus') }}</h3>
-            <b-form-group>
-              <ep-content v-model="data.tutkinnonOsa.kuvaus"
-                          :validation="validation.tutkinnonOsa.kuvaus"
-                          layout="normal"
-                          :is-editable="isEditing"></ep-content>
-            </b-form-group>
-          </ep-collapse>
-
           <ep-collapse tyyppi="osa-alueet" :border-bottom="false" :border-top="true">
             <h3 slot="header">{{ $t('osa-alueet') }}</h3>
-            <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" icon="plus">
+            <div>
+              <EpBalloonList v-if="data.tutkinnonOsa.osaAlueet" :value="data.tutkinnonOsa.osaAlueet">
+              <template v-slot:default="{ item }">
+                <router-link :to="{ name: 'osaalue', params: { osaalueId: item.id } }">{{ $kaanna(item.nimi) || $t('nimeton') }}</router-link>
+                <span v-if="item.koodi" class="ml-1">({{ item.koodi.arvo }})</span>
+              </template>
+              </EpBalloonList>
+            </div>
+            <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" icon="plus" v-if="!isEditing">
               {{ $t('lisaa-osa-alue') }}
             </ep-button>
           </ep-collapse>
         </div>
+        <pre>{{ data }}</pre>
       </template>
       </EpEditointi>
     </div>
@@ -138,8 +148,10 @@ import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
+import EpErrorWrapper from '@shared/components/forms/EpErrorWrapper.vue';
 import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
+import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
 import { YhdistettyGeneerinen } from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
 import { LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -152,10 +164,12 @@ import { Murupolku } from '@shared/stores/murupolku';
   components: {
     EpAlert,
     EpAmmattitaitovaatimukset,
+    EpBalloonList,
     EpButton,
     EpCollapse,
     EpContent,
     EpEditointi,
+    EpErrorWrapper,
     EpInput,
     EpLaajuusInput,
     EpSpinner,

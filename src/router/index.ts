@@ -120,7 +120,6 @@ const router = new VueRouter({
       props: { ...stores },
     }, {
       path: 'perusteprojekti/:projektiId',
-      name: 'projekti',
       component: RoutePerusteprojekti,
       props: {
         ...stores,

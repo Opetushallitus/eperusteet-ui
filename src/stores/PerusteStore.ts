@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
 // import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
-import { NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi } from '@shared/utils/perusteet';
@@ -19,7 +19,7 @@ export class PerusteStore implements IEditoitava {
     navigation: null as NavigationNodeDto | null,
     perusteId: null as number | null,
     isInitialized: false,
-    julkaisut: null,
+    julkaisut: null as any,
     initializing: false,
     projektiStatus: null as TilaUpdateStatus | null,
   });
@@ -160,13 +160,13 @@ export class PerusteStore implements IEditoitava {
     }
   });
 
-  async julkaise(tiedote: any) {
-    const res = await Julkaisut.teeJulkaisu(this.state.perusteId, tiedot);
+  async julkaise(tiedot: any) {
+    const res = await Julkaisut.teeJulkaisu(this.state.perusteId!, tiedot);
     this.state.julkaisut = [...this.state.julkaisut, res.data];
   }
 
   async fetchJulkaisut() {
-    this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId)).data;
+    this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
   }
 
   async acquire() {

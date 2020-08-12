@@ -87,6 +87,7 @@
                   </div>
                 </div>
               </template>
+
               <template v-slot:viite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
@@ -95,6 +96,7 @@
                   </router-link>
                 </div>
               </template>
+
               <template v-slot:tutkinnonosaviite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'tutkinnonosa', params: { tutkinnonOsaId: item.id } }">
@@ -103,18 +105,29 @@
                   </router-link>
                 </div>
               </template>
+
               <template v-slot:osaalueet>
-                <div class="menu-item text-muted">
+                <div class="menu-item text-muted ml-2">
                   {{ $t('osa-alueet') }}
                 </div>
               </template>
+
               <template v-slot:osaalue="{ item }">
-                <div class="menu-item">
+                <div class="menu-item ml-2">
                   <router-link :to="{ name: 'osaalue', params: { osaalueId: item.id } }">
                     {{ $kaanna(item.label) || $t('nimeton') }}
                   </router-link>
                 </div>
               </template>
+
+              <template v-slot:osaalue-post="{ item }">
+                <div class="menu-item ml-2">
+                  <router-link :to="{ name: 'osaalue', params: { osaalueId: 'uusi' } }">
+                    {{ $t('uusi-osaalue') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:liite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
@@ -123,6 +136,7 @@
                   </router-link>
                 </div>
               </template>
+
               <template v-slot:kvliite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'kvliite' }">
@@ -131,6 +145,7 @@
                   </router-link>
                 </div>
               </template>
+
               <template v-slot:tutkinnonosat="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'tutkinnonosat' }">
@@ -139,6 +154,7 @@
                   </router-link>
                 </div>
               </template>
+
               <template v-slot:muodostuminen="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'muodostuminen' }">
@@ -158,6 +174,7 @@
                   </ep-tekstikappale-lisays>
                 </div>
               </template>
+
             </EpTreeNavibar>
           </div>
         </template>
