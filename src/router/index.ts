@@ -246,7 +246,7 @@ const router = new VueRouter({
             text: 'oppaan-tiedot',
           },
           {
-            route: 'oppaanPdfLuonti',
+            route: 'pdfluonti',
             icon: ['far', 'file-pdf'],
             text: 'luo-pdf',
           },
