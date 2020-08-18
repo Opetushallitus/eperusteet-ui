@@ -45,6 +45,7 @@ import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
+import { Meta } from '@shared/utils/decorators';
 
 @Component({
   components: {
@@ -60,7 +61,6 @@ import { KayttajaStore } from '@/stores/kayttaja';
   },
 })
 export default class Home extends Vue {
-
   @Prop({ required: true })
   private tiedotteetStore!: TiedotteetStore;
 
@@ -68,6 +68,14 @@ export default class Home extends Vue {
   private kayttajaStore!: KayttajaStore;
 
   private rajain = '';
+
+  @Meta
+  getMetaInfo() {
+    return {
+      title: this.$t('eperusteet'),
+      titleTemplate: null,
+    };
+  }
 
   get nimi() {
     return this.kayttajaStore?.nimi?.value || null;

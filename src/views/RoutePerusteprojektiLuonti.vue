@@ -263,7 +263,6 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
   },
 })
 export default class RoutePerusteprojektiLuonti extends Vue {
-
   @Prop({ required: true })
   perusteprojektiStore!: PerusteprojektiStore;
 
@@ -297,7 +296,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       koulutustyyppi: null,
     };
   }
-  
+
   get pohjat() {
     return this.perusteprojektiStore.pohjat.value?.data;
   }
