@@ -248,7 +248,7 @@ export default class EpPerusteprojektiListaus extends Vue {
       ...this.query,
       tila: tila
         ? [tila]
-        : ( this.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] :['LAADINTA', 'JULKAISTU', 'POISTETTU']),
+        : (this.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU']),
     };
   }
 

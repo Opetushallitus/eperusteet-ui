@@ -12,6 +12,7 @@ import VueScrollTo from 'vue-scrollto';
 import Loading from 'vue-loading-overlay';
 import Notifications from 'vue-notification';
 import PortalVue from 'portal-vue';
+import Vuelidate from 'vuelidate';
 
 import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 import Aikaleima from '@shared/plugins/aikaleima';
@@ -26,7 +27,7 @@ import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
-import Vuelidate from 'vuelidate';
+import { registerIconColorSchemeChange } from '@shared/utils/icon';
 
 import router from './router';
 
@@ -89,6 +90,7 @@ Vue.use(MuodostuminenStore, {
 });
 
 async function main() {
+  registerIconColorSchemeChange();
   new Vue({
     router,
     i18n: Kielet.i18n,

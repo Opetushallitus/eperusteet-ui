@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import VueMeta from 'vue-meta';
 
 import RouteArviointi from '@/views/RouteArviointi.vue';
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue';
@@ -35,6 +36,9 @@ import { stores } from '@/stores';
 import { arkistoiPeruste } from '@/utils/arkistointi';
 
 Vue.use(VueRouter);
+Vue.use(VueMeta, {
+  refreshOnceOnNavigation: true,
+});
 
 const router = new VueRouter({
   routes: [{

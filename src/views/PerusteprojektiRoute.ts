@@ -1,4 +1,6 @@
+import _ from 'lodash';
 import { Watch, Prop, Vue } from 'vue-property-decorator';
+
 import { PerusteStore } from '@/stores/PerusteStore';
 
 export abstract class PerusteprojektiRoute extends Vue {
