@@ -6,7 +6,7 @@
           v-for="geneerinen in geneeriset"
           name="geneerinen"
           :value="geneerinen.id"
-          :key="'geneerinen-' + inner">
+          :key="'geneerinen-' + geneerinen.id">
           {{ $kaanna(geneerinen.nimi) }}
         </b-form-radio>
       </b-form-radio-group>

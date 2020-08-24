@@ -60,7 +60,6 @@ import { KayttajaStore } from '@/stores/kayttaja';
   },
 })
 export default class Home extends Vue {
-
   @Prop({ required: true })
   private tiedotteetStore!: TiedotteetStore;
 

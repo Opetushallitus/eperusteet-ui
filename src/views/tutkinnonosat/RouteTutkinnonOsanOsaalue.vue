@@ -74,7 +74,7 @@
                                 :arviointi-store="arviointiStore"
                                 :is-editing="isEditing" />
         </ep-collapse>
-        
+
       </template>
       </EpEditointi>
     </div>
@@ -197,7 +197,6 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
       this.$router);
     this.store = new EditointiStore(store);
   }
-
 }
 </script>
 

@@ -17,14 +17,14 @@ describe('EpVirhelistaus', () => {
       propsData: {
         validation: {
           infot: [{
-            viesti: "kvliite-validointi-arvosana-asteikko",
+            viesti: 'kvliite-validointi-arvosana-asteikko',
             perusteprojekti: null,
             lastCheck: null,
             validointi: null,
             nimet: null,
             suoritustapa: null,
             kielet: null,
-            validointiKategoria: "MAARITTELEMATON"
+            validointiKategoria: 'MAARITTELEMATON',
           }],
         },
       },

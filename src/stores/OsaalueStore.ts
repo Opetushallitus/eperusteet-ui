@@ -93,5 +93,4 @@ export class OsaalueStore implements IEditoitava {
   }
 
   // acquire?: () => Promise<ILukko | null>;
-
 }
