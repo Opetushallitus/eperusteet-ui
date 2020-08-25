@@ -130,7 +130,6 @@
             </ep-button>
           </ep-collapse>
         </div>
-        <pre>{{ data }}</pre>
       </template>
       </EpEditointi>
     </div>

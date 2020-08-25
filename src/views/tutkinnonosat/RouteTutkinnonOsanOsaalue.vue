@@ -122,6 +122,12 @@ import _ from 'lodash';
     EpToggle,
     Osaamistavoite,
   },
+  watch: {
+    'osaalueId': {
+      handler: 'onOsaAlueChange',
+      immediate: true,
+    } as any,
+  },
 })
 export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   @Prop({ required: true })
@@ -152,11 +158,11 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   }
 
   get tutkinnonOsaId() {
-    return this.$route.params.tutkinnonOsaId;
+    return this.$route?.params?.tutkinnonOsaId || null;
   }
 
   get osaalueId() {
-    return this.$route.params.osaalueId;
+    return this.$route?.params?.osaalueId || null;
   }
 
   get arviointiasteikot() {
@@ -181,9 +187,8 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
     },
   });
 
-  // @Watch('this.$route.path', { immediate: true })
-  @Watch('osaalueId', { immediate: true })
-  async onParamChange() {
+  async onOsaAlueChange() {
+    console.log('laukean');
     if (!this.tutkinnonOsaId || !this.osaalueId) {
       return;
     }

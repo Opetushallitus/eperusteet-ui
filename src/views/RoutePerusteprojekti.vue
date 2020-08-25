@@ -120,7 +120,7 @@
                 </div>
               </template>
 
-              <template v-slot:osaalue-post="{ item }">
+              <template v-slot:osaalue-post="{}">
                 <div class="menu-item ml-2">
                   <router-link :to="{ name: 'osaalue', params: { osaalueId: 'uusi' } }">
                     {{ $t('uusi-osaalue') }}
@@ -199,7 +199,7 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
@@ -249,6 +249,7 @@ function routeToNode(route: Location): NavigationNodeDto | null {
     };
   }
   else if (route.name === 'osaalue') {
+    console.log(route);
     return {
       type: 'osaalue',
       id: Number(route.params?.osaalueId!),
@@ -320,10 +321,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   set query(val: string) {
-  }
-
-  get projektiId() {
-    return this.$route.params.projektiId;
   }
 
   get projekti() {

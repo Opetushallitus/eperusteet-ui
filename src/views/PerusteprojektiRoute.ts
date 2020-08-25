@@ -1,10 +1,18 @@
-import { Watch, Prop, Vue } from 'vue-property-decorator';
+import { Component, Watch, Prop, Vue } from 'vue-property-decorator';
 import { PerusteStore } from '@/stores/PerusteStore';
 import _ from 'lodash';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 
 const browserStore = new BrowserStore();
 
+@Component({
+  watch: {
+    'projektiId': {
+      handler: 'onProjektiChangeImpl',
+      immediate: true,
+    } as any,
+  },
+})
 export class PerusteprojektiRoute extends Vue {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
@@ -34,7 +42,6 @@ export class PerusteprojektiRoute extends Vue {
   protected async onProjektiChange(projektiId: number, perusteId: number) {
   }
 
-  @Watch('projektiId', { immediate: true })
   async onProjektiChangeImpl(newValue: string, oldValue: string) {
     if (newValue && newValue !== oldValue && !this.isInitingProjekti) {
       const projektiId = _.parseInt(newValue);
