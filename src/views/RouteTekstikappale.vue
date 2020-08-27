@@ -102,6 +102,7 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import * as _ from 'lodash';
 import { KoodiDto } from '../../eperusteet-frontend-utils/vue/src/generated/eperusteet';
+import { Murupolku } from '@shared/stores/murupolku';
 
 interface koodistoryhma {
   ryhma: string;
@@ -200,6 +201,19 @@ export default class RouteTekstikappale extends Vue {
     await this.perusteStore.blockUntilInitialized();
     const tkstore = new TekstikappaleStore(this.perusteId!, Number(id));
     this.store = new EditointiStore(tkstore);
+  }
+
+  get tekstikappale() {
+    return this.store?.data?.value || null;
+  }
+
+  @Watch('tekstikappale')
+  onDataChange(tk) {
+    if (tk) {
+      Murupolku.aseta('tekstikappale', this.$kaanna(tk.nimi), {
+        name: 'tekstikappale',
+      });
+    }
   }
 
   private koodistoStore(koodistoNimi) {

@@ -16,6 +16,7 @@ import Vuelidate from 'vuelidate';
 
 import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 import Aikaleima from '@shared/plugins/aikaleima';
+import { Vahvistus } from '@shared/plugins/vahvistus';
 import Kaannos from '@shared/plugins/kaannos';
 import { Notifikaatiot } from '@shared/plugins/notifikaatiot';
 import { Kielet } from '@shared/stores/kieli';
@@ -57,7 +58,9 @@ Vue.use(Kielet, {
     },
   },
 });
+
 Vue.use(Kaannos);
+Vue.use(Vahvistus);
 Vue.use(Aikaleima);
 Vue.use(Notifikaatiot);
 Vue.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });

@@ -14,9 +14,13 @@ import _ from 'lodash';
 import { Prop, Watch, Component, Vue } from 'vue-property-decorator';
 import Sticky from 'vue-sticky-directive';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
+import { Kayttajat, KayttajaStore } from '@/stores/kayttaja';
+
 import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
-import { KayttajaStore } from '@/stores/kayttaja';
+
 import { BrowserStore } from '@shared/stores/BrowserStore';
+
+import { PerusteStore } from '@/stores/PerusteStore';
 import { Meta } from '@shared/utils/decorators';
 
 @Component({
@@ -34,6 +38,9 @@ export default class RouteRoot extends Vue {
 
   @Prop({ required: true })
   private kayttajaStore!: KayttajaStore;
+
+  @Prop({ required: true })
+  private perusteStore!: PerusteStore;
 
   private isSticky = false;
   private height = null as number | null;
@@ -132,13 +139,13 @@ export default class RouteRoot extends Vue {
 .home-container {
   .header {
     color: white;
-    background-color: $etusivu-header-background;
     background-image: url('../../public/img/banners/header.svg');
     background-position: 100% 0;
-    background-repeat: no-repeat;
+    background-repeat: none;
+    background-size: cover;
     @media only screen and (min-width: 2503px)  {
-      background-size: 100%;
     }
+    /* background-size: 100%; */
   }
 }
 

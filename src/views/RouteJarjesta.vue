@@ -2,20 +2,36 @@
   <ep-spinner v-if="!store" />
   <EpEditointi v-else :store="store">
     <template #header="{ data }">
-      <h2>{{ $t('rakenne') }}</h2>
+      <h2>{{ $t('muokkaa-jarjestysta') }}</h2>
     </template>
     <template #default="{ data, isEditing }">
-      <EpJarjesta
-        v-model="data.lapset"
-        childField="lapset"
-        group="sisaltoJarjestysGroup"
-        :is-editable="isEditing">
-        <template #default="{ node }">
-          <span>
-            {{ $kaanna(node.perusteenOsa.nimi) }}
-          </span>
-        </template>
-      </EpJarjesta>
+      <b-tabs content-class="mt-3">
+        <b-tab :title="$t('tutkinnon-osat')" v-if="data.tutkinnonOsat">
+          <EpJarjesta
+            v-model="data.tutkinnonOsat"
+            group="sisaltoJarjestysGroup"
+            :is-editable="isEditing">
+          <template #default="{ node }">
+            <span>
+              {{ $kaanna(node.nimi) }}
+            </span>
+          </template>
+          </EpJarjesta>
+        </b-tab>
+        <b-tab :title="$t('tekstikappaleet')" v-if="data.tekstit">
+          <EpJarjesta
+            v-model="data.tekstit.lapset"
+            childField="lapset"
+            group="sisaltoJarjestysGroup"
+            :is-editable="isEditing">
+          <template #default="{ node }">
+            <span>
+              {{ $kaanna(node.perusteenOsa.nimi) }}
+            </span>
+          </template>
+          </EpJarjesta>
+        </b-tab>
+      </b-tabs>
     </template>
   </EpEditointi>
 </template>
@@ -28,9 +44,13 @@ import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJarjesta from '@shared/components/EpJarjesta/EpJarjesta.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
+import { JarjestysStore } from '@/stores/JarjestysStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
-import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
+import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
+import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
+
+import { PerusteStore } from '@/stores/PerusteStore';
 
 @Component({
   components: {
@@ -44,11 +64,19 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 })
 export default class RouteJarjesta extends PerusteprojektiRoute {
   private store: EditointiStore | null = null;
+  private stores: { [key: string]: IEditoitava } = {};
 
   async onProjektiChange(projektiId: number) {
     if (this.perusteId) {
-      const tkstore = new TekstiRakenneStore(this.perusteId);
-      this.store = new EditointiStore(tkstore);
+      this.stores = {
+        tekstit: new TekstiRakenneStore(this.perusteId),
+      };
+
+      if (this.isAmmatillinen) {
+        this.stores.tutkinnonOsat = new TutkinnonOsaStore(this.perusteStore);
+      }
+
+      this.store = new EditointiStore(new JarjestysStore(this.stores));
     }
   }
 }

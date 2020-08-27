@@ -89,7 +89,9 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
       this.muokkaustietoStore.init(this.peruste.id);
       this.aikatauluStore.init(this.peruste);
       this.tutkinnonOsaStore.fetch();
-      this.tiedotteetStore.init(this.peruste.id);
+      this.tiedotteetStore.init({
+        perusteIds: [this.peruste.id],
+      });
       this.tyoryhmaStore.init(this.projekti?.ryhmaOid);
     }
   }

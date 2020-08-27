@@ -1,8 +1,10 @@
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
+import { BreadcrumbStore } from '@/stores/BreadcrumbStore';
 import { Kayttajat } from '@/stores/kayttaja';
 import { Kielet } from '@shared/stores/kieli';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
+import { Murupolku } from '@shared/stores/murupolku';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
@@ -34,9 +36,11 @@ const tyoryhmaStore = new TyoryhmaStore();
 export const stores = Object.freeze({
   aikatauluStore,
   arviointiStore,
+  murupolkuStore: Murupolku,
   browserStore,
-  kayttajaStore: Kayttajat,
+  kayttajaStore,
   muokkaustietoStore,
+  oppaatStore,
   perusteOppaatStore,
   perusteStore,
   perusteetStore,
@@ -45,8 +49,7 @@ export const stores = Object.freeze({
   tiedotteetStore,
   tutkinnonOsaStore,
   tutoriaaliStore,
+  tyoryhmaStore,
   ulkopuolisetStore,
   virheellisetPerusteetStore,
-  oppaatStore,
-  tyoryhmaStore,
 });

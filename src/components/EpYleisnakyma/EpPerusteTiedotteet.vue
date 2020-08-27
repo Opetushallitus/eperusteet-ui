@@ -49,15 +49,15 @@ export default class EpPerusteTiedotteet extends Vue {
   private tiedoteMaara = 3;
 
   get tiedotteet() {
-    return this.tiedotteetStore.perusteenTiedotteet.value;
+    return this.tiedotteetStore.tiedotteet.value;
   }
 
   get tiedotteetSize() {
-    return _.size(this.tiedotteetStore.perusteenTiedotteet.value);
+    return _.size(this.tiedotteetStore.tiedotteet.value);
   }
 
   get tiedotteetFiltered() {
-    return _.chain(this.tiedotteetStore.perusteenTiedotteet.value)
+    return _.chain(this.tiedotteetStore.tiedotteet.value)
       .map(tiedote => {
         return {
           ...tiedote,

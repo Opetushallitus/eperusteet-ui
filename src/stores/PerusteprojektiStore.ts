@@ -42,25 +42,21 @@ export class PerusteprojektiStore {
     this.state.perusteet = res.data as any;
   }
 
-  @Debounced(300)
   public async addPerusteprojekti(luontiDto: PerusteprojektiLuontiDto) {
     const res = await Perusteprojektit.addPerusteprojekti(luontiDto);
     return res.data;
   }
 
-  @Debounced(300)
   public async importPerusteprojekti(importDto: any) {
     const res = await Maintenance.tuoPeruste(importDto);
     return res.data;
   }
 
-  @Debounced(300)
   public async getPerusteprojekti(perusteProjektiId: number) {
     const res = await Perusteprojektit.getPerusteprojekti(perusteProjektiId);
     return res.data;
   }
 
-  @Debounced(300)
   public async getPerusteprojektiTyoryhma(perusteProjektiId: number) {
     const res = await Perusteprojektit.getPerusteprojektiTyoryhmat(perusteProjektiId);
     return res.data;

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { Ulkopuoliset, getPerusteprojektit, PerusteHakuDto, getAllPerusteet, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { Debounced } from '@shared/utils/delay';
@@ -46,5 +46,12 @@ export class PerusteetStore implements IProjektiProvider {
       ...this.overrides,
     });
     this.state.projects = res.data as any;
+  }
+
+  public async findPerusteet(query: PerusteQuery) {
+    const res = await getAllPerusteet({
+      ...query,
+    });
+    return res.data as Page<PerusteHakuDto>;
   }
 }

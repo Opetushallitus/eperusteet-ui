@@ -2,10 +2,11 @@ import Vue from 'vue';
 import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
 import { MuokkaustietoKayttajallaDto, Muokkaustiedot } from '@shared/api/eperusteet';
 import _ from 'lodash';
+import { IMuokkaustietoProvider } from '@shared/components/EpViimeaikainenToiminta/types';
 
 Vue.use(VueCompositionApi);
 
-export class MuokkaustietoStore {
+export class MuokkaustietoStore implements IMuokkaustietoProvider {
   private state = reactive({
     muokkaustiedot: null as MuokkaustietoKayttajallaDto[] | null,
     viimeinenHaku: null as MuokkaustietoKayttajallaDto[] | null,
@@ -20,7 +21,7 @@ export class MuokkaustietoStore {
   }
 
   public readonly muokkaustiedot = computed(() => this.state.muokkaustiedot);
-  public readonly viimeinenHaku = computed(() => this.state.hakuLukumaara);
+  public readonly viimeinenHaku = computed(() => this.state.viimeinenHaku);
   public readonly hakuLukumaara = computed(() => this.state.hakuLukumaara);
 
   public async update() {
