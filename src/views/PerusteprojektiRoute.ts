@@ -1,7 +1,7 @@
 import { Component, Watch, Prop, Vue } from 'vue-property-decorator';
 import { PerusteStore } from '@/stores/PerusteStore';
-import _ from 'lodash';
 import { BrowserStore } from '@shared/stores/BrowserStore';
+import _ from 'lodash';
 
 const browserStore = new BrowserStore();
 

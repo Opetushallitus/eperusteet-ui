@@ -10,14 +10,18 @@
 </template>
 
 <script lang="ts">
+import _ from 'lodash';
 import { Prop, Watch, Component, Vue } from 'vue-property-decorator';
+import Sticky from 'vue-sticky-directive';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
 import { Kayttajat, KayttajaStore } from '@/stores/kayttaja';
+
+import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
+
 import { BrowserStore } from '@shared/stores/BrowserStore';
 
-import Sticky from 'vue-sticky-directive';
 import { PerusteStore } from '@/stores/PerusteStore';
-import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
+import { Meta } from '@shared/utils/decorators';
 
 @Component({
   components: {
@@ -38,12 +42,57 @@ export default class RouteRoot extends Vue {
   @Prop({ required: true })
   private perusteStore!: PerusteStore;
 
+  private isSticky = false;
+  private height = null as number | null;
+
   get kayttaja() {
     return this.kayttajaStore?.tiedot?.value || null;
   }
 
-  private isSticky = false;
-  private height = null as number | null;
+  @Meta
+  getMetaInfo() {
+    const lang = _.get(this.$route, 'params.lang');
+    const hasRouteName = this.$route && this.$route.name;
+    return {
+      title: hasRouteName ? this.$t('route-' + this.$route.name) : this.$t('eperusteet'),
+      titleTemplate: hasRouteName ? '%s - ' + this.$t('eperusteet') : null,
+      htmlAttrs: {
+        lang: lang || 'fi',
+      },
+      meta: [
+        {
+          vmid: 'description',
+          name: 'description',
+          content: this.$t('tervetuloa-kuvaus'),
+        },
+        {
+          vmid: 'keywords',
+          name: 'keywords',
+          content: this.$t('avainsanalista'),
+        },
+        {
+          vmid: 'author',
+          name: 'author',
+          content: this.$t('opetushallitus'),
+        },
+        {
+          vmid: 'og:site_name',
+          property: 'og:site_name',
+          content: this.$t('eperusteet'),
+        },
+        {
+          vmid: 'og:description',
+          property: 'og:description',
+          content: this.$t('tervetuloa-kuvaus'),
+        },
+        {
+          vmid: 'og:locale',
+          property: 'og:locale',
+          content: lang + '_FI',
+        },
+      ],
+    };
+  }
 
   get portalStyle() {
     if (this.height === null) {

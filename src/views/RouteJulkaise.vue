@@ -110,7 +110,6 @@
           </table>
         </div>
       </ep-collapse>
-  </div>
     </div>
 
   </div>

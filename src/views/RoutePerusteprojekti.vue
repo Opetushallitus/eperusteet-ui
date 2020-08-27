@@ -216,6 +216,7 @@ import { NavigationNodeDto } from '@shared/tyypit';
 import { NavigationNodeDtoTypeEnum, Sisallot } from '@shared/api/eperusteet';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { Location } from 'vue-router';
+import { Meta } from '@shared/utils/decorators';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -299,6 +300,16 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   private naviStore: EpTreeNavibarStore | null = null;
   private loading = false;
+
+  @Meta
+  getMetaInfo() {
+    if (this.peruste && this.peruste.nimi && !_.isEmpty(this.$kaanna(this.peruste.nimi))) {
+      return {
+        title: this.$kaanna(this.peruste.nimi),
+        titleTemplate: '%s - ' + this.$t('eperusteet-ops-tyokalu'),
+      };
+    }
+  }
 
   async onProjektiChange(projektiId: number) {
     this.naviStore = new EpTreeNavibarStore(

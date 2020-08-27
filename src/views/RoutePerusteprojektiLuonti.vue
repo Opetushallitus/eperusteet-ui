@@ -13,7 +13,8 @@
                 <div v-if="tyyppi === 'pohjasta'">
                   <EpMultiSelect
                     v-if="pohjat"
-                    v-model="data.peruste"
+                    :value="data.peruste"
+                    @input="valitsePeruste($event)"
                     :placeholder="$t('valitse-pohja')"
                     :is-editing="true"
                     :options="pohjat">
@@ -31,7 +32,8 @@
                 <div v-if="tyyppi === 'perusteesta'">
                   <EpMultiSelect
                     v-if="perusteet"
-                    v-model="data.peruste"
+                    :value="data.peruste"
+                    @input="valitsePeruste($event)"
                     :placeholder="$t('valitse-peruste')"
                     :is-editing="true"
                     :options="perusteet">
@@ -75,7 +77,7 @@
           <b-form-group :label="$t('koulutus-tutkintotyyppi') + '*'" required>
             <EpMultiSelect v-model="data.koulutustyyppi"
                            :placeholder="$t('valitse-koulutustyyppi')"
-                           :search-identity="tyoryhmaSearchIdentity"
+                           :search-identity="ktSearchIdentity"
                            :is-editing="true"
                            :options="vaihtoehdotKoulutustyypit">
               <template slot="singleLabel" slot-scope="{ option }">
@@ -96,6 +98,7 @@
           <b-form-group :label="$t('perustetyoryhma') + '*'" required>
             <EpMultiSelect v-model="data.tyoryhma"
                            v-if="tyoryhmat"
+                           :search-identity="tyoryhmaSearchIdentity"
                            :is-editing="true"
                            :options="tyoryhmat">
               <template slot="singleLabel" slot-scope="{ option }">
@@ -233,6 +236,8 @@ import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { requiredOneLang, minValue, notNull } from '@shared/validators/required';
 
+const util = require('util');
+
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
 @Component({
@@ -271,7 +276,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     tyoryhma: null,
     peruste: null,
   };
-  private tyyppi: 'pohjasta' | 'perusteesta' | 'tiedostosta' | 'uusi' | null = null;
+  private tyyppi: 'pohjasta' | 'perusteesta' | 'tiedostosta' | 'uusi' | null = 'uusi';
   private currentStep: Step | null = null;
 
   async mounted() {
@@ -280,25 +285,15 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       this.perusteprojektiStore.fetchPohjat(),
       this.perusteprojektiStore.fetchPohjaProjektit(),
     ]);
-
-    if (this.pohjat && this.pohjat?.length > 0) {
-      this.tyyppi = 'pohjasta';
-    }
-    else if (this.perusteet && this.perusteet?.length > 0) {
-      this.tyyppi = 'perusteesta';
-    }
-    else {
-      this.tyyppi = 'uusi';
-    }
   }
 
   @Watch('tyyppi')
   onTyyppiChange() {
     this.data = {
       ...this.data,
-      pohja: null,
       tiedosto: null,
       peruste: null,
+      koulutustyyppi: null,
     };
   }
 
@@ -316,11 +311,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       key: 'pohja',
       name: this.$t('pohjan-valinta'),
       isValid() {
-        if (self.tyyppi === 'pohjasta' && !self.data.pohja) {
-          return false;
-        }
-
-        if (self.tyyppi === 'perusteesta' && !self.data.peruste) {
+        if ((self.tyyppi === 'pohjasta' || self.tyyppi === 'perusteesta') && !self.data.peruste) {
           return false;
         }
 
@@ -361,6 +352,15 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       name: this.$t('tietojen-tarkistus'),
       description: this.$t('yhteenveto-kuvaus-tallenna-tiedot'),
     }];
+  }
+
+  valitsePeruste(event) {
+    this.data.peruste = event;
+    this.data.koulutustyyppi = event ? event.koulutustyyppi : null;
+  }
+
+  ktSearchIdentity(kt: any) {
+    return _.toLower(this.$kaannaOlioTaiTeksti(kt));
   }
 
   tyoryhmaSearchIdentity(tr: any) {
