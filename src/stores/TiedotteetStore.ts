@@ -4,20 +4,23 @@ import { TiedoteDto, Tiedotteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { ITiedotteetProvider } from '@shared/stores/types';
 import { TiedoteQuery } from '@shared/api/types';
+import { Debounced } from '@shared/utils/delay';
+import { Page } from '@shared/tyypit';
 
 Vue.use(VueCompositionApi);
 
 export class TiedotteetStore implements ITiedotteetProvider {
   private state = reactive({
-    tiedotteet: null as TiedoteDto[] | null,
+    tiedotteetPage: null as Page<TiedoteDto> | null,
     query: {} as TiedoteQuery,
     isLoading: false,
     kokonaismaara: 0,
   })
 
-  public readonly tiedotteet = computed(() => this.state.tiedotteet);
+  public readonly tiedotteet = computed(() => this.state.tiedotteetPage?.data || null);
+  public readonly tiedotteetPage = computed(() => this.state.tiedotteetPage);
   public readonly perusteId = computed(() => this.state.query.perusteId);
-  public readonly kokonaismaara = computed(() => this.state.kokonaismaara);
+  public readonly kokonaismaara = computed(() => this.state.tiedotteetPage?.kokonaismäärä);
   public readonly isLoading = computed(() => this.state.isLoading);
   public readonly options = computed(() => this.state.query);
 
@@ -39,30 +42,34 @@ export class TiedotteetStore implements ITiedotteetProvider {
       q.tiedoteJulkaisuPaikka,
       q.perusteIds,
       q.koulutusTyyppi,
+      q.jarjestys,
+      q.jarjestysNouseva,
     )).data as any;
-    return res.data;
+    return res;
   }
 
+  @Debounced(300)
   public async fetch() {
-    this.state.tiedotteet = await this.fetchImpl(this.options.value);
+    this.state.tiedotteetPage = null;
+    this.state.tiedotteetPage = await this.fetchImpl(this.options.value);
   }
 
   public async save(tiedote: TiedoteDto) {
     if (_.isNil(tiedote.id)) {
       const tallennettu = (await Tiedotteet.addTiedote(tiedote) as any).data;
-      this.state.tiedotteet = [tallennettu, ...this.state.tiedotteet || []];
+      this.state.tiedotteetPage!.data = [tallennettu, ...this.state.tiedotteetPage!.data || []];
     }
     else {
       await Tiedotteet.updateTiedote((tiedote as any).id, tiedote);
       const tallennettu = (await Tiedotteet.getTiedote((tiedote as any).id, tiedote) as any).data;
-      this.state.tiedotteet = _.map(this.state.tiedotteet, (listaTiedote) => listaTiedote.id === tallennettu.id ? tallennettu : listaTiedote);
+      this.state.tiedotteetPage!.data = _.map(this.state.tiedotteetPage!.data, (listaTiedote) => listaTiedote.id === tallennettu.id ? tallennettu : listaTiedote);
     }
   }
 
   public async delete(tiedote: TiedoteDto) {
     if (tiedote.id) {
       await Tiedotteet.deleteTiedote(tiedote.id);
-      this.state.tiedotteet = _.filter(this.state.tiedotteet, (listaTiedote) => listaTiedote.id !== tiedote.id);
+      this.state.tiedotteetPage!.data = _.filter(this.state.tiedotteetPage!.data, (listaTiedote) => listaTiedote.id !== tiedote.id);
     }
   }
 }

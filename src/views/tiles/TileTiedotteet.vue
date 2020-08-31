@@ -1,5 +1,5 @@
 <template>
-<EpHomeTile icon="muistikirja" :route="{ name: 'tiedotteet' }">
+<EpHomeTile icon="muistikirja" :route="{ name: 'tiedotteet' }" :count="uudetTiedotteetCount">
   <template slot="header">
     <span>{{ $t('tiedotteet') }}</span>
   </template>
@@ -7,7 +7,7 @@
     <div v-if="tiedotteet">
       <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
         <div class="col-3">{{$sd(tiedote.muokattu)}}</div>
-        <div class="col-7 otsikko">{{$kaanna(tiedote.otsikko)}}</div>
+        <div class="col-7 otsikko" :class="{'font-weight-bold': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}}</div>
       </div>
     </div>
     <div v-else-if="tiedotteet === []">
@@ -25,6 +25,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import _ from 'lodash';
 import { perustetila } from '@shared/utils/perusteet';
+import { onkoUusi } from '@shared/utils/tiedote';
 
 @Component({
   components: {
@@ -48,12 +49,22 @@ export default class TileTiedotteet extends Vue {
     if (this.tiedotteetStore.tiedotteet.value) {
       return _.chain(this.tiedotteetStore.tiedotteet.value)
         .filter(tiedote => _.isEmpty(tiedote.perusteet) || !_.some(tiedote.perusteet, (peruste) => (peruste.tila as any) !== perustetila.valmis))
+        .map(tiedote => {
+          return {
+            ...tiedote,
+            uusi: onkoUusi(tiedote.luotu),
+          };
+        })
         .value();
     }
   }
 
   get viimeisimmatTiedotteet() {
     return _.take(this.tiedotteet, 3);
+  }
+
+  get uudetTiedotteetCount() {
+    return _.size(_.filter(this.tiedotteet, 'uusi'));
   }
 }
 </script>
