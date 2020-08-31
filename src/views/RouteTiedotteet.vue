@@ -29,24 +29,31 @@
       </div>
     </div>
 
-    <b-table responsive
-      borderless
-      striped
-      fixed
-      hover
-      :items="tiedotteetFiltered"
-      :fields="tableFields"
-      :per-page="perPage"
-      :current-page="currentPage"
-      @row-clicked="avaaTiedote"/>
+    <ep-spinner v-if="!tiedotteetPage" />
 
-    <b-pagination
-      v-model="currentPage"
-      :total-rows="tiedotteetFiltered.length"
-      :per-page="perPage"
-      aria-controls="tiedotteet"
-      align="center">
-    </b-pagination>
+    <div v-else>
+      <b-table responsive
+        borderless
+        striped
+        fixed
+        hover
+        no-local-sorting
+        @sort-changed="sortingChanged"
+        :sort-by.sync="sort.sortBy"
+        :sort-desc.sync="sort.sortDesc"
+        :items="tiedotteetFiltered"
+        :fields="tableFields"
+        :per-page="perPage"
+        @row-clicked="avaaTiedote"/>
+
+      <b-pagination
+        v-model="page"
+        :total-rows="totalRows"
+        :per-page="perPage"
+        aria-controls="tiedotteet"
+        align="center">
+      </b-pagination>
+    </div>
 
   </ep-main-view>
 </template>
@@ -71,6 +78,7 @@ import { required } from 'vuelidate/lib/validators';
 import { validationMixin } from 'vuelidate';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
 import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 
 @Component({
   components: {
@@ -80,6 +88,7 @@ import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
     EpFormContent,
     EpMultiSelect,
     EpTiedoteModal,
+    EpSpinner,
   },
 } as any)
 export default class RouteTiedotteet extends Vue {
@@ -89,15 +98,20 @@ export default class RouteTiedotteet extends Vue {
   @Prop({ required: true })
   private tutoriaaliStore!: TutoriaaliStore;
 
-  private currentPage = 1;
+  private sivu = 0;
   private perPage = 10;
-  private totalRows = 0;
   private nimiFilter = ''
+  private sort = {};
   private valitutJulkaisupaikat: [] = [];
   private perusteet: PerusteHakuInternalDto[] = [];
 
   async mounted() {
-    this.tiedotteetStore.fetch();
+    this.tiedotteetStore.init(
+      {
+        sivu: this.sivu,
+        sivukoko: 10,
+      }
+    );
     const res = (await Perusteet.getAllPerusteetInternal(0, 9999) as any).data;
     this.perusteet = res.data;
   }
@@ -111,20 +125,80 @@ export default class RouteTiedotteet extends Vue {
       .value();
   }
 
+  @Watch('nimiFilter')
+  nimiChange() {
+    this.fetch(
+      {
+        sivu: 0,
+        nimi: this.nimiFilter,
+      }
+    );
+  }
+
+  @Watch('valitutJulkaisupaikat')
+  valitutJulkaispaikatChange() {
+    this.fetch(
+      {
+        sivu: 0,
+        tiedoteJulkaisuPaikka: _.map(this.valitutJulkaisupaikat, 'value'),
+      }
+    );
+  }
+
+  @Watch('sivu')
+  sivuChange() {
+    this.fetch(
+      {
+        sivu: this.sivu,
+      }
+    );
+  }
+
+  sortingChanged(sort) {
+    this.sort = sort;
+    this.fetch(
+      {
+        sivu: 0,
+        jarjestys: sort.sortBy,
+        jarjestysNouseva: !sort.sortDesc,
+      }
+    );
+  }
+
+  private fetch(query) {
+    this.tiedotteetStore.init(
+      {
+        ...this.tiedotteetStore.options.value,
+        ...query,
+      }
+    );
+  }
+
+  get tiedotteetPage() {
+    return this.tiedotteetStore?.tiedotteetPage.value || null;
+  }
+
+  get totalRows() {
+    return this.tiedotteetPage!.kokonaismäärä;
+  }
+
+  get page() {
+    return this.tiedotteetPage!.sivu + 1;
+  }
+
+  set page(value: number) {
+    this.sivu = value - 1;
+  }
+
   get tiedotteetFiltered() {
-    return _.chain(this.tiedotteetStore.tiedotteet.value)
-      .filter(tiedote => !this.nimiFilter || (!_.isEmpty(tiedote.otsikko) && Kielet.search(this.nimiFilter, tiedote.otsikko)))
-      .filter(tiedote => _.isEmpty(this.valitutJulkaisuPaikatValues) || _.some(this.valitutJulkaisuPaikatValues, (filter) => _.includes(tiedote.julkaisupaikat, filter)))
-      .filter(tiedote => _.isEmpty(tiedote.perusteet) || !_.some(tiedote.perusteet, (peruste) => (peruste.tila as any) !== perustetila.valmis))
-      .map(tiedote => {
-        return {
-          ...tiedote,
-          julkaisupaikat: _.chain(tiedote.julkaisupaikat)
-            .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
-            .value(),
-        };
-      })
-      .value();
+    return _.map(this.tiedotteetStore.tiedotteet.value, tiedote => {
+      return {
+        ...tiedote,
+        julkaisupaikat: _.chain(tiedote.julkaisupaikat)
+          .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
+          .value(),
+      };
+    });
   }
 
   get valitutJulkaisuPaikatValues() {
@@ -162,18 +236,16 @@ export default class RouteTiedotteet extends Vue {
     }, {
       key: 'otsikko',
       label: this.$t('tiedotteen-otsikko'),
-      sortable: true,
-      sortByFormatted: true,
-      thStyle: { width: '35%' },
+      sortable: false,
+      thStyle: { width: '35%', borderBottom: '0px' },
       formatter: (value: any, key: any, item: any) => {
         return (this as any).$kaanna(value);
       },
     }, {
       key: 'julkaisupaikat',
       label: this.$t('tiedote-julkaistu'),
-      sortable: true,
-      thStyle: { width: '35%' },
-      sortByFormatted: true,
+      sortable: false,
+      thStyle: { width: '35%', borderBottom: '0px' },
       formatter: (value: any, key: any, item: any) => {
         return _.chain(value)
           .sortBy(julkaisupaikka => julkaisupaikkaSort[julkaisupaikka])
