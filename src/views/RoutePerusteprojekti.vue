@@ -233,8 +233,10 @@ interface ValidationStats {
   total: number;
 }
 
+const ignoredRouteNames = ['kasitteet', 'opasKasitteet', 'poistetut'];
+
 function routeToNode(route: Location): NavigationNodeDto | null {
-  if (!route) {
+  if (!route || _.includes(ignoredRouteNames, route.name)) {
     return null;
   }
 

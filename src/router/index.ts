@@ -31,6 +31,7 @@ import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
 import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
+import RouteKasite from '@/views/RouteKasite.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -144,6 +145,10 @@ const router = new VueRouter({
           icon: ['far', 'file-pdf'],
           text: 'luo-pdf',
         }, {
+          route: 'kasitteet',
+          icon: 'kasitteet',
+          text: 'kasitteet',
+        }, {
           route: 'poistetut',
           icon: 'roskalaatikko',
           text: 'poistetut-sisallot',
@@ -235,7 +240,13 @@ const router = new VueRouter({
         name: 'perusteenPdfLuonti',
         component: RoutePdfLuonti,
         props: { ...stores },
-      }],
+      }, {
+        path: 'kasitteet',
+        name: 'kasitteet',
+        component: RouteKasite,
+        props: { ...stores },
+      },
+      ],
     }, {
       path: 'opas/:projektiId',
       component: RoutePerusteprojekti,
@@ -249,6 +260,10 @@ const router = new VueRouter({
           route: 'oppaanPdfLuonti',
           icon: ['far', 'file-pdf'],
           text: 'luo-pdf',
+        }, {
+          route: 'opasKasitteet',
+          icon: 'kasitteet',
+          text: 'kasitteet',
         }, {
           route: 'poistetut',
           icon: 'roskalaatikko',
@@ -300,6 +315,11 @@ const router = new VueRouter({
           ...stores,
           selitteenteksti: 'luo-opas-pdf-selite',
         },
+      }, {
+        path: 'kasitteet',
+        name: 'opasKasitteet',
+        component: RouteKasite,
+        props: { ...stores },
       },
       ],
     },
