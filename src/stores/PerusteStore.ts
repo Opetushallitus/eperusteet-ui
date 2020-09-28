@@ -89,6 +89,7 @@ export class PerusteStore implements IEditoitava {
       this.state.isInitialized = false;
       this.state.peruste = null;
       this.state.projekti = null;
+      this.state.projektiStatus = null;
 
       this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
       const perusteId = Number((this.state.projekti as any)._peruste);

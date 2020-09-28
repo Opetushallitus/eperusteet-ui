@@ -23,7 +23,11 @@
           <ep-toggle class="mt-4" v-model="data.liite">{{$t('nayta-tekstikappale-liitteena')}}</ep-toggle>
         </div>
         <div :class="{ 'mt-4': isEditing }">
-          <ep-content v-model="data.teksti" layout="normal" :is-editable="isEditing"></ep-content>
+          <ep-content v-model="data.teksti"
+                      layout="normal"
+                      :is-editable="isEditing"
+                      :kasiteHandler="kasiteHandler"
+                      :kuvaHandler="kuvaHandler"></ep-content>
         </div>
 
         <div v-if="koodistoryhmat" class="koodistoryhmat">
@@ -103,6 +107,10 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import * as _ from 'lodash';
 import { KoodiDto } from '../../eperusteet-frontend-utils/vue/src/generated/eperusteet';
 import { Murupolku } from '@shared/stores/murupolku';
+import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
+import { TermitStore } from '@/stores/TermitStore';
+import { KuvaStore } from '@/stores/KuvaStore';
+import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 
 interface koodistoryhma {
   ryhma: string;
@@ -293,6 +301,15 @@ export default class RouteTekstikappale extends Vue {
 
     return fields;
   }
+
+  get kasiteHandler() {
+    return createKasiteHandler(new TermitStore(this.perusteId!));
+  }
+
+  get kuvaHandler() {
+    return createKuvaHandler(new KuvaStore(this.perusteId!));
+  }
+
 }
 </script>
 

@@ -143,6 +143,10 @@ export class TekstikappaleStore implements IEditoitava {
       suoritustapakoodi = _.get(_.head(TekstikappaleStore.config.perusteStore.peruste.value?.suoritustavat), 'suoritustapakoodi');
     }
 
+    if (!suoritustapakoodi) {
+      suoritustapakoodi = 'reformi';
+    }
+
     if (TekstikappaleStore.config.perusteStore.perusteId.value && suoritustapakoodi) {
       if (_.isEmpty(tekstikappaleIsa)) {
         if (TekstikappaleStore.config.perusteStore.perusteId.value && suoritustapakoodi) {

@@ -48,7 +48,7 @@
                     <b-form-radio value="PERUSTEEN_UUDISTUS">{{ $t('perusteen-uudistus') }}</b-form-radio>
                   </b-form-radio-group>
                 </div>
-                <ep-content v-model="data.kuvaus" layout="normal" :is-editable="isEditing"></ep-content>
+                <ep-content v-model="data.kuvaus" layout="normal" :is-editable="isEditing" :kasiteHandler="kasiteHandler" :kuvaHandler="kuvaHandler"></ep-content>
               </b-form-group>
             </b-col>
           </b-row>
@@ -102,6 +102,10 @@ import { PerusteprojektiEditStore } from '@/stores/PerusteprojektiEditStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import _ from 'lodash';
+import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
+import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
+import { KuvaStore } from '@/stores/KuvaStore';
+import { TermitStore } from '@/stores/TermitStore';
 
 @Component({
   components: {
@@ -123,6 +127,14 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
 
   async onProjektiChange(projektiId: number) {
     this.store = new EditointiStore(new PerusteprojektiEditStore(projektiId));
+  }
+
+  get kasiteHandler() {
+    return createKasiteHandler(new TermitStore(this.perusteId!));
+  }
+
+  get kuvaHandler() {
+    return createKuvaHandler(new KuvaStore(this.perusteId!));
   }
 }
 </script>

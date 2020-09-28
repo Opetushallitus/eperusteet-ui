@@ -57,7 +57,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
-import { muokkaustietoRoute, muokkaustietoIcon } from '@/utils/tapahtuma';
+import { muokkaustietoRoute, muokkaustietoIcon } from '@shared/utils/tapahtuma';
 import { MuokkaustietoKayttajallaDto, PerusteDto } from '@shared/api/eperusteet';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
 
@@ -99,7 +99,7 @@ export default class EpPerusteViimeaikainenToiminta extends Vue {
       .map((muokkaustieto: MuokkaustietoKayttajallaDto) => {
         return {
           ...muokkaustieto,
-          route: muokkaustietoRoute(muokkaustieto.kohdeId, muokkaustieto.kohde, muokkaustieto.tapahtuma),
+          route: muokkaustietoRoute(muokkaustieto.kohdeId, muokkaustieto.kohde, muokkaustieto.tapahtuma, this.peruste.tyyppi),
           icon: muokkaustietoIcon(muokkaustieto.kohde, muokkaustieto.tapahtuma),
           iconClass: this.muokkaustietoIconClass(muokkaustieto),
           kayttajaNimi: muokkaustieto.kayttajanTieto ? parsiEsitysnimi(muokkaustieto.kayttajanTieto) : muokkaustieto.muokkaaja,
