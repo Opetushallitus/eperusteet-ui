@@ -24,9 +24,9 @@
         <TilePerusteprojektit />
         <TilePohjat />
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
-        <TileOppaat />
+        <TileOppaat :perusteOppaatStore="perusteOppaatStore"/>
         <TileArviointiasteikot />
-        <TileVirheellisetPerusteet />
+        <TileVirheellisetPerusteet :virheellisetPerusteetStore="virheellisetPerusteetStore"/>
       </div>
     </div>
   </div>
@@ -46,6 +46,8 @@ import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
+import { PerusteetStore } from '@/stores/PerusteetStore';
+import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore';
 
 @Component({
   components: {
@@ -66,6 +68,12 @@ export default class Home extends Vue {
 
   @Prop({ required: true })
   private kayttajaStore!: KayttajaStore;
+
+  @Prop({ required: true })
+  private perusteOppaatStore!: PerusteetStore;
+
+  @Prop({ required: true })
+  private virheellisetPerusteetStore!: VirheellisetPerusteetStore;
 
   private rajain = '';
 

@@ -6,8 +6,8 @@
   <template slot="content">
     <div v-if="tiedotteet">
       <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
-        <div class="col-3">{{$sd(tiedote.muokattu)}}</div>
-        <div class="col-7 otsikko" :class="{'font-weight-bold': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}}</div>
+        <div class="col-2">{{$sd(tiedote.muokattu)}}</div>
+        <div class="col-8 otsikko" :class="{'font-weight-bold': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}}</div>
       </div>
     </div>
     <div v-else-if="tiedotteet === []">

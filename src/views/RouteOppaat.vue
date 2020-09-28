@@ -74,6 +74,10 @@ export default class RouteOppaat extends Vue {
   @Prop({ required: true })
   perusteOppaatStore!: PerusteetStore;
 
+  mounted() {
+    this.perusteOppaatStore.clear();
+  }
+
   ensimmainenKoulutustyyppi(perusteProjekti) {
     if (perusteProjekti.peruste.oppaanKoulutustyypit && perusteProjekti.peruste.oppaanKoulutustyypit.length > 0) {
       return _.head(perusteProjekti.peruste.oppaanKoulutustyypit);
