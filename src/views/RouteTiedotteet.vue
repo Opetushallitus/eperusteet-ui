@@ -208,7 +208,7 @@ export default class RouteTiedotteet extends Vue {
   get julkaisupaikatItems() {
     return [
       { text: this.$t('tiedote-julkaisupaikka-opintopolku'), value: julkaisupaikka.opintopolku_etusivu },
-      { text: this.$t('tiedote-julkaisupaikka-ops'), value: julkaisupaikka.lops },
+      { text: this.$t('tiedote-julkaisupaikka-ops'), value: julkaisupaikka.ops },
       { text: this.$t('tiedote-julkaisupaikka-lops'), value: julkaisupaikka.lops },
       { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: julkaisupaikka.amosaa },
     ];
