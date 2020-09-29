@@ -36,6 +36,8 @@ import RouteKasite from '@/views/RouteKasite.vue';
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
 import { arkistoiPeruste } from '@/utils/arkistointi';
+import { getCasKayttajaKieli } from '@shared/api/common';
+import * as _ from 'lodash';
 
 Vue.use(VueRouter);
 Vue.use(VueMeta, {
@@ -45,10 +47,8 @@ Vue.use(VueMeta, {
 const router = new VueRouter({
   routes: [{
     path: '',
-    redirect: () => '/fi',
   }, {
     path: '/',
-    redirect: () => '/fi',
   }, {
     path: '/:lang',
     component: RouteRoot,
@@ -325,6 +325,14 @@ const router = new VueRouter({
     },
     ],
   }],
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (!_.get(to.params, 'lang')) {
+    router.push({ path: '/' + await getCasKayttajaKieli() });
+  }
+
+  next();
 });
 
 router.beforeEach((to, from, next) => {
