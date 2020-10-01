@@ -1,6 +1,6 @@
 <template>
   <router-link :to="link" tag="div" :class="classes">
-    <div v-if="indicator" class="p-2 flex-shrink-1">
+    <div v-if="indicator" class="p-2 pl-4 flex-shrink-1">
       <EpColorIndicator size="16" :kind="indicator" />
     </div>
     <div v-else></div>

@@ -59,24 +59,7 @@
           </b-form-group>
 
           <b-form-group :label="$t('koulutus-tutkintotyyppi') + ' *'" required>
-            <EpMultiSelect v-model="data.koulutustyyppi"
-                            :placeholder="$t('valitse')"
-                            :search-identity="koulutustyyppiSearchIdentity"
-                            :is-editing="true"
-                            :options="vaihtoehdotKoulutustyypit">
-              <template slot="singleLabel" slot-scope="{ option }">
-                <span class="text-nowrap">
-                  <EpColorIndicator :size="10" :kind="option" />
-                  <span class="ml-2">{{ $t(option) }}</span>
-                </span>
-              </template>
-              <template slot="option" slot-scope="{ option }">
-                <span class="text-nowrap">
-                  <EpColorIndicator :size="10" :kind="option" />
-                  <span class="ml-2">{{ $t(option) }}</span>
-                </span>
-              </template>
-            </EpMultiSelect>
+            <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required/>
           </b-form-group>
 
         </template>
@@ -117,6 +100,7 @@ import { required } from 'vuelidate/lib/validators';
 import { computed } from '@vue/composition-api';
 import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
 import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
+import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 
 @Component({
   components: {
@@ -132,6 +116,7 @@ import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
     EpSpinner,
     EpSteps,
     EpMultiListSelect,
+    KoulutustyyppiSelect,
   },
   validations() {
     return {
@@ -184,7 +169,9 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
       key: 'tiedot',
       name: this.$t('projektin-tiedot'),
       isValid() {
-        return !self.$v.$invalid && !_.isEmpty(self.data.tyoryhma);
+        return !self.$v.$invalid
+        && !_.isEmpty(self.data.tyoryhma)
+        && !_.isEmpty(self.data.koulutustyyppi);
       },
     },
     ];

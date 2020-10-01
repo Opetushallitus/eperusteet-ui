@@ -59,26 +59,16 @@
           </b-form-group>
 
           <b-form-group :label="$t('koulutus-tutkintotyyppi')" required class="pl-0">
-            <EpMultiListSelect v-model="data.koulutustyypit"
-                           :is-editing="true"
-                           :items="koulutustyypit"
-                           :required="true">
-              <template slot="singleLabel" slot-scope="{ option }">
-                <span class="text-nowrap">
-                  <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
-                  <span class="ml-2">{{ option.text }}</span>
-                </span>
-              </template>
-              <template slot="option" slot-scope="{ option }">
-                <span class="text-nowrap">
-                  <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
-                  <span class="ml-2">{{ option.text }}</span>
-                </span>
-              </template>
-              <template slot="lisaaTeksti">
-                {{$t('lisaa-koulutus-tutkintotyyppi')}}
-              </template>
-            </EpMultiListSelect>
+
+            <div class="row" v-for="(koulutustyyppi, index) in data.koulutustyypit" :key="'koulutustyyppi'+index">
+              <koulutustyyppi-select v-model="data.koulutustyypit[index]" :isEditing="true" required class="mb-2 col-11"/>
+              <div class="col-1">
+                <ep-button v-if="index > 0 " buttonClass="p-0 pt-2 roskalaatikko" variant="link" icon="roskalaatikko" @click="poistaKoulutustyyppi(index)"/>
+              </div>
+            </div>
+            <ep-button buttonClass="pl-0" variant="outline-primary" icon="plussa" @click="lisaaKoulutustyyppi">
+              {{$t('lisaa-koulutus-tutkintotyyppi')}}
+            </ep-button>
           </b-form-group>
 
           <b-form-group :label="$t('peruste')" required class="pl-0">
@@ -131,6 +121,7 @@ import { required } from 'vuelidate/lib/validators';
 import { computed } from '@vue/composition-api';
 import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
 import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
+import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -148,6 +139,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSpinner,
     EpSteps,
     EpMultiListSelect,
+    KoulutustyyppiSelect,
   },
   validations() {
     return {
@@ -168,7 +160,9 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
   @Prop({ required: true })
   oppaatStore!: OppaatStore;
 
-  private data: any = {};
+  private data: any = {
+    koulutustyypit: [null],
+  };
   private tyyppi: 'oppaasta' | 'uusi' = 'uusi';
   private currentStep: string | null = null;
 
@@ -185,6 +179,9 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
     this.data = {
       ...this.data,
       pohja: null,
+      koulutustyypit: [
+        null,
+      ],
     };
   }
 
@@ -275,6 +272,17 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
     return {
       nimi: requiredOneLang(),
     };
+  }
+
+  lisaaKoulutustyyppi() {
+    this.data.koulutustyypit = [
+      ...this.data.koulutustyypit,
+      null,
+    ];
+  }
+
+  poistaKoulutustyyppi(index) {
+    this.data.koulutustyypit = _.filter(this.data.koulutustyypit, (val, valIndex) => index !== valIndex);
   }
 }
 </script>
