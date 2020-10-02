@@ -26,7 +26,7 @@
         </div>
         <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
           <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                        :indicator="project.koulutustyyppi">
+                        :indicator="project.peruste.koulutustyyppi">
             <template slot="lower" class="small-text">
               {{ $t('tila-' + project.tila) }}
             </template>
@@ -52,18 +52,7 @@
         </div>
         <div class="m-2 flex-fill" v-if="filtersInclude('koulutustyyppi')">
           <label>{{ $t('koulutustyyppi') }}</label>
-          <EpMultiSelect v-model="koulutustyyppi"
-                    :enable-empty-option="true"
-                    placeholder="kaikki"
-                    :is-editing="true"
-                    :options="vaihtoehdotKoulutustyypit">
-            <template slot="singleLabel" slot-scope="{ option }">
-              {{ $t(option) }}
-            </template>
-            <template slot="option" slot-scope="{ option }">
-              {{ $t(option) }}
-            </template>
-          </EpMultiSelect>
+          <koulutustyyppi-select v-model="koulutustyyppi" :isEditing="true"/>
         </div>
         <div class="m-2 flex-fill" v-if="filtersInclude('peruste')">
           <label>{{ $t('peruste') }}</label>
@@ -159,6 +148,7 @@ import { BvTableFieldArray } from 'bootstrap-vue';
 import { IProjektiProvider } from './types';
 import ProjektiCard from './ProjektiCard.vue';
 import * as _ from 'lodash';
+import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -172,6 +162,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSearch,
     EpSpinner,
     ProjektiCard,
+    KoulutustyyppiSelect,
   },
 })
 export default class EpPerusteprojektiListaus extends Vue {

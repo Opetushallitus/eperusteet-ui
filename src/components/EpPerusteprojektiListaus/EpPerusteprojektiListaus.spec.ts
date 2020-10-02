@@ -64,8 +64,10 @@ describe('Projektilistaus', () => {
       data: [{
         id: 42,
         nimi: 'projekti 42',
-        koulutustyyppi: 'koulutustyyppi_11',
         tila: 'valmis',
+        peruste: {
+          koulutustyyppi: 'koulutustyyppi_11',
+        },
       }] as any,
     };
 
@@ -73,6 +75,9 @@ describe('Projektilistaus', () => {
       id: 43,
       nimi: 'perusteprojekti',
       tila: 'laadinta' as any,
+      peruste: {
+        koulutustyyppi: 'koulutustyyppi_11',
+      },
     }];
 
     await localVue.nextTick();

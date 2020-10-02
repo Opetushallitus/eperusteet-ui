@@ -75,24 +75,7 @@
           </b-form-group>
 
           <b-form-group :label="$t('koulutus-tutkintotyyppi') + '*'" required>
-            <EpMultiSelect v-model="data.koulutustyyppi"
-                           :placeholder="$t('valitse-koulutustyyppi')"
-                           :search-identity="ktSearchIdentity"
-                           :is-editing="true"
-                           :options="vaihtoehdotKoulutustyypit">
-              <template slot="singleLabel" slot-scope="{ option }">
-                <span class="text-nowrap">
-                  <EpColorIndicator :size="10" :kind="option" />
-                  <span class="ml-2">{{ $t(option) }}</span>
-                </span>
-              </template>
-              <template slot="option" slot-scope="{ option }">
-                <span class="text-nowrap">
-                  <EpColorIndicator :size="10" :kind="option" />
-                  <span class="ml-2">{{ $t(option) }}</span>
-                </span>
-              </template>
-            </EpMultiSelect>
+            <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required/>
           </b-form-group>
 
           <b-form-group :label="$t('perustetyoryhma') + '*'" required>
@@ -235,6 +218,7 @@ import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { requiredOneLang, minValue, notNull } from '@shared/validators/required';
+import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 
 const util = require('util');
 
@@ -255,6 +239,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSteps,
     EpTiedostoLataus,
     EpDatepicker,
+    KoulutustyyppiSelect,
   },
   validations() {
     return {
