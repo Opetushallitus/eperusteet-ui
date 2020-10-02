@@ -46,8 +46,11 @@ export class PerusteStore implements IEditoitava {
       if (this.isOpas.value) {
         return 'opas';
       }
-      else {
+      else if (_.head(this.suoritustavat.value)) {
         return _.head(this.suoritustavat.value);
+      }
+      else {
+        return 'reformi';
       }
     }
   });
@@ -135,6 +138,26 @@ export class PerusteStore implements IEditoitava {
     node.children = _(node.children || [])
       .reject(child => child.id === item.id && child.type === item.type)
       .map(child => this.removeImpl(child, item))
+      .value();
+    return node;
+  }
+
+  public updateNavigationEntry(item: { id: number, type: string, label: { [key: string]: string }}) {
+    if (this.state.navigation) {
+      this.state.navigation = this.updateImpl(this.state.navigation, item);
+    }
+  }
+
+  updateImpl(node: NavigationNodeDto, item: { id: number, type: string, label: { [key: string]: string }}): NavigationNodeDto {
+    node.children = _(node.children || [])
+      .map(child => {
+        if (child.id === item.id && child.type === item.type) {
+          return { ...child, label: item.label };
+        }
+
+        return child;
+      })
+      .map(child => this.updateImpl(child, item))
       .value();
     return node;
   }

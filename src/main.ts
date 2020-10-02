@@ -33,6 +33,7 @@ import { registerIconColorSchemeChange } from '@shared/utils/icon';
 import router from './router';
 
 import { stores } from '@/stores';
+import { OpintokokonaisuusStore } from './stores/OpintokokonaisuusStore';
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
@@ -88,6 +89,11 @@ Vue.use(TutkinnonOsaEditStore, {
 });
 
 Vue.use(MuodostuminenStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(OpintokokonaisuusStore, {
   perusteStore: stores.perusteStore,
   router,
 });

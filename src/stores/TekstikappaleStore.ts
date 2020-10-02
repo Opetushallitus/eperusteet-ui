@@ -62,6 +62,13 @@ export class TekstikappaleStore implements IEditoitava {
 
   public async save(data: Matala) {
     const res = await Perusteenosat.updatePerusteenOsa(this.id.value!, data);
+
+    TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
+      id: this.tekstiKappaleId,
+      type: 'viite',
+      label: res.data.nimi as any,
+    });
+
     return res.data;
   }
 

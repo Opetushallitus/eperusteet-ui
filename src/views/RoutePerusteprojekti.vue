@@ -137,6 +137,15 @@
                 </div>
               </template>
 
+              <template v-slot:opintokokonaisuus="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'opintokokonaisuus', params: { opintokokonaisuusId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-opintokokonaisuus') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:kvliite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'kvliite' }">
@@ -166,9 +175,34 @@
 
               <template v-slot:new>
                 <div class="ml-2">
-                  <ep-tekstikappale-lisays @save="tallennaUusiTekstikappale" :tekstikappaleet="tekstikappaleet" :paatasovalinta="true">
+                  <ep-tekstikappale-lisays @save="tallennaUusiTekstikappale" :tekstikappaleet="perusteenOsat" :paatasovalinta="true">
                     <template v-slot:default="{tekstikappale}">
-                      <span class="text-muted mr-1">{{ item.chapter }}</span>
+                      <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
+                      {{ $kaanna(tekstikappale.label) }}
+                    </template>
+                  </ep-tekstikappale-lisays>
+
+                  <ep-tekstikappale-lisays
+                    v-if="perusteVapaasivistystyo"
+                    @save="tallennaUusiOpintokokonaisuus"
+                    :tekstikappaleet="perusteenOsat"
+                    :paatasovalinta="true"
+                    :otsikkoRequired="false"
+                    modalId="opintokokonaisuusLisays">
+                    <template v-slot:lisays-btn-text>
+                      {{$t('uusi-opintokokonaisuus')}}
+                    </template>
+                    <template v-slot:modal-title>
+                      {{$t('uusi-opintokokonaisuus')}}
+                    </template>
+                    <template v-slot:footer-lisays-btn-text>
+                      {{$t('lisaa-opintokokonaisuus')}}
+                    </template>
+                    <template v-slot:header>
+                      {{$t('opintokokonaisuuden-sijainti')}}
+                    </template>
+                    <template v-slot:default="{tekstikappale}">
+                      <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
                       {{ $kaanna(tekstikappale.label) }}
                     </template>
                   </ep-tekstikappale-lisays>
@@ -215,6 +249,7 @@ import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTe
 import { NavigationNodeDto } from '@shared/tyypit';
 import { NavigationNodeDtoTypeEnum, Sisallot } from '@shared/api/eperusteet';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
+import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
 import { Location } from 'vue-router';
 import { Meta } from '@shared/utils/decorators';
 
@@ -272,6 +307,12 @@ function routeToNode(route: Location): NavigationNodeDto | null {
   else if (route.name === 'tutkinnonosat') {
     return {
       type: 'tutkinnonosat',
+    };
+  }
+  else if (route.name === 'opintokokonaisuus') {
+    return {
+      type: 'opintokokonaisuus',
+      id: Number(route.params?.opintokokonaisuusId!),
     };
   }
   else {
@@ -349,15 +390,18 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get tekstikappaleet() {
-    if (this.navigation) {
-      return _.chain(this.navigation.children)
-        .filter(child => child.type === NavigationNodeDtoTypeEnum.Viite)
-        .map(child => this.flatten(child))
-        .flatMap()
-        .value();
-    }
+    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Viite);
+  }
 
-    return [];
+  get opintokokonaisuudet() {
+    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Opintokokonaisuus);
+  }
+
+  get perusteenOsat() {
+    return _.sortBy([
+      ...this.tekstikappaleet,
+      ...this.opintokokonaisuudet,
+    ], 'chapter');
   }
 
   flatten(parent) {
@@ -438,8 +482,26 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     });
   }
 
+  async tallennaUusiOpintokokonaisuus(otsikko, tekstikappaleIsa) {
+    const tkstore = new OpintokokonaisuusStore(this.peruste!.id!, 0);
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+
+    this.perusteStore.updateNavigation();
+
+    this.$router.push({
+      name: 'opintokokonaisuus',
+      params: {
+        opintokokonaisuusId: '' + tallennettu!.id,
+      },
+    });
+  }
+
   ratasClick(clickFn, meta) {
     clickFn(this, meta);
+  }
+
+  get perusteVapaasivistystyo() {
+    return this.peruste!.koulutustyyppi === 'koulutustyyppi_30';
   }
 }
 </script>

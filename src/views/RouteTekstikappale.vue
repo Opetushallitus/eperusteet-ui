@@ -309,7 +309,6 @@ export default class RouteTekstikappale extends Vue {
   get kuvaHandler() {
     return createKuvaHandler(new KuvaStore(this.perusteId!));
   }
-
 }
 </script>
 
