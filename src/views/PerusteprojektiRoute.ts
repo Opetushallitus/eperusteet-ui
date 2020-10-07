@@ -39,6 +39,10 @@ export class PerusteprojektiRoute extends Vue {
     return this.perusteStore.isAmmatillinen.value;
   }
 
+  protected get isVapaasivistystyo() {
+    return this.perusteStore.isVapaasivistystyo.value;
+  }
+
   protected async onProjektiChange(projektiId: number, perusteId: number) {
   }
 
