@@ -62,7 +62,7 @@ export class OpintokokonaisuusStore implements IEditoitava {
     OpintokokonaisuusStore.config!.perusteStore!.updateNavigationEntry({
       id: this.opintokokonaisuusId,
       type: 'opintokokonaisuus',
-      label: res.data.nimi as any,
+      label: (res.data as any).nimi as any,
     });
 
     return res.data;

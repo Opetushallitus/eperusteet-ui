@@ -66,7 +66,7 @@ export class TekstikappaleStore implements IEditoitava {
     TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
       id: this.tekstiKappaleId,
       type: 'viite',
-      label: res.data.nimi as any,
+      label: (res.data as any).nimi as any,
     });
 
     return res.data;
