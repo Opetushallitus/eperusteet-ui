@@ -113,7 +113,7 @@ export class OpintokokonaisuusStore implements IEditoitava {
       nimiKoodi: {
         nimi: required,
       },
-      laajuus: minValue(1),
+      minimilaajuus: minValue(1),
       kuvaus: translated(julkaisukielet),
       opetuksenTavoiteOtsikko: translated(julkaisukielet),
       opetuksenTavoitteet: {

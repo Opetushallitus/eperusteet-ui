@@ -27,7 +27,9 @@
 
         <b-col md="2">
           <b-form-group :label="$t('minimilaajuus')  + (isEditing ? ' *' : '')" required>
-            <ep-laajuus-input v-model="data.laajuus" :is-editing="isEditing" />
+            <ep-laajuus-input v-model="data.minimilaajuus" :is-editing="isEditing">
+              {{$t('opintopiste')}}
+            </ep-laajuus-input>
           </b-form-group>
         </b-col>
       </b-row>
