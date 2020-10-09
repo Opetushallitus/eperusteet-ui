@@ -32,6 +32,7 @@ import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
 import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
 import RouteKasite from '@/views/RouteKasite.vue';
+import RouteOpintokokonaisuus from '@/views/RouteOpintokokonaisuus.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -44,6 +45,13 @@ Vue.use(VueMeta, {
   refreshOnceOnNavigation: true,
 });
 
+const props = (route: any) => {
+  return {
+    ...route.params,
+    ...stores,
+  };
+};
+
 const router = new VueRouter({
   routes: [{
     path: '',
@@ -52,17 +60,17 @@ const router = new VueRouter({
   }, {
     path: '/:lang',
     component: RouteRoot,
-    props: { ...stores },
+    props,
     children: [{
       path: '',
       name: 'root',
       component: RouteHome,
-      props: { ...stores },
+      props,
     }, {
       path: '',
       name: 'home',
       component: RouteHome,
-      props: { ...stores },
+      props,
     }, {
       path: 'virhe',
       name: 'virhe',
@@ -71,58 +79,58 @@ const router = new VueRouter({
       path: 'oppaat',
       name: 'oppaat',
       component: RouteOppaat,
-      props: { ...stores },
+      props,
     }, {
       path: 'perusteprojektit',
       name: 'perusteprojektit',
       component: RoutePerusteprojektit,
-      props: { ...stores },
+      props,
     }, {
       path: 'pohjat',
       name: 'pohjat',
       component: RoutePohjat,
-      props: { ...stores },
+      props,
     }, {
       path: 'tiedotteet',
       name: 'tiedotteet',
       component: RouteTiedotteet,
-      props: { ...stores },
+      props,
     }, {
       path: 'arviointi',
       name: 'arviointi',
       component: RouteArviointi,
-      props: { ...stores },
+      props,
       children: [{
         path: 'geneerinen',
         name: 'geneerinen',
         component: RouteGeneerinenArviointi,
-        props: { ...stores },
+        props,
       }, {
         path: 'arviointiasteikot',
         name: 'arviointiasteikot',
         component: RouteArviointiasteikot,
-        props: { ...stores },
+        props,
       }],
     }, {
       path: 'virheelliset',
       name: 'virheellisetperusteet',
       component: RouteVirheellisetPerusteet,
-      props: { ...stores },
+      props,
     }, {
       path: 'perusteprojektit/uusi',
       name: 'perusteprojektiLuonti',
       component: RoutePerusteprojektiLuonti,
-      props: { ...stores },
+      props,
     }, {
       path: 'pohjat/uusi',
       name: 'pohjaLuonti',
       component: RoutePohjatLuonti,
-      props: { ...stores },
+      props,
     }, {
       path: 'oppaat/uusi',
       name: 'opasLuonti',
       component: RouteOppaatLuonti,
-      props: { ...stores },
+      props,
     }, {
       path: 'perusteprojekti/:projektiId',
       component: RoutePerusteprojekti,
@@ -169,82 +177,87 @@ const router = new VueRouter({
         path: '',
         name: 'perusteprojekti',
         component: RouteYleisnakyma,
-        props: { ...stores },
+        props,
       }, {
         path: 'jarjesta',
         name: 'jarjesta',
         component: RouteJarjesta,
-        props: { ...stores },
+        props,
       }, {
         path: 'julkaise',
         name: 'julkaise',
         component: RouteJulkaise,
-        props: { ...stores },
+        props,
       }, {
         path: 'rakenne',
         name: 'muodostuminen',
         component: RouteMuodostuminen,
-        props: { ...stores },
+        props,
       }, {
         path: 'tutkinnonosat',
         name: 'tutkinnonosat',
         component: RouteTutkinnonOsat,
-        props: { ...stores },
+        props,
       }, {
         path: 'tekstikappale/:tekstiKappaleId',
         name: 'tekstikappale',
         component: RouteTekstikappale,
-        props: { ...stores },
+        props,
       }, {
         path: 'termisto',
         name: 'termisto',
         component: RouteTermisto,
-        props: { ...stores },
+        props,
       }, {
         path: 'peruste',
         name: 'perusteenTiedot',
         component: RoutePerusteenTiedot,
-        props: { ...stores },
+        props,
       }, {
         path: 'kvliite',
         name: 'kvliite',
         component: RouteKvliite,
-        props: { ...stores },
+        props,
       }, {
         path: 'projekti',
         name: 'projektinTiedot',
         component: RouteProjektiTiedot,
-        props: { ...stores },
+        props,
       }, {
         path: 'dokumentti',
         name: 'dokumentti',
         component: RoutePerusteenTiedot,
-        props: { ...stores },
+        props,
       }, {
         path: 'poistetut',
         name: 'poistetut',
         component: RoutePerusteenTiedot,
-        props: { ...stores },
+        props,
       }, {
         path: 'tutkinnonosat/:tutkinnonOsaId',
         name: 'tutkinnonosa',
         component: RouteTutkinnonOsa,
-        props: { ...stores },
+        props,
       }, {
         path: 'tutkinnonosat/:tutkinnonOsaId/osaalueet/:osaalueId',
         name: 'osaalue',
         component: RouteTutkinnonOsanOsaalue,
-        props: { ...stores },
+        props,
       }, {
         path: 'pdfluonti',
         name: 'perusteenPdfLuonti',
         component: RoutePdfLuonti,
-        props: { ...stores },
+        props,
       }, {
         path: 'kasitteet',
         name: 'kasitteet',
         component: RouteKasite,
-        props: { ...stores },
+        props,
+      }, {
+        path: 'opintokokonaisuus/:opintokokonaisuusId',
+        name: 'opintokokonaisuus',
+        component: RouteOpintokokonaisuus,
+        props,
       },
       ],
     }, {
@@ -306,7 +319,7 @@ const router = new VueRouter({
         path: 'tiedot',
         name: 'oppaanTiedot',
         component: RouteOppaanTiedot,
-        props: { ...stores },
+        props,
       }, {
         path: 'pdfluonti',
         name: 'oppaanPdfLuonti',
@@ -319,7 +332,7 @@ const router = new VueRouter({
         path: 'kasitteet',
         name: 'opasKasitteet',
         component: RouteKasite,
-        props: { ...stores },
+        props,
       },
       ],
     },

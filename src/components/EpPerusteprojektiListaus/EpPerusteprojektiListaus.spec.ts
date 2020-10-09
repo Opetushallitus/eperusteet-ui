@@ -127,7 +127,9 @@ describe('Projektilistaus', () => {
       data: [{
         id: 42,
         nimi: 'projekti 42',
-        koulutustyyppi: 'koulutustyyppi_11',
+        peruste: {
+          koulutustyyppi: 'koulutustyyppi_11',
+        },
         tila: 'valmis',
       }] as any,
     };
@@ -136,6 +138,9 @@ describe('Projektilistaus', () => {
       id: 43,
       nimi: 'oma projekti',
       tila: 'laadinta' as any,
+      peruste: {
+        koulutustyyppi: 'koulutustyyppi_11',
+      },
     }];
 
     expect(wrapper.html()).toContain('projekti 42');
