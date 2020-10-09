@@ -4,7 +4,7 @@ import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-a
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
-import { isAmmatillinenKoulutustyyppi } from '@shared/utils/perusteet';
+import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi } from '@shared/utils/perusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 
@@ -33,6 +33,7 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
   public readonly projektiStatus = computed(() => this.state.projektiStatus);
   public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
+  public readonly isVapaasivistystyo = computed(() => isVapaasivistystyoKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly julkaisut = computed(() => this.state.julkaisut);
 
   public readonly isOpas = computed(() => {

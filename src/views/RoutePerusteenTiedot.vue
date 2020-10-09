@@ -8,8 +8,8 @@
 
       <template v-slot:default="{ data, isEditing, validation }">
         <h3>{{ $t('perustiedot') }}</h3>
-        <b-container fluid>
-          <b-row no-gutters>
+        <b-container fluid="lg" class="ml-0 pl-0">
+          <b-row no-gutters >
             <b-col>
               <b-form-group :label="$t('perusteen-nimi') + '*'">
                 <ep-input v-model="data.nimi"
@@ -19,7 +19,18 @@
             </b-col>
           </b-row>
           <b-row no-gutters>
-            <b-col lg="6">
+            <b-col lg="6" v-if="filtersContain('laajuus')">
+              <b-form-group :label="$t('laajuus')">
+                <div class="d-flex align-items-center">
+                  <ep-input v-model="data.vstSisalto.laajuus"
+                            type="string"
+                            :is-editing="isEditing"
+                            :validation="validation.laajuus"></ep-input>
+                  <div class="ml-2">{{$t('opintopiste')}}</div>
+                </div>
+              </b-form-group>
+            </b-col>
+            <b-col lg="6" v-if="filtersContain('diaarinumero')">
               <b-form-group :label="$t('diaarinumero')">
                 <ep-input v-model="data.diaarinumero"
                           type="string"
@@ -27,14 +38,12 @@
                           :validation="validation.diaarinumero"></ep-input>
               </b-form-group>
             </b-col>
-            <b-col lg="6">
+            <b-col lg="6" v-if="filtersContain('paatospaivamaara')">
               <b-form-group :label="$t('maarayksen-paatospaivamaara')">
                 <ep-datepicker v-model="data.paatospvm" :is-editing="isEditing" />
               </b-form-group>
             </b-col>
-          </b-row>
-          <b-row no-gutters>
-            <b-col lg="6">
+            <b-col lg="6" v-if="filtersContain('voimassaolo')">
               <b-form-group :label="$t('voimassaolo')">
                 <div class="d-flex align-items-center">
                   <ep-datepicker v-model="data.voimassaoloAlkaa" :is-editing="isEditing" />
@@ -43,16 +52,14 @@
                 </div>
               </b-form-group>
             </b-col>
-            <b-col lg="6">
+            <b-col lg="6" v-if="filtersContain('koulutustyyppi')">
               <b-form-group :label="$t('koulutustyyppi')">
                 <ep-koulutustyyppi-select v-model="data.koulutustyyppi"
                                           :koulutustyypit="siirtymat[data.koulutustyyppi]"
                                           :is-editing="isEditing && !!siirtymat[data.koulutustyyppi]" />
               </b-form-group>
             </b-col>
-          </b-row>
-          <b-row no-gutters>
-            <b-col lg="6">
+            <b-col lg="6" v-if="filtersContain('perusteenkieli')">
               <b-form-group :label="$t('perusteen-kielet')">
                 <b-form-checkbox-group v-if="isEditing" v-model="data.kielet" stacked>
                   <b-form-checkbox v-for="kieli in kielet" :key="kieli" :value="kieli">
@@ -66,7 +73,7 @@
                 </div>
               </b-form-group>
             </b-col>
-            <b-col lg="6">
+            <b-col lg="6" v-if="filtersContain('koulutusvienti')">
               <b-form-group :label="$t('koulutusvienti')">
                 <b-form-checkbox v-model="data.koulutusvienti" v-if="isEditing">
                 </b-form-checkbox>
@@ -74,220 +81,221 @@
               </b-form-group>
             </b-col>
           </b-row>
-        </b-container>
 
-        <b-row no-gutters v-if="data.kvliite">
-          <b-col>
-            <b-form-group :label="$t('tutkinnon-suorittaneen-osaaminen')">
-              <ep-content
-                v-model="data.kvliite.suorittaneenOsaaminen"
-                layout="normal"
-                :is-editable="isEditing"></ep-content>
-            </b-form-group>
-          </b-col>
-        </b-row>
+          <b-row no-gutters v-if="data.kvliite">
+            <b-col>
+              <b-form-group :label="$t('tutkinnon-suorittaneen-osaaminen')">
+                <ep-content
+                  v-model="data.kvliite.suorittaneenOsaaminen"
+                  layout="normal"
+                  :is-editable="isEditing"></ep-content>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row no-gutters v-if="data.kvliite">
-          <b-col>
-            <b-form-group :label="$t('tyotehtavat-joissa-voi-toimia')">
-              <ep-content
-                v-model="data.kvliite.tyotehtavatJoissaVoiToimia"
-                layout="normal"
-                :is-editable="isEditing"></ep-content>
-            </b-form-group>
-          </b-col>
-        </b-row>
+          <b-row no-gutters v-if="data.kvliite">
+            <b-col>
+              <b-form-group :label="$t('tyotehtavat-joissa-voi-toimia')">
+                <ep-content
+                  v-model="data.kvliite.tyotehtavatJoissaVoiToimia"
+                  layout="normal"
+                  :is-editable="isEditing"></ep-content>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row no-gutters>
-          <b-col>
-            <b-form-group :label="$t('peruste-koulutukset')">
-              <b-table striped
-                show-empty
-                       :items="data.koulutukset"
-                       :fields="koulutuksetFields"
-                       :empty-text="$t('ei-koulutuskoodeja') ">
-                <template v-slot:empty="">
-                  <h4>{{ $t('ei-koulutuskoodeja') }}</h4>
-                </template>
-                <template v-slot:cell(koodi)="data">
-                  <span class="font-weight-bold">{{ data.item.koulutuskoodiArvo }}</span>
-                </template>
-                <template v-slot:cell(nimi)="data">
-                  {{ $kaanna(data.item.nimi) }}
-                </template>
-              </b-table>
-              <ep-koodisto-select @add="addKoulutuskoodi(data, $event)"
-                :store="koulutuskoodisto"
-                v-if="isEditing">
-                <template v-slot:default="{ open }">
-                  <ep-button @click="open" icon="plus" variant="outline">
-                    {{ $t('lisaa-koulutus') }}
-                  </ep-button>
-                </template>
-              </ep-koodisto-select>
-            </b-form-group>
-          </b-col>
-        </b-row>
-
-        <b-row no-gutters>
-          <b-col>
-            <b-form-group :label="$t('korvattavat-perusteet')">
-              <b-table v-if="korvattavatDiaarinumerot"
-                       :items="korvattavatDiaarinumerot"
-                       :fields="korvattavatFields"
-                       responsive
-                       borderless
-                       striped
-                       fixed
-                       hover>
-                <template v-slot:cell(diaarinumero)="data">
-                  {{ data.item }}
-                </template>
-                <template v-slot:cell(peruste)="data">
-                  <span v-if="korvattavatPerusteet[data.item]">
-                    {{ $kaanna(korvattavatPerusteet[data.item].nimi) }}
-                  </span>
-                  <span v-else-if="korvattavatPerusteet[data.item] === null" class="font-italic">
-                    {{ $t('ei-eperusteissa') }}
-                  </span>
-                  <ep-spinner v-else />
-                </template>
-                <template v-slot:cell(toiminnot)="data">
-                  <div class="text-center" v-if="isEditing">
-                    <ep-button variant="link" icon="roskalaatikko" @click="poistaKorvattava(data.item)">
-                      {{ $t('poista') }}
+          <b-row no-gutters>
+            <b-col>
+              <b-form-group :label="$t('peruste-koulutukset')">
+                <b-table striped
+                  show-empty
+                        :items="data.koulutukset"
+                        :fields="koulutuksetFields"
+                        :empty-text="$t('ei-koulutuskoodeja') ">
+                  <template v-slot:empty="">
+                    <h4>{{ $t('ei-koulutuskoodeja') }}</h4>
+                  </template>
+                  <template v-slot:cell(koodi)="data">
+                    <span class="font-weight-bold">{{ data.item.koulutuskoodiArvo }}</span>
+                  </template>
+                  <template v-slot:cell(nimi)="data">
+                    {{ $kaanna(data.item.nimi) }}
+                  </template>
+                </b-table>
+                <ep-koodisto-select @add="addKoulutuskoodi(data, $event)"
+                  :store="koulutuskoodisto"
+                  v-if="isEditing">
+                  <template v-slot:default="{ open }">
+                    <ep-button @click="open" icon="plus" variant="outline">
+                      {{ $t('lisaa-koulutus') }}
                     </ep-button>
-                  </div>
-                </template>
-              </b-table>
-              <b-input-group v-if="isEditing">
-                <b-form-input v-model="korvattavaDiaarinumero"></b-form-input>
-                <b-input-group-append>
-                  <b-button @click="lisaaDiaarinumero" icon="plus" variant="primary" :disabled="!korvattavaDiaarinumero">
-                    {{ $t('lisaa-peruste') }}
-                  </b-button>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-          </b-col>
-        </b-row>
+                  </template>
+                </ep-koodisto-select>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row no-gutters>
-          <b-col>
-            <b-form-group :label="$t('liitteet-ja-maaraykset')">
-              <ep-spinner v-if="!liitteet" />
-              <div v-else>
-                <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
-                <div class="liiteohje" v-html="$t('liitetiedosto-ohje')"></div>
-                <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!isEditing && !file" />
-                <div v-if="file">
-                  <b-input-group>
-                    <b-form-input v-model="liitteenNimi"></b-form-input>
-                    <b-input-group-append>
-                      <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
-                        {{ $t('lisaa-liite') }}
-                      </b-button>
-                    </b-input-group-append>
-                  </b-input-group>
-                </div>
-                <b-table :items="liitteet"
-                         :fields="liitetableFields"
-                         responsive
-                         borderless
-                         striped
-                         fixed
-                         hover>
+          <b-row no-gutters>
+            <b-col>
+              <b-form-group :label="$t('korvattavat-perusteet')">
+                <b-table v-if="korvattavatDiaarinumerot"
+                        :items="korvattavatDiaarinumerot"
+                        :fields="korvattavatFields"
+                        responsive
+                        borderless
+                        striped
+                        fixed
+                        hover>
+                  <template v-slot:cell(diaarinumero)="data">
+                    {{ data.item }}
+                  </template>
+                  <template v-slot:cell(peruste)="data">
+                    <span v-if="korvattavatPerusteet[data.item]">
+                      {{ $kaanna(korvattavatPerusteet[data.item].nimi) }}
+                    </span>
+                    <span v-else-if="korvattavatPerusteet[data.item] === null" class="font-italic">
+                      {{ $t('ei-eperusteissa') }}
+                    </span>
+                    <ep-spinner v-else />
+                  </template>
                   <template v-slot:cell(toiminnot)="data">
                     <div class="text-center" v-if="isEditing">
-                      <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                      <ep-button variant="link" icon="roskalaatikko" @click="poistaKorvattava(data.item)">
                         {{ $t('poista') }}
                       </ep-button>
                     </div>
                   </template>
                 </b-table>
-              </div>
-            </b-form-group>
-          </b-col>
-        </b-row>
+                <b-input-group v-if="isEditing">
+                  <b-form-input v-model="korvattavaDiaarinumero"></b-form-input>
+                  <b-input-group-append>
+                    <b-button @click="lisaaDiaarinumero" icon="plus" variant="primary" :disabled="!korvattavaDiaarinumero">
+                      {{ $t('lisaa-peruste') }}
+                    </b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row no-gutters>
-          <b-col>
-            <b-form-group :label="$t('maarayskirje')">
-              <div class="d-flex align-items-center w-100" v-if="isEditing">
-                <div class="flex-fill-1 w-100">
-                  <ep-multi-select class="w-100" v-model="maarayskirje" :options="liitteet" track-by="id">
-                    <template v-slot:singleLabel="{ option }">{{ option.nimi }}</template>
-                    <template v-slot:option="{ option }">{{ option.nimi }}</template>
-                    <template v-slot:tag="{ option }">{{ option.nimi }}</template>
-                  </ep-multi-select>
+          <b-row no-gutters>
+            <b-col>
+              <b-form-group :label="$t('liitteet-ja-maaraykset')">
+                <ep-spinner v-if="!liitteet" />
+                <div v-else>
+                  <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                  <div class="liiteohje" v-html="$t('liitetiedosto-ohje')"></div>
+                  <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!isEditing && !file" />
+                  <div v-if="file">
+                    <b-input-group>
+                      <b-form-input v-model="liitteenNimi"></b-form-input>
+                      <b-input-group-append>
+                        <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
+                          {{ $t('lisaa-liite') }}
+                        </b-button>
+                      </b-input-group-append>
+                    </b-input-group>
+                  </div>
+                  <b-table :items="liitteet"
+                          :fields="liitetableFields"
+                          responsive
+                          borderless
+                          striped
+                          fixed
+                          hover>
+                    <template v-slot:cell(toiminnot)="data">
+                      <div class="text-center" v-if="isEditing">
+                        <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                          {{ $t('poista') }}
+                        </ep-button>
+                      </div>
+                    </template>
+                  </b-table>
                 </div>
-                <b-button @click="data.maarayskirje = null" variant="link" v-if="data.maarayskirje">
-                  {{ $t('tyhjenna') }}
-                </b-button>
-              </div>
-              <div v-else-if="maarayskirje">
-                <a :href="maarayskirjeUrl" target="_blank" rel="noopener noreferrer">{{ maarayskirje.nimi }}</a>
-              </div>
-              <div v-else>
-                -
-              </div>
-            </b-form-group>
-          </b-col>
-        </b-row>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row no-gutters>
-          <b-col>
-            <b-form-group :label="$t('muutosmaaraykset')">
-              <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
-                                  :is-editing="isEditing"
-                                  :liitteet="liitteet" />
-            </b-form-group>
-          </b-col>
-        </b-row>
+          <b-row no-gutters>
+            <b-col>
+              <b-form-group :label="$t('maarayskirje')">
+                <div class="d-flex align-items-center w-100" v-if="isEditing">
+                  <div class="flex-fill-1 w-100">
+                    <ep-multi-select class="w-100" v-model="maarayskirje" :options="liitteet" track-by="id">
+                      <template v-slot:singleLabel="{ option }">{{ option.nimi }}</template>
+                      <template v-slot:option="{ option }">{{ option.nimi }}</template>
+                      <template v-slot:tag="{ option }">{{ option.nimi }}</template>
+                    </ep-multi-select>
+                  </div>
+                  <b-button @click="data.maarayskirje = null" variant="link" v-if="data.maarayskirje">
+                    {{ $t('tyhjenna') }}
+                  </b-button>
+                </div>
+                <div v-else-if="maarayskirje">
+                  <a :href="maarayskirjeUrl" target="_blank" rel="noopener noreferrer">{{ maarayskirje.nimi }}</a>
+                </div>
+                <div v-else>
+                  -
+                </div>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row no-gutters>
-          <b-col>
-            <b-form-group :label="$t('osaamisalat')">
-              <div class="text-muted font-size-small">
-                {{ $t('lisaa-tai-poista-osaamisala') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
-              </div>
-              <b-table striped
-                show-empty
-                       :items="osaamisalat"
-                       :fields="fields"
-                       :empty-text="$t('ei-kiinnitettyja-osaamisaloja')">
-                <template v-slot:cell(koodi)="data">
-                  <span class="font-weight-bold">{{ data.item.arvo }}</span>
-                </template>
-                <template v-slot:cell(nimi)="data">
-                  {{ $kaanna(data.item.nimi) }}
-                </template>
-              </b-table>
-            </b-form-group>
-          </b-col>
-        </b-row>
+          <b-row no-gutters>
+            <b-col>
+              <b-form-group :label="$t('muutosmaaraykset')">
+                <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
+                                    :is-editing="isEditing"
+                                    :liitteet="liitteet" />
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row no-gutters>
-          <b-col>
-            <b-form-group :label="$t('tutkintonimikkeet')">
-              <div class="text-muted font-size-small">
-                {{ $t('lisaa-tai-poista-tutkintonimike') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
-              </div>
-              <b-table striped
-                show-empty
-                       :items="tutkintonimikkeet"
-                       :fields="fields"
-                       :empty-text="$t('ei-kiinnitettyja-tutkintonimikkeita')">
-                <template v-slot:cell(koodi)="data">
-                  <span class="font-weight-bold">{{ data.item.arvo }}</span>
-                </template>
-                <template v-slot:cell(nimi)="data">
-                  {{ $kaanna(data.item.nimi) }}
-                </template>
-              </b-table>
-            </b-form-group>
-          </b-col>
-        </b-row>
+          <b-row no-gutters v-if="isAmmatillinen">
+            <b-col>
+              <b-form-group :label="$t('osaamisalat')">
+                <div class="text-muted font-size-small">
+                  {{ $t('lisaa-tai-poista-osaamisala') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
+                </div>
+                <b-table striped
+                  show-empty
+                        :items="osaamisalat"
+                        :fields="fields"
+                        :empty-text="$t('ei-kiinnitettyja-osaamisaloja')">
+                  <template v-slot:cell(koodi)="data">
+                    <span class="font-weight-bold">{{ data.item.arvo }}</span>
+                  </template>
+                  <template v-slot:cell(nimi)="data">
+                    {{ $kaanna(data.item.nimi) }}
+                  </template>
+                </b-table>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row no-gutters v-if="isAmmatillinen">
+            <b-col>
+              <b-form-group :label="$t('tutkintonimikkeet')">
+                <div class="text-muted font-size-small">
+                  {{ $t('lisaa-tai-poista-tutkintonimike') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
+                </div>
+                <b-table striped
+                  show-empty
+                        :items="tutkintonimikkeet"
+                        :fields="fields"
+                        :empty-text="$t('ei-kiinnitettyja-tutkintonimikkeita')">
+                  <template v-slot:cell(koodi)="data">
+                    <span class="font-weight-bold">{{ data.item.arvo }}</span>
+                  </template>
+                  <template v-slot:cell(nimi)="data">
+                    {{ $kaanna(data.item.nimi) }}
+                  </template>
+                </b-table>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+         </b-container>
 
       </template>
     </EpEditointi>
@@ -323,6 +331,17 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { UiKielet } from '@shared/stores/kieli';
 import _ from 'lodash';
+
+export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
+
+const koulutustyyppiTietoFilters = {
+  'default': [
+    'diaarinumero', 'paatospaivamaara', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli', 'koulutusvienti',
+  ],
+  'koulutustyyppi_30': [
+    'laajuus', 'diaarinumero', 'paatospaivamaara', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli',
+  ],
+};
 
 @Component({
   components: {
@@ -460,7 +479,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
     }, {
       key: 'toiminnot',
       label: '',
-      thStyle: { width: '10%' },
+      thStyle: { width: '10%', borderBottom: '0px' },
       sortable: false,
     }];
   }
@@ -481,7 +500,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
     }, {
       key: 'toiminnot',
       label: '',
-      thStyle: { width: '10%' },
+      thStyle: { width: '10%', borderBottom: '0px' },
       sortable: false,
     }];
   }
@@ -553,6 +572,23 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
       ...data,
       korvattavatDiaarinumerot: _.reject(data?.korvattavatDiaarinumerot, x => x === diaarinumero),
     });
+  }
+
+  get peruste() {
+    return this.store?.data?.value || {};
+  }
+
+  get tietoFilters() {
+    if (koulutustyyppiTietoFilters[this.peruste.koulutustyyppi]) {
+      return koulutustyyppiTietoFilters[this.peruste.koulutustyyppi];
+    }
+    else {
+      return koulutustyyppiTietoFilters['default'];
+    }
+  }
+
+  filtersContain(filter) {
+    return _.includes(this.tietoFilters, filter);
   }
 }
 

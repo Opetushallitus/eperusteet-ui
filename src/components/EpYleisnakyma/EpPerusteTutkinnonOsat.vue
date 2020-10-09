@@ -4,14 +4,9 @@
 
     <ep-spinner v-if="!tutkinnonOsat || !peruste" />
 
-    <div class="box d-inline-flex flex-column align-items-center justify-content-center text-center" v-if="tutkinnonOsat">
-      <div class="count">{{tutkinnonOsiaTuotu}}</div>
-      <div class="topic">{{$t('tuotua')}}</div>
-    </div>
-
-    <div class="box d-inline-flex flex-column  align-items-center justify-content-center text-center" v-if="tutkinnonOsat">
-      <div class="count">{{tutkinnonOsiaLuotu}}</div>
-      <div class="topic">{{$t('luotua')}}</div>
+    <div v-else>
+      <ep-small-data-box :topic="$t('tuotua')" :count="tutkinnonOsiaTuotu" />
+      <ep-small-data-box :topic="$t('luotua')" :count="tutkinnonOsiaLuotu" />
     </div>
 
   </div>
@@ -24,10 +19,12 @@ import _ from 'lodash';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { PerusteDto } from '@shared/api/eperusteet';
+import EpSmallDataBox from '@/components/EpYleisnakyma/EpSmallDataBox.vue';
 
 @Component({
   components: {
     EpSpinner,
+    EpSmallDataBox,
   },
 })
 export default class EpPerusteTutkinnonOsat extends Vue {
@@ -53,28 +50,4 @@ export default class EpPerusteTutkinnonOsat extends Vue {
 
 <style scoped lang="scss">
 @import "@/styles/_variables.scss";
-
-  .box {
-    width: 125px;
-    height: 140px;
-    margin-right: 10px;
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #f7f8fc;
-
-    .count {
-      font-size: 2.375rem;
-      line-height: 1;
-
-      .secondary {
-        font-size: 1rem;
-        color: $gray-lighten-1;
-      }
-    }
-
-    .topic {
-      padding-top: 10px;
-    }
-  }
-
 </style>

@@ -6,8 +6,22 @@
     <div class="d-flex flex-wrap">
 
       <ep-perustieto-data icon="info" :topic="$t('projektin-kuvaus')" class="w-100">
-        <ep-input type="localized" :value="projektinKuvaus" />
+        <div v-html="$kaanna(projektinKuvaus)"></div>
       </ep-perustieto-data>
+
+      <div class="w-40">
+        <ep-perustieto-data icon="comment" :topic="$t('yhteyshenkilo')">
+          {{yhteyshenkilo}}
+        </ep-perustieto-data>
+
+        <ep-perustieto-data icon="kielet" :topic="$t('julkaisukielet')">
+          {{julkaisukielet}}
+        </ep-perustieto-data>
+
+        <ep-perustieto-data icon="kalenteri" :topic="$t('luotu')">
+          {{$sdt(peruste.luotu)}}
+        </ep-perustieto-data>
+      </div>
 
       <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" class="w-60" v-if="virkailijat">
         <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
@@ -17,16 +31,6 @@
           {{$t('nayta-lisaa')}}
         </ep-button>
       </ep-perustieto-data>
-
-      <div>
-        <ep-perustieto-data icon="comment" :topic="$t('yhteyshenkilo')">
-          {{yhteyshenkilo}}
-        </ep-perustieto-data>
-
-        <ep-perustieto-data icon="kielet" :topic="$t('julkaisukielet')">
-          {{julkaisukielet}}
-        </ep-perustieto-data>
-      </div>
     </div>
 
   </div>
@@ -67,9 +71,7 @@ export default class EpPerustePerustiedot extends Vue {
   private tyoryhmaStore!: TyoryhmaStore;
 
   get projektinKuvaus() {
-    if (this.peruste) {
-      return this.peruste.kuvaus;
-    }
+    return this.projekti.kuvaus;
   }
 
   get yhteyshenkilo() {

@@ -12,7 +12,8 @@
       <div class="col">
         <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
         <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
-        <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore"/>
+        <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore" v-if="isAmmatillinen"/>
+        <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore" v-if="isVapaasivistystyo"/>
       </div>
       <div class="col">
         <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
@@ -43,6 +44,7 @@ import EpOpasPerustiedot from '@/components/EpYleisnakyma/EpOpasPerustiedot.vue'
 import EpPerusteViimeaikainenToiminta from '@/components/EpYleisnakyma/EpPerusteViimeaikainenToiminta.vue';
 import EpPerusteTutkinnonOsat from '@/components/EpYleisnakyma/EpPerusteTutkinnonOsat.vue';
 import EpPerusteTiedotteet from '@/components/EpYleisnakyma/EpPerusteTiedotteet.vue';
+import EpPerusteRakenne from '@/components/EpYleisnakyma/EpPerusteRakenne.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
@@ -60,6 +62,7 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
     EpPerustePerustiedot,
     EpPerusteTiedotteet,
     EpOpasPerustiedot,
+    EpPerusteRakenne,
   },
 })
 export default class RouteYleisnakyma extends PerusteprojektiRoute {
@@ -88,11 +91,14 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
     if (this.peruste && this.peruste.id) {
       this.muokkaustietoStore.init(this.peruste.id);
       this.aikatauluStore.init(this.peruste);
-      this.tutkinnonOsaStore.fetch();
       this.tiedotteetStore.init({
         perusteIds: [this.peruste.id],
       });
       this.tyoryhmaStore.init(this.projekti?.ryhmaOid);
+
+      if (this.isAmmatillinen) {
+        this.tutkinnonOsaStore.fetch();
+      }
     }
   }
 
