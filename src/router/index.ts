@@ -145,10 +145,6 @@ const router = new VueRouter({
           icon: 'info',
           text: 'perusteen-tiedot',
         }, {
-          route: 'dokumentti',
-          icon: ['far', 'file-pdf'],
-          text: 'luo-pdf',
-        }, {
           route: 'perusteenPdfLuonti',
           icon: ['far', 'file-pdf'],
           text: 'luo-pdf',
@@ -222,11 +218,6 @@ const router = new VueRouter({
         path: 'projekti',
         name: 'projektinTiedot',
         component: RouteProjektiTiedot,
-        props,
-      }, {
-        path: 'dokumentti',
-        name: 'dokumentti',
-        component: RoutePerusteenTiedot,
         props,
       }, {
         path: 'poistetut',

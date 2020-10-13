@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { minLength, required } from 'vuelidate/lib/validators';
-import { minValue, translated, warning } from '@shared/validators/required';
+import { allTranslations, minValue, translated, warning } from '@shared/validators/required';
 
 Vue.use(VueCompositionApi);
 
@@ -79,7 +79,7 @@ export class OpintokokonaisuusStore implements IEditoitava {
     await Sisallot.removeSisaltoViite(this.perusteId, 'REFORMI', this.opintokokonaisuusId);
     OpintokokonaisuusStore.config!.perusteStore!.removeNavigationEntry({
       id: this.opintokokonaisuusId,
-      type: 'viite',
+      type: 'opintokokonaisuus',
     });
     OpintokokonaisuusStore.config.router.push({ name: 'perusteprojekti' });
   }
@@ -113,8 +113,7 @@ export class OpintokokonaisuusStore implements IEditoitava {
       nimiKoodi: {
         nimi: required,
       },
-      minimilaajuus: minValue(1),
-      kuvaus: translated(julkaisukielet),
+      kuvaus: allTranslations(julkaisukielet),
       opetuksenTavoiteOtsikko: translated(julkaisukielet),
       opetuksenTavoitteet: {
         'min-length': minLength(1),

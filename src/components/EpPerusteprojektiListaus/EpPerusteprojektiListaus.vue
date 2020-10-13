@@ -24,7 +24,8 @@
             </div>
           </ProjektiCard>
         </div>
-        <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
+        <EpSpinner v-if="!ownProjects" class="m-5"/>
+        <div v-else class="card-wrapper" v-for="project in ownProjects" :key="project.id">
           <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
                         :indicator="project.peruste.koulutustyyppi">
             <template slot="lower" class="small-text">

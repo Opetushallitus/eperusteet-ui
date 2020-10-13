@@ -21,10 +21,13 @@ export class PerusteetStore implements IProjektiProvider {
   })
 
   public readonly ownProjects = computed(() => {
-    return _.filter(this.state.ownProjects, p => {
-      const tyyppi = this.overrides?.tyyppi;
-      return !tyyppi || _.includes(tyyppi, _.toUpper(p.peruste?.tyyppi));
-    });
+    if (this.state.ownProjects) {
+      return _.filter(this.state.ownProjects, p => {
+        const tyyppi = this.overrides?.tyyppi;
+        return !tyyppi || _.includes(tyyppi, _.toUpper(p.peruste?.tyyppi));
+      });
+    }
+    return null;
   });
 
   public readonly projects = computed(() => this.state.projects);
