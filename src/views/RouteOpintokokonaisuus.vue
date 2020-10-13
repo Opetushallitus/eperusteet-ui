@@ -26,7 +26,7 @@
         </b-col>
 
         <b-col md="2">
-          <b-form-group :label="$t('minimilaajuus')  + (isEditing ? ' *' : '')" required>
+          <b-form-group :label="$t('minimilaajuus')" required>
             <ep-laajuus-input v-model="data.minimilaajuus" :is-editing="isEditing">
               {{$t('opintopiste')}}
             </ep-laajuus-input>
@@ -61,28 +61,38 @@
 
       <b-form-group :label="$t('tavoitteet')  + (isEditing ? ' *' : '')" required>
 
-        <draggable
-          v-bind="tavoitteetOptions"
-          tag="div"
-          v-model="data.opetuksenTavoitteet">
+        <div v-if="isEditing">
+          <draggable
+            v-bind="tavoitteetOptions"
+            tag="div"
+            v-model="data.opetuksenTavoitteet">
 
-          <b-row v-for="(tavoite, index) in data.opetuksenTavoitteet" :key="'tavoite'+index" class="pb-2">
-            <b-col cols="10" lg="8">
-              <ep-input v-model="tavoite.nimi" :is-editing="isEditing" :disabled="tavoite.uri !== undefined">
-                <div class="order-handle m-2" slot="left">
-                  <fas icon="grip-vertical"></fas>
-                </div>
-              </ep-input>
-            </b-col>
-            <b-col cols="1" v-if="isEditing">
-              <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poista(tavoite, 'opetuksenTavoitteet')"/>
-            </b-col>
-          </b-row>
-        </draggable>
+            <b-row v-for="(tavoite, index) in data.opetuksenTavoitteet" :key="'tavoite'+index" class="pb-2">
+              <b-col cols="10" lg="8">
+                <ep-input v-model="tavoite.nimi" :is-editing="isEditing" :disabled="tavoite.uri !== undefined">
+                  <div class="order-handle m-2" slot="left">
+                    <fas icon="grip-vertical"></fas>
+                  </div>
+                </ep-input>
+              </b-col>
+              <b-col cols="1" v-if="isEditing">
+                <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poista(tavoite, 'opetuksenTavoitteet')"/>
+              </b-col>
+            </b-row>
+          </draggable>
 
-        <ep-button variant="outline" icon="plus" @click="lisaa('opetuksenTavoitteet')" v-if="isEditing">
-          {{ $t('lisaa-tavoite') }}
-        </ep-button>
+          <ep-button variant="outline" icon="plus" @click="lisaa('opetuksenTavoitteet')" v-if="isEditing">
+            {{ $t('lisaa-tavoite') }}
+          </ep-button>
+        </div>
+
+        <div v-else>
+          <ul>
+            <li v-for="(tavoite, index) in data.opetuksenTavoitteet" :key="'tavoite'+index">
+              {{$kaanna(tavoite.nimi)}}
+            </li>
+          </ul>
+        </div>
       </b-form-group>
 
       <hr/>
@@ -91,29 +101,40 @@
 
       <b-form-group :label="$t('opiskelijan-osaamisen-arvioinnin-kohteet')  + (isEditing ? ' *' : '')" required>
 
-        <draggable
-          v-bind="arvioinnitOptions"
-          tag="div"
-          v-model="data.arvioinnit">
+        <div v-if="isEditing">
+          <draggable
+            v-bind="arvioinnitOptions"
+            tag="div"
+            v-model="data.arvioinnit">
 
-          <b-row v-for="(arviointi, index) in data.arvioinnit" :key="'arviointi'+index" class="pb-2">
-            <b-col cols="10" lg="8">
-              <ep-input v-model="arviointi[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
-                <div class="order-handle m-2" slot="left">
-                  <fas icon="grip-vertical"></fas>
-                </div>
-              </ep-input>
-            </b-col>
-            <b-col cols="1" v-if="isEditing">
-              <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poista(arviointi, 'arvioinnit')"/>
-            </b-col>
-          </b-row>
+            <b-row v-for="(arviointi, index) in data.arvioinnit" :key="'arviointi'+index" class="pb-2">
+              <b-col cols="10" lg="8">
+                <ep-input v-model="arviointi[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
+                  <div class="order-handle m-2" slot="left">
+                    <fas icon="grip-vertical"></fas>
+                  </div>
+                </ep-input>
+              </b-col>
+              <b-col cols="1" v-if="isEditing">
+                <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poista(arviointi, 'arvioinnit')"/>
+              </b-col>
+            </b-row>
 
-        </draggable>
+          </draggable>
 
-        <ep-button variant="outline" icon="plus" @click="lisaa('arvioinnit')" v-if="isEditing">
-          {{ $t('lisaa-arvioinnin-kohde') }}
-        </ep-button>
+          <ep-button variant="outline" icon="plus" @click="lisaa('arvioinnit')" v-if="isEditing">
+            {{ $t('lisaa-arvioinnin-kohde') }}
+          </ep-button>
+        </div>
+
+        <div v-else>
+          <ul>
+            <li v-for="(arviointi, index) in data.arvioinnit" :key="'arviointi'+index">
+              {{$kaanna(arviointi)}}
+            </li>
+          </ul>
+
+        </div>
       </b-form-group>
 
     </template>
