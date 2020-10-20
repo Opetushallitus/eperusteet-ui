@@ -212,7 +212,7 @@ import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, Perust
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { EperusteetKoulutustyypit } from '@/utils/perusteet';
+import { EperusteetKoulutustyypit, isLukiokoulutus } from '@/utils/perusteet';
 import { Page } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
@@ -410,6 +410,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       yhteistyotaho: this.data.yhteyshenkilo,
       perusteenAikataulut: this.tapahtumat,
       kuvaus: this.data.kuvaus,
+      ...(isLukiokoulutus(this.data.koulutustyyppi) && { toteutus: 'lops2019' }),
     };
 
     if (this.data.tiedosto) {
