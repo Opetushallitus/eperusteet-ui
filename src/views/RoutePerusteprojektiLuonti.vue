@@ -410,7 +410,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       yhteistyotaho: this.data.yhteyshenkilo,
       perusteenAikataulut: this.tapahtumat,
       kuvaus: this.data.kuvaus,
-      ...(isLukiokoulutus(this.data.koulutustyyppi) && { toteutus: 'lops2019' }),
+      ...(isLukiokoulutus(this.data.koulutustyyppi) && { toteutus: 'lops2019' as any }),
     };
 
     if (this.data.tiedosto) {
