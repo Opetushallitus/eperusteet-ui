@@ -101,7 +101,16 @@
       </div>
 
       <div v-if="items.data.length > 0">
-        <b-table striped hover responsive :items="items.data" :fields="fields">
+        <b-table
+          striped
+          hover
+          responsive
+          :items="items.data"
+          :fields="fields"
+          no-local-sorting
+          @sort-changed="sortingChanged"
+          :sort-by.sync="sort.sortBy"
+          :sort-desc.sync="sort.sortDesc">
           <template v-slot:head(nimi)>
             <slot name="nimiotsikko"></slot>
           </template>
@@ -193,6 +202,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   private tila: string[] | null = null;
   private voimassaolo: string | null = null;
   private isLoading = false;
+  private sort = {};
 
   private query = {
     sivu: 0,
@@ -287,6 +297,16 @@ export default class EpPerusteprojektiListaus extends Vue {
     this.query.perusteet = [peruste.id as number];
   }
 
+  sortingChanged(sort) {
+    this.sort = sort;
+    this.query = {
+      ...this.query,
+      sivu: 0,
+      jarjestysOrder: sort.sortDesc,
+      jarjestysTapa: sort.sortBy,
+    };
+  }
+
   get vaihtoehdotKoulutustyypit() {
     return EperusteetKoulutustyypit;
   }
@@ -367,10 +387,12 @@ export default class EpPerusteprojektiListaus extends Vue {
       label: this.$t('luotu') as string,
       formatter: dateFormatter,
     }, {
-      key: 'globalVersion.aikaleima',
+      key: 'muokattu',
       sortable: true,
       label: this.$t('muokattu') as string,
-      formatter: dateFormatter,
+      formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
+        return dateFormatter(item.globalVersion?.aikaleima!);
+      },
     }, {
       key: 'peruste.voimassaoloAlkaa',
       sortable: true,
