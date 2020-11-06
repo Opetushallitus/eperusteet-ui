@@ -153,10 +153,6 @@ const router = new VueRouter({
           icon: 'kasitteet',
           text: 'kasitteet',
         }, {
-          route: 'poistetut',
-          icon: 'roskalaatikko',
-          text: 'poistetut-sisallot',
-        }, {
           separator: true,
         }, {
           icon: ['far', 'folder'],
@@ -268,10 +264,6 @@ const router = new VueRouter({
           route: 'opasKasitteet',
           icon: 'kasitteet',
           text: 'kasitteet',
-        }, {
-          route: 'poistetut',
-          icon: 'roskalaatikko',
-          text: 'poistetut-sisallot',
         }, {
           separator: true,
         }, {
