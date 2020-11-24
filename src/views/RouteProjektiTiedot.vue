@@ -55,27 +55,19 @@
         </b-container>
         <h3>{{ $t('esikatselu-ja-lataus') }}</h3>
         <b-container fluid>
-          <b-row no-gutters v-if="!isEditing">
+          <b-row no-gutters>
             <b-col lg="6">
-              <b-form-group :label="$t('salli-perusteen-esikatselu')">
-                <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing"></ep-toggle>
-              </b-form-group>
+              <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing" v-if="isEditing || !data.esikatseltavissa">
+                {{$t('salli-perusteen-esikatselu')}}
+              </ep-toggle>
+              <ep-external-link :url="data.esikatseluUrl" v-if="!isEditing && data.esikatseltavissa">
+                {{$t('esikatsele-perustetta')}}
+              </ep-external-link>
             </b-col>
             <b-col lg="6">
               <b-form-group :label="$t('perusteen-lataus')" v-if="!isEditing">
                 <ep-button variant="primary" icon="file">{{ $t('lataa-peruste-json') }}</ep-button>
               </b-form-group>
-            </b-col>
-          </b-row>
-          <b-row no-gutters v-else>
-            <b-col lg="6">
-              <b-form-group>
-                <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing">
-                  {{ $t('salli-perusteen-esikatselu') }}
-                </ep-toggle>
-              </b-form-group>
-            </b-col>
-            <b-col lg="6">
             </b-col>
           </b-row>
         </b-container>
@@ -106,6 +98,7 @@ import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler'
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { TermitStore } from '@/stores/TermitStore';
+import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 
 @Component({
   components: {
@@ -117,6 +110,7 @@ import { TermitStore } from '@/stores/TermitStore';
     EpSpinner,
     EpToggle,
     PerustetyoryhmaSelect,
+    EpExternalLink,
   },
 })
 export default class RouteProjektiTiedot extends PerusteprojektiRoute {
@@ -126,7 +120,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
   private store: EditointiStore | null = null;
 
   async onProjektiChange(projektiId: number) {
-    this.store = new EditointiStore(new PerusteprojektiEditStore(projektiId));
+    this.store = new EditointiStore(new PerusteprojektiEditStore(projektiId, this.perusteStore));
   }
 
   get kasiteHandler() {

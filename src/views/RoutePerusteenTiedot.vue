@@ -331,6 +331,7 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { UiKielet } from '@shared/stores/kieli';
 import _ from 'lodash';
+import { PerusteStore } from '@/stores/PerusteStore';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
@@ -361,7 +362,7 @@ const koulutustyyppiTietoFilters = {
     PerustetyoryhmaSelect,
   },
 })
-export default class RouteProjektiTiedot extends PerusteprojektiRoute {
+export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   @Prop({ required: true })
   private perusteetStore!: PerusteetStore;
 
@@ -397,7 +398,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
   }
 
   async onProjektiChange(projektiId: number, perusteId: number) {
-    this.store = new EditointiStore(new PerusteEditStore(projektiId, perusteId));
+    this.store = new EditointiStore(new PerusteEditStore(projektiId, perusteId, this.perusteStore));
     this.fetchLiitteet();
   }
 
