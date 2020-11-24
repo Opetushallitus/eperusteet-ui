@@ -121,6 +121,15 @@ export class PerusteStore implements IEditoitava {
     }
   }
 
+  async updateCurrent() {
+    this.state.projekti = (await Perusteprojektit.getPerusteprojekti(this.projekti.value!.id!)).data;
+    this.state.peruste = (await Perusteet.getPerusteenTiedot(this.peruste.value!.id!)).data;
+
+    Murupolku.aseta('projekti', this.state.projekti?.nimi, {
+      name: 'perusteprojekti',
+    });
+  }
+
   public async updateNavigation() {
     if (!this.state.perusteId) {
       return;
