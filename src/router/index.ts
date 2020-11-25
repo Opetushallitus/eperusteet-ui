@@ -288,7 +288,7 @@ const router = new VueRouter({
         }],
         palautusMeta: {
           title: 'palauta-opas',
-          confirm: 'palauta-opas-vahvistu',
+          confirm: 'palauta-opas-vahvistus',
           tila: 'laadinta',
           callback: async () => stores.perusteStore.updateCurrent(),
         },

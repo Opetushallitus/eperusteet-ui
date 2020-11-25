@@ -18,7 +18,18 @@ export class TyoryhmaStore {
   public readonly tyoryhmanVirkailiijat = computed(() => this.state.tyoryhmanVirkailiijat);
 
   async init(oid) {
-    this.state.perusteenTyoryhma = (await Ulkopuoliset.getOrganisaatioRyhmatByOid(oid)).data as any;
-    this.state.tyoryhmanVirkailiijat = (await Ulkopuoliset.getOrganisaatioVirkailijat(oid)).data as any;
+    try {
+      this.state.perusteenTyoryhma = (await Ulkopuoliset.getOrganisaatioRyhmatByOid(oid)).data as any;
+    }
+    catch (e) {
+      this.state.perusteenTyoryhma = [];
+    }
+
+    try {
+      this.state.tyoryhmanVirkailiijat = (await Ulkopuoliset.getOrganisaatioVirkailijat(oid)).data as any;
+    }
+    catch (e) {
+      this.state.tyoryhmanVirkailiijat = [];
+    }
   }
 }
