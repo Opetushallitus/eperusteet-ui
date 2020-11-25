@@ -7,6 +7,7 @@ import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi } from '@shared/utils/perusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 
 Vue.use(VueCompositionApi);
 
@@ -78,8 +79,14 @@ export class PerusteStore implements IEditoitava {
 
   public async updateValidointi() {
     if (this.state.projekti?.id) {
-      const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
-      this.state.projektiStatus = res.data;
+      this.state.projektiStatus = null;
+      if (this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
+        const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
+        this.state.projektiStatus = res.data;
+      }
+      else {
+        this.state.projektiStatus = {};
+      }
     }
   }
 
@@ -93,7 +100,6 @@ export class PerusteStore implements IEditoitava {
       this.state.isInitialized = false;
       this.state.peruste = null;
       this.state.projekti = null;
-      this.state.projektiStatus = null;
 
       this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
       const perusteId = Number((this.state.projekti as any)._peruste);
@@ -110,7 +116,8 @@ export class PerusteStore implements IEditoitava {
         Perusteet.getPerusteenTiedot(perusteId),
         Perusteet.getNavigation(perusteId),
       ]), 'data');
-      this.updateValidointi();
+      await this.updateValidointi();
+      await this.fetchJulkaisut();
       this.state.isInitialized = true;
     }
     catch (err) {
@@ -124,6 +131,8 @@ export class PerusteStore implements IEditoitava {
   async updateCurrent() {
     this.state.projekti = (await Perusteprojektit.getPerusteprojekti(this.projekti.value!.id!)).data;
     this.state.peruste = (await Perusteet.getPerusteenTiedot(this.peruste.value!.id!)).data;
+
+    await this.updateValidointi();
 
     Murupolku.aseta('projekti', this.state.projekti?.nimi, {
       name: 'perusteprojekti',

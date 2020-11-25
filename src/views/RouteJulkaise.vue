@@ -79,7 +79,7 @@
         <ep-content v-model="julkaisu.tiedote"
                     layout="full"
                     :is-editable="true" />
-        <ep-button class="mt-3" @click="julkaise">
+        <ep-button class="mt-3" @click="julkaise" :showSpinner="julkaistaan">
           {{ $t('julkaise') }}
         </ep-button>
       </b-form-group>
@@ -130,7 +130,7 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { Api, Liitetiedostot, Koodisto } from '@shared/api/eperusteet';
+import { Api, Liitetiedostot, Koodisto, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
 import { SallitutKoulutustyyppisiirtymat, LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
@@ -172,6 +172,8 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
 
+  private julkaistaan = false;
+
   private julkaisu = {
     tiedote: {},
   };
@@ -181,8 +183,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   get julkaisuMahdollinen() {
-    return true;
-    // return this.status?.vaihtoOk || false;
+    return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.status?.vaihtoOk;
   }
 
   get julkaisut() {
@@ -198,9 +199,11 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   async julkaise() {
-    this.perusteStore!.julkaise({
+    this.julkaistaan = true;
+    await this.perusteStore!.julkaise({
       tiedote: this.julkaisu.tiedote,
     });
+    this.julkaistaan = false;
   }
 }
 
