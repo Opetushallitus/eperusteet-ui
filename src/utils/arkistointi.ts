@@ -1,6 +1,6 @@
 import { Perusteprojektit } from '@shared/api/eperusteet';
 
-export async function arkistoiPeruste(el, meta) {
+export async function vaihdaPerusteTilaConfirm(el, meta) {
   const arkistoi = await el.$bvModal.msgBoxConfirm(el.$t(meta.confirm) as any, {
     title: el.$t(meta.title),
     okVariant: 'primary',
@@ -11,9 +11,21 @@ export async function arkistoiPeruste(el, meta) {
   });
 
   if (arkistoi) {
-    await Perusteprojektit.updatePerusteprojektiTila(el.$route.params.projektiId, 'poistettu');
-    el.$router.push({
-      name: meta.reroute,
-    });
+    try {
+      await Perusteprojektit.updatePerusteprojektiTila(el.$route.params.projektiId, meta.tila);
+      el.$success(el.$t('tilan-vaihto-' + meta.tila + '-onnistui'));
+    }
+    catch (e) {
+      el.$fail(el.$t('tilan-vaihto-' + meta.tila + '-epaonnistui'));
+    }
+    if (meta.reroute) {
+      el.$router.push({
+        name: meta.reroute,
+      });
+    }
+
+    if (meta.callback) {
+      await meta.callback();
+    }
   }
 }

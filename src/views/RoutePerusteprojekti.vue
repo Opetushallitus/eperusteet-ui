@@ -3,23 +3,29 @@
     <Portal to="headerExtension">
       <div class="portal-menu d-flex">
         <div class="upper-left">
-          <ep-progress-popover :slices="progressSlices" :popup-style="popupStyle">
+          <ep-progress-popover :slices="progressSlices" :popup-style="popupStyle" height="60" width="60">
             <template v-slot:header>
-              <div class="pt-1 row justify-content-center" v-if="validationStats">
-                <div v-if="validationStats.ok < validationStats.total">
-                  {{ validationStats.ok }} / {{ validationStats.total }} {{$t('valmis')}}
-                </div>
-                <div v-else-if="validationCategories">
-                  <b-button class="px-3 py-1" variant="primary"
-                      :to="{ name: 'julkaise' }">{{ $t('julkaise') }}</b-button>
-                </div>
+              <div class="d-flex flex-column align-items-center">
+                <div class="mb-1">{{$t(tila)}}</div>
+
+                <b-button class="px-3 py-1" variant="primary" :to="{ name: 'julkaise' }" v-if="tila && !isJulkaistu && !isArkistoitu">
+                  {{ $t('siirry-julkaisunakymaan') }}
+                </b-button>
               </div>
             </template>
 
-            <div v-if="validationStats" class="row justify-content-center">
-              <b-button v-if="validationStats.ok < validationStats.total"
-                        variant="primary"
-                        :to="{ name: 'julkaise' }">{{ $t('siirry-julkaisunakymaan') }}</b-button>
+            <b-button class="px-3 py-1" variant="primary" :to="{ name: 'julkaise' }" v-if="isJulkaistu">
+              {{ $t('siirry-julkaisunakymaan') }}
+            </b-button>
+
+            <div v-if="isArkistoitu" class="d-flex flex-column align-items-center text-center">
+              <b-button class="px-3 py-1" variant="primary" @click="palauta">
+                {{ $t('palauta') }}
+              </b-button>
+              <div class="font-size-08 mt-1">{{$t('voit-palauttaa-arkistoidun-perusteen-luonnostilaan')}}</div>
+            </div>
+
+            <div v-else-if="validationStats" class="row justify-content-center">
               <div v-if="validationCategories">
                 <div class="pl-3 pt-2 pb-1 row" v-for="c in validationStats.categories" :key="c.category">
                   <div class="col-1">
@@ -46,7 +52,7 @@
                   <fas icon="ratas" class="hallinta" />
                 </template>
 
-                <div v-for="(ratasvalinta, index) in ratasvalinnat" :key="'ratasvalinta'+index">
+                <div v-for="(ratasvalinta, index) in ratasvalintaFiltered" :key="'ratasvalinta'+index">
 
                   <hr v-if="ratasvalinta.separator" class="mt-2 mb-2" />
 
@@ -55,7 +61,7 @@
                     {{ $t(ratasvalinta.text) }}
                   </b-dropdown-item>
 
-                  <b-dropdown-item v-if="ratasvalinta.click" @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)">
+                  <b-dropdown-item v-if="ratasvalinta.click" @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)" :disabled="ratasvalinta.disabled">
                     <fas :icon="ratasvalinta.icon" />
                     {{ $t(ratasvalinta.text) }}
                   </b-dropdown-item>
@@ -247,11 +253,12 @@ import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPo
 import * as _ from 'lodash';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { NavigationNodeDto } from '@shared/tyypit';
-import { NavigationNodeDtoTypeEnum, Sisallot } from '@shared/api/eperusteet';
+import { NavigationNodeDtoTypeEnum, Sisallot, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
 import { Location } from 'vue-router';
 import { Meta } from '@shared/utils/decorators';
+import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -341,6 +348,9 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   @Prop()
   ratasvalinnat!: any[];
 
+  @Prop()
+  palautusMeta!: any;
+
   private naviStore: EpTreeNavibarStore | null = null;
   private loading = false;
 
@@ -362,6 +372,15 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
           disableNesting: true,
         },
       });
+  }
+
+  get ratasvalintaFiltered() {
+    return _.map(this.ratasvalinnat, ratasvalinta => {
+      return {
+        ...ratasvalinta,
+        disabled: _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila,
+      };
+    });
   }
 
   get popupStyle() {
@@ -432,7 +451,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get validationStats() {
     if (this.validationCategories) {
-      const kategoriat = _.chain(this.validationCategories)
+      let kategoriat = _.chain(this.validationCategories)
         .map(kategoria => {
           return {
             category: _.lowerCase(kategoria),
@@ -442,6 +461,15 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
           } as ValidationCategory;
         })
         .value();
+
+      if (_.size(kategoriat) === 0) {
+        kategoriat = [{
+          category: 'validation-category-peruste',
+          ok: 0,
+          failcount: 0,
+          total: 0,
+        }];
+      }
 
       return {
         categories: kategoriat,
@@ -461,10 +489,16 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get progressSlices() {
-    if (this.validationCategories) {
-      return _.chain(this.validationCategories)
-        .map(kategoria => 0.5)
-        .value();
+    if (this.tila) {
+      if (this.isArkistoitu) {
+        return [0];
+      }
+
+      if (this.validationCategories) {
+        return _.chain(this.validationCategories)
+          .map(kategoria => 0.5)
+          .value();
+      }
     }
   }
 
@@ -502,6 +536,39 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get perusteVapaasivistystyo() {
     return this.peruste!.koulutustyyppi === 'koulutustyyppi_30';
+  }
+
+  get julkaisut() {
+    if (this.isArkistoitu) {
+      return [];
+    }
+
+    return this.perusteStore.julkaisut.value;
+  }
+
+  get tila() {
+    if (this.julkaisut) {
+      if (this.isJulkaistu) {
+        return 'julkaistu';
+      }
+
+      return _.toLower(this.peruste?.tila);
+    }
+  }
+
+  get isJulkaistu() {
+    return (_.size(this.julkaisut) > 0 || this.peruste?.tila === PerusteDtoTilaEnum.VALMIS) && !this.isArkistoitu;
+  }
+
+  get isArkistoitu() {
+    return this.peruste?.tila === _.toLower(PerusteDtoTilaEnum.POISTETTU);
+  }
+
+  async palauta() {
+    await vaihdaPerusteTilaConfirm(
+      this,
+      this.palautusMeta,
+    );
   }
 }
 </script>

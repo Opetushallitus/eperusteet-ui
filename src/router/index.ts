@@ -36,7 +36,7 @@ import RouteOpintokokonaisuus from '@/views/RouteOpintokokonaisuus.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
-import { arkistoiPeruste } from '@/utils/arkistointi';
+import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 import { getCasKayttajaKieli } from '@shared/api/common';
 import * as _ from 'lodash';
 
@@ -157,13 +157,21 @@ const router = new VueRouter({
         }, {
           icon: ['far', 'folder'],
           text: 'arkistoi-peruste',
-          click: arkistoiPeruste,
+          click: vaihdaPerusteTilaConfirm,
           meta: {
             title: 'arkistoi-peruste',
             confirm: 'arkistoi-peruste-vahvistus',
             reroute: 'perusteprojektit',
+            tila: 'poistettu',
+            callback: async () => stores.perusteStore.updateCurrent(),
           },
         }],
+        palautusMeta: {
+          title: 'palauta-peruste',
+          confirm: 'palauta-peruste-vahvistus',
+          tila: 'laadinta',
+          callback: async () => stores.perusteStore.updateCurrent(),
+        },
       },
       children: [{
         path: '',
@@ -269,13 +277,21 @@ const router = new VueRouter({
         }, {
           icon: ['far', 'folder'],
           text: 'arkistoi-opas',
-          click: arkistoiPeruste,
+          click: vaihdaPerusteTilaConfirm,
           meta: {
             title: 'arkistoi-opas',
             confirm: 'arkistoi-opas-vahvistus',
             reroute: 'oppaat',
+            tila: 'poistettu',
+            callback: async () => stores.perusteStore.updateCurrent(),
           },
         }],
+        palautusMeta: {
+          title: 'palauta-opas',
+          confirm: 'palauta-opas-vahvistu',
+          tila: 'laadinta',
+          callback: async () => stores.perusteStore.updateCurrent(),
+        },
       },
       children: [{
         path: '',
