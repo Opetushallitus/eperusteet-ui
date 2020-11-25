@@ -4,9 +4,13 @@ import { Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
 import { required } from 'vuelidate/lib/validators';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
+import { PerusteStore } from './PerusteStore';
 
 export class OpasEditStore implements IEditoitava {
-  constructor(private projektiId: number, private perusteId: number) {
+  constructor(
+    private projektiId: number,
+    private perusteId: number,
+    private perusteStore: PerusteStore) {
   }
 
   async acquire() {
@@ -39,7 +43,7 @@ export class OpasEditStore implements IEditoitava {
     data.peruste.nimi = { [Kielet.getSisaltoKieli.value]: data.nimi };
     await Perusteet.updatePeruste(this.perusteId, data.peruste);
     await Perusteprojektit.updatePerusteprojekti(this.projektiId, data);
-
+    await this.perusteStore.updateCurrent();
     return data;
   }
 

@@ -181,7 +181,7 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   }
 
   async onProjektiChange(projektiId: number, perusteId: number) {
-    this.store = new EditointiStore(new OpasEditStore(projektiId, perusteId));
+    this.store = new EditointiStore(new OpasEditStore(projektiId, perusteId, this.perusteStore));
     this.maintenanceStore = new MaintenanceStore(projektiId, perusteId);
   }
 

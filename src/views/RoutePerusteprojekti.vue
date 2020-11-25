@@ -46,7 +46,7 @@
         <div class="flex-grow-1 align-self-center">
           <div class="mb-5 p-2" v-if="peruste && projekti">
             <h1>
-              <span>{{ $kaanna(peruste.nimi) || projekti.nimi }}</span>
+              <span>{{nimi}}</span>
               <b-dropdown class="asetukset" size="lg" variant="link" toggle-class="text-decoration-none" no-caret>
                 <template v-slot:button-content>
                   <fas icon="ratas" class="hallinta" />
@@ -69,7 +69,7 @@
               </b-dropdown>
             </h1>
             <div class="diaarinumero" v-if="showNavigation">
-              {{ $t(peruste.koulutustyyppi) }} | {{ peruste.diaarinumero }}
+              {{ $t(peruste.koulutustyyppi) }} <span v-if="peruste.koulutustyyppi && peruste.diaarinumero">|</span> {{ peruste.diaarinumero }}
             </div>
           </div>
         </div>
@@ -253,7 +253,7 @@ import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPo
 import * as _ from 'lodash';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { NavigationNodeDto } from '@shared/tyypit';
-import { NavigationNodeDtoTypeEnum, Sisallot, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
+import { NavigationNodeDtoTypeEnum, Sisallot, PerusteDtoTilaEnum, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
 import { Location } from 'vue-router';
@@ -406,6 +406,14 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get peruste() {
     return this.perusteStore.peruste.value;
+  }
+
+  get nimi() {
+    if (this.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.OPAS)) {
+      return this.projekti?.nimi;
+    }
+
+    return this.$kaanna(this.peruste?.nimi as any) || this.projekti?.nimi;
   }
 
   get tekstikappaleet() {
