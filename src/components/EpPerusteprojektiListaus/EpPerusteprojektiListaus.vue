@@ -129,6 +129,18 @@
               </span>
             </slot>
           </template>
+          <template v-slot:cell(tila)="data">
+            <div class="d-flex">
+              {{ $t(data.item.tila) }}
+              <ep-button
+                v-if="data.item.tila === 'poistettu'"
+                variant="link py-0"
+                icon="peruuta"
+                @click="restore(data.item)">
+                {{ $t('palauta') }}
+              </ep-button>
+            </div>
+          </template>
         </b-table>
         <ep-pagination v-model="sivu"
                        :per-page="perPage"
@@ -151,6 +163,7 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto, Perusteet, PerusteKevytDto } from '@shared/api/eperusteet';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
 import { Page } from '@shared/tyypit';
@@ -159,6 +172,7 @@ import { IProjektiProvider } from './types';
 import ProjektiCard from './ProjektiCard.vue';
 import * as _ from 'lodash';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
+import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -173,6 +187,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSpinner,
     ProjektiCard,
     KoulutustyyppiSelect,
+    EpButton,
   },
 })
 export default class EpPerusteprojektiListaus extends Vue {
@@ -408,6 +423,20 @@ export default class EpPerusteprojektiListaus extends Vue {
 
   filtersInclude(filter) {
     return !this.filters || _.includes(this.filters, filter);
+  }
+
+  async restore(item) {
+    await vaihdaPerusteTilaConfirm(
+      this,
+      {
+        title: 'palauta-peruste',
+        confirm: 'palauta-peruste-vahvistus',
+        tila: 'laadinta',
+        projektiId: item.id,
+      }
+    );
+    await this.onQueryChange(this.query);
+    await this.provider.updateOwnProjects();
   }
 }
 </script>
