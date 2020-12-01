@@ -44,11 +44,23 @@ export class PerusteetStore implements IProjektiProvider {
 
   @Debounced(300)
   public async updateQuery(query: PerusteQuery) {
-    const res = await getPerusteprojektit({
+    const res = (await getPerusteprojektit({
       ...query,
       ...this.overrides,
-    });
-    this.state.projects = res.data as any;
+    })).data as any;
+    const projectIds = _.chain((res).data)
+      .map('id')
+      .value() as number[];
+    const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(projectIds)).data;
+    const resWithRights = {
+      ...res,
+      data: (res).data.map((proj: PerusteprojektiKevytDto) => ({
+        ...proj,
+        oikeudet: rights[proj.id!],
+      })),
+    }
+
+    this.state.projects = resWithRights;
   }
 
   public async findPerusteet(query: PerusteQuery) {

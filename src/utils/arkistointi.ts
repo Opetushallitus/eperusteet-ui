@@ -12,7 +12,7 @@ export async function vaihdaPerusteTilaConfirm(el, meta) {
 
   if (arkistoi) {
     try {
-      await Perusteprojektit.updatePerusteprojektiTila(el.$route.params.projektiId, meta.tila);
+      await Perusteprojektit.updatePerusteprojektiTila(meta.projektiId ? meta.projektiId : el.$route.params.projektiId, meta.tila);
       el.$success(el.$t('tilan-vaihto-' + meta.tila + '-onnistui'));
     }
     catch (e) {
