@@ -133,7 +133,7 @@
             <div class="d-flex">
               {{ $t(data.item.tila) }}
               <ep-button
-                v-if="data.item.tila === 'poistettu'"
+                v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
                 variant="link py-0"
                 icon="peruuta"
                 @click="restore(data.item)">
@@ -320,6 +320,10 @@ export default class EpPerusteprojektiListaus extends Vue {
       jarjestysOrder: sort.sortDesc,
       jarjestysTapa: sort.sortBy,
     };
+  }
+
+  stateChangeAllowed(rights: string[]): boolean {
+    return _.includes(rights, 'tilanvaihto');
   }
 
   get vaihtoehdotKoulutustyypit() {
