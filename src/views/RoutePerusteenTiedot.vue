@@ -183,19 +183,21 @@
               <b-form-group :label="$t('liitteet-ja-maaraykset')">
                 <ep-spinner v-if="!liitteet" />
                 <div v-else>
-                  <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
-                  <div class="liiteohje" v-html="$t('liitetiedosto-ohje')"></div>
-                  <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!isEditing && !file" />
-                  <div v-if="file">
-                    <b-input-group>
-                      <b-form-input v-model="liitteenNimi"></b-form-input>
-                      <b-input-group-append>
-                        <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
-                          {{ $t('lisaa-liite') }}
-                        </b-button>
-                      </b-input-group-append>
-                    </b-input-group>
-                  </div>
+                  <template v-if="isEditing">
+                    <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                    <div class="liiteohje" v-html="$t('liitetiedosto-ohje')"></div>
+                    <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!file" />
+                    <div v-if="file">
+                      <b-input-group>
+                        <b-form-input v-model="liitteenNimi"></b-form-input>
+                        <b-input-group-append>
+                          <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
+                            {{ $t('lisaa-liite') }}
+                          </b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </div>
+                  </template>
                   <b-table :items="liitteet"
                           :fields="liitetableFields"
                           responsive
