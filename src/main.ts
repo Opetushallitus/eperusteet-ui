@@ -28,12 +28,13 @@ import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
+import { OpintokokonaisuusStore } from './stores/OpintokokonaisuusStore';
+import { KoulutuksenOsaStore } from './stores/KoulutuksenOsaStore';
 import { registerIconColorSchemeChange } from '@shared/utils/icon';
 
 import router from './router';
 
 import { stores } from '@/stores';
-import { OpintokokonaisuusStore } from './stores/OpintokokonaisuusStore';
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
@@ -94,6 +95,11 @@ Vue.use(MuodostuminenStore, {
 });
 
 Vue.use(OpintokokonaisuusStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(KoulutuksenOsaStore, {
   perusteStore: stores.perusteStore,
   router,
 });

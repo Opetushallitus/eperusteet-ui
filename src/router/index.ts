@@ -33,6 +33,7 @@ import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
 import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
 import RouteKasite from '@/views/RouteKasite.vue';
 import RouteOpintokokonaisuus from '@/views/RouteOpintokokonaisuus.vue';
+import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -252,6 +253,11 @@ const router = new VueRouter({
         path: 'opintokokonaisuus/:opintokokonaisuusId',
         name: 'opintokokonaisuus',
         component: RouteOpintokokonaisuus,
+        props,
+      }, {
+        path: 'koulutuksenosa/:koulutuksenosaId',
+        name: 'koulutuksenosa',
+        component: RouteKoulutuksenOsa,
         props,
       },
       ],
