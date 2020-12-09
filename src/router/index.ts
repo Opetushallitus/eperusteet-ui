@@ -154,6 +154,7 @@ const router = new VueRouter({
           text: 'kasitteet',
         }, {
           separator: true,
+          meta: { tila: 'poistettu' },
         }, {
           icon: ['far', 'folder'],
           text: 'arkistoi-peruste',
@@ -274,6 +275,7 @@ const router = new VueRouter({
           text: 'kasitteet',
         }, {
           separator: true,
+          meta: { tila: 'poistettu' },
         }, {
           icon: ['far', 'folder'],
           text: 'arkistoi-opas',

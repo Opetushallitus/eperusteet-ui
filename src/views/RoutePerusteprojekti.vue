@@ -375,12 +375,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get ratasvalintaFiltered() {
-    return _.map(this.ratasvalinnat, ratasvalinta => {
-      return {
-        ...ratasvalinta,
-        disabled: _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila,
-      };
-    });
+    return _.reject(this.ratasvalinnat, ratasvalinta => _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila);
   }
 
   get popupStyle() {
