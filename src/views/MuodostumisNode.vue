@@ -5,17 +5,20 @@
     tag="div"
     :class="classes"
     v-model="model">
-    <div v-for="(node, idx) in model" :key="idx" class="muodostumisnode">
+    <div v-for="(node, idx) in model" :key="node.tunniste || node.uuid || idx" class="muodostumisnode">
       <MuodostumisItem v-model="model[idx]"
                        :depth="depth"
                        :is-editing="isEditing"
                        :tutkinnonOsatMap="tutkinnonOsatMap"
                        @toggle="toggleOpen"
-                       @remove="remove(idx)">
+                       @remove="remove(idx)"
+                       :isOpen="isOpen"
+                       ref="muodostumisItem">
       </MuodostumisItem>
 
-      <div class="children" :class="{ muodostumisryhma: !!node.rooli && depth > 0 }" :style="{ 'padding-left': 30 + 'px' }">
+      <div class="children" :class="{ muodostumisryhma: !!node.rooli && depth > 0 }" :style="{ 'padding-left': 30 + 'px' }" v-if="isOpen">
         <MuodostumisNode
+          ref="childNode"
           :tutkinnonOsatMap="tutkinnonOsatMap"
           :depth="depth + 1"
           v-model="node.osat"
@@ -109,7 +112,6 @@ export default class MuodostumisNode extends Vue {
   }
 
   toggleOpen() {
-    console.log('toggling');
     this.isOpen = !this.isOpen;
   }
 
@@ -182,6 +184,11 @@ export default class MuodostumisNode extends Vue {
 
   remove(idx: number) {
     this.$emit('input', disassoc(this.model, idx));
+  }
+
+  toggleDescription(toggle?) {
+    _.forEach(this.$refs['muodostumisItem'], item => (item as any).toggleDescription(toggle));
+    _.forEach(this.$refs['childNode'], item => (item as any).toggleDescription(toggle));
   }
 
   // onChildrenChange(idx, children) {

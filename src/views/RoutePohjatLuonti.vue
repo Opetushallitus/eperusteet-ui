@@ -9,7 +9,7 @@
             <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
-                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('toinen-pohja') }}</b-form-radio>
+                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('toista-pohjaa') }}</b-form-radio>
                 <div v-if="tyyppi === 'pohjasta'" class="ml-2">
                   <EpMultiSelect
                     v-if="pohjat"
@@ -27,7 +27,7 @@
                   <EpSpinner v-else />
                 </div>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi-perustepohja') }}</b-form-radio>
 
               </b-form-group>
             </div>

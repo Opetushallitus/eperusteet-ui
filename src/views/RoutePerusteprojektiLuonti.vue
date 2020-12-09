@@ -9,7 +9,7 @@
             <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
-                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('oletuspohja') }}</b-form-radio>
+                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('perustepohjaa') }}</b-form-radio>
                 <div v-if="tyyppi === 'pohjasta'">
                   <EpMultiSelect
                     v-if="pohjat"
@@ -28,7 +28,7 @@
                   <EpSpinner v-else />
                 </div>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">{{ $t('toinen-perusteprojekti') }}</b-form-radio>
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">{{ $t('toista-perusteprojektia') }}</b-form-radio>
                 <div v-if="tyyppi === 'perusteesta'">
                   <EpMultiSelect
                     v-if="perusteet"
@@ -47,12 +47,14 @@
                   <EpSpinner v-else />
                 </div>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="tiedostosta" name="tyyppi">{{ $t('tuo-tiedostosta') }}</b-form-radio>
-                <div v-if="tyyppi === 'tiedostosta'">
-                  <ep-tiedosto-lataus :fileTypes="['application/json']" v-model="data.tiedosto" />
-                </div>
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi-ilman-pohjaa') }}</b-form-radio>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
+                <template v-if="$isAdmin">
+                  <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="tiedostosta" name="tyyppi">{{ $t('tuo-tiedostosta') }}</b-form-radio>
+                  <div v-if="tyyppi === 'tiedostosta'">
+                    <ep-tiedosto-lataus :fileTypes="['application/json']" v-model="data.tiedosto" />
+                  </div>
+                </template>
 
               </b-form-group>
             </div>
@@ -69,8 +71,8 @@
           </b-form-group>
 
           <b-form-group :label="$t('projektin-kuvaus')" required>
-            <b-form-radio class="ml-1" v-model="data.muutos" value="iso" name="tyyppi">{{ $t('perusteen-uudistaminen') }}</b-form-radio>
-            <b-form-radio class="ml-1" v-model="data.muutos" value="pieni" name="tyyppi">{{ $t('perusteen-korjaus') }}</b-form-radio>
+            <b-form-radio class="ml-1" v-model="data.projektiKuvaus" :value="kuvaus.uudistus" name="tyyppi">{{ $t('perusteen-uudistaminen-kuvaus') }}</b-form-radio>
+            <b-form-radio class="ml-1" v-model="data.projektiKuvaus" :value="kuvaus.korjaus" name="tyyppi">{{ $t('perusteen-korjaus-kuvaus') }}</b-form-radio>
             <ep-input class="mt-1" v-model="data.kuvaus" type="localized" :is-editing="true" :placeholder="$t('projektin-vapaamuotoinen-kuvaus')" />
           </b-form-group>
 
@@ -78,7 +80,7 @@
             <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required/>
           </b-form-group>
 
-          <b-form-group :label="$t('perustetyoryhma') + '*'" required>
+          <b-form-group :label="$t('perustetyoryhma')" required>
             <EpMultiSelect v-model="data.tyoryhma"
                            v-if="tyoryhmat"
                            :search-identity="tyoryhmaSearchIdentity"
@@ -159,15 +161,23 @@
               <div class="nimi">
                 {{ $t('kuvaus') }}
               </div>
+              <div v-if="data.projektiKuvaus === kuvaus.korjaus">
+                {{ $t('perusteen-korjaus') }}
+              </div>
+              <div v-else-if="data.projektiKuvaus === kuvaus.uudistus">
+                {{ $t('perusteen-uudistus') }}
+              </div>
               <ep-input type="localized" :value="data.kuvaus" />
             </div>
             <div class="tieto w-50">
               <div>
-                <div class="nimi">
-                  {{ $t('perustetyoryhma') }}
+                <div class="mb-5" v-if="data.tyoryhma">
+                  <div class="nimi">
+                    {{ $t('perustetyoryhma') }}
+                  </div>
+                  {{ $kaanna(data.tyoryhma.nimi) }}
                 </div>
-                {{ $kaanna(data.tyoryhma.nimi) }}
-                <div class="nimi mt-5">
+                <div class="nimi">
                   {{ $t('yhteyshenkilo') }}
                 </div>
                 {{ data.yhteyshenkilo }}
@@ -208,7 +218,7 @@ import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
-import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
@@ -260,6 +270,8 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     koulutustyyppi: null,
     tyoryhma: null,
     peruste: null,
+    kuvaus: null,
+    projektiKuvaus: null,
   };
   private tyyppi: 'pohjasta' | 'perusteesta' | 'tiedostosta' | 'uusi' | null = 'uusi';
   private currentStep: Step | null = null;
@@ -405,11 +417,12 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       paatosPvm: this.data.paatosPvm,
       perusteId: this.data.peruste?.id,
       laajuusYksikko: 'OSAAMISPISTE' as any,
-      ryhmaOid: this.data.tyoryhma.oid,
+      ryhmaOid: this.data.tyoryhma ? this.data.tyoryhma.oid : null,
       voimassaoloAlkaa: this.data.voimassaoloAlkaa,
       yhteistyotaho: this.data.yhteyshenkilo,
       perusteenAikataulut: this.tapahtumat,
       kuvaus: this.data.kuvaus,
+      projektiKuvaus: this.data.projektiKuvaus,
       ...(isLukiokoulutus(this.data.koulutustyyppi) && { toteutus: 'lops2019' as any }),
     };
 
@@ -465,7 +478,6 @@ export default class RoutePerusteprojektiLuonti extends Vue {
         nimi: notNull(),
         diaarinumero: notNull(),
         koulutustyyppi: notNull(),
-        tyoryhma: notNull(),
       };
     }
 
@@ -484,6 +496,13 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     }
 
     return {};
+  }
+
+  get kuvaus() {
+    return {
+      uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
+      korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
+    };
   }
 }
 </script>

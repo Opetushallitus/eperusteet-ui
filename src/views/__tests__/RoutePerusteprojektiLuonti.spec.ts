@@ -51,6 +51,7 @@ describe('RoutePohjatLuonti component', () => {
           $sdt: x => x,
           $sd: x => x,
           $router: router,
+          $isAdmin: () => true,
         },
         stubs: {
           fas: '<div />',
@@ -69,13 +70,13 @@ describe('RoutePohjatLuonti component', () => {
 
     expect(wrapper.findAll('input[type="radio"]')).toHaveLength(4);
     expect(wrapper.findAll('input[type="radio"] + label').at(0)
-      .text()).toContain('oletuspohja');
+      .text()).toContain('perustepohjaa');
     expect(wrapper.findAll('input[type="radio"] + label').at(1)
-      .text()).toContain('toinen-perusteprojekti');
+      .text()).toContain('toista-perusteprojektia');
     expect(wrapper.findAll('input[type="radio"] + label').at(2)
-      .text()).toContain('tuo-tiedostosta');
+      .text()).toContain('luo-uusi-ilman-pohjaa');
     expect(wrapper.findAll('input[type="radio"] + label').at(3)
-      .text()).toContain('luo-uusi');
+      .text()).toContain('tuo-tiedostosta');
   });
 
   test('Projektin luonti canceled', async () => {
