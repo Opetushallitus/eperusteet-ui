@@ -43,10 +43,16 @@
                   <div class="text-muted mb-3">
                     {{ $t('perusteprojekti-ohje-kuvaus') }}
                   </div>
-                  <b-form-radio-group stacked v-model="data.tyyppi" class="mb-3">
-                    <b-form-radio value="PERUSTEEN_KORJAUS">{{ $t('perusteen-korjaus') }}</b-form-radio>
-                    <b-form-radio value="PERUSTEEN_UUDISTUS">{{ $t('perusteen-uudistus') }}</b-form-radio>
+                  <b-form-radio-group stacked v-model="data.projektiKuvaus" class="mb-3">
+                    <b-form-radio :value="kuvaus.korjaus">{{ $t('perusteen-korjaus') }}</b-form-radio>
+                    <b-form-radio :value="kuvaus.uudistus">{{ $t('perusteen-uudistus') }}</b-form-radio>
                   </b-form-radio-group>
+                </div>
+                <div v-else-if="data.projektiKuvaus === kuvaus.korjaus">
+                  {{ $t('perusteen-korjaus') }}
+                </div>
+                <div v-else-if="data.projektiKuvaus === kuvaus.uudistus">
+                  {{ $t('perusteen-uudistus') }}
                 </div>
                 <ep-content v-model="data.kuvaus" layout="normal" :is-editable="isEditing" :kasiteHandler="kasiteHandler" :kuvaHandler="kuvaHandler"></ep-content>
               </b-form-group>
@@ -99,6 +105,7 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { TermitStore } from '@/stores/TermitStore';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
+import { PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -129,6 +136,13 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
 
   get kuvaHandler() {
     return createKuvaHandler(new KuvaStore(this.perusteId!));
+  }
+
+  get kuvaus() {
+    return {
+      uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
+      korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
+    };
   }
 }
 </script>

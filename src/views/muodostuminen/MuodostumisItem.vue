@@ -48,7 +48,7 @@
         <ep-content v-model="value.kuvaus" :is-editable="false" layout="normal"></ep-content>
       </div>
       <div class="text-center description-button">
-        <b-button variant="link" @click="toggleDescription">
+        <b-button variant="link" @click="toggleDescription()">
           <fas icon="ellipsis-h" />
         </b-button>
       </div>
@@ -97,7 +97,7 @@
                 </ep-input>
               </div>
               <div class="ml-2">
-                osp
+                 {{$t('osaamispiste')}}
               </div>
             </div>
             <ep-toggle
@@ -193,11 +193,11 @@ export default class MuodostumisItem extends Vue {
       'rakenne-moduuli-pakollinen',
     ];
     for (const rt of rakennetyypit) {
-      if (this.value?.name?.fi === this.$t(rt, 'fi')) {
+      if (this.value?.nimi?.fi === this.$t(rt, 'fi')) {
         return rt;
       }
     }
-    console.log('?');
+
     return 'rakenne-moduuli-pakollinen';
   }
 
@@ -349,8 +349,13 @@ export default class MuodostumisItem extends Vue {
     }
   }
 
-  toggleDescription() {
-    this.showDescription = !this.showDescription;
+  toggleDescription(toggle?) {
+    if (toggle) {
+      this.showDescription = toggle;
+    }
+    else {
+      this.showDescription = !this.showDescription;
+    }
   }
 }
 </script>
