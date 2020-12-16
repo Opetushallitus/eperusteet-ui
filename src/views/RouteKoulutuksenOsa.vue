@@ -326,7 +326,8 @@ export default class RouteKoulutuksenOsa extends Vue {
 
   setNimiValue(nimiKoodi) {
     const julkaisukielet = this.perusteStore.julkaisukielet.value;
-    const mappedByLang = julkaisukielet.reduce((obj, key) => (obj[key] = nimiKoodi?.nimi['fi'], obj), {});
+    const sourceLang = _.includes(julkaisukielet as string[], 'fi') ? 'fi' : julkaisukielet[0];
+    const mappedByLang = julkaisukielet.reduce((obj, key) => (obj[key] = nimiKoodi?.nimi[sourceLang], obj), {});
     return mappedByLang;
   }
 
