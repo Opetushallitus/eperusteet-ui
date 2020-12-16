@@ -183,7 +183,7 @@
                     <EpInput
                       v-model="data.arvioinnit[i]"
                       :is-editing="isEditing"
-                      :disabled="arviointi.uri !== undefined">
+                      :validation="validation.arvioinnit">
                       <div class="order-handle m-2" slot="left">
                         <fas icon="grip-vertical"/>
                       </div>
