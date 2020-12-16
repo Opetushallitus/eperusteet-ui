@@ -383,10 +383,6 @@ export default class RouteKoulutuksenOsa extends Vue {
       },
     };
   }
-
-  get sisaltokieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
 }
 </script>
 
