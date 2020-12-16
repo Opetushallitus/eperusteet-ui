@@ -7,6 +7,7 @@
        <b-row>
          <b-col>
            <b-form-group :label="$t('koulutustyyppi') + (isEditing ? ' *' : '')" required>
+            <p class="font-size-08">{{ $t('koulutustyyppi-info') }}</p>
             <template v-if="isEditing">
               <b-form-radio
                 v-for="type in koulutusOsanKoulutustyypit"
@@ -27,29 +28,40 @@
       <b-row>
         <b-col md="6">
           <b-form-group :label="$t('koulutuksen-osan-nimi') + (isEditing ? ' *' : '')" required>
-            <EpKoodistoSelect
-              v-if="isTuvaKoulutusTyyppi(data.koulutusOsanKoulutustyyppi)"
-              :store="koodisto"
-              v-model="data.nimiKoodi"
-              :is-editing="isEditing"
-              :naytaArvo="false">
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled>
-                  </b-form-input>
-                  <b-input-group-append>
-                    <b-button
-                      @click="open"
-                      icon="plus"
-                      variant="primary">
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-            </EpKoodistoSelect>
+            <template v-if="isTuvaKoulutusTyyppi(data.koulutusOsanKoulutustyyppi)">
+              <EpKoodistoSelect
+                :store="koodisto"
+                v-model="data.nimiKoodi"
+                :is-editing="isEditing"
+                :naytaArvo="false"
+                @add="onNimiKoodiAdd()">
+                <template #default="{ open }">
+                  <b-input-group>
+                    <b-form-input
+                      :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
+                      :validation="isTuvaKoulutusTyyppi(data.koulutusOsanKoulutustyyppi) ? validation.nimiKoodi : null"
+                      disabled>
+                    </b-form-input>
+                    <b-input-group-append>
+                      <b-button
+                        @click="open"
+                        icon="plus"
+                        variant="primary">
+                        {{ $t('hae-koodistosta') }}
+                      </b-button>
+                    </b-input-group-append>
+                  </b-input-group>
+                </template>
+              </EpKoodistoSelect>
+              <EpInput
+                class="sr-only"
+                aria-hidden="true"
+                :value="data.nimi"
+                @input="data.nimi = setNimiValue(data.nimiKoodi)"
+                :is-editing="isEditing"
+                :validation="validation.nimi"
+                ref="inputNimi"/>
+            </template>
             <EpInput
               v-else
               v-model="data.nimi"
@@ -88,7 +100,6 @@
               v-model="data.kuvaus"
               layout="normal"
               :is-editable="isEditing"
-              :validation="validation.kuvaus"
               :kuvaHandler="kuvaHandler"/>
             <EpAlert v-if="!isEditing && !data.kuvaus" :text="$t('ei-sisaltoa')" />
           </b-form-group>
@@ -283,7 +294,6 @@ export default class RouteKoulutuksenOsa extends Vue {
     if (!id || id === oldId) {
       return;
     }
-
     await this.perusteStore.blockUntilInitialized();
     const tkstore = new KoulutuksenOsaStore(this.perusteId!, Number(id));
     this.store = new EditointiStore(tkstore);
@@ -308,6 +318,16 @@ export default class RouteKoulutuksenOsa extends Vue {
       ...this.store?.data.value,
       [array]: _.filter(_.get(this.store?.data.value, array), rivi => rivi !== rowToRemove),
     });
+  }
+
+  onNimiKoodiAdd() {
+    ((this.$refs.inputNimi as Vue).$el.querySelector('input') as HTMLInputElement).dispatchEvent(new Event('input'));
+  }
+
+  setNimiValue(nimiKoodi) {
+    const julkaisukielet = this.perusteStore.julkaisukielet.value;
+    const mappedByLang = julkaisukielet.reduce((obj, key) => (obj[key] = nimiKoodi?.nimi['fi'], obj), {});
+    return mappedByLang;
   }
 
   private formatKoulutusTyyppi(type: KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum): string {

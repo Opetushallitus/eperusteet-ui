@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 import { KoulutuksenOsaDto, KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum, Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
-import { allTranslations, translated } from '@shared/validators/required';
+import { translated } from '@shared/validators/required';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -126,9 +126,6 @@ export class KoulutuksenOsaStore implements IEditoitava {
     const julkaisukielet = KoulutuksenOsaStore.config!.perusteStore.julkaisukielet.value;
     return {
       koulutusOsanKoulutustyyppi: { required },
-      // nimiKoodi: {
-      //   nimi: required,
-      // },
       nimi: translated(julkaisukielet),
       laajuusMinimi: { required },
       laajuusMaksimi: { required },
