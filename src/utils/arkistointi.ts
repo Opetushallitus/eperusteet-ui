@@ -4,7 +4,7 @@ export async function vaihdaPerusteTilaConfirm(el, meta) {
   const arkistoi = await el.$bvModal.msgBoxConfirm(el.$t(meta.confirm) as any, {
     title: el.$t(meta.title),
     okVariant: 'primary',
-    okTitle: el.$t('kylla') as any,
+    okTitle: el.$t(meta.okTitle ? meta.okTitle : 'kylla') as any,
     cancelVariant: 'link',
     cancelTitle: el.$t('peruuta') as any,
     centered: true,
@@ -20,7 +20,7 @@ export async function vaihdaPerusteTilaConfirm(el, meta) {
     }
     if (meta.reroute) {
       el.$router.push({
-        name: meta.reroute,
+        name: meta.reroute(),
       });
     }
 
