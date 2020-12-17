@@ -36,6 +36,7 @@ export class PerusteStore implements IEditoitava {
   public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly isVapaasivistystyo = computed(() => isVapaasivistystyoKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly julkaisut = computed(() => this.state.julkaisut);
+  public readonly isPohja = computed(() => this.state.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA));
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {

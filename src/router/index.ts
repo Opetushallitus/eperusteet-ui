@@ -162,7 +162,7 @@ const router = new VueRouter({
           meta: {
             title: 'arkistoi-peruste',
             confirm: 'arkistoi-peruste-vahvistus',
-            reroute: 'perusteprojektit',
+            reroute: () => stores.perusteStore.isPohja.value ? 'pohjat' : 'perusteprojektit',
             tila: 'poistettu',
             callback: async () => stores.perusteStore.updateCurrent(),
           },
@@ -283,7 +283,7 @@ const router = new VueRouter({
           meta: {
             title: 'arkistoi-opas',
             confirm: 'arkistoi-opas-vahvistus',
-            reroute: 'oppaat',
+            reroute: () => 'oppaat',
             tila: 'poistettu',
             callback: async () => stores.perusteStore.updateCurrent(),
           },

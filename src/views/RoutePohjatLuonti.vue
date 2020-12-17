@@ -41,7 +41,7 @@
                 :validation="$v.data.nimi" />
           </b-form-group>
 
-          <b-form-group :label="$t('perustetyoryhma') + ' *'" required class="pl-0">
+          <b-form-group :label="$t('perustetyoryhma')" required class="pl-0">
             <EpMultiSelect v-model="data.tyoryhma"
                            v-if="tyoryhmat"
                            :placeholder="$t('valitse')"
@@ -170,7 +170,6 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
       name: this.$t('projektin-tiedot'),
       isValid() {
         return !self.$v.$invalid
-        && !_.isEmpty(self.data.tyoryhma)
         && !_.isEmpty(self.data.koulutustyyppi);
       },
     },
@@ -204,7 +203,7 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
   async onSave() {
     const luotu = await this.perusteprojektiStore.addPerusteprojekti({
       nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
-      ryhmaOid: this.data.tyoryhma.oid,
+      ryhmaOid: this.data.tyoryhma ? this.data.tyoryhma.oid : undefined,
       koulutustyyppi: this.data.koulutustyyppi,
       perusteId: this.data.pohja?.peruste.id,
       tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.POHJA,
