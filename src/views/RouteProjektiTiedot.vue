@@ -72,7 +72,7 @@
             </b-col>
             <b-col lg="6">
               <b-form-group :label="$t('perusteen-lataus')" v-if="!isEditing">
-                <ep-button variant="primary" icon="file">{{ $t('lataa-peruste-json') }}</ep-button>
+                <ep-button variant="primary" icon="file" @click="exportPeruste">{{ $t('lataa-peruste-json') }}</ep-button>
               </b-form-group>
             </b-col>
           </b-row>
@@ -105,7 +105,7 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { TermitStore } from '@/stores/TermitStore';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
-import { PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
+import { Maintenance, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -143,6 +143,16 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
       uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
       korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
     };
+  }
+
+  async exportPeruste() {
+    const peruste = JSON.stringify((await Maintenance.viePerusteJson(this.perusteId!)).data);
+    const blob = new Blob([peruste as any], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'peruste';
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
 }
 </script>
