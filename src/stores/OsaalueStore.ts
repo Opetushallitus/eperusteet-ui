@@ -5,8 +5,14 @@ import { TutkinnonOsaViiteDto, OsaAlueet } from '@shared/api/eperusteet';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
+import { required } from 'vuelidate/lib/validators';
+import { translated, requiredOneLang } from '@shared/validators/required';
 
 Vue.use(VueCompositionApi);
+
+interface OsaalueStoreConfig {
+  perusteStore: PerusteStore;
+}
 
 export class OsaalueStore implements IEditoitava {
   constructor(
@@ -14,6 +20,12 @@ export class OsaalueStore implements IEditoitava {
     private osaalueId: number | string,
     private router: VueRouter,
   ) { }
+
+  private static config: OsaalueStoreConfig;
+
+  public static install(vue: typeof Vue, config: OsaalueStoreConfig) {
+    OsaalueStore.config = config;
+  }
 
   public async load() {
     if (this.osaalueId === 'uusi') {
@@ -71,16 +83,18 @@ export class OsaalueStore implements IEditoitava {
     }
 
     if (this.osaalueId === 'uusi') {
-      const res = await OsaAlueet.addOsaAlueV2(this.tovId, data);
+      const saved = (await OsaAlueet.addOsaAlueV2(this.tovId, data)).data;
+      await OsaalueStore.config.perusteStore.updateNavigation();
+
       this.router.replace({
+        name: 'osaalue',
         params: {
-          osaalueId: '' + res.data.id!,
+          osaalueId: '' + saved.id!,
         },
       });
-      return res.data;
     }
     else {
-      return (await OsaAlueet.updateOsaAlueV2(this.tovId, Number(this.osaalueId), data)).data;
+      await OsaAlueet.updateOsaAlueV2(this.tovId, Number(this.osaalueId), data);
     }
   }
 
@@ -92,5 +106,17 @@ export class OsaalueStore implements IEditoitava {
     return null;
   }
 
-  // acquire?: () => Promise<ILukko | null>;
+  public readonly validator = computed(() => {
+    return {
+      nimi: requiredOneLang(),
+      koodi: {
+        required,
+      },
+      arviointi: {
+        id: {
+          required,
+        },
+      },
+    };
+  });
 }

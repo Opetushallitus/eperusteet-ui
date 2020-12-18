@@ -268,7 +268,7 @@
             <router-link :to="{ name: 'jarjesta' }">
               <span class="text-nowrap">
                 <fas icon="jarjesta" fixed-width />
-                {{ $t('muokkaa-rakennetta') }}
+                <a class="btn btn-link btn-link-nav">{{$t('muokkaa-jarjestysta')}}</a>
               </span>
             </router-link>
           </div>
@@ -716,12 +716,14 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   padding: 7px 10px 7px 10px;
 
   a {
-    color: #000;
-
     &.router-link-exact-active {
       font-weight: 600;
     }
   }
+}
+
+.menu-item:not(.bottom-menu-item) a{
+  color: #000;
 }
 
 .navigation ::v-deep .ep-button .btn {

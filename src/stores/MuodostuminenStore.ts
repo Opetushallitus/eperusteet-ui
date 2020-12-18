@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Api, UpdateDtoRakenneModuuliDto, RakenneModuuliDto, TutkinnonRakenne } from '@shared/api/eperusteet';
+import { Api, UpdateDtoRakenneModuuliDto, RakenneModuuliDto, TutkinnonRakenne, Perusteet } from '@shared/api/eperusteet';
 import { Revision, Page } from '@shared/tyypit';
 import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
+import { config } from 'vue/types/umd';
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
@@ -41,17 +42,25 @@ export class MuodostuminenStore implements IEditoitava {
   public async load() {
     const res = await TutkinnonRakenne.getRakenne(this.perusteId, 'REFORMI');
     return {
-      ...res.data,
-      muodostumisSaanto: res.data.muodostumisSaanto || {
-        laajuus: {
-          minimi: 0,
+      rakenne: {
+        ...res.data,
+        muodostumisSaanto: res.data.muodostumisSaanto || {
+          laajuus: {
+            minimi: 0,
+          },
         },
       },
+      osaamisalat: MuodostuminenStore.config?.perusteStore.peruste.value?.osaamisalat || [],
+      tutkintonimikkeet: MuodostuminenStore.config?.perusteStore.peruste.value?.tutkintonimikkeet || [],
     };
   }
 
-  public async save(data: RakenneModuuliDto) {
-    await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, 'REFORMI', data as any);
+  public async save(data) {
+    const rakenne = data.rakenne;
+    await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, 'REFORMI', rakenne as any);
+    await Perusteet.updateOsaamisalat(this.perusteId, data.osaamisalat);
+    await Perusteet.updateTutkintonimikkeet(this.perusteId, data.tutkintonimikkeet);
+    await MuodostuminenStore.config?.perusteStore.updateCurrent();
   }
 
   public readonly validator = computed(() => {
