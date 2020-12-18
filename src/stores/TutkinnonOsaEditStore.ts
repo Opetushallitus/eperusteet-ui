@@ -9,6 +9,7 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { minValue, translated, warning } from '@shared/validators/required';
 import { required } from 'vuelidate/lib/validators';
+import { Kielet } from '@shared/stores/kieli';
 
 export function notNull() {
   return {
@@ -37,6 +38,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     private readonly perusteId: number,
     // Jos undefined, luodaan uusi
     private readonly tutkinnonOsaViiteId?: number,
+    private readonly el?: any,
   ) {
     if (!TutkinnonOsaEditStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -59,7 +61,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
           tyyppi: 'normaali',
           osanTyyppi: 'tutkinnonosa',
           ammattitaitovaatimukset2019: {
-            kohde: null,
+            kohde: { [Kielet.getSisaltoKieli.value]: this.el.$t('opiskelija') },
             vaatimukset: [],
             kohdealueet: [],
           },

@@ -5,27 +5,29 @@
     tag="div"
     :class="classes"
     v-model="model">
-    <div v-for="(node, idx) in model" :key="node.tunniste || node.uuid || idx" class="muodostumisnode">
-      <MuodostumisItem v-model="model[idx]"
-                       :depth="depth"
-                       :is-editing="isEditing"
-                       :tutkinnonOsatMap="tutkinnonOsatMap"
-                       @toggle="toggleOpen"
-                       @remove="remove(idx)"
-                       :isOpen="isOpen"
-                       ref="muodostumisItem">
-      </MuodostumisItem>
+      <div v-for="(node, idx) in model" :key="node.tunniste || node.uuid || idx" class="muodostumisnode">
+        <MuodostumisItem v-model="model[idx]"
+                        :depth="depth"
+                        :is-editing="isEditing"
+                        :tutkinnonOsatMap="tutkinnonOsatMap"
+                        @toggle="toggleOpen"
+                        @remove="remove(idx)"
+                        :isOpen="isOpen"
+                        :parentMandatory="parentMandatory"
+                        ref="muodostumisItem">
+        </MuodostumisItem>
 
-      <div class="children" :class="{ muodostumisryhma: !!node.rooli && depth > 0 }" :style="{ 'padding-left': 30 + 'px' }" v-if="isOpen">
-        <MuodostumisNode
-          ref="childNode"
-          :tutkinnonOsatMap="tutkinnonOsatMap"
-          :depth="depth + 1"
-          v-model="node.osat"
-          :is-editing="isEditing">
-        </MuodostumisNode>
+        <div class="children" :class="{muodostumisryhma: !!node.rooli && depth > 0}" :style="{ 'padding-left': 30 + 'px' }" v-if="isOpen">
+          <MuodostumisNode
+            ref="childNode"
+            :tutkinnonOsatMap="tutkinnonOsatMap"
+            :depth="depth + 1"
+            v-model="node.osat"
+            :is-editing="isEditing"
+            :parentMandatory="pakollinen(node)">
+          </MuodostumisNode>
+        </div>
       </div>
-    </div>
   </draggable>
 </template>
 
@@ -37,8 +39,8 @@ import { RakenneModuuliDto } from '@shared/api/eperusteet';
 import draggable from 'vuedraggable';
 import _ from 'lodash';
 import { v4 as genUuid } from 'uuid';
-import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType } from './muodostuminen/utils';
-import MuodostumisItem from './muodostuminen/MuodostumisItem.vue';
+import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType } from '@/components/muodostuminen/utils';
+import MuodostumisItem from './MuodostumisItem.vue';
 
 function disassoc<T>(array: T[], idx: number): T[] {
   if (!_.isNumber(idx)) {
@@ -97,6 +99,9 @@ export default class MuodostumisNode extends Vue {
   @Prop({ required: true })
   private tutkinnonOsatMap!: any;
 
+  @Prop({ default: false, type: Boolean })
+  private parentMandatory!: boolean;
+
   private isOpen = true;
 
   get classes() {
@@ -111,8 +116,13 @@ export default class MuodostumisNode extends Vue {
     }
   }
 
-  toggleOpen() {
-    this.isOpen = !this.isOpen;
+  toggleOpen(toggleStatus?) {
+    if (toggleStatus) {
+      this.isOpen = toggleStatus;
+    }
+    else {
+      this.isOpen = !this.isOpen;
+    }
   }
 
   nodeColor(node: any) {
@@ -191,45 +201,27 @@ export default class MuodostumisNode extends Vue {
     _.forEach(this.$refs['childNode'], item => (item as any).toggleDescription(toggle));
   }
 
-  // onChildrenChange(idx, children) {
-  //   const updated = [..._.map(this.nodes, 'node')];
-  //   updated[idx].osat = children;
-  //   console.log('updating children', updated);
-  //   this.$emit('input', updated);
-  // }
+  toggleRakenne(toggle?) {
+    this.toggleOpen(toggle);
+    _.forEach(this.$refs['childNode'], item => (item as any).toggleRakenne(toggle));
+  }
 
-  // onChange(event) {
-  //   if (event.moved) {
-  //     const nodes = swapped(this.nodes, event.moved.newIndex, event.moved.oldIndex);
-  //     console.log(event, nodes);
-  //     this.emit(nodes);
-  //   }
-  //   else if (event.added) {
-  //     const nodes = assoc(this.nodes, event.added.element, event.added.newIndex);
-  //     console.log(event, nodes);
-  //     this.emit(nodes);
-  //   }
-  //   else if (event.removed) {
-  //     const nodes = disassoc(this.nodes, event.removed.oldIndex);
-  //     console.log(event, nodes);
-  //     this.emit(nodes);
-  //   }
-  //   console.log('done');
-  // }
+  pakollinen(node) {
+    return (node.rooli === 'määritelty' && this.$kaanna(node.nimi) === this.$t('rakenne-moduuli-pakollinen')) || node.pakollinen;
+  }
 }
 </script>
 
 <style scoped lang="scss">
+@import "@shared/styles/_variables.scss";
+
 $ryhma-height: 52px;
 $linecolor: #ccc;
-
 .children {
   background: #f2f2f2;
 }
-
 .muodostumisryhma {
 }
-
 // .rakenne-moduuli:before {
 //   background: red;
 //   border-bottom: 1px solid red;
@@ -240,7 +232,6 @@ $linecolor: #ccc;
 //   margin-left: -56px;
 //   margin-top: -$ryhma-height / 2;
 // }
-
 // .rakenne-moduuli-root:after {
 //   border-left: 1px solid $linecolor;
 //   height: 100%;
@@ -250,7 +241,6 @@ $linecolor: #ccc;
 //   // height: 100px;
 //   position: absolute;
 // }
-
 // .muodostumisryhma:before {
 //   border-top: 1px solid $linecolor;
 //   margin-left: -56px;
@@ -259,7 +249,6 @@ $linecolor: #ccc;
 //   width: 26px;
 //   position: absolute;
 // }
-
 .ryhma {
   // height: $ryhma-height;
   .nimi {
@@ -267,19 +256,15 @@ $linecolor: #ccc;
     font-size: 80%;
   }
 }
-
 .rakenne-moduuli-root {
-  padding: 18px 0 12px 0;
+  // padding: 18px 0 12px 0;
 }
-
 .muodostumisnode {
-  padding: 8px 0 8px 0;
+  // padding: 8px 0 8px 0;
 }
-
 .rakenne-moduuli {
-  padding: 8px 0 0 0;
+  // padding: 8px 0 0 0;
 }
-
 // .children:before {
 //   background: gray;
 //   content: '';
@@ -289,7 +274,6 @@ $linecolor: #ccc;
 //   margin-top: $ryhma-height;
 //   width: 1px;
 // }
-
 .colorblock {
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;

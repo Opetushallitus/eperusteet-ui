@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column h-100 moduuli" :style="style">
+  <div class="d-flex flex-column h-100 moduuli mb-3" :style="style">
     <div class="d-flex align-items-center flex-grow-1 h-100">
       <div class="pl-1" v-if="hasChildren">
         <b-button variant="link" @click="toggleOpen">
@@ -8,6 +8,7 @@
         </b-button>
       </div>
       <div class="flex-grow-1 h-100 p-2 nimi">
+        <EpColorIndicator :size="10" :backgroundColor="color" class="ml-2 mr-2" v-if="tosa"/>
         {{ $kaanna(nimi) }}
       </div>
       <div style="width: 100px;" class="text-center">
@@ -36,8 +37,8 @@
             <b-dropdown-item-button @click="remove">{{ $t('poista') }}</b-dropdown-item-button>
             <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
             <b-dropdown-text v-if="isRyhma">
-              <ep-button icon="plus" variant="outline">{{ $t('liita-tutkinnon-osa') }}</ep-button>
-              <ep-button icon="plus" variant="outline">{{ $t('lisaa-ryhma') }}</ep-button>
+              <ep-button icon="plus" variant="outline" @click="liitaTosa">{{ $t('liita-tutkinnon-osa') }}</ep-button>
+              <ep-button icon="plus" variant="outline" @click="lisaaRyhma">{{ $t('lisaa-ryhma') }}</ep-button>
             </b-dropdown-text>
           </b-dropdown>
         </div>
@@ -53,73 +54,12 @@
         </b-button>
       </div>
     </div>
-    <b-modal ref="editModal" size="lg">
-      <template #modal-header>
-        <h2>{{ $t('muokkaa') }}: {{ $kaanna(nimi) }}</h2>
-      </template>
+    <EpRakenneModal v-model="innerModel" ref="eprakennemodal" @remove="remove" :tutkinnonOsatMap="tutkinnonOsatMap" muokkaus/>
 
-      <template #default>
-        <div v-if="isRyhma">
-          <b-form-group :label="$t('pakollisuus')">
-            <b-form-radio class="ml-1" v-model="tyyppi" value="osaamisala" name="tyyppi">
-              {{ $t('osaamisala') }}
-            </b-form-radio>
-            <b-form-radio class="ml-1" v-model="tyyppi" value="tutkintonimike" name="tyyppi">
-              {{ $t('tutkintonimike') }}
-            </b-form-radio>
-            <b-form-radio class="ml-1 mt-2" v-model="tyyppi" value="rakenne-moduuli-pakollinen" name="tyyppi">
-              {{ $t('rakenne-moduuli-pakollinen') }}
-            </b-form-radio>
-            <b-form-radio class="ml-1" v-model="tyyppi" value="rakenne-moduuli-valinnainen" name="tyyppi">
-              {{ $t('rakenne-moduuli-valinnainen') }}
-            </b-form-radio>
-            <b-form-radio class="ml-1" v-model="tyyppi" value="rakenne-moduuli-ammatilliset" name="tyyppi">
-              {{ $t('rakenne-moduuli-ammatilliset') }}
-            </b-form-radio>
-            <b-form-radio class="ml-1" v-model="tyyppi" value="rakenne-moduuli-yhteiset" name="tyyppi">
-              {{ $t('rakenne-moduuli-yhteiset') }}
-            </b-form-radio>
-            <b-form-radio class="ml-1 mt-2" v-model="tyyppi" value="rakenne-moduuli-paikalliset" name="tyyppi">
-              {{ $t('rakenne-moduuli-paikalliset') }}
-            </b-form-radio>
-          </b-form-group>
-          <b-form-group :label="$t('laajuus')">
-            <div class="d-flex align-items-center">
-              <div>
-                <ep-input type="number" is-editing v-model="value.muodostumisSaanto.laajuus.minimi">
-                </ep-input>
-              </div>
-              <div class="ml-2" v-if="value.muodostumisSaanto.laajuus.maksimi">
-                -
-              </div>
-              <div class="ml-2" v-if="value.muodostumisSaanto.laajuus.maksimi">
-                <ep-input type="number" is-editing v-model="value.muodostumisSaanto.laajuus.maksimi">
-                </ep-input>
-              </div>
-              <div class="ml-2">
-                 {{$t('osaamispiste')}}
-              </div>
-            </div>
-            <ep-toggle
-              :value="value.muodostumisSaanto.laajuus.maksimi !== null"
-              @input="toggleMaksimi"
-              switch>
-            {{ $t('aseta-myos-maksimiarvo') }}
-            </ep-toggle>
-          </b-form-group>
-        </div>
-        <div v-else>
-          <b-form-group :label="$t('pakollisuus')">
-            <ep-toggle v-model="value.pakollinen" switch>
-              {{ $t('tutkinnon-osa-on-pakollinen') }}
-            </ep-toggle>
-          </b-form-group>
-        </div>
-        <b-form-group :label="$t('kuvaus')">
-          <ep-content v-model="value.kuvaus" :is-editable="true" layout="normal"></ep-content>
-        </b-form-group>
-      </template>
-    </b-modal>
+    <EpRakenneModal v-model="uusi.ryhma" ref="eprakennemodalNew" @save="addUusi(value)"/>
+
+    <TutkinnonosatAddModal ref="tutkinnonosatModal" :tutkinnonosat="tutkinnonosat" @save="lisaaTutkinnonosat" />
+
   </div>
 </template>
 
@@ -130,10 +70,13 @@ import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import _ from 'lodash';
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Watch, Prop, Component, Vue, Inject } from 'vue-property-decorator';
 import { RakenneModuuliDto } from '@shared/api/eperusteet';
-import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType } from './utils';
+import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType, DefaultRyhma, ryhmaTemplate } from './utils';
 import { v4 as genUuid } from 'uuid';
+import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
+import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
+import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 
 @Component({
   name: 'MuodostumisItem',
@@ -142,6 +85,9 @@ import { v4 as genUuid } from 'uuid';
     EpContent,
     EpInput,
     EpToggle,
+    EpRakenneModal,
+    TutkinnonosatAddModal,
+    EpColorIndicator,
   },
 })
 export default class MuodostumisItem extends Vue {
@@ -160,7 +106,19 @@ export default class MuodostumisItem extends Vue {
   @Prop({ default: true })
   private isOpen!: boolean;
 
+  @Prop({ default: false, type: Boolean })
+  private parentMandatory!: boolean;
+
   private showDescription = false;
+  private uusi: any | null = DefaultRyhma;
+
+  set innerModel(innerModel) {
+    this.$emit('input', innerModel);
+  }
+
+  get innerModel() {
+    return this.value;
+  }
 
   get hasChildren() {
     return this.value.osat?.length > 0;
@@ -177,30 +135,6 @@ export default class MuodostumisItem extends Vue {
     return this.tutkinnonOsatMap[this.value._tutkinnonOsaViite];
   }
 
-  get tyyppi() {
-    if (this.value.rooli === 'osaamisala') {
-      return 'osaamisala';
-    }
-    else if (this.value.rooli === 'tutkinnonosa') {
-      return 'tutkinnonosa';
-    }
-
-    const rakennetyypit = [
-      'rakenne-moduuli-valinnainen',
-      'rakenne-moduuli-ammatilliset',
-      'rakenne-moduuli-yhteiset',
-      'rakenne-moduuli-paikalliset',
-      'rakenne-moduuli-pakollinen',
-    ];
-    for (const rt of rakennetyypit) {
-      if (this.value?.nimi?.fi === this.$t(rt, 'fi')) {
-        return rt;
-      }
-    }
-
-    return 'rakenne-moduuli-pakollinen';
-  }
-
   get laskettu() {
     if (this.isRyhma) {
       return _(this.value.osat)
@@ -214,14 +148,6 @@ export default class MuodostumisItem extends Vue {
     else {
       return this.laajuusMinimi;
     }
-  }
-
-  set tyyppi(value: string) {
-    this.value.nimi = {
-      fi: this.$t(value, 'fi'),
-      sv: this.$t(value, 'sv'),
-      en: this.$t(value, 'en'),
-    };
   }
 
   mounted() {
@@ -296,7 +222,7 @@ export default class MuodostumisItem extends Vue {
   get style() {
     return {
       'min-height': (this.isRyhma ? 52 : 42) + 'px',
-      'border-left': '9px solid ' + this.color,
+      ...(!this.tosa && { 'border-left': '9px solid ' + this.color }),
       'border-bottom-left-radius': '4px',
       'border-top-left-radius': '4px',
     };
@@ -319,7 +245,7 @@ export default class MuodostumisItem extends Vue {
       return ColorMap.valinnainen;
     }
     else {
-      if (this.value.pakollinen) {
+      if (this.parentMandatory || this.value.pakollinen) {
         return ColorMap.pakollinen;
       }
       else {
@@ -337,16 +263,7 @@ export default class MuodostumisItem extends Vue {
   }
 
   edit() {
-    (this.$refs.editModal as any).show();
-  }
-
-  toggleMaksimi() {
-    if (_.isNumber(this.value.muodostumisSaanto?.laajuus.maksimi)) {
-      this.value.muodostumisSaanto.laajuus.maksimi = null;
-    }
-    else {
-      this.value.muodostumisSaanto.laajuus.maksimi = 1;
-    }
+    (this.$refs.eprakennemodal as any).show();
   }
 
   toggleDescription(toggle?) {
@@ -356,6 +273,53 @@ export default class MuodostumisItem extends Vue {
     else {
       this.showDescription = !this.showDescription;
     }
+  }
+
+  addUusi(root) {
+    const template = ryhmaTemplate(this.uusi.tyyppi, this);
+    if (this.uusi) {
+      root.osat = [{
+        ...template,
+        ...this.uusi.ryhma,
+      }, ...root.osat];
+    }
+  }
+
+  lisaaRyhma() {
+    this.uusi = _.cloneDeep(DefaultRyhma);
+    (this.$refs.eprakennemodalNew as any).show(true);
+  }
+
+  liitaTosa() {
+    (this.$refs.tutkinnonosatModal as any).show();
+  }
+
+  get tutkinnonosat() {
+    return _.chain(this.tutkinnonOsatMap)
+      .keys()
+      .map(tosaViite => {
+        return {
+          ...this.tutkinnonOsatMap[tosaViite],
+          _tutkinnonOsaViite: tosaViite,
+        };
+      })
+      .value();
+  }
+
+  lisaaTutkinnonosat(tutkinnonosat) {
+    this.value.osat = [
+      ...this.value.osat,
+      ..._.map(tutkinnonosat, tosa => {
+        return {
+          kuvaus: null,
+          vieras: null,
+          tunniste: null,
+          pakollinen: false,
+          erikoisuus: null,
+          _tutkinnonOsaViite: tosa._tutkinnonOsaViite,
+        };
+      }),
+    ];
   }
 }
 </script>

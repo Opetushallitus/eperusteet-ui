@@ -30,6 +30,7 @@ import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
 import { OpintokokonaisuusStore } from './stores/OpintokokonaisuusStore';
 import { KoulutuksenOsaStore } from './stores/KoulutuksenOsaStore';
+import { OsaalueStore } from '@/stores/OsaalueStore';
 import { registerIconColorSchemeChange } from '@shared/utils/icon';
 
 import router from './router';
@@ -102,6 +103,10 @@ Vue.use(OpintokokonaisuusStore, {
 Vue.use(KoulutuksenOsaStore, {
   perusteStore: stores.perusteStore,
   router,
+});
+
+Vue.use(OsaalueStore, {
+  perusteStore: stores.perusteStore,
 });
 
 async function main() {

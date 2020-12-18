@@ -30,9 +30,32 @@
         <b-row>
           <b-col md="8">
             <b-form-group :label="$t('tutkinnon-osan-nimi')">
-              <ep-input v-model="data.tutkinnonOsa.nimi"
-                        :is-editing="isEditing"
-                        :validation="validation.tutkinnonOsa.nimi" />
+              <ep-koodisto-select
+                :store="tutkinnonosaKoodisto"
+                v-model="data.tutkinnonOsa.koodi"
+                :is-editing="isEditing"
+                :naytaArvo="false"
+                :additionalFields="tutkinnonosaKoodistoKaytossaField"
+                @add="tutkinnonOsaNimiKoodiLisays">
+                <template #default="{ open }">
+                  <div class="d-flex">
+                    <b-input-group>
+                      <b-form-input v-model="nimi" :disabled="data.tutkinnonOsa.koodi !== null || koodiTallennus"></b-form-input>
+                      <b-input-group-append>
+                        <b-button @click="open" icon="plus" variant="primary">
+                          {{ $t('hae-koodistosta') }}
+                        </b-button>
+                      </b-input-group-append>
+                    </b-input-group>
+
+                    <ep-button icon="roskalaatikko" variant="link" v-if="data.tutkinnonOsa.koodi" @click="tyhjennaTutkinnonosaKoodi"/>
+                    <ep-button variant="link" v-if="!data.tutkinnonOsa.koodi" @click="lisaaTutkinnonosaNimiKoodistoon" :disabled="!hasNimi">
+                      {{$t('vie-koodistoon')}}
+                    </ep-button>
+                    <ep-spinner v-if="koodiTallennus" />
+                  </div>
+                </template>
+              </ep-koodisto-select>
             </b-form-group>
           </b-col>
 
@@ -158,6 +181,10 @@ import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import _ from 'lodash';
 import { Murupolku } from '@shared/stores/murupolku';
+import { Koodisto, TutkinnonosatPrivate } from '@shared/api/eperusteet';
+import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
+import { Kielet } from '@shared/stores/kieli';
 
 @Component({
   components: {
@@ -172,6 +199,7 @@ import { Murupolku } from '@shared/stores/murupolku';
     EpInput,
     EpLaajuusInput,
     EpSpinner,
+    EpKoodistoSelect,
   },
 })
 export default class RouteTutkinnonosa extends Vue {
@@ -182,6 +210,45 @@ export default class RouteTutkinnonosa extends Vue {
   arviointiStore!: ArviointiStore;
 
   private store: EditointiStore | null = null;
+  private koodiTallennus = false;
+
+  private readonly tutkinnonosaKoodisto = new KoodistoSelectStore({
+    async query(query: string, sivu = 0) {
+      const koodit = (await Koodisto.kaikkiSivutettuna('tutkinnonosat', query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        },
+      })).data as any;
+
+      const kaytetyt = (await TutkinnonosatPrivate.getTutkinnonOsaByKoodit(_.map(koodit.data, 'koodiUri'))).data;
+
+      return {
+        ...koodit,
+        data: _.map(koodit.data, koodi => {
+          return {
+            ...koodi,
+            kaytossa: kaytetyt[koodi.koodiUri],
+          };
+        }),
+      };
+    },
+  });
+
+  get tutkinnonosaKoodistoKaytossaField() {
+    return [{
+      key: 'kaytossa',
+      label: this.$t('kaytossa'),
+      thStyle: { width: '10rem' },
+      formatter: (value, key, item) => {
+        if (value) {
+          return this.$t('kylla');
+        }
+
+        return '';
+      },
+    }];
+  }
 
   get isNew() {
     return this.tutkinnonOsaId === 'uusi';
@@ -265,10 +332,7 @@ export default class RouteTutkinnonosa extends Vue {
     this.arviointiStore.fetchArviointiasteikot();
     this.arviointiStore.fetchGeneeriset();
     await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(
-      this.perusteId!,
-      id ? Number(id!)
-        : undefined);
+    const store = new TutkinnonOsaEditStore(this.perusteId!, id ? Number(id!) : undefined, this);
     this.store = new EditointiStore(store);
   }
 
@@ -279,6 +343,77 @@ export default class RouteTutkinnonosa extends Vue {
         osaalueId: 'uusi',
       },
     });
+  }
+
+  get hasNimi() {
+    return !_.isEmpty(_.get(this.store?.data.value.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value));
+  }
+
+  set nimi(value) {
+    this.store?.setData({
+      ...this.store?.data.value,
+      tutkinnonOsa: {
+        ...this.store?.data.value.tutkinnonOsa,
+        nimi: {
+          ...this.store?.data.value.tutkinnonOsa.nimi,
+          [Kielet.getSisaltoKieli.value]: value,
+        },
+      },
+    });
+  }
+
+  get nimi() {
+    return _.get(this.store?.data.value.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value);
+  }
+
+  tutkinnonOsaNimiKoodiLisays(koodi) {
+    if (koodi.kaytossa) {
+      this.$fail(this.$t('tutkinnon-osan-koodi-kaytossa') as string);
+      this.tyhjennaTutkinnonosaKoodi();
+    }
+    else {
+      this.store?.setData({
+        ...this.store?.data.value,
+        tutkinnonOsa: {
+          ...this.store?.data.value.tutkinnonOsa,
+          nimi: koodi.nimi,
+          koodi,
+        },
+      });
+    }
+  }
+
+  tyhjennaTutkinnonosaKoodi() {
+    this.store?.setData({
+      ...this.store?.data.value,
+      tutkinnonOsa: {
+        ...this.store?.data.value.tutkinnonOsa,
+        koodi: null,
+        nimi: null,
+      },
+    });
+  }
+
+  async lisaaTutkinnonosaNimiKoodistoon() {
+    this.koodiTallennus = true;
+    try {
+      const koodi = (await Koodisto.lisaaUusiKoodi('tutkinnonosat', this.store?.data.value.tutkinnonOsa.nimi)).data as any;
+
+      this.store?.setData({
+        ...this.store?.data.value,
+        tutkinnonOsa: {
+          ...this.store?.data.value.tutkinnonOsa,
+          koodi,
+          nimi: _.mapValues(_.keyBy(koodi.metadata, v => _.toLower(v.kieli)), v => v.nimi),
+        },
+      });
+    }
+    catch (e) {
+      this.$fail(this.$t('virhe-palvelu-virhe') as string);
+    }
+    finally {
+      this.koodiTallennus = false;
+    }
   }
 }
 </script>

@@ -18,7 +18,7 @@
         <div v-else>
           <b-row>
             <b-col md="6">
-              <b-form-group :label="$t('osaalue-nimi') + '*'">
+              <b-form-group :label="$t('osaalue-nimi') + (isEditing ? ' *' : '')">
                 <ep-input v-model="data.nimi"
                           :is-editing="isEditing"
                           :validation="validation.nimi" />
@@ -26,7 +26,7 @@
             </b-col>
 
             <b-col md="6">
-              <b-form-group :label="$t('koodi') + '*'">
+              <b-form-group :label="$t('koodi') + (isEditing ? ' *' : '')">
                 <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing">
                   <template #default="{ open }">
                     <b-input-group>
@@ -69,7 +69,7 @@
         </ep-collapse>
 
         <ep-collapse tyyppi="arviointi" :border-bottom="false" :border-top="true">
-          <h3 slot="header">{{ $t('arviointi') }}</h3>
+          <h3 slot="header">{{ $t('arviointi') + (isEditing ? ' *' : '')}} </h3>
           <EpGeneerinenAsteikko v-model="arviointi"
                                 :arviointi-store="arviointiStore"
                                 :is-editing="isEditing" />
@@ -188,7 +188,6 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   });
 
   async onOsaAlueChange() {
-    console.log('laukean');
     if (!this.tutkinnonOsaId || !this.osaalueId) {
       return;
     }
