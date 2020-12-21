@@ -135,7 +135,7 @@ export class KoulutuksenOsaStore implements IEditoitava {
       laajuusMaksimi: {
         'min-value': minValue(0),
         required,
-       },
+      },
       arvioinnit: {
         'min-length': minLength(1),
         required,

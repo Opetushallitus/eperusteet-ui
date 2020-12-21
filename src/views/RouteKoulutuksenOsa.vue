@@ -340,12 +340,13 @@ export default class RouteKoulutuksenOsa extends Vue {
 
     if (this.isTuvaKoulutusTyyppi && !storeData.nimiKoodi?.nimi[sisaltokieli]) {
       this.setStoreNimiValue(null);
-    } else if (this.isTuvaKoulutusTyyppi && storeData.nimiKoodi?.nimi[sisaltokieli]) {
+    }
+    else if (this.isTuvaKoulutusTyyppi && storeData.nimiKoodi?.nimi[sisaltokieli]) {
       this.setStoreNimiValue(this.setNimiValue(storeData.nimiKoodi));
     }
 
     if (!this.isTuvaKoulutusTyyppi) {
-      this.setStoreNimiValue(this.tempNimiValue)
+      this.setStoreNimiValue(this.tempNimiValue);
     }
   }
 
