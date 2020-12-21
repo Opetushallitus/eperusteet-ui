@@ -9,7 +9,7 @@
             <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
-                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('toinen-pohja') }}</b-form-radio>
+                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('toista-pohjaa') }}</b-form-radio>
                 <div v-if="tyyppi === 'pohjasta'" class="ml-2">
                   <EpMultiSelect
                     v-if="pohjat"
@@ -27,7 +27,7 @@
                   <EpSpinner v-else />
                 </div>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi-perustepohja') }}</b-form-radio>
 
               </b-form-group>
             </div>
@@ -41,7 +41,7 @@
                 :validation="$v.data.nimi" />
           </b-form-group>
 
-          <b-form-group :label="$t('perustetyoryhma') + ' *'" required class="pl-0">
+          <b-form-group :label="$t('perustetyoryhma')" required class="pl-0">
             <EpMultiSelect v-model="data.tyoryhma"
                            v-if="tyoryhmat"
                            :placeholder="$t('valitse')"
@@ -170,7 +170,6 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
       name: this.$t('projektin-tiedot'),
       isValid() {
         return !self.$v.$invalid
-        && !_.isEmpty(self.data.tyoryhma)
         && !_.isEmpty(self.data.koulutustyyppi);
       },
     },
@@ -204,7 +203,7 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
   async onSave() {
     const luotu = await this.perusteprojektiStore.addPerusteprojekti({
       nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
-      ryhmaOid: this.data.tyoryhma.oid,
+      ryhmaOid: this.data.tyoryhma ? this.data.tyoryhma.oid : undefined,
       koulutustyyppi: this.data.koulutustyyppi,
       perusteId: this.data.pohja?.peruste.id,
       tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.POHJA,

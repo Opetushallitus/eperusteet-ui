@@ -43,10 +43,16 @@
                   <div class="text-muted mb-3">
                     {{ $t('perusteprojekti-ohje-kuvaus') }}
                   </div>
-                  <b-form-radio-group stacked v-model="data.tyyppi" class="mb-3">
-                    <b-form-radio value="PERUSTEEN_KORJAUS">{{ $t('perusteen-korjaus') }}</b-form-radio>
-                    <b-form-radio value="PERUSTEEN_UUDISTUS">{{ $t('perusteen-uudistus') }}</b-form-radio>
+                  <b-form-radio-group stacked v-model="data.projektiKuvaus" class="mb-3">
+                    <b-form-radio :value="kuvaus.korjaus">{{ $t('perusteen-korjaus') }}</b-form-radio>
+                    <b-form-radio :value="kuvaus.uudistus">{{ $t('perusteen-uudistus') }}</b-form-radio>
                   </b-form-radio-group>
+                </div>
+                <div v-else-if="data.projektiKuvaus === kuvaus.korjaus">
+                  {{ $t('perusteen-korjaus') }}
+                </div>
+                <div v-else-if="data.projektiKuvaus === kuvaus.uudistus">
+                  {{ $t('perusteen-uudistus') }}
                 </div>
                 <ep-content v-model="data.kuvaus" layout="normal" :is-editable="isEditing" :kasiteHandler="kasiteHandler" :kuvaHandler="kuvaHandler"></ep-content>
               </b-form-group>
@@ -66,7 +72,7 @@
             </b-col>
             <b-col lg="6">
               <b-form-group :label="$t('perusteen-lataus')" v-if="!isEditing">
-                <ep-button variant="primary" icon="file">{{ $t('lataa-peruste-json') }}</ep-button>
+                <ep-button variant="primary" icon="file" @click="exportPeruste">{{ $t('lataa-peruste-json') }}</ep-button>
               </b-form-group>
             </b-col>
           </b-row>
@@ -99,6 +105,7 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { TermitStore } from '@/stores/TermitStore';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
+import { Maintenance, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -129,6 +136,23 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
 
   get kuvaHandler() {
     return createKuvaHandler(new KuvaStore(this.perusteId!));
+  }
+
+  get kuvaus() {
+    return {
+      uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
+      korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
+    };
+  }
+
+  async exportPeruste() {
+    const peruste = JSON.stringify((await Maintenance.viePerusteJson(this.perusteId!)).data);
+    const blob = new Blob([peruste as any], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'peruste';
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
 }
 </script>

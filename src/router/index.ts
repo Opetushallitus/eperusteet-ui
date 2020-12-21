@@ -155,6 +155,7 @@ const router = new VueRouter({
           text: 'kasitteet',
         }, {
           separator: true,
+          meta: { tila: 'poistettu' },
         }, {
           icon: ['far', 'folder'],
           text: 'arkistoi-peruste',
@@ -162,7 +163,7 @@ const router = new VueRouter({
           meta: {
             title: 'arkistoi-peruste',
             confirm: 'arkistoi-peruste-vahvistus',
-            reroute: 'perusteprojektit',
+            reroute: () => stores.perusteStore.isPohja.value ? 'pohjat' : 'perusteprojektit',
             tila: 'poistettu',
             callback: async () => stores.perusteStore.updateCurrent(),
           },
@@ -280,6 +281,7 @@ const router = new VueRouter({
           text: 'kasitteet',
         }, {
           separator: true,
+          meta: { tila: 'poistettu' },
         }, {
           icon: ['far', 'folder'],
           text: 'arkistoi-opas',
@@ -287,7 +289,7 @@ const router = new VueRouter({
           meta: {
             title: 'arkistoi-opas',
             confirm: 'arkistoi-opas-vahvistus',
-            reroute: 'oppaat',
+            reroute: () => 'oppaat',
             tila: 'poistettu',
             callback: async () => stores.perusteStore.updateCurrent(),
           },

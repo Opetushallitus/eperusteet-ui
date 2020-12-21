@@ -8,7 +8,10 @@
               <div class="d-flex flex-column align-items-center">
                 <div class="mb-1">{{$t(tila)}}</div>
 
-                <b-button class="px-3 py-1" variant="primary" :to="{ name: 'julkaise' }" v-if="tila && !isJulkaistu && !isArkistoitu">
+                <b-button class="px-3 py-1" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
+                  {{$t('aseta-valmiiksi')}}
+                </b-button>
+                <b-button class="px-3 py-1" variant="primary" :to="{ name: 'julkaise' }" v-else-if="!isPohja && tila && !isJulkaistu && !isArkistoitu">
                   {{ $t('siirry-julkaisunakymaan') }}
                 </b-button>
               </div>
@@ -415,12 +418,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get ratasvalintaFiltered() {
-    return _.map(this.ratasvalinnat, ratasvalinta => {
-      return {
-        ...ratasvalinta,
-        disabled: _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila,
-      };
-    });
+    return _.reject(this.ratasvalinnat, ratasvalinta => _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila);
   }
 
   get popupStyle() {
@@ -527,6 +525,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       return {
         categories: kategoriat,
         ok: 0,
+        fails: _.sum(_.map(kategoriat, 'failcount')),
         total: _.size(kategoriat),
       } as ValidationStats;
     }
@@ -635,11 +634,32 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     return this.peruste?.tila === _.toLower(PerusteDtoTilaEnum.POISTETTU);
   }
 
+  get isLuonnos() {
+    return this.peruste?.tila === _.toLower(PerusteDtoTilaEnum.LUONNOS);
+  }
+
   async palauta() {
     await vaihdaPerusteTilaConfirm(
       this,
       this.palautusMeta,
     );
+  }
+
+  get isPohja() {
+    if (this.peruste) {
+      return this.peruste.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA);
+    }
+  }
+
+  async asetaValmiiksi() {
+    await vaihdaPerusteTilaConfirm(this, {
+      tila: 'valmis',
+      title: 'aseta-pohja-valmiiksi',
+      confirm: 'pohja-valmis-varmistus',
+      okTitle: 'aseta-valmiiksi',
+    });
+
+    await this.perusteStore.updateCurrent();
   }
 }
 </script>

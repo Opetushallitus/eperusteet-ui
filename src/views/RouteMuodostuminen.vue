@@ -26,11 +26,11 @@
               <ep-search v-model="query" :placeholder="$t('etsi-rakenteesta')" />
             </div>
             <div class="tree mt-3">
-              <div class="actions p-2" v-if="isEditing">
-                <ep-button @click="addRyhma" variant="outline" icon="plus">
+              <div class="actions pl-2">
+                <ep-button @click="addRyhma" variant="outline" icon="plus" v-if="isEditing">
                   {{ $t('lisaa-ryhma-rakenteeseen') }}
                 </ep-button>
-                <ep-button @click="toggleKuvaukset" variant="outline">
+                <ep-button @click="toggleDescription" variant="link">
                   {{ $t('nayta-ryhmien-kuvaukset') }}
                 </ep-button>
               </div>
@@ -115,7 +115,7 @@
                         </template>
                       </ep-koodisto-select>
                       <draggable :value="osaamisalat" v-bind="optionsKoodit" tag="div">
-                        <div v-for="ryhma in osaamisalat" :key="ryhma.osaamisala" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
+                        <div v-for="ryhma in osaamisalat" :key="ryhma.osaamisala.osaamisalakoodiUri" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
                           <div class="colorblock" :style="{ background: colorMap['osaamisala'] }"></div>
                           <div class="flex-grow-1 paaryhma-label pl-2 noselect">
                             {{ $kaanna(ryhma.nimi) }}
@@ -137,7 +137,7 @@
                         </template>
                       </ep-koodisto-select>
                       <draggable :value="tutkintonimikkeet" v-bind="optionsKoodit" tag="div">
-                        <div v-for="ryhma in tutkintonimikkeet" :key="ryhma.tutkintonimike" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
+                        <div v-for="ryhma in tutkintonimikkeet" :key="ryhma.tutkintonimike.uri" class="mb-1 d-flex justify-content-center paaryhma align-items-center">
                           <div class="colorblock" :style="{ background: colorMap['tutkintonimike'] }"></div>
                           <div class="flex-grow-1 paaryhma-label pl-2 noselect">
                             {{ $kaanna(ryhma.nimi) }}
@@ -169,7 +169,7 @@
                     </ep-input>
                   </div>
                   <div class="ml-2">
-                    osp
+                    {{$t('osaamispiste')}}
                   </div>
                 </div>
               </b-form-group>
@@ -315,6 +315,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   private uusi: any | null = DefaultRyhma;
   private tutkintonimikkeet = [] as any[];
   private osaamisalat = [] as any[];
+  private naytaKuvaukset = false;
 
   private osaamisalaStore = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {
@@ -414,6 +415,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       tutkintonimike: null,
       osat: [],
       nimi: this.getNimi(kind),
+      uuid: genUuid(),
     };
 
     if (kind === 'rakenne-moduuli-yhteiset') {
@@ -582,7 +584,9 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     }
   }
 
-  toggleKuvaukset() {
+  toggleDescription() {
+    this.naytaKuvaukset = !this.naytaKuvaukset;
+    (this.$refs['root'] as any).toggleDescription(this.naytaKuvaukset);
   }
 
   toggleRange() {
@@ -598,7 +602,6 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   addUusi(root) {
     try {
       const template = this.ryhmaTemplate(this.uusi.tyyppi);
-      console.log(root, { ...template, ...this.uusi.ryhma });
       if (this.uusi) {
         root.osat = [{
           ...template,
@@ -620,7 +623,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     this.tutkintonimikkeet = [...this.tutkintonimikkeet, {
       ...this.ryhmaTemplate('tutkintonimike'),
       nimi: koodi.nimi,
-      tutkintonimike: koodi.koodiUri,
+      tutkintonimike: koodi,
     }];
   }
 
@@ -628,7 +631,10 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     this.osaamisalat = [...this.osaamisalat, {
       ...this.ryhmaTemplate('osaamisala'),
       nimi: koodi.nimi,
-      osaamisala: koodi.koodiUri,
+      osaamisala: {
+        'osaamisalakoodiArvo': koodi.arvo,
+        'osaamisalakoodiUri': koodi.uri,
+      },
     }];
   }
 

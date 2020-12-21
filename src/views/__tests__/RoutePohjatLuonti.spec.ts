@@ -58,7 +58,7 @@ describe('RoutePohjatLuonti component', () => {
     expect(wrapper.text()).toContain('kayta-pohjana');
     expect(wrapper.findAll('input[type="radio"]')).toHaveLength(2);
     expect(wrapper.findAll('[type="radio"] + label').at(0)
-      .text()).toContain('toinen-pohja');
+      .text()).toContain('toista-pohjaa');
     expect(wrapper.findAll('[type="radio"] + label').at(1)
       .text()).toContain('uusi');
 
