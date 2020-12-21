@@ -324,54 +324,46 @@ function routeToNode(route: Location): NavigationNodeDto | null {
   }
 
   switch (route.name) {
-    case 'tekstikappale':
-      return {
-        type: 'viite',
-        id: Number(route.params?.tekstiKappaleId!),
-      };
-      break;
-    case 'muodostuminen':
-      return {
-        type: 'muodostuminen',
-      };
-      break;
-    case 'osaalue':
-      return {
-        type: 'osaalue',
-        id: Number(route.params?.osaalueId!),
-       };
-      break;
-    case 'tutkinnonosa':
-      return {
-        type: 'tutkinnonosaviite',
-        id: Number(route.params?.tutkinnonOsaId!),
-       };
-      break;
-    case 'kvliite':
-      return {
-        type: 'kvliite',
-      };
-      break;
-    case 'tutkinnonosat':
-      return {
-        type: 'tutkinnonosat',
-      };
-      break;
-    case 'opintokokonaisuus':
-      return {
-        type: 'opintokokonaisuus',
-        id: Number(route.params?.opintokokonaisuusId!),
-       };
-      break;
-    case 'koulutuksenosa':
-      return {
-        type: 'koulutuksenosa',
-        id: Number(route.params?.koulutuksenosaId!),
-       };
-      break;
-    default:
-      console.error('Unknown route', route.name, route);
-      break;
+  case 'tekstikappale':
+    return {
+      type: 'viite',
+      id: Number(route.params?.tekstiKappaleId!),
+    };
+  case 'muodostuminen':
+    return {
+      type: 'muodostuminen',
+    };
+  case 'osaalue':
+    return {
+      type: 'osaalue',
+      id: Number(route.params?.osaalueId!),
+    };
+  case 'tutkinnonosa':
+    return {
+      type: 'tutkinnonosaviite',
+      id: Number(route.params?.tutkinnonOsaId!),
+    };
+  case 'kvliite':
+    return {
+      type: 'kvliite',
+    };
+  case 'tutkinnonosat':
+    return {
+      type: 'tutkinnonosat',
+    };
+  case 'opintokokonaisuus':
+    return {
+      type: 'opintokokonaisuus',
+      id: Number(route.params?.opintokokonaisuusId!),
+    };
+  case 'koulutuksenosa':
+    return {
+      type: 'koulutuksenosa',
+      id: Number(route.params?.koulutuksenosaId!),
+    };
+  default:
+    console.error('Unknown route', route.name, route);
+    break;
   }
 
   return null;

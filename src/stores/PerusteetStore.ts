@@ -58,7 +58,7 @@ export class PerusteetStore implements IProjektiProvider {
         ...proj,
         oikeudet: rights[proj.id!],
       })),
-    }
+    };
 
     this.state.projects = resWithRights;
   }

@@ -247,13 +247,13 @@ import { KuvaStore } from '@/stores/KuvaStore';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue'
+import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import EpContent from '@shared/components/EpContent/EpContent.vue'
-import EpButton from '@shared/components/EpButton/EpButton.vue'
+import EpContent from '@shared/components/EpContent/EpContent.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import EpAlert from '@shared/components/EpAlert/EpAlert.vue'
-import { Koodisto, KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum } from '@shared/api/eperusteet'
+import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
+import { Koodisto, KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum } from '@shared/api/eperusteet';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { Kielet } from '@shared/stores/kieli';
 
@@ -267,7 +267,7 @@ import { Kielet } from '@shared/stores/kieli';
     EpButton,
     draggable,
     EpAlert,
-  }
+  },
 })
 export default class RouteKoulutuksenOsa extends Vue {
   @Prop({ required: true })
@@ -327,7 +327,7 @@ export default class RouteKoulutuksenOsa extends Vue {
   setNimiValue(nimiKoodi) {
     const julkaisukielet = this.perusteStore.julkaisukielet.value;
     const sourceLang = _.includes(julkaisukielet as string[], 'fi') ? 'fi' : julkaisukielet[0];
-    const mappedByLang = julkaisukielet.reduce((obj, key) => (obj[key] = nimiKoodi?.nimi[sourceLang], obj), {});
+    const mappedByLang = julkaisukielet.reduce((obj, key) => ({ ...obj, [key]: nimiKoodi.nimi?.[sourceLang] }), {});
     return mappedByLang;
   }
 
@@ -349,7 +349,7 @@ export default class RouteKoulutuksenOsa extends Vue {
       this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.PERUSOPETUS),
       this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.LUKIOKOULUTUS),
       this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.AMMATILLINENKOULUTUS),
-    ]
+    ];
   }
 
   get kuvaHandler() {
