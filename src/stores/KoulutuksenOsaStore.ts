@@ -59,7 +59,7 @@ export class KoulutuksenOsaStore implements IEditoitava {
   }
 
   public async save(data: KoulutuksenOsaDto) {
-    if (this.isTuvaKoulutusTyyppi(data.koulutusOsanKoulutustyyppi as string)) {
+    if (data.koulutusOsanKoulutustyyppi === _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA)) {
       data.nimi = data.nimiKoodi?.nimi;
     }
     else if (data.nimiKoodi) {
@@ -74,14 +74,6 @@ export class KoulutuksenOsaStore implements IEditoitava {
     });
 
     return res.data;
-  }
-
-  private isTuvaKoulutusTyyppi(type: string): boolean {
-    return type === _.chain(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA)
-      .split('_')
-      .join('')
-      .toLower()
-      .value();
   }
 
   public async history() {

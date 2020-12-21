@@ -357,24 +357,16 @@ export default class RouteKoulutuksenOsa extends Vue {
     });
   }
 
-  private formatKoulutusTyyppi(type: KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum): string {
-    return _.chain(type)
-      .split('_')
-      .join('')
-      .toLower()
-      .value();
-  }
-
   get perusteId() {
     return this.perusteStore.perusteId.value;
   }
 
   get koulutusOsanKoulutustyypit(): string[] {
     return [
-      this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA),
-      this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.PERUSOPETUS),
-      this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.LUKIOKOULUTUS),
-      this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.AMMATILLINENKOULUTUS),
+      _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA),
+      _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.PERUSOPETUS),
+      _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.LUKIOKOULUTUS),
+      _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.AMMATILLINENKOULUTUS),
     ];
   }
 
@@ -411,7 +403,7 @@ export default class RouteKoulutuksenOsa extends Vue {
   }
 
   get isTuvaKoulutusTyyppi(): boolean {
-    return this.store?.data.value.koulutusOsanKoulutustyyppi === this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA);
+    return this.store?.data.value.koulutusOsanKoulutustyyppi === _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA);
   }
 }
 </script>
