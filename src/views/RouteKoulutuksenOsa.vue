@@ -7,7 +7,7 @@
        <b-row>
          <b-col>
            <b-form-group :label="$t('koulutustyyppi') + (isEditing ? ' *' : '')" required>
-            <p class="font-size-08">{{ $t('koulutustyyppi-info') }}</p>
+            <p v-if="isEditing" class="font-size-08">{{ $t('koulutustyyppi-info') }}</p>
             <template v-if="isEditing">
               <b-form-radio
                 v-for="type in koulutusOsanKoulutustyypit"
@@ -16,7 +16,8 @@
                 v-model="data.koulutusOsanKoulutustyyppi"
                 :value="type"
                 name="koulutustyyppi"
-                :validation="validation.koulutusOsanKoulutustyyppi">
+                :validation="validation.koulutusOsanKoulutustyyppi"
+                @input="onSelectKoulutusTyyppi()">
                 {{ $t(type) }}
               </b-form-radio>
             </template>
@@ -28,7 +29,7 @@
       <b-row>
         <b-col md="6">
           <b-form-group :label="$t('koulutuksen-osan-nimi') + (isEditing ? ' *' : '')" required>
-            <template v-if="isTuvaKoulutusTyyppi(data.koulutusOsanKoulutustyyppi)">
+            <template v-if="isTuvaKoulutusTyyppi">
               <EpKoodistoSelect
                 :store="koodisto"
                 v-model="data.nimiKoodi"
@@ -39,7 +40,6 @@
                   <b-input-group>
                     <b-form-input
                       :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                      :validation="isTuvaKoulutusTyyppi(data.koulutusOsanKoulutustyyppi) ? validation.nimiKoodi : null"
                       disabled>
                     </b-form-input>
                     <b-input-group-append>
@@ -78,14 +78,14 @@
                 :is-editing="isEditing"
                 :validation="validation.laajuusMinimi"
                 type="number"
-                min="0"/>
+                :min="0"/>
               <span :class="isEditing ? 'mx-3' : 'mx-1'">-</span>
               <EpInput
                 v-model="data.laajuusMaksimi"
                 :is-editing="isEditing"
                 :validation="validation.laajuusMaksimi"
                 type="number"
-                min="0"/>
+                :min="data.laajuusMinimi"/>
               <span class="ml-2">{{ $t('viikkoa') }}</span>
             </div>
             <p v-else-if="!isEditing" class="font-italic">{{ $t('ei-asetettu') }}</p>
@@ -116,7 +116,7 @@
                 tag="div"
                 v-model="data.tavoitteet">
                 <b-row v-for="(tavoite, i) in data.tavoitteet" :key="tavoite.id" class="pb-2">
-                  <b-col cols="12" lg="10">
+                  <b-col cols="11" lg="10">
                     <EpInput
                       v-model="data.tavoitteet[i]"
                       :is-editing="isEditing"
@@ -179,7 +179,7 @@
                 tag="div"
                 v-model="data.arvioinnit">
                 <b-row v-for="(arviointi, i) in data.arvioinnit" :key="arviointi.id" class="pb-2">
-                  <b-col cols="12" lg="10">
+                  <b-col cols="11" lg="10">
                     <EpInput
                       v-model="data.arvioinnit[i]"
                       :is-editing="isEditing"
@@ -277,6 +277,7 @@ export default class RouteKoulutuksenOsa extends Vue {
   koulutuksenosaId!: number;
 
   private store: EditointiStore | null = null;
+  private tempNimiValue = null;
 
   private readonly koodisto = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {
@@ -297,10 +298,7 @@ export default class RouteKoulutuksenOsa extends Vue {
     await this.perusteStore.blockUntilInitialized();
     const tkstore = new KoulutuksenOsaStore(this.perusteId!, Number(id));
     this.store = new EditointiStore(tkstore);
-  }
-
-  isTuvaKoulutusTyyppi(type): boolean {
-    return type === this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA);
+    this.tempNimiValue = null;
   }
 
   onAddListItem(array): void {
@@ -329,6 +327,33 @@ export default class RouteKoulutuksenOsa extends Vue {
     const sourceLang = _.includes(julkaisukielet as string[], 'fi') ? 'fi' : julkaisukielet[0];
     const mappedByLang = julkaisukielet.reduce((obj, key) => ({ ...obj, [key]: nimiKoodi.nimi?.[sourceLang] }), {});
     return mappedByLang;
+  }
+
+  onSelectKoulutusTyyppi() {
+    const sisaltokieli = Kielet.getSisaltoKieli.value;
+    const storeData = this.store?.data.value!;
+    const hasNimiEquality = storeData.nimi?.[sisaltokieli] === storeData.nimiKoodi?.nimi[sisaltokieli];
+
+    if (storeData.nimi && !hasNimiEquality) {
+      this.tempNimiValue = storeData.nimi;
+    }
+
+    if (this.isTuvaKoulutusTyyppi && !storeData.nimiKoodi?.nimi[sisaltokieli]) {
+      this.setStoreNimiValue(null);
+    } else if (this.isTuvaKoulutusTyyppi && storeData.nimiKoodi?.nimi[sisaltokieli]) {
+      this.setStoreNimiValue(this.setNimiValue(storeData.nimiKoodi));
+    }
+
+    if (!this.isTuvaKoulutusTyyppi) {
+      this.setStoreNimiValue(this.tempNimiValue)
+    }
+  }
+
+  private setStoreNimiValue(nameValue) {
+    this.store?.setData({
+      ...this.store?.data.value,
+      nimi: nameValue,
+    });
   }
 
   private formatKoulutusTyyppi(type: KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum): string {
@@ -382,6 +407,10 @@ export default class RouteKoulutuksenOsa extends Vue {
         name: 'arvioinnit',
       },
     };
+  }
+
+  get isTuvaKoulutusTyyppi(): boolean {
+    return this.store?.data.value.koulutusOsanKoulutustyyppi === this.formatKoulutusTyyppi(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA);
   }
 }
 </script>

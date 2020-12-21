@@ -2,7 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
 
-import { minLength, required } from 'vuelidate/lib/validators';
+import { minLength, required, minValue } from 'vuelidate/lib/validators';
 import _ from 'lodash';
 
 import { KoulutuksenOsaDto, KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum, Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
@@ -128,8 +128,14 @@ export class KoulutuksenOsaStore implements IEditoitava {
     return {
       koulutusOsanKoulutustyyppi: { required },
       nimi: translated(julkaisukielet),
-      laajuusMinimi: { required },
-      laajuusMaksimi: { required },
+      laajuusMinimi: {
+        'min-value': minValue(0),
+        required,
+      },
+      laajuusMaksimi: {
+        'min-value': minValue(0),
+        required,
+       },
       arvioinnit: {
         'min-length': minLength(1),
         required,
