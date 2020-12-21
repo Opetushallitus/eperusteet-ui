@@ -27,7 +27,6 @@ import { PerusteStore } from '@/stores/PerusteStore';
   },
 })
 export default class EpRakenne extends Vue {
-
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
 

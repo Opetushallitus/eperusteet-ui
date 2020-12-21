@@ -155,6 +155,15 @@
                 </div>
               </template>
 
+              <template v-slot:koulutuksenosa="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'koulutuksenosa', params: { koulutuksenosaId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-koulutuksen-osa') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:kvliite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'kvliite' }">
@@ -184,7 +193,10 @@
 
               <template v-slot:new>
                 <div class="ml-2">
-                  <ep-tekstikappale-lisays @save="tallennaUusiTekstikappale" :tekstikappaleet="perusteenOsat" :paatasovalinta="true">
+                  <ep-tekstikappale-lisays
+                    @save="tallennaUusiTekstikappale"
+                    :tekstikappaleet="perusteenOsat"
+                    :paatasovalinta="true">
                     <template v-slot:default="{tekstikappale}">
                       <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
                       {{ $kaanna(tekstikappale.label) }}
@@ -192,7 +204,7 @@
                   </ep-tekstikappale-lisays>
 
                   <ep-tekstikappale-lisays
-                    v-if="perusteVapaasivistystyo"
+                    v-if="isPerusteVapaasivistystyo"
                     @save="tallennaUusiOpintokokonaisuus"
                     :tekstikappaleet="perusteenOsat"
                     :paatasovalinta="true"
@@ -209,6 +221,31 @@
                     </template>
                     <template v-slot:header>
                       {{$t('opintokokonaisuuden-sijainti')}}
+                    </template>
+                    <template v-slot:default="{tekstikappale}">
+                      <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
+                      {{ $kaanna(tekstikappale.label) }}
+                    </template>
+                  </ep-tekstikappale-lisays>
+
+                  <ep-tekstikappale-lisays
+                    v-if="isPerusteTutkintoonValmentava"
+                    @save="tallennaUusiKoulutuksenOsa"
+                    :tekstikappaleet="perusteenOsat"
+                    :paatasovalinta="true"
+                    :otsikkoRequired="false"
+                    modalId="koulutuksenosaLisays">
+                    <template v-slot:lisays-btn-text>
+                      {{$t('uusi-koulutuksenosa')}}
+                    </template>
+                    <template v-slot:modal-title>
+                      {{$t('uusi-koulutuksenosa')}}
+                    </template>
+                    <template v-slot:footer-lisays-btn-text>
+                      {{$t('lisaa-koulutuksenosa')}}
+                    </template>
+                    <template v-slot:header>
+                      {{$t('koulutuksen-osan-sijainti')}}
                     </template>
                     <template v-slot:default="{tekstikappale}">
                       <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
@@ -243,24 +280,28 @@
 
 <script lang="ts">
 import { Prop, Component, Vue } from 'vue-property-decorator';
+import { Location } from 'vue-router';
+
+import * as _ from 'lodash';
+
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpSidebar from '@shared/components/EpSidebar/EpSidebar.vue';
-import { PerusteStore } from '@/stores/PerusteStore';
 import EpTreeNavibar from '@shared/components/EpTreeNavibar/EpTreeNavibar.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
-import * as _ from 'lodash';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { NavigationNodeDto } from '@shared/tyypit';
-import { NavigationNodeDtoTypeEnum, Sisallot, PerusteDtoTilaEnum, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import { NavigationNodeDtoTypeEnum, Sisallot, PerusteDtoTilaEnum, PerusteDtoTyyppiEnum, PerusteDtoToteutusEnum } from '@shared/api/eperusteet';
+import { Meta } from '@shared/utils/decorators';
+
+import { PerusteStore } from '@/stores/PerusteStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
-import { Location } from 'vue-router';
-import { Meta } from '@shared/utils/decorators';
+import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
@@ -285,48 +326,47 @@ function routeToNode(route: Location): NavigationNodeDto | null {
     return null;
   }
 
-  if (route.name === 'tekstikappale') {
+  switch (route.name) {
+  case 'tekstikappale':
     return {
       type: 'viite',
       id: Number(route.params?.tekstiKappaleId!),
     };
-  }
-  else if (route.name === 'muodostuminen') {
+  case 'muodostuminen':
     return {
       type: 'muodostuminen',
     };
-  }
-  else if (route.name === 'osaalue') {
-    console.log(route);
+  case 'osaalue':
     return {
       type: 'osaalue',
       id: Number(route.params?.osaalueId!),
     };
-  }
-  else if (route.name === 'tutkinnonosa') {
+  case 'tutkinnonosa':
     return {
       type: 'tutkinnonosaviite',
       id: Number(route.params?.tutkinnonOsaId!),
     };
-  }
-  else if (route.name === 'kvliite') {
+  case 'kvliite':
     return {
       type: 'kvliite',
     };
-  }
-  else if (route.name === 'tutkinnonosat') {
+  case 'tutkinnonosat':
     return {
       type: 'tutkinnonosat',
     };
-  }
-  else if (route.name === 'opintokokonaisuus') {
+  case 'opintokokonaisuus':
     return {
       type: 'opintokokonaisuus',
       id: Number(route.params?.opintokokonaisuusId!),
     };
-  }
-  else {
+  case 'koulutuksenosa':
+    return {
+      type: 'koulutuksenosa',
+      id: Number(route.params?.koulutuksenosaId!),
+    };
+  default:
     console.error('Unknown route', route.name, route);
+    break;
   }
 
   return null;
@@ -422,10 +462,15 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Opintokokonaisuus);
   }
 
+  get koulutuksenosat() {
+    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Koulutuksenosa);
+  }
+
   get perusteenOsat() {
     return _.sortBy([
       ...this.tekstikappaleet,
       ...this.opintokokonaisuudet,
+      ...this.koulutuksenosat,
     ], 'chapter');
   }
 
@@ -537,12 +582,30 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     });
   }
 
+  async tallennaUusiKoulutuksenOsa(otsikko, tekstikappaleIsa) {
+    const tkstore = new KoulutuksenOsaStore(this.peruste!.id!, 0);
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+
+    this.perusteStore.updateNavigation();
+
+    this.$router.push({
+      name: 'koulutuksenosa',
+      params: {
+        koulutuksenosaId: '' + tallennettu!.id,
+      },
+    });
+  }
+
   ratasClick(clickFn, meta) {
     clickFn(this, meta);
   }
 
-  get perusteVapaasivistystyo() {
-    return this.peruste!.koulutustyyppi === 'koulutustyyppi_30';
+  get isPerusteVapaasivistystyo(): boolean {
+    return this.peruste!.toteutus === _.toLower(PerusteDtoToteutusEnum.VAPAASIVISTYSTYO);
+  }
+
+  get isPerusteTutkintoonValmentava(): boolean {
+    return this.peruste!.toteutus === _.toLower(PerusteDtoToteutusEnum.TUTKINTOONVALMENTAVA);
   }
 
   get julkaisut() {
