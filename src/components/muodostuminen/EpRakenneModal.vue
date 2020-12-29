@@ -248,23 +248,6 @@ export default class EpRakenneModal extends Vue {
     return 'rakenne-moduuli-paikalliset';
   }
 
-  // set tyyppi(value: string) {
-  //   if (value === 'osaamisala') {
-  //     this.innerModel.rooli = 'osaamisala';
-  //   }
-  //   else if (value === 'tutkintonimike') {
-  //     this.innerModel.rooli = 'tutkintonimike';
-  //   }
-  //   else {
-  //     this.innerModel.rooli = null;
-  //     this.value.nimi = {
-  //       fi: this.$t(value, 'fi'),
-  //       sv: this.$t(value, 'sv'),
-  //       en: this.$t(value, 'en'),
-  //     };
-  //   }
-  // }
-
   toggleMaksimi() {
     if (this.innerModel.muodostumisSaanto?.laajuus.maksimi) {
       this.innerModel.muodostumisSaanto.laajuus.maksimi = null;
