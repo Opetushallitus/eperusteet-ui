@@ -337,6 +337,7 @@ import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, RakenneModuuliT
     draggable,
     EpRakenneModal,
   },
+  inject: [],
 })
 export default class RouteMuodostuminen extends PerusteprojektiRoute {
   @Prop({ required: true })
@@ -562,7 +563,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   @ProvideReactive('kayttamattomatTutkinnonOsat')
   get kayttamattomatTutkinnonOsat() {
     if (!this.liitetytOsat) {
-      return null;
+      return [];
     }
     return _.filter(this.tutkinnonOsatRaw, osa => !this.liitetytOsat![osa.id!]);
   }
