@@ -86,7 +86,7 @@
             <EpSearch v-model="query" />
           </div>
           <div class="navigation">
-            <EpTreeNavibar :store="naviStore">
+            <EpTreeNavibar :store="naviStore" :query="query">
               <template v-slot:header>
                 <div class="heading">
                   <div class="menu-item">
@@ -396,6 +396,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   private naviStore: EpTreeNavibarStore | null = null;
   private loading = false;
+  private query = '';
 
   @Meta
   getMetaInfo() {
@@ -425,13 +426,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     return {
       background: '#1d7599',
     };
-  }
-
-  get query() {
-    return '';
-  }
-
-  set query(val: string) {
   }
 
   get projekti() {

@@ -5,7 +5,7 @@ import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Tut
 import { Revision, Page, Kieli } from '@shared/tyypit';
 import { Computed } from '@shared/utils/interfaces';
 import _ from 'lodash';
-import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { minValue, translated, warning } from '@shared/validators/required';
 import { required } from 'vuelidate/lib/validators';
@@ -30,6 +30,7 @@ interface TutkinnonOsaEditStoreConfig {
 export class TutkinnonOsaEditStore implements IEditoitava {
   private static config: TutkinnonOsaEditStoreConfig;
   private tutkinnonOsaId: number | null = null;
+  private projektitJoissaKaytossa: any[] | null = null;
 
   public static install(vue: typeof Vue, config: TutkinnonOsaEditStoreConfig) {
     TutkinnonOsaEditStore.config = config;
@@ -71,6 +72,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
       };
     }
     const res = await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
+    this.projektitJoissaKaytossa = (await (Perusteenosat.getOwningProjektit((res.data as any).tutkinnonOsa.id))).data;
     this.tutkinnonOsaId = Number((res.data as any)._tutkinnonOsa);
     return res.data;
   }
@@ -221,5 +223,21 @@ export class TutkinnonOsaEditStore implements IEditoitava {
       return;
     }
     await TutkinnonosatPrivate.revertToVersio(this.tutkinnonOsaViiteId, rev);
+  }
+
+  public async copy(data) {
+    await TutkinnonRakenne.kloonaaTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId!);
+  }
+
+  public features(data: any) {
+    return computed(() => {
+      return {
+        editable: data.tutkinnonOsa.tila !== 'valmis' && _.size(this.projektitJoissaKaytossa) <= 1,
+        removable: data.tutkinnonOsa.tila !== 'valmis' && _.size(this.projektitJoissaKaytossa) <= 1,
+        hideable: false,
+        recoverable: true,
+        copyable: data.tutkinnonOsa.tila === 'valmis' || _.size(this.projektitJoissaKaytossa) > 1,
+      } as EditoitavaFeatures;
+    });
   }
 }
