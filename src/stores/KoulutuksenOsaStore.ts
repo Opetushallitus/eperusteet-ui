@@ -84,7 +84,7 @@ export class KoulutuksenOsaStore implements IEditoitava {
   }
 
   public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId, 'REFORMI', this.koulutuksenosaId);
+    await Sisallot.removeSisaltoViite(this.perusteId, KoulutuksenOsaStore.config?.perusteStore.perusteSuoritustapa.value!, this.koulutuksenosaId);
     KoulutuksenOsaStore.config!.perusteStore!.removeNavigationEntry({
       id: this.koulutuksenosaId,
       type: 'koulutuksenosa',
@@ -162,7 +162,7 @@ export class KoulutuksenOsaStore implements IEditoitava {
     if (_.isEmpty(tekstikappaleIsa)) {
       const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
         KoulutuksenOsaStore.config.perusteStore.perusteId.value!,
-        'reformi',
+        KoulutuksenOsaStore.config?.perusteStore.perusteSuoritustapa.value!,
         perusteenOsa
       ));
       return tallennettu.data;
@@ -170,7 +170,7 @@ export class KoulutuksenOsaStore implements IEditoitava {
     else {
       const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
         KoulutuksenOsaStore.config.perusteStore.perusteId.value!,
-        'reformi',
+        KoulutuksenOsaStore.config?.perusteStore.perusteSuoritustapa.value!,
         tekstikappaleIsa.id,
         perusteenOsa
       ));

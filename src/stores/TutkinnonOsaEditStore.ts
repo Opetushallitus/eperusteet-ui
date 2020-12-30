@@ -10,6 +10,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { minValue, translated, warning } from '@shared/validators/required';
 import { required } from 'vuelidate/lib/validators';
 import { Kielet } from '@shared/stores/kieli';
+import { perusteenSuoritustapa } from '@shared/utils/perusteet';
 
 export function notNull() {
   return {
@@ -69,7 +70,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
         },
       };
     }
-    const res = await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, 'REFORMI', this.tutkinnonOsaViiteId);
+    const res = await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
     this.tutkinnonOsaId = Number((res.data as any)._tutkinnonOsa);
     return res.data;
   }
@@ -78,7 +79,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     if (this.tutkinnonOsaViiteId) {
       const res = await TutkinnonRakenne.updateTutkinnonOsa(
         this.perusteId,
-        'REFORMI',
+        TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!,
         this.tutkinnonOsaViiteId,
         data);
       return res.data;
@@ -86,7 +87,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     else {
       const res = await TutkinnonRakenne.addTutkinnonOsa(
         this.perusteId,
-        'REFORMI',
+        TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!,
         data as any);
       setTimeout(() => {
         TutkinnonOsaEditStore.config.router.replace({
@@ -161,7 +162,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     if (!this.tutkinnonOsaViiteId) {
       return;
     }
-    await TutkinnonRakenne.removeTutkinnonOsa(this.perusteId, 'REFORMI', this.tutkinnonOsaViiteId);
+    await TutkinnonRakenne.removeTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
     TutkinnonOsaEditStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tutkinnonOsaViiteId,
       type: 'tutkinnonosa',
