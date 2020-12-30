@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { config } from 'vue/types/umd';
+import { perusteenSuoritustapa } from '@shared/utils/perusteet';
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
@@ -40,7 +41,7 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async load() {
-    const res = await TutkinnonRakenne.getRakenne(this.perusteId, 'REFORMI');
+    const res = await TutkinnonRakenne.getRakenne(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!);
     return {
       rakenne: {
         ...res.data,
@@ -57,7 +58,7 @@ export class MuodostuminenStore implements IEditoitava {
 
   public async save(data) {
     const rakenne = data.rakenne;
-    await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, 'REFORMI', rakenne as any);
+    await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!, rakenne as any);
     await Perusteet.updateOsaamisalat(this.perusteId, data.osaamisalat);
     await Perusteet.updateTutkintonimikkeet(this.perusteId, data.tutkintonimikkeet);
     await MuodostuminenStore.config?.perusteStore.updateCurrent();
@@ -91,7 +92,7 @@ export class MuodostuminenStore implements IEditoitava {
   public async acquire() {
     const res = await Api.post(`/perusteet/${this.perusteId}/suoritustavat/reformi/rakenne/lukko`, {
       osanId: this.perusteId,
-      suoritustapa: 'reformi',
+      suoritustapa: MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!,
     });
     return res.data;
   }
@@ -112,12 +113,12 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async revisions() {
-    const res = await TutkinnonRakenne.getRakenneVersiot(this.perusteId, 'REFORMI');
+    const res = await TutkinnonRakenne.getRakenneVersiot(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!);
     return res.data as any;
   }
 
   public async restore(rev: number) {
-    await TutkinnonRakenne.revertRakenneVersio(this.perusteId, 'REFORMI', rev);
+    await TutkinnonRakenne.revertRakenneVersio(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!, rev);
   }
 
   public async validate() {

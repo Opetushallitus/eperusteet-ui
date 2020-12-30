@@ -80,7 +80,7 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId, 'REFORMI', this.tekstiKappaleId);
+    await Sisallot.removeSisaltoViite(this.perusteId, TekstikappaleStore.config?.perusteStore.perusteSuoritustapa.value!, this.tekstiKappaleId);
     TekstikappaleStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tekstiKappaleId,
       type: 'viite',

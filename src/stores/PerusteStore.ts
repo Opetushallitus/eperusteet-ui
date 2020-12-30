@@ -4,7 +4,7 @@ import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-a
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
-import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi } from '@shared/utils/perusteet';
+import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa } from '@shared/utils/perusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
@@ -47,13 +47,13 @@ export class PerusteStore implements IEditoitava {
   public readonly perusteSuoritustapa = computed(() => {
     if (this.state.peruste) {
       if (this.isOpas.value) {
-        return 'opas';
+        return 'OPAS';
       }
-      else if (_.head(this.suoritustavat.value)) {
-        return _.head(this.suoritustavat.value);
+      else if (perusteenSuoritustapa(this.peruste.value)) {
+        return perusteenSuoritustapa(this.peruste.value);
       }
       else {
-        return 'reformi';
+        return 'REFORMI';
       }
     }
   });

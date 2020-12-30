@@ -44,7 +44,7 @@ export class TekstiRakenneStore implements IEditoitava {
   }
 
   public async load() {
-    const res = await Sisallot.getSuoritustapaSisaltoUUSI(this.perusteId, 'REFORMI');
+    const res = await Sisallot.getSuoritustapaSisaltoUUSI(this.perusteId, TekstiRakenneStore.config?.perusteStore.perusteSuoritustapa.value!);
     return res.data;
   }
 
@@ -59,7 +59,7 @@ export class TekstiRakenneStore implements IEditoitava {
 
     const filtered = pick(data);
     if (data.id) {
-      await Sisallot.updateSisaltoViiteWithPut(this.perusteId, 'REFORMI', data.id!, filtered);
+      await Sisallot.updateSisaltoViiteWithPut(this.perusteId, TekstiRakenneStore.config?.perusteStore.perusteSuoritustapa.value!, data.id!, filtered);
       await TekstiRakenneStore.config.perusteStore.updateNavigation();
     }
   }
