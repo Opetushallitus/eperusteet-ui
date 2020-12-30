@@ -18,6 +18,7 @@
           <ep-button @click="tuoTutkinnonOsa" variant="outline" icon="plus">
             {{ $t('tuo-tutkinnon-osa') }}
           </ep-button>
+          <EpTutkinnonosaTuontiModal ref="tutkinnonosaTuontiModal" :peruste="peruste" @refresh="refresh"/>
         </div>
       </div>
 
@@ -86,6 +87,7 @@ import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import draggable from 'vuedraggable';
 import _ from 'lodash';
+import EpTutkinnonosaTuontiModal from '@/components/EpTutkinnonosaTuontiModal.vue';
 
 @Component({
   components: {
@@ -95,6 +97,7 @@ import _ from 'lodash';
     EpSearch,
     EpSpinner,
     draggable,
+    EpTutkinnonosaTuontiModal,
   },
 })
 export default class RouteTutkinnonosat extends PerusteprojektiRoute {
@@ -195,7 +198,16 @@ export default class RouteTutkinnonosat extends PerusteprojektiRoute {
   }
 
   tuoTutkinnonOsa() {
-    throw new Error('todo');
+    (this.$refs.tutkinnonosaTuontiModal as any).show();
+  }
+
+  get peruste() {
+    return this.perusteStore.peruste.value;
+  }
+
+  async refresh() {
+    await this.onProjektiChange();
+    await this.perusteStore.updateNavigation();
   }
 }
 </script>

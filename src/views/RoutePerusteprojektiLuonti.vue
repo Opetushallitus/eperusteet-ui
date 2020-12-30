@@ -104,7 +104,7 @@
         <template v-slot:aikataulu>
           <EpAikataulu :aikataulut="tapahtumat" />
 
-          <b-form-group :label="$t('peruste-astuu-voimaan') + '*'" required class="col-md-4 col-12">
+          <b-form-group :label="$t('peruste-astuu-voimaan')" required class="col-md-4 col-12">
             <ep-datepicker v-model="data.voimassaoloAlkaa" class="mb-2" :isEditing="true" :validation="$v.data.voimassaoloAlkaa" :showValidValidation="false"/>
           </b-form-group>
 
@@ -483,7 +483,6 @@ export default class RoutePerusteprojektiLuonti extends Vue {
 
     if (this.currentStep && this.currentStep.key === 'aikataulu') {
       return {
-        voimassaoloAlkaa: notNull(),
         tavoitepaivamaarat: {
           $each: {
             tapahtumapaiva: notNull(),
