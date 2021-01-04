@@ -56,7 +56,12 @@
                     </div>
                     <ep-spinner v-if="!data" />
                     <div class="p-3 helptext text-muted text-center" v-else-if="data.rakenne.osat.length === 0">
-                      {{ $t('luo-tutkinnolle-rakenne-ohje') }}
+                      <span v-if="!isEditing">
+                        {{ $t('luo-tutkinnolle-rakenne-muokkaamalla-ohje') }}
+                      </span>
+                      <span v-else>
+                        {{ $t('luo-tutkinnolle-rakenne-ohje') }}
+                      </span>
                     </div>
                     <MuodostumisNode v-model="data.rakenne.osat" ref="root" :is-editing="isEditing" :tutkinnonOsatMap="tutkinnonOsatMap">
                       <template #moduuli="{ depth, node, color, uuid }">
@@ -75,7 +80,7 @@
                     </MuodostumisNode>
                   </div>
                 </div>
-                <div class="drag-area-right">
+                <div class="drag-area-right" v-if="isEditing">
                   <div class="menu p-3">
                     <h5 class="font-weight-600">{{ $t('paaryhmat') }}</h5>
                     <div class="mt-3">
