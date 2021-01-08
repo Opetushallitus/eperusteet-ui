@@ -128,10 +128,6 @@ export class KoulutuksenOsaStore implements IEditoitava {
         'min-value': minValue(0),
         required,
       },
-      arvioinnit: {
-        'min-length': minLength(1),
-        required,
-      },
     };
   });
 

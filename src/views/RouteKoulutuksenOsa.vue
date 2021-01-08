@@ -105,18 +105,22 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <hr>
+      <hr/>
       <b-row>
-        <b-col>
-          <h3 class="mb-3">{{ $t('tavoitteet') }}</h3>
-          <b-form-group :label="$t('opiskelija')">
+        <b-col md="10">
+          <h3 class="mb-4">{{$t('tavoitteet')}}</h3>
+          <b-form-group :label="$t('tavoitteiden-kuvaus')">
+            <ep-input v-model="data.tavoitteenKuvaus" :is-editing="isEditing" class="mb-2" v-if="isEditing || data.tavoitteenKuvaus"/>
+            <p v-else-if="!isEditing" class="font-italic">{{ $t('ei-asetettu') }}</p>
+          </b-form-group>
+          <b-form-group :label="$t('tavoitteet')">
             <template v-if="isEditing">
               <draggable
                 v-bind="tavoitteetOptions"
                 tag="div"
                 v-model="data.tavoitteet">
                 <b-row v-for="(tavoite, i) in data.tavoitteet" :key="tavoite.id" class="pb-2">
-                  <b-col cols="11" lg="10">
+                  <b-col cols="11">
                     <EpInput
                       v-model="data.tavoitteet[i]"
                       :is-editing="isEditing"
@@ -153,11 +157,11 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <hr>
+      <hr/>
       <b-row>
         <b-col md="10">
-          <h3>{{ $t('keskeinen-sisalto') }}</h3>
           <b-form-group>
+            <h3 slot="label">{{ $t('keskeinen-sisalto') }}</h3>
             <EpContent
               v-if="isEditing || !isEditing && data.keskeinenSisalto"
               v-model="data.keskeinenSisalto"
@@ -168,51 +172,33 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <hr>
+      <hr/>
+       <b-row>
+        <b-col md="10">
+          <b-form-group>
+            <h3 slot="label">{{ $t('laaja-alainen-osaaminen') }}</h3>
+            <EpContent
+              v-if="isEditing || !isEditing && data.laajaAlaisenOsaamisenKuvaus"
+              v-model="data.laajaAlaisenOsaamisenKuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+              :kuvaHandler="kuvaHandler"/>
+            <EpAlert v-if="!isEditing && !data.laajaAlaisenOsaamisenKuvaus" :text="$t('ei-sisaltoa')" />
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <hr/>
       <b-row>
-        <b-col>
-          <h3 class="mb-3">{{ $t('arviointi') }}</h3>
-          <b-form-group :label="$t('koulutuksen-osa-hyvaksytty-kun-opiskelija') + (isEditing ? ' *' : '')" required>
-            <template v-if="isEditing">
-              <draggable
-                v-bind="arvioinnitOptions"
-                tag="div"
-                v-model="data.arvioinnit">
-                <b-row v-for="(arviointi, i) in data.arvioinnit" :key="arviointi.id" class="pb-2">
-                  <b-col cols="11" lg="10">
-                    <EpInput
-                      v-model="data.arvioinnit[i]"
-                      :is-editing="isEditing"
-                      :validation="validation.arvioinnit">
-                      <div class="order-handle m-2" slot="left">
-                        <fas icon="grip-vertical"/>
-                      </div>
-                    </EpInput>
-                  </b-col>
-                  <b-col cols="1" v-if="isEditing">
-                    <fas
-                      icon="roskalaatikko"
-                      class="default-icon clickable mt-2"
-                      @click="onRemoveListItem(arviointi, 'arvioinnit')"/>
-                  </b-col>
-                </b-row>
-              </draggable>
-              <EpButton
-                variant="outline"
-                icon="plus"
-                @click="onAddListItem('arvioinnit')"
-                v-if="isEditing">
-                {{ $t('lisaa-arviointi') }}
-              </EpButton>
-            </template>
-            <template v-else-if="data.arvioinnit.length > 0">
-              <ul>
-                <li v-for="arviointi in data.arvioinnit" :key="arviointi.id">
-                  {{$kaanna(arviointi)}}
-                </li>
-              </ul>
-            </template>
-            <p v-else-if="!isEditing" class="font-italic">{{ $t('ei-asetettu') }}</p>
+        <b-col md="10">
+          <b-form-group>
+            <h3 slot="label">{{ $t('arviointi') }}</h3>
+            <EpContent
+              v-if="isEditing || !isEditing && data.arvioinninKuvaus"
+              v-model="data.arvioinninKuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+              :kuvaHandler="kuvaHandler"/>
+            <EpAlert v-if="!isEditing && !data.arvioinninKuvaus" :text="$t('ei-sisaltoa')" />
           </b-form-group>
         </b-col>
       </b-row>
