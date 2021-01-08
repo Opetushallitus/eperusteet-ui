@@ -109,11 +109,7 @@
       <b-row>
         <b-col md="10">
           <h3 class="mb-4">{{$t('tavoitteet')}}</h3>
-          <b-form-group :label="$t('tavoitteiden-kuvaus')">
-            <ep-input v-model="data.tavoitteenKuvaus" :is-editing="isEditing" class="mb-2" v-if="isEditing || data.tavoitteenKuvaus"/>
-            <p v-else-if="!isEditing" class="font-italic">{{ $t('ei-asetettu') }}</p>
-          </b-form-group>
-          <b-form-group :label="$t('tavoitteet')">
+          <b-form-group :label="$t('opiskelija')">
             <template v-if="isEditing">
               <draggable
                 v-bind="tavoitteetOptions"
@@ -158,21 +154,6 @@
         </b-col>
       </b-row>
       <hr/>
-      <b-row>
-        <b-col md="10">
-          <b-form-group>
-            <h3 slot="label">{{ $t('keskeinen-sisalto') }}</h3>
-            <EpContent
-              v-if="isEditing || !isEditing && data.keskeinenSisalto"
-              v-model="data.keskeinenSisalto"
-              layout="normal"
-              :is-editable="isEditing"
-              :kuvaHandler="kuvaHandler"/>
-            <EpAlert v-if="!isEditing && !data.keskeinenSisalto" :text="$t('ei-sisaltoa')" />
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <hr/>
        <b-row>
         <b-col md="10">
           <b-form-group>
@@ -191,6 +172,21 @@
       <b-row>
         <b-col md="10">
           <b-form-group>
+            <h3 slot="label">{{ $t('keskeinen-sisalto') }}</h3>
+            <EpContent
+              v-if="isEditing || !isEditing && data.keskeinenSisalto"
+              v-model="data.keskeinenSisalto"
+              layout="normal"
+              :is-editable="isEditing"
+              :kuvaHandler="kuvaHandler"/>
+            <EpAlert v-if="!isEditing && !data.keskeinenSisalto" :text="$t('ei-sisaltoa')" />
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <hr/>
+      <b-row>
+        <b-col md="10">
+          <b-form-group>
             <h3 slot="label">{{ $t('arviointi') }}</h3>
             <EpContent
               v-if="isEditing || !isEditing && data.arvioinninKuvaus"
@@ -199,19 +195,6 @@
               :is-editable="isEditing"
               :kuvaHandler="kuvaHandler"/>
             <EpAlert v-if="!isEditing && !data.arvioinninKuvaus" :text="$t('ei-sisaltoa')" />
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col md="10">
-          <b-form-group :label="$t('osaamisen-arvioinnista')">
-            <EpContent
-              v-if="isEditing || !isEditing && data.osaamisenArvioinnista"
-              v-model="data.osaamisenArvioinnista"
-              layout="normal"
-              :is-editable="isEditing"
-              :kuvaHandler="kuvaHandler"/>
-            <EpAlert v-if="!isEditing && !data.osaamisenArvioinnista" :text="$t('ei-sisaltoa')" />
           </b-form-group>
         </b-col>
       </b-row>
