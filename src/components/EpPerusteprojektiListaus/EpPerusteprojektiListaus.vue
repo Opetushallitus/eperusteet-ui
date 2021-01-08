@@ -254,6 +254,9 @@ export default class EpPerusteprojektiListaus extends Vue {
         ...query,
       });
     }
+    catch (e) {
+      this.$fail(this.$t('virhe-palvelu-virhe') as string);
+    }
     finally {
       this.isLoading = false;
     }
