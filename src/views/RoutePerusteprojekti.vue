@@ -563,31 +563,37 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   async tallennaUusiOpintokokonaisuus(otsikko, tekstikappaleIsa) {
-    const tkstore = new OpintokokonaisuusStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-
-    this.perusteStore.updateNavigation();
-
-    this.$router.push({
-      name: 'opintokokonaisuus',
-      params: {
-        opintokokonaisuusId: '' + tallennettu!.id,
-      },
-    });
+    try {
+      const tkstore = new OpintokokonaisuusStore(this.peruste!.id!, 0);
+      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+      this.perusteStore.updateNavigation();
+      this.$router.push({
+        name: 'opintokokonaisuus',
+        params: {
+          opintokokonaisuusId: '' + tallennettu!.id,
+        },
+      });
+    }
+    catch (e) {
+      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
+    }
   }
 
   async tallennaUusiKoulutuksenOsa(otsikko, tekstikappaleIsa) {
-    const tkstore = new KoulutuksenOsaStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-
-    this.perusteStore.updateNavigation();
-
-    this.$router.push({
-      name: 'koulutuksenosa',
-      params: {
-        koulutuksenosaId: '' + tallennettu!.id,
-      },
-    });
+    try {
+      const tkstore = new KoulutuksenOsaStore(this.peruste!.id!, 0);
+      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+      this.perusteStore.updateNavigation();
+      this.$router.push({
+        name: 'koulutuksenosa',
+        params: {
+          koulutuksenosaId: '' + tallennettu!.id,
+        },
+      });
+    }
+    catch (e) {
+      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
+    }
   }
 
   ratasClick(clickFn, meta) {
