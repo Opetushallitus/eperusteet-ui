@@ -35,9 +35,22 @@ export default class EpPerusteAikataulu extends Vue {
   private aikatauluStore!: AikatauluStore;
 
   get aikataulut() {
+    let aikataulu = this.aikatauluStore.aikataulutapahtumat.value as any;
+
+    if (!this.luontitapahtuma) {
+      aikataulu = [
+        ...aikataulu,
+        {
+          tapahtuma: 'luominen',
+          tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('peruste-luotu') },
+          tapahtumapaiva: this.aikatauluStore.peruste.value?.luotu,
+        },
+      ];
+    }
+
     if (!this.julkaisutapahtuma) {
-      return [
-        ...this.aikatauluStore.aikataulutapahtumat.value,
+      aikataulu = [
+        ...aikataulu,
         {
           tapahtuma: 'julkaisu',
           tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('perusteen-arvioitu-julkaisupaiva') },
@@ -46,11 +59,15 @@ export default class EpPerusteAikataulu extends Vue {
       ];
     }
 
-    return this.aikatauluStore.aikataulutapahtumat.value;
+    return aikataulu;
   }
 
   get julkaisutapahtuma() {
     return _.head(_.filter(this.aikatauluStore.aikataulutapahtumat.value, tapahtuma => tapahtuma.tapahtuma === 'julkaisu'));
+  }
+
+  get luontitapahtuma() {
+    return _.head(_.filter(this.aikatauluStore.aikataulutapahtumat.value, tapahtuma => tapahtuma.tapahtuma === 'luominen'));
   }
 
   async tallenna(aikataulut) {
