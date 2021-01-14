@@ -22,6 +22,7 @@ export class AikatauluStore {
       } as Tapahtuma;
     });
   });
+  public readonly peruste = computed(() => this.state.peruste);
 
   async init(peruste) {
     this.state.peruste = peruste;
