@@ -71,7 +71,7 @@ import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue
 
 import { perustetila, perusteprojektitila } from '@shared/utils/perusteet';
 import { TutoriaaliStore } from '@shared/stores/tutoriaali';
-import { Perusteet, PerusteHakuDto, PerusteHakuInternalDto, TiedoteDto } from '@shared/api/eperusteet';
+import { getAllPerusteetInternal, Perusteet, PerusteHakuDto, PerusteHakuInternalDto, TiedoteDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { required } from 'vuelidate/lib/validators';
@@ -112,14 +112,17 @@ export default class RouteTiedotteet extends Vue {
         sivukoko: 10,
       }
     );
-    const res = (await Perusteet.getAllPerusteetInternal(0, 9999) as any).data;
+    const res = (await getAllPerusteetInternal({
+      sivu: 0,
+      sivukoko: 9999,
+      tila: ['VALMIS'],
+      julkaistu: true,
+    }) as any).data;
     this.perusteet = res.data;
   }
 
   get julkaistutPerusteet() {
     return _.chain(this.perusteet)
-      .filter(peruste => peruste.perusteprojekti?.tila === perusteprojektitila.julkaistu)
-      .filter(peruste => peruste.tila === perustetila.valmis)
       .filter(peruste => (!peruste.voimassaoloAlkaa || new Date(peruste.voimassaoloAlkaa) < new Date()))
       .filter(peruste => (!peruste.voimassaoloLoppuu || new Date(peruste.voimassaoloLoppuu) > new Date()))
       .value();
@@ -211,6 +214,7 @@ export default class RouteTiedotteet extends Vue {
       { text: this.$t('tiedote-julkaisupaikka-ops'), value: julkaisupaikka.ops },
       { text: this.$t('tiedote-julkaisupaikka-lops'), value: julkaisupaikka.lops },
       { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: julkaisupaikka.amosaa },
+      { text: this.$t('tiedote-julkaisupaikka-vst'), value: julkaisupaikka.vst },
     ];
   }
 
