@@ -32,11 +32,10 @@
         <div class="asteikko mt-4" v-for="(asteikko, idx) in arviointiasteikot" :key="idx">
           <span class="text-nowrap">
             <h3>{{$t('arviointiasteikko') + ' ' + (idx+1)}}</h3>
-            <ep-julki-lista
-              :tiedot="asteikko.osaamistasot"
-              :tietoMaara="10"
+            <ep-arviointi-asteikko-lista
+              :osaamistasot="asteikko.osaamistasot"
               :is-editing="isEditing"
-              @tietoInput="setOsaamistasoOtsikko"/>
+              @osaamistasoInput="setOsaamistasoOtsikko"/>
           </span>
         </div>
       </template>
@@ -54,6 +53,8 @@ import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 
+import EpArviointiAsteikkoLista from '@/components/EpArviointiAsteikkoLista/EpArviointiAsteikkoLista.vue'
+
 import { ArviointiStore } from '@/stores/ArviointiStore';
 
 import { ArviointiAsteikkoDto, OsaamistasoDto } from '@shared/api/eperusteet';
@@ -65,6 +66,7 @@ import { ArviointiAsteikkoDto, OsaamistasoDto } from '@shared/api/eperusteet';
     EpJulkiLista,
     EpButton,
     EpSpinner,
+    EpArviointiAsteikkoLista,
   },
 })
 export default class RouteArviointiasteikot extends Vue {
