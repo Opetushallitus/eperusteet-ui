@@ -65,7 +65,7 @@ export default class EpArviointiAsteikkoLista extends Vue {
   &:nth-of-type(odd):not(.is-editing) {
     background-color: $table-odd-row-bg-color;
   }
-  &.clickable:hover{
+  &.clickable:hover {
     background-color: $table-hover-row-bg-color;
     cursor: pointer;
   }
