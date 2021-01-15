@@ -32,27 +32,27 @@
         <div class="asteikko mt-4" v-for="(asteikko, idx) in arviointiasteikot" :key="asteikko.id">
           <span class="text-nowrap">
             <h3>{{$t('arviointiasteikko') + ' ' + (idx+1)}}</h3>
-              <ep-spinner v-if="!asteikko.osaamistasot" />
-              <div v-else>
-                <div
-                  v-for="(taso, index) in asteikko.osaamistasot"
-                  :key="taso.id"
-                  class="taso py-2"
-                  :class="{ 'pl-3': !isEditing, 'is-editing': isEditing }">
-                  <template v-if="!isEditing">
-                    {{ $kaanna(taso.otsikko) }}
-                  </template>
-                  <b-form-group
-                    :label="$t('osaamistaso') + ' ' + (index + 1)"
-                    v-else>
-                    <ep-input
-                      :name="$t('osaamistaso')"
-                      v-model="taso.otsikko"
-                      :is-editing="true"
-                      @input="setOsaamistasoOtsikko"/>
-                  </b-form-group>
-                </div>
+            <ep-spinner v-if="!asteikko.osaamistasot" />
+            <div v-else>
+              <div
+                v-for="(taso, index) in asteikko.osaamistasot"
+                :key="taso.id"
+                class="taso py-2"
+                :class="{ 'pl-3': !isEditing, 'is-editing': isEditing }">
+                <template v-if="!isEditing">
+                  {{ $kaanna(taso.otsikko) }}
+                </template>
+                <b-form-group
+                  :label="$t('osaamistaso') + ' ' + (index + 1)"
+                  v-else>
+                  <ep-input
+                    :name="$t('osaamistaso')"
+                    v-model="taso.otsikko"
+                    :is-editing="true"
+                    @input="setOsaamistasoOtsikko"/>
+                </b-form-group>
               </div>
+            </div>
           </span>
         </div>
       </template>
