@@ -29,13 +29,30 @@
     </div>
     <div class="taso-wrapper">
       <template v-if="arviointiasteikot">
-        <div class="asteikko mt-4" v-for="(asteikko, idx) in arviointiasteikot" :key="idx">
+        <div class="asteikko mt-4" v-for="(asteikko, idx) in arviointiasteikot" :key="asteikko.id">
           <span class="text-nowrap">
             <h3>{{$t('arviointiasteikko') + ' ' + (idx+1)}}</h3>
-            <ep-arviointi-asteikko-lista
-              :osaamistasot="asteikko.osaamistasot"
-              :is-editing="isEditing"
-              @osaamistasoInput="setOsaamistasoOtsikko"/>
+              <ep-spinner v-if="!asteikko.osaamistasot" />
+              <div v-else>
+                <div
+                  v-for="(taso, index) in asteikko.osaamistasot"
+                  :key="taso.id"
+                  class="taso py-2"
+                  :class="{ 'pl-3': !isEditing, 'is-editing': isEditing }">
+                  <template v-if="!isEditing">
+                    {{ $kaanna(taso.otsikko) }}
+                  </template>
+                  <b-form-group
+                    :label="$t('osaamistaso') + ' ' + (index + 1)"
+                    v-else>
+                    <ep-input
+                      :name="$t('osaamistaso')"
+                      v-model="taso.otsikko"
+                      :is-editing="true"
+                      @input="setOsaamistasoOtsikko"/>
+                  </b-form-group>
+                </div>
+              </div>
           </span>
         </div>
       </template>
@@ -52,8 +69,7 @@ import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-
-import EpArviointiAsteikkoLista from '@/components/EpArviointiAsteikkoLista/EpArviointiAsteikkoLista.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
 
 import { ArviointiStore } from '@/stores/ArviointiStore';
 
@@ -66,7 +82,7 @@ import { ArviointiAsteikkoDto, OsaamistasoDto } from '@shared/api/eperusteet';
     EpJulkiLista,
     EpButton,
     EpSpinner,
-    EpArviointiAsteikkoLista,
+    EpInput,
   },
 })
 export default class RouteArviointiasteikot extends Vue {
@@ -128,6 +144,8 @@ export default class RouteArviointiasteikot extends Vue {
 </script>
 
 <style lang="scss">
+@import "@shared/styles/_variables.scss";
+
 .asteikko {
   padding: 18px;
   border-radius: 10px;
@@ -137,5 +155,22 @@ export default class RouteArviointiasteikot extends Vue {
 
 .taso-wrapper {
   min-height: 75vh;
+}
+
+.taso {
+  &:nth-of-type(even):not(.is-editing) {
+    background-color: $table-even-row-bg-color;
+  }
+  &:nth-of-type(odd):not(.is-editing) {
+    background-color: $table-odd-row-bg-color;
+  }
+  &.clickable:hover {
+    background-color: $table-hover-row-bg-color;
+    cursor: pointer;
+  }
+}
+
+.form-group {
+  margin: 0;
 }
 </style>
