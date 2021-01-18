@@ -27,6 +27,7 @@
         <TileOppaat :perusteOppaatStore="perusteOppaatStore"/>
         <TileArviointiasteikot />
         <TileVirheellisetPerusteet :virheellisetPerusteetStore="virheellisetPerusteetStore"/>
+        <TileTilastot v-if="$isAdmin"/>
       </div>
     </div>
   </div>
@@ -43,6 +44,7 @@ import TilePohjat from './tiles/TilePohjat.vue';
 import TileTiedotteet from './tiles/TileTiedotteet.vue';
 import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
+import TileTilastot from './tiles/TileTilastot.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
@@ -60,6 +62,7 @@ import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
     TileTiedotteet,
     TileVirheellisetPerusteet,
     TileArviointiasteikot,
+    TileTilastot,
   },
 })
 export default class Home extends Vue {
