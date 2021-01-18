@@ -48,9 +48,9 @@ export class ArviointiStore {
     this.state.arviointiasteikot = res.data;
   }
 
-  public async updateArviointiasteikot(data: ArviointiAsteikkoDto[] | undefined) {
-    await Arviointiasteikot.updateArviointiasteikot(data);
-    await this.fetchArviointiasteikot();
+  public async updateArviointiasteikot(data: ArviointiAsteikkoDto[]) {
+    const res = await Arviointiasteikot.updateArviointiasteikot(data!);
+    this.state.arviointiasteikot = res.data;
   }
 
   public async fetchGeneeriset() {

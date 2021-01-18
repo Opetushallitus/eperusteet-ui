@@ -48,8 +48,7 @@
                   <ep-input
                     :name="$t('osaamistaso')"
                     v-model="taso.otsikko"
-                    :is-editing="true"
-                    @input="setOsaamistasoOtsikko"/>
+                    :is-editing="true"/>
                 </b-form-group>
               </div>
             </div>
@@ -91,29 +90,13 @@ export default class RouteArviointiasteikot extends Vue {
 
   private isEditing = false;
   private isSaving = false;
-  private arviointiAsteikkoData: ArviointiAsteikkoDto[] | undefined = undefined;
 
   async mounted() {
     await this.arviointiStore.fetchArviointiasteikot();
-    this.arviointiStore.fetchGeneeriset();
-    this.arviointiAsteikkoData = this.arviointiStore.arviointiasteikot.value as ArviointiAsteikkoDto[];
   }
 
   toggleEdit() {
     this.isEditing = !this.isEditing;
-  }
-
-  setOsaamistasoOtsikko(data: OsaamistasoDto) {
-    this.arviointiAsteikkoData = this.arviointiStore.arviointiasteikot.value?.map(asteikko => ({
-      ...asteikko,
-      osaamistasot: asteikko.osaamistasot?.map(taso => {
-        if (taso.id === data.id) {
-          taso.otsikko = data.otsikko;
-        }
-        return taso;
-      }),
-    })
-    );
   }
 
   async saveArviointiAsteikko() {
@@ -121,7 +104,7 @@ export default class RouteArviointiasteikot extends Vue {
     this.isEditing = false;
 
     try {
-      await this.arviointiStore.updateArviointiasteikot(this.arviointiAsteikkoData);
+      await this.arviointiStore.updateArviointiasteikot(this.arviointiasteikot as ArviointiAsteikkoDto[]);
       this.$success(this.$t('arviointiasteikko-tallennettu-onnistuneesti') as string);
     }
     catch (_err) {
@@ -134,11 +117,7 @@ export default class RouteArviointiasteikot extends Vue {
   }
 
   get arviointiasteikot() {
-    return this.arviointiStore.arviointiasteikot.value;
-  }
-
-  get geneeriset() {
-    return this.arviointiStore.geneeriset.value;
+    return this.arviointiStore.state.arviointiasteikot;
   }
 }
 </script>
@@ -163,10 +142,6 @@ export default class RouteArviointiasteikot extends Vue {
   }
   &:nth-of-type(odd):not(.is-editing) {
     background-color: $table-odd-row-bg-color;
-  }
-  &.clickable:hover {
-    background-color: $table-hover-row-bg-color;
-    cursor: pointer;
   }
 }
 
