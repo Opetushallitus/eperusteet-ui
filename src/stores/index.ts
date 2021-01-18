@@ -17,6 +17,7 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import { OppaatStore } from '@/stores/OppaatStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { TermitStore } from '@/stores/TermitStore';
+import { TilastotStore } from '@/stores/TilastotStore';
 
 const arviointiStore = new ArviointiStore(Kielet);
 const kayttajaStore = Kayttajat;
@@ -34,6 +35,7 @@ const browserStore = new BrowserStore();
 const oppaatStore = new OppaatStore();
 const tyoryhmaStore = new TyoryhmaStore();
 const termitStore = new TermitStore();
+const tilastotStore = new TilastotStore();
 
 export const stores = Object.freeze({
   aikatauluStore,
@@ -55,4 +57,5 @@ export const stores = Object.freeze({
   ulkopuolisetStore,
   virheellisetPerusteetStore,
   termitStore,
+  tilastotStore,
 });

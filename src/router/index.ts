@@ -34,6 +34,7 @@ import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
 import RouteKasite from '@/views/RouteKasite.vue';
 import RouteOpintokokonaisuus from '@/views/RouteOpintokokonaisuus.vue';
 import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
+import RouteTilastot from '@/views/RouteTilastot.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -95,6 +96,11 @@ const router = new VueRouter({
       path: 'tiedotteet',
       name: 'tiedotteet',
       component: RouteTiedotteet,
+      props,
+    }, {
+      path: 'tilastot',
+      name: 'tilastot',
+      component: RouteTilastot,
       props,
     }, {
       path: 'arviointi',

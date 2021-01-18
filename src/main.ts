@@ -13,6 +13,7 @@ import Loading from 'vue-loading-overlay';
 import Notifications from 'vue-notification';
 import PortalVue from 'portal-vue';
 import Vuelidate from 'vuelidate';
+import VueApexCharts from 'vue-apexcharts';
 
 import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 import Aikaleima from '@shared/plugins/aikaleima';
@@ -69,6 +70,8 @@ Vue.use(Notifikaatiot);
 Vue.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
 Vue.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
 Vue.use(VueTutorial, { tutoriaaliStore });
+Vue.use(VueApexCharts);
+Vue.component('apexchart', VueApexCharts);
 
 Vue.use(TekstikappaleStore, {
   perusteStore: stores.perusteStore,

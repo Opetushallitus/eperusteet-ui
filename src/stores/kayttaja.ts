@@ -25,6 +25,8 @@ function getOikeusArvo(oikeus: Oikeus) {
   }
 }
 
+const AdminOids = ['ROLE_APP_EPERUSTEET_CRUD_1.2.246.562.10.00000000001', 'ROLE_EPERUSTEET_ADMIN'];
+
 export function parsiEsitysnimi(tiedot: any): string {
   if (tiedot.kutsumanimi && tiedot.sukunimi) {
     return tiedot.kutsumanimi + ' ' + tiedot.sukunimi;
@@ -52,7 +54,7 @@ export class KayttajaStore implements IOikeusProvider {
   public readonly virkailijat = computed(() => this.state.virkailijat);
   public readonly oikeudet = computed(() => this.state.oikeudet);
   public readonly nimi = computed(() => parsiEsitysnimi(this.state.tiedot));
-  public readonly isAdmin = computed(() => _.includes(this.state.tiedot?.oikeudet || [], 'ROLE_EPERUSTEET_ADMIN'));
+  public readonly isAdmin = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(AdminOids, oikeus)));
 
   public async init() {
     try {
