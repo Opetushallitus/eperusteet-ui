@@ -90,13 +90,22 @@ export default class RouteArviointiasteikot extends Vue {
 
   private isEditing = false;
   private isSaving = false;
+  private arviointiasteikot: ArviointiAsteikkoDto[] | null = null;
 
-  async mounted() {
-    await this.arviointiStore.fetchArviointiasteikot();
+  mounted() {
+    this.init();
   }
 
   toggleEdit() {
     this.isEditing = !this.isEditing;
+    if (!this.isEditing) {
+      this.init();
+    }
+  }
+
+  async init() {
+    await this.arviointiStore.fetchArviointiasteikot();
+    this.arviointiasteikot = this.arviointiStore.arviointiasteikot.value as ArviointiAsteikkoDto[];
   }
 
   async saveArviointiAsteikko() {
@@ -104,24 +113,16 @@ export default class RouteArviointiasteikot extends Vue {
     this.isEditing = false;
 
     try {
-      await this.arviointiStore.updateArviointiasteikot([...this.arviointiasteikot]);
+      await this.arviointiStore.updateArviointiasteikot(this.arviointiasteikot as ArviointiAsteikkoDto[]);
       this.$success(this.$t('arviointiasteikko-tallennettu-onnistuneesti') as string);
     }
     catch (_err) {
       this.$fail(this.$t('arviointiasteikon-tallennus-epaonnistui') as string);
-      this.arviointiStore.fetchArviointiasteikot();
+      this.init();
     }
     finally {
       this.isSaving = false;
     }
-  }
-
-  get arviointiasteikot() {
-    return this.arviointiStore.arviointiasteikot.value as ArviointiAsteikkoDto[];
-  }
-
-  set arviointiasteikot(value: ArviointiAsteikkoDto[]) {
-    this.arviointiStore.setArviointiasteikot(value);
   }
 }
 </script>
