@@ -124,7 +124,6 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
-import { Opetussuunnitelmat, Ulkopuoliset, OpetussuunnitelmaInfoDto, PerusteInfoDto } from '@shared/api/ylops';
 
 import { YlopsKoulutustyypit } from '@/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
@@ -139,10 +138,10 @@ import { Kielet } from '@shared/stores/kieli';
 })
 export default class EpYlopsTilastot extends Vue {
   @Prop({ required: true })
-  private opetussuunnitelmat: OpetussuunnitelmaInfoDto[] = [];
+  private opetussuunnitelmat!: any[];
 
   @Prop({ required: true })
-  private perusteet: PerusteInfoDto[] = [];
+  private perusteet!: any[];
 
   private currentPage = 1;
   private perPage = 10;
