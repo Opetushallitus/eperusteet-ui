@@ -104,7 +104,7 @@ export default class RouteArviointiasteikot extends Vue {
     this.isEditing = false;
 
     try {
-      await this.arviointiStore.updateArviointiasteikot(this.arviointiasteikot as ArviointiAsteikkoDto[]);
+      await this.arviointiStore.updateArviointiasteikot([...this.arviointiasteikot]);
       this.$success(this.$t('arviointiasteikko-tallennettu-onnistuneesti') as string);
     }
     catch (_err) {
@@ -117,7 +117,11 @@ export default class RouteArviointiasteikot extends Vue {
   }
 
   get arviointiasteikot() {
-    return this.arviointiStore.state.arviointiasteikot;
+    return this.arviointiStore.arviointiasteikot.value as ArviointiAsteikkoDto[];
+  }
+
+  set arviointiasteikot(value: ArviointiAsteikkoDto[]) {
+    this.arviointiStore.setArviointiasteikot(value);
   }
 }
 </script>
