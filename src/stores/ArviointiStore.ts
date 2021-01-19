@@ -1,10 +1,11 @@
 import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+
+import _ from 'lodash';
+
 import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
-import { Page } from '@shared/tyypit';
 import { KieliStore } from '@shared/stores/kieli';
 import { Debounced } from '@shared/utils/delay';
-import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
 
@@ -45,6 +46,10 @@ export class ArviointiStore {
     this.state.arviointiasteikot = null;
     const res = await Arviointiasteikot.getAll();
     this.state.arviointiasteikot = res.data;
+  }
+
+  public async updateArviointiasteikot(data: ArviointiAsteikkoDto[]) {
+    await Arviointiasteikot.updateArviointiasteikot(data);
   }
 
   public async fetchGeneeriset() {
