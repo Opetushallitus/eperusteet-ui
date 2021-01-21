@@ -1,7 +1,7 @@
 <template>
   <div>
     <ep-spinner v-if="!store || !peruste" />
-    <EpEditointi v-else :store="store" :key="'' + new Date()">
+    <EpEditointi v-else :store="store">
       <template #header="{ data }">
         <h2>{{ $t('tutkinnon-muodostuminen') }}</h2>
       </template>

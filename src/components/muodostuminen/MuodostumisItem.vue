@@ -137,17 +137,22 @@ export default class MuodostumisItem extends Vue {
 
   get laskettu() {
     if (this.isRyhma) {
-      return _(this.value.osat)
-        .map(osa =>
-          osa.muodostumisSaanto?.laajuus?.maksimi
-            || (osa._tutkinnonOsaViite && this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
-            || 0)
-        .filter()
-        .sum();
+      return this.osanLaajuusRecursive(this.value);
     }
     else {
       return this.laajuusMinimi;
     }
+  }
+
+  osanLaajuusRecursive(osa) {
+    return _(osa.osat)
+      .map(osa => {
+        return this.osanLaajuusRecursive(osa) + osa?.muodostumisSaanto?.laajuus?.maksimi
+            || (osa._tutkinnonOsaViite && this.tutkinnonOsatMap[osa._tutkinnonOsaViite] && this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
+            || 0;
+      })
+      .filter()
+      .sum();
   }
 
   mounted() {
@@ -192,7 +197,7 @@ export default class MuodostumisItem extends Vue {
     if (this.isRyhma) {
       return this.value.nimi;
     }
-    else {
+    else if (this.tosa) {
       return this.tosa.nimi;
     }
   }
