@@ -18,7 +18,8 @@
         <b-pagination
           v-model="sivu"
           align="center"
-          per-page="sivukoko"
+          :per-page="sivukoko"
+          :total-rows="kokonaismaara"
           />
       </div>
       <ep-spinner v-else />
@@ -63,8 +64,12 @@ export default class RouteVirheellisetPerusteet extends Vue {
     return this.virheellisetPerusteetStore.sivu.value + 1;
   }
 
+  get kokonaismaara() {
+    return this.virheellisetPerusteetStore.kokonaismaara.value;
+  }
+
   set sivu(value: number) {
-    if (value !== null && this.sivu !== value - 1) {
+    if (value !== null) {
       this.virheellisetPerusteetStore.updateFilters(value - 1, 10);
     }
   }

@@ -5,8 +5,7 @@
     <ep-spinner v-if="!tutkinnonOsat || !peruste" />
 
     <div v-else>
-      <ep-small-data-box :topic="$t('tuotua')" :count="tutkinnonOsiaTuotu" />
-      <ep-small-data-box :topic="$t('luotua')" :count="tutkinnonOsiaLuotu" />
+      <ep-small-data-box :topic="$t('kpl')" :count="tutkinnonOsia" />
     </div>
 
   </div>
@@ -38,12 +37,8 @@ export default class EpPerusteTutkinnonOsat extends Vue {
     return this.tutkinnonOsaStore.tutkinnonOsat.value;
   }
 
-  get tutkinnonOsiaLuotu() {
+  get tutkinnonOsia() {
     return _.size(this.tutkinnonOsaStore.tutkinnonOsat.value);
-  }
-
-  get tutkinnonOsiaTuotu() {
-    return '?';
   }
 }
 </script>

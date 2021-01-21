@@ -4,7 +4,8 @@
     v-bind="options"
     tag="div"
     :class="classes"
-    v-model="model">
+    v-model="model"
+    @add="add">
       <div v-for="(node, idx) in model" :key="node.tunniste || node.uuid || idx" class="muodostumisnode">
         <MuodostumisItem v-model="model[idx]"
                         :depth="depth"
@@ -208,6 +209,12 @@ export default class MuodostumisNode extends Vue {
 
   pakollinen(node) {
     return (node.rooli === 'määritelty' && this.$kaanna(node.nimi) === this.$t('rakenne-moduuli-pakollinen')) || node.pakollinen;
+  }
+
+  async add(element) {
+    if (this.model[element.newIndex] && this.model[element.newIndex].rooli === 'määrittelemätön') {
+      this.$refs['muodostumisItem'][_.size(this.$refs['muodostumisItem']) - 1].edit();
+    }
   }
 }
 </script>
