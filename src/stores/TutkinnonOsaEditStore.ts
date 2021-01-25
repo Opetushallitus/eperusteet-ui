@@ -232,11 +232,12 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   public features(data: any) {
     return computed(() => {
       return {
-        editable: !!data && data.tutkinnonOsa.tila !== 'valmis' && _.size(this.projektitJoissaKaytossa) <= 1,
-        removable: !!data && data.tutkinnonOsa.tila !== 'valmis' && _.size(this.projektitJoissaKaytossa) <= 1,
+        editable: (data.tutkinnonOsa?.tila !== 'valmis' && _.size(this.projektitJoissaKaytossa) <= 1)
+          || data.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId,
+        removable: true,
         hideable: false,
         recoverable: true,
-        copyable: !!data && (data.tutkinnonOsa.tila === 'valmis' || _.size(this.projektitJoissaKaytossa) > 1),
+        copyable: !data.tutkinnonOsa?.alkuperainenPeruste && (data.tutkinnonOsa?.tila === 'valmis' || _.size(this.projektitJoissaKaytossa) > 1),
       } as EditoitavaFeatures;
     });
   }
