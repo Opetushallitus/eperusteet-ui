@@ -186,6 +186,7 @@ export default class EpTutkinnonosaTuontiModal extends Vue {
       return {
         ...tutkinnonosa,
         kopioiMuokattavaksi: _.includes(_.map(this.valitutMuokattavaksiTutkinnonosat, 'id'), _.get(tutkinnonosa, 'id')),
+        alkuperainenPeruste: tutkinnonosa.peruste,
       };
     });
   }
@@ -230,7 +231,7 @@ export default class EpTutkinnonosaTuontiModal extends Vue {
     try {
       await this.tutkinnonosatTuontiStore!.tuoSisaltoa(
         _.map(this.tutkinnonosatWithSalliMuokattavaksi, tutkinnonosa =>
-          _.pick(tutkinnonosa, ['laajuus', 'nimi', 'suoritustapakoodi', 'tyyppi', '_tutkinnonOsa', 'kopioiMuokattavaksi']) as any));
+          _.pick(tutkinnonosa, ['laajuus', 'nimi', 'suoritustapakoodi', 'tyyppi', '_tutkinnonOsa', 'kopioiMuokattavaksi', 'alkuperainenPeruste']) as any));
 
       this.$success(this.$t('tutkinnon-osat-tuotu-onnistuneesti') as string);
       this.close();

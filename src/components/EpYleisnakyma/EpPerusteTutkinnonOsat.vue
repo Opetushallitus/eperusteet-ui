@@ -37,8 +37,13 @@ export default class EpPerusteTutkinnonOsat extends Vue {
     return this.tutkinnonOsaStore.tutkinnonOsat.value;
   }
 
-  get tutkinnonOsia() {
-    return _.size(this.tutkinnonOsaStore.tutkinnonOsat.value);
+  get tutkinnonOsiaLuotu() {
+    return _.size(_.filter(this.tutkinnonOsaStore.tutkinnonOsat.value,
+      tutkinnonosaViite => !tutkinnonosaViite.tutkinnonOsa?.alkuperainenPeruste || tutkinnonosaViite.tutkinnonOsa.alkuperainenPeruste.id === this.peruste.id));
+  }
+
+  get tutkinnonOsiaTuotu() {
+    return _.size(this.tutkinnonOsaStore.tutkinnonOsat.value) - this.tutkinnonOsiaLuotu;
   }
 }
 </script>

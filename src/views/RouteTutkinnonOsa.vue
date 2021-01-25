@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="store">
-      <EpEditointi :store="store" :labelCopyConfirm="'kopioidaanko-tutkinnonosa'">
+      <EpEditointi :store="store" :labelCopyConfirm="'kopioidaanko-tutkinnonosa'" :labelRemove="'poista-tutkinnonosa'">
       <template v-slot:header="{ data }">
         <h2 class="m-0">
           <span>
