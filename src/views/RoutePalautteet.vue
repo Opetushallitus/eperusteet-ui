@@ -2,11 +2,14 @@
   <EpMainView>
     <h2 aria-level="1" class="mb-4">{{ $t('palautteet-otsikko') }}</h2>
     <b-table
-      v-if="currentPagePalautteet"
+      v-if="palautteet"
       striped
       responsive
       :items="currentPagePalautteet"
-      :fields="fields">
+      :fields="fields"
+      @sort-changed="sortingChanged"
+      :sort-by.sync="sort.sortBy"
+      :sort-desc.sync="sort.sortDesc">
       <template #table-colgroup="scope">
         <col
           v-for="{ key } in scope.fields"
@@ -36,15 +39,15 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  import { BvTableFieldArray } from 'bootstrap-vue';
+import { BvTableFieldArray } from 'bootstrap-vue';
 
-  import { ITEMS_PER_PAGE, PalautteetStore } from '@/stores/PalautteetStore';
+import { ITEMS_PER_PAGE, PalautteetStore } from '@/stores/PalautteetStore';
 
-  import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-  import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-  import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
   enum Review {
     STARS = 'stars',
@@ -57,19 +60,29 @@
       EpMainView,
       EpSpinner,
       EpPagination,
-    }
+    },
   })
-  export default class RoutePalautteet extends Vue {
+export default class RoutePalautteet extends Vue {
     @Prop({ required: true })
     palautteetStore!: PalautteetStore;
 
     private currentPage = 0;
 
-    ratings = Array.from({length: 5}, (_v, k) => k + 1);
+    ratings = Array.from({ length: 5 }, (_v, k) => k + 1);
     Review = Review;
+    sort = { sortDesc: true };
 
-    async mounted() {
-      await this.palautteetStore.fetch();
+    mounted() {
+      this.fetch();
+    }
+
+    private async fetch(sortDesc?: boolean) {
+      await this.palautteetStore.fetch(sortDesc);
+    }
+
+    sortingChanged(sort) {
+      this.sort = sort;
+      this.fetch(this.sort.sortDesc);
     }
 
     get palautteet() {
@@ -87,7 +100,7 @@
     get fields(): BvTableFieldArray {
       return [{
         key: Review.STARS,
-        label: `${this.$t('arviointi') as string} (${this.$t('ka')} ${this.averageReview})`,
+        label: `${this.$t('arviointi') as string} (${this.$t('ka-keskiarvo')} ${this.averageReview})`,
         sortable: false,
       }, {
         key: Review.FEEDBACK,
@@ -118,7 +131,7 @@
     get totalItems() {
       return this.palautteet?.length || 0;
     }
-  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -133,12 +146,20 @@
     }
   }
 
-  ::v-deep .b-table thead th:not([aria-sort]) {
+  ::v-deep .b-table thead th {
     &,
     &:active,
     &:focus,
     &:focus-within {
-      border-bottom: none !important;
+      border-bottom: 2px solid $gray-lighten-3 !important;
+    }
+
+    &[aria-sort] {
+      &:active,
+      &:focus,
+      &:focus-within {
+        border-bottom: 2px solid $black !important;
+      }
     }
   }
 </style>
