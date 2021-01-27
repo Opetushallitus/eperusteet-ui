@@ -5,7 +5,8 @@
     <ep-spinner v-if="!tutkinnonOsat || !peruste" />
 
     <div v-else>
-      <ep-small-data-box :topic="$t('kpl')" :count="tutkinnonOsia" />
+      <ep-small-data-box :topic="$t('tuotua')" :count="tutkinnonOsiaTuotu" />
+      <ep-small-data-box :topic="$t('luotu')" :count="tutkinnonOsiaLuotu" />
     </div>
 
   </div>
