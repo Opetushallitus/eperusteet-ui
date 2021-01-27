@@ -18,17 +18,16 @@ export class PalautteetStore {
   public readonly palautteet = computed(() => this.state.palautteet);
   public readonly paginated = computed(() => this.state.paginated);
 
-  public async fetch(sortDesc = true) {
-    this.state.palautteet = null;
+  public async fetch() {
     const { data } = await Palautteet.palautteet();
-    const palauteData = (data as unknown) as PalauteDto[];
-    const sortedData = sortDesc ? _.chain(palauteData)
-      .sortBy('created-at')
-      .reverse()
-      .value() : palauteData;
+    this.state.palautteet = this.sortDesc((data as unknown) as PalauteDto[]);
+    this.state.paginated = this.paginateData(this.state.palautteet as PalauteDto[]);
+  }
 
-    this.state.palautteet = sortedData;
-    this.state.paginated = this.paginateData(sortedData);
+  public sortData(sortDesc: boolean) {
+    const currentPalautteet = [...this.state.palautteet as PalauteDto[]];
+    const sortedPalautteet = sortDesc ? this.sortDesc(currentPalautteet) : this.sortAsc(currentPalautteet);
+    this.state.paginated = this.paginateData(sortedPalautteet);
   }
 
   private paginateData(data: PalauteDto[]): PalauteDto[][] {
@@ -54,5 +53,18 @@ export class PalautteetStore {
     });
 
     return paginated;
+  }
+
+  private sortDesc(data: PalauteDto[]): PalauteDto[] {
+    return _.chain(data)
+    .sortBy('created-at')
+    .reverse()
+    .value();
+  }
+
+  private sortAsc(data: PalauteDto[]): PalauteDto[] {
+    return _.chain(data)
+    .sortBy('created-at')
+    .value();
   }
 }

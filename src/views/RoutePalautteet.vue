@@ -7,9 +7,7 @@
       responsive
       :items="currentPagePalautteet"
       :fields="fields"
-      @sort-changed="sortingChanged"
-      :sort-by.sync="sort.sortBy"
-      :sort-desc.sync="sort.sortDesc">
+      @sort-changed="sortingChanged">
       <template #table-colgroup="scope">
         <col
           v-for="{ key } in scope.fields"
@@ -39,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { BvTableFieldArray } from 'bootstrap-vue';
 
@@ -70,19 +68,13 @@ export default class RoutePalautteet extends Vue {
 
     ratings = Array.from({ length: 5 }, (_v, k) => k + 1);
     Review = Review;
-    sort = { sortDesc: true };
 
-    mounted() {
-      this.fetch();
+    async mounted() {
+      await this.palautteetStore.fetch();
     }
 
-    private async fetch(sortDesc?: boolean) {
-      await this.palautteetStore.fetch(sortDesc);
-    }
-
-    sortingChanged(sort) {
-      this.sort = sort;
-      this.fetch(this.sort.sortDesc);
+    sortingChanged({ sortDesc }: { sortDesc: boolean }) {
+      this.palautteetStore.sortData(sortDesc);
     }
 
     get palautteet() {
