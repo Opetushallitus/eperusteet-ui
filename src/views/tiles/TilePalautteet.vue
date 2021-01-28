@@ -20,7 +20,5 @@ import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
     EpHomeTile,
   },
 })
-export default class TilePalautteet extends Vue {
-
-}
+export default class TilePalautteet extends Vue {}
 </script>
