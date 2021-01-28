@@ -6,9 +6,12 @@
         v-if="palautteet.length > 0"
         striped
         responsive
-        :items="currentPagePalautteet"
+        :items="palautteet"
         :fields="fields"
-        @sort-changed="sortingChanged">
+        :per-page="perPage"
+        :current-page="currentPage"
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc">
         <template #table-colgroup="scope">
           <col
             v-for="{ key } in scope.fields"
@@ -32,10 +35,11 @@
       <p v-else>Ei palautteita</p>
     </template>
     <ep-spinner v-else />
-    <ep-pagination
-      v-model="page"
+    <b-pagination
+      v-model="currentPage"
+      :total-rows="totalItems"
       :per-page="perPage"
-      :total-rows="totalItems"/>
+      align="center" />
   </EpMainView>
 </template>
 
@@ -44,11 +48,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { BvTableFieldArray } from 'bootstrap-vue';
 
-import { ITEMS_PER_PAGE, PalautteetStore } from '@/stores/PalautteetStore';
+import { PalautteetStore } from '@/stores/PalautteetStore';
 
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
 enum Review {
   STARS = 'stars',
@@ -60,14 +63,16 @@ enum Review {
   components: {
     EpMainView,
     EpSpinner,
-    EpPagination,
   },
 })
 export default class RoutePalautteet extends Vue {
   @Prop({ required: true })
   palautteetStore!: PalautteetStore;
 
-  private currentPage = 0;
+  private currentPage = 1;
+  private perPage = 10;
+  private sortBy = Review.CREATED;
+  private sortDesc = true;
 
   ratings = Array.from({ length: 5 }, (_v, k) => k + 1);
   Review = Review;
@@ -76,16 +81,8 @@ export default class RoutePalautteet extends Vue {
     await this.palautteetStore.fetch();
   }
 
-  sortingChanged({ sortDesc }: { sortDesc: boolean }) {
-    this.palautteetStore.sortData(sortDesc);
-  }
-
   get palautteet() {
     return this.palautteetStore.palautteet.value;
-  }
-
-  get currentPagePalautteet() {
-    return this.palautteetStore.paginated.value?.[this.currentPage];
   }
 
   get averageReview() {
@@ -109,18 +106,6 @@ export default class RoutePalautteet extends Vue {
         return this.$sd(item![Review.CREATED]);
       },
     }];
-  }
-
-  get page() {
-    return this.currentPage + 1;
-  }
-
-  set page(value: number) {
-    this.currentPage = value - 1;
-  }
-
-  get perPage() {
-    return ITEMS_PER_PAGE;
   }
 
   get totalItems() {
