@@ -85,7 +85,7 @@
 
         </b-form-group>
 
-        <b-form-group :label="$t('laajuus')">
+        <b-form-group :label="$t('laajuus')" v-if="innerModel.muodostumisSaanto">
           <div class="d-flex align-items-center">
             <div>
               <ep-input type="number" is-editing v-model="innerModel.muodostumisSaanto.laajuus.minimi">
