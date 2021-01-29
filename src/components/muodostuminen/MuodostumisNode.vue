@@ -213,7 +213,12 @@ export default class MuodostumisNode extends Vue {
 
   async add(element) {
     if (this.model[element.newIndex] && this.model[element.newIndex].rooli === 'määrittelemätön') {
-      this.$refs['muodostumisItem'][_.size(this.$refs['muodostumisItem']) - 1].edit();
+      const uuid = _.get(this.model[element.newIndex], 'uuid');
+      const muodostumisItem = _.find(this.$refs['muodostumisItem'], item => _.get(item, 'innerModel.uuid') === uuid);
+
+      if (muodostumisItem) {
+        (muodostumisItem as any).edit();
+      }
     }
   }
 }
