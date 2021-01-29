@@ -74,7 +74,7 @@
     <div v-if="julkaisuMahdollinen">
       <hr class="mt-4 mb-4">
       <h3>{{ $t('uusi-julkaisu') }}</h3>
-      <b-form-group :label="$t('julkaisun-tiedote') + '*'">
+      <b-form-group :label="$t('julkaisun-tiedote')">
         <div class="mt-2 mb-3">{{ $t('tiedotteen-nakyvyys') }}</div>
         <ep-content v-model="julkaisu.tiedote"
                     layout="full"
