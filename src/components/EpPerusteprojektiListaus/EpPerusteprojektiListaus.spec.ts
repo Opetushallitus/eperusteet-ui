@@ -144,6 +144,6 @@ describe('Projektilistaus', () => {
     }];
 
     expect(wrapper.html()).toContain('projekti 42');
-    expect(wrapper.html()).not.toContain('oma projekti');
+    expect(wrapper.html()).toContain('oma projekti');
   });
 });
