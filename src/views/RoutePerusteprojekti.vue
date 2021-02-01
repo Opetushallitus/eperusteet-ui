@@ -32,12 +32,18 @@
               <div v-if="validationCategories">
                 <div class="pl-3 pt-2 pb-1 row" v-for="c in validationStats.categories" :key="c.category">
                   <div class="col-1">
-                    <fas class="text-success" icon="check-circle" v-if="c.failcount === 0"/>
-                    <fas class="text-danger" icon="info-circle" v-if="c.failcount > 0"/>
+                    <fas class="text-warning" icon="info-circle" v-if="isHuomautus(c.category)"/>
+                    <template v-else>
+                      <fas class="text-success" icon="check-circle" v-if="c.failcount === 0"/>
+                      <fas class="text-danger" icon="info-circle" v-if="c.failcount > 0"/>
+                    </template>
                   </div>
                   <div class="col">
-                    <span v-if="c.failcount === 0">{{ $t(c.category + "-validation-ok") }}</span>
-                    <span v-if="c.failcount > 0">{{ $t(c.category + "-validation-error") }}</span>
+                    <span v-if="isHuomautus(c.category)">{{ $t('perusteessa-huomautuksia') }}</span>
+                    <template v-else>
+                      <span v-if="c.failcount === 0">{{ $t(c.category + "-validation-ok") }}</span>
+                      <span v-if="c.failcount > 0">{{ $t(c.category + "-validation-error") }}</span>
+                    </template>
                   </div>
                 </div>
               </div>
@@ -295,7 +301,15 @@ import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { NavigationNodeDto } from '@shared/tyypit';
-import { NavigationNodeDtoTypeEnum, Sisallot, PerusteDtoTilaEnum, PerusteDtoTyyppiEnum, PerusteDtoToteutusEnum } from '@shared/api/eperusteet';
+import {
+  NavigationNodeDtoTypeEnum,
+  PerusteDtoTilaEnum,
+  PerusteDtoTyyppiEnum,
+  PerusteDtoToteutusEnum,
+  StatusValidointiKategoriaEnum,
+  StatusValidointiStatusTypeEnum,
+  Status,
+} from '@shared/api/eperusteet';
 import { Meta } from '@shared/utils/decorators';
 
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -484,6 +498,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     return [parent];
   }
 
+  isHuomautus(category: string): boolean {
+    return category === _.toLower(StatusValidointiStatusTypeEnum.HUOMAUTUS);
+  }
+
   get yleisnakymaRoute() {
     if (this.peruste && (this.peruste.tyyppi as any) === 'opas') {
       return 'opas';
@@ -531,10 +549,15 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     }
   }
 
-  get validationCategories() {
+  get validationCategories(): string[] | undefined {
     if (this.perusteStore.projektiStatus.value) {
-      return _.chain(this.perusteStore.projektiStatus.value.infot)
-        .keyBy('validointiKategoria')
+      return _.chain(this.perusteStore.projektiStatus.value.infot as Status[])
+        .keyBy((info: Status): string => {
+          if (!info.validointiKategoria && info.validointiStatusType === StatusValidointiStatusTypeEnum.HUOMAUTUS) {
+            return info.validointiStatusType as string;
+          }
+          return info.validointiKategoria as string;
+        })
         .keys()
         .value();
     }
