@@ -39,7 +39,7 @@
           </div>
           <div v-else>
             <p>{{$t('tekstikappale-koodisto-ohje')}} <br/>
-              <router-link :to="{ name: 'perusteenTiedot' }" exact>
+              <router-link :to="{ name: 'oppaanTiedot' }" exact>
                 {{ $t('tekstikappale-koodisto-ohje-linkki') }}
               </router-link>
             </p>

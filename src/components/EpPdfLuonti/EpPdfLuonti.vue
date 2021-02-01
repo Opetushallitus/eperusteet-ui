@@ -1,13 +1,16 @@
 <template>
   <div >
     <div class="row pdf-box align-items-center justify-content-between"
-        :class="{'luotu': dokumenttiLuotu, 'ei-luotu': !dokumenttiLuotu, 'polling': isPolling}">
+        :class="{'luotu': dokumenttiLuotu, 'ei-luotu': !dokumenttiLuotu, 'polling': isPolling, 'epaonnistui': dokumenttiEpaonnistui}">
       <div class="col col-auto ikoni">
         <img src="../../../public/img/icons/pdfkuva_lataus.svg" />
       </div>
       <div class="col-lg teksti">
         <span  v-if="dokumenttiLuotu">
           {{pdfnimi}}.pdf
+        </span>
+        <span v-else-if="dokumenttiEpaonnistui">
+          {{$t('pdf-tiedosto-luonti-epaonnistui')}}
         </span>
         <span v-else>
           {{$t('pdf-tiedostoa-ei-ole-viela-luotu')}}
@@ -56,6 +59,10 @@ export default class EpPdfLuonti extends Vue {
 
   get dokumenttiLuotu() {
     return this.dokumentti != null && this.dokumenttiHref != null;
+  }
+
+  get dokumenttiEpaonnistui() {
+    return this.dokumentti && this.dokumentti.tila as any === 'epaonnistui';
   }
 
   get dokumentti() {
@@ -117,6 +124,12 @@ export default class EpPdfLuonti extends Vue {
       border: 1px solid $gray-lighten-9;
       color: $gray-lighten-2;
       font-style: italic;
+    }
+
+    &.epaonnistui {
+      border-color: $red;
+      color: $red;
+      font-style: normal;
     }
 
     .polling {

@@ -1,0 +1,104 @@
+import { mock, mocks } from '@shared/utils/jestutils';
+import { ref, computed, reactive } from '@vue/composition-api';
+import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
+import { mockPerusteet, toteutussuunnitelmaTilastotMocks } from './data';
+
+import RouteTilastot from '../RouteTilastot.vue';
+import { TilastotStore } from '@/stores/TilastotStore';
+import * as _ from 'lodash';
+import '@shared/config/bootstrap';
+import '@shared/config/fontawesome';
+
+describe('RouteTilastot', () => {
+  const localVue = createLocalVue();
+
+  const createWrapper = () => {
+    const tilastotStore = mock(TilastotStore);
+    tilastotStore.state.toteutussuunnitelmat = toteutussuunnitelmaTilastotMocks as any;
+    tilastotStore.state.opetussuunnitelmat = [] as any;
+    tilastotStore.state.perusteet = mockPerusteet() as any;
+
+    return mount(RouteTilastot, {
+      propsData: {
+        tilastotStore,
+      },
+      localVue,
+      mocks: {
+        ...mocks,
+      },
+      stubs: {
+        apexchart: '<div />',
+      },
+    });
+  };
+
+  test('Mounting', async () => {
+    const wrapper = createWrapper();
+
+    expect(wrapper.text()).toContain('toteutussuunnitelmat 3 kpl');
+    expect(wrapper.text()).toContain('koulutustoimijat 2 kpl');
+  });
+
+  test('filtered by name', async () => {
+    const wrapper = createWrapper();
+
+    wrapper.find('input[type="search"]').setValue('test2');
+
+    expect(wrapper.text()).toContain('toteutussuunnitelmat 1 kpl');
+    expect(wrapper.text()).toContain('koulutustoimijat 1 kpl');
+  });
+
+  test('filtered by koulutustyyppi', async () => {
+    const wrapper = createWrapper();
+    wrapper.find('#koulutustyyppiFilter').find('.multiselect__option')
+      .trigger('click');
+
+    expect(wrapper.text()).toContain('toteutussuunnitelmat 1 kpl');
+    expect(wrapper.text()).toContain('koulutustoimijat 1 kpl');
+    expect(wrapper.text()).toContain('test1');
+  });
+
+  test('filtered by tila', async () => {
+    const wrapper = createWrapper();
+    wrapper.find('#tilaFilter').find('.multiselect__option')
+      .trigger('click');
+
+    expect(wrapper.text()).toContain('toteutussuunnitelmat 1 kpl');
+    expect(wrapper.text()).toContain('koulutustoimijat 1 kpl');
+    expect(wrapper.text()).toContain('test1');
+  });
+
+  test('filtered by voimassaolo', async () => {
+    const wrapper = createWrapper();
+    wrapper.find('#voimassaoloFilter').find('.multiselect__option')
+      .trigger('click');
+
+    expect(wrapper.text()).toContain('toteutussuunnitelmat 1 kpl');
+    expect(wrapper.text()).toContain('koulutustoimijat 1 kpl');
+    expect(wrapper.text()).toContain('Kaarinan kaupunki');
+  });
+
+  test('filtered by peruste', async () => {
+    const wrapper = createWrapper();
+    wrapper.find('#perusteFilter').find('.multiselect__option')
+      .trigger('click');
+
+    expect(wrapper.text()).toContain('toteutussuunnitelmat 2 kpl');
+    expect(wrapper.text()).toContain('koulutustoimijat 1 kpl');
+    expect(wrapper.text()).toContain('test1');
+    expect(wrapper.text()).toContain('test2');
+  });
+
+  test('filtered by koulutustoimija', async () => {
+    const wrapper = createWrapper();
+    wrapper.find('#koulutustoimijaFilter').findAll('.multiselect__element')
+      .at(1)
+      .find('.multiselect__option')
+      .trigger('click');
+
+    expect(wrapper.text()).toContain('toteutussuunnitelmat 1 kpl');
+    expect(wrapper.text()).toContain('koulutustoimijat 1 kpl');
+    expect(wrapper.text()).toContain('test3');
+    expect(wrapper.text()).toContain('Hesa kaupunki');
+  });
+});

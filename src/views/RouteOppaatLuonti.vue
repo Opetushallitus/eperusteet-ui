@@ -250,7 +250,7 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
     const luotu = await this.oppaatStore.saveOpas({
       nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
       ryhmaOid: this.data.tyoryhma.oid,
-      oppaanKoulutustyypit: this.data.koulutustyypit,
+      oppaanKoulutustyypit: _.filter(this.data.koulutustyypit, koulutustyyppi => koulutustyyppi !== null),
       oppaanPerusteet: this.data.perusteet,
       pohjaId: this.data.pohja?.peruste.id,
     });

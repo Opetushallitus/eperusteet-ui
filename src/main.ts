@@ -60,6 +60,9 @@ Vue.use(Kielet, {
       ...require('@shared/translations/locale-sv.json'),
       ...require('@/translations/locale-sv.json'),
     },
+    en: {
+      ...require('@shared/translations/locale-en.json'),
+    },
   },
 });
 

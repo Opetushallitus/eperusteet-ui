@@ -74,7 +74,7 @@
     <div v-if="julkaisuMahdollinen">
       <hr class="mt-4 mb-4">
       <h3>{{ $t('uusi-julkaisu') }}</h3>
-      <b-form-group :label="$t('julkaisun-tiedote') + '*'">
+      <b-form-group :label="$t('julkaisun-tiedote')">
         <div class="mt-2 mb-3">{{ $t('tiedotteen-nakyvyys') }}</div>
         <ep-content v-model="julkaisu.tiedote"
                     layout="full"
@@ -200,9 +200,14 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
   async julkaise() {
     this.julkaistaan = true;
-    await this.perusteStore!.julkaise({
-      tiedote: this.julkaisu.tiedote,
-    });
+    try {
+      await this.perusteStore!.julkaise({
+        tiedote: this.julkaisu.tiedote,
+      });
+    }
+    catch (e) {
+      this.$fail(this.$t('virhe-palvelu-virhe') as string);
+    }
     this.julkaistaan = false;
   }
 }

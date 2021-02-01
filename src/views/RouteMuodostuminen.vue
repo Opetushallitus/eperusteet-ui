@@ -1,7 +1,7 @@
 <template>
   <div>
     <ep-spinner v-if="!store || !peruste" />
-    <EpEditointi v-else :store="store" :key="'' + new Date()">
+    <EpEditointi v-else :store="store">
       <template #header="{ data }">
         <h2>{{ $t('tutkinnon-muodostuminen') }}</h2>
       </template>
@@ -128,23 +128,32 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('osaamisalat') }}</h5>
                     <div>
-                      <ep-koodisto-select :store="osaamisalaStore" @add="lisaaOsaamisala" v-if="isEditing" multiple>
-                        <template #default="{ open }">
-                          <ep-button @click="open" icon="plus" variant="outline">
-                            {{ $t('lisaa-osaamisala') }}
-                          </ep-button>
-                        </template>
-                      </ep-koodisto-select>
+                      <ep-button @click="lisaaOsaamisala" icon="plus" variant="outline">
+                        {{ $t('lisaa-osaamisala') }}
+                      </ep-button>
                       <draggable :value="osaamisalat" v-bind="optionsKoodit" tag="div">
-                        <div v-for="ryhma in osaamisalatPaged" :key="ryhma.osaamisala.osaamisalakoodiUri" class="mb-1 d-flex justify-content-center align-items-center draggable">
-                          <div class="colorblock p-1" :style="{ border:'1px solid ' + colorMap['osaamisala'],  background: colorMap['osaamisala'] }">
+                        <div v-for="(ryhma, index) in osaamisalatPaged" :key="'osaamisala' + index" class="mb-1 d-flex justify-content-center align-items-center draggable osaamisalat">
+                          <div class="colorblock" :style="{ border:'1px solid ' + colorMap['osaamisala'],  background: colorMap['osaamisala'] }">
                             <fas icon="grip-vertical"/>
                           </div>
-                          <div class="flex-grow-1 paaryhma-label p-1 pl-2 noselect">
-                            {{ $kaanna(ryhma.nimi) }}
-                          </div>
+                          <ep-koodisto-select :store="osaamisalaStore" v-if="isEditing" :value="index" @add="osaamisalaKoodiLisays" class="w-100">
+                            <template #default="{ open }">
+                              <b-input-group class="w-100 d-flex">
+                                <ep-input class="koodi-input flex-grow-1"
+                                  v-model="ryhma.nimi"
+                                  :isEditing="true"
+                                  :disabled="!!ryhma.osaamisala.osaamisalakoodiUri"
+                                  :change="() => osaamisalaNimiChange(ryhma, index)"/>
+                                <b-input-group-append>
+                                  <b-button @click="open" icon="plus" variant="primary">
+                                    {{ $t('hae') }}
+                                  </b-button>
+                                </b-input-group-append>
+                              </b-input-group>
+                            </template>
+                          </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
-                            <ep-button @click="poistaOsaamisala(ryhma)" variant="link" icon="roskalaatikko"  v-if="isEditing"></ep-button>
+                            <ep-button @click="poistaOsaamisala(index)" variant="link" icon="roskalaatikko"  v-if="isEditing"></ep-button>
                           </div>
                         </div>
                       </draggable>
@@ -159,23 +168,33 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('tutkintonimikkeet') }}</h5>
                     <div>
-                      <ep-koodisto-select :store="tutkintonimikeStore" @add="lisaaTutkintonimike" v-if="isEditing" multiple>
-                        <template #default="{ open }">
-                          <ep-button @click="open" icon="plus" variant="outline">
-                            {{ $t('lisaa-tutkintonimike') }}
-                          </ep-button>
-                        </template>
-                      </ep-koodisto-select>
+                      <ep-button @click="lisaaTutkintonimike" icon="plus" variant="outline">
+                        {{ $t('lisaa-tutkintonimike') }}
+                      </ep-button>
+
                       <draggable :value="tutkintonimikkeet" v-bind="optionsKoodit" tag="div">
-                        <div v-for="ryhma in tutkintonimikkeetPaged" :key="ryhma.tutkintonimike.uri" class="mb-1 d-flex justify-content-center align-items-center draggable">
-                          <div class="colorblock p-1" :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }">
+                        <div v-for="(ryhma, index) in tutkintonimikkeetPaged" :key="ryhma.tutkintonimike.uri" class="mb-1 d-flex justify-content-center align-items-center draggable tutkintonimikkeet">
+                          <div class="colorblock" :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }">
                             <fas icon="grip-vertical"/>
                           </div>
-                          <div class="flex-grow-1 paaryhma-label p-1 pl-2 noselect">
-                            {{ $kaanna(ryhma.nimi) }}
-                          </div>
+                           <ep-koodisto-select :store="tutkintonimikeStore" v-if="isEditing" :value="index" @add="tutkintonimikeKoodiLisays" class="w-100">
+                            <template #default="{ open }">
+                              <b-input-group class="w-100 d-flex">
+                                <ep-input class="koodi-input flex-grow-1"
+                                  v-model="ryhma.nimi"
+                                  :isEditing="true"
+                                  :disabled="!!ryhma.tutkintonimike.tutkintonimikeUri"
+                                  :change="() => tutkintonimikeNimiChange(ryhma, index)"/>
+                                <b-input-group-append>
+                                  <b-button @click="open" icon="plus" variant="primary">
+                                    {{ $t('hae') }}
+                                  </b-button>
+                                </b-input-group-append>
+                              </b-input-group>
+                            </template>
+                          </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
-                            <ep-button @click="poistaTutkintonimike(ryhma)" variant="link" icon="roskalaatikko" v-if="isEditing"></ep-button>
+                            <ep-button @click="poistaTutkintonimike(index)" variant="link" icon="roskalaatikko" v-if="isEditing"></ep-button>
                           </div>
                         </div>
                       </draggable>
@@ -565,18 +584,44 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     });
   }
 
-  lisaaTutkintonimike(koodit: any) {
+  tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex) {
+    return tutkintonimikeIndex + (this.tutkintonimikkeetSivu - 1) * this.sivukoot;
+  }
+
+  tutkintonimikeNimiChange(ryhma, tutkintonimikeIndex) {
+    this.store?.setData(
+      {
+        ...this.store.data.value,
+        tutkintonimikkeet: _.map(this.store.data.value.tutkintonimikkeet,
+          (tutkintonimike, index) => index === this.tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex) ? { ...tutkintonimike, nimi: ryhma.nimi } : tutkintonimike),
+      });
+  }
+
+  lisaaTutkintonimike() {
     this.store?.setData(
       {
         ...this.store.data.value,
         tutkintonimikkeet: [
           ...this.store.data.value.tutkintonimikkeet,
-          ..._.map(koodit, koodi => ({
-            nimi: koodi.nimi,
-            'tutkintonimikeUri': koodi.uri,
-            'tutkintonimikeArvo': koodi.arvo,
-          })),
+          {
+            nimi: {},
+          },
         ],
+      });
+  }
+
+  tutkintonimikeKoodiLisays(koodi, tutkintonimikeIndex) {
+    this.store?.setData(
+      {
+        ...this.store.data.value,
+        tutkintonimikkeet: _.map(this.store.data.value.tutkintonimikkeet,
+          (tutkintonimike, index) => index === this.tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)
+            ? {
+              nimi: koodi.nimi,
+              'tutkintonimikeUri': koodi.uri,
+              'tutkintonimikeArvo': koodi.arvo,
+            }
+            : tutkintonimike),
       });
   }
 
@@ -594,30 +639,54 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     });
   }
 
-  lisaaOsaamisala(koodit: any) {
+  osaamisalaNimiChange(ryhma, osaamisalaIndex) {
+    this.store?.setData(
+      {
+        ...this.store.data.value,
+        osaamisalat: _.map(this.store.data.value.osaamisalat,
+          (osaamisala, index) => index === this.osaamisalaSivutettuIndeksi(osaamisalaIndex) ? { ...osaamisala, nimi: ryhma.nimi } : osaamisala),
+      });
+  }
+
+  lisaaOsaamisala() {
     this.store?.setData(
       {
         ...this.store.data.value,
         osaamisalat: [
           ...this.store.data.value.osaamisalat,
-          ...koodit,
+          {
+            nimi: {},
+          },
         ],
       });
   }
 
-  poistaOsaamisala(ryhma) {
+  osaamisalaSivutettuIndeksi(osaamisalaIndex) {
+    return osaamisalaIndex + (this.osaamisalatSivu - 1) * this.sivukoot;
+  }
+
+  osaamisalaKoodiLisays(koodi, osaamisalaIndex) {
     this.store?.setData(
       {
         ...this.store.data.value,
-        osaamisalat: _.filter(this.store.data.value.osaamisalat, osaamisala => osaamisala.uri !== ryhma.osaamisala.osaamisalakoodiUri),
+        osaamisalat: _.map(this.store.data.value.osaamisalat,
+          (osaamisala, index) => index === this.osaamisalaSivutettuIndeksi(osaamisalaIndex) ? koodi : osaamisala),
       });
   }
 
-  poistaTutkintonimike(ryhma) {
+  poistaOsaamisala(osaamisalaIndex) {
     this.store?.setData(
       {
         ...this.store.data.value,
-        tutkintonimikkeet: _.filter(this.store.data.value.tutkintonimikkeet, tutkintonimike => tutkintonimike.tutkintonimikeUri !== ryhma.tutkintonimike.uri),
+        osaamisalat: _.filter(this.store.data.value.osaamisalat, (osaamisala, index) => index !== this.osaamisalaSivutettuIndeksi(osaamisalaIndex)),
+      });
+  }
+
+  poistaTutkintonimike(tutkintonimikeIndex) {
+    this.store?.setData(
+      {
+        ...this.store.data.value,
+        tutkintonimikkeet: _.filter(this.store.data.value.tutkintonimikkeet, (tutkintonimike, index) => index !== this.tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)),
       });
   }
 
@@ -723,6 +792,16 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       color: $blue-lighten-6;
     }
   }
+
+  &.osaamisalat .colorblock, &.tutkintonimikkeet .colorblock{
+    padding: 0.45rem 0.3rem !important;
+  }
+
+  .koodi-input ::v-deep input{
+    border-radius: 0;
+    border-right: 0;
+    border-left: 0;
+  }
 }
 
 .actions {
@@ -733,6 +812,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       padding-left: 0px !important;
     }
   }
+
 }
 
 </style>

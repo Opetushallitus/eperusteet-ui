@@ -85,7 +85,7 @@
 
         </b-form-group>
 
-        <b-form-group :label="$t('laajuus')">
+        <b-form-group :label="$t('laajuus')" v-if="innerModel.muodostumisSaanto">
           <div class="d-flex align-items-center">
             <div>
               <ep-input type="number" is-editing v-model="innerModel.muodostumisSaanto.laajuus.minimi">
@@ -163,6 +163,7 @@ export default class EpRakenneModal extends Vue {
 
   private nimiValinta: 'paikallinen' | 'tutkinnonosato' | 'korkeakoulu' | 'yhteinen' | 'muu' | null = null;
   private tyyppi: string | null = null;
+  private tempModel: any;
 
   set innerModel(innerModel) {
     this.$emit('input', innerModel);
@@ -179,6 +180,20 @@ export default class EpRakenneModal extends Vue {
     }
     else {
       this.tyyppi = this.defaultTyyppi;
+    }
+
+    this.tempModel = _.cloneDeep(this.innerModel);
+    this.setDefaultNimi();
+
+    if (!this.innerModel.muodostumisSaanto) {
+      this.$emit('input', { ...this.innerModel,
+        muodostumisSaanto: {
+          laajuus: {
+            minimi: null,
+            maksimi: null,
+          },
+        },
+      });
     }
   }
 
@@ -209,6 +224,7 @@ export default class EpRakenneModal extends Vue {
   }
 
   cancel() {
+    this.$emit('input', this.tempModel);
     (this.$refs.rakenneModal as any).hide();
   }
 
@@ -248,6 +264,20 @@ export default class EpRakenneModal extends Vue {
     return 'rakenne-moduuli-paikalliset';
   }
 
+  setDefaultNimi() {
+    if (this.tyyppi === 'rakenne-moduuli-paikalliset') {
+      for (const nimiteksti of _.keys(this.nimiValintaTekstit)) {
+        if (this.value?.nimi?.fi === this.$t(this.nimiValintaTekstit[nimiteksti], 'fi')) {
+          this.nimiValinta = nimiteksti as any;
+        }
+      }
+
+      if (!this.nimiValinta) {
+        this.nimiValinta = 'muu';
+      }
+    }
+  }
+
   toggleMaksimi() {
     if (this.innerModel.muodostumisSaanto?.laajuus.maksimi) {
       this.innerModel.muodostumisSaanto.laajuus.maksimi = null;
@@ -263,18 +293,18 @@ export default class EpRakenneModal extends Vue {
       if (this.nimiValinta !== 'muu') {
         this.$emit('input', { ...this.innerModel, nimi: this.getNimi(this.nimiValintaTekstit[this.nimiValinta]) });
       }
-      else {
+      else if (oldVal) {
         this.$emit('input', { ...this.innerModel, nimi: null });
       }
     }
   }
 
   @Watch('tyyppi')
-  tyyppiChange() {
+  tyyppiChange(newVal, oldVal) {
     if (this.tyyppi && this.tyyppi !== 'rakenne-moduuli-paikalliset') {
       this.$emit('input', { ...this.innerModel, nimi: this.getNimi(this.tyyppi) });
     }
-    else {
+    else if (oldVal) {
       this.$emit('input', { ...this.innerModel, nimi: null });
     }
   }

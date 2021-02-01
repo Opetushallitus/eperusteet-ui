@@ -6,7 +6,7 @@
 
     <div v-else>
       <ep-small-data-box :topic="$t('tuotua')" :count="tutkinnonOsiaTuotu" />
-      <ep-small-data-box :topic="$t('luotua')" :count="tutkinnonOsiaLuotu" />
+      <ep-small-data-box :topic="$t('luotu')" :count="tutkinnonOsiaLuotu" />
     </div>
 
   </div>
@@ -39,11 +39,12 @@ export default class EpPerusteTutkinnonOsat extends Vue {
   }
 
   get tutkinnonOsiaLuotu() {
-    return _.size(this.tutkinnonOsaStore.tutkinnonOsat.value);
+    return _.size(_.filter(this.tutkinnonOsaStore.tutkinnonOsat.value,
+      tutkinnonosaViite => !tutkinnonosaViite.tutkinnonOsa?.alkuperainenPeruste || tutkinnonosaViite.tutkinnonOsa.alkuperainenPeruste.id === this.peruste.id));
   }
 
   get tutkinnonOsiaTuotu() {
-    return '?';
+    return _.size(this.tutkinnonOsaStore.tutkinnonOsat.value) - this.tutkinnonOsiaLuotu;
   }
 }
 </script>
