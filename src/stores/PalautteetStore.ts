@@ -12,22 +12,28 @@ export class PalautteetStore {
   public readonly palautteet = computed(() => this.state.palautteet);
 
   public async fetch() {
-    let request;
     const origin = window.location.origin;
 
     if (_.includes(origin, 'localhost')) {
-      request = Palautteet.palautteet();
+      this.state.palautteet = (((await Palautteet.palautteet()).data as unknown) as PalauteDto[]); ;
     }
     else {
-      request = Api.request({
+      const request = Api.request({
         method: 'GET',
         url: `${window.location.origin}/palaute/api/palaute?q=eperusteet`,
         headers: {
           'Content-Type': 'application/json',
         },
       });
-    }
 
-    this.state.palautteet = (((await request).data as unknown) as PalauteDto[]);
+      const palautteetObject = ((await request).data as unknown) as any[][];
+      this.state.palautteet = _.map(palautteetObject, row => {
+        return {
+          'created-at': row[0],
+          stars: row[1],
+          feedback: row[3],
+        } as PalauteDto;
+      });
+    }
   }
 }
