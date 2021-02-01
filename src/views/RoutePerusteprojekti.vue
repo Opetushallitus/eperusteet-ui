@@ -11,13 +11,13 @@
                 <b-button class="px-3 py-1" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
                   {{$t('aseta-valmiiksi')}}
                 </b-button>
-                <b-button class="px-3 py-1" variant="primary" :to="{ name: 'julkaise' }" v-else-if="!isPohja && tila && !isJulkaistu && !isArkistoitu">
+                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="!isPohja && tila && !isJulkaistu && !isArkistoitu">
                   {{ $t('siirry-julkaisunakymaan') }}
                 </b-button>
               </div>
             </template>
 
-            <b-button class="px-3 py-1" variant="primary" :to="{ name: 'julkaise' }" v-if="isJulkaistu">
+            <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-if="isJulkaistu">
               {{ $t('siirry-julkaisunakymaan') }}
             </b-button>
 
@@ -265,7 +265,7 @@
 
         <template v-slot:bottom>
           <div class="menu-item bottom-menu-item">
-            <router-link :to="{ name: 'jarjesta' }">
+            <router-link :to="jarjestaRoute">
               <span class="text-nowrap">
                 <fas icon="jarjesta" fixed-width />
                 <a class="btn btn-link btn-link-nav">{{$t('muokkaa-jarjestysta')}}</a>
@@ -393,6 +393,12 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   @Prop()
   palautusMeta!: any;
+
+  @Prop({ required: false, default: () => ({ name: 'julkaise' }) })
+  private julkaisuRoute!: any;
+
+  @Prop({ required: false, default: () => ({ name: 'jarjesta' }) })
+  private jarjestaRoute!: any;
 
   private naviStore: EpTreeNavibarStore | null = null;
   private loading = false;

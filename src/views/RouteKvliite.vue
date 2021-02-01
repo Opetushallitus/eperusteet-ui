@@ -8,7 +8,7 @@
       <template v-slot:default="{ data, isEditing }">
         <h3>{{ $t('tutkinnon-suorittaneen-ammatillinen-osaaminen') }}</h3>
         <b-form-group :label="$t('tutkinnon-muodostuminen')">
-          <ep-content v-model="data.kvliite.muodostumisenKuvaus[0]"
+          <ep-content v-model="tutkinnonMuodostuminen"
                       layout="simplified"></ep-content>
         </b-form-group>
 
@@ -101,6 +101,7 @@ import { KvliiteEditStore } from '@/stores/KvliiteEditStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
+import { perusteenSuoritustapa } from '@shared/utils/perusteet';
 
 @Component({
   components: {
@@ -114,6 +115,12 @@ export default class RouteKvliite extends PerusteprojektiRoute {
 
   async onProjektiChange(projektiId: number, perusteId: number) {
     this.store = new EditointiStore(new KvliiteEditStore(projektiId, perusteId));
+  }
+
+  get tutkinnonMuodostuminen() {
+    if (this.perusteStore.perusteSuoritustapa.value && this.store?.data.value?.kvliite) {
+      return this.store?.data.value?.kvliite.muodostumisenKuvaus[_.toLower(this.perusteStore.perusteSuoritustapa.value)];
+    }
   }
 }
 </script>

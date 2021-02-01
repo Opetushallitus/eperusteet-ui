@@ -279,6 +279,8 @@ const router = new VueRouter({
       component: RoutePerusteprojekti,
       props: {
         ...stores,
+        julkaisuRoute: { name: 'julkaiseOpas' },
+        jarjestaRoute: { name: 'jarjestaOpas' },
         ratasvalinnat: [{
           route: 'oppaanTiedot',
           icon: 'info',
@@ -334,6 +336,16 @@ const router = new VueRouter({
             },
           ],
         },
+      }, {
+        path: 'julkaise',
+        name: 'julkaiseOpas',
+        component: RouteJulkaise,
+        props,
+      }, {
+        path: 'jarjesta',
+        name: 'jarjestaOpas',
+        component: RouteJarjesta,
+        props,
       }, {
         path: 'tiedot',
         name: 'oppaanTiedot',
