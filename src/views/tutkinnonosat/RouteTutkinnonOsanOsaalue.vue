@@ -75,6 +75,22 @@
                                 :is-editing="isEditing" />
         </ep-collapse>
 
+        <ep-collapse tyyppi="kieli" :border-bottom="false" :border-top="true">
+          <h3 slot="header">{{ $t('osa-alue-kieli') }} </h3>
+          <EpSelect
+            v-if="isEditing || data.kieli"
+            class="kieli-select"
+            :is-editing="isEditing"
+            :items="kielet"
+            v-model="data.kieli"
+            help="osa-alue-kieli-valinta-ohjeteksti">
+            <template #default="{ item }">
+              <span>{{$t(item)}}</span>
+            </template>
+          </EpSelect>
+          <span v-if="!isEditing && !data.kieli">{{$t('kielta-ei-valittu')}}</span>
+        </ep-collapse>
+
       </template>
       </EpEditointi>
     </div>
@@ -89,6 +105,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -99,13 +116,14 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
 import EpGeneerinenAsteikko from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { LokalisoituTekstiDto } from '@shared/tyypit';
+import { Kieli, LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import { PerusteprojektiRoute } from '../PerusteprojektiRoute';
 
 import _ from 'lodash';
+import { UiKielet } from '@shared/stores/kieli';
 
 @Component({
   components: {
@@ -121,6 +139,7 @@ import _ from 'lodash';
     EpSpinner,
     EpToggle,
     Osaamistavoite,
+    EpSelect,
   },
   watch: {
     'osaalueId': {
@@ -201,8 +220,16 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
       this.$router);
     this.store = new EditointiStore(store);
   }
+
+  get kielet() {
+    return UiKielet;
+  }
 }
 </script>
 
 <style lang="scss" scoped>
+
+  .kieli-select {
+    width: 300px;
+  }
 </style>
