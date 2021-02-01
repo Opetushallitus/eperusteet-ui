@@ -93,10 +93,10 @@ export default class RoutePalautteet extends Vue {
     return [{
       key: Review.STARS,
       label: `${this.$t('arviointi') as string} (${this.$t('ka-keskiarvo')} ${this.averageReview})`,
-      sortable: false,
+      sortable: true,
     }, {
       key: Review.FEEDBACK,
-      sortable: false,
+      sortable: true,
       label: this.$t('palaute') as string,
     }, {
       key: Review.CREATED,
