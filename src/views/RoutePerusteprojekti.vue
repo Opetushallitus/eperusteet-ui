@@ -28,25 +28,23 @@
               <div class="font-size-08 mt-1">{{$t('voit-palauttaa-arkistoidun-perusteen-luonnostilaan')}}</div>
             </div>
 
-            <div v-else-if="validationStats" class="row justify-content-center">
-              <div v-if="validationCategories">
-                <div class="pl-3 pt-2 pb-1 row" v-for="c in validationStats.categories" :key="c.category">
-                  <div class="col-1">
-                    <fas class="text-warning" icon="info-circle" v-if="isHuomautus(c.category)"/>
-                    <template v-else>
-                      <fas class="text-success" icon="check-circle" v-if="c.failcount === 0"/>
-                      <fas class="text-danger" icon="info-circle" v-if="c.failcount > 0"/>
-                    </template>
-                  </div>
-                  <div class="col">
-                    <span v-if="isHuomautus(c.category)">{{ $t('perusteessa-huomautuksia') }}</span>
-                    <template v-else>
-                      <span v-if="c.failcount === 0">{{ $t(c.category + "-validation-ok") }}</span>
-                      <span v-if="c.failcount > 0">{{ $t(c.category + "-validation-error") }}</span>
-                    </template>
-                  </div>
-                </div>
+            <div v-else-if="validationStats">
+              <div v-if="validationStats.warnings > 0" class="pl-3 pt-2 pb-1 d-flex align-items-center">
+                <fas class="text-warning mr-3" icon="info-circle" />
+                <span>{{ $t('perusteessa-huomautuksia') }}</span>
               </div>
+              <template v-if="validationCategories">
+                <div class="pl-3 pt-2 pb-1 d-flex align-items-center" v-for="c in validationStats.categories" :key="c.category">
+                  <template v-if="c.failcount === 0">
+                    <fas class="text-success mr-3" icon="check-circle" />
+                    <span>{{ $t(c.category + '-validation-ok') }}</span>
+                  </template>
+                  <template v-if="c.failcount > 0">
+                    <fas class="text-danger mr-3" icon="info-circle" />
+                    <span>{{ $t(c.category + '-validation-error') }}</span>
+                  </template>
+                </div>
+              </template>
             </div>
             <ep-spinner v-else />
 
@@ -306,9 +304,7 @@ import {
   PerusteDtoTilaEnum,
   PerusteDtoTyyppiEnum,
   PerusteDtoToteutusEnum,
-  StatusValidointiKategoriaEnum,
   StatusValidointiStatusTypeEnum,
-  Status,
 } from '@shared/api/eperusteet';
 import { Meta } from '@shared/utils/decorators';
 
@@ -330,6 +326,7 @@ interface ValidationCategory {
 interface ValidationStats {
   categories: ValidationCategory[];
   ok: number;
+  warnings: number;
   total: number;
 }
 
@@ -498,10 +495,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     return [parent];
   }
 
-  isHuomautus(category: string): boolean {
-    return category === _.toLower(StatusValidointiStatusTypeEnum.HUOMAUTUS);
-  }
-
   get yleisnakymaRoute() {
     if (this.peruste && (this.peruste.tyyppi as any) === 'opas') {
       return 'opas';
@@ -529,6 +522,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
             total: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiKategoria === kategoria)),
           } as ValidationCategory;
         })
+        .filter(c => c.category !== 'null')
         .value();
 
       if (_.size(kategoriat) === 0) {
@@ -543,21 +537,17 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       return {
         categories: kategoriat,
         ok: 0,
+        warnings: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiStatusType === StatusValidointiStatusTypeEnum.HUOMAUTUS)),
         fails: _.sum(_.map(kategoriat, 'failcount')),
         total: _.size(kategoriat),
       } as ValidationStats;
     }
   }
 
-  get validationCategories(): string[] | undefined {
+  get validationCategories() {
     if (this.perusteStore.projektiStatus.value) {
-      return _.chain(this.perusteStore.projektiStatus.value.infot as Status[])
-        .keyBy((info: Status): string => {
-          if (!info.validointiKategoria && info.validointiStatusType === StatusValidointiStatusTypeEnum.HUOMAUTUS) {
-            return info.validointiStatusType as string;
-          }
-          return info.validointiKategoria as string;
-        })
+      return _.chain(this.perusteStore.projektiStatus.value.infot)
+        .keyBy('validointiKategoria')
         .keys()
         .value();
     }
