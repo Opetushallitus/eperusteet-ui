@@ -30,7 +30,7 @@
         <b-row>
           <b-col md="8">
             <b-form-group :label="$t('tutkinnon-osan-nimi')">
-              <ep-koodisto-select
+              <ep-koodisto-select v-if="isEditing || !nimi"
                 :store="tutkinnonosaKoodisto"
                 v-model="data.tutkinnonOsa.koodi"
                 :is-editing="isEditing"
@@ -56,6 +56,9 @@
                   </div>
                 </template>
               </ep-koodisto-select>
+              <div v-else>
+                {{$kaanna(nimi)}}
+              </div>
             </b-form-group>
           </b-col>
 
@@ -79,6 +82,12 @@
           <ep-collapse tyyppi="ammattitaitovaatimukset" :border-bottom="false" :border-top="isEditing">
             <h3 slot="header">{{ $t('ammattitaitovaatimukset') }}</h3>
             <b-form-group>
+              <ep-content v-if="data.tutkinnonOsa.ammattitaitovaatimukset"
+                          v-model="data.tutkinnonOsa.ammattitaitovaatimukset"
+                          layout="normal"
+                          :is-editable="isEditing"
+                          class="mb-4"></ep-content>
+
               <EpAmmattitaitovaatimukset v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
                                          :validation="validation.tutkinnonOsa.ammattitaitovaatimukset2019"
                                          :is-editing="isEditing" />
