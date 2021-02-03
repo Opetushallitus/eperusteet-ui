@@ -29,16 +29,21 @@
             :is-editing="true"
             :options="perusteet ? perusteet : []"
             @search="perusteSearch"
-            :loading="perusteetLoading"
             :internalSearch="false"
             :clearOnSelect="false">
             <template slot="noResult"><div v-if="perusteet && perusteet.length === 0">{{ $t('ei-hakutuloksia') }}</div><div v-else/></template>
             <template slot="noOptions"><div></div></template>
             <template slot="singleLabel" slot-scope="{ option }">
               {{ $kaanna(option.nimi) }}
+              <span v-if="option.voimassaoloAlkaa">
+                ({{$t('voimassa')}} {{$sd(option.voimassaoloAlkaa)}} - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+              </span>
             </template>
             <template slot="option" slot-scope="{ option }">
               {{ $kaanna(option.nimi) }}
+              <span v-if="option.voimassaoloAlkaa">
+                ({{$t('voimassa')}} {{$sd(option.voimassaoloAlkaa)}} - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+              </span>
             </template>
           </EpMultiSelect>
         </b-form-group>
@@ -165,7 +170,7 @@ export default class EpTutkinnonosaTuontiModal extends Vue {
   }
 
   get perusteetLoading() {
-    return !this.perusteet && !!this.tutkinnonosaQuery.peruste;
+    return !this.perusteet;
   }
 
   get tutkinnonosat() {

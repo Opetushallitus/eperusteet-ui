@@ -16,6 +16,7 @@ export class TutkinnonosatTuontiStore {
 
   constructor(
     private readonly peruste: PerusteDto) {
+    this.state.perusteet = { data: [] } as any;
   }
 
   public readonly perusteet = computed(() => this.state.perusteet);
