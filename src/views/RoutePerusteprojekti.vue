@@ -28,19 +28,23 @@
               <div class="font-size-08 mt-1">{{$t('voit-palauttaa-arkistoidun-perusteen-luonnostilaan')}}</div>
             </div>
 
-            <div v-else-if="validationStats" class="row justify-content-center">
-              <div v-if="validationCategories">
-                <div class="pl-3 pt-2 pb-1 row" v-for="c in validationStats.categories" :key="c.category">
-                  <div class="col-1">
-                    <fas class="text-success" icon="check-circle" v-if="c.failcount === 0"/>
-                    <fas class="text-danger" icon="info-circle" v-if="c.failcount > 0"/>
-                  </div>
-                  <div class="col">
-                    <span v-if="c.failcount === 0">{{ $t(c.category + "-validation-ok") }}</span>
-                    <span v-if="c.failcount > 0">{{ $t(c.category + "-validation-error") }}</span>
-                  </div>
-                </div>
+            <div v-else-if="validationStats">
+              <div v-if="validationStats.warnings > 0" class="pl-3 pt-2 pb-1 d-flex align-items-center">
+                <fas class="text-warning mr-3" icon="info-circle" />
+                <span>{{ $t('perusteessa-huomautuksia') }}</span>
               </div>
+              <template v-if="validationCategories">
+                <div class="pl-3 pt-2 pb-1 d-flex align-items-center" v-for="c in validationStats.categories" :key="c.category">
+                  <template v-if="c.failcount === 0">
+                    <fas class="text-success mr-3" icon="check-circle" />
+                    <span>{{ $t(c.category + '-validation-ok') }}</span>
+                  </template>
+                  <template v-if="c.failcount > 0">
+                    <fas class="text-danger mr-3" icon="info-circle" />
+                    <span>{{ $t(c.category + '-validation-error') }}</span>
+                  </template>
+                </div>
+              </template>
             </div>
             <ep-spinner v-else />
 
@@ -295,7 +299,13 @@ import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { NavigationNodeDto } from '@shared/tyypit';
-import { NavigationNodeDtoTypeEnum, Sisallot, PerusteDtoTilaEnum, PerusteDtoTyyppiEnum, PerusteDtoToteutusEnum } from '@shared/api/eperusteet';
+import {
+  NavigationNodeDtoTypeEnum,
+  PerusteDtoTilaEnum,
+  PerusteDtoTyyppiEnum,
+  PerusteDtoToteutusEnum,
+  StatusValidointiStatusTypeEnum,
+} from '@shared/api/eperusteet';
 import { Meta } from '@shared/utils/decorators';
 
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -316,6 +326,7 @@ interface ValidationCategory {
 interface ValidationStats {
   categories: ValidationCategory[];
   ok: number;
+  warnings: number;
   total: number;
 }
 
@@ -511,6 +522,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
             total: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiKategoria === kategoria)),
           } as ValidationCategory;
         })
+        .filter(c => c.category !== 'null')
         .value();
 
       if (_.size(kategoriat) === 0) {
@@ -525,6 +537,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       return {
         categories: kategoriat,
         ok: 0,
+        warnings: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiStatusType === StatusValidointiStatusTypeEnum.HUOMAUTUS)),
         fails: _.sum(_.map(kategoriat, 'failcount')),
         total: _.size(kategoriat),
       } as ValidationStats;
