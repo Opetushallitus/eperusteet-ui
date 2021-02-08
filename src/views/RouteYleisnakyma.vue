@@ -45,11 +45,9 @@ import EpPerusteViimeaikainenToiminta from '@/components/EpYleisnakyma/EpPeruste
 import EpPerusteTutkinnonOsat from '@/components/EpYleisnakyma/EpPerusteTutkinnonOsat.vue';
 import EpPerusteTiedotteet from '@/components/EpYleisnakyma/EpPerusteTiedotteet.vue';
 import EpPerusteRakenne from '@/components/EpYleisnakyma/EpPerusteRakenne.vue';
-import { PerusteStore } from '@/stores/PerusteStore';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
-import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
@@ -74,9 +72,6 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
 
   @Prop({ required: true })
   private muokkaustietoStore!: MuokkaustietoStore;
-
-  @Prop({ required: true })
-  private perusteprojektiStore!: PerusteprojektiStore;
 
   @Prop({ required: true })
   private aikatauluStore!: AikatauluStore;

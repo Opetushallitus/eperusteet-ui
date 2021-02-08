@@ -11,35 +11,35 @@ Vue.use(VueCompositionApi);
 
 export class PerusteprojektiStore {
   public state = reactive({
-    pohjat: null as Page<PerusteHakuInternalDto> | null,
-    perusteet: null as Page<PerusteHakuInternalDto> | null,
+    pohjat: null as PerusteHakuInternalDto[] | null,
+    perusteet: null as PerusteHakuInternalDto[] | null,
   })
 
   public readonly perusteet = computed(() => this.state.perusteet);
   public readonly pohjat = computed(() => this.state.pohjat);
 
   public async fetchPohjat() {
-    const res = await getAllPerusteetInternal({
+    const res = (await getAllPerusteetInternal({
       koulutusvienti: false,
       nimi: '',
       perusteTyyppi: 'pohja',
       sivu: 0,
       sivukoko: 1000,
       tila: ['valmis'],
-    } as any);
-    this.state.pohjat = res.data as any;
+    } as any)).data as Page<PerusteHakuInternalDto>;
+    this.state.pohjat = res.data;
   }
 
   public async fetchPohjaProjektit() {
-    const res = await getAllPerusteetInternal({
+    const res = (await getAllPerusteetInternal({
       koulutusvienti: false,
       nimi: '',
       perusteTyyppi: 'normaali',
       sivu: 0,
       sivukoko: 1000,
       tila: ['valmis'],
-    } as any);
-    this.state.perusteet = res.data as any;
+    } as any)).data as Page<PerusteHakuInternalDto>;
+    this.state.perusteet = res.data;
   }
 
   public async addPerusteprojekti(luontiDto: PerusteprojektiLuontiDto) {

@@ -295,11 +295,15 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   }
 
   get pohjat() {
-    return this.perusteprojektiStore.pohjat.value?.data;
+    if (this.perusteprojektiStore.pohjat.value) {
+      return _.sortBy(this.perusteprojektiStore.pohjat.value, pohja => _.toLower(this.$kaanna(pohja.nimi!)));
+    }
   }
 
   get perusteet() {
-    return this.perusteprojektiStore.perusteet.value?.data;
+    if (this.perusteprojektiStore.perusteet.value) {
+      return _.sortBy(this.perusteprojektiStore.perusteet.value, peruste => _.toLower(this.$kaanna(peruste.nimi!)));
+    }
   }
 
   get steps() {

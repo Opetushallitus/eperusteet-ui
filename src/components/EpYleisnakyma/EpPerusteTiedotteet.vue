@@ -29,7 +29,6 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
-import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteDto, TiedoteDto } from '@shared/api/eperusteet';
 
 @Component({

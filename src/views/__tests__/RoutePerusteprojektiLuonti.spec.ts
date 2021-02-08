@@ -18,8 +18,8 @@ describe('RoutePohjatLuonti component', () => {
   const ulkopuolisetStore = mock(UlkopuolisetStore);
   ulkopuolisetStore.state.tyoryhmat = mockTyoryhmat();
   const perusteprojektiStore = mock(PerusteprojektiStore);
-  perusteprojektiStore.state.pohjat = mockPerusteet();
-  perusteprojektiStore.state.perusteet = mockPerusteet();
+  perusteprojektiStore.state.pohjat = mockPerusteet().data;
+  perusteprojektiStore.state.perusteet = mockPerusteet().data;
   perusteprojektiStore.addPerusteprojekti = jest.fn(async () => {
     return {
       id: 1,

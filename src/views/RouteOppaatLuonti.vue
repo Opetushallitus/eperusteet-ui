@@ -106,19 +106,14 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSteps from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
-import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { OppaatStore } from '@/stores/OppaatStore';
 import { EperusteetKoulutustyypit } from '@/utils/perusteet';
-import { Page, Kieli } from '@shared/tyypit';
-import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
 import { themes, koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
 import { validationMixin } from 'vuelidate';
-import { required } from 'vuelidate/lib/validators';
-import { computed } from '@vue/composition-api';
 import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
 import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
@@ -236,13 +231,14 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
   }
 
   get perusteet() {
-    return _.chain(this.perusteprojektiStore.perusteet.value?.data)
+    return _.chain(this.perusteprojektiStore.perusteet.value)
       .map(peruste => {
         return {
           value: peruste,
           text: this.$kaanna((peruste as any).nimi),
         } as MultiListSelectItem;
       })
+      .sortBy(peruste => _.toLower(peruste.text))
       .value();
   }
 
