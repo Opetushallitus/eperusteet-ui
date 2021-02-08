@@ -17,6 +17,7 @@
                     @input="valitsePeruste($event)"
                     :placeholder="$t('valitse-pohja')"
                     :is-editing="true"
+                    :search-identity="nimiSearchIdentity"
                     :options="pohjat">
                     <template slot="singleLabel" slot-scope="{ option }">
                       {{ $kaanna(option.nimi) }}
@@ -36,6 +37,7 @@
                     @input="valitsePeruste($event)"
                     :placeholder="$t('valitse-peruste')"
                     :is-editing="true"
+                    :search-identity="nimiSearchIdentity"
                     :options="perusteet">
                     <template slot="singleLabel" slot-scope="{ option }">
                       {{ $kaanna(option.nimi) }}
@@ -83,7 +85,7 @@
           <b-form-group :label="$t('perustetyoryhma')" required>
             <EpMultiSelect v-model="data.tyoryhma"
                            v-if="tyoryhmat"
-                           :search-identity="tyoryhmaSearchIdentity"
+                           :search-identity="nimiSearchIdentity"
                            :is-editing="true"
                            :options="tyoryhmat">
               <template slot="singleLabel" slot-scope="{ option }">
@@ -361,12 +363,12 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     return _.toLower(this.$kaannaOlioTaiTeksti(kt));
   }
 
-  tyoryhmaSearchIdentity(tr: any) {
-    return _.toLower(this.$kaanna(tr.nimi));
+  nimiSearchIdentity(obj: any) {
+    return _.toLower(this.$kaanna(obj.nimi));
   }
 
   get tyoryhmat() {
-    return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.tyoryhmaSearchIdentity);
+    return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.nimiSearchIdentity);
   }
 
   get vaihtoehdotKoulutustyypit() {
