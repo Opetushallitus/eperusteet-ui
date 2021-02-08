@@ -19,10 +19,10 @@
                     :is-editing="true"
                     :options="pohjat">
                     <template slot="singleLabel" slot-scope="{ option }">
-                      {{ option.perusteprojekti.nimi }}
+                      {{ $kaanna(option.nimi) }}
                     </template>
                     <template slot="option" slot-scope="{ option }">
-                      {{ option.perusteprojekti.nimi }}
+                      {{ $kaanna(option.nimi) }}
                     </template>
                   </EpMultiSelect>
                   <EpSpinner v-else />
@@ -218,16 +218,13 @@ import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
-import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
+import { PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
-import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { EperusteetKoulutustyypit, isLukiokoulutus } from '@/utils/perusteet';
-import { Page } from '@shared/tyypit';
-import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
-import { requiredOneLang, minValue, notNull } from '@shared/validators/required';
+import { notNull } from '@shared/validators/required';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 
 const util = require('util');
