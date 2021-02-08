@@ -129,22 +129,13 @@ import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
-import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { Api, Liitetiedostot, Koodisto, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
-import { SallitutKoulutustyyppisiirtymat, LokalisoituTekstiDto } from '@shared/tyypit';
-import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
+import { PerusteDtoTilaEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
-import { PerusteEditStore } from '@/stores/PerusteEditStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import EpValidation from '@shared/mixins/EpValidation';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import Vuelidate from 'vuelidate';
-
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import { UiKielet } from '@shared/stores/kieli';
 import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 

@@ -134,7 +134,6 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { OpasEditStore } from '@/stores/OpasEditStore';
@@ -206,7 +205,7 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   }
 
   get perusteet() {
-    return _.chain(this.perusteprojektiStore.perusteet.value?.data)
+    return _.chain(this.perusteprojektiStore.perusteet.value)
       .map(peruste => {
         return {
           value: {
@@ -215,6 +214,7 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
           text: this.$kaanna((peruste as any).nimi),
         } as MultiListSelectItem;
       })
+      .sortBy(peruste => _.toLower(peruste.text))
       .value();
   }
 

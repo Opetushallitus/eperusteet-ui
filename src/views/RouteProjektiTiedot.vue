@@ -93,8 +93,6 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { LokalisoituTekstiDto } from '@shared/tyypit';
-import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteprojektiEditStore } from '@/stores/PerusteprojektiEditStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
