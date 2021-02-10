@@ -118,7 +118,6 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
 
   .row {
     margin: 0px;
-    padding-top: 10px;
 
     .col {
       padding: 0px;

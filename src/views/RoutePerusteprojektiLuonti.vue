@@ -104,27 +104,28 @@
         </template>
 
         <template v-slot:aikataulu>
-          <EpAikataulu :aikataulut="tapahtumat" />
+          <EpAikataulu :aikataulut="tapahtumat">
+            <span slot="luomispaiva-topic" v-html="$t('projektin-luomispaiva')"></span>
+            <span slot="julkaisupaiva-topic" v-html="$t('peruste-astuu-voimaan')"></span>
+          </EpAikataulu>
 
-          <b-form-group :label="$t('peruste-astuu-voimaan')" required class="col-md-4 col-12">
-            <ep-datepicker v-model="data.voimassaoloAlkaa" class="mb-2" :isEditing="true" :validation="$v.data.voimassaoloAlkaa" :showValidValidation="false"/>
-          </b-form-group>
-
-          <b-form-group :label="$t('perusteen-arvioitu-julkaisupaiva')" required class="col-md-4 col-12">
-            <ep-datepicker v-model="data.paatosPvm" class="mb-2" :isEditing="true"/>
-          </b-form-group>
-
-          <b-form-group :label="$t('lausuntokierros-alkaa')" required class="col-md-4 col-12">
-            <ep-datepicker v-model="data.lausuntakierrosAlkaa" class="mb-2" :isEditing="true"/>
-          </b-form-group>
-
-          <b-form-group :label="$t('johtokunnan-kasittely')" required class="col-md-4 col-12">
-            <ep-datepicker v-model="data.johtokunnanKasittely" class="mb-2" :isEditing="true"/>
+          <b-form-group
+            v-for="paatavoite in data.paatavoitteet"
+            :key="'paatavoite'+paatavoite.tapahtuma"
+            :label="$kaanna(paatavoite.tavoite)"
+            class="col-md-4 col-12">
+            <ep-datepicker v-model="paatavoite.tapahtumapaiva" class="mb-2" :isEditing="true"/>
+            <ep-toggle v-model="paatavoite.julkinen" v-if="isAmmatillinen" class="mb-2">
+              {{$t('julkinen')}}
+            </ep-toggle>
           </b-form-group>
 
           <div v-for="(tpvm, idx) in data.tavoitepaivamaarat" :key="idx" class="row p-0 m-0" >
             <b-form-group :label="$t('tavoitteen-pvm')" class="col-md-4 col-12">
               <ep-datepicker v-model="tpvm.tapahtumapaiva" class="mb-2" :isEditing="true" :validation="$v.data.tavoitepaivamaarat.$each.$iter[idx].tapahtumapaiva"/>
+              <ep-toggle v-model="tpvm.julkinen" v-if="isAmmatillinen" class="mb-2">
+                {{$t('julkinen')}}
+              </ep-toggle>
             </b-form-group>
             <b-form-group :label="$t('tavoitteen-nimi-kuvaus') + '*'" class="col-md-7 col-11">
               <ep-input v-model="tpvm.tavoite" type="localized" :is-editing="true" :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')" :validation="$v.data.tavoitepaivamaarat.$each.$iter[idx].tavoite" />
@@ -191,7 +192,10 @@
               <div class="nimi">
                 {{ $t('aikataulu') }}
               </div>
-              <EpAikataulu :aikataulut="tapahtumat" />
+              <EpAikataulu :aikataulut="tapahtumat">
+                <span slot="luomispaiva-topic" v-html="$t('projektin-luomispaiva')"></span>
+                <span slot="julkaisupaiva-topic" v-html="$t('peruste-astuu-voimaan')"></span>
+              </EpAikataulu>
             </div>
           </div>
         </template>
@@ -214,13 +218,14 @@ import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
-import { PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
+import { PerusteAikatauluDtoTapahtumaEnum, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { EperusteetKoulutustyypit, isLukiokoulutus } from '@/utils/perusteet';
@@ -228,6 +233,7 @@ import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { notNull } from '@shared/validators/required';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
+import { isKoulutustyyppiAmmatillinen } from '@shared/utils/perusteet';
 
 const util = require('util');
 
@@ -249,6 +255,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpTiedostoLataus,
     EpDatepicker,
     KoulutustyyppiSelect,
+    EpToggle,
   },
   validations() {
     return {
@@ -266,6 +273,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   private data: any = {
     voimassaoloAlkaa: null,
     tavoitepaivamaarat: [] as any[],
+    paatavoitteet: [] as any[],
     koulutustyyppi: null,
     tyoryhma: null,
     peruste: null,
@@ -281,6 +289,8 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       this.perusteprojektiStore.fetchPohjat(),
       this.perusteprojektiStore.fetchPohjaProjektit(),
     ]);
+
+    this.data.paatavoitteet = this.defaultPaatavoitteet;
   }
 
   @Watch('tyyppi')
@@ -380,25 +390,36 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       tapahtuma: 'luominen',
       tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('peruste-luotu') },
       tapahtumapaiva: new Date(),
-    }, {
-      tapahtuma: 'tavoite',
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('peruste-astuu-voimaan') },
-      tapahtumapaiva: this.data.voimassaoloAlkaa && new Date(this.data.voimassaoloAlkaa),
-    }, {
-      tapahtuma: 'julkaisu',
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('perusteen-arvioitu-julkaisupaiva') },
-      tapahtumapaiva: this.data.paatosPvm && new Date(this.data.paatosPvm),
-    }, {
-      tapahtuma: 'tavoite',
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('lausuntokierros-alkaa') },
-      tapahtumapaiva: this.data.lausuntakierrosAlkaa && new Date(this.data.lausuntakierrosAlkaa),
-    }, {
-      tapahtuma: 'tavoite',
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('johtokunnan-kasittely') },
-      tapahtumapaiva: this.data.johtokunnanKasittely && new Date(this.data.johtokunnanKasittely),
-    }, ...this.data.tavoitepaivamaarat])
+    },
+    ...this.data.paatavoitteet,
+    ...this.data.tavoitepaivamaarat,
+    ])
       .filter('tapahtumapaiva')
       .value();
+  }
+
+  get defaultPaatavoitteet() {
+    return [{
+      tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.LAUSUNTOKIERROS),
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('lausuntokierros-alkaa') },
+      tapahtumapaiva: null,
+      julkinen: false,
+    }, {
+      tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.JOHTOKUNNANKASITTELY),
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('johtokunnan-kasittely') },
+      tapahtumapaiva: null,
+      julkinen: false,
+    }, {
+      tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.ARVIOITUJULKAISUPAIVA),
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('perusteen-arvioitu-julkaisupaiva') },
+      tapahtumapaiva: null,
+      julkinen: false,
+    }, {
+      tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.JULKAISU),
+      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('peruste-astuu-voimaan') },
+      tapahtumapaiva: null,
+      julkinen: false,
+    }];
   }
 
   poistaTavoite(tavoitepaivamaara) {
@@ -417,11 +438,9 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       koulutustyyppi: this.data.koulutustyyppi,
       lausuntakierrosAlkaa: this.data.lausuntakierrosAlkaa,
       nimi: this.data.nimi,
-      paatosPvm: this.data.paatosPvm,
       perusteId: this.data.peruste?.id,
       laajuusYksikko: 'OSAAMISPISTE' as any,
       ryhmaOid: this.data.tyoryhma ? this.data.tyoryhma.oid : null,
-      voimassaoloAlkaa: this.data.voimassaoloAlkaa,
       yhteistyotaho: this.data.yhteyshenkilo,
       perusteenAikataulut: this.tapahtumat,
       kuvaus: this.data.kuvaus,
@@ -461,6 +480,7 @@ export default class RoutePerusteprojektiLuonti extends Vue {
         tapahtuma: 'tavoite',
         tavoite: { [Kielet.getSisaltoKieli.value]: '' },
         tapahtumapaiva: new Date(),
+        julkinen: false,
       },
     ];
   }
@@ -505,6 +525,12 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
       korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
     };
+  }
+
+  get isAmmatillinen() {
+    if (this.data.koulutustyyppi) {
+      return isKoulutustyyppiAmmatillinen(this.data.koulutustyyppi);
+    }
   }
 }
 </script>

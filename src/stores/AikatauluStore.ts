@@ -12,16 +12,7 @@ export class AikatauluStore {
     peruste: null as PerusteDto | null,
   })
 
-  public readonly aikataulutapahtumat = computed(() => {
-    return _.map(this.state.peruste?.perusteenAikataulut, tapahtuma => {
-      return {
-        id: tapahtuma.id,
-        tapahtuma: tapahtuma.tapahtuma?.toLowerCase().toString(),
-        tapahtumapaiva: tapahtuma.tapahtumapaiva,
-        tavoite: tapahtuma.tavoite,
-      } as Tapahtuma;
-    });
-  });
+  public readonly aikataulutapahtumat = computed(() => this.state.peruste?.perusteenAikataulut);
   public readonly peruste = computed(() => this.state.peruste);
 
   async init(peruste) {
