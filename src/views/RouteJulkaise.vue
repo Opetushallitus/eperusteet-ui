@@ -74,10 +74,10 @@
     <div v-if="julkaisuMahdollinen">
       <hr class="mt-4 mb-4">
       <h3>{{ $t('uusi-julkaisu') }}</h3>
-      <b-form-group :label="$t('julkaisun-tiedote')">
-        <div class="mt-2 mb-3">{{ $t('tiedotteen-nakyvyys') }}</div>
+      <b-form-group :label="$t('julkaisutiedot')" class="mt-4">
+        <div class="mb-3">{{ $t('teksti-naytetaan-taman-sivun-julkaisuhistoriassa') }}</div>
         <ep-content v-model="julkaisu.tiedote"
-                    layout="full"
+                    layout="simplified"
                     :is-editable="true" />
         <ep-button class="mt-3" @click="julkaise" :showSpinner="julkaistaan">
           {{ $t('julkaise') }}
@@ -86,30 +86,20 @@
     </div>
 
     <div class="julkaisuhistoria">
-      <ep-collapse tyyppi="julkaisut">
-        <h3 slot="header">{{ $t('julkaisuhistoria') }}</h3>
-        <div class="alert alert-info" v-if="julkaisut.length === 0">
-          {{ $t('perusteella-ei-julkaisuja') }}
+      <h3 slot="header">{{ $t('julkaisuhistoria') }}</h3>
+      <div class="alert alert-info" v-if="julkaisut.length === 0">
+        {{ $t('perusteella-ei-julkaisuja') }}
+      </div>
+      <div v-else>
+        <div v-for="(julkaisu, index) in julkaisutMapped" :key="'julkaisu'+julkaisu.revision" class="julkaisu py-2 ml-1 px-3">
+          <div class="my-1">
+            <span class="font-weight-bold pr-1">{{$t('julkaisu')}} {{julkaisu.fixedRevision}}</span>
+            <span v-if="index === 0">({{$t('uusin-julkaisu')}})</span>
+          </div>
+          <div class="my-1">{{$sdt(julkaisu.luotu)}} {{julkaisu.nimi}}</div>
+          <div class="my-1" v-html="$kaanna(julkaisu.tiedote)"></div>
         </div>
-        <div v-else>
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>{{ $t('versio') }}</th>
-                <th>{{ $t('luontihetki') }}</th>
-                <th>{{ $t('tiedote') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(julkaisu, idx) in julkaisut" :key="idx">
-                <td>{{ julkaisu.revision }}</td>
-                <td>{{ $ago(julkaisu.luotu) }}</td>
-                <td v-html="$kaanna(julkaisu.tiedote)"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </ep-collapse>
+      </div>
     </div>
 
   </div>
@@ -138,6 +128,7 @@ import EpValidation from '@shared/mixins/EpValidation';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 
 @Component({
   components: {
@@ -181,6 +172,20 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     return this.perusteStore.julkaisut.value || [];
   }
 
+  get julkaisutMapped() {
+    return _.chain(this.julkaisut)
+      .map(julkaisu => {
+        return {
+          ...julkaisu,
+          nimi: parsiEsitysnimi(julkaisu.kayttajanTieto),
+          fixedRevision: '1.' + julkaisu.revision,
+        };
+      })
+      .sortBy('luotu')
+      .reverse()
+      .value();
+  }
+
   get status() {
     return this.perusteStore?.projektiStatus?.value || null;
   }
@@ -195,6 +200,9 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       await this.perusteStore!.julkaise({
         tiedote: this.julkaisu.tiedote,
       });
+
+      this.julkaisu.tiedote = {};
+      this.$success(this.$t('julkaistu') as string);
     }
     catch (e) {
       this.$fail(this.$t('virhe-palvelu-virhe') as string);
@@ -206,6 +214,8 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 </script>
 
 <style lang="scss" scoped>
+@import '@shared/styles/_variables';
+
 .valiviiva {
   display: block;
   height: 1px;
@@ -226,6 +236,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
 .julkaisuhistoria {
   padding-top: 60px;
+}
+
+.julkaisu:nth-of-type(even) {
+  background-color: $gray-lighten-13;
 }
 
 </style>
