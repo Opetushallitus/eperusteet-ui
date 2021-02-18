@@ -204,8 +204,13 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       this.julkaisu.tiedote = {};
       this.$success(this.$t('julkaistu') as string);
     }
-    catch (e) {
-      this.$fail(this.$t('virhe-palvelu-virhe') as string);
+    catch (err) {
+      if (err.response?.data?.syy === 'ei-muuttunut-viime-julkaisun-jalkeen') {
+        this.$fail(this.$t('julkaisu-epaonnistui-peruste-' + err.response.data.syy) as string);
+      }
+      else {
+        this.$fail(this.$t('virhe-palvelu-virhe') as string);
+      }
     }
     this.julkaistaan = false;
   }
