@@ -338,7 +338,7 @@ const koulutustyyppiTietoFilters = {
   'default': [
     'diaarinumero', 'paatospaivamaara', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli', 'koulutusvienti',
   ],
-  'koulutustyyppi_30': [
+  'koulutustyyppi_10': [
     'laajuus', 'diaarinumero', 'paatospaivamaara', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli',
   ],
 };
