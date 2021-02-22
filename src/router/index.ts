@@ -42,6 +42,9 @@ import { stores } from '@/stores';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 import { getCasKayttajaKieli } from '@shared/api/common';
 import * as _ from 'lodash';
+import { Kielet } from '@shared/stores/kieli';
+
+import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 
 Vue.use(VueRouter);
 Vue.use(VueMeta, {
@@ -369,6 +372,38 @@ const router = new VueRouter({
     },
     ],
   }],
+});
+
+window.addEventListener('beforeunload', e => {
+  if (EditointiStore.anyEditing()) {
+    e.preventDefault();
+    // Vanhemmat selainversiot vaativat erillisen varmistustekstin
+    e.returnValue = Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti');
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (EditointiStore.anyEditing()) {
+    const value = await router.app.$bvModal.msgBoxConfirm(
+      Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti-dialogi'), {
+        title: Kielet.kaannaOlioTaiTeksti('haluatko-poistua-tallentamatta'),
+        okTitle: Kielet.kaannaOlioTaiTeksti('poistu-tallentamatta'),
+        cancelTitle: Kielet.kaannaOlioTaiTeksti('peruuta'),
+        size: 'lg',
+      });
+
+    if (value) {
+      try {
+        await EditointiStore.cancelAll();
+      }
+      finally {
+        next();
+      }
+    }
+  }
+  else {
+    next();
+  }
 });
 
 router.beforeEach(async (to, from, next) => {

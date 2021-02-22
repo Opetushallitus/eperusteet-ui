@@ -57,7 +57,7 @@
                 </template>
               </ep-koodisto-select>
               <div v-else>
-                {{$kaanna(nimi)}}
+                {{nimi}}
               </div>
             </b-form-group>
           </b-col>

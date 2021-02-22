@@ -6,13 +6,14 @@
     :class="classes"
     v-model="model"
     @add="add">
-      <div v-for="(node, idx) in model" :key="node.tunniste || node.uuid || idx" class="muodostumisnode">
+      <div v-for="(node, idx) in model" :key="node.tunniste || node.uuid || idx" class="muodostumisnode" :class="{'draggable': isEditing}">
         <MuodostumisItem v-model="model[idx]"
                         :depth="depth"
                         :is-editing="isEditing"
                         :tutkinnonOsatMap="tutkinnonOsatMap"
                         @toggle="toggleOpen"
                         @remove="remove(idx)"
+                        @copy="copy(idx)"
                         :isOpen="isOpen"
                         :parentMandatory="parentMandatory"
                         ref="muodostumisItem">
@@ -51,6 +52,16 @@ function disassoc<T>(array: T[], idx: number): T[] {
     throw new Error('off indexed');
   }
   return [...array.slice(0, idx), ...array.slice(idx + 1)];
+}
+
+function getIndex<T>(array: T[], idx: number): T {
+  if (!_.isNumber(idx)) {
+    throw new Error('not numbers');
+  }
+  if (idx < 0 || idx > _.size(array)) {
+    throw new Error('off indexed');
+  }
+  return array[idx];
 }
 
 function assoc<T>(array: T[], element: T, idx: number): T[] {
@@ -164,9 +175,15 @@ export default class MuodostumisNode extends Vue {
       emptyInsertThreshold: 10,
       group: {
         name: 'rakennepuu',
+        pull: true,
       },
       disabled: !this.isEditing,
       ghostClass: 'rakenne-placeholder',
+      scrollSensitivity: 200,
+      forceFallback: true,
+      move: (element) => {
+        return !_.includes(element.to.classList, 'leikelauta') || !!element.draggedContext.element.rooli;
+      },
     };
   }
 
@@ -212,7 +229,7 @@ export default class MuodostumisNode extends Vue {
   }
 
   async add(element) {
-    if (this.model[element.newIndex] && this.model[element.newIndex].rooli === 'määrittelemätön') {
+    if (_.includes(element.from.classList, 'paaryhmat') && this.model[element.newIndex] && this.model[element.newIndex].rooli === 'määrittelemätön') {
       const uuid = _.get(this.model[element.newIndex], 'uuid');
       const muodostumisItem = _.find(this.$refs['muodostumisItem'], item => _.get(item, 'innerModel.uuid') === uuid);
 
@@ -220,6 +237,10 @@ export default class MuodostumisNode extends Vue {
         (muodostumisItem as any).edit();
       }
     }
+  }
+
+  copy(idx: number) {
+    this.$emit('copy', getIndex(this.model, idx));
   }
 }
 </script>
@@ -232,60 +253,21 @@ $linecolor: #ccc;
 .children {
   background: #f2f2f2;
 }
-.muodostumisryhma {
-}
-// .rakenne-moduuli:before {
-//   background: red;
-//   border-bottom: 1px solid red;
-//   content: ' ';
-//   display: block;
-//   width: 26px;
-//   position: absolute;
-//   margin-left: -56px;
-//   margin-top: -$ryhma-height / 2;
-// }
-// .rakenne-moduuli-root:after {
-//   border-left: 1px solid $linecolor;
-//   height: 100%;
-//   // margin-left: -26px;
-//   // margin-top: 30px;
-//   content: ' ';
-//   // height: 100px;
-//   position: absolute;
-// }
-// .muodostumisryhma:before {
-//   border-top: 1px solid $linecolor;
-//   margin-left: -56px;
-//   margin-top: -$ryhma-height / 2;
-//   content: ' ';
-//   width: 26px;
-//   position: absolute;
-// }
+
 .ryhma {
-  // height: $ryhma-height;
   .nimi {
     font-weight: 600;
     font-size: 80%;
   }
 }
-.rakenne-moduuli-root {
-  // padding: 18px 0 12px 0;
-}
+
 .muodostumisnode {
-  // padding: 8px 0 8px 0;
+
+  &.draggable {
+    cursor: grab;
+  }
 }
-.rakenne-moduuli {
-  // padding: 8px 0 0 0;
-}
-// .children:before {
-//   background: gray;
-//   content: '';
-//   display: block;
-//   position: absolute;
-//   height: 100%;
-//   margin-top: $ryhma-height;
-//   width: 1px;
-// }
+
 .colorblock {
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;

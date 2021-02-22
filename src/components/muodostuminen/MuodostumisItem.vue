@@ -35,11 +35,15 @@
             </template>
             <b-dropdown-item-button @click="edit">{{ $t('muokkaa') }}</b-dropdown-item-button>
             <b-dropdown-item-button @click="remove">{{ $t('poista') }}</b-dropdown-item-button>
-            <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
-            <b-dropdown-text v-if="isRyhma">
-              <ep-button icon="plus" variant="outline" @click="liitaTosa">{{ $t('liita-tutkinnon-osa') }}</ep-button>
-              <ep-button icon="plus" variant="outline" @click="lisaaRyhma">{{ $t('lisaa-ryhma') }}</ep-button>
-            </b-dropdown-text>
+
+            <template v-if="isRyhma">
+              <b-dropdown-item-button @click="copy">{{ $t('kopioi-leikelaudalle') }}</b-dropdown-item-button>
+              <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
+              <b-dropdown-text v-if="isRyhma">
+                <ep-button icon="plus" variant="outline" @click="liitaTosa">{{ $t('liita-tutkinnon-osa') }}</ep-button>
+                <ep-button icon="plus" variant="outline" @click="lisaaRyhma">{{ $t('lisaa-ryhma') }}</ep-button>
+              </b-dropdown-text>
+            </template>
           </b-dropdown>
         </div>
       </div>
@@ -72,7 +76,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import _ from 'lodash';
 import { Watch, Prop, Component, Vue, Inject } from 'vue-property-decorator';
 import { RakenneModuuliDto } from '@shared/api/eperusteet';
-import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType, DefaultRyhma, ryhmaTemplate } from './utils';
+import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType, DefaultRyhma, ryhmaTemplate, rakenneNodecolor } from './utils';
 import { v4 as genUuid } from 'uuid';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
@@ -234,29 +238,7 @@ export default class MuodostumisItem extends Vue {
   }
 
   get color() {
-    if (this.isRyhma) {
-      const mapped = RooliToTheme[this.value.rooli];
-      if (mapped) {
-        return ColorMap[mapped];
-      }
-      if (this.value.rooli === 'määritelty') {
-        if (this.$kaanna(this.value.nimi) === this.$t('rakenne-moduuli-pakollinen')) {
-          return ColorMap.pakollinen;
-        }
-        else if (this.$kaanna(this.value.nimi) === this.$t('rakenne-moduuli-ammatilliset')) {
-          return ColorMap.ammatilliset;
-        }
-      }
-      return ColorMap.valinnainen;
-    }
-    else {
-      if (this.parentMandatory || this.value.pakollinen) {
-        return ColorMap.pakollinen;
-      }
-      else {
-        return ColorMap.valinnainen;
-      }
-    }
+    return rakenneNodecolor(this.value, this.parentMandatory, this);
   }
 
   get isRyhma() {
@@ -325,6 +307,10 @@ export default class MuodostumisItem extends Vue {
         };
       }),
     ];
+  }
+
+  copy() {
+    this.$emit('copy');
   }
 }
 </script>

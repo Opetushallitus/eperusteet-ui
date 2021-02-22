@@ -1,7 +1,7 @@
 <template>
   <div>
     <ep-spinner v-if="!store || !peruste" />
-    <EpEditointi v-else :store="store">
+    <EpEditointi v-else :store="store" :allowSave="tarkistaTallennusLeikelauta" :allowCancel="tarkistaPeruutusLeikelauta">
       <template #header="{ data }">
         <h2>{{ $t('tutkinnon-muodostuminen') }}</h2>
       </template>
@@ -63,35 +63,45 @@
                         {{ $t('luo-tutkinnolle-rakenne-ohje') }}
                       </span>
                     </div>
-                    <MuodostumisNode v-model="data.rakenne.osat" ref="root" :is-editing="isEditing" :tutkinnonOsatMap="tutkinnonOsatMap">
-                      <template #moduuli="{ depth, node, color, uuid }">
-                        <div class="mt-2 d-flex align-items-center moduuli ryhma" tabindex="0" :moduuli="uuid">
-                          <div class="colorblock" :style="{ height: '52px', background: color }"></div>
-                          <div class="ml-2 nimi flex-grow-1">{{ $kaanna(node.nimi) }}</div>
-                        </div>
-                      </template>
-
-                      <template #osa="{ depth, node, color, uuid }">
-                        <div class="mt-2 moduuli osa d-flex align-items-center" tabindex="0" :moduuli="uuid">
-                          <div class="colorblock" :style="{ height: '42px', background: color }"></div>
-                          <div class="ml-2 nimi flex-grow-1 text-truncate">{{ $kaanna(tutkinnonOsatMap[node._tutkinnonOsaViite].nimi) }}</div>
-                        </div>
-                      </template>
+                    <MuodostumisNode
+                      v-model="data.rakenne.osat"
+                      ref="root"
+                      :is-editing="isEditing"
+                      :tutkinnonOsatMap="tutkinnonOsatMap"
+                      @copy="copy">
                     </MuodostumisNode>
                   </div>
                 </div>
                 <div class="drag-area-right" v-if="isEditing">
                   <div class="menu p-3">
-                    <h5 class="font-weight-600">{{ $t('paaryhmat') }}</h5>
+                    <h5 class="font-weight-600">{{ $t('leikelauta') }}</h5>
                     <div class="mt-3">
-                    <draggable :value="paaryhmat" v-bind="optionsPaaryhma" tag="div">
-                      <div v-for="ryhma in paaryhmat" :key="ryhma.uuid" class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable">
-                        <div class="colorblock" :style="{ height: '44px', background: colorMap[ryhma.kind] }"></div>
-                        <div class="flex-grow-1 paaryhma-label pl-2 noselect">
-                          {{ $t(ryhma.label) }}
+                      <draggable v-model="leikelauta" v-bind="optionsLeikelauta" tag="div" class="leikelauta" :class="{'empty': leikelauta.length === 0}">
+                        <div v-for="lauta in leikelautaWithColor"
+                          :key="'leikelauta' + (lauta.tunniste || lauta.uuid)"
+                          class="mb-1 d-flex justify-content-center align-items-center draggable kopioitava">
+                          <div class="colorblock" :style="{ height: '54px', background: lauta.color }"></div>
+                          <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                            {{ $kaanna(lauta.nimi) }}
+                            <div v-if="lauta.osat && lauta.osat.length > 0">({{lauta.osat.length}}
+                              <span v-if="lauta.osat.length === 1">{{$t('ryhma')}}</span>
+                              <span v-else>{{$t('ryhmaa')}}</span>)
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </draggable>
+                      </draggable>
+                    </div>
+
+                    <h5 class="mt-4 font-weight-600">{{ $t('paaryhmat') }}</h5>
+                    <div class="mt-3">
+                      <draggable :value="paaryhmat" v-bind="optionsPaaryhma" tag="div" class="paaryhmat">
+                        <div v-for="ryhma in paaryhmat" :key="ryhma.uuid" class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable">
+                          <div class="colorblock" :style="{ height: '44px', background: colorMap[ryhma.kind] }"></div>
+                          <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                            {{ $t(ryhma.label) }}
+                          </div>
+                        </div>
+                      </draggable>
                     </div>
 
                     <h5 class="mt-4 font-weight-600">{{ $t('tutkinnon-osat') }}</h5>
@@ -268,7 +278,7 @@ import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
-import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, RakenneModuuliType } from '@/components/muodostuminen/utils';
+import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, RakenneModuuliType, rakenneNodecolor } from '@/components/muodostuminen/utils';
 
 @Component({
   components: {
@@ -309,6 +319,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   private tutkintonimikkeetSivu = 1;
   private tutkinnonosatSivu = 1;
   private sivukoot = 5;
+  private leikelauta: any[] = [];
 
   private osaamisalaStore = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {
@@ -424,17 +435,12 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       create: () => ({
         ...ryhmaTemplate('rakenne-moduuli-paikalliset', this),
       }),
-    // }, {
-    //   kind: 'osaamisala',
-    //   label: 'rakenne-moduuli-osaamisala',
-    // }, {
-    //   kind: 'tutkintonimike',
-    //   label: 'rakenne-moduuli-tutkintonimike',
     }];
   }
 
   get optionsKoodit() {
     return {
+      ...this.defaultOptions,
       disabled: !this.isEditing,
       group: {
         name: 'rakennepuu',
@@ -449,12 +455,12 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           },
         };
       },
-      sort: false,
     };
   }
 
   get optionsTutkinnonOsat() {
     return {
+      ...this.defaultOptions,
       disabled: !this.isEditing,
       group: {
         name: 'rakennepuu',
@@ -471,7 +477,6 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           _tutkinnonOsaViite: '' + original.id,
         };
       },
-      sort: false,
     };
   }
 
@@ -481,6 +486,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 
   get optionsPaaryhma() {
     return {
+      ...this.defaultOptions,
       disabled: !this.isEditing,
       group: {
         name: 'rakennepuu',
@@ -492,7 +498,26 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           return original.create();
         }
       },
+    };
+  }
+
+  get optionsLeikelauta() {
+    const self = this;
+    return {
+      ...this.defaultOptions,
+      disabled: !this.isEditing,
+      group: {
+        name: 'rakennepuu',
+      },
+      emptyInsertThreshold: 10,
+    };
+  }
+
+  get defaultOptions() {
+    return {
       sort: false,
+      scrollSensitivity: 100,
+      forceFallback: true,
     };
   }
 
@@ -717,6 +742,72 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     this.naytaRakenne = !this.naytaRakenne;
     (this.$refs['root'] as any).toggleRakenne(this.naytaRakenne);
   }
+
+  copy(val) {
+    const clone = _.cloneDeep(val);
+    this.leikelauta = [
+      ...this.leikelauta,
+      this.recursiveClone(clone),
+    ];
+  }
+
+  recursiveClone(clone) {
+    return {
+      ...clone,
+      ...(clone.uuid && { uuid: genUuid() }),
+      ...(clone.tunniste && { tunniste: genUuid() }),
+      osat: _.map(clone.osat, osa => this.recursiveClone(osa)),
+    };
+  }
+
+  get leikelautaWithColor() {
+    return _.map(this.leikelauta, lauta => {
+      return {
+        ...lauta,
+        color: rakenneNodecolor(lauta, false, this),
+      };
+    });
+  }
+
+  async tarkistaTallennusLeikelauta() {
+    if (_.size(this.leikelauta) > 0) {
+      const ok = await this.$bvModal.msgBoxConfirm(
+        Kielet.kaannaOlioTaiTeksti('leikelauta-varoitus'), {
+          title: Kielet.kaannaOlioTaiTeksti('vahvista-tallennus'),
+          okTitle: Kielet.kaannaOlioTaiTeksti('tallenna'),
+          cancelTitle: Kielet.kaannaOlioTaiTeksti('peruuta'),
+          size: 'lg',
+        });
+
+      if (ok) {
+        this.leikelauta = [];
+      }
+
+      return ok;
+    }
+
+    return true;
+  }
+
+  async tarkistaPeruutusLeikelauta() {
+    if (_.size(this.leikelauta) > 0) {
+      const ok = await this.$bvModal.msgBoxConfirm(
+        Kielet.kaannaOlioTaiTeksti('leikelauta-varoitus'), {
+          title: Kielet.kaannaOlioTaiTeksti('vahvista-peruutus'),
+          okTitle: Kielet.kaannaOlioTaiTeksti('vahvista-peruutus'),
+          cancelTitle: Kielet.kaannaOlioTaiTeksti('peruuta'),
+          size: 'lg',
+        });
+
+      if (ok) {
+        this.leikelauta = [];
+      }
+
+      return ok;
+    }
+
+    return true;
+  }
 }
 </script>
 
@@ -750,15 +841,33 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           border-bottom-right-radius: 4px;
           border-top-right-radius: 4px;
         }
+
+        .kopioitava {
+          height: 54px;
+          background: #ffffff;
+          border-bottom-right-radius: 4px;
+          border-top-right-radius: 4px;
+        }
       }
     }
+  }
+}
+
+.leikelauta {
+  padding: 10px;
+  background: #f7f7f7;
+  border:1px solid #e0e0e1;
+  border-radius: 5px;
+
+  &.empty {
+    height: 80px;
   }
 }
 
 .draggable {
   cursor: grab;
 
-  &.paaryhma {
+  &.paaryhma, &.kopioitava {
     .colorblock {
       border-bottom-left-radius: 4px;
       border-top-left-radius: 4px;
