@@ -86,3 +86,31 @@ export const ColorMap = Object.freeze({
   valinnainen: '#e60895',
   yhteiset: '#878787',
 });
+
+export function rakenneNodecolor(node, parentMandatory, el) {
+  const isRyhma = !!node.rooli;
+
+  if (isRyhma) {
+    const mapped = RooliToTheme[node.rooli];
+    if (mapped) {
+      return ColorMap[mapped];
+    }
+    if (node.rooli === 'määritelty') {
+      if (el.$kaanna(node.nimi) === el.$t('rakenne-moduuli-pakollinen')) {
+        return ColorMap.pakollinen;
+      }
+      else if (el.$kaanna(node.nimi) === el.$t('rakenne-moduuli-ammatilliset')) {
+        return ColorMap.ammatilliset;
+      }
+    }
+    return ColorMap.valinnainen;
+  }
+  else {
+    if (parentMandatory || node.pakollinen) {
+      return ColorMap.pakollinen;
+    }
+    else {
+      return ColorMap.valinnainen;
+    }
+  }
+}
