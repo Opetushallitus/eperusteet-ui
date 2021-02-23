@@ -85,22 +85,9 @@
       </b-form-group>
     </div>
 
-    <div class="julkaisuhistoria">
-      <h3 slot="header">{{ $t('julkaisuhistoria') }}</h3>
-      <div class="alert alert-info" v-if="julkaisut.length === 0">
-        {{ $t('perusteella-ei-julkaisuja') }}
-      </div>
-      <div v-else>
-        <div v-for="(julkaisu, index) in julkaisutMapped" :key="'julkaisu'+julkaisu.revision" class="julkaisu py-2 ml-1 px-3">
-          <div class="my-1">
-            <span class="font-weight-bold pr-1">{{$t('julkaisu')}} {{julkaisu.fixedRevision}}</span>
-            <span v-if="index === 0">({{$t('uusin-julkaisu')}})</span>
-          </div>
-          <div class="my-1">{{$sdt(julkaisu.luotu)}} {{julkaisu.nimi}}</div>
-          <div class="my-1" v-html="$kaanna(julkaisu.tiedote)"></div>
-        </div>
-      </div>
-    </div>
+    <EpJulkaisuHistoria :julkaisut="julkaisut">
+      <div slot="empty">{{ $t('perusteella-ei-julkaisuja') }}</div>
+    </EpJulkaisuHistoria>
 
   </div>
 </template>
@@ -129,6 +116,7 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
+import EpJulkaisuHistoria from '@shared/components/EpJulkaisuHistoria/EpJulkaisuHistoria.vue';
 
 @Component({
   components: {
@@ -148,6 +136,7 @@ import { parsiEsitysnimi } from '@shared/utils/kayttaja';
     EpToggle,
     EpVirhelistaus,
     PerustetyoryhmaSelect,
+    EpJulkaisuHistoria,
   },
 })
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
@@ -205,12 +194,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       this.$success(this.$t('julkaistu') as string);
     }
     catch (err) {
-      if (err.response?.data?.syy === 'ei-muuttunut-viime-julkaisun-jalkeen') {
-        this.$fail(this.$t('julkaisu-epaonnistui-peruste-' + err.response.data.syy) as string);
-      }
-      else {
-        this.$fail(this.$t('virhe-palvelu-virhe') as string);
-      }
+      this.$fail(this.$t('julkaisu-epaonnistui-peruste-' + err.response?.data?.syy) as string);
     }
     this.julkaistaan = false;
   }
