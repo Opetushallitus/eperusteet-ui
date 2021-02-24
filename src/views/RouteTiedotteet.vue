@@ -7,7 +7,7 @@
     <template slot="header">
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tiedotteet') }}</h1>
-        <ep-tiedote-modal ref="eptiedotemodal" :perusteet="julkaistutPerusteet" :tiedotteetStore="tiedotteetStore"/>
+        <ep-tiedote-modal ref="eptiedotemodal" :perusteet="perusteet" :tiedotteetStore="tiedotteetStore"/>
       </div>
     </template>
 
@@ -68,17 +68,12 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
-
-import { perustetila, perusteprojektitila } from '@shared/utils/perusteet';
 import { TutoriaaliStore } from '@shared/stores/tutoriaali';
-import { getAllPerusteetInternal, Perusteet, PerusteHakuDto, PerusteHakuInternalDto, TiedoteDto } from '@shared/api/eperusteet';
-import { Kielet } from '@shared/stores/kieli';
+import { Perusteet, TiedoteDto } from '@shared/api/eperusteet';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
-import { required } from 'vuelidate/lib/validators';
-import { validationMixin } from 'vuelidate';
-import { parsiEsitysnimi } from '@/stores/kayttaja';
 import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import { PerusteKevytDto } from '@shared/generated/eperusteet';
 
 @Component({
   components: {
@@ -103,7 +98,7 @@ export default class RouteTiedotteet extends Vue {
   private nimiFilter = ''
   private sort = {};
   private valitutJulkaisupaikat: [] = [];
-  private perusteet: PerusteHakuInternalDto[] = [];
+  private perusteet: PerusteKevytDto[] | null = null;
 
   async mounted() {
     this.tiedotteetStore.init(
@@ -112,20 +107,7 @@ export default class RouteTiedotteet extends Vue {
         sivukoko: 10,
       }
     );
-    const res = (await getAllPerusteetInternal({
-      sivu: 0,
-      sivukoko: 9999,
-      tila: ['VALMIS'],
-      julkaistu: true,
-    }) as any).data;
-    this.perusteet = res.data;
-  }
-
-  get julkaistutPerusteet() {
-    return _.chain(this.perusteet)
-      .filter(peruste => (!peruste.voimassaoloAlkaa || new Date(peruste.voimassaoloAlkaa) < new Date()))
-      .filter(peruste => (!peruste.voimassaoloLoppuu || new Date(peruste.voimassaoloLoppuu) > new Date()))
-      .value();
+    this.perusteet = (await Perusteet.getJulkaistutPerusteet()).data;
   }
 
   @Watch('nimiFilter')

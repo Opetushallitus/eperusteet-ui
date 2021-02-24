@@ -26,6 +26,7 @@ export class TiedotteetStore implements ITiedotteetProvider {
 
   async init(query: TiedoteQuery) {
     this.state.query = query;
+    this.state.tiedotteetPage = null;
     await this.fetch();
   }
 

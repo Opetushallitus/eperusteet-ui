@@ -5,14 +5,7 @@ import _ from 'lodash';
 
 const browserStore = new BrowserStore();
 
-@Component({
-  watch: {
-    'projektiId': {
-      handler: 'onProjektiChangeImpl',
-      immediate: true,
-    } as any,
-  },
-})
+@Component
 export class PerusteprojektiRoute extends Vue {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
@@ -46,14 +39,18 @@ export class PerusteprojektiRoute extends Vue {
   protected async onProjektiChange(projektiId: number, perusteId: number) {
   }
 
+  @Watch('projektiId', { immediate: true })
   async onProjektiChangeImpl(newValue: string, oldValue: string) {
     if (newValue && newValue !== oldValue && !this.isInitingProjekti) {
       const projektiId = _.parseInt(newValue);
       this.isInitingProjekti = true;
+      window.scrollTo(0, 0);
       try {
-        await this.perusteStore.init(projektiId);
-        await this.perusteStore.blockUntilInitialized();
-        await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
+        await Promise.all([
+          this.perusteStore.init(projektiId),
+          this.perusteStore.blockUntilInitialized(),
+          this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!),
+        ]);
       }
       catch (err) {
         console.error(err);
