@@ -1,38 +1,37 @@
 <template>
-<div class="yleisnakyma">
+  <div class="yleisnakyma">
+    <div v-if="tyyppi === 'peruste'">
+      <div class="row">
+        <div class="col">
+          <ep-peruste-aikataulu class="info-box" :aikatauluStore="aikatauluStore" :peruste="peruste"/>
+        </div>
+      </div>
 
-  <div v-if="tyyppi === 'peruste'">
-    <div class="row">
-      <div class="col">
-        <ep-peruste-aikataulu class="info-box" :aikatauluStore="aikatauluStore" :peruste="peruste"/>
+      <div class="row">
+        <div class="col">
+          <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
+          <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
+          <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore" v-if="isAmmatillinen"/>
+          <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore" v-if="isVapaasivistystyo"/>
+        </div>
+        <div class="col">
+          <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+        </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col">
-        <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
-        <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
-        <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore" v-if="isAmmatillinen"/>
-        <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore" v-if="isVapaasivistystyo"/>
-      </div>
-      <div class="col">
-        <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+    <div v-else>
+      <div class="row">
+        <div class="col">
+          <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
+        </div>
+        <div class="col">
+          <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+        </div>
       </div>
     </div>
+
   </div>
-
-  <div v-else>
-    <div class="row">
-      <div class="col">
-        <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
-      </div>
-      <div class="col">
-        <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
-      </div>
-    </div>
-  </div>
-
-</div>
 </template>
 
 <script lang="ts">
@@ -84,16 +83,13 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
 
   async onProjektiChange() {
     if (this.peruste && this.peruste.id) {
-      this.muokkaustietoStore.init(this.peruste.id);
-      this.aikatauluStore.init(this.peruste);
-      this.tiedotteetStore.init({
-        perusteIds: [this.peruste.id],
-      });
-      this.tyoryhmaStore.init(this.projekti?.ryhmaOid);
-
-      if (this.isAmmatillinen) {
-        this.tutkinnonOsaStore.fetch();
-      }
+      await Promise.all([
+        this.muokkaustietoStore.init(this.peruste.id),
+        this.aikatauluStore.init(this.peruste),
+        this.tiedotteetStore.init({ perusteIds: [this.peruste.id] }),
+        this.tyoryhmaStore.init(this.projekti?.ryhmaOid),
+        ...(this.isAmmatillinen ? [this.tutkinnonOsaStore.fetch()] : []),
+      ]);
     }
   }
 

@@ -22,6 +22,7 @@ export class TutkinnonOsaStore implements IEditoitava {
     const perusteId = this.perusteStore.perusteId.value;
     const st = this.perusteStore.suoritustavat.value;
     if (perusteId && st) {
+      this.state.tutkinnonOsat = null;
       await this.init(perusteId, st);
     }
   }

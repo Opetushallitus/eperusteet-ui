@@ -9,6 +9,8 @@ import { Page } from '@shared/tyypit';
 import '@shared/config/bootstrap';
 import '@shared/config/fontawesome';
 
+window.scrollTo = jest.fn();
+
 describe('RoutePerusteprojekti', () => {
   const localVue = createLocalVue();
 
