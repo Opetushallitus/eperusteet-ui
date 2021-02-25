@@ -527,10 +527,12 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     }
     const osat = [] as any[];
     const walk = (node) => {
-      if (node._tutkinnonOsaViite) {
-        osat.push(node);
+      if (node) {
+        if (node._tutkinnonOsaViite) {
+          osat.push(node);
+        }
+        _.forEach(node.osat, walk);
       }
-      _.forEach(node.osat, walk);
     };
     walk(this.store.data.value?.rakenne);
     return _.keyBy(osat, '_tutkinnonOsaViite');
@@ -596,7 +598,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 
   @ProvideReactive('tutkintonimikkeet')
   get tutkintonimikkeet() {
-    return _.map(this.store?.data.value.tutkintonimikkeet, tutkintonimike => {
+    return _.map(this.store?.data?.value?.tutkintonimikkeet, tutkintonimike => {
       return {
         ...ryhmaTemplate('tutkintonimike', this),
         nimi: tutkintonimike.nimi,
@@ -652,7 +654,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 
   @ProvideReactive('osaamisalat')
   get osaamisalat() {
-    return _.map(this.store?.data.value.osaamisalat, osaamisala => {
+    return _.map(this.store?.data?.value?.osaamisalat, osaamisala => {
       return {
         ...ryhmaTemplate('osaamisala', this),
         nimi: osaamisala.nimi,

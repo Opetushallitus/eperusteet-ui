@@ -57,7 +57,11 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async save(data) {
-    const rakenne = data.rakenne;
+    let rakenne = data.rakenne;
+    if (rakenne?.muodostumisSaanto?.laajuus) {
+      rakenne.muodostumisSaanto.laajuus.maksimi = rakenne.muodostumisSaanto.laajuus.minimi;
+    }
+
     await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!, rakenne as any);
     await Perusteet.updateOsaamisalat(this.perusteId, data.osaamisalat);
     await Perusteet.updateTutkintonimikkeet(this.perusteId, data.tutkintonimikkeet);
