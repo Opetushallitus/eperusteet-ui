@@ -42,11 +42,7 @@ export class OsaalueStore implements IEditoitava {
       };
     }
     else {
-      const res = (await OsaAlueet.getOsaAlueV2(this.tovId, Number(this.osaalueId))).data;
-      return {
-        ...res,
-        piilotaValinnaiset: res.valinnaisetOsaamistavoitteet,
-      };
+      return (await OsaAlueet.getOsaAlueV2(this.tovId, Number(this.osaalueId))).data;
     }
   }
 
@@ -78,10 +74,6 @@ export class OsaalueStore implements IEditoitava {
   }
 
   public async save(data: any) {
-    if (data.piilotaValinnaiset) {
-      data.valinnaisetOsaamistavoitteet = null;
-    }
-
     if (this.osaalueId === 'uusi') {
       const saved = (await OsaAlueet.addOsaAlueV2(this.tovId, data)).data;
       await OsaalueStore.config.perusteStore.updateNavigation();

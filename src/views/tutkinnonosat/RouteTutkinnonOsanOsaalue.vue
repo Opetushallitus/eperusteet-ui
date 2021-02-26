@@ -55,14 +55,22 @@
           </Osaamistavoite>
         </ep-collapse>
 
-        <ep-collapse tyyppi="valinnaiset-osaamistavoitteet" :border-bottom="false" :border-top="true" v-if="isEditing || !data.piilotaValinnaiset">
+        <ep-collapse tyyppi="valinnaiset-osaamistavoitteet" :border-bottom="false" :border-top="true" v-if="isEditing || data.valinnaisetOsaamistavoitteet">
           <h3 slot="header">{{ $t('valinnaiset-osaamistavoitteet') }}</h3>
-          <ep-toggle class="mb-4" v-model="data.piilotaValinnaiset" v-if="isEditing">
-            {{ $t('piilota-valinnaiset-osaamistavoitteet') }}
-          </ep-toggle>
+
+          <div v-if="isEditing" class="mb-3">
+            <ep-button @click="poistaValinnaisetOsaamistavoitteet()" variant="link" icon="roskalaatikko" v-if="data.valinnaisetOsaamistavoitteet">
+              {{ $t('poista-valinnaiset-osaamistavoitteet') }}
+            </ep-button>
+
+            <ep-button @click="lisaaValinnaisetOsaamistavoitteet()" variant="outline" icon="plus" v-else>
+              {{ $t('lisaa-valinnaiset-osaamistavoitteet') }}
+            </ep-button>
+          </div>
+
           <Osaamistavoite v-model="data.valinnaisetOsaamistavoitteet"
-                          v-if="!data.piilotaValinnaiset"
                           :arviointi-store="arviointiStore"
+                          v-if="data.valinnaisetOsaamistavoitteet"
                           :is-valinnainen="true"
                           :is-editing="isEditing">
           </Osaamistavoite>
@@ -223,6 +231,20 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
 
   get kielet() {
     return UiKielet;
+  }
+
+  poistaValinnaisetOsaamistavoitteet() {
+    this.store!.setData({
+      ...this.store!.data.value,
+      valinnaisetOsaamistavoitteet: null,
+    });
+  }
+
+  lisaaValinnaisetOsaamistavoitteet() {
+    this.store!.setData({
+      ...this.store!.data.value,
+      valinnaisetOsaamistavoitteet: {},
+    });
   }
 }
 </script>
