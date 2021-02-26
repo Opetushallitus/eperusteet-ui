@@ -10,7 +10,7 @@
         <h3>{{ $t('perustiedot') }}</h3>
         <b-container fluid="lg" class="ml-0 pl-0">
           <b-row no-gutters >
-            <b-col>
+            <b-col class="mb-4 mt-4">
               <b-form-group :label="$t('perusteen-nimi') + '*'">
                 <ep-input v-model="data.nimi"
                           :is-editing="isEditing"
@@ -19,7 +19,7 @@
             </b-col>
           </b-row>
           <b-row no-gutters>
-            <b-col lg="6" v-if="filtersContain('laajuus')">
+            <b-col lg="6" v-if="filtersContain('laajuus')" class="mb-4">
               <b-form-group :label="$t('laajuus')">
                 <div class="d-flex align-items-center">
                   <ep-input v-model="data.vstSisalto.laajuus"
@@ -30,7 +30,7 @@
                 </div>
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="filtersContain('diaarinumero')">
+            <b-col lg="6" v-if="filtersContain('diaarinumero')" class="mb-4">
               <b-form-group :label="$t('diaarinumero')">
                 <ep-input v-model="data.diaarinumero"
                           type="string"
@@ -38,12 +38,12 @@
                           :validation="validation.diaarinumero"></ep-input>
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="filtersContain('paatospaivamaara')">
+            <b-col lg="6" v-if="filtersContain('paatospaivamaara')" class="mb-4">
               <b-form-group :label="$t('maarayksen-paatospaivamaara')">
                 <ep-datepicker v-model="data.paatospvm" :is-editing="isEditing" />
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="filtersContain('voimassaolo')">
+            <b-col lg="6" v-if="filtersContain('voimassaolo')" class="mb-4">
               <b-form-group :label="$t('voimassaolo')">
                 <div class="d-flex align-items-center">
                   <ep-datepicker v-model="data.voimassaoloAlkaa" :is-editing="isEditing" />
@@ -52,14 +52,19 @@
                 </div>
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="filtersContain('koulutustyyppi')">
+            <b-col lg="6" v-if="filtersContain('siirtymaPaattyy')" class="mb-4">
+              <b-form-group :label="$t('siirtymaajan-paattymisaika')">
+                <ep-datepicker v-model="data.siirtymaPaattyy" :is-editing="isEditing" :help="'siirtymaajan-paattymisaika-kuvaus'"/>
+              </b-form-group>
+            </b-col>
+            <b-col lg="6" v-if="filtersContain('koulutustyyppi')" class="mb-4">
               <b-form-group :label="$t('koulutustyyppi')">
                 <ep-koulutustyyppi-select v-model="data.koulutustyyppi"
                                           :koulutustyypit="siirtymat[data.koulutustyyppi]"
                                           :is-editing="isEditing && !!siirtymat[data.koulutustyyppi]" />
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="filtersContain('perusteenkieli')">
+            <b-col lg="6" v-if="filtersContain('perusteenkieli')" class="mb-4">
               <b-form-group :label="$t('perusteen-kielet')">
                 <b-form-checkbox-group v-if="isEditing" v-model="data.kielet" stacked>
                   <b-form-checkbox v-for="kieli in kielet" :key="kieli" :value="kieli">
@@ -73,7 +78,7 @@
                 </div>
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="filtersContain('koulutusvienti')">
+            <b-col lg="6" v-if="filtersContain('koulutusvienti')" class="mb-4">
               <b-form-group :label="$t('koulutusvienti')">
                 <b-form-checkbox v-model="data.koulutusvienti" v-if="isEditing">
                 </b-form-checkbox>
@@ -83,7 +88,7 @@
           </b-row>
 
           <b-row no-gutters v-if="data.kvliite">
-            <b-col>
+            <b-col class="mb-4">
               <b-form-group :label="$t('tutkinnon-suorittaneen-osaaminen')">
                 <ep-content
                   v-model="data.kvliite.suorittaneenOsaaminen"
@@ -94,7 +99,7 @@
           </b-row>
 
           <b-row no-gutters v-if="data.kvliite">
-            <b-col>
+            <b-col class="mb-4">
               <b-form-group :label="$t('tyotehtavat-joissa-voi-toimia')">
                 <ep-content
                   v-model="data.kvliite.tyotehtavatJoissaVoiToimia"
@@ -105,8 +110,9 @@
           </b-row>
 
           <b-row no-gutters>
-            <b-col>
-              <b-form-group :label="$t('peruste-koulutukset')">
+            <b-col class="mb-4">
+              <b-form-group>
+                <h3 slot="label">{{$t('peruste-koulutukset')}}</h3>
                 <b-table striped
                   show-empty
                         :items="data.koulutukset"
@@ -136,9 +142,10 @@
           </b-row>
 
           <b-row no-gutters>
-            <b-col>
-              <b-form-group :label="$t('korvattavat-perusteet')">
-                <b-table v-if="korvattavatDiaarinumerot"
+            <b-col class="mb-4">
+              <b-form-group>
+                <h3 slot="label">{{$t('korvattavat-perusteet')}}</h3>
+                <b-table v-if="korvattavatDiaarinumerot && korvattavatDiaarinumerot.length > 0"
                         :items="korvattavatDiaarinumerot"
                         :fields="korvattavatFields"
                         responsive
@@ -179,8 +186,9 @@
           </b-row>
 
           <b-row no-gutters>
-            <b-col>
-              <b-form-group :label="$t('liitteet-ja-maaraykset')">
+            <b-col class="mb-4">
+              <b-form-group>
+                <h3 slot="label">{{$t('liitteet-ja-maaraykset')}}</h3>
                 <ep-spinner v-if="!liitteet" />
                 <div v-else>
                   <template v-if="isEditing">
@@ -198,7 +206,8 @@
                       </b-input-group>
                     </div>
                   </template>
-                  <b-table :items="liitteet"
+                  <b-table v-if="liitteet && liitteet.length > 0"
+                          :items="liitteet"
                           :fields="liitetableFields"
                           responsive
                           borderless
@@ -219,7 +228,7 @@
           </b-row>
 
           <b-row no-gutters>
-            <b-col>
+            <b-col class="mb-4">
               <b-form-group :label="$t('maarayskirje')">
                 <div class="d-flex align-items-center w-100" v-if="isEditing">
                   <div class="flex-fill-1 w-100">
@@ -244,7 +253,7 @@
           </b-row>
 
           <b-row no-gutters>
-            <b-col>
+            <b-col class="mb-4">
               <b-form-group :label="$t('muutosmaaraykset')">
                 <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
                                     :is-editing="isEditing"
@@ -254,8 +263,9 @@
           </b-row>
 
           <b-row no-gutters v-if="isAmmatillinen">
-            <b-col>
-              <b-form-group :label="$t('osaamisalat')">
+            <b-col class="mb-4">
+              <b-form-group>
+                <h3 slot="label">{{$t('osaamisalat')}}</h3>
                 <div class="text-muted font-size-small">
                   {{ $t('lisaa-tai-poista-osaamisala') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
                 </div>
@@ -276,8 +286,9 @@
           </b-row>
 
           <b-row no-gutters v-if="isAmmatillinen">
-            <b-col>
-              <b-form-group :label="$t('tutkintonimikkeet')">
+            <b-col class="mb-4">
+              <b-form-group>
+                <h3 slot="label">{{$t('tutkintonimikkeet')}}</h3>
                 <div class="text-muted font-size-small">
                   {{ $t('lisaa-tai-poista-tutkintonimike') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
                 </div>
@@ -336,10 +347,10 @@ export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospa
 
 const koulutustyyppiTietoFilters = {
   'default': [
-    'diaarinumero', 'paatospaivamaara', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli', 'koulutusvienti',
+    'diaarinumero', 'paatospaivamaara', 'voimassaolo', 'siirtymaPaattyy', 'koulutustyyppi', 'perusteenkieli', 'koulutusvienti',
   ],
   'koulutustyyppi_10': [
-    'laajuus', 'diaarinumero', 'paatospaivamaara', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli',
+    'laajuus', 'diaarinumero', 'paatospaivamaara', 'siirtymaPaattyy', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli',
   ],
 };
 
