@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table class="table" v-if="liitteet">
+    <table class="table" v-if="liitteet && liitteet.length > 0">
       <thead>
         <tr>
           <th>{{ $t('nimi') }}</th>
