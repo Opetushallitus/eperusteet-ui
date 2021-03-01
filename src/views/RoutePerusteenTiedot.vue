@@ -401,6 +401,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       ...this.store!.data.value,
       maarayskirje: {
         liitteet: {
+          ...this.store!.data.value.maarayskirje.liitteet,
           [this.$slang.value]: liite,
         },
       },
@@ -540,24 +541,28 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       return;
     }
     const data = new FormData();
-    data.append('file', this.file.binary);
+    data.append('file', window.btoa(this.file.binary));
     data.set('nimi', this.liitteenNimi);
     data.set('tyyppi', 'tuntematon');
-    const res = await Api.request({
+    await Api.request({
       method: 'POST',
-      url: `perusteet/${this.perusteId!}/liitteet`,
+      url: `perusteet/${this.perusteId!}/liitteet/b64`,
       data,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+    this.$success(this.$t('liitetiedosto-tallennettu') as string);
     this.fetchLiitteet();
+    this.file = null;
+    this.liitteenNimi = '';
   }
 
   async poistaLiite(item: any) {
     try {
       await Liitetiedostot._delete(Number(this.perusteId!), item.id);
       this.$success(this.$t('liitetiedoston-poisto-onnistui') as string);
+      this.fetchLiitteet();
     }
     catch (err) {
       this.$fail(this.$t('liitetiedoston-poisto-epaonnistui') as string);
