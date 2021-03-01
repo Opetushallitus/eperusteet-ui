@@ -14,7 +14,9 @@
                 }">
                 <fas icon="info" />
               </span>
-              <span>{{ $t(info.viesti) }}</span>
+              <slot name="viesti" :info="info">
+                <span>{{ $t(info.viesti) }}</span>
+              </slot>
             </div>
             <div v-if="info.nimet && info.nimet.length > 0">
               <div v-for="nimi in info.nimet" :key="nimi._id">

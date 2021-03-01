@@ -204,7 +204,12 @@ const router = new VueRouter({
         path: 'julkaise',
         name: 'julkaise',
         component: RouteJulkaise,
-        props,
+        props: {
+          ...stores,
+          tiedotSivu: {
+            name: 'perusteenTiedot',
+          },
+        },
       }, {
         path: 'rakenne',
         name: 'muodostuminen',
@@ -343,7 +348,12 @@ const router = new VueRouter({
         path: 'julkaise',
         name: 'julkaiseOpas',
         component: RouteJulkaise,
-        props,
+        props: {
+          ...stores,
+          tiedotSivu: {
+            name: 'oppaanTiedot',
+          },
+        },
       }, {
         path: 'jarjesta',
         name: 'jarjestaOpas',

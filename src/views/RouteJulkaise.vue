@@ -14,7 +14,7 @@
     <div>
       <h3>{{ $t('tarkistukset') }}</h3>
       <ep-virhelistaus v-if="status"
-                       :validation="status" />
+                       :validation="statusRoute" />
       <EpSpinner v-else />
     </div>
 
@@ -106,7 +106,7 @@ import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
-import { PerusteDtoTilaEnum } from '@shared/api/eperusteet';
+import { PerusteDtoTilaEnum, NavigationNodeDto, Status } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
@@ -117,6 +117,7 @@ import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpJulkaisuHistoria from '@shared/components/EpJulkaisuHistoria/EpJulkaisuHistoria.vue';
+import { Route } from 'vue-router';
 
 @Component({
   components: {
@@ -142,6 +143,9 @@ import EpJulkaisuHistoria from '@shared/components/EpJulkaisuHistoria/EpJulkaisu
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
+
+  @Prop({ required: true })
+  protected tiedotSivu!: Route;
 
   private julkaistaan = false;
 
@@ -197,6 +201,37 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       this.$fail(this.$t('julkaisu-epaonnistui-peruste-' + err.response?.data?.syy) as string);
     }
     this.julkaistaan = false;
+  }
+
+  get statusRoute() {
+    if (this.status) {
+      return {
+        ...this.status,
+        infot: _.map((this.status.infot as Status[]), info => {
+          return {
+            ...info,
+            route: this.routeToNode(info.navigationNode),
+          };
+        }),
+      };
+    }
+  }
+
+  routeToNode(navigationNode: NavigationNodeDto | undefined): Route | null {
+    if (!navigationNode) {
+      return null;
+    }
+
+    switch (navigationNode.type) {
+    case 'tiedot':
+      return this.tiedotSivu;
+    case 'muodostuminen':
+      return {
+        name: 'muodostuminen',
+      } as any;
+    default:
+      return null;
+    }
   }
 }
 

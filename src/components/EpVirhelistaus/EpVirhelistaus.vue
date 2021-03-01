@@ -17,6 +17,14 @@
             v-if="infot[StatusValidointiStatusTypeEnum.VIRHE]"
             :infot="infot[StatusValidointiStatusTypeEnum.VIRHE]">
             <template #heading>{{ $t('julkaisun-estavat-virheet') }}</template>
+            <template v-slot:viesti="{info}">
+              <router-link :to="info.route" v-if="info.route">
+                {{$t(info.viesti)}}
+              </router-link>
+              <span v-else>
+                {{$t(info.viesti)}}
+              </span>
+            </template>
           </ep-virhelistaus-table>
           <ep-virhelistaus-table
             v-if="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]"
