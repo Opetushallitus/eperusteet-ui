@@ -199,6 +199,9 @@
                       <b-input-group>
                         <b-form-input v-model="liitteenNimi"></b-form-input>
                         <b-input-group-append>
+                          <b-button @click="peruutaLiite()" variant="secondary">
+                            {{ $t('peruuta') }}
+                          </b-button>
                           <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
                             {{ $t('lisaa-liite') }}
                           </b-button>
@@ -554,6 +557,11 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     });
     this.$success(this.$t('liitetiedosto-tallennettu') as string);
     this.fetchLiitteet();
+    this.file = null;
+    this.liitteenNimi = '';
+  }
+
+  peruutaLiite() {
     this.file = null;
     this.liitteenNimi = '';
   }
