@@ -79,7 +79,7 @@
         <ep-content v-model="julkaisu.tiedote"
                     layout="simplified"
                     :is-editable="true" />
-        <ep-button class="mt-3" @click="julkaise" :showSpinner="julkaistaan">
+        <ep-button class="mt-3" @click="julkaise" :showSpinner="julkaistaan" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
           {{ $t('julkaise') }}
         </ep-button>
       </b-form-group>

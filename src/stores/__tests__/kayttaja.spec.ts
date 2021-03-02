@@ -24,8 +24,14 @@ describe('Kayttajat', () => {
       pohja: ['luonti'],
     };
 
-    expect(await kayttajaStore.hasOikeus('hallinta', 'pohja')).toEqual(true);
+    expect(await kayttajaStore.hasOikeus('hallinta', 'pohja')).toEqual(false);
     expect(await kayttajaStore.hasOikeus('luku', 'pohja')).toEqual(true);
+
+    kayttajaStore.state.tiedot = {
+      oikeudet: ['ROLE_APP_EPERUSTEET_ADMIN_1.2.246.562.10.00000000001'],
+    };
+
+    expect(await kayttajaStore.hasOikeus('hallinta', 'pohja')).toEqual(true);
   });
 
   test('Rikkinäisillä parametreilla ei oikeuksia', async () => {

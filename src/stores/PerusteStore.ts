@@ -82,8 +82,13 @@ export class PerusteStore implements IEditoitava {
     if (this.state.projekti?.id) {
       this.state.projektiStatus = null;
       if (this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
-        const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
-        this.state.projektiStatus = res.data;
+        try {
+          const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
+          this.state.projektiStatus = res.data;
+        }
+        catch (e) {
+          this.state.projektiStatus = {};
+        }
       }
       else {
         this.state.projektiStatus = {};

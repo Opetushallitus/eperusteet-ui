@@ -25,7 +25,7 @@ function getOikeusArvo(oikeus: Oikeus) {
   }
 }
 
-const AdminOids = ['ROLE_APP_EPERUSTEET_CRUD_1.2.246.562.10.00000000001', 'ROLE_EPERUSTEET_ADMIN'];
+const AdminOids = ['ROLE_APP_EPERUSTEET_ADMIN_1.2.246.562.10.00000000001'];
 
 export function parsiEsitysnimi(tiedot: any): string {
   if (tiedot.kutsumanimi && tiedot.sukunimi) {
@@ -113,6 +113,10 @@ export class KayttajaStore implements IOikeusProvider {
   }
 
   private hasHallintaoikeus(kohde) {
+    if (kohde === 'pohja') {
+      return this.isAdmin.value;
+    }
+
     return _.includes(this.oikeudet.value[kohde], 'luonti');
   }
 }

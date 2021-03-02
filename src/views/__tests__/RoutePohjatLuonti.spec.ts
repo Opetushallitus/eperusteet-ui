@@ -20,7 +20,7 @@ describe('RoutePohjatLuonti component', () => {
   const ulkopuolisetStore = mock(UlkopuolisetStore);
   ulkopuolisetStore.state.tyoryhmat = mockTyoryhmat();
   const perusteprojektiStore = mock(PerusteprojektiStore);
-  perusteprojektiStore.addPerusteprojekti = jest.fn(async () => {
+  perusteprojektiStore.addPerusteprojektiPohja = jest.fn(async () => {
     return {
       id: 1,
     } as PerusteprojektiDto;
@@ -133,7 +133,7 @@ describe('RoutePohjatLuonti component', () => {
 
     wrapper.findAll('button.btn-primary').trigger('click');
 
-    expect(perusteprojektiStore.addPerusteprojekti).toHaveBeenCalled();
+    expect(perusteprojektiStore.addPerusteprojektiPohja).toHaveBeenCalled();
     await delay();
 
     expect(currentRoute.name).toBe('perusteprojekti');

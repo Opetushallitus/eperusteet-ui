@@ -19,7 +19,7 @@
             </b-col>
           </b-row>
           <b-row no-gutters>
-            <b-col lg="6" v-if="filtersContain('laajuus')" class="mb-4">
+            <b-col lg="6" v-if="filtersContain('laajuus') && data.vstSisalto" class="mb-4">
               <b-form-group :label="$t('laajuus')">
                 <div class="d-flex align-items-center">
                   <ep-input v-model="data.vstSisalto.laajuus"
