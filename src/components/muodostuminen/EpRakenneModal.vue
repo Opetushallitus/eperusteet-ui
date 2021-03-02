@@ -165,6 +165,11 @@ export default class EpRakenneModal extends Vue {
   private tyyppi: string | null = null;
   private tempModel: any;
 
+  private tyyppiRoolit = {
+    'rakenne-moduuli-yhteiset': 'vieras',
+    'rakenne-moduuli-paikalliset': 'määrittelemätön',
+  }
+
   set innerModel(innerModel) {
     this.$emit('input', innerModel);
   }
@@ -205,12 +210,17 @@ export default class EpRakenneModal extends Vue {
         nimi: _.get(_.find(this.osaamisalat, osaamisala => osaamisala.osaamisala.osaamisalakoodiUri === this.innerModel.osaamisala.osaamisalakoodiUri), 'nimi'),
       };
     }
-
-    if (this.tyyppi === 'tutkintonimike') {
+    else if (this.tyyppi === 'tutkintonimike') {
       this.innerModel = {
         ...this.innerModel,
         rooli: 'tutkintonimike',
         nimi: _.get(_.find(this.tutkintonimikkeet, tutkintonimike => tutkintonimike.tutkintonimike.tutkintonimikeUri === this.innerModel.tutkintonimike.tutkintonimikeUri), 'nimi'),
+      };
+    }
+    else if (this.tyyppi && this.tyyppiRoolit[this.tyyppi]) {
+      this.innerModel = {
+        ...this.innerModel,
+        rooli: this.tyyppiRoolit[this.tyyppi],
       };
     }
 
