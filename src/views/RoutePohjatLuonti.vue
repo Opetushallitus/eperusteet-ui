@@ -201,19 +201,24 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
   }
 
   async onSave() {
-    const luotu = await this.perusteprojektiStore.addPerusteprojekti({
-      nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
-      ryhmaOid: this.data.tyoryhma ? this.data.tyoryhma.oid : undefined,
-      koulutustyyppi: this.data.koulutustyyppi,
-      perusteId: this.data.pohja?.peruste.id,
-      tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.POHJA,
-    });
-    this.$router.push({
-      name: 'perusteprojekti',
-      params: {
-        projektiId: '' + luotu.id,
-      },
-    });
+    try {
+      const luotu = await this.perusteprojektiStore.addPerusteprojektiPohja({
+        nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
+        ryhmaOid: this.data.tyoryhma ? this.data.tyoryhma.oid : undefined,
+        koulutustyyppi: this.data.koulutustyyppi,
+        perusteId: this.data.pohja?.peruste.id,
+        tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.POHJA,
+      });
+      this.$router.push({
+        name: 'perusteprojekti',
+        params: {
+          projektiId: '' + luotu.id,
+        },
+      });
+    }
+    catch (e) {
+      this.$fail(this.$t('virhe-palvelu-virhe') as string);
+    }
   }
 
   onCancel() {

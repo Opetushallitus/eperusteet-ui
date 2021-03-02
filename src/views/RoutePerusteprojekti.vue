@@ -8,7 +8,7 @@
               <div class="d-flex flex-column align-items-center">
                 <div class="mb-1">{{$t(tila)}}</div>
 
-                <b-button class="px-3 py-1" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
+                <b-button class="px-3 py-1" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
                   {{$t('aseta-valmiiksi')}}
                 </b-button>
                 <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="!isPohja && tila && !isJulkaistu && !isArkistoitu">
@@ -22,7 +22,7 @@
             </b-button>
 
             <div v-if="isArkistoitu" class="d-flex flex-column align-items-center text-center">
-              <b-button class="px-3 py-1" variant="primary" @click="palauta">
+              <b-button class="px-3 py-1" variant="primary" @click="palauta" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
                 {{ $t('palauta') }}
               </b-button>
               <div class="font-size-08 mt-1">{{$t('voit-palauttaa-arkistoidun-perusteen-luonnostilaan')}}</div>
@@ -61,14 +61,18 @@
 
                 <div v-for="(ratasvalinta, index) in ratasvalintaFiltered" :key="'ratasvalinta'+index">
 
-                  <hr v-if="ratasvalinta.separator" class="mt-2 mb-2" />
+                  <hr v-if="ratasvalinta.separator && index !== (ratasvalintaFiltered.length - 1)" class="mt-2 mb-2" />
 
                   <b-dropdown-item v-if="ratasvalinta.route " :to="{ name: ratasvalinta.route }">
                     <fas :icon="ratasvalinta.icon" />
                     {{ $t(ratasvalinta.text) }}
                   </b-dropdown-item>
 
-                  <b-dropdown-item v-if="ratasvalinta.click" @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)" :disabled="ratasvalinta.disabled">
+                  <b-dropdown-item
+                    v-if="ratasvalinta.click"
+                    @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)"
+                    :disabled="ratasvalinta.disabled"
+                    v-oikeustarkastelu="ratasvalinta.meta.oikeus">
                     <fas :icon="ratasvalinta.icon" />
                     {{ $t(ratasvalinta.text) }}
                   </b-dropdown-item>
@@ -200,7 +204,8 @@
                   <ep-tekstikappale-lisays
                     @save="tallennaUusiTekstikappale"
                     :tekstikappaleet="perusteenOsat"
-                    :paatasovalinta="true">
+                    :paatasovalinta="true"
+                    v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
                     <template v-slot:default="{tekstikappale}">
                       <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
                       {{ $kaanna(tekstikappale.label) }}
@@ -213,7 +218,8 @@
                     :tekstikappaleet="perusteenOsat"
                     :paatasovalinta="true"
                     :otsikkoRequired="false"
-                    modalId="opintokokonaisuusLisays">
+                    modalId="opintokokonaisuusLisays"
+                    v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
                     <template v-slot:lisays-btn-text>
                       {{$t('uusi-opintokokonaisuus')}}
                     </template>
@@ -238,7 +244,8 @@
                     :tekstikappaleet="perusteenOsat"
                     :paatasovalinta="true"
                     :otsikkoRequired="false"
-                    modalId="koulutuksenosaLisays">
+                    modalId="koulutuksenosaLisays"
+                    v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
                     <template v-slot:lisays-btn-text>
                       {{$t('uusi-koulutuksenosa')}}
                     </template>
@@ -268,7 +275,7 @@
         </template>
 
         <template v-slot:bottom>
-          <div class="menu-item bottom-menu-item">
+          <div class="menu-item bottom-menu-item" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
             <router-link :to="jarjestaRoute">
               <span class="text-nowrap">
                 <fas icon="jarjesta" fixed-width />
@@ -313,6 +320,7 @@ import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
 import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
+import { KayttajaStore } from '@/stores/kayttaja';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -436,7 +444,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get ratasvalintaFiltered() {
-    return _.reject(this.ratasvalinnat, ratasvalinta => _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila);
+    return _.chain(this.ratasvalinnat)
+      .reject(ratasvalinta => _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila)
+      .filter(ratasvalinta => !ratasvalinta.meta?.oikeus || this.$hasOikeus(ratasvalinta.meta?.oikeus.oikeus, 'peruste'))
+      .value();
   }
 
   get popupStyle() {

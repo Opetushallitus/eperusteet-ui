@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { Page } from '@shared/tyypit';
 import '@shared/config/bootstrap';
 import '@shared/config/fontawesome';
+import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 Vue.use(VueCompositionApi);
 
 function map<T extends Vue, R>(wrapper: WrapperArray<T>, fn: (param: Wrapper<T>) => R): R[] {
@@ -21,6 +22,13 @@ function map<T extends Vue, R>(wrapper: WrapperArray<T>, fn: (param: Wrapper<T>)
 
 describe('Projektilistaus', () => {
   const localVue = createLocalVue();
+  localVue.use(Oikeustarkastelu, {
+    oikeusProvider: {
+      async hasOikeus() {
+        return true;
+      },
+    },
+  });
 
   const data = reactive({
     projects: null as Page<PerusteprojektiKevytDto[]> | null,

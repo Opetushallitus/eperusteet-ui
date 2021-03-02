@@ -22,13 +22,13 @@
     <div class="container tile-container">
       <div class="d-flex flex-row flex-wrap justify-content-center">
         <TilePerusteprojektit />
-        <TilePohjat />
+        <TilePohjat/>
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileOppaat :perusteOppaatStore="perusteOppaatStore"/>
         <TileArviointiasteikot />
         <TileVirheellisetPerusteet :virheellisetPerusteetStore="virheellisetPerusteetStore"/>
         <TilePalautteet />
-        <TileTilastot v-if="$isAdmin"/>
+        <TileTilastot/>
       </div>
     </div>
   </div>

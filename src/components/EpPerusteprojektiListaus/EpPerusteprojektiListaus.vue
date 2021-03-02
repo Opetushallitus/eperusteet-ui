@@ -7,8 +7,8 @@
         </slot>
       </div>
 
-      <div class="d-flex flex-wrap" v-if="items">
-        <div class="card-wrapper">
+      <div class="d-flex flex-wrap" v-if="ownProjects">
+        <div class="card-wrapper" v-oikeustarkastelu="luontioikeus">
           <ProjektiCard :full-background="true" :link="newRoute">
             <div class="d-flex align-items-center flex-column h-100">
               <div class="h-50 text-center d-flex align-items-center pt-4">
@@ -143,8 +143,8 @@
           </template>
         </b-table>
         <ep-pagination v-model="sivu"
-                       :per-page="perPage"
-                       :total-rows="total"/>
+                      :per-page="perPage"
+                      :total-rows="total"/>
       </div>
       <div v-else class="m-2 alert alert-info">
         {{ $t('ei-hakutuloksia') }}
@@ -211,6 +211,9 @@ export default class EpPerusteprojektiListaus extends Vue {
 
   @Prop({ required: false, default: () => ['koulutustyyppi', 'tila', 'voimassaolo'] })
   filters!: ProjektiFilter[];
+
+  @Prop({ required: false, default: () => ({ 'oikeus': 'hallinta', 'kohde': 'perusteprojekti' }) })
+  luontioikeus!: any;
 
   private koulutustyyppi: string | null = null;
   private peruste: PerusteKevytDto | null = null;

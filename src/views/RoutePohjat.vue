@@ -3,7 +3,8 @@
     <EpPerusteprojektiListaus :provider="pohjatStore"
                               :edit-route="'perusteprojekti'"
                               :new-route="{ name: 'pohjaLuonti' }"
-                              :is-pohja="true">
+                              :is-pohja="true"
+                              :luontioikeus="{ 'oikeus': 'hallinta', 'kohde': 'pohja' }">
       <h2 slot="upperheader">{{ $t('pohjasi') }}</h2>
       <h2 slot="lowerheader">{{ $t('kaikki-pohjat') }}</h2>
     </EpPerusteprojektiListaus>
