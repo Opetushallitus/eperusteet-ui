@@ -6,7 +6,7 @@
           <h1 class="bg-danger">slot: upperheader</h1>
         </slot>
 
-        <div class="d-flex flex-wrap" v-if="ownProjects">
+        <div class="d-flex flex-wrap pt-4" v-if="ownProjects">
           <div class="card-wrapper">
             <ProjektiCard :full-background="true" :link="newRoute">
               <div class="d-flex align-items-center flex-column h-100">
@@ -212,7 +212,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   @Prop({ required: false, default: () => ['koulutustyyppi', 'tila', 'voimassaolo'] })
   filters!: ProjektiFilter[];
 
-  @Prop({ required: false, default: () => ({ 'oikeus': 'hallinta', 'kohde': 'perusteprojekti' }) })
+  @Prop({ required: false, default: () => ({ 'oikeus': 'hallinta', 'kohde': 'peruste' }) })
   luontioikeus!: any;
 
   private koulutustyyppi: string | null = null;

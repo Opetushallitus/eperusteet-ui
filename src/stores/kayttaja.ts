@@ -26,6 +26,7 @@ function getOikeusArvo(oikeus: Oikeus) {
 }
 
 const AdminOids = ['ROLE_APP_EPERUSTEET_ADMIN_1.2.246.562.10.00000000001'];
+const CrudOids = ['ROLE_APP_EPERUSTEET_CRUD_1.2.246.562.10.00000000001'];
 
 export function parsiEsitysnimi(tiedot: any): string {
   if (tiedot.kutsumanimi && tiedot.sukunimi) {
@@ -55,6 +56,7 @@ export class KayttajaStore implements IOikeusProvider {
   public readonly oikeudet = computed(() => this.state.oikeudet);
   public readonly nimi = computed(() => parsiEsitysnimi(this.state.tiedot));
   public readonly isAdmin = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(AdminOids, oikeus)));
+  public readonly hasCrud = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(CrudOids, oikeus)));
 
   public async init() {
     try {
@@ -115,6 +117,10 @@ export class KayttajaStore implements IOikeusProvider {
   private hasHallintaoikeus(kohde) {
     if (kohde === 'pohja') {
       return this.isAdmin.value;
+    }
+
+    if (_.isEmpty(this.oikeudet.value)) {
+      return this.hasCrud.value;
     }
 
     return _.includes(this.oikeudet.value[kohde], 'luonti');
