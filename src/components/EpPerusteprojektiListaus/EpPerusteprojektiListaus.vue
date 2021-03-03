@@ -1,43 +1,43 @@
 <template>
   <div>
     <div v-if="showCards">
-      <div class="upper">
+      <div class="upper" v-oikeustarkastelu="luontioikeus">
         <slot name="upperheader">
           <h1 class="bg-danger">slot: upperheader</h1>
         </slot>
-      </div>
 
-      <div class="d-flex flex-wrap" v-if="ownProjects">
-        <div class="card-wrapper" v-oikeustarkastelu="luontioikeus">
-          <ProjektiCard :full-background="true" :link="newRoute">
-            <div class="d-flex align-items-center flex-column h-100">
-              <div class="h-50 text-center d-flex align-items-center pt-4">
-                <div class="ikoni">
-                  <fas icon="plus" />
+        <div class="d-flex flex-wrap" v-if="ownProjects">
+          <div class="card-wrapper">
+            <ProjektiCard :full-background="true" :link="newRoute">
+              <div class="d-flex align-items-center flex-column h-100">
+                <div class="h-50 text-center d-flex align-items-center pt-4">
+                  <div class="ikoni">
+                    <fas icon="plus" />
+                  </div>
+                </div>
+                <div class="h-50 text-center d-flex align-items-center pb-5">
+                  <div class="teksti">
+                    {{ $t('luo-uusi') }}
+                  </div>
                 </div>
               </div>
-              <div class="h-50 text-center d-flex align-items-center pb-5">
-                <div class="teksti">
-                  {{ $t('luo-uusi') }}
-                </div>
+            </ProjektiCard>
+          </div>
+          <EpSpinner v-if="!ownProjects" class="m-5"/>
+          <div v-else class="card-wrapper" v-for="project in ownProjects" :key="project.id">
+            <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
+                          :indicator="project.peruste.koulutustyyppi">
+              <template slot="lower" class="small-text">
+                {{ $t('tila-' + project.tila) }}
+              </template>
+              <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
+                {{ project.nimi }}
               </div>
-            </div>
-          </ProjektiCard>
+            </ProjektiCard>
+          </div>
         </div>
-        <EpSpinner v-if="!ownProjects" class="m-5"/>
-        <div v-else class="card-wrapper" v-for="project in ownProjects" :key="project.id">
-          <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                        :indicator="project.peruste.koulutustyyppi">
-            <template slot="lower" class="small-text">
-              {{ $t('tila-' + project.tila) }}
-            </template>
-            <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
-              {{ project.nimi }}
-            </div>
-          </ProjektiCard>
-        </div>
+        <EpSpinner v-else />
       </div>
-      <EpSpinner v-else />
     </div>
 
     <div class="lower" :class="{'mt-0': !showCards}">
@@ -452,10 +452,10 @@ export default class EpPerusteprojektiListaus extends Vue {
 
 .upper {
   margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .lower {
-  margin-top: 4rem;
 }
 
 .teksti {
