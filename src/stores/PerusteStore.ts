@@ -4,7 +4,7 @@ import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-a
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
-import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa } from '@shared/utils/perusteet';
+import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isKoulutustyyppiPdfTuettu } from '@shared/utils/perusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
@@ -37,6 +37,7 @@ export class PerusteStore implements IEditoitava {
   public readonly isVapaasivistystyo = computed(() => isVapaasivistystyoKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly julkaisut = computed(() => this.state.julkaisut);
   public readonly isPohja = computed(() => this.state.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA));
+  public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.peruste.value?.koulutustyyppi));
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {

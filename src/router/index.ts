@@ -164,6 +164,7 @@ const router = new VueRouter({
           route: 'perusteenPdfLuonti',
           icon: ['far', 'file-pdf'],
           text: 'luo-pdf',
+          disabled: () => !stores.perusteStore.pdfEnabled.value,
         }, {
           route: 'kasitteet',
           icon: 'kasitteet',
