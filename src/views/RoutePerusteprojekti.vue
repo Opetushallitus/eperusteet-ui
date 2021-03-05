@@ -63,7 +63,7 @@
 
                   <hr v-if="ratasvalinta.separator && index !== (ratasvalintaFiltered.length - 1)" class="mt-2 mb-2" />
 
-                  <b-dropdown-item v-if="ratasvalinta.route " :to="{ name: ratasvalinta.route }">
+                  <b-dropdown-item v-if="ratasvalinta.route " :to="{ name: ratasvalinta.route }" :disabled="ratasvalinta.disabled">
                     <fas :icon="ratasvalinta.icon" />
                     {{ $t(ratasvalinta.text) }}
                   </b-dropdown-item>
@@ -447,6 +447,12 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     return _.chain(this.ratasvalinnat)
       .reject(ratasvalinta => _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila)
       .filter(ratasvalinta => !ratasvalinta.meta?.oikeus || this.$hasOikeus(ratasvalinta.meta?.oikeus.oikeus, 'peruste'))
+      .map(ratasvalinta => {
+        return {
+          ...ratasvalinta,
+          disabled: ratasvalinta.disabled && ratasvalinta.disabled(),
+        };
+      })
       .value();
   }
 
