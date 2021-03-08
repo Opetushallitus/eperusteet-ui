@@ -13,15 +13,15 @@
                         :depth="depth"
                         :is-editing="isEditing"
                         :tutkinnonOsatMap="tutkinnonOsatMap"
-                        @toggle="toggleOpen"
                         @remove="remove(idx)"
                         @copy="copy(idx)"
-                        :isOpen="isOpen"
                         :parentMandatory="parentMandatory"
                         ref="muodostumisItem">
         </MuodostumisItem>
-
-        <div class="children" :class="{muodostumisryhma: !!node.rooli && depth > 0}" :style="{ 'padding-left': 30 + 'px' }" v-if="isOpen">
+        <div class="children"
+            :class="{muodostumisryhma: !!node.rooli && depth > 0}"
+            :style="{ 'padding-left': 30 + 'px' }"
+            v-if="node.isOpen || node.isOpen === undefined">
           <MuodostumisNode
             ref="childNode"
             :tutkinnonOsatMap="tutkinnonOsatMap"
@@ -120,7 +120,6 @@ export default class MuodostumisNode extends Vue {
   @Prop({ default: false })
   private copyToClipBoard!: Function;
 
-  private isOpen = true;
   private tempValue: any[] | null = null;
 
   get classes() {
@@ -132,15 +131,6 @@ export default class MuodostumisNode extends Vue {
     }
     else {
       return 'rakenne-moduuli';
-    }
-  }
-
-  toggleOpen(toggleStatus?) {
-    if (toggleStatus) {
-      this.isOpen = toggleStatus;
-    }
-    else {
-      this.isOpen = !this.isOpen;
     }
   }
 
@@ -235,11 +225,6 @@ export default class MuodostumisNode extends Vue {
   toggleDescription(toggle?) {
     _.forEach(this.$refs['muodostumisItem'], item => (item as any).toggleDescription(toggle));
     _.forEach(this.$refs['childNode'], item => (item as any).toggleDescription(toggle));
-  }
-
-  toggleRakenne(toggle?) {
-    this.toggleOpen(toggle);
-    _.forEach(this.$refs['childNode'], item => (item as any).toggleRakenne(toggle));
   }
 
   pakollinen(node) {

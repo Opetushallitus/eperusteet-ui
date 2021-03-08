@@ -107,9 +107,6 @@ export default class MuodostumisItem extends Vue {
   @Prop({ required: true })
   private tutkinnonOsatMap!: any;
 
-  @Prop({ default: true })
-  private isOpen!: boolean;
-
   @Prop({ default: false, type: Boolean })
   private parentMandatory!: boolean;
 
@@ -128,8 +125,22 @@ export default class MuodostumisItem extends Vue {
     return this.value.osat?.length > 0;
   }
 
+  get isOpen() {
+    if (this.innerModel.isOpen === undefined) {
+      this.innerModel = {
+        ...this.innerModel,
+        isOpen: true,
+      };
+    }
+
+    return this.innerModel.isOpen;
+  }
+
   toggleOpen() {
-    this.$emit('toggle');
+    this.innerModel = {
+      ...this.innerModel,
+      isOpen: !this.innerModel.isOpen,
+    };
   }
 
   get tosa() {

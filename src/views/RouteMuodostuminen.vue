@@ -273,7 +273,6 @@ import { Watch, Prop, Component, Vue, Provide, ProvideReactive } from 'vue-prope
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
 import draggable from 'vuedraggable';
-import { Kieli } from '@shared/tyypit';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
@@ -750,7 +749,22 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 
   toggleRakenne() {
     this.naytaRakenne = !this.naytaRakenne;
-    (this.$refs['root'] as any).toggleRakenne(this.naytaRakenne);
+    this.store?.setData(
+      {
+        ...this.store.data.value,
+        rakenne: {
+          ...this.store.data.value.rakenne,
+          osat: _.map(this.store.data.value.rakenne.osat, osa => this.toggleOsa(osa, this.naytaRakenne)),
+        },
+      });
+  }
+
+  toggleOsa(osa, isOpen) {
+    return {
+      ...osa,
+      isOpen,
+      osat: _.map(osa.osat, lapsi => this.toggleOsa(lapsi, isOpen)),
+    };
   }
 
   copy(val) {
