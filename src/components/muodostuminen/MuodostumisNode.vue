@@ -26,7 +26,8 @@
             :depth="depth + 1"
             v-model="node.osat"
             :is-editing="isEditing"
-            :parentMandatory="pakollinen(node)">
+            :parentMandatory="pakollinen(node)"
+            :copyToClipBoard="copyToClipBoard">
           </MuodostumisNode>
         </div>
       </div>
@@ -113,6 +114,9 @@ export default class MuodostumisNode extends Vue {
 
   @Prop({ default: false, type: Boolean })
   private parentMandatory!: boolean;
+
+  @Prop({ default: false })
+  private copyToClipBoard!: Function;
 
   private isOpen = true;
 
@@ -240,7 +244,9 @@ export default class MuodostumisNode extends Vue {
   }
 
   copy(idx: number) {
-    this.$emit('copy', getIndex(this.model, idx));
+    if (this.copyToClipBoard) {
+      this.copyToClipBoard(getIndex(this.model, idx));
+    }
   }
 }
 </script>

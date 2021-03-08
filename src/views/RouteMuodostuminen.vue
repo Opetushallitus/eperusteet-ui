@@ -68,7 +68,7 @@
                       ref="root"
                       :is-editing="isEditing"
                       :tutkinnonOsatMap="tutkinnonOsatMap"
-                      @copy="copy">
+                      :copyToClipBoard="copy">
                     </MuodostumisNode>
                   </div>
                 </div>
