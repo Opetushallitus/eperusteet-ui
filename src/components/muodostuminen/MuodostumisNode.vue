@@ -5,7 +5,9 @@
     tag="div"
     :class="classes"
     v-model="model"
-    @add="add">
+    @add="add"
+    @start="onDragStart"
+    @end="onDragEnd">
       <div v-for="(node, idx) in model" :key="node.tunniste || node.uuid || idx" class="muodostumisnode" :class="{'draggable': isEditing}">
         <MuodostumisItem v-model="model[idx]"
                         :depth="depth"
@@ -119,6 +121,7 @@ export default class MuodostumisNode extends Vue {
   private copyToClipBoard!: Function;
 
   private isOpen = true;
+  private tempValue: any[] | null = null;
 
   get classes() {
     if (this.depth === 0) {
@@ -183,12 +186,23 @@ export default class MuodostumisNode extends Vue {
       },
       disabled: !this.isEditing,
       ghostClass: 'rakenne-placeholder',
-      scrollSensitivity: 200,
+      scrollSensitivity: 50,
       forceFallback: true,
       move: (element) => {
         return !_.includes(element.to.classList, 'leikelauta') || !!element.draggedContext.element.rooli;
       },
     };
+  }
+
+  onDragStart(evt) {
+    this.tempValue = _.cloneDeep(this.model);
+  }
+
+  onDragEnd(evt) {
+    if (this.tempValue && _.includes(evt.to.classList, 'leikelauta')) {
+      this.model = this.tempValue;
+      this.tempValue = null;
+    }
   }
 
   public move(uuid: string, dir: 'up' | 'down' | 'left' | 'right') {
