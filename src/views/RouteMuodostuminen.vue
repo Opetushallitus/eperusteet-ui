@@ -76,7 +76,7 @@
                   <div class="menu p-3">
                     <h5 class="font-weight-600">{{ $t('leikelauta') }}</h5>
                     <div class="mt-3">
-                      <draggable v-model="leikelauta" v-bind="optionsLeikelauta" tag="div" class="leikelauta" :class="{'empty': leikelauta.length === 0}">
+                      <draggable v-model="leikelauta" v-bind="optionsLeikelauta" tag="div" class="leikelauta" :class="{'empty': leikelauta.length === 0}" @add="onLeikelautaAdd">
                         <div v-for="lauta in leikelautaWithColor"
                           :key="'leikelauta' + (lauta.tunniste || lauta.uuid)"
                           class="mb-1 d-flex justify-content-center align-items-center draggable kopioitava">
@@ -511,6 +511,14 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       },
       emptyInsertThreshold: 10,
     };
+  }
+
+  onLeikelautaAdd(evt) {
+    this.leikelauta = _.map(this.leikelauta, leike => {
+      return {
+        ...this.recursiveClone(leike),
+      };
+    });
   }
 
   get defaultOptions() {
