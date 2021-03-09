@@ -7,7 +7,11 @@
     <template slot="header">
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tiedotteet') }}</h1>
-        <ep-tiedote-modal ref="eptiedotemodal" :perusteet="perusteet" :tiedotteetStore="tiedotteetStore"/>
+        <ep-tiedote-modal
+          ref="eptiedotemodal"
+          :perusteet="perusteet"
+          :tiedotteetStore="tiedotteetStore"
+          :oikeustarkastelu="{oikeus:'hallinta'}"/>
       </div>
     </template>
 
