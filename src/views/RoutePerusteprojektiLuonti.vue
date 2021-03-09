@@ -51,7 +51,7 @@
 
                 <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi-ilman-pohjaa') }}</b-form-radio>
 
-                <template v-if="$isAdmin">
+                <template v-if="$isAdmin()">
                   <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="tiedostosta" name="tyyppi">{{ $t('tuo-tiedostosta') }}</b-form-radio>
                   <div v-if="tyyppi === 'tiedostosta'">
                     <ep-tiedosto-lataus :fileTypes="['application/json']" v-model="data.tiedosto" />

@@ -4,7 +4,7 @@ import { Store, Getter, State } from '@shared/stores/store';
 import { Kayttajat as KayttajatApi, KayttajanTietoDto, Perusteprojektit } from '@shared/api/eperusteet';
 import { createLogger } from '@shared/utils/logger';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { IOikeusProvider } from '@shared/plugins/oikeustarkastelu';
+import { IOikeusProvider, Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 
 Vue.use(VueCompositionApi);
 
@@ -25,8 +25,8 @@ function getOikeusArvo(oikeus: Oikeus) {
   }
 }
 
-const AdminOids = ['ROLE_APP_EPERUSTEET_ADMIN_1.2.246.562.10.00000000001'];
-const CrudOids = ['ROLE_APP_EPERUSTEET_CRUD_1.2.246.562.10.00000000001'];
+const OphAdminOids = ['ROLE_APP_EPERUSTEET_ADMIN_1.2.246.562.10.00000000001'];
+const OphCrudOids = ['ROLE_APP_EPERUSTEET_CRUD_1.2.246.562.10.00000000001'];
 
 export function parsiEsitysnimi(tiedot: any): string {
   if (tiedot.kutsumanimi && tiedot.sukunimi) {
@@ -55,8 +55,8 @@ export class KayttajaStore implements IOikeusProvider {
   public readonly virkailijat = computed(() => this.state.virkailijat);
   public readonly oikeudet = computed(() => this.state.oikeudet);
   public readonly nimi = computed(() => parsiEsitysnimi(this.state.tiedot));
-  public readonly isAdmin = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(AdminOids, oikeus)));
-  public readonly hasCrud = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(CrudOids, oikeus)));
+  public readonly isAdmin = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(OphAdminOids, oikeus)));
+  public readonly hasOphCrud = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(OphCrudOids, oikeus)));
 
   public async init() {
     try {
@@ -84,7 +84,6 @@ export class KayttajaStore implements IOikeusProvider {
       const res = await Perusteprojektit.getPerusteprojektiOikeudet(perusteprojektiId);
       this.state.projektiId = perusteprojektiId;
       this.state.oikeudet = res.data as any;
-      console.log('setting perusteprojekti', this.state);
     }
     catch (err) {
       logger.error('Ei oikeuksia', err.message);
@@ -120,7 +119,7 @@ export class KayttajaStore implements IOikeusProvider {
     }
 
     if (_.isEmpty(this.oikeudet.value)) {
-      return this.hasCrud.value;
+      return this.hasOphCrud.value;
     }
 
     return _.includes(this.oikeudet.value[kohde], 'luonti');

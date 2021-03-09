@@ -260,7 +260,6 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJarjesta from '@shared/components/EpJarjesta/EpJarjesta.vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
@@ -289,7 +288,6 @@ import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, RakenneModuuliT
     EpJarjesta,
     EpKoodistoSelect,
     EpMainView,
-    EpPerusteprojektiListaus,
     EpSearch,
     EpSpinner,
     EpToggle,

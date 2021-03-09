@@ -22,13 +22,13 @@
     <div class="container tile-container">
       <div class="d-flex flex-row flex-wrap justify-content-center">
         <TilePerusteprojektit />
-        <TilePohjat/>
+        <TilePohjat v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileOppaat :perusteOppaatStore="perusteOppaatStore"/>
-        <TileArviointiasteikot />
-        <TileVirheellisetPerusteet :virheellisetPerusteetStore="virheellisetPerusteetStore"/>
-        <TilePalautteet />
-        <TileTilastot/>
+        <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
+        <TileVirheellisetPerusteet :virheellisetPerusteetStore="virheellisetPerusteetStore" v-oikeustarkastelu="{oikeus:'hallinta'}"/>
+        <TilePalautteet v-oikeustarkastelu="{oikeus:'hallinta'}"/>
+        <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
       </div>
     </div>
   </div>

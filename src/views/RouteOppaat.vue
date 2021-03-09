@@ -3,9 +3,11 @@
     <EpPerusteprojektiListaus :provider="perusteOppaatStore"
                               :edit-route="'opas'"
                               :new-route="{ name: 'opasLuonti' }"
-                              :show-cards="false"
                               :fieldKeys="['nimi','koulutustyyppi','tila','luotu', 'globalVersion.aikaleima']"
-                              :filters="['koulutustyyppi', 'peruste', 'tila']">
+                              :filters="['koulutustyyppi', 'peruste', 'tila']"
+                              :showCards="!$isAdmin() && !$hasOphCrud()">
+      <h2 slot="upperheader">{{ $t('Oppaasi') }}</h2>
+      <h3 slot="cardsEmpty">{{ $t('ei-oppaita')}}</h3>
       <template v-slot:lowerheader>
         <div class="d-flex">
           <h2 class="pt-2 flex-grow-1">{{ $t('oppaat') }}</h2>
@@ -56,9 +58,7 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 import * as _ from 'lodash';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
-import { Kielet } from '@shared/stores/kieli';
 import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
-import { Perusteet, PerusteHakuInternalDto } from '@shared/api/eperusteet';
 
 @Component({
   components: {

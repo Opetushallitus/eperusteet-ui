@@ -1,13 +1,14 @@
 <template>
   <div>
     <div v-if="showCards">
-      <div class="upper" v-oikeustarkastelu="luontioikeus">
+      <div class="upper">
         <slot name="upperheader">
           <h1 class="bg-danger">slot: upperheader</h1>
         </slot>
 
-        <div class="d-flex flex-wrap pt-4" v-if="ownProjects">
-          <div class="card-wrapper">
+        <EpSpinner v-if="!ownProjects" />
+        <div class="d-flex flex-wrap pt-4" v-else>
+          <div class="card-wrapper" v-oikeustarkastelu="luontioikeus">
             <ProjektiCard :full-background="true" :link="newRoute">
               <div class="d-flex align-items-center flex-column h-100">
                 <div class="h-50 text-center d-flex align-items-center pt-4">
@@ -36,121 +37,129 @@
             </ProjektiCard>
           </div>
         </div>
-        <EpSpinner v-else />
+
+        <template v-if="ownProjects && !$hasOphCrud() && ownProjects.length === 0">
+          <slot name="cardsEmpty">
+            <h3>{{$t('ei-perusteprojekteja')}}</h3>
+          </slot>
+        </template>
+
       </div>
     </div>
 
-    <div class="lower" :class="{'mt-0': !showCards}">
-      <slot name="lowerheader">
-        <h1 class="bg-danger">slot: lowerheader</h1>
-      </slot>
-    </div>
-
-    <div class="filters" v-if="items">
-      <div class="d-lg-flex align-items-end">
-        <div class="mt-2 mb-2 mr-2 flex-fill">
-          <EpSearch v-model="query.nimi" :placeholder="$t('etsi-perusteprojektia')"/>
-        </div>
-        <div class="m-2 flex-fill" v-if="filtersInclude('koulutustyyppi')">
-          <label>{{ $t('koulutustyyppi') }}</label>
-          <koulutustyyppi-select v-model="koulutustyyppi" :isEditing="true"/>
-        </div>
-        <div class="m-2 flex-fill" v-if="filtersInclude('peruste')">
-          <label>{{ $t('peruste') }}</label>
-          <EpMultiSelect v-model="peruste"
-                    :enable-empty-option="true"
-                    placeholder="kaikki"
-                    :is-editing="true"
-                    :options="perusteet">
-            <template slot="singleLabel" slot-scope="{ option }">
-              {{ $kaanna(option.nimi) }}
-            </template>
-            <template slot="option" slot-scope="{ option }">
-              {{ $kaanna(option.nimi) }}
-            </template>
-          </EpMultiSelect>
-        </div>
-        <div class="m-2 flex-fill" v-if="filtersInclude('voimassaolo')">
-          <label>{{ $t('voimassaolo') }}</label>
-          <EpMultiSelect v-model="voimassaolo"
-                    :enable-empty-option="true"
-                    placeholder="kaikki"
-                    :is-editing="true"
-                    :options="vaihtoehdotVoimassaolo">
-            <template slot="singleLabel" slot-scope="{ option }">
-              {{ $t('ajoitus-' + option.toLowerCase()) }}
-            </template>
-            <template slot="option" slot-scope="{ option }">
-              {{ $t('ajoitus-' + option.toLowerCase()) }}
-            </template>
-          </EpMultiSelect>
-        </div>
-        <div class="mb-3">
-          <EpSpinner v-if="isLoading" />
-        </div>
+    <div v-oikeustarkastelu="{oikeus:'hallinta'}">
+      <div class="lower" :class="{'mt-0': !showCards}">
+        <slot name="lowerheader">
+          <h1 class="bg-danger">slot: lowerheader</h1>
+        </slot>
       </div>
 
-      <div class="d-lg-flex align-items-end">
-        <div class="m-2" v-if="filtersInclude('tila')">
-          <b-form-checkbox-group v-model="tila">
-            <b-form-checkbox v-for="tila in vaihtoehdotTilat" :key="tila" :value="tila">
-              {{ $t('tila-' + tila.toLowerCase()) }}
-            </b-form-checkbox>
-          </b-form-checkbox-group>
+      <div class="filters" v-if="items">
+        <div class="d-lg-flex align-items-end">
+          <div class="mt-2 mb-2 mr-2 flex-fill">
+            <EpSearch v-model="query.nimi" :placeholder="$t('etsi-perusteprojektia')"/>
+          </div>
+          <div class="m-2 flex-fill" v-if="filtersInclude('koulutustyyppi')">
+            <label>{{ $t('koulutustyyppi') }}</label>
+            <koulutustyyppi-select v-model="koulutustyyppi" :isEditing="true"/>
+          </div>
+          <div class="m-2 flex-fill" v-if="filtersInclude('peruste')">
+            <label>{{ $t('peruste') }}</label>
+            <EpMultiSelect v-model="peruste"
+                      :enable-empty-option="true"
+                      placeholder="kaikki"
+                      :is-editing="true"
+                      :options="perusteet">
+              <template slot="singleLabel" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
+              </template>
+              <template slot="option" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
+              </template>
+            </EpMultiSelect>
+          </div>
+          <div class="m-2 flex-fill" v-if="filtersInclude('voimassaolo')">
+            <label>{{ $t('voimassaolo') }}</label>
+            <EpMultiSelect v-model="voimassaolo"
+                      :enable-empty-option="true"
+                      placeholder="kaikki"
+                      :is-editing="true"
+                      :options="vaihtoehdotVoimassaolo">
+              <template slot="singleLabel" slot-scope="{ option }">
+                {{ $t('ajoitus-' + option.toLowerCase()) }}
+              </template>
+              <template slot="option" slot-scope="{ option }">
+                {{ $t('ajoitus-' + option.toLowerCase()) }}
+              </template>
+            </EpMultiSelect>
+          </div>
+          <div class="mb-3">
+            <EpSpinner v-if="isLoading" />
+          </div>
         </div>
-      </div>
 
-      <div v-if="items.data.length > 0">
-        <b-table
-          striped
-          hover
-          responsive
-          :items="items.data"
-          :fields="fields"
-          no-local-sorting
-          @sort-changed="sortingChanged"
-          :sort-by.sync="sort.sortBy"
-          :sort-desc.sync="sort.sortDesc">
-          <template v-slot:head(nimi)>
-            <slot name="nimiotsikko"></slot>
-          </template>
-          <template v-slot:cell(nimi)="data">
-            <router-link :to="{ name: editRoute, params: { projektiId: data.item.id } }">
-              {{ data.item.nimi }}
-            </router-link>
-          </template>
-          <template v-slot:cell(koulutustyyppi)="data">
-            <slot name="koulutustyyppisarake" :perusteProjekti="data.item">
-              <span class="text-nowrap">
-                <EpColorIndicator :size="10" :kind="data.item.koulutustyyppi" v-if="data.item.koulutustyyppi"/>
-                <span class="ml-1">
-                  {{ $t(data.item.koulutustyyppi) }}
+        <div class="d-lg-flex align-items-end">
+          <div class="m-2" v-if="filtersInclude('tila')">
+            <b-form-checkbox-group v-model="tila">
+              <b-form-checkbox v-for="tila in vaihtoehdotTilat" :key="tila" :value="tila">
+                {{ $t('tila-' + tila.toLowerCase()) }}
+              </b-form-checkbox>
+            </b-form-checkbox-group>
+          </div>
+        </div>
+
+        <div v-if="items.data.length > 0">
+          <b-table
+            striped
+            hover
+            responsive
+            :items="items.data"
+            :fields="fields"
+            no-local-sorting
+            @sort-changed="sortingChanged"
+            :sort-by.sync="sort.sortBy"
+            :sort-desc.sync="sort.sortDesc">
+            <template v-slot:head(nimi)>
+              <slot name="nimiotsikko"></slot>
+            </template>
+            <template v-slot:cell(nimi)="data">
+              <router-link :to="{ name: editRoute, params: { projektiId: data.item.id } }">
+                {{ data.item.nimi }}
+              </router-link>
+            </template>
+            <template v-slot:cell(koulutustyyppi)="data">
+              <slot name="koulutustyyppisarake" :perusteProjekti="data.item">
+                <span class="text-nowrap">
+                  <EpColorIndicator :size="10" :kind="data.item.koulutustyyppi" v-if="data.item.koulutustyyppi"/>
+                  <span class="ml-1">
+                    {{ $t(data.item.koulutustyyppi) }}
+                  </span>
                 </span>
-              </span>
-            </slot>
-          </template>
-          <template v-slot:cell(tila)="data">
-            <div class="d-flex">
-              {{ $t(data.item.tila) }}
-              <ep-button
-                v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
-                variant="link py-0"
-                icon="peruuta"
-                @click="restore(data.item)">
-                {{ $t('palauta') }}
-              </ep-button>
-            </div>
-          </template>
-        </b-table>
-        <ep-pagination v-model="sivu"
-                      :per-page="perPage"
-                      :total-rows="total"/>
+              </slot>
+            </template>
+            <template v-slot:cell(tila)="data">
+              <div class="d-flex">
+                {{ $t(data.item.tila) }}
+                <ep-button
+                  v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
+                  variant="link py-0"
+                  icon="peruuta"
+                  @click="restore(data.item)">
+                  {{ $t('palauta') }}
+                </ep-button>
+              </div>
+            </template>
+          </b-table>
+          <ep-pagination v-model="sivu"
+                        :per-page="perPage"
+                        :total-rows="total"/>
+        </div>
+        <div v-else class="m-2 alert alert-info">
+          {{ $t('ei-hakutuloksia') }}
+        </div>
       </div>
-      <div v-else class="m-2 alert alert-info">
-        {{ $t('ei-hakutuloksia') }}
-      </div>
+      <EpSpinner v-else />
     </div>
-    <EpSpinner v-else />
   </div>
 </template>
 
@@ -253,9 +262,11 @@ export default class EpPerusteprojektiListaus extends Vue {
   async onQueryChange(query: PerusteQuery) {
     this.isLoading = true;
     try {
-      await this.provider.updateQuery({
-        ...query,
-      });
+      if (this.$hasOphCrud()) {
+        await this.provider.updateQuery({
+          ...query,
+        });
+      }
     }
     catch (e) {
       this.$fail(this.$t('virhe-palvelu-virhe') as string);
