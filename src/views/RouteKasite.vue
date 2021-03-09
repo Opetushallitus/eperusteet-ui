@@ -10,7 +10,9 @@
       <div class="kasitelista m-3" v-if="termit.length > 0">
         <div class="row align-items-start" :class="{open: !termi.closed}" v-for="(termi, idx) in termitFiltered" :key="idx">
           <div class="col col-3 font-weight-bold pl-3" v-html="$kaanna(termi.termi)" />
-          <div class="col col-6 pl-3" v-html="$kaanna(termi.selitys)" />
+          <div class="col col-6 pl-3">
+            <ep-content :value="termi.selitys" layout="normal"></ep-content>
+          </div>
           <div class="col col-3 text-right toiminnot">
             <button class="btn btn-link" @click="avaaPoistoModal(termi)">
               <fas :icon="['far','trash-alt']" fixed-width="fixed-width"/>
@@ -51,7 +53,7 @@
         <ep-input v-model="kasite.termi" type="localized" help="kasite-termi-ohje" :validation="validation.termi" :is-editing="true"></ep-input>
       </ep-form-content>
       <ep-form-content name="kasite-selitys">
-        <ep-field help="kasite-selitys-ohje" v-model="kasite.selitys" :validation="validation.selitys" :is-editing="true" />
+        <ep-content v-model="kasite.selitys" help="kasite-selitys-ohje" :validation="validation.selitys" :is-editable="true" layout="normal"></ep-content>
       </ep-form-content>
 
       <template slot="modal-cancel">{{ $t('peruuta') }}</template>
@@ -79,6 +81,7 @@ import EpSubView from '@shared/components/EpSubView/EpSubView.vue';
 import { kasiteValidator } from '@shared/validators/kasite';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { createLogger } from '@shared/utils/logger';
+import EpContent from '@shared/components/EpContent/EpContent.vue';
 
 const logger = createLogger('RouteKasite');
 
@@ -92,6 +95,7 @@ const logger = createLogger('RouteKasite');
     EpButton,
     EpKielivalinta,
     EpField,
+    EpContent,
   },
   mixins: [
     validationMixin,
