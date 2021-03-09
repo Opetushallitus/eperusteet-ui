@@ -39,7 +39,6 @@
 <script lang="ts">
 import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJarjesta from '@shared/components/EpJarjesta/EpJarjesta.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
@@ -58,7 +57,6 @@ import { PerusteStore } from '@/stores/PerusteStore';
     EpIcon,
     EpJarjesta,
     EpMainView,
-    EpPerusteprojektiListaus,
     EpSpinner,
   },
 })

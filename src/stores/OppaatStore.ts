@@ -9,6 +9,7 @@ Vue.use(VueCompositionApi);
 export class OppaatStore {
   private state = reactive({
     oppaat: null as PerusteHakuDto[] | null,
+
   })
 
   public readonly projects = computed(() => this.state.oppaat);

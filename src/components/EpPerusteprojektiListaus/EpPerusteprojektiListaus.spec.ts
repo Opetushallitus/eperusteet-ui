@@ -54,7 +54,8 @@ describe('Projektilistaus', () => {
       localVue,
       mocks: {
         $t: x => x,
-        $isAdmin: { value: false },
+        $isAdmin: () => false,
+        $hasOphCrud: () => true,
       },
       stubs: {
         RouterLink: RouterLinkStub,
@@ -120,7 +121,8 @@ describe('Projektilistaus', () => {
       localVue,
       mocks: {
         $t: x => x,
-        $isAdmin: { value: true },
+        $isAdmin: () => true,
+        $hasOphCrud: () => true,
       },
       stubs: {
         RouterLink: RouterLinkStub,
