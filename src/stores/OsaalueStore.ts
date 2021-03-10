@@ -78,12 +78,14 @@ export class OsaalueStore implements IEditoitava {
       const saved = (await OsaAlueet.addOsaAlueV2(this.tovId, data)).data;
       await OsaalueStore.config.perusteStore.updateNavigation();
 
-      this.router.replace({
-        name: 'osaalue',
-        params: {
-          osaalueId: '' + saved.id!,
-        },
-      });
+      return () => {
+        this.router.replace({
+          name: 'osaalue',
+          params: {
+            osaalueId: '' + saved.id!,
+          },
+        });
+      };
     }
     else {
       await OsaAlueet.updateOsaAlueV2(this.tovId, Number(this.osaalueId), data);
