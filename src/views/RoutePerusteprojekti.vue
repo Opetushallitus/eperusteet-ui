@@ -475,10 +475,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get nimi() {
-    if (this.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.OPAS)) {
-      return this.projekti?.nimi;
-    }
-
     return this.$kaanna(this.peruste?.nimi as any) || this.projekti?.nimi;
   }
 

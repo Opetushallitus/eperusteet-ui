@@ -5,6 +5,9 @@ import { required } from 'vuelidate/lib/validators';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { PerusteStore } from './PerusteStore';
+import { requiredLokalisoituTeksti } from '@shared/validators/required';
+import { buildEsikatseluUrl } from '@shared/utils/esikatselu';
+import { koulutustyyppiTheme } from '@shared/utils/perusteet';
 
 export class OpasEditStore implements IEditoitava {
   constructor(
@@ -36,11 +39,13 @@ export class OpasEditStore implements IEditoitava {
       };
     });
 
-    return projekti;
+    return {
+      ...projekti,
+      esikatseluUrl: buildEsikatseluUrl(Kielet.getSisaltoKieli.value, `/opas/${_.get(projekti, '_peruste')}`),
+    };
   }
 
   async save(data: any) {
-    data.peruste.nimi = { [Kielet.getSisaltoKieli.value]: data.nimi };
     await Perusteet.updatePeruste(this.perusteId, data.peruste);
     await Perusteprojektit.updatePerusteprojekti(this.projektiId, data);
     await this.perusteStore.updateCurrent();
@@ -73,8 +78,10 @@ export class OpasEditStore implements IEditoitava {
 
   public readonly validator = computed(() => {
     return {
-      nimi: {
-        required,
+      peruste: {
+        nimi: {
+          ...requiredLokalisoituTeksti(),
+        },
       },
       ryhmaOid: {
         required,
