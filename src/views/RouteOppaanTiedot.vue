@@ -10,10 +10,10 @@
           <b-row no-gutters>
             <b-col lg="6">
               <b-form-group :label="$t('oppaan-nimi')+'*'">
-                <ep-input v-model="data.nimi"
-                          type="string"
+                <ep-input v-model="data.peruste.nimi"
+                          type="localized"
                           :is-editing="isEditing"
-                          :validation="validation.nimi"></ep-input>
+                          :validation="validation.peruste.nimi"></ep-input>
               </b-form-group>
             </b-col>
             <b-col lg="6">
@@ -103,13 +103,13 @@
         <h3 class="mt-4">{{ $t('esikatselu-ja-lataus') }}</h3>
         <b-container fluid>
           <b-row no-gutters>
-            <b-col lg="6">
-              <b-form-group v-if="!isEditing" :label="$t('salli-oppaan-esikatselu')">
-                <span v-if="data.esikatseltavissa">{{$t('kylla')}}</span>
-                <span v-else>{{$t('ei')}}</span>
-              </b-form-group>
-              <ep-toggle v-else v-model="data.esikatseltavissa"
-                        :is-editing="isEditing" :isSWitch="false">{{$t('salli-oppaan-esikatselu')}}</ep-toggle>
+             <b-col lg="6">
+              <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing" v-if="isEditing || !data.esikatseltavissa">
+                {{$t('salli-oppaan-esikatselu')}}
+              </ep-toggle>
+              <ep-external-link :url="data.esikatseluUrl" v-if="!isEditing && data.esikatseltavissa">
+                {{$t('esikatsele-opasta')}}
+              </ep-external-link>
             </b-col>
             <b-col lg="6" v-if="!isEditing">
               <b-form-group :label="$t('oppaan-lataus')">
@@ -148,6 +148,7 @@ import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { UiKielet } from '@shared/stores/kieli';
 import { MaintenanceStore } from '@/stores/MaintenanceStore';
+import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 
 @Component({
   components: {
@@ -163,6 +164,7 @@ import { MaintenanceStore } from '@/stores/MaintenanceStore';
     EpDatepicker,
     EpMultiListSelect,
     EpColorIndicator,
+    EpExternalLink,
   },
 })
 export default class RouteOppaanTiedot extends PerusteprojektiRoute {

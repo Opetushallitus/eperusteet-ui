@@ -37,8 +37,8 @@
         <template v-slot:tiedot>
 
           <b-form-group :label="$t('oppaan-nimi') + ' *'" required class="pl-0">
-            <ep-input v-model="data.nimi" :is-editing="true" :placeholder="$t('kirjoita-oppaan-nimi')"
-                :validation="$v.data.nimi" />
+            <ep-input v-model="data.lokalisoituNimi" :is-editing="true" :placeholder="$t('kirjoita-oppaan-nimi')"
+                :validation="$v.data.lokalisoituNimi" />
           </b-form-group>
 
           <b-form-group :label="$t('opastyoryhma') + ' *'" required class="pl-0">
@@ -244,7 +244,8 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
 
   async onSave() {
     const luotu = await this.oppaatStore.saveOpas({
-      nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
+      nimi: this.data.lokalisoituNimi[Kielet.getSisaltoKieli.value],
+      lokalisoituNimi: this.data.lokalisoituNimi,
       ryhmaOid: this.data.tyoryhma.oid,
       oppaanKoulutustyypit: _.filter(this.data.koulutustyypit, koulutustyyppi => koulutustyyppi !== null),
       oppaanPerusteet: this.data.perusteet,
@@ -266,7 +267,7 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
 
   get validator() {
     return {
-      nimi: requiredOneLang(),
+      lokalisoituNimi: requiredOneLang(),
     };
   }
 
