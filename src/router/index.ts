@@ -7,35 +7,36 @@ import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue';
 import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';
 import RouteHome from '@/views/RouteHome.vue';
 import RouteJarjesta from '@/views/RouteJarjesta.vue';
+import RouteJulkaise from '@/views/RouteJulkaise.vue';
+import RouteKaannokset from '@/views/RouteKaannokset.vue';
+import RouteKasite from '@/views/RouteKasite.vue';
+import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
+import RouteKvliite from '@/views/RouteKvliite.vue';
 import RouteMuodostuminen from '@/views/RouteMuodostuminen.vue';
+import RouteOpintokokonaisuus from '@/views/RouteOpintokokonaisuus.vue';
+import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
 import RouteOppaat from '@/views/RouteOppaat.vue';
 import RouteOppaatLuonti from '@/views/RouteOppaatLuonti.vue';
+import RoutePalautteet from '@/views/RoutePalautteet.vue';
+import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
+import RoutePerusteenTiedot from '@/views/RoutePerusteenTiedot.vue';
 import RoutePerusteprojekti from '@/views/RoutePerusteprojekti.vue';
 import RoutePerusteprojektiLuonti from '@/views/RoutePerusteprojektiLuonti.vue';
 import RoutePerusteprojektit from '@/views/RoutePerusteprojektit.vue';
 import RoutePohjat from '@/views/RoutePohjat.vue';
-import RouteJulkaise from '@/views/RouteJulkaise.vue';
 import RoutePohjatLuonti from '@/views/RoutePohjatLuonti.vue';
+import RouteProjektiTiedot from '@/views/RouteProjektiTiedot.vue';
 import RouteRoot from '@/views/RouteRoot.vue';
 import RouteTekstikappale from '@/views/RouteTekstikappale.vue';
 import RouteTermisto from '@/views/RouteTermisto.vue';
-import RouteProjektiTiedot from '@/views/RouteProjektiTiedot.vue';
-import RoutePerusteenTiedot from '@/views/RoutePerusteenTiedot.vue';
-import RouteKvliite from '@/views/RouteKvliite.vue';
 import RouteTiedotteet from '@/views/RouteTiedotteet.vue';
+import RouteTilastot from '@/views/RouteTilastot.vue';
 import RouteTutkinnonOsa from '@/views/RouteTutkinnonOsa.vue';
 import RouteTutkinnonOsanOsaalue from '@/views/tutkinnonosat/RouteTutkinnonOsanOsaalue.vue';
 import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
 import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
-import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
-import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
-import RouteKasite from '@/views/RouteKasite.vue';
-import RouteOpintokokonaisuus from '@/views/RouteOpintokokonaisuus.vue';
-import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
-import RouteTilastot from '@/views/RouteTilastot.vue';
-import RoutePalautteet from '@/views/RoutePalautteet.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -77,6 +78,10 @@ const router = new VueRouter({
       name: 'home',
       component: RouteHome,
       props,
+    }, {
+      path: 'kaannokset',
+      name: 'kaannokset',
+      component: RouteKaannokset,
     }, {
       path: 'virhe',
       name: 'virhe',
