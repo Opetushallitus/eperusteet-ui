@@ -1,7 +1,7 @@
 <template>
   <div class="home-container minfull">
     <div class="header" ref="header">
-      <EpNavbar :kayttaja="kayttaja" />
+      <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet"/>
       <PortalTarget ref="innerPortal" name="headerExtension" />
     </div>
     <RouterView />
@@ -129,6 +129,10 @@ export default class RouteRoot extends Vue {
         }, 100);
       }
     }
+  }
+
+  get sovellusOikeudet() {
+    return this.kayttajaStore?.sovellusOikeudet.value;
   }
 }
 </script>

@@ -4,7 +4,8 @@ import { Store, Getter, State } from '@shared/stores/store';
 import { Kayttajat as KayttajatApi, KayttajanTietoDto, Perusteprojektit } from '@shared/api/eperusteet';
 import { createLogger } from '@shared/utils/logger';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { IOikeusProvider, Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
+import { getSovellusoikeudet, IOikeusProvider, Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
+import { getCasKayttaja } from '@shared/api/common';
 
 Vue.use(VueCompositionApi);
 
@@ -47,6 +48,7 @@ export class KayttajaStore implements IOikeusProvider {
     virkailijat: [] as any[],
     oikeudet: {
     } as Oikeudet,
+    casKayttaja: null as any | null,
   });
 
   public readonly organisaatiot = computed(() => this.state.organisaatiot);
@@ -57,11 +59,14 @@ export class KayttajaStore implements IOikeusProvider {
   public readonly nimi = computed(() => parsiEsitysnimi(this.state.tiedot));
   public readonly isAdmin = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(OphAdminOids, oikeus)));
   public readonly hasOphCrud = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(OphCrudOids, oikeus)));
+  public readonly casKayttaja = computed(() => this.state.casKayttaja);
+  public readonly sovellusOikeudet = computed(() => getSovellusoikeudet(this.state.casKayttaja?.groups, 'APP_EPERUSTEET'));
 
   public async init() {
     try {
       logger.info('Haetaan käyttäjän tiedot');
       this.state.tiedot = (await KayttajatApi.getKirjautunutKayttajat()).data;
+      this.state.casKayttaja = await getCasKayttaja();
       logger.info('Käyttäjän tiedot', this.tiedot.value);
     }
     catch (err) {
