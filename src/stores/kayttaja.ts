@@ -65,8 +65,8 @@ export class KayttajaStore implements IOikeusProvider {
   public async init() {
     try {
       logger.info('Haetaan käyttäjän tiedot');
-      this.state.tiedot = (await KayttajatApi.getKirjautunutKayttajat()).data;
       this.state.casKayttaja = await getCasKayttaja();
+      this.state.tiedot = (await KayttajatApi.getKirjautunutKayttajat()).data;
       logger.info('Käyttäjän tiedot', this.tiedot.value);
     }
     catch (err) {
