@@ -734,7 +734,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 }
 
 .navigation {
-  min-height: 1200px;
+  height: calc(100% - 145px);
 }
 
 .heading {
