@@ -52,6 +52,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "file-loader": "^5.0.2",
+    "file-saver": "^2.0.5",
     "husky": "^4.2.3",
     "lint-staged": "^10.1.2",
     "lodash": "^4.17.15",
@@ -67,8 +68,8 @@
     "typescript": "3.7.5",
     "uuid": "^7.0.2",
     "vue": "^2.6.10",
-    "vue-axe": "^1.0.7",
     "vue-apexcharts": "^1.5.2",
+    "vue-axe": "^1.0.7",
     "vue-class-component": "^7.0.2",
     "vue-i18n": "^8.15.3",
     "vue-loading-overlay": "^3.2.0",
@@ -83,14 +84,16 @@
     "vue-social-sharing": "^2.4.7",
     "vue-sticky-directive": "^0.0.10",
     "vue-template-compiler": "^2.6.10",
+    "vue-upload-component": "^2.8.22",
     "vue2-datepicker": "^3.3.0",
     "vuedraggable": "^2.23.2",
     "vuelidate": "^0.7.5",
     "vuelidate-property-decorators": "^1.0.28",
-    "vuex": "^3.1.2"
+    "vuex": "^3.1.2",
+    "xlsx": "^0.16.9"
   },
   "engines": {
-    "node": "^10 || ^12"
+    "node": "^10 || ^12 || ^14"
   },
   "resolutions": {
     "prosemirror-model": "1.8.2",

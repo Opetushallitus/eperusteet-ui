@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import Vue from 'vue';
-import { Store, Getter, State } from '@shared/stores/store';
 import { Kayttajat as KayttajatApi, KayttajanTietoDto, Perusteprojektit } from '@shared/api/eperusteet';
 import { createLogger } from '@shared/utils/logger';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
@@ -46,9 +45,9 @@ export class KayttajaStore implements IOikeusProvider {
     organisaatiot: [] as any[],
     tiedot: {} as KayttajanTietoDto,
     virkailijat: [] as any[],
+    casKayttaja: null as any,
     oikeudet: {
     } as Oikeudet,
-    casKayttaja: null as any | null,
   });
 
   public readonly organisaatiot = computed(() => this.state.organisaatiot);
