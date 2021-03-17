@@ -39,7 +39,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import { PalautteetStore } from '@/stores/PalautteetStore';
-import { kaannokset } from '@shared/stores/kieli';
+import { getMessages } from '@shared/stores/kieli';
 import { Api } from '@shared/api/eperusteet';
 import { saveAs } from 'file-saver';
 
@@ -137,6 +137,8 @@ export default class RouteKaannokset extends Vue {
       'eperusteet-ylops': {},
       'eperusteet-amosaa': {},
     } as any;
+
+    const kaannokset = getMessages();
 
     for (const kaannos in kaannokset.fi) {
       result.eperusteet[kaannos] = {
