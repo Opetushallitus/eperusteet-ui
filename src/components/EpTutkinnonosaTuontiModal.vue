@@ -62,6 +62,7 @@
               <fas v-if="item.selected" icon="check-square" class="checked mr-2"/>
               <fas v-else :icon="['far', 'square']" class="checked mr-2"/>
               <span>{{$kaanna(item.nimi)}}</span>
+              <span v-if="item.tutkinnonOsa.koodiArvo">({{item.tutkinnonOsa.koodiArvo}})</span>
             </div>
           </template>
           <template v-slot:cell(peruste)="{ item, value }">
