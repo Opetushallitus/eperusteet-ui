@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Matala, Perusteenosat, Sisallot, PerusteprojektiListausDto, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import { Matala, Perusteenosat, Sisallot, PerusteprojektiListausDto, PerusteDtoTyyppiEnum, Laaja } from '@shared/api/eperusteet';
 import { Revision, Page } from '@shared/tyypit';
 import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
@@ -20,7 +20,7 @@ interface TekstikappaleStoreConfig {
 
 export class TekstikappaleStore implements IEditoitava {
   private state = reactive({
-    tekstikappale: null as Matala | null,
+    tekstikappale: null as Laaja | null,
   });
 
   private static config: TekstikappaleStoreConfig;
@@ -57,7 +57,10 @@ export class TekstikappaleStore implements IEditoitava {
 
   public async load() {
     await this.fetch();
-    return this.tekstikappale.value;
+    return {
+      ...this.tekstikappale.value,
+      originalNimi: this.tekstikappale.value?.nimi,
+    };
   }
 
   public async save(data: Matala) {

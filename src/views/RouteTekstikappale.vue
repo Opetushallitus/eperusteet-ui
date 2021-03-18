@@ -16,10 +16,17 @@
             </ep-select>
           </div>
 
-          <h3>{{$t('otsikko')}}</h3>
-          <ep-input v-model="data.nimi" :is-editing="true" :validation="validation.nimi" :disabled="data.osaamisala"></ep-input>
-          <!-- <ep-input v-else v-model="data.osaamisala.nimi" :is-editing="true" :disabled="true"></ep-input> -->
+          <div v-if="tutkintonimikkeet.length > 0" class="mb-4">
+            <h3>{{$t('tutkintonimikkeet')}}</h3>
+            <ep-select :items="tutkintonimikkeet" v-model="data.tutkintonimike" :is-editing="true">
+              <template #default="{ item }">
+                {{$kaanna(item.nimi)}}
+              </template>
+            </ep-select>
+          </div>
 
+          <h3>{{$t('otsikko')}}</h3>
+          <ep-input v-model="data.nimi" :is-editing="true" :validation="validation.nimi" :disabled="!!data.osaamisala || !!data.tutkintonimike"></ep-input>
           <ep-toggle class="mt-4" v-model="data.liite">{{$t('nayta-tekstikappale-liitteena')}}</ep-toggle>
         </div>
         <div :class="{ 'mt-4': isEditing }">
@@ -138,7 +145,7 @@ export default class RouteTekstikappale extends Vue {
 
   private store: EditointiStore | null = null;
   private storet = {};
-  private oldNimi: Object | null = null;
+  private blockChange = false;
 
   mounted() {
     this.storet = _.chain(this.koodistoryhmat)
@@ -168,6 +175,18 @@ export default class RouteTekstikappale extends Vue {
     return this.perusteStore.peruste.value?.osaamisalat;
   }
 
+  get tutkintonimikkeet() {
+    return _.map(this.perusteStore.peruste.value?.tutkintonimikkeet, tutkintonimike => {
+      return {
+        nimi: tutkintonimike.nimi,
+        uri: tutkintonimike.tutkintonimikeUri,
+        arvo: tutkintonimike.tutkintonimikeArvo,
+        koodisto: 'tutkintonimikkeet',
+        versio: null,
+      };
+    });
+  }
+
   get koodistot() {
     return _.chain(this.koodistoryhmat)
       .map(koodistoRyhma => {
@@ -184,11 +203,41 @@ export default class RouteTekstikappale extends Vue {
       .value();
   }
 
+  async doWatchBlock(watch) {
+    if (!this.blockChange) {
+      this.blockChange = true;
+      await watch();
+      this.blockChange = false;
+    }
+  }
+
   @Watch('store.data.value.osaamisala', { immediate: true })
   async onOsaamisalaChange(val, oldVal) {
-    if (!oldVal) {
-      this.oldNimi = this.store?.data.value.nimi;
-    }
+    await this.doWatchBlock(async () => {
+      if (val) {
+        this.store?.setData({
+          ...this.store?.data.value,
+          tutkintonimike: null,
+        });
+      }
+      this.koodiNimikeChange(val, oldVal);
+    });
+  }
+
+  @Watch('store.data.value.tutkintonimike', { immediate: true })
+  async onTutkintonimikeChange(val, oldVal) {
+    await this.doWatchBlock(async () => {
+      if (val) {
+        this.store?.setData({
+          ...this.store?.data.value,
+          osaamisala: null,
+        });
+      }
+      this.koodiNimikeChange(val, oldVal);
+    });
+  }
+
+  koodiNimikeChange(val, oldVal) {
     if (!val) {
       val = { nimi: this.oldNimi };
     }
@@ -198,6 +247,10 @@ export default class RouteTekstikappale extends Vue {
         nimi: val.nimi,
       });
     }
+  }
+
+  get oldNimi() {
+    return this.store?.data.value.originalNimi;
   }
 
   @Watch('tekstikappaleId', { immediate: true })
