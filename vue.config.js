@@ -37,4 +37,7 @@ module.exports = {
     port: 9001,
     proxy,
   },
+  transpileDependencies: [
+    /[\\/]node_modules[\\/]tiptap.*/,
+  ],
 };

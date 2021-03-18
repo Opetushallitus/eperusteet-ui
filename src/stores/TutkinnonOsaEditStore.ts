@@ -84,7 +84,14 @@ export class TutkinnonOsaEditStore implements IEditoitava {
         TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!,
         this.tutkinnonOsaViiteId,
         data);
-      return res.data;
+
+        TutkinnonOsaEditStore.config!.perusteStore!.updateNavigationEntry({
+          id: data.id!,
+          type: 'tutkinnonosaviite',
+          label: data.tutkinnonOsa!.nimi as any,
+        });
+
+        return res.data;
     }
     else {
       const res = await TutkinnonRakenne.addTutkinnonOsa(
