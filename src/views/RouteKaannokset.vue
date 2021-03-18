@@ -79,10 +79,7 @@ export default class RouteKaannokset extends Vue {
 
       if (rows[0]
         && rows[0].hasOwnProperty('kategoria')
-        && rows[0].hasOwnProperty('avain')
-        && rows[0].hasOwnProperty('suomi')
-        && rows[0].hasOwnProperty('ruotsi')
-        && rows[0].hasOwnProperty('englanti')) {
+        && rows[0].hasOwnProperty('avain')) {
         const send = [] as any[];
         const originals = await this.fetchTranslations();
 
