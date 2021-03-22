@@ -30,7 +30,7 @@ export class PalautteetStore implements ITPalauteProvider {
       else {
         const request = Api.request({
           method: 'GET',
-          url: `${window.location.origin}/palaute/api/palaute?q=eperusteet`,
+          url: `${window.location.origin}/palaute/api/palaute?q=${palautekanava}`,
           headers: {
             'Content-Type': 'application/json',
           },
