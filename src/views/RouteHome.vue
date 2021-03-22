@@ -31,6 +31,9 @@
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
       </div>
     </div>
+
+    <EpFeedbackModal :palauteProvider="palautteetStore"/>
+
   </div>
 </template>
 
@@ -52,6 +55,8 @@ import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore';
+import { PalautteetStore } from '@/stores/PalautteetStore';
+import EpFeedbackModal from '@shared/components/EpFeedback/EpFeedbackModal.vue';
 
 @Component({
   components: {
@@ -66,6 +71,7 @@ import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore'
     TileArviointiasteikot,
     TileTilastot,
     TilePalautteet,
+    EpFeedbackModal,
   },
 })
 export default class Home extends Vue {
@@ -80,6 +86,9 @@ export default class Home extends Vue {
 
   @Prop({ required: true })
   private virheellisetPerusteetStore!: VirheellisetPerusteetStore;
+
+  @Prop({ required: true })
+  private palautteetStore!: PalautteetStore;
 
   private rajain = '';
 
