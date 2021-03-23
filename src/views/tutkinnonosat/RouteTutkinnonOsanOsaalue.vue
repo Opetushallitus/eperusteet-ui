@@ -49,7 +49,6 @@
         <ep-collapse tyyppi="pakolliset-osaamistavoitteet" :border-bottom="false" :border-top="true">
           <h3 slot="header">{{ $t('pakolliset-osaamistavoitteet') }}</h3>
           <Osaamistavoite v-model="data.pakollisetOsaamistavoitteet"
-                          :arviointi-store="arviointiStore"
                           :is-valinnainen="false"
                           :is-editing="isEditing">
           </Osaamistavoite>
@@ -69,7 +68,6 @@
           </div>
 
           <Osaamistavoite v-model="data.valinnaisetOsaamistavoitteet"
-                          :arviointi-store="arviointiStore"
                           v-if="data.valinnaisetOsaamistavoitteet"
                           :is-valinnainen="true"
                           :is-editing="isEditing">
@@ -119,7 +117,7 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import Osaamistavoite from './Osaamistavoite.vue';
+import Osaamistavoite from '@shared/components/EpOsaamistavoite/Osaamistavoite.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
 import EpGeneerinenAsteikko from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
