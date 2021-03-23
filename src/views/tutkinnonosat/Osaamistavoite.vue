@@ -15,7 +15,7 @@
                                  :kaannos-vaatimukset="$t('tavoitteet')"
                                  :kohde="{ fi: $t('opiskelija') }"
                                  :tavoitekoodisto="'osaamistavoitteet'"
-                                 :show-kohde="false"
+                                 :show-kohde="true"
                                  :is-editing="isEditing" />
     </b-form-group>
   </div>
@@ -23,40 +23,15 @@
 
 <script lang="ts">
 import { Watch, Prop, Component, Vue } from 'vue-property-decorator'; import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
-import EpInput from '@shared/components/forms/EpInput.vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import { Koodisto } from '@shared/api/eperusteet';
-import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
-import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { LokalisoituTekstiDto } from '@shared/tyypit';
-import { PerusteStore } from '@/stores/PerusteStore';
-import { OsaalueStore } from '@/stores/OsaalueStore';
-import { ArviointiStore } from '@/stores/ArviointiStore';
-import { PerusteprojektiRoute } from '../PerusteprojektiRoute';
-import EpGeneerinenAsteikko from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
 
 import _ from 'lodash';
 
 @Component({
   components: {
     EpAmmattitaitovaatimukset,
-    EpButton,
-    EpCollapse,
-    EpContent,
-    EpEditointi,
-    EpGeneerinenAsteikko,
-    EpInput,
-    EpKoodistoSelect,
     EpLaajuusInput,
-    EpSpinner,
-    EpToggle,
   },
 })
 export default class Osaamistavoite extends Vue {
@@ -91,9 +66,6 @@ export default class Osaamistavoite extends Vue {
 
   @Prop({ default: false })
   isEditing!: boolean;
-
-  @Prop({ required: true })
-  arviointiStore!: ArviointiStore;
 
   @Prop({ required: false })
   validation!: any;
