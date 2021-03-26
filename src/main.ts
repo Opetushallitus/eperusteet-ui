@@ -37,6 +37,7 @@ import { registerIconColorSchemeChange } from '@shared/utils/icon';
 import router from './router';
 
 import { stores } from '@/stores';
+import { getKaannokset } from '@shared/api/eperusteet';
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
@@ -122,6 +123,7 @@ async function main() {
     i18n: Kielet.i18n,
     render: h => h(App),
   }).$mount('#app');
+  Kielet.load(await getKaannokset('eperusteet'));
 }
 
 main();
