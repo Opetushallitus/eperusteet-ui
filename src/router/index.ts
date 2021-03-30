@@ -37,6 +37,7 @@ import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
 import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
+import RouteTavoitesisaltoalue from '@/views/RouteTavoitesisaltoalue.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -285,6 +286,11 @@ const router = new VueRouter({
         path: 'koulutuksenosa/:koulutuksenosaId',
         name: 'koulutuksenosa',
         component: RouteKoulutuksenOsa,
+        props,
+      }, {
+        path: 'tavoitesisaltoalue/:tavoitesisaltoalueId',
+        name: 'tavoitesisaltoalue',
+        component: RouteTavoitesisaltoalue,
         props,
       },
       ],

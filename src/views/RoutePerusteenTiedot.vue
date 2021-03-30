@@ -355,6 +355,9 @@ const koulutustyyppiTietoFilters = {
   'koulutustyyppi_10': [
     'laajuus', 'diaarinumero', 'paatospaivamaara', 'siirtymaPaattyy', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli',
   ],
+  'koulutustyyppi_35': [
+    'diaarinumero', 'paatospaivamaara', 'siirtymaPaattyy', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli',
+  ],
 };
 
 @Component({
