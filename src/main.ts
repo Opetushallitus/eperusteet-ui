@@ -38,6 +38,7 @@ import router from './router';
 
 import { stores } from '@/stores';
 import { getKaannokset } from '@shared/api/eperusteet';
+import { TavoitesisaltoalueStore } from './stores/TavoitesisaltoalueStore';
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
@@ -103,6 +104,11 @@ Vue.use(MuodostuminenStore, {
 });
 
 Vue.use(OpintokokonaisuusStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(TavoitesisaltoalueStore, {
   perusteStore: stores.perusteStore,
   router,
 });
