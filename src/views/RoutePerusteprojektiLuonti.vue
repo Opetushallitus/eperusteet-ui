@@ -38,12 +38,19 @@
                     :placeholder="$t('valitse-peruste')"
                     :is-editing="true"
                     :search-identity="nimiSearchIdentity"
-                    :options="perusteet">
+                    :options="perusteet"
+                    class="perustevalinta">
                     <template slot="singleLabel" slot-scope="{ option }">
                       {{ $kaanna(option.nimi) }}
+                      <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
+                        (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span>-<span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                      </span>
                     </template>
                     <template slot="option" slot-scope="{ option }">
                       {{ $kaanna(option.nimi) }}
+                      <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
+                        (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span> - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                      </span>
                     </template>
                   </EpMultiSelect>
                   <EpSpinner v-else />
@@ -542,6 +549,13 @@ export default class RoutePerusteprojektiLuonti extends Vue {
 
   .nimi {
     font-weight: 600;
+  }
+}
+
+.perustevalinta {
+
+  .voimassaolo {
+    font-size:0.9rem;
   }
 }
 
