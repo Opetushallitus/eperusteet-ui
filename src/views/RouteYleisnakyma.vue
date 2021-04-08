@@ -12,7 +12,7 @@
           <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
           <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
           <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore" v-if="isAmmatillinen"/>
-          <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore" v-if="isVapaasivistystyo"/>
+          <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore"/>
         </div>
         <div class="col">
           <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>

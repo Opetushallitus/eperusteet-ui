@@ -5,7 +5,7 @@
     <ep-spinner v-if="!peruste" />
 
     <ep-small-data-box :topic="$t('tekstikappaleita')" :count="tekstikappaleita" />
-    <ep-small-data-box :topic="$t('opintokokonaisuutta')" :count="opintokokonaisuutta" />
+    <ep-small-data-box v-if="hasLisasisalto" :topic="$t(lisasisaltoOtsikko)" :count="lisasisaltoMaara" />
 
   </div>
 </template>
@@ -19,6 +19,25 @@ import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { PerusteDto } from '@shared/api/eperusteet';
 import EpSmallDataBox from '@/components/EpYleisnakyma/EpSmallDataBox.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
+
+const koulutustyyppiLisasisalto = {
+  'koulutustyyppi_10': {
+    otsikko: 'opintokokonaisuutta',
+    tietue: 'opintokokonaisuus',
+  },
+  'koulutustyyppi_30': {
+    otsikko: 'tavoitesisaltoalueita',
+    tietue: 'tavoitesisaltoalue',
+  },
+  'koulutustyyppi_35': {
+    otsikko: 'tavoitesisaltoalueita',
+    tietue: 'tavoitesisaltoalue',
+  },
+  'koulutustyyppi_40': {
+    otsikko: 'koulutuksenosaa',
+    tietue: 'koulutuksenosa',
+  },
+};
 
 @Component({
   components: {
@@ -38,8 +57,16 @@ export default class EpRakenne extends Vue {
     return _.size(_.filter(this.sisaltoFlat, sisalto => sisalto.type === 'viite'));
   }
 
-  get opintokokonaisuutta() {
-    return _.size(_.filter(this.sisaltoFlat, sisalto => sisalto.type === 'opintokokonaisuus'));
+  get hasLisasisalto() {
+    return !!_.get(koulutustyyppiLisasisalto, this.peruste?.koulutustyyppi!);
+  }
+
+  get lisasisaltoOtsikko() {
+    return koulutustyyppiLisasisalto[this.peruste?.koulutustyyppi!]['otsikko'];
+  }
+
+  get lisasisaltoMaara() {
+    return _.size(_.filter(this.sisaltoFlat, sisalto => sisalto.type === koulutustyyppiLisasisalto[this.peruste?.koulutustyyppi!]['tietue']));
   }
 
   get sisaltoFlat() {
