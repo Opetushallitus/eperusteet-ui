@@ -80,7 +80,7 @@
             </b-col>
             <b-col lg="6" v-if="filtersContain('koulutusvienti')" class="mb-4">
               <b-form-group :label="$t('koulutusvienti')">
-                <b-form-checkbox v-model="data.koulutusvienti" v-if="isEditing">
+                <b-form-checkbox v-model="data.koulutusvienti" v-if="isEditing" switch>
                 </b-form-checkbox>
                 <div v-else>{{ $t('' + data.koulutusvienti) }}</div>
               </b-form-group>
@@ -334,7 +334,7 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { Api, Liitetiedostot, Koodisto } from '@shared/api/eperusteet';
-import { SallitutKoulutustyyppisiirtymat, LokalisoituTekstiDto } from '@shared/tyypit';
+import { SallitutKoulutustyyppisiirtymat, LokalisoituTekstiDto, Koulutustyyppi } from '@shared/tyypit';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteEditStore } from '@/stores/PerusteEditStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
@@ -348,17 +348,20 @@ import _ from 'lodash';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
-const koulutustyyppiTietoFilters = {
-  'default': [
-    'diaarinumero', 'paatospaivamaara', 'voimassaolo', 'siirtymaPaattyy', 'koulutustyyppi', 'perusteenkieli', 'koulutusvienti',
-  ],
-  'koulutustyyppi_10': [
-    'laajuus', 'diaarinumero', 'paatospaivamaara', 'siirtymaPaattyy', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli',
-  ],
-  'koulutustyyppi_35': [
-    'diaarinumero', 'paatospaivamaara', 'siirtymaPaattyy', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli',
-  ],
-};
+const koulutustyyppiTietoFilters = [
+  {
+    koulutustyypit: ['default'],
+    filters: ['diaarinumero', 'paatospaivamaara', 'voimassaolo', 'siirtymaPaattyy', 'koulutustyyppi', 'perusteenkieli', 'koulutusvienti'],
+  },
+  {
+    koulutustyypit: [Koulutustyyppi.vapaasivistystyo],
+    filters: ['laajuus', 'diaarinumero', 'paatospaivamaara', 'siirtymaPaattyy', 'voimassaolo', 'koulutustyyppi', 'perusteenkieli'],
+  },
+  {
+    koulutustyypit: [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus, Koulutustyyppi.vapaasivistystyolukutaito],
+    filters: ['diaarinumero', 'paatospaivamaara', 'voimassaolo', 'siirtymaPaattyy', 'koulutustyyppi', 'perusteenkieli', 'koulutusvienti'],
+  },
+];
 
 @Component({
   components: {
@@ -606,12 +609,8 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   }
 
   get tietoFilters() {
-    if (koulutustyyppiTietoFilters[this.peruste.koulutustyyppi]) {
-      return koulutustyyppiTietoFilters[this.peruste.koulutustyyppi];
-    }
-    else {
-      return koulutustyyppiTietoFilters['default'];
-    }
+    return _.get(_.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, this.peruste.koulutustyyppi))
+              ?? _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, 'default')), 'filters');
   }
 
   filtersContain(filter) {

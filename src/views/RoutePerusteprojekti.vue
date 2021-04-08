@@ -677,6 +677,14 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
           'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
         },
       },
+      [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus]: {
+        save: this.tallennaUusiTavoitesisaltoalue,
+        label: {
+          'uusi': 'tavoitteet-ja-sisaltoalueet',
+          'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
+          'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
+        },
+      },
       [Koulutustyyppi.tutkintoonvalmentava]: {
         save: this.tallennaUusiKoulutuksenOsa,
         label: {
