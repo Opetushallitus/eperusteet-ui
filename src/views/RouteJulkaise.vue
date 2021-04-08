@@ -94,7 +94,6 @@
 
 <script lang="ts">
 import { Mixins, Watch, Prop, Component, Vue } from 'vue-property-decorator';
-import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -133,7 +132,6 @@ import { Route } from 'vue-router';
     EpMultiSelect,
     EpMuutosmaaraykset,
     EpSpinner,
-    EpTiedostoLataus,
     EpToggle,
     EpVirhelistaus,
     PerustetyoryhmaSelect,

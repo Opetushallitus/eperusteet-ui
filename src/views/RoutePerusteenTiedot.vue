@@ -407,7 +407,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       ...this.store!.data.value,
       maarayskirje: {
         liitteet: {
-          ...this.store!.data.value.maarayskirje.liitteet,
+          ...this.store!.data.value.maarayskirje?.liitteet ?? [],
           [this.$slang.value]: liite,
         },
       },
