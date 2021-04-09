@@ -4,7 +4,7 @@
 
     <b-tabs>
       <b-tab v-for="palautekanava in palautekanavat" :key="palautekanava" :title="$t(palautekanava)" class="p-3">
-        <ep-palautteet :palautteet="palautteet[palautekanava]" />
+        <ep-palautteet :palautteet="palautteet[palautekanava]" :palauteProvider="palautteetStore" />
       </b-tab>
 
     </b-tabs>
