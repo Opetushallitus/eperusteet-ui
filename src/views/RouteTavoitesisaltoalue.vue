@@ -29,11 +29,10 @@
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <div v-if="isEditing" slot="label">{{$t('kappaleen-teksti')  + (isEditing ? ' *' : '')}}</div>
+            <div v-if="isEditing" slot="label">{{$t('kappaleen-teksti')}}</div>
             <ep-content v-model="data.teksti"
                         layout="normal"
                         :is-editable="isEditing"
-                        :validation="validation.teksti"
                         :kasiteHandler="kasiteHandler"
                         :kuvaHandler="kuvaHandler"></ep-content>
           </b-form-group>

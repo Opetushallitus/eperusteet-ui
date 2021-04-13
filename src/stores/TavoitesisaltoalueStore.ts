@@ -6,8 +6,9 @@ import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { minLength, required, requiredIf } from 'vuelidate/lib/validators';
-import { allTranslations, minValue, translated, warning } from '@shared/validators/required';
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { koodistoKoodiValidator, requiredOneLang } from '@shared/validators/required';
+import { Kielet } from '@shared/stores/kieli';
 
 Vue.use(VueCompositionApi);
 
@@ -113,13 +114,22 @@ export class TavoitesisaltoalueStore implements IEditoitava {
       nimiKoodi: {
         nimi: required,
       },
-      teksti: allTranslations(julkaisukielet),
       tavoitealueet: {
         $each: {
           otsikko: {
             required: requiredIf((value) => {
               return value && value.tavoiteAlueTyyppi === 'OTSIKKO';
             }),
+          },
+          tavoitteet: {
+            $each: {
+              ...koodistoKoodiValidator(),
+            },
+          },
+          keskeisetSisaltoalueet: {
+            $each: {
+              ...requiredOneLang(),
+            },
           },
         },
       },
