@@ -4,13 +4,13 @@
       <div class="flex-grow-1">
         <ep-input :value="bullet" @input="onInput($event, idx)" :is-editing="true" />
       </div>
-      <div class="flex-shrink-1">
+      <div class="flex-shrink-1" v-if="allowStructureChange">
         <b-button variant="link" @click="remove(idx)">
           <fas icon="roskalaatikko" />
         </b-button>
       </div>
     </div>
-    <div class="mt-2">
+    <div class="mt-2" v-if="allowStructureChange">
       <ep-button variant="outline-primary" icon="plus" @click="add">
         <slot name="add">
           {{ $t('lisaa') }}
@@ -50,6 +50,9 @@ export default class EpPrefixList extends Vue {
   private isEditable!: boolean;
 
   private state!: { [lang: string]: string }[];
+
+  @Prop({ default: true, type: Boolean })
+  private allowStructureChange!: boolean;
 
   @Watch('value', { immediate: true })
   onValueChange(value: any) {

@@ -8,7 +8,8 @@
       <div class="arviointi-wrapper" v-for="(geneerinen, idx) in julkaistut" :key="idx + '-julkaistut'">
         <GeneerinenArviointi
         :value="geneerinen"
-          :arviointi-store="arviointiStore">
+          :arviointi-store="arviointiStore"
+          :kayttajaStore="kayttajaStore">
         </GeneerinenArviointi>
       </div>
     </div>
@@ -28,6 +29,7 @@
         <GeneerinenArviointi
           :value="geneerinen"
           :arviointi-store="arviointiStore"
+          :kayttajaStore="kayttajaStore"
           :editing="geneerinen.editing">
         </GeneerinenArviointi>
       </div>
@@ -46,6 +48,7 @@ import { ArviointiStore } from '@/stores/ArviointiStore';
 import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
 import GeneerinenArviointi from './GeneerinenArviointi.vue';
 import * as _ from 'lodash';
+import { KayttajaStore } from '@/stores/kayttaja';
 
 @Component({
   components: {
@@ -60,6 +63,9 @@ import * as _ from 'lodash';
 export default class RouteGeneerinenArviointi extends Vue {
   @Prop({ required: true })
   arviointiStore!: ArviointiStore;
+
+  @Prop({ required: true })
+  kayttajaStore!: KayttajaStore;
 
   private open = {} as { [id: number]: boolean };
   private muokattava: GeneerinenArviointiasteikkoDto | null = null;

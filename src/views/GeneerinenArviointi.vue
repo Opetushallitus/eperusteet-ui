@@ -39,7 +39,7 @@
           </template>
 
           <template v-slot:cell(kriteerit)="data">
-            <EpBulletEditor kohde="" v-model="data.item.kriteerit" :is-editable="isEditing">
+            <EpBulletEditor kohde="" v-model="data.item.kriteerit" :is-editable="isEditing" :allowStructureChange="!inner.julkaistu">
               <template slot="add">{{ $t('lisaa-kriteeri') }}</template>
             </EpBulletEditor>
           </template>
@@ -47,17 +47,15 @@
       </div>
       <EpSpinner v-if="isLoading" />
       <div v-else>
-        <div v-if="inner.julkaistu">
-          <ep-button variant="primary" @click="onCopy()">{{ $t('kopioi') }}</ep-button>
-        </div>
-        <div v-else-if="!isEditing">
-          <ep-button variant="primary" @click="onEdit()">{{ $t('muokkaa') }}</ep-button>
+        <div v-if="!isEditing">
+          <ep-button variant="primary" @click="onCopy()" v-if="inner.julkaistu">{{ $t('kopioi') }}</ep-button>
+          <ep-button variant="primary ml-2" @click="onEdit()" v-if="!inner.julkaistu || kayttajaIsAdmin">{{ $t('muokkaa') }}</ep-button>
         </div>
         <div class="d-flex justify-content-between" v-else>
           <div>
-            <ep-button variant="link" @click="onRemove()">{{ $t('poista') }}</ep-button>
+            <ep-button variant="link" @click="onRemove()" v-if="!inner.julkaistu">{{ $t('poista') }}</ep-button>
             <ep-button class="ml-2" variant="primary" @click="onSave()">{{ $t('tallenna') }}</ep-button>
-            <ep-button class="ml-2" variant="primary" @click="onPublish()">{{ $t('julkaise') }}</ep-button>
+            <ep-button class="ml-2" variant="primary" @click="onPublish()" v-if="!inner.julkaistu">{{ $t('julkaise') }}</ep-button>
           </div>
         </div>
       </div>
@@ -77,6 +75,7 @@ import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/ap
 import { BvTableFieldArray } from 'bootstrap-vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import * as _ from 'lodash';
+import { KayttajaStore } from '@/stores/kayttaja';
 
 @Component({
   components: {
@@ -93,6 +92,9 @@ export default class GeneerinenArviointi extends Vue {
 
   @Prop({ required: true })
   private arviointiStore!: ArviointiStore;
+
+  @Prop({ required: true })
+  private kayttajaStore!: KayttajaStore;
 
   @Prop({ required: false, default: false })
   private editing!: boolean;
@@ -218,6 +220,10 @@ export default class GeneerinenArviointi extends Vue {
       julkaistu: false,
       id: undefined,
     });
+  }
+
+  get kayttajaIsAdmin() {
+    return this.kayttajaStore.isAdmin.value;
   }
 }
 </script>
