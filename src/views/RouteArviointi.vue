@@ -32,7 +32,7 @@ import { ArviointiStore } from '@/stores/ArviointiStore';
     EpIcon,
   },
 })
-export default class RouteArviointiasteikot extends Vue {
+export default class RouteArviointi extends Vue {
   @Prop({ required: true })
   arviointiStore!: ArviointiStore;
 

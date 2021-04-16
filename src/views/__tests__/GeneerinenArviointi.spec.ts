@@ -11,21 +11,27 @@ import * as _ from 'lodash';
 import { Page } from '@shared/tyypit';
 import '@shared/config/bootstrap';
 import '@shared/config/fontawesome';
+import { KayttajaStore } from '@/stores/kayttaja';
 
 describe('GeneerinenArviointi', () => {
   const localVue = createLocalVue();
 
   test('Mounting', async () => {
     const arviointiStore = mock(ArviointiStore);
+    const kayttajaStore = mock(KayttajaStore);
     const { geneeriset, arviointiasteikot } = getMockGeneeriset();
     const value: GeneerinenArviointiasteikkoDto = geneeriset[0];
     arviointiStore.state.arviointiasteikot = arviointiasteikot;
     arviointiStore.state.geneeriset = geneeriset;
+    kayttajaStore.state.tiedot = {
+      oikeudet: ['ROLE_APP_EPERUSTEET_ADMIN_1.2.246.562.10.00000000001'],
+    };
 
     const wrapper = mount(GeneerinenArviointi, {
       propsData: {
         value,
         arviointiStore,
+        kayttajaStore,
       },
       localVue,
       mocks: {
