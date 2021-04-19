@@ -38,6 +38,8 @@ import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import RouteTavoitesisaltoalue from '@/views/RouteTavoitesisaltoalue.vue';
+import RouteKotoKielitaitotaso from '@/views/RouteKotoKielitaitotaso.vue';
+import RouteKotoOpinto from '@/views/RouteKotoOpinto.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -291,6 +293,16 @@ const router = new VueRouter({
         path: 'tavoitesisaltoalue/:tavoitesisaltoalueId',
         name: 'tavoitesisaltoalue',
         component: RouteTavoitesisaltoalue,
+        props,
+      }, {
+        path: 'koto/kielitaitotaso/:kotokielitaitotasoId',
+        name: 'koto_kielitaitotaso',
+        component: RouteKotoKielitaitotaso,
+        props,
+      }, {
+        path: 'koto/opinto/:kotoOpintoId',
+        name: 'koto_opinto',
+        component: RouteKotoOpinto,
         props,
       },
       ],
