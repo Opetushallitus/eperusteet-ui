@@ -32,6 +32,8 @@ import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
 import { OpintokokonaisuusStore } from './stores/OpintokokonaisuusStore';
 import { KoulutuksenOsaStore } from './stores/KoulutuksenOsaStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
+import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
+import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
 import { registerIconColorSchemeChange } from '@shared/utils/icon';
 
 import router from './router';
@@ -114,6 +116,16 @@ Vue.use(TavoitesisaltoalueStore, {
 });
 
 Vue.use(KoulutuksenOsaStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(KotoKielitaitotasoStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(KotoOpintoStore, {
   perusteStore: stores.perusteStore,
   router,
 });

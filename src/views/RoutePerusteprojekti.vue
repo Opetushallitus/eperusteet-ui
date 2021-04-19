@@ -181,6 +181,24 @@
                 </div>
               </template>
 
+              <template v-slot:koto_kielitaitotaso="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'koto_kielitaitotaso', params: { kotokielitaitotasoId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-kielitaitotaso') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:koto_opinto="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'koto_opinto', params: { kotoOpintoId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-opinto') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:kvliite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'kvliite' }">
@@ -209,45 +227,7 @@
               </template>
 
               <template v-slot:new>
-                <div class="ml-2">
-                  <ep-tekstikappale-lisays
-                    @save="tallennaUusiTekstikappale"
-                    :tekstikappaleet="perusteenOsat"
-                    :paatasovalinta="true"
-                    v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-                    <template v-slot:default="{tekstikappale}">
-                      <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
-                      {{ $kaanna(tekstikappale.label) }}
-                    </template>
-                  </ep-tekstikappale-lisays>
-
-                  <ep-tekstikappale-lisays
-                    v-if="isLisasisaltoLisays"
-                    @save="lisasisaltoLisays.save"
-                    :tekstikappaleet="perusteenOsat"
-                    :paatasovalinta="true"
-                    :otsikkoRequired="false"
-                    modalId="lisasisaltoLisays"
-                    v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-                    <template v-slot:lisays-btn-text>
-                      {{$t(lisasisaltoLisays.label['uusi'])}}
-                    </template>
-                    <template v-slot:modal-title>
-                      {{$t(lisasisaltoLisays.label['uusi'])}}
-                    </template>
-                    <template v-slot:footer-lisays-btn-text>
-                      {{$t(lisasisaltoLisays.label['lisaa'])}}
-                    </template>
-                    <template v-slot:header>
-                      {{$t(lisasisaltoLisays.label['sijainti'])}}
-                    </template>
-                    <template v-slot:default="{tekstikappale}">
-                      <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
-                      {{ $kaanna(tekstikappale.label) }}
-                    </template>
-                  </ep-tekstikappale-lisays>
-
-                </div>
+                <EpSisallonLisays :perusteStore="perusteStore" :naviStore="naviStore" />
               </template>
 
             </EpTreeNavibar>
@@ -304,8 +284,11 @@ import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
 import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
-import { KayttajaStore } from '@/stores/kayttaja';
 import { TavoitesisaltoalueStore } from '@/stores/TavoitesisaltoalueStore';
+import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
+import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpSisallonLisays from '@/components/EpSisallonLisays.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -373,6 +356,16 @@ function routeToNode(route: Location): NavigationNodeDto | null {
       type: 'tavoitesisaltoalue',
       id: Number(route.params?.tavoitesisaltoalueId!),
     };
+  case 'koto_kielitaitotaso':
+    return {
+      type: 'koto_kielitaitotaso',
+      id: Number(route.params?.kotokielitaitotasoId!),
+    };
+  case 'koto_opinto':
+    return {
+      type: 'koto_opinto',
+      id: Number(route.params?.kotoOpintoId!),
+    };
   default:
     console.error('Unknown route', route.name, route);
     break;
@@ -391,6 +384,8 @@ function routeToNode(route: Location): NavigationNodeDto | null {
     EpTreeNavibar,
     EpProgressPopover,
     EpTekstikappaleLisays,
+    EpButton,
+    EpSisallonLisays,
   },
 })
 export default class RoutePerusteprojekti extends PerusteprojektiRoute {
@@ -575,70 +570,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     }
   }
 
-  async tallennaUusiTekstikappale(otsikko, tekstikappaleIsa) {
-    const tkstore = new TekstikappaleStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: this.tekstikappaleRoute,
-      params: {
-        tekstiKappaleId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaUusiOpintokokonaisuus(otsikko, tekstikappaleIsa) {
-    try {
-      const tkstore = new OpintokokonaisuusStore(this.peruste!.id!, 0);
-      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'opintokokonaisuus',
-        params: {
-          opintokokonaisuusId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
-  }
-
-  async tallennaUusiTavoitesisaltoalue(otsikko, tekstikappaleIsa) {
-    console.log('tallennaUusiTavoitesisaltoalue');
-    try {
-      const tkstore = new TavoitesisaltoalueStore(this.peruste!.id!, 0);
-      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'tavoitesisaltoalue',
-        params: {
-          tavoitesisaltoalueId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
-  }
-
-  async tallennaUusiKoulutuksenOsa(otsikko, tekstikappaleIsa) {
-    try {
-      const tkstore = new KoulutuksenOsaStore(this.peruste!.id!, 0);
-      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'koulutuksenosa',
-        params: {
-          koulutuksenosaId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
-  }
-
   ratasClick(clickFn, meta) {
     clickFn(this, meta);
   }
@@ -649,51 +580,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get isPerusteTutkintoonValmentava(): boolean {
     return this.peruste?.toteutus === _.toLower(PerusteDtoToteutusEnum.TUTKINTOONVALMENTAVA);
-  }
-
-  get isLisasisaltoLisays() {
-    return !!this.peruste && !!this.koulutustyypinLisasisaltoLisays[this.peruste.koulutustyyppi!];
-  }
-
-  get lisasisaltoLisays() {
-    return this.koulutustyypinLisasisaltoLisays[this.peruste!.koulutustyyppi!];
-  }
-
-  get koulutustyypinLisasisaltoLisays() {
-    return {
-      [Koulutustyyppi.vapaasivistystyo]: {
-        save: this.tallennaUusiOpintokokonaisuus,
-        label: {
-          'uusi': 'uusi-opintokokonaisuus',
-          'lisaa': 'lisaa-opintokokonaisuus',
-          'sijainti': 'opintokokonaisuuden-sijainti',
-        },
-      },
-      [Koulutustyyppi.vapaasivistystyolukutaito]: {
-        save: this.tallennaUusiTavoitesisaltoalue,
-        label: {
-          'uusi': 'tavoitteet-ja-sisaltoalueet',
-          'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
-          'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
-        },
-      },
-      [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus]: {
-        save: this.tallennaUusiTavoitesisaltoalue,
-        label: {
-          'uusi': 'tavoitteet-ja-sisaltoalueet',
-          'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
-          'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
-        },
-      },
-      [Koulutustyyppi.tutkintoonvalmentava]: {
-        save: this.tallennaUusiKoulutuksenOsa,
-        label: {
-          'uusi': 'uusi-koulutuksenosa',
-          'lisaa': 'lisaa-koulutuksenosa',
-          'sijainti': 'koulutuksen-osan-sijainti',
-        },
-      },
-    };
   }
 
   get julkaisut() {
