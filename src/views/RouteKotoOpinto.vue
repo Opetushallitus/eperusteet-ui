@@ -71,6 +71,7 @@ import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import EpKotoTaitotasot from '@shared/components/EpKotoTaitotasot/EpKotoTaitotasot.vue';
 import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
+import { Murupolku } from '@shared/stores/murupolku';
 
 @Component({
   components: {
@@ -103,6 +104,19 @@ export default class RouteKotoOpinto extends Vue {
     await this.perusteStore.blockUntilInitialized();
     const tkstore = new KotoOpintoStore(this.perusteId!, Number(id));
     this.store = new EditointiStore(tkstore);
+  }
+
+  get kotoSisalto() {
+    return this.store?.data?.value || null;
+  }
+
+  @Watch('kotoSisalto')
+  onDataChange(kotoSisalto) {
+    if (kotoSisalto) {
+      Murupolku.aseta('koto_opinto', kotoSisalto.nimiKoodi ? this.$kaanna(kotoSisalto.nimiKoodi.nimi) : this.$t('nimeton-opinto'), {
+        name: 'koto_opinto',
+      });
+    }
   }
 
   private readonly tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({

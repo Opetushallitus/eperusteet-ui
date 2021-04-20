@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-// import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus } from '@shared/api/eperusteet';
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
@@ -109,14 +108,11 @@ export class PerusteStore implements IEditoitava {
       this.state.projekti = null;
       this.state.projektiStatus = null;
       this.state.julkaisut = null;
+      Murupolku.tyhjenna();
 
       this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
       const perusteId = Number((this.state.projekti as any)._peruste);
       this.state.perusteId = perusteId;
-
-      Murupolku.aseta('projekti', this.state.projekti?.nimi, {
-        name: 'perusteprojekti',
-      });
 
       [
         this.state.peruste,
@@ -125,8 +121,10 @@ export class PerusteStore implements IEditoitava {
         Perusteet.getPerusteenTiedot(perusteId),
         Perusteet.getNavigation(perusteId),
       ]), 'data');
+
       await this.updateValidointi();
       await this.fetchJulkaisut();
+
       this.state.isInitialized = true;
     }
     catch (err) {
@@ -142,10 +140,6 @@ export class PerusteStore implements IEditoitava {
     this.state.peruste = (await Perusteet.getPerusteenTiedot(this.peruste.value!.id!)).data;
 
     await this.updateValidointi();
-
-    Murupolku.aseta('projekti', this.state.projekti?.nimi, {
-      name: 'perusteprojekti',
-    });
   }
 
   public async updateNavigation() {
