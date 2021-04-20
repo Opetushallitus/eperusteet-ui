@@ -138,12 +138,22 @@ export default class EpSisallonLisays extends Vue {
     return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Tavoitesisaltoalue);
   }
 
+  get kotoKielitaitotasot() {
+    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.KotoKielitaitotaso);
+  }
+
+  get kotoOpinnot() {
+    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.KotoOpinto);
+  }
+
   get perusteenOsat() {
     return _.sortBy([
       ...this.tekstikappaleet,
       ...this.opintokokonaisuudet,
       ...this.koulutuksenosat,
       ...this.tavoitesisaltoalueet,
+      ...this.kotoKielitaitotasot,
+      ...this.kotoOpinnot,
     ], 'chapter');
   }
 

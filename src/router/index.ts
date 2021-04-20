@@ -158,6 +158,7 @@ const router = new VueRouter({
     }, {
       path: 'perusteprojekti/:projektiId',
       component: RoutePerusteprojekti,
+      name: 'perusteprojekti',
       props: {
         ...stores,
         ratasvalinnat: [{
@@ -309,6 +310,7 @@ const router = new VueRouter({
     }, {
       path: 'opas/:projektiId',
       component: RoutePerusteprojekti,
+      name: 'opas',
       props: {
         ...stores,
         julkaisuRoute: { name: 'julkaiseOpas' },
