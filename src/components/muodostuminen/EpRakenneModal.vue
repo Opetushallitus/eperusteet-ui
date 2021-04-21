@@ -214,10 +214,10 @@ export default class EpRakenneModal extends Vue {
       this.innerModel = {
         ...this.innerModel,
         rooli: 'tutkintonimike',
-        nimi: _.get(_.find(this.tutkintonimikkeet, tutkintonimike => tutkintonimike.tutkintonimike.tutkintonimikeUri === this.innerModel.tutkintonimike.tutkintonimikeUri), 'nimi'),
+        nimi: _.get(_.find(this.tutkintonimikkeet, tutkintonimike => tutkintonimike.tutkintonimike.uri === this.innerModel.tutkintonimike.uri), 'nimi'),
       };
     }
-    else if (this.tyyppi && this.tyyppiRoolit[this.tyyppi]) {
+    else if (this.isRyhma && this.tyyppi && this.tyyppiRoolit[this.tyyppi]) {
       this.innerModel = {
         ...this.innerModel,
         rooli: this.tyyppiRoolit[this.tyyppi],
