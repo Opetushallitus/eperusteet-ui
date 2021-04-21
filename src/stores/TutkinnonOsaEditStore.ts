@@ -120,51 +120,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     return {
       tutkinnonOsa: {},
     };
-
-    // console.log('Initing validator', data.value);
-    // const julkaisukielet = TutkinnonOsaEditStore.config.perusteStore.julkaisukielet.value;
-    // const common = {
-    //   laajuus: _.mapValues(minValue(1), warning),
-    //   tutkinnonOsa: {
-    //     nimi: translated(julkaisukielet),
-    //     tyyppi: required,
-    //     ammattitaidonOsoittamistavat: translated(julkaisukielet),
-    //   },
-    // };
-    //
-    // if (!data.tyyppi) {
-    //   return { ...common };
-    // }
-    // else if (data.tyyppi === 'normaali') {
-    //   return {
-    //     ...common,
-    //     tutkinnonOsa: {
-    //       ammattitaitovaatimukset2019: {
-    //         kohde: translated(julkaisukielet),
-    //         vaatimukset: {
-    //           $each: {
-    //             vaatimus: translated(julkaisukielet),
-    //           },
-    //         },
-    //         kohdealueet: {
-    //           $each: {
-    //             kuvaus: translated(julkaisukielet),
-    //             vaatimukset: {
-    //               $each: {
-    //                 vaatimus: translated(julkaisukielet),
-    //               },
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   };
-    // }
-    // else {
-    //   return {
-    //     ...common,
-    //   };
-    // }
   });
 
   public async remove() {
@@ -234,6 +189,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
 
   public async copy(data) {
     await TutkinnonRakenne.kloonaaTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId!);
+    return true;
   }
 
   public features(data: any) {
