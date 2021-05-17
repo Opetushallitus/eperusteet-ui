@@ -57,12 +57,15 @@ export class TermitStore implements ITermiStore {
   getTermi(avain: string) {
     return Termit.getTermi(this.perusteId!, avain);
   }
+
   getAllTermit() {
     return Termit.getAllTermit(this.perusteId!);
   }
+
   updateTermi(termiId: number, termi: ITermi) {
     return Termit.updateTermi(this.perusteId!, termiId, termi);
   }
+
   addTermi(termi: ITermi) {
     return Termit.addTermi(this.perusteId!, {
       ...termi,
