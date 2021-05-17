@@ -56,6 +56,10 @@
         <ep-content v-model="kasite.selitys" help="kasite-selitys-ohje" :validation="validation.selitys" :is-editable="true" layout="normal"></ep-content>
       </ep-form-content>
 
+      <ep-form-content name="alaviitteessa">
+        <ep-toggle v-model="kasite.alaviite">{{ $t('nayta-alaviitteessa') }}</ep-toggle>
+      </ep-form-content>
+
       <template slot="modal-cancel">{{ $t('peruuta') }}</template>
       <template slot="modal-ok">{{ kasite.id ? $t('tallenna') : $t('lisaa-kasite') }}</template>
     </b-modal>
@@ -82,6 +86,7 @@ import { kasiteValidator } from '@shared/validators/kasite';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { createLogger } from '@shared/utils/logger';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 
 const logger = createLogger('RouteKasite');
 
@@ -96,6 +101,7 @@ const logger = createLogger('RouteKasite');
     EpKielivalinta,
     EpField,
     EpContent,
+    EpToggle,
   },
   mixins: [
     validationMixin,
