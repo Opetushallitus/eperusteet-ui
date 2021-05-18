@@ -79,9 +79,7 @@
         <ep-content v-model="julkaisu.tiedote"
                     layout="simplified"
                     :is-editable="true" />
-        <ep-button class="mt-3" @click="julkaise" :showSpinner="julkaistaan" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-          {{ $t('julkaise') }}
-        </ep-button>
+        <EpJulkaisuButton class="mt-3" :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }"/>
       </b-form-group>
     </div>
 
@@ -117,6 +115,7 @@ import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpJulkaisuHistoria from '@shared/components/EpJulkaisuHistoria/EpJulkaisuHistoria.vue';
 import { Route } from 'vue-router';
+import EpJulkaisuButton from '@shared/components/EpJulkaisuButton/EpJulkaisuButton.vue';
 
 @Component({
   components: {
@@ -136,6 +135,7 @@ import { Route } from 'vue-router';
     EpVirhelistaus,
     PerustetyoryhmaSelect,
     EpJulkaisuHistoria,
+    EpJulkaisuButton,
   },
 })
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
@@ -144,8 +144,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
   @Prop({ required: true })
   protected tiedotSivu!: Route;
-
-  private julkaistaan = false;
 
   private julkaisu = {
     tiedote: {},
@@ -186,7 +184,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   async julkaise() {
-    this.julkaistaan = true;
     try {
       await this.perusteStore!.julkaise({
         tiedote: this.julkaisu.tiedote,
@@ -198,7 +195,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     catch (err) {
       this.$fail(this.$t('julkaisu-epaonnistui-peruste-' + err.response?.data?.syy) as string);
     }
-    this.julkaistaan = false;
   }
 
   get statusRoute() {
