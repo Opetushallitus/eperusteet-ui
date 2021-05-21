@@ -38,7 +38,7 @@
         </template>
       </ep-tekstikappale-lisays>
 
-      <b-dropdown v-else-if="lisasisaltoLisays.length > 1" variant="link" class="lisasisalto-dropdown" toggle-class="text-decoration-none" no-caret>
+      <b-dropdown v-else-if="lisasisaltoLisays.length > 1 && lisasisaltoLisays[0].linkkiteksti" variant="link" class="lisasisalto-dropdown" toggle-class="text-decoration-none" no-caret>
         <template v-slot:button-content>
           <ep-button variant="link" buttonClass="text-decoration-none">
             <fas class="mr-2" icon="plussa" />
@@ -80,6 +80,35 @@
 
         </div>
       </b-dropdown>
+
+      <template v-else-if="lisasisaltoLisays.length > 1">
+        <ep-tekstikappale-lisays
+            v-for="(lisasisalto, index) in lisasisaltoLisays" :key="'lisasisalto'+index"
+            @save="lisasisalto.save"
+            :tekstikappaleet="perusteenOsat"
+            :paatasovalinta="true"
+            :otsikkoRequired="false"
+            :modalId="'lisasisaltoLisays'+index"
+            v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <template v-slot:lisays-btn-text>
+              {{$t(lisasisalto.label['uusi'])}}
+            </template>
+            <template v-slot:modal-title>
+              {{$t(lisasisalto.label['uusi'])}}
+            </template>
+            <template v-slot:footer-lisays-btn-text>
+              {{$t(lisasisalto.label['lisaa'])}}
+            </template>
+            <template v-slot:header>
+              {{$t(lisasisalto.label['sijainti'])}}
+            </template>
+            <template v-slot:default="{tekstikappale}">
+              <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
+              {{ $kaanna(tekstikappale.label) }}
+            </template>
+          </ep-tekstikappale-lisays>
+      </template>
+
     </template>
 
   </div>
@@ -94,6 +123,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
 import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
+import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import { TavoitesisaltoalueStore } from '@/stores/TavoitesisaltoalueStore';
 import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
 import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
@@ -134,6 +164,10 @@ export default class EpSisallonLisays extends Vue {
     return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Koulutuksenosa);
   }
 
+  get laajaalaisetosaamiset() {
+    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Laajaalainenosaaminen);
+  }
+
   get tavoitesisaltoalueet() {
     return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Tavoitesisaltoalue);
   }
@@ -151,6 +185,7 @@ export default class EpSisallonLisays extends Vue {
       ...this.tekstikappaleet,
       ...this.opintokokonaisuudet,
       ...this.koulutuksenosat,
+      ...this.laajaalaisetosaamiset,
       ...this.tavoitesisaltoalueet,
       ...this.kotoKielitaitotasot,
       ...this.kotoOpinnot,
@@ -220,6 +255,23 @@ export default class EpSisallonLisays extends Vue {
         name: 'koulutuksenosa',
         params: {
           koulutuksenosaId: '' + tallennettu!.id,
+        },
+      });
+    }
+    catch (e) {
+      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
+    }
+  }
+
+  async tallennaUusiLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
+    try {
+      const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
+      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+      await this.perusteStore.updateNavigation();
+      await this.$router.push({
+        name: 'laajaalainenosaaminen',
+        params: {
+          laajaalainenosaaminenId: '' + tallennettu!.id,
         },
       });
     }
@@ -313,7 +365,15 @@ export default class EpSisallonLisays extends Vue {
           'lisaa': 'lisaa-koulutuksenosa',
           'sijainti': 'koulutuksen-osan-sijainti',
         },
-      }],
+      }, {
+        save: this.tallennaUusiLaajaAlainenOsaaminen,
+        label: {
+          'uusi': 'uusi-laaja-alainen-osaaminen',
+          'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
+          'sijainti': 'laaja-alaisen-osaamisen-sijainti',
+        },
+      },
+      ],
     };
   }
 }
