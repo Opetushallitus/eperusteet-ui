@@ -218,7 +218,7 @@ export default class EpTutkinnonosaTuontiModal extends Vue {
   }
 
   async queryFetch() {
-    await this.tutkinnonosatTuontiStore!.fetchTutkinnonosat({ ...this.tutkinnonosaQuery, sivu: this.sivu });
+    await this.tutkinnonosatTuontiStore!.fetchTutkinnonosat({ ...this.tutkinnonosaQuery, sivu: this.sivu, kieli: Kielet.getSisaltoKieli.value });
   }
 
   get totalRows() {

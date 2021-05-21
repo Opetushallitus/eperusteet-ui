@@ -34,9 +34,9 @@ export class TutkinnonosatTuontiStore {
   }
 
   @Debounced(300)
-  public async fetchTutkinnonosat({ sivu, sivukoko, nimi, peruste, vanhentuneet }) {
+  public async fetchTutkinnonosat({ sivu, sivukoko, nimi, peruste, vanhentuneet, kieli }) {
     this.state.tutkinnonosat = null;
-    this.state.tutkinnonosat = (await Tutkinnonosat.getAllTutkinnonOsatBy(sivu, sivukoko, nimi, peruste?.id, vanhentuneet)).data as any;
+    this.state.tutkinnonosat = (await Tutkinnonosat.getAllTutkinnonOsatBy(sivu, sivukoko, nimi, peruste?.id, vanhentuneet, kieli)).data as any;
   }
 
   public async tuoSisaltoa(tutkinnonosat: TutkinnonOsaViiteLuontiDto[]) {
