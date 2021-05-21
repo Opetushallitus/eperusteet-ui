@@ -12,6 +12,7 @@ import RouteKaannokset from '@/views/RouteKaannokset.vue';
 import RouteKasite from '@/views/RouteKasite.vue';
 import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
 import RouteKvliite from '@/views/RouteKvliite.vue';
+import RouteLaajaalainenOsaaminen from '@/views/RouteLaajaalainenOsaaminen.vue';
 import RouteMuodostuminen from '@/views/RouteMuodostuminen.vue';
 import RouteOpintokokonaisuus from '@/views/RouteOpintokokonaisuus.vue';
 import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
@@ -289,6 +290,11 @@ const router = new VueRouter({
         path: 'koulutuksenosa/:koulutuksenosaId',
         name: 'koulutuksenosa',
         component: RouteKoulutuksenOsa,
+        props,
+      }, {
+        path: 'laajaalainenosaaminen/:laajaalainenosaaminenId',
+        name: 'laajaalainenosaaminen',
+        component: RouteLaajaalainenOsaaminen,
         props,
       }, {
         path: 'tavoitesisaltoalue/:tavoitesisaltoalueId',

@@ -181,6 +181,15 @@
                 </div>
               </template>
 
+              <template v-slot:laajaalainenosaaminen="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'laajaalainenosaaminen', params: { laajaalainenosaaminenId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-laaja-alainen-osaaminen') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:koto_kielitaitotaso="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'koto_kielitaitotaso', params: { kotokielitaitotasoId: item.id } }">
@@ -350,6 +359,11 @@ function routeToNode(route: Location): NavigationNodeDto | null {
     return {
       type: 'koulutuksenosa',
       id: Number(route.params?.koulutuksenosaId!),
+    };
+  case 'laajaalainenosaaminen':
+    return {
+      type: 'laajaalainenosaaminen',
+      id: Number(route.params?.laajaalainenosaaminenId!),
     };
   case 'tavoitesisaltoalue':
     return {

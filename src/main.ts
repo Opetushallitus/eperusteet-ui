@@ -41,6 +41,7 @@ import router from './router';
 import { stores } from '@/stores';
 import { getKaannokset } from '@shared/api/eperusteet';
 import { TavoitesisaltoalueStore } from './stores/TavoitesisaltoalueStore';
+import { LaajaalainenOsaaminenStore } from './stores/LaajaalainenOsaaminenStore';
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
@@ -116,6 +117,11 @@ Vue.use(TavoitesisaltoalueStore, {
 });
 
 Vue.use(KoulutuksenOsaStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(LaajaalainenOsaaminenStore, {
   perusteStore: stores.perusteStore,
   router,
 });
