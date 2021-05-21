@@ -13,7 +13,7 @@
       </div>
       <div style="width: 100px;" class="text-center">
         <b-button variant="none" :class="{ 'text-danger': !validity.isValid }" v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu">
-          <span v-if="laajuusMinimi > 0">
+          <span v-if="laajuusMinimi > 0 || laajuusMaksimi > 0">
             {{ laajuusMinimi }}
           </span>
           <span v-if="laajuusMaksimi > 0">
