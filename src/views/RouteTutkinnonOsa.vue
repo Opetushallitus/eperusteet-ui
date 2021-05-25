@@ -417,7 +417,11 @@ export default class RouteTutkinnonosa extends Vue {
           ...this.store?.data.value,
           tutkinnonOsa: {
             ...this.store?.data.value.tutkinnonOsa,
-            koodi,
+            koodi: {
+              uri: koodi.koodiUri,
+              koodisto: koodi.koodisto.koodistoUri,
+              arvo: koodi.koodiArvo,
+            },
             nimi: _.mapValues(_.keyBy(koodi.metadata, v => _.toLower(v.kieli)), v => v.nimi),
           },
         });

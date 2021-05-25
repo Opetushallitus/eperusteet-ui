@@ -9,6 +9,7 @@
         <li>{{ $t('julkaisusta-julkinen') }}</li>
         <li>{{ $t('julkaisusta-luodaan-pdf') }}</li>
         <li>{{ $t('julkaisusta-vanhat-versiot-sailyvat') }}</li>
+        <li v-if="isAmmatillinen">{{ $t('tutkinnon-muodostumisessa-lisatyt-uudet-osaamisalat-ja-tutkintonimikkeet-viedaan-koodistoon') }}</li>
       </ul>
     </div>
     <div>
@@ -148,6 +149,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   private julkaisu = {
     tiedote: {},
   };
+
+  get isAmmatillinen() {
+    return this.perusteStore?.isAmmatillinen.value;
+  }
 
   get peruste() {
     return this.perusteStore?.peruste?.value || null;

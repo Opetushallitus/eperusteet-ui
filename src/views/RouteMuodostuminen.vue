@@ -152,7 +152,7 @@
                                 <ep-input class="koodi-input flex-grow-1"
                                   v-model="ryhma.nimi"
                                   :isEditing="true"
-                                  :disabled="!!ryhma.osaamisala.osaamisalakoodiUri"
+                                  :disabled="!ryhma.osaamisala.osaamisalakoodiUri.startsWith('temporary')"
                                   :change="() => osaamisalaNimiChange(ryhma, index)"/>
                                 <b-input-group-append>
                                   <b-button @click="open" icon="plus" variant="primary">
@@ -193,7 +193,7 @@
                                 <ep-input class="koodi-input flex-grow-1"
                                   v-model="ryhma.nimi"
                                   :isEditing="true"
-                                  :disabled="!!ryhma.tutkintonimike.tutkintonimikeUri"
+                                  :disabled="!ryhma.tutkintonimike.uri.startsWith('temporary')"
                                   :change="() => tutkintonimikeNimiChange(ryhma, index)"/>
                                 <b-input-group-append>
                                   <b-button @click="open" icon="plus" variant="primary">
@@ -273,7 +273,7 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
 import draggable from 'vuedraggable';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
-import { v4 as genUuid } from 'uuid';
+import { v4 as genUuid, v4 as uuidv4 } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, RakenneModuuliType, rakenneNodecolor } from '@/components/muodostuminen/utils';
@@ -608,7 +608,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
         ...ryhmaTemplate('tutkintonimike', this),
         nimi: tutkintonimike.nimi,
         tutkintonimike: {
-          ...tutkintonimike,
+          nimi: tutkintonimike.nimi,
           uri: tutkintonimike.tutkintonimikeUri,
           arvo: tutkintonimike.tutkintonimikeArvo,
         },
@@ -637,6 +637,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           ...this.store.data.value.tutkintonimikkeet,
           {
             nimi: {},
+            tutkintonimikeUri: 'temporary_' + uuidv4(),
           },
         ],
       });
@@ -664,6 +665,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
         ...ryhmaTemplate('osaamisala', this),
         nimi: osaamisala.nimi,
         osaamisala: {
+          nimi: osaamisala.nimi,
           'osaamisalakoodiArvo': osaamisala.arvo,
           'osaamisalakoodiUri': osaamisala.uri,
         },
@@ -688,6 +690,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           ...this.store.data.value.osaamisalat,
           {
             nimi: {},
+            uri: 'temporary_' + uuidv4(),
           },
         ],
       });
