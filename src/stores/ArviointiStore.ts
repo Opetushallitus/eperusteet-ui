@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
 import { KieliStore } from '@shared/stores/kieli';
 import { Debounced } from '@shared/utils/delay';
+import { fail, success } from '@shared/utils/notifications';
 
 Vue.use(VueCompositionApi);
 
@@ -93,11 +94,11 @@ export class ArviointiStore {
         };
       });
       this.state.geneeriset = [...(this.state.geneeriset || []), res.data];
+      success('tallennettu');
       return res.data;
-      // Vue.$success(Vue.$t('geneerinen-arviointiasteikko-luotu'));
     }
     catch (err) {
-      // Vue.$fail(Vue.$t('geneerinen-arviointiasteikko-luotu-fail'));
+      fail('virhe-palvelu-virhe');
     }
   }
 
@@ -106,25 +107,25 @@ export class ArviointiStore {
       const res = await GeneerinenArviointiasteikko.updateGeneerinenArviontiasteikko(value.id!, value);
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
       Vue.set(this.state.geneeriset!, idx, res.data);
-      // Vue.$success(Vue.$t('geneerinen-arviointiasteikko-tallennettu'));
+      success('tallennettu');
     }
     catch (err) {
-      // Vue.$fail(Vue.$t('geneerinen-arviointiasteikko-tallennettu-fail'));
+      fail('tallennus-epaonnistui');
     }
   }
 
-  public async publish(value: GeneerinenArviointiasteikkoDto) {
+  public async publish(value: GeneerinenArviointiasteikkoDto, julkaistu: boolean) {
     try {
       const res = await GeneerinenArviointiasteikko.updateGeneerinenArviontiasteikko(value.id!, {
         ...value,
-        julkaistu: true,
+        julkaistu,
       });
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
       Vue.set(this.state.geneeriset!, idx, res.data);
-      // Vue.$success(Vue.$t('geneerinen-arviointiasteikko-julkaistu'));
+      success('geneerinen-arviointi-julkaistu');
     }
     catch (err) {
-      // Vue.$fail(Vue.$t('geneerinen-arviointiasteikko-julkaistu-fail'));
+      fail('virhe-palvelu-virhe');
     }
   }
 
@@ -133,10 +134,10 @@ export class ArviointiStore {
       await GeneerinenArviointiasteikko.removeGeneerinenArviontiasteikko(value.id!);
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
       Vue.delete(this.state.geneeriset!, idx);
-      // Vue.$success(Vue.$t('geneerinen-arviointiasteikko-poistettu'));
+      success('geneerinen-arviointi-poistettu');
     }
     catch (err) {
-      // Vue.$fail(Vue.$t('geneerinen-arviointiasteikko-poistettu-fail'));
+      fail('virhe-palvelu-virhe');
     }
   }
 }
