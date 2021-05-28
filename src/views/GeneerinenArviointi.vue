@@ -56,6 +56,7 @@
             <ep-button variant="link" @click="onRemove()" v-if="!inner.julkaistu">{{ $t('poista') }}</ep-button>
             <ep-button class="ml-2" variant="primary" @click="onSave()">{{ $t('tallenna') }}</ep-button>
             <ep-button class="ml-2" variant="primary" @click="onPublish()" v-if="!inner.julkaistu">{{ $t('julkaise') }}</ep-button>
+            <ep-button class="ml-2" variant="primary" @click="onUnPublish()" v-if="inner.julkaistu && kayttajaIsAdmin">{{ $t('palauta-keskeneraiseksi') }}</ep-button>
           </div>
         </div>
       </div>
@@ -188,7 +189,19 @@ export default class GeneerinenArviointi extends Vue {
         size: 'lg',
       });
     this.isEditing = false;
-    await this.arviointiStore.publish(this.inner!);
+    await this.arviointiStore.publish(this.inner!, true);
+  }
+
+  async onUnPublish() {
+    await this.$bvModal.msgBoxConfirm(
+      ' ' as any, {
+        title: this.$t('palautetaanko-geneerinen-arviointi-keskeneraiseksi') as any,
+        okTitle: this.$t('palauta') as any,
+        cancelTitle: this.$t('peruuta') as any,
+        size: 'lg',
+      });
+    this.isEditing = false;
+    await this.arviointiStore.publish(this.inner!, false);
   }
 
   async onRemove() {
@@ -203,7 +216,6 @@ export default class GeneerinenArviointi extends Vue {
 
     if (poisto) {
       await this.arviointiStore.remove(this.inner!);
-      this.$success(poistosuccess);
     }
   }
 
