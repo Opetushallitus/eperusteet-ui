@@ -273,7 +273,7 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
 import draggable from 'vuedraggable';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
-import { v4 as genUuid, v4 as uuidv4 } from 'uuid';
+import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, RakenneModuuliType, rakenneNodecolor } from '@/components/muodostuminen/utils';
@@ -637,7 +637,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           ...this.store.data.value.tutkintonimikkeet,
           {
             nimi: {},
-            tutkintonimikeUri: 'temporary_' + uuidv4(),
+            tutkintonimikeUri: 'temporary_' + genUuid(),
           },
         ],
       });
@@ -690,7 +690,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           ...this.store.data.value.osaamisalat,
           {
             nimi: {},
-            uri: 'temporary_' + uuidv4(),
+            uri: 'temporary_' + genUuid(),
           },
         ],
       });
