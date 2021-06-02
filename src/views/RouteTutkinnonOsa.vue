@@ -405,17 +405,23 @@ export default class RouteTutkinnonosa extends Vue {
 
   async lisaaTutkinnonosaNimiKoodistoon() {
     this.koodiTallennus = true;
-    try {
-      const koodi = (await Koodisto.lisaaUusiKoodi('tutkinnonosat', this.store?.data.value.tutkinnonOsa.nimi)).data as any;
 
-      this.store?.setData({
-        ...this.store?.data.value,
-        tutkinnonOsa: {
-          ...this.store?.data.value.tutkinnonOsa,
-          koodi,
-          nimi: _.mapValues(_.keyBy(koodi.metadata, v => _.toLower(v.kieli)), v => v.nimi),
-        },
-      });
+    try {
+      if (_.isEmpty(_.get(this.store?.data.value.tutkinnonOsa.nimi, 'fi')) || _.isEmpty(_.get(this.store?.data.value.tutkinnonOsa.nimi, 'sv'))) {
+        this.$fail(this.$t('koodistoon-vienti-epaonnistui') as string, this.$t('tutkinnon-osan-nimi-koodisto-vienti-vaadittu-kieli-virhe') as string);
+      }
+      else {
+        const koodi = (await Koodisto.lisaaUusiKoodi('tutkinnonosat', this.store?.data.value.tutkinnonOsa.nimi)).data as any;
+
+        this.store?.setData({
+          ...this.store?.data.value,
+          tutkinnonOsa: {
+            ...this.store?.data.value.tutkinnonOsa,
+            koodi,
+            nimi: _.mapValues(_.keyBy(koodi.metadata, v => _.toLower(v.kieli)), v => v.nimi),
+          },
+        });
+      }
     }
     catch (e) {
       this.$fail(this.$t('virhe-palvelu-virhe') as string);
