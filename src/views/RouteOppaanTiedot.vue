@@ -103,7 +103,7 @@
         <h3 class="mt-4">{{ $t('esikatselu-ja-lataus') }}</h3>
         <b-container fluid>
           <b-row no-gutters>
-             <b-col lg="6">
+            <b-col lg="6">
               <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing" v-if="isEditing || !data.esikatseltavissa">
                 {{$t('salli-oppaan-esikatselu')}}
               </ep-toggle>
@@ -118,6 +118,107 @@
             </b-col>
           </b-row>
         </b-container>
+
+        <b-container fluid>
+          <b-row no-gutters>
+            <b-col lg="8">
+              <h3 class="mt-5">{{ $t('oppaan-liittaminen-perusteen-sisaltoihin') }}</h3>
+              <div class="mb-4">{{ $t('oppaan-liittaminen-perusteen-sisaltoihin-kuvaus') }}</div>
+            </b-col>
+          </b-row>
+        </b-container>
+
+        <b-container fluid>
+          <template v-if="isEditing || (tutkinnonosaKoodit.length > 0 || osaamisalaKoodit.length > 0)">
+            <h4>{{$t('ammatillinen-koulutus')}}</h4>
+              <b-row no-gutters>
+                <b-col lg="8">
+                  <div class="koodiryhma">
+                    <EpKoodistoSelectTable
+                      v-if="isEditing || tutkinnonosaKoodit.length > 0"
+                      class="mb-4"
+                      :store="tutkinnonOsatKoodisto"
+                      :isEditing="isEditing"
+                      v-model="tutkinnonosaKoodit"
+                      @remove="removeOppaanKoodi">
+                      <h4 slot="header">{{$t('tutkinnonosat')}}</h4>
+                      <span slot="button-text">{{$t('lisaa-tutkinnon-osa')}}</span>
+                    </EpKoodistoSelectTable>
+                    <EpKoodistoSelectTable
+                      v-if="isEditing || osaamisalaKoodit.length > 0"
+                      :store="osaamisalaKoodisto"
+                      :isEditing="isEditing"
+                      v-model="osaamisalaKoodit"
+                      @remove="removeOppaanKoodi">
+                      <h4 slot="header">{{$t('osaamisalat')}}</h4>
+                      <span slot="button-text">{{$t('lisaa-osaamisala')}}</span>
+                    </EpKoodistoSelectTable>
+                  </div>
+                </b-col>
+              </b-row>
+          </template>
+
+          <template v-if="isEditing || oppiaineKoodit.length > 0">
+            <h4>{{$t('lukiokoulutus')}}</h4>
+
+            <b-row no-gutters>
+              <b-col lg="8">
+                <div class="koodiryhma">
+                <EpKoodistoSelectTable
+                  :store="oppiaineKoodisto"
+                  :isEditing="isEditing"
+                  v-model="oppiaineKoodit"
+                  @remove="removeOppaanKoodi"
+                  :showKoodiArvo="false">
+                  <h4 slot="header">{{$t('oppiaineet')}}</h4>
+                  <span slot="button-text">{{$t('lisaa-oppiaine')}}</span>
+                </EpKoodistoSelectTable>
+                </div>
+              </b-col>
+            </b-row>
+          </template>
+
+          <template v-if="isEditing || opintokokonaisuusKoodit.length > 0">
+            <h4>{{$t('vapaa-sivistystyo')}}</h4>
+
+            <b-row no-gutters>
+              <b-col lg="8">
+                <div class="koodiryhma">
+                <EpKoodistoSelectTable
+                  :store="opintokokonaisuusKoodisto"
+                  :isEditing="isEditing"
+                  v-model="opintokokonaisuusKoodit"
+                  @remove="removeOppaanKoodi"
+                  :showKoodiArvo="false">
+                  <h4 slot="header">{{$t('opintokokonaisuudet')}}</h4>
+                  <span slot="button-text">{{$t('lisaa-opintokokonaisuus')}}</span>
+                </EpKoodistoSelectTable>
+                </div>
+              </b-col>
+            </b-row>
+          </template>
+
+          <template v-if="isEditing || koulutuksenosaKoodit.length > 0">
+            <h4>{{$t('tutkintokoulutukseen-valmentava-koulutus')}}</h4>
+
+            <b-row no-gutters>
+              <b-col lg="8">
+                <div class="koodiryhma">
+                  <EpKoodistoSelectTable
+                    :store="koulutuksenosaKoodisto"
+                    :isEditing="isEditing"
+                    v-model="koulutuksenosaKoodit"
+                    @remove="removeOppaanKoodi"
+                    :showKoodiArvo="false">
+                    <h4 slot="header">{{$t('koulutuksenosat')}}</h4>
+                    <span slot="button-text">{{$t('lisaa-koulutuksenosa')}}</span>
+                  </EpKoodistoSelectTable>
+                </div>
+              </b-col>
+            </b-row>
+          </template>
+        </b-container>
+
       </template>
     </EpEditointi>
   </div>
@@ -149,6 +250,9 @@ import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicat
 import { UiKielet } from '@shared/stores/kieli';
 import { MaintenanceStore } from '@/stores/MaintenanceStore';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
+import EpKoodistoSelectTable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectTable.vue';
+import { Koodisto } from '@shared/api/eperusteet';
+import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 
 @Component({
   components: {
@@ -165,6 +269,7 @@ import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue
     EpMultiListSelect,
     EpColorIndicator,
     EpExternalLink,
+    EpKoodistoSelectTable,
   },
 })
 export default class RouteOppaanTiedot extends PerusteprojektiRoute {
@@ -223,6 +328,182 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   async lataa() {
     await this.maintenanceStore?.exportPeruste();
   }
+
+  private tutkinnonOsatKoodisto = new KoodistoSelectStore({
+    async query(query: string, sivu = 0) {
+      return (await Koodisto.kaikkiSivutettuna('tutkinnonosat', query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        },
+      })).data as any;
+    },
+  });
+
+  private osaamisalaKoodisto = new KoodistoSelectStore({
+    async query(query: string, sivu = 0) {
+      return (await Koodisto.kaikkiSivutettuna('osaamisala', query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        },
+      })).data as any;
+    },
+  });
+
+  private oppiaineKoodisto = new KoodistoSelectStore({
+    async query(query: string, sivu = 0) {
+      return (await Koodisto.kaikkiSivutettuna('oppiaineetjaoppimaaratlops2021', query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        },
+      })).data as any;
+    },
+  });
+
+  private opintokokonaisuusKoodisto = new KoodistoSelectStore({
+    async query(query: string, sivu = 0) {
+      return (await Koodisto.kaikkiSivutettuna('opintokokonaisuusnimet', query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        },
+      })).data as any;
+    },
+  });
+
+  private koulutuksenosaKoodisto = new KoodistoSelectStore({
+    async query(query: string, sivu = 0) {
+      return (await Koodisto.kaikkiSivutettuna('koulutuksenosattuva', query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        },
+      })).data as any;
+    },
+  });
+
+  get tutkinnonosaKoodit() {
+    return _.chain(this.oppaanKiinnitetytKoodit)
+      .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'TUTKINNONOSA')
+      .map('koodi')
+      .value();
+  }
+
+  set tutkinnonosaKoodit(koodit) {
+    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+      return {
+        kiinnitettyKoodiTyyppi: 'TUTKINNONOSA',
+        koodi,
+      };
+    }));
+  }
+
+  get osaamisalaKoodit() {
+    return _.chain(this.oppaanKiinnitetytKoodit)
+      .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OSAAMISALA')
+      .map('koodi')
+      .value();
+  }
+
+  set osaamisalaKoodit(koodit) {
+    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+      return {
+        kiinnitettyKoodiTyyppi: 'OSAAMISALA',
+        koodi,
+      };
+    }));
+  }
+
+  get oppiaineKoodit() {
+    return _.chain(this.oppaanKiinnitetytKoodit)
+      .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OPPIAINE')
+      .map('koodi')
+      .value();
+  }
+
+  set oppiaineKoodit(koodit) {
+    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+      return {
+        kiinnitettyKoodiTyyppi: 'OPPIAINE',
+        koodi,
+      };
+    }));
+  }
+
+  get opintokokonaisuusKoodit() {
+    return _.chain(this.oppaanKiinnitetytKoodit)
+      .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OPINTOKOKONAISUUS')
+      .map('koodi')
+      .value();
+  }
+
+  set opintokokonaisuusKoodit(koodit) {
+    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+      return {
+        kiinnitettyKoodiTyyppi: 'OPINTOKOKONAISUUS',
+        koodi,
+      };
+    }));
+  }
+
+  get koulutuksenosaKoodit() {
+    return _.chain(this.oppaanKiinnitetytKoodit)
+      .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'KOULUTUKSENOSA')
+      .map('koodi')
+      .value();
+  }
+
+  set koulutuksenosaKoodit(koodit) {
+    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+      return {
+        kiinnitettyKoodiTyyppi: 'KOULUTUKSENOSA',
+        koodi,
+      };
+    }));
+  }
+
+  get oppaanKiinnitetytKoodit() {
+    return this.store!.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit;
+  }
+
+  get oppaanKiinnitetytKooditUris() {
+    return _.map(this.oppaanKiinnitetytKoodit, okk => okk.koodi.uri);
+  }
+
+  asetaOppaanKoodit(kiinnitettyKoodi) {
+    this.store!.setData(
+      {
+        ...this.store?.data.value,
+        peruste: {
+          ...this.store?.data.value.peruste,
+          oppaanSisalto: {
+            ...this.store?.data.value.peruste.oppaanSisalto,
+            oppaanKiinnitetytKoodit: [
+              ...this.store?.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit,
+              ..._.filter(kiinnitettyKoodi, koodi => !_.includes(this.oppaanKiinnitetytKooditUris, koodi.koodi.uri)),
+            ],
+          },
+        },
+      },
+    );
+  }
+
+  removeOppaanKoodi(koodi) {
+    this.store!.setData(
+      {
+        ...this.store?.data.value,
+        peruste: {
+          ...this.store?.data.value.peruste,
+          oppaanSisalto: {
+            ...this.store?.data.value.peruste.oppaanSisalto,
+            oppaanKiinnitetytKoodit: _.filter(this.store?.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit, kiinnitettyKoodi => kiinnitettyKoodi.koodi.uri !== koodi.uri),
+          },
+        },
+      },
+    );
+  }
 }
 </script>
 
@@ -232,5 +513,11 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   .asettamatta {
     font-style: italic;
     color: $gray-lighten-2;
+  }
+
+  .koodiryhma {
+    padding: 1rem;
+    border: 1px solid $gray-lighten-3;
+    margin-bottom: 2rem;
   }
 </style>

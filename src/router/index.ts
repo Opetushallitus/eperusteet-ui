@@ -369,12 +369,6 @@ const router = new VueRouter({
         component: RouteTekstikappale,
         props: {
           ...stores,
-          koodistoryhmat: [
-            {
-              ryhma: 'ammatillinen-koulutus',
-              koodistot: ['tutkinnonosat', 'osaamisala'],
-            },
-          ],
         },
       }, {
         path: 'julkaise',

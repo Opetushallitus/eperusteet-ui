@@ -333,7 +333,7 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { Api, Liitetiedostot, Koodisto } from '@shared/api/eperusteet';
+import { Api, Liitetiedostot, Koodisto, PerusteprojektiKevytDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { SallitutKoulutustyyppisiirtymat, LokalisoituTekstiDto, Koulutustyyppi } from '@shared/tyypit';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteEditStore } from '@/stores/PerusteEditStore';
@@ -410,7 +410,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       ...this.store!.data.value,
       maarayskirje: {
         liitteet: {
-          ...this.store!.data.value.maarayskirje?.liitteet ?? [],
+          ...(this.store!.data.value.maarayskirje?.liitteet ? this.store!.data.value.maarayskirje?.liitteet : []),
           [this.$slang.value]: liite,
         },
       },
@@ -608,9 +608,12 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     return this.store?.data?.value || {};
   }
 
+  get koulutustyyppiFilters() {
+    return _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, this.peruste.koulutustyyppi));
+  }
+
   get tietoFilters() {
-    return _.get(_.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, this.peruste.koulutustyyppi))
-              ?? _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, 'default')), 'filters');
+    return _.get(this.koulutustyyppiFilters ? this.koulutustyyppiFilters : _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, 'default')), 'filters');
   }
 
   filtersContain(filter) {
