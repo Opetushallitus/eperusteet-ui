@@ -36,60 +36,6 @@
                       :kasiteHandler="kasiteHandler"
                       :kuvaHandler="kuvaHandler"></ep-content>
         </div>
-
-        <div v-if="koodistoryhmat" class="koodistoryhmat">
-          <h3>{{$t('koodistot')}}</h3>
-
-          <div v-if="!isEditing">
-            <p v-if="(!data.koodit || data.koodit.length === 0)">{{$t('tekstikappaletta-ei-ole-liitetty-koodistoihin')}}</p>
-            <p v-else>{{$t('tekstikappale-on-liitetty-koodistoihin')}}</p>
-          </div>
-          <div v-else>
-            <p>{{$t('tekstikappale-koodisto-ohje')}} <br/>
-              <router-link :to="{ name: 'oppaanTiedot' }" exact>
-                {{ $t('tekstikappale-koodisto-ohje-linkki') }}
-              </router-link>
-            </p>
-          </div>
-
-          <div v-if="(data.koodit && data.koodit.length > 0) || isEditing">
-            <div v-for="(koodistoryhma, index) in koodistot" :key="'koodistoryhma'+index" class="koodistoryhma">
-
-              <h4>{{$t(koodistoryhma.ryhma)}}</h4>
-
-              <div class="koodistot">
-                <div v-for="(koodisto, index) in koodistoryhma.koodistot" :key="'koodisto'+index">
-
-                  <div v-if="koodisto.koodit.length > 0 || isEditing" class="koodisto">
-                    <h4>{{$t(koodisto.koodisto)}}</h4>
-
-                    <b-table
-                      sortable
-                      striped
-                      :fields="fields"
-                      :items="koodisto.koodit"
-                      v-if="koodisto.koodit.length > 0">
-
-                      <template v-slot:cell(delete)="data">
-                        <fas icon="roskalaatikko" class="roskalaatikko" @click="poistaKoodi(data.item)"/>
-                      </template>
-
-                    </b-table>
-
-                    <ep-koodisto-select :store="storet[koodisto.koodisto]" @add="lisaaKoodit" v-if="isEditing" :multiple="true">
-                      <template v-slot:koodisto>({{koodisto.koodisto}})</template>
-                      <template #default="{ open }">
-                        <ep-button @click="open" icon="plus" variant="outline">
-                          {{ $t('lisaa-'+koodisto.koodisto) }}
-                        </ep-button>
-                      </template>
-                    </ep-koodisto-select>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </template>
     </EpEditointi>
   </div>
@@ -140,24 +86,8 @@ export default class RouteTekstikappale extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
-  @Prop({ required: false })
-  private koodistoryhmat!: koodistoryhma[];
-
   private store: EditointiStore | null = null;
-  private storet = {};
   private blockChange = false;
-
-  mounted() {
-    this.storet = _.chain(this.koodistoryhmat)
-      .flatMap('koodistot')
-      .reduceRight((result, value, key) => {
-        return {
-          ...result,
-          [value]: this.koodistoStore(value),
-        };
-      }, {})
-      .value();
-  }
 
   get projektiId() {
     return this.$route.params.projektiId;
@@ -185,22 +115,6 @@ export default class RouteTekstikappale extends Vue {
         versio: null,
       };
     });
-  }
-
-  get koodistot() {
-    return _.chain(this.koodistoryhmat)
-      .map(koodistoRyhma => {
-        return {
-          ryhma: koodistoRyhma.ryhma,
-          koodistot: _.map(koodistoRyhma.koodistot, koodisto => {
-            return {
-              koodisto,
-              koodit: this.koodistonKoodit(koodisto),
-            };
-          }),
-        };
-      })
-      .value();
   }
 
   async doWatchBlock(watch) {
@@ -275,53 +189,6 @@ export default class RouteTekstikappale extends Vue {
         name: 'tekstikappale',
       });
     }
-  }
-
-  private koodistoStore(koodistoNimi) {
-    return new KoodistoSelectStore({
-      async query(query: string, sivu = 0, onlyValidKoodis = true) {
-        return (await Koodisto.kaikkiSivutettuna(koodistoNimi, query, {
-          params: {
-            sivu,
-            sivukoko: 10,
-            onlyValidKoodis: onlyValidKoodis,
-          },
-        })).data as any;
-      },
-    });
-  }
-
-  koodistonKoodit(koodisto) {
-    return _.chain(this.store?.data.value.koodit)
-      .filter(koodi => koodi.koodisto === koodisto)
-      .value();
-  }
-
-  lisaaKoodit(koodit: any[]) {
-    const kooditKoodistolla = _.chain(koodit)
-      .filter(koodi => !_.includes(_.map(this.store?.data.value.koodit, 'uri'), koodi.uri))
-      .map(koodi => {
-        return {
-          ...koodi,
-          koodisto: koodi.koodisto.koodistoUri,
-        };
-      })
-      .value();
-
-    this.store?.setData({
-      ...this.store?.data.value,
-      koodit: [
-        ...this.store?.data.value.koodit,
-        ...kooditKoodistolla,
-      ],
-    });
-  }
-
-  poistaKoodi(koodi) {
-    this.store?.setData({
-      ...this.store?.data.value,
-      koodit: _.filter(this.store?.data.value.koodit, dataKoodi => dataKoodi.uri !== koodi.uri),
-    });
   }
 
   get fields() {
