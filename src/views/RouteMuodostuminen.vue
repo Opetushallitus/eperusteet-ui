@@ -649,7 +649,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           ...this.store.data.value.tutkintonimikkeet,
           {
             nimi: {},
-            tutkintonimikeUri: 'temporary_' + genUuid(),
+            tutkintonimikeUri: 'temporary_tutkintonimikkeet_' + genUuid(),
           },
         ],
       });
@@ -702,7 +702,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           ...this.store.data.value.osaamisalat,
           {
             nimi: {},
-            uri: 'temporary_' + genUuid(),
+            uri: 'temporary_osaamisala_' + genUuid(),
           },
         ],
       });
