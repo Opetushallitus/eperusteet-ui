@@ -168,6 +168,10 @@ export default class RouteTutkinnonosat extends PerusteprojektiRoute {
       sortByFormatted: true,
       thStyle: { width: '50%' },
       formatter: (value: any, key: any, item: any) => {
+        if (item.tutkinnonOsa.nimi) {
+          return (this as any).$kaanna(item.tutkinnonOsa.nimi);
+        }
+
         return (this as any).$kaanna(value);
       },
     }, {
