@@ -9,7 +9,7 @@
       </div>
       <div class="flex-grow-1 h-100 p-2 nimi">
         <EpColorIndicator :size="10" :backgroundColor="color" class="ml-2 mr-2" v-if="tosa"/>
-        {{ $kaanna(nimi) }}
+        {{ $kaanna(nimi) }} <span v-if="koodiArvo">({{koodiArvo}})</span>
       </div>
       <div style="width: 100px;" class="text-center">
         <b-button variant="none" :class="{ 'text-danger': !validity.isValid }" v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu">
@@ -214,6 +214,24 @@ export default class MuodostumisItem extends Vue {
     }
     else if (this.tosa) {
       return this.tosa.nimi;
+    }
+  }
+
+  get koodiArvo() {
+    if (this.innerModel.tutkintonimike?.arvo) {
+      return this.innerModel.tutkintonimike?.arvo;
+    }
+
+    if (this.innerModel.tutkinnonosa?.tutkinnonOsa?.koodi?.arvo) {
+      return this.innerModel.tutkinnonosa?.tutkinnonOsa?.koodi?.arvo;
+    }
+
+    if (this.tosa?.tutkinnonOsa?.koodi?.arvo) {
+      return this.tosa?.tutkinnonOsa?.koodi?.arvo;
+    }
+
+    if (this.innerModel.osaamisala?.osaamisalakoodiArvo) {
+      return this.innerModel.osaamisala?.osaamisalakoodiArvo;
     }
   }
 

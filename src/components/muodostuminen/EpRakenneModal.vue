@@ -50,15 +50,15 @@
         </b-form-group>
 
         <b-form-group :label="$t('osaamisala') + ' *'" v-if="tyyppi ==='osaamisala'">
-          <b-form-radio v-for="(osaamisala, index) in osaamisalat" :key='"osaamisala"+index'
-              class="ml-1" v-model="innerModel.osaamisala" :value="osaamisala.osaamisala" name="osaamisalaValinta">
+          <b-form-radio v-for="(osaamisala, index) in selectableOsaamisalat" :key='"osaamisala"+index'
+              class="ml-1" v-model="innerModel.osaamisala" :value="osaamisala" name="osaamisalaValinta">
             {{ $kaanna(osaamisala.nimi) }}
           </b-form-radio>
         </b-form-group>
 
         <b-form-group :label="$t('tutkintonimike') + ' *'" v-if="tyyppi ==='tutkintonimike'">
-          <b-form-radio v-for="(tutkintonimike, index) in tutkintonimikkeet" :key='"tutkintonimike"+index'
-              class="ml-1" v-model="innerModel.tutkintonimike" :value="tutkintonimike.tutkintonimike" name="tutkintonimikeValinta">
+          <b-form-radio v-for="(tutkintonimike, index) in selectableTutkintonimikkeet" :key='"tutkintonimike"+index'
+              class="ml-1" v-model="innerModel.tutkintonimike" :value="tutkintonimike" name="tutkintonimikeValinta">
             {{ $kaanna(tutkintonimike.nimi) }}
           </b-form-radio>
         </b-form-group>
@@ -166,6 +166,9 @@ export default class EpRakenneModal extends Vue {
   private tempModel: any;
 
   private tyyppiRoolit = {
+    'rakenne-moduuli-pakollinen': 'määritelty',
+    'rakenne-moduuli-valinnainen': 'määritelty',
+    'rakenne-moduuli-ammatilliset': 'määritelty',
     'rakenne-moduuli-yhteiset': 'vieras',
     'rakenne-moduuli-paikalliset': 'määrittelemätön',
   }
@@ -199,6 +202,14 @@ export default class EpRakenneModal extends Vue {
           },
         },
       });
+    }
+
+    if (this.innerModel.tutkintonimike) {
+      this.$emit('input',
+        {
+          ...this.innerModel,
+          tutkintonimike: _.find(this.selectableTutkintonimikkeet, tutkintonimike => this.innerModel.tutkintonimike.uri === tutkintonimike.uri),
+        });
     }
   }
 
@@ -311,8 +322,20 @@ export default class EpRakenneModal extends Vue {
 
   @Watch('tyyppi')
   tyyppiChange(newVal, oldVal) {
+    let osaamisala = this.innerModel.osaamisala;
+    if (this.tyyppi === 'osaamisala' && _.isNil(this.innerModel.osaamisala)) {
+      osaamisala = {};
+    }
+    else if (this.tyyppi !== 'osaamisala') {
+      osaamisala = null;
+    }
+
     if (this.tyyppi && this.tyyppi !== 'rakenne-moduuli-paikalliset') {
-      this.$emit('input', { ...this.innerModel, nimi: this.getNimi(this.tyyppi) });
+      this.$emit('input', {
+        ...this.innerModel,
+        nimi: this.getNimi(this.tyyppi),
+        osaamisala,
+      });
     }
     else if (oldVal) {
       this.$emit('input', { ...this.innerModel, nimi: null });
@@ -368,6 +391,26 @@ export default class EpRakenneModal extends Vue {
     else {
       return this.tosa.nimi;
     }
+  }
+
+  get selectableOsaamisalat() {
+    return _.map(this.osaamisalat, osaamisala => {
+      return {
+        nimi: osaamisala.nimi,
+        osaamisalakoodiArvo: osaamisala.osaamisala.osaamisalakoodiArvo,
+        osaamisalakoodiUri: osaamisala.osaamisala.osaamisalakoodiUri,
+      };
+    });
+  }
+
+  get selectableTutkintonimikkeet() {
+    return _.map(this.tutkintonimikkeet, tutkintonimike => {
+      return {
+        nimi: tutkintonimike.nimi,
+        arvo: tutkintonimike.tutkintonimike.arvo,
+        uri: tutkintonimike.tutkintonimike.uri,
+      };
+    });
   }
 }
 

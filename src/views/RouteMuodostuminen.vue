@@ -120,7 +120,7 @@
                             <fas icon="grip-vertical"/>
                           </div>
                           <div class="flex-grow-1">
-                            {{ $kaanna(tosa.nimi) }}
+                            {{ $kaanna(tosa.nimi) }} <span v-if="tosa.tutkinnonOsa.koodiArvo">({{tosa.tutkinnonOsa.koodiArvo}})</span>
                           </div>
                           <div class="laajuus">
                             {{ tosa.laajuus }}
@@ -150,9 +150,15 @@
                             <template #default="{ open }">
                               <b-input-group class="w-100 d-flex">
                                 <ep-input class="koodi-input flex-grow-1"
+                                  v-if="!ryhma.osaamisala.osaamisalakoodiUri.startsWith('temporary')"
+                                  :value="$kaanna(ryhma.nimi) + ' (' + ryhma.osaamisala.osaamisalakoodiArvo + ')'"
+                                  :isEditing="true"
+                                  :disabled="true"/>
+                                <ep-input class="koodi-input flex-grow-1"
+                                  v-else
                                   v-model="ryhma.nimi"
                                   :isEditing="true"
-                                  :disabled="!!ryhma.osaamisala.osaamisalakoodiUri"
+                                  :disabled="false"
                                   :change="() => osaamisalaNimiChange(ryhma, index)"/>
                                 <b-input-group-append>
                                   <b-button @click="open" icon="plus" variant="primary">
@@ -191,9 +197,15 @@
                             <template #default="{ open }">
                               <b-input-group class="w-100 d-flex">
                                 <ep-input class="koodi-input flex-grow-1"
+                                  v-if="!ryhma.tutkintonimike.uri.startsWith('temporary')"
+                                  :value="$kaanna(ryhma.nimi) + ' (' + ryhma.tutkintonimike.arvo + ')'"
+                                  :isEditing="true"
+                                  :disabled="true"/>
+                                <ep-input class="koodi-input flex-grow-1"
+                                  v-else
                                   v-model="ryhma.nimi"
                                   :isEditing="true"
-                                  :disabled="!!ryhma.tutkintonimike.tutkintonimikeUri"
+                                  :disabled="!ryhma.tutkintonimike.uri.startsWith('temporary')"
                                   :change="() => tutkintonimikeNimiChange(ryhma, index)"/>
                                 <b-input-group-append>
                                   <b-button @click="open" icon="plus" variant="primary">
@@ -608,7 +620,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
         ...ryhmaTemplate('tutkintonimike', this),
         nimi: tutkintonimike.nimi,
         tutkintonimike: {
-          ...tutkintonimike,
+          nimi: tutkintonimike.nimi,
           uri: tutkintonimike.tutkintonimikeUri,
           arvo: tutkintonimike.tutkintonimikeArvo,
         },
@@ -637,6 +649,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           ...this.store.data.value.tutkintonimikkeet,
           {
             nimi: {},
+            tutkintonimikeUri: 'temporary_tutkintonimikkeet_' + genUuid(),
           },
         ],
       });
@@ -664,6 +677,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
         ...ryhmaTemplate('osaamisala', this),
         nimi: osaamisala.nimi,
         osaamisala: {
+          nimi: osaamisala.nimi,
           'osaamisalakoodiArvo': osaamisala.arvo,
           'osaamisalakoodiUri': osaamisala.uri,
         },
@@ -688,6 +702,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           ...this.store.data.value.osaamisalat,
           {
             nimi: {},
+            uri: 'temporary_osaamisala_' + genUuid(),
           },
         ],
       });
