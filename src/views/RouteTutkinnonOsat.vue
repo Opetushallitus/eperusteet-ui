@@ -45,7 +45,7 @@
                   <fas icon="dragindicator"></fas>
                   {{ idx + 1 }}
                 </td>
-                <td>{{ $kaanna(item.nimi) || $t('nimeton-tutkinnonosa') }}</td>
+                <td>{{ $kaanna(item.tutkinnonOsa.nimi) || $t('nimeton-tutkinnonosa') }}</td>
                 <td>{{ item.laajuus }}</td>
                 <td>{{ $ago(item.muokattu) }}</td>
               </tr>
@@ -64,7 +64,7 @@
           :fields="fields">
           <template v-slot:cell(nimi)="{ item }">
             <router-link :to="item.to">
-              {{ $kaanna(item.nimi) || $t('nimeton-tutkinnonosa') }}
+              {{ $kaanna(item.tutkinnonOsa.nimi) || $t('nimeton-tutkinnonosa') }}
             </router-link>
           </template>
         </b-table>
