@@ -94,7 +94,7 @@ export class KayttajaStore implements IOikeusProvider {
     }
   }
 
-  public hasOikeus(oikeus: Oikeus, kohde: OikeusKohde = 'peruste') {
+  public hasOikeus(oikeus: Oikeus, kohde: OikeusKohde = 'perusteprojekti') {
     if (!oikeus) {
       return false;
     }
@@ -106,7 +106,7 @@ export class KayttajaStore implements IOikeusProvider {
     }
   }
 
-  private vertaa(oikeus: Oikeus, kohde: OikeusKohde = 'peruste') {
+  private vertaa(oikeus: Oikeus, kohde: OikeusKohde = 'perusteprojekti') {
     const haettu = getOikeusArvo(oikeus);
     if (haettu === 0) {
       return false;

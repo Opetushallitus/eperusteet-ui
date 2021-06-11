@@ -69,7 +69,7 @@
 
             <b-row v-for="(tavoite, index) in data.opetuksenTavoitteet" :key="'tavoite'+index" class="pb-2">
               <b-col cols="10" lg="8">
-                <ep-input v-model="tavoite.nimi" :is-editing="isEditing" :disabled="tavoite.uri !== undefined">
+                <ep-input v-model="tavoite.nimi" :is-editing="isEditing" :disabled="!tavoite.uri.startsWith('temporary')">
                   <div class="order-handle m-2" slot="left">
                     <fas icon="grip-vertical"></fas>
                   </div>
@@ -81,7 +81,7 @@
             </b-row>
           </draggable>
 
-          <ep-button variant="outline" icon="plus" @click="lisaa('opetuksenTavoitteet')" v-if="isEditing">
+          <ep-button variant="outline" icon="plus" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')" v-if="isEditing">
             {{ $t('lisaa-tavoite') }}
           </ep-button>
         </div>
@@ -163,6 +163,7 @@ import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler'
 import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
+import { generateTemporaryKoodiUri } from '@shared/utils/koodi';
 
 @Component({
   components: {
@@ -211,12 +212,14 @@ export default class RouteOpintokokonaisuus extends Vue {
     },
   });
 
-  lisaa(array) {
+  lisaa(array, koodisto?) {
     this.store?.setData({
       ...this.store?.data.value,
       [array]: [
         ..._.get(this.store?.data.value, array),
-        {},
+        {
+          ...(koodisto && { uri: generateTemporaryKoodiUri(koodisto) }),
+        },
       ],
     });
   }
