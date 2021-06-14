@@ -114,7 +114,7 @@
                           </span>
                         </ep-toggle>
                       </div>
-                      <draggable :value="tutkinnonOsat" v-bind="optionsTutkinnonOsat" tag="div">
+                      <draggable :value="tutkinnonosatPaged" v-bind="optionsTutkinnonOsat" tag="div">
                         <div v-for="tosa in tutkinnonosatPaged" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pr-3 m-1 tosa draggable tosa">
                           <div class="grip mr-2" v-if="isEditing">
                             <fas icon="grip-vertical"/>
@@ -141,7 +141,7 @@
                       <ep-button @click="lisaaOsaamisala" icon="plus" variant="outline">
                         {{ $t('lisaa-osaamisala') }}
                       </ep-button>
-                      <draggable :value="osaamisalat" v-bind="optionsKoodit" tag="div">
+                      <draggable :value="osaamisalatPaged" v-bind="optionsKoodit" tag="div">
                         <div v-for="(ryhma, index) in osaamisalatPaged" :key="'osaamisala' + index" class="mb-1 d-flex justify-content-center align-items-center draggable osaamisalat">
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['osaamisala'],  background: colorMap['osaamisala'] }">
                             <fas icon="grip-vertical"/>
@@ -188,7 +188,7 @@
                         {{ $t('lisaa-tutkintonimike') }}
                       </ep-button>
 
-                      <draggable :value="tutkintonimikkeet" v-bind="optionsKoodit" tag="div">
+                      <draggable :value="tutkintonimikkeetPaged" v-bind="optionsKoodit" tag="div">
                         <div v-for="(ryhma, index) in tutkintonimikkeetPaged" :key="ryhma.tutkintonimike.uri" class="mb-1 d-flex justify-content-center align-items-center draggable tutkintonimikkeet">
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }">
                             <fas icon="grip-vertical"/>
