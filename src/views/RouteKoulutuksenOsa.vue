@@ -4,7 +4,7 @@
       <h2 class="m-0">{{ $kaanna(data.nimi) || $t('nimeton-koulutuksen-osa') }}</h2>
     </template>
      <template #default="{ data, isEditing, validation }">
-       <b-row>
+       <b-row class="mb-4">
          <b-col>
            <b-form-group :label="$t('koulutustyyppi') + (isEditing ? ' *' : '')" required>
             <p v-if="isEditing" class="font-size-08">{{ $t('koulutustyyppi-info') }}</p>
@@ -25,8 +25,8 @@
             <p v-if="!isEditing && !data.koulutusOsanKoulutustyyppi" class="font-italic">{{ $t('ei-asetettu') }}</p>
           </b-form-group>
          </b-col>
-       </b-row>
-      <b-row>
+      </b-row>
+      <b-row class="mb-4">
         <b-col md="6">
           <b-form-group :label="$t('koulutuksen-osan-nimi') + (isEditing ? ' *' : '')" required>
             <template v-if="isTuvaKoulutusTyyppi">
@@ -92,7 +92,27 @@
           </b-form-group>
         </b-col>
       </b-row>
-      <b-row>
+      <b-row class="mb-4">
+        <b-col>
+           <b-form-group :label="$t('opintojen-tyyppi') + (isEditing ? ' *' : '')" required>
+            <template v-if="isEditing">
+              <b-form-radio
+                v-for="type in koulutusOsanTyypit"
+                :key="type"
+                class="ml-1"
+                v-model="data.koulutusOsanTyyppi"
+                :value="type"
+                name="koulutusOsanTyyppi"
+                :validation="validation.koulutusOsanTyyppi">
+                {{ $t(type) }}
+              </b-form-radio>
+            </template>
+            <template v-else>{{ $t(data.koulutusOsanTyyppi) }}</template>
+            <p v-if="!isEditing && !data.koulutusOsanTyyppi" class="font-italic">{{ $t('ei-asetettu') }}</p>
+          </b-form-group>
+         </b-col>
+      </b-row>
+      <b-row class="mb-4">
         <b-col md="10">
           <b-form-group :label="$t('kuvaus')">
             <EpContent
@@ -222,7 +242,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
-import { Koodisto, KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum } from '@shared/api/eperusteet';
+import { Koodisto, KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum, KoulutuksenOsaDtoKoulutusOsanTyyppiEnum } from '@shared/api/eperusteet';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { Kielet } from '@shared/stores/kieli';
 
@@ -336,6 +356,13 @@ export default class RouteKoulutuksenOsa extends Vue {
       _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.PERUSOPETUS),
       _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.LUKIOKOULUTUS),
       _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.AMMATILLINENKOULUTUS),
+    ];
+  }
+
+  get koulutusOsanTyypit(): string[] {
+    return [
+      _.toLower(KoulutuksenOsaDtoKoulutusOsanTyyppiEnum.YHTEINEN),
+      _.toLower(KoulutuksenOsaDtoKoulutusOsanTyyppiEnum.VALINNAINEN),
     ];
   }
 
