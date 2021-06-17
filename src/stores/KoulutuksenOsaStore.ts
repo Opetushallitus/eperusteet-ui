@@ -119,6 +119,7 @@ export class KoulutuksenOsaStore implements IEditoitava {
     const julkaisukielet = KoulutuksenOsaStore.config!.perusteStore.julkaisukielet.value;
     return {
       koulutusOsanKoulutustyyppi: { required },
+      koulutusOsanTyyppi: { required },
       nimi: translated(julkaisukielet),
       laajuusMinimi: {
         'min-value': minValue(0),
