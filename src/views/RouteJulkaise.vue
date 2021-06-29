@@ -84,7 +84,7 @@
       </b-form-group>
     </div>
 
-    <EpJulkaisuHistoria :julkaisut="julkaisut">
+    <EpJulkaisuHistoria :julkaisut="julkaisut" :palauta="palautaJulkaisu">
       <div slot="empty">{{ $t('perusteella-ei-julkaisuja') }}</div>
     </EpJulkaisuHistoria>
 
@@ -199,6 +199,16 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     }
     catch (err) {
       this.$fail(this.$t('julkaisu-epaonnistui-peruste-' + err.response?.data?.syy) as string);
+    }
+  }
+
+  async palautaJulkaisu(julkaisu) {
+    try {
+      await this.perusteStore.palautaJulkaisu(julkaisu);
+      this.$success(this.$t('perusteen-julkaisuversio-palautettu-julkiseksi') as string);
+    }
+    catch (err) {
+      this.$fail(this.$t('palautus-epaonnistui') as string);
     }
   }
 
