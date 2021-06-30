@@ -15,7 +15,7 @@
           <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore"/>
         </div>
         <div class="col">
-          <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore"/>
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
           <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
         </div>
         <div class="col">
-          <ep-peruste-viimeaikainen-toiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore"/>
         </div>
       </div>
     </div>
@@ -40,10 +40,10 @@ import { Prop, Mixins, Component, Vue, Watch } from 'vue-property-decorator';
 import EpPerusteAikataulu from '@/components/EpYleisnakyma/EpPerusteAikataulu.vue';
 import EpPerustePerustiedot from '@/components/EpYleisnakyma/EpPerustePerustiedot.vue';
 import EpOpasPerustiedot from '@/components/EpYleisnakyma/EpOpasPerustiedot.vue';
-import EpPerusteViimeaikainenToiminta from '@/components/EpYleisnakyma/EpPerusteViimeaikainenToiminta.vue';
 import EpPerusteTutkinnonOsat from '@/components/EpYleisnakyma/EpPerusteTutkinnonOsat.vue';
 import EpPerusteTiedotteet from '@/components/EpYleisnakyma/EpPerusteTiedotteet.vue';
 import EpPerusteRakenne from '@/components/EpYleisnakyma/EpPerusteRakenne.vue';
+import EpViimeaikainenToiminta from '@shared/components/EpViimeaikainenToiminta/EpViimeaikainenToiminta.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
@@ -54,12 +54,12 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 @Component({
   components: {
     EpPerusteAikataulu,
-    EpPerusteViimeaikainenToiminta,
     EpPerusteTutkinnonOsat,
     EpPerustePerustiedot,
     EpPerusteTiedotteet,
     EpOpasPerustiedot,
     EpPerusteRakenne,
+    EpViimeaikainenToiminta,
   },
 })
 export default class RouteYleisnakyma extends PerusteprojektiRoute {
