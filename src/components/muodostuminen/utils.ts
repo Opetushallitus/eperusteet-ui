@@ -102,6 +102,9 @@ export function rakenneNodecolor(node, parentMandatory, el) {
       else if (el.$kaanna(node.nimi) === el.$t('rakenne-moduuli-ammatilliset')) {
         return ColorMap.ammatilliset;
       }
+      else if (el.$kaanna(node.nimi) === el.$t('rakenne-moduuli-yhteiset')) {
+        return ColorMap.yhteiset;
+      }
     }
     return ColorMap.valinnainen;
   }
