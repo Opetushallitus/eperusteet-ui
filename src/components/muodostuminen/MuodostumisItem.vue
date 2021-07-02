@@ -76,11 +76,12 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import _ from 'lodash';
 import { Watch, Prop, Component, Vue, Inject } from 'vue-property-decorator';
 import { RakenneModuuliDto } from '@shared/api/eperusteet';
-import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType, DefaultRyhma, ryhmaTemplate, rakenneNodecolor } from './utils';
+import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType, DefaultRyhma, ryhmaTemplate } from './utils';
 import { v4 as genUuid } from 'uuid';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
+import { rakenneNodecolor } from '@shared/utils/perusterakenne';
 
 @Component({
   name: 'MuodostumisItem',
