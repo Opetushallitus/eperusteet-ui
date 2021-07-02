@@ -150,11 +150,11 @@
           <ep-collapse tyyppi="osa-alueet" :border-bottom="false" :border-top="true">
             <h3 slot="header">{{ $t('osa-alueet') }}</h3>
             <div>
-              <EpBalloonList v-if="data.tutkinnonOsa.osaAlueet" :value="data.tutkinnonOsa.osaAlueet">
-              <template v-slot:default="{ item }">
-                <router-link :to="{ name: 'osaalue', params: { osaalueId: item.id } }">{{ $kaanna(item.nimi) || $t('nimeton') }}</router-link>
-                <span v-if="item.koodi" class="ml-1">({{ item.koodi.arvo }})</span>
-              </template>
+              <EpBalloonList v-if="data.tutkinnonOsa.osaAlueet" v-model="data.tutkinnonOsa.osaAlueet" :isEditing="isEditing" sortable>
+                <template v-slot:default="{ item }">
+                  <router-link :to="{ name: 'osaalue', params: { osaalueId: item.id } }">{{ $kaanna(item.nimi) || $t('nimeton') }}</router-link>
+                  <span v-if="item.koodi" class="ml-1">({{ item.koodi.arvo }})</span>
+                </template>
               </EpBalloonList>
             </div>
             <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" icon="plus" v-if="!isEditing">
