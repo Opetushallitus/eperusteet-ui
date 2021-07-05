@@ -130,6 +130,7 @@ import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
 import { NavigationNodeDtoTypeEnum } from '@shared/api/eperusteet';
+import { chapterStringSort } from '@shared/utils/NavigationBuilder';
 
 @Component({
   components: {
@@ -189,7 +190,7 @@ export default class EpSisallonLisays extends Vue {
       ...this.tavoitesisaltoalueet,
       ...this.kotoKielitaitotasot,
       ...this.kotoOpinnot,
-    ], 'chapter');
+    ], osa => chapterStringSort(osa.chapter));
   }
 
   get tekstikappaleRoute() {

@@ -21,6 +21,8 @@ describe('RouteGeneerinenArviointi', () => {
     const { geneeriset, arviointiasteikot } = getMockGeneeriset();
     arviointiStore.state.arviointiasteikot = arviointiasteikot;
     arviointiStore.state.geneeriset = geneeriset;
+    arviointiStore.fetchArviointiasteikot = jest.fn(async () => {});
+    arviointiStore.fetchGeneeriset = jest.fn(async () => {});
     kayttajaStore.state.tiedot = {
       oikeudet: ['ROLE_APP_EPERUSTEET_ADMIN_1.2.246.562.10.00000000001'],
     };
