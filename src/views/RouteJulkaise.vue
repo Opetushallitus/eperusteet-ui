@@ -74,7 +74,14 @@
 
     <div v-if="julkaisuMahdollinen">
       <hr class="mt-4 mb-4">
-      <h3>{{ $t('uusi-julkaisu') }}</h3>
+
+      <div class="d-flex justify-content-between">
+        <h3>{{ $t('uusi-julkaisu') }}</h3>
+        <EpButton v-if="$isAdmin && valmiiksiMahdollinen" @click="asetaValmiiksi">
+          {{$t('aseta-peruste-valmiiksi')}}
+        </EpButton>
+      </div>
+
       <b-form-group :label="$t('julkaisutiedot')" class="mt-4">
         <div class="mb-3">{{ $t('teksti-naytetaan-taman-sivun-julkaisuhistoriassa') }}</div>
         <ep-content v-model="julkaisu.tiedote"
@@ -104,7 +111,7 @@ import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
-import { PerusteDtoTilaEnum, NavigationNodeDto, Status } from '@shared/api/eperusteet';
+import { PerusteDtoTilaEnum, NavigationNodeDto, Status, Perusteprojektit, PerusteprojektiDtoTilaEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
@@ -117,6 +124,7 @@ import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpJulkaisuHistoria from '@shared/components/EpJulkaisuHistoria/EpJulkaisuHistoria.vue';
 import { Route } from 'vue-router';
 import EpJulkaisuButton from '@shared/components/EpJulkaisuButton/EpJulkaisuButton.vue';
+import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 
 @Component({
   components: {
@@ -158,8 +166,16 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     return this.perusteStore?.peruste?.value || null;
   }
 
+  get projekti() {
+    return this.perusteStore?.projekti?.value || null;
+  }
+
   get julkaisuMahdollinen() {
     return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.status?.vaihtoOk;
+  }
+
+  get valmiiksiMahdollinen() {
+    return this.projekti?.tila === _.toLower(PerusteprojektiDtoTilaEnum.LAADINTA);
   }
 
   get julkaisut() {
@@ -240,6 +256,29 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       } as any;
     default:
       return null;
+    }
+  }
+
+  async asetaValmiiksi() {
+    const asetaValmiiksi = await this.$bvModal.msgBoxConfirm(this.$t('peruste-valmis-varmistus') as any, {
+      title: this.$t('aseta-peruste-valmiiksi') as any,
+      okVariant: 'primary',
+      okTitle: this.$t('aseta-valmiiksi') as any,
+      cancelVariant: 'link',
+      cancelTitle: this.$t('peruuta') as any,
+      centered: true,
+    });
+
+    if (asetaValmiiksi) {
+      try {
+        await Perusteprojektit.updatePerusteprojektiTila(_.toNumber(this.$route.params.projektiId), 'viimeistely');
+        await Perusteprojektit.updatePerusteprojektiTila(_.toNumber(this.$route.params.projektiId), 'valmis');
+        await this.perusteStore.updateCurrent();
+        this.$success(this.$t('tilan-vaihto-valmis-onnistui') as string);
+      }
+      catch (e) {
+        this.$fail(this.$t('tilan-vaihto-valmis-epaonnistui') as string);
+      }
     }
   }
 }
