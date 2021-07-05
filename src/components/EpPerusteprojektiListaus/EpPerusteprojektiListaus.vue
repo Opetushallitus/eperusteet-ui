@@ -348,7 +348,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   }
 
   get vaihtoehdotTilat() {
-    return this.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU'];
+    return this.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'VALMIS', 'JULKAISTU', 'POISTETTU'];
   }
 
   get vaihtoehdotVoimassaolo() {

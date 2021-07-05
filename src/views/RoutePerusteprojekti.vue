@@ -6,7 +6,7 @@
           <ep-progress-popover :slices="progressSlices" :popup-style="popupStyle" height="60" width="60">
             <template v-slot:header>
               <div class="d-flex flex-column align-items-center">
-                <div class="mb-1">{{$t(tila)}}</div>
+                <div class="mb-1">{{$t(projektiTila)}}</div>
 
                 <b-button class="px-3 py-1" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
                   {{$t('aseta-valmiiksi')}}
@@ -612,6 +612,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
       return _.toLower(this.peruste?.tila);
     }
+  }
+
+  get projektiTila() {
+    return _.toLower(this.projekti?.tila);
   }
 
   get isJulkaistu() {
