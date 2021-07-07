@@ -615,7 +615,13 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get projektiTila() {
-    return _.toLower(this.projekti?.tila);
+    if (this.julkaisut) {
+      if (this.isJulkaistu) {
+        return 'julkaistu';
+      }
+
+      return _.toLower(this.projekti?.tila);
+    }
   }
 
   get isJulkaistu() {
