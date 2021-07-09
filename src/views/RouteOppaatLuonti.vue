@@ -144,9 +144,6 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 })
 export default class RouteOppaatLuonti extends Mixins(validationMixin) {
   @Prop({ required: true })
-  perusteOppaatStore!: PerusteetStore;
-
-  @Prop({ required: true })
   perusteprojektiStore!: PerusteprojektiStore;
 
   @Prop({ required: true })
@@ -164,7 +161,7 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
   async mounted() {
     await Promise.all([
       this.ulkopuolisetStore.fetchTyoryhmat(),
-      this.perusteOppaatStore.updateQuery({}),
+      this.oppaatStore.updateQuery(),
       this.perusteprojektiStore.fetchPohjaProjektit(),
     ]);
   }
@@ -181,7 +178,7 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
   }
 
   get oppaat() {
-    return this.perusteOppaatStore.projects.value?.data;
+    return this.oppaatStore.oppaat.value;
   }
 
   get steps() {

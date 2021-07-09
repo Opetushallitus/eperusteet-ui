@@ -12,7 +12,7 @@ export class OppaatStore {
 
   })
 
-  public readonly projects = computed(() => this.state.oppaat);
+  public readonly oppaat = computed(() => this.state.oppaat);
 
   public async saveOpas(opas: OpasLuontiDto) {
     const res = await Oppaat.addOpas(opas);
@@ -26,7 +26,7 @@ export class OppaatStore {
 
   @Debounced(300)
   public async updateQuery() {
-    const res = await Oppaat.getAllOppaat();
-    this.state.oppaat = res.data.content as any;
+    const res = (await Oppaat.getAllOppaatKevyt(1000)).data;
+    this.state.oppaat = (res as any).data as any;
   }
 }
