@@ -16,14 +16,8 @@ export class PerusteprojektiEditStore implements IEditoitava {
     return null;
   }
 
-  async cancel() {
-  }
-
   async editAfterLoad() {
     return false;
-  }
-
-  async history() {
   }
 
   async load() {
@@ -50,16 +44,6 @@ export class PerusteprojektiEditStore implements IEditoitava {
 
   async lock() {
     return null;
-  }
-
-  async remove() {
-  }
-
-  async restore() {
-  }
-
-  async revisions() {
-    return [];
   }
 
   async start() {

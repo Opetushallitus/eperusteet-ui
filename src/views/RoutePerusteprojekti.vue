@@ -315,7 +315,7 @@ interface ValidationStats {
   total: number;
 }
 
-const ignoredRouteNames = ['kasitteet', 'opasKasitteet', 'poistetut'];
+const ignoredRouteNames = ['kasitteet', 'opasKasitteet', 'poistetut', 'opas', 'oppaanTiedot'];
 
 function routeToNode(route: Location): NavigationNodeDto | null {
   if (!route || _.includes(ignoredRouteNames, route.name)) {

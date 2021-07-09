@@ -20,14 +20,8 @@ export class OpasEditStore implements IEditoitava {
     return null;
   }
 
-  async cancel() {
-  }
-
   async editAfterLoad() {
     return false;
-  }
-
-  async history() {
   }
 
   async load() {
@@ -56,24 +50,12 @@ export class OpasEditStore implements IEditoitava {
     return null;
   }
 
-  async release() {
-  }
-
   async lock() {
     return null;
   }
 
-  async remove() {
-  }
-
-  async restore() {
-  }
-
   async revisions() {
     return [];
-  }
-
-  async start() {
   }
 
   public readonly validator = computed(() => {
