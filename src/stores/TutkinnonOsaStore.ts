@@ -33,6 +33,7 @@ export class TutkinnonOsaStore implements IEditoitava {
         _.map(suoritustapakoodit, suoritustapakoodi => TutkinnonRakenne.getPerusteenTutkinnonOsat(projektiId, (suoritustapakoodi as any)))))
         .map('data')
         .flatMap()
+        .sortBy('jarjestys')
         .value();
       this.state.tutkinnonOsat = tutkinnonosat;
     }
