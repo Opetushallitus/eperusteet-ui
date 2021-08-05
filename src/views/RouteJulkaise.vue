@@ -1,6 +1,12 @@
 <template>
   <div class="p-4">
-    <h2>{{ $t('julkaisunakyma') }}</h2>
+     <div class="d-flex justify-content-between">
+      <h2>{{ $t('julkaisunakyma') }}</h2>
+      <EpButton v-if="$isAdmin() && valmiiksiMahdollinen" @click="asetaValmiiksi">
+        {{$t('aseta-peruste-valmiiksi')}}
+      </EpButton>
+    </div>
+
     <div>{{ $t('julkaisunakyma-kuvaus') }}</div>
 
     <div class="mt-4">
@@ -75,12 +81,7 @@
     <div v-if="julkaisuMahdollinen">
       <hr class="mt-4 mb-4">
 
-      <div class="d-flex justify-content-between">
-        <h3>{{ $t('uusi-julkaisu') }}</h3>
-        <EpButton v-if="$isAdmin && valmiiksiMahdollinen" @click="asetaValmiiksi">
-          {{$t('aseta-peruste-valmiiksi')}}
-        </EpButton>
-      </div>
+      <h3>{{ $t('uusi-julkaisu') }}</h3>
 
       <b-form-group :label="$t('julkaisutiedot')" class="mt-4">
         <div class="mb-3">{{ $t('teksti-naytetaan-taman-sivun-julkaisuhistoriassa') }}</div>
@@ -271,8 +272,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
     if (asetaValmiiksi) {
       try {
-        await Perusteprojektit.updatePerusteprojektiTila(_.toNumber(this.$route.params.projektiId), 'viimeistely');
-        await Perusteprojektit.updatePerusteprojektiTila(_.toNumber(this.$route.params.projektiId), 'valmis');
+        await Perusteprojektit.updateProjektiTilaOnly(_.toNumber(this.$route.params.projektiId), 'valmis');
         await this.perusteStore.updateCurrent();
         this.$success(this.$t('tilan-vaihto-valmis-onnistui') as string);
       }
