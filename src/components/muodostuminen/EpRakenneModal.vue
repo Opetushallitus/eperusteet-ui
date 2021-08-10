@@ -103,7 +103,7 @@
             </div>
           </div>
           <ep-toggle
-            :value="innerModel.muodostumisSaanto.laajuus.maksimi !== null"
+            :value="!!innerModel.muodostumisSaanto.laajuus.maksimi"
             @input="toggleMaksimi"
             switch>
           {{ $t('aseta-myos-maksimiarvo') }}
@@ -164,6 +164,7 @@ export default class EpRakenneModal extends Vue {
   private nimiValinta: 'paikallinen' | 'tutkinnonosato' | 'korkeakoulu' | 'yhteinen' | 'muu' | null = null;
   private tyyppi: string | null = null;
   private tempModel: any;
+  private oldMaksimi = 1;
 
   private tyyppiRoolit = {
     'rakenne-moduuli-pakollinen': 'määritelty',
@@ -299,12 +300,18 @@ export default class EpRakenneModal extends Vue {
     }
   }
 
-  toggleMaksimi() {
-    if (this.innerModel.muodostumisSaanto?.laajuus.maksimi) {
+  toggleMaksimi(toggled) {
+    if (!toggled) {
+      if (this.innerModel.muodostumisSaanto.laajuus.maksimi) {
+        this.oldMaksimi = this.innerModel.muodostumisSaanto.laajuus.maksimi;
+      }
       this.innerModel.muodostumisSaanto.laajuus.maksimi = null;
     }
     else {
-      this.innerModel.muodostumisSaanto.laajuus.maksimi = 1;
+      this.innerModel.muodostumisSaanto.laajuus = {
+        ...this.innerModel.muodostumisSaanto.laajuus,
+        maksimi: this.oldMaksimi,
+      };
     }
   }
 
