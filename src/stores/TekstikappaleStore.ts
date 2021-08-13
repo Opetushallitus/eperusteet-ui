@@ -34,7 +34,7 @@ export class TekstikappaleStore implements IEditoitava {
 
   constructor(
     private readonly perusteId: number,
-    private readonly tekstiKappaleId: number,
+    private readonly tekstiKappaleViiteId: number,
   ) {
     // if (!TekstikappaleStore.config?.notifikaatiotStore) {
     //   throw new Error('NotifikaatiotStore missing');
@@ -49,7 +49,7 @@ export class TekstikappaleStore implements IEditoitava {
 
   public async fetch() {
     try {
-      this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleId)).data;
+      this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleViiteId)).data;
     }
     catch (err) {
     }
@@ -64,10 +64,10 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async save(data: Matala) {
-    const res = await Perusteenosat.updatePerusteenOsa(this.id.value!, data);
+    const res = await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.id.value!, data);
 
     TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
-      id: this.tekstiKappaleId,
+      id: this.tekstiKappaleViiteId,
       type: 'viite',
       label: (res.data as any).nimi as any,
     });
@@ -83,9 +83,9 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId, TekstikappaleStore.config?.perusteStore.perusteSuoritustapa.value!, this.tekstiKappaleId);
+    await Sisallot.removeSisaltoViite(this.perusteId, TekstikappaleStore.config?.perusteStore.perusteSuoritustapa.value!, this.tekstiKappaleViiteId);
     TekstikappaleStore.config!.perusteStore!.removeNavigationEntry({
-      id: this.tekstiKappaleId,
+      id: this.tekstiKappaleViiteId,
       type: 'viite',
     });
     TekstikappaleStore.config.router.push({ name: 'perusteprojekti' });

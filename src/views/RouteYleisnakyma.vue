@@ -15,7 +15,7 @@
           <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore"/>
         </div>
         <div class="col">
-          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore"/>
+          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
           <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
         </div>
         <div class="col">
-          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore"/>
+          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
         </div>
       </div>
     </div>
