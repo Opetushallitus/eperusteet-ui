@@ -122,11 +122,10 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
 import EpGeneerinenAsteikko from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { Kieli, LokalisoituTekstiDto } from '@shared/tyypit';
-import { PerusteStore } from '@/stores/PerusteStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import { PerusteprojektiRoute } from '../PerusteprojektiRoute';
+import { findDeep } from 'deepdash-es/standalone';
 
 import _ from 'lodash';
 import { UiKielet } from '@shared/stores/kieli';
@@ -161,7 +160,7 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   private store: EditointiStore | null = null;
 
   get isNew() {
-    return this.tutkinnonOsaId === 'uusi';
+    return this.osaalueId === 'uusi';
   }
 
   get tov() {
@@ -182,10 +181,6 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
     return this.store?.data.value.arviointi?.id || null;
   }
 
-  get tutkinnonOsaId() {
-    return this.$route?.params?.tutkinnonOsaId || null;
-  }
-
   get osaalueId() {
     return this.$route?.params?.osaalueId || null;
   }
@@ -196,6 +191,25 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
 
   get kaikkiGeneeriset() {
     return this.arviointiStore.geneeriset.value;
+  }
+
+  get navigation() {
+    return this.perusteStore.navigation.value;
+  }
+
+  get osaalueNavigationNode() {
+    return _.get(findDeep(this.perusteStore.navigation.value, (value, key) => {
+      if (_.keys(this.osaalueIdObject)[0] === key && _.values(this.osaalueIdObject)[0] === value) return true;
+      return false;
+    }), 'parent');
+  }
+
+  get tutkinnonOsaId() {
+    return _.get(this.osaalueNavigationNode, 'meta.tutkinnonOsaViite') || this.$route.query.tutkinnonOsaId;
+  }
+
+  get osaalueIdObject() {
+    return { id: _.toNumber(this.osaalueId) };
   }
 
   protected async onProjektiChange() {

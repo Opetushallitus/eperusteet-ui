@@ -351,6 +351,9 @@ export default class RouteTutkinnonosa extends Vue {
       params: {
         osaalueId: 'uusi',
       },
+      query: {
+        tutkinnonOsaId: this.tutkinnonOsaId,
+      },
     });
   }
 

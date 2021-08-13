@@ -75,7 +75,7 @@ export class OsaalueStore implements IEditoitava {
 
   public async save(data: any) {
     if (this.osaalueId === 'uusi') {
-      const saved = (await OsaAlueet.addOsaAlueV2(this.tovId, data)).data;
+      const saved = (await OsaAlueet.addOsaAluePerusteella(OsaalueStore.config.perusteStore.perusteId.value!, this.tovId, data)).data;
       await OsaalueStore.config.perusteStore.updateNavigation();
 
       return () => {
@@ -88,7 +88,7 @@ export class OsaalueStore implements IEditoitava {
       };
     }
     else {
-      await OsaAlueet.updateOsaAlueV2(this.tovId, Number(this.osaalueId), data);
+      await OsaAlueet.updateOsaAluePerusteella(OsaalueStore.config.perusteStore.perusteId.value!, this.tovId, Number(this.osaalueId), data);
     }
   }
 
