@@ -1,7 +1,6 @@
 <template>
   <div v-if="!isInitializing && store">
     <EpEditointi :store="store">
-
       <template v-slot:header="{ }">
         <h2 class="m-0">{{ $t('perusteen-tiedot') }}</h2>
       </template>
@@ -209,8 +208,8 @@
                       </b-input-group>
                     </div>
                   </template>
-                  <b-table v-if="liitteet && liitteet.length > 0"
-                          :items="liitteet"
+                  <b-table v-if="liitteetFiltered && liitteetFiltered.length > 0"
+                          :items="liitteetFiltered"
                           :fields="liitetableFields"
                           responsive
                           borderless
@@ -235,7 +234,7 @@
               <b-form-group :label="$t('maarayskirje')">
                 <div class="d-flex align-items-center w-100" v-if="isEditing">
                   <div class="flex-fill-1 w-100">
-                    <ep-multi-select class="w-100" v-model="maarayskirje" :options="liitteet" track-by="id">
+                    <ep-multi-select class="w-100" v-model="maarayskirje" :options="liitteetFiltered" track-by="id">
                       <template v-slot:singleLabel="{ option }">{{ option.nimi }}</template>
                       <template v-slot:option="{ option }">{{ option.nimi }}</template>
                       <template v-slot:tag="{ option }">{{ option.nimi }}</template>
@@ -262,6 +261,45 @@
                                     :is-editing="isEditing"
                                     :liitteet="liitteet" />
               </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row v-if="isAmmatillinen">
+            <b-col class="mb-4">
+              <hr/>
+              <b-form-group>
+                <h3 slot="label">{{$t('koulutusviennin-ohje')}}</h3>
+                <ep-spinner v-if="!liitteet" />
+                <div v-else>
+                  <template v-if="isEditing && !koulutusvienninOhje">
+                    <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                    <div class="liiteohje" v-html="$t('koulutusviennin-lataus-ohje')"></div>
+                    <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="koulutusvienninOhjeFile" :as-binary="true" v-if="!koulutusvienninOhjeFile" />
+                  </template>
+                  <b-table v-if="koulutusvienninOhje"
+                          :items="[koulutusvienninOhje]"
+                          :fields="koulutusvientiOhjeFields"
+                          responsive
+                          borderless
+                          striped
+                          fixed
+                          hover>
+
+                    <template v-slot:cell(diaarinumero)>
+                      <EpInput type="string" :isEditing="isEditing" :placeholder="$t('kirjoita-diaarinumero')" v-model="koulutusvienninOhje.lisatieto"/>
+                    </template>
+
+                    <template v-slot:cell(toiminnot)="data">
+                      <div class="text-center" v-if="isEditing">
+                        <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                          {{ $t('poista') }}
+                        </ep-button>
+                      </div>
+                    </template>
+                  </b-table>
+                </div>
+              </b-form-group>
+              <hr/>
             </b-col>
           </b-row>
 
@@ -387,6 +425,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 
   private store: EditointiStore | null = null;
   private file: any | null = null;
+  private koulutusvienninOhjeFile: any | null = null;
   private liitteet: any[] | null = null;
   private liitteenNimi = '';
   private korvattavatPerusteet: { [diaari: string]: any } = {};
@@ -418,13 +457,21 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   }
 
   async onProjektiChange(projektiId: number, perusteId: number) {
-    this.store = new EditointiStore(new PerusteEditStore(projektiId, perusteId, this.perusteStore));
-    this.fetchLiitteet();
+    this.store = new EditointiStore(new PerusteEditStore(projektiId, perusteId, this.perusteStore, this.tallennaKoulutusvienninOhjeDiaari));
+    await this.fetchLiitteet();
   }
 
   async fetchLiitteet() {
     const res = await Liitetiedostot.getAllLiitteet(Number(this.perusteId!));
     this.liitteet = res.data;
+  }
+
+  get liitteetFiltered() {
+    return _.reject(this.liitteet, liite => liite.tyyppi === 'KOULUTUSVIENNINOHJE');
+  }
+
+  get koulutusvienninOhje() {
+    return _.find(this.liitteet, liite => liite.tyyppi === 'KOULUTUSVIENNINOHJE');
   }
 
   get siirtymat() {
@@ -526,6 +573,31 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     }];
   }
 
+  get koulutusvientiOhjeFields() {
+    return [{
+      key: 'nimi',
+      label: this.$t('nimi'),
+      thStyle: { width: '40%' },
+      sortable: false,
+    }, {
+      key: 'diaarinumero',
+      label: this.$t('diaarinumero'),
+      sortable: false,
+    }, {
+      key: 'luotu',
+      label: this.$t('julkaistu'),
+      sortable: false,
+      formatter: (value: any, key: any, item: any) => {
+        return (this as any).$sdt(value);
+      },
+    }, {
+      key: 'toiminnot',
+      label: '',
+      thStyle: { width: '10%' },
+      sortable: false,
+    }];
+  }
+
   private koulutuskoodisto = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {
       return (await Koodisto.kaikkiSivutettuna('koulutus', query, {
@@ -618,6 +690,40 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 
   filtersContain(filter) {
     return _.includes(this.tietoFilters, filter);
+  }
+
+  @Watch('file')
+  fileChange() {
+    if (this.file) {
+      this.liitteenNimi = this.file.file.name;
+    }
+  }
+
+  @Watch('koulutusvienninOhjeFile')
+  async koulutusvienninOhjeFileChange() {
+    if (this.koulutusvienninOhjeFile) {
+      const data = new FormData();
+      data.append('file', window.btoa(this.koulutusvienninOhjeFile.binary));
+      data.set('nimi', this.koulutusvienninOhjeFile.file.name);
+      data.set('tyyppi', 'koulutusvienninohje');
+      await Api.request({
+        method: 'POST',
+        url: `perusteet/${this.perusteId!}/liitteet/b64`,
+        data,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      this.$success(this.$t('koulutusvienninohje-tallennettu') as string);
+      this.fetchLiitteet();
+      this.koulutusvienninOhjeFile = null;
+    }
+  }
+
+  async tallennaKoulutusvienninOhjeDiaari() {
+    if (this.koulutusvienninOhje) {
+      await Liitetiedostot.paivitaLisatieto(this.perusteId!, this.koulutusvienninOhje.id, this.koulutusvienninOhje.lisatieto);
+    }
   }
 }
 
