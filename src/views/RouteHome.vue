@@ -23,8 +23,9 @@
       <div class="d-flex flex-row flex-wrap justify-content-center">
         <TilePerusteprojektit />
         <TilePohjat v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileOppaat :perusteOppaatStore="perusteOppaatStore"/>
+        <TileMaaraykset :maarayksetStore="maarayksetStore"/>
+        <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TileVirheellisetPerusteet :virheellisetPerusteetStore="virheellisetPerusteetStore" v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TilePalautteet v-oikeustarkastelu="{oikeus:'hallinta'}"/>
@@ -50,6 +51,7 @@ import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import TileTilastot from './tiles/TileTilastot.vue';
 import TilePalautteet from './tiles/TilePalautteet.vue';
+import TileMaaraykset from './tiles/TileMaaraykset.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
@@ -57,6 +59,7 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
 import EpFeedbackModal from '@shared/components/EpFeedback/EpFeedbackModal.vue';
+import { MaarayksetStore } from '@/stores/MaarayksetStore';
 
 @Component({
   components: {
@@ -72,6 +75,7 @@ import EpFeedbackModal from '@shared/components/EpFeedback/EpFeedbackModal.vue';
     TileTilastot,
     TilePalautteet,
     EpFeedbackModal,
+    TileMaaraykset,
   },
 })
 export default class Home extends Vue {
@@ -89,6 +93,9 @@ export default class Home extends Vue {
 
   @Prop({ required: true })
   private palautteetStore!: PalautteetStore;
+
+  @Prop({ required: true })
+  private maarayksetStore!: MaarayksetStore;
 
   private rajain = '';
 

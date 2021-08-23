@@ -41,6 +41,7 @@ import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import RouteTavoitesisaltoalue from '@/views/RouteTavoitesisaltoalue.vue';
 import RouteKotoKielitaitotaso from '@/views/RouteKotoKielitaitotaso.vue';
 import RouteKotoOpinto from '@/views/RouteKotoOpinto.vue';
+import RouteMaaraykset from '@/views/RouteMaaraykset.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -109,6 +110,11 @@ const router = new VueRouter({
       path: 'tiedotteet',
       name: 'tiedotteet',
       component: RouteTiedotteet,
+      props,
+    }, {
+      path: 'maaraykset',
+      name: 'maaraykset',
+      component: RouteMaaraykset,
       props,
     }, {
       path: 'tilastot',
