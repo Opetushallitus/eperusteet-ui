@@ -263,7 +263,7 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component, Vue, ProvideReactive } from 'vue-property-decorator';
 import { Location } from 'vue-router';
 
 import * as _ from 'lodash';
@@ -298,6 +298,7 @@ import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
 import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSisallonLisays from '@/components/EpSisallonLisays.vue';
+import { routeToNode, LinkkiHandler } from '@/utils/routing';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -315,79 +316,6 @@ interface ValidationStats {
   total: number;
 }
 
-const ignoredRouteNames = ['kasitteet', 'opasKasitteet', 'poistetut', 'opas', 'oppaanTiedot'];
-
-function routeToNode(route: Location): NavigationNodeDto | null {
-  if (!route || _.includes(ignoredRouteNames, route.name)) {
-    return null;
-  }
-
-  switch (route.name) {
-  case 'tekstikappale':
-    return {
-      type: 'viite',
-      id: Number(route.params?.tekstiKappaleId!),
-    };
-  case 'muodostuminen':
-    return {
-      type: 'muodostuminen',
-    };
-  case 'osaalue':
-    return {
-      type: 'osaalue',
-      id: Number(route.params?.osaalueId!),
-    };
-  case 'tutkinnonosa':
-    return {
-      type: 'tutkinnonosaviite',
-      id: Number(route.params?.tutkinnonOsaId!),
-    };
-  case 'kvliite':
-    return {
-      type: 'kvliite',
-    };
-  case 'tutkinnonosat':
-    return {
-      type: 'tutkinnonosat',
-    };
-  case 'opintokokonaisuus':
-    return {
-      type: 'opintokokonaisuus',
-      id: Number(route.params?.opintokokonaisuusId!),
-    };
-  case 'koulutuksenosa':
-    return {
-      type: 'koulutuksenosa',
-      id: Number(route.params?.koulutuksenosaId!),
-    };
-  case 'laajaalainenosaaminen':
-    return {
-      type: 'laajaalainenosaaminen',
-      id: Number(route.params?.laajaalainenosaaminenId!),
-    };
-  case 'tavoitesisaltoalue':
-    return {
-      type: 'tavoitesisaltoalue',
-      id: Number(route.params?.tavoitesisaltoalueId!),
-    };
-  case 'koto_kielitaitotaso':
-    return {
-      type: 'koto_kielitaitotaso',
-      id: Number(route.params?.kotokielitaitotasoId!),
-    };
-  case 'koto_opinto':
-    return {
-      type: 'koto_opinto',
-      id: Number(route.params?.kotoOpintoId!),
-    };
-  default:
-    console.error('Unknown route', route.name, route);
-    break;
-  }
-
-  return null;
-}
-
 @Component({
   components: {
     EpIcon,
@@ -401,6 +329,7 @@ function routeToNode(route: Location): NavigationNodeDto | null {
     EpButton,
     EpSisallonLisays,
   },
+  inject: [],
 })
 export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   @Prop({ required: true })
@@ -465,8 +394,14 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     return this.perusteStore.projekti.value;
   }
 
+  @ProvideReactive('navigation')
   get navigation() {
     return this.perusteStore.navigation.value;
+  }
+
+  @ProvideReactive('linkkiHandler')
+  get linkkiHandler() {
+    return new LinkkiHandler();
   }
 
   get peruste() {
