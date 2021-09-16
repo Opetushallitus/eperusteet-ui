@@ -11,13 +11,18 @@
                 <b-button class="px-3 py-1" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
                   {{$t('aseta-valmiiksi')}}
                 </b-button>
-                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="!isPohja && tila && !isJulkaistu && !isArkistoitu">
+                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="!isPohja && tila && !isJulkaistu && !isArkistoitu && isKoulutustyyppiSupported">
                   {{ $t('siirry-julkaisunakymaan') }}
                 </b-button>
+
+                <div class="px-5 text-center not-supported" v-if="!isKoulutustyyppiSupported">
+                  {{$t('julkaisu-on-estetty-koska-koulutustyyppi-ei-ole-tuettu')}}
+                </div>
               </div>
+
             </template>
 
-            <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-if="isJulkaistu">
+            <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-if="isJulkaistu && isKoulutustyyppiSupported">
               {{ $t('siirry-julkaisunakymaan') }}
             </b-button>
 
@@ -594,6 +599,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
     await this.perusteStore.updateCurrent();
   }
+
+  get isKoulutustyyppiSupported() {
+    return this.perusteStore.koulutustyyppiSupported.value;
+  }
 }
 </script>
 
@@ -666,6 +675,11 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 .bottom-menu-item {
   margin-left: 20px;
   margin-bottom: 10px;
+}
+
+.not-supported {
+  font-size: 0.8rem;
+  color: $gray-lighten-8;
 }
 
 </style>

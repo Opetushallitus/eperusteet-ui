@@ -59,7 +59,7 @@
           </b-form-group>
 
           <b-form-group :label="$t('koulutus-tutkintotyyppi') + ' *'" required>
-            <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required/>
+            <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"/>
           </b-form-group>
 
         </template>
@@ -90,17 +90,17 @@ import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, Perust
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { EperusteetKoulutustyypit } from '@/utils/perusteet';
 import { Page, Kieli } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
-import { themes, koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
+import { themes, koulutustyyppiRyhmaSort, EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import { validationMixin } from 'vuelidate';
 import { required } from 'vuelidate/lib/validators';
 import { computed } from '@vue/composition-api';
 import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
 import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
+import { EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perusteet';
 
 @Component({
   components: {
@@ -154,7 +154,12 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
   }
 
   get pohjat() {
-    return this.pohjatStore.projects.value?.data;
+    return _.map(this.pohjatStore.projects.value?.data, pohja => {
+      return {
+        ...pohja,
+        $isDisabled: !isKoulutustyyppiSupported(pohja.koulutustyyppi),
+      };
+    });
   }
 
   get steps() {
@@ -231,6 +236,10 @@ export default class RoutePohjatLuonti extends Mixins(validationMixin) {
     return {
       nimi: requiredOneLang(),
     };
+  }
+
+  get eiTuetutKoulutustyypit() {
+    return EiTuetutKoulutustyypit;
   }
 }
 </script>

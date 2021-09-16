@@ -1,3 +1,5 @@
+import { KoulutustyyppiToteutus } from '@shared/tyypit';
+import { EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import _ from 'lodash';
 
 enum KoulutusTyyppi {
@@ -24,25 +26,20 @@ const LUKIOKOULUTUS = [
   KoulutusTyyppi.LUKIOVALMISTAVAKOULUTUS,
 ];
 
-export const KoodistoLops2019LaajaAlaiset = 'laajaalainenosaaminenlops2021';
-
-export const EperusteetKoulutustyypit = Object.freeze([
-  KoulutusTyyppi.AMMATILLINEN_PERUSTUTKINTO,
-  KoulutusTyyppi.LUKIOKOULUTUS,
-  KoulutusTyyppi.TELMA,
-  KoulutusTyyppi.LISAOPETUS,
-  KoulutusTyyppi.AMMATTITUTKINTO,
-  KoulutusTyyppi.ERIKOISAMMATTITUTKINTO,
-  KoulutusTyyppi.AIKUISLUKIOKOULUTUS,
-  KoulutusTyyppi.ESIOPETUS,
+export const EiTuetutKoulutustyypit = [
   KoulutusTyyppi.PERUSOPETUS,
   KoulutusTyyppi.AIKUISTEN_PERUSOPETUS,
-  KoulutusTyyppi.VALMA,
-  KoulutusTyyppi.VARHAISKASVATUS,
-  KoulutusTyyppi.PERUSOPETUKSEEN_VALMISTAVA,
+  KoulutusTyyppi.LUKIOKOULUTUS,
   KoulutusTyyppi.LUKIOVALMISTAVAKOULUTUS,
+  KoulutusTyyppi.AIKUISLUKIOKOULUTUS,
   KoulutusTyyppi.TAITEEN_PERUSOPETUS,
-]);
+  KoulutusTyyppi.PERUSOPETUKSEEN_VALMISTAVA,
+  KoulutusTyyppi.LISAOPETUS,
+];
+
+export const TuetutKoulutustyypit = _.filter(EperusteetKoulutustyypit, koulutustyyppi => !_.includes(EiTuetutKoulutustyypit, koulutustyyppi));
+
+export const KoodistoLops2019LaajaAlaiset = 'laajaalainenosaaminenlops2021';
 
 export const YlopsKoulutustyypit = Object.freeze([
   KoulutusTyyppi.ESIOPETUS,
@@ -82,6 +79,10 @@ export function isPerusteSupported(peruste: any) {
     return toteutus === 'lops2019';
   }
   return _.includes(YlopsKoulutustyypit, koulutustyyppi);
+}
+
+export function isKoulutustyyppiSupported(koulutustyyppi: string | undefined) {
+  return !_.includes(EiTuetutKoulutustyypit, koulutustyyppi);
 }
 
 export function isLukiokoulutus(koulutustyyppi: KoulutusTyyppi): boolean {
