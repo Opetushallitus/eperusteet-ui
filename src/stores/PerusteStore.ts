@@ -7,6 +7,7 @@ import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, peruste
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
+import { isKoulutustyyppiSupported } from '@/utils/perusteet';
 
 Vue.use(VueCompositionApi);
 
@@ -37,6 +38,7 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisut = computed(() => this.state.julkaisut);
   public readonly isPohja = computed(() => this.state.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA));
   public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.peruste.value?.koulutustyyppi));
+  public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.peruste.value?.koulutustyyppi));
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {

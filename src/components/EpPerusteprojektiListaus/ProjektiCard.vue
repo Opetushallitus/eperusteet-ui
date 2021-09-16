@@ -1,7 +1,7 @@
 <template>
   <router-link :to="link" tag="div" :class="classes">
-    <div v-if="indicator" class="p-2 pl-4 flex-shrink-1">
-      <EpColorIndicator size="16" :kind="indicator" />
+    <div v-if="koulutustyyppi" class="p-2 pl-4 flex-shrink-1">
+      <EpColorIndicator size="16" :kind="koulutustyyppi" />
     </div>
     <div v-else></div>
     <div class="flex-grow-1 mainslot h-100">
@@ -16,9 +16,7 @@
 <script lang="ts">
 import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
-import { Page } from '@shared/tyypit';
-import { BvTableFieldArray } from 'bootstrap-vue';
-import { IProjektiProvider } from './types';
+import * as _ from 'lodash';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -32,23 +30,27 @@ export default class ProjektiCard extends Vue {
   fullBackground!: boolean;
 
   @Prop()
-  indicator!: string;
+  koulutustyyppi!: string;
 
   @Prop()
   link!: any;
+
+  @Prop({ required: false, default: () => [] })
+  eiTuetutKoulutustyypit!: string[];
 
   get classes() {
     if (this.fullBackground) {
       return 'project-card full-color h-100';
     }
     else {
-      return 'project-card d-flex flex-column h-100';
+      return 'project-card d-flex flex-column h-100 ' + (_.includes(this.eiTuetutKoulutustyypit, (this.koulutustyyppi)) ? 'not-supported' : '');
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "@shared/styles/_variables.scss";
 
 .full-color {
   background: linear-gradient(180deg, #3C839F 0%, #4797B7 100%);
@@ -68,6 +70,10 @@ export default class ProjektiCard extends Vue {
 
   &:hover {
     box-shadow: 5px 5px 20px 3px rgba(27,41,102,0.12);
+  }
+
+  &.not-supported {
+    background-color: $gray-lighten-5;
   }
 }
 

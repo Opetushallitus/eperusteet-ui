@@ -2,7 +2,8 @@
   <EpMainView>
     <EpPerusteprojektiListaus :provider="perusteetStore"
                               :edit-route="'perusteprojekti'"
-                              :new-route="{ name: 'perusteprojektiLuonti' }">
+                              :new-route="{ name: 'perusteprojektiLuonti' }"
+                              :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
       <h2 slot="upperheader">{{ $t('perusteprojektisi') }}</h2>
       <h2 slot="lowerheader">{{ $t('kaikki-perusteprojektit') }}</h2>
     </EpPerusteprojektiListaus>
@@ -16,6 +17,7 @@ import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPe
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
+import { EiTuetutKoulutustyypit } from '@/utils/perusteet';
 
 @Component({
   components: {
@@ -27,5 +29,9 @@ import { KayttajaStore } from '@/stores/kayttaja';
 export default class RoutePerusteprojektit extends Vue {
   @Prop({ required: true })
   perusteetStore!: PerusteetStore;
+
+  get eiTuetutKoulutustyypit() {
+    return EiTuetutKoulutustyypit;
+  }
 }
 </script>

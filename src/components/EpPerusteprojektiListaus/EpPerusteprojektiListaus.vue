@@ -27,7 +27,8 @@
           <EpSpinner v-if="!ownProjects" class="m-5"/>
           <div v-else class="card-wrapper" v-for="project in ownProjects" :key="project.id">
             <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                          :indicator="project.peruste.koulutustyyppi">
+                          :koulutustyyppi="project.peruste.koulutustyyppi"
+                          :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
               <template slot="lower" class="small-text">
                 {{ $t('tila-' + project.tila) }}
               </template>
@@ -174,7 +175,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto, Perusteet, PerusteKevytDto } from '@shared/api/eperusteet';
-import { EperusteetKoulutustyypit } from '@/utils/perusteet';
+import { EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import { Page } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import { IProjektiProvider } from './types';
@@ -223,6 +224,9 @@ export default class EpPerusteprojektiListaus extends Vue {
 
   @Prop({ required: false, default: () => ({ 'oikeus': 'hallinta', 'kohde': 'peruste' }) })
   luontioikeus!: any;
+
+  @Prop({ required: false, default: () => [] })
+  eiTuetutKoulutustyypit!: string[];
 
   private koulutustyyppi: string | null = null;
   private peruste: PerusteKevytDto | null = null;

@@ -86,7 +86,7 @@
           </b-form-group>
 
           <b-form-group :label="$t('koulutus-tutkintotyyppi') + '*'" required>
-            <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required/>
+            <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"/>
           </b-form-group>
 
           <b-form-group :label="$t('perustetyoryhma')" required>
@@ -235,12 +235,12 @@ import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLata
 import { PerusteAikatauluDtoTapahtumaEnum, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { EperusteetKoulutustyypit, isLukiokoulutus } from '@/utils/perusteet';
+import { isLukiokoulutus, EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perusteet';
+import { EperusteetKoulutustyypit, isKoulutustyyppiAmmatillinen } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { notNull } from '@shared/validators/required';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
-import { isKoulutustyyppiAmmatillinen } from '@shared/utils/perusteet';
 
 const util = require('util');
 
@@ -312,14 +312,23 @@ export default class RoutePerusteprojektiLuonti extends Vue {
 
   get pohjat() {
     if (this.perusteprojektiStore.pohjat.value) {
-      return _.sortBy(this.perusteprojektiStore.pohjat.value, pohja => _.toLower(this.$kaanna(pohja.nimi!)));
+      return _.sortBy(this.setIsDisabled(this.perusteprojektiStore.pohjat.value), pohja => _.toLower(this.$kaanna(pohja.nimi!)));
     }
   }
 
   get perusteet() {
     if (this.perusteprojektiStore.perusteet.value) {
-      return _.sortBy(this.perusteprojektiStore.perusteet.value, peruste => _.toLower(this.$kaanna(peruste.nimi!)));
+      return _.sortBy(this.setIsDisabled(this.perusteprojektiStore.perusteet.value), peruste => _.toLower(this.$kaanna(peruste.nimi!)));
     }
+  }
+
+  setIsDisabled(koulutustyypilliset) {
+    return _.map(koulutustyypilliset, koulutustyypillinen => {
+      return {
+        ...koulutustyypillinen,
+        $isDisabled: !isKoulutustyyppiSupported(koulutustyypillinen.koulutustyyppi),
+      };
+    });
   }
 
   get steps() {
@@ -538,6 +547,10 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     if (this.data.koulutustyyppi) {
       return isKoulutustyyppiAmmatillinen(this.data.koulutustyyppi);
     }
+  }
+
+  get eiTuetutKoulutustyypit() {
+    return EiTuetutKoulutustyypit;
   }
 }
 </script>
