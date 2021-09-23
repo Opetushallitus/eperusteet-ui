@@ -398,7 +398,7 @@ export default class EpAmosaaTilastot extends Vue {
       },
     }, {
       key: 'paatospaivamaara',
-      label: this.$t('voimassaolo-paattyy'),
+      label: this.$t('paatospaivamaara'),
       sortable: true,
       thStyle: { width: '15%', paddingTop: '0px' },
       formatter: (value, key, item) => {
