@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-import { Tilastot, getAllPerusteet } from '@shared/api/eperusteet';
+import { Tilastot, getAllPerusteet, Perusteet } from '@shared/api/eperusteet';
 import { yleissivistavatKoulutustyypit } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
 
@@ -18,14 +18,29 @@ export class TilastotStore {
   public readonly perusteet = computed(() => this.state.perusteet);
 
   public async fetch() {
-    const res = _.map(await Promise.all([
-      Tilastot.getAmosaaTilastot(),
-      Tilastot.getYlopsTilastot(),
-      getAllPerusteet({ koulutustyyppi: yleissivistavatKoulutustyypit }),
-    ]), 'data') as any;
+    try {
+      this.state.toteutussuunnitelmat = (await Tilastot.getAmosaaTilastot()).data;
+    }
+    catch (e) {}
 
-    this.state.toteutussuunnitelmat = res[0];
-    this.state.opetussuunnitelmat = res[1];
-    this.state.perusteet = res[2].data;
+    try {
+      this.state.opetussuunnitelmat = (await Tilastot.getYlopsTilastot()).data as any;
+    }
+    catch (e) {}
+
+    try {
+      this.state.perusteet = _.get((await Perusteet.getAllPerusteetInternal(
+        undefined,
+        1000,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        yleissivistavatKoulutustyypit,
+      )).data, 'data');
+    }
+    catch (e) {}
   }
 }
