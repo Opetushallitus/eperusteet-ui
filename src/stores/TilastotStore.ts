@@ -21,12 +21,16 @@ export class TilastotStore {
     try {
       this.state.toteutussuunnitelmat = (await Tilastot.getAmosaaTilastot()).data;
     }
-    catch (e) {}
+    catch (e) {
+      this.state.toteutussuunnitelmat = [];
+    }
 
     try {
       this.state.opetussuunnitelmat = (await Tilastot.getYlopsTilastot()).data as any;
     }
-    catch (e) {}
+    catch (e) {
+      this.state.opetussuunnitelmat = [];
+    }
 
     try {
       this.state.perusteet = _.get((await Perusteet.getAllPerusteetInternal(
@@ -41,6 +45,8 @@ export class TilastotStore {
         yleissivistavatKoulutustyypit,
       )).data, 'data');
     }
-    catch (e) {}
+    catch (e) {
+      this.state.perusteet = [];
+    }
   }
 }
