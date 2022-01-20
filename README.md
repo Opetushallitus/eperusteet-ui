@@ -79,6 +79,8 @@ yarn lint
 
 # Korjaus automaattisesti
 yarn lint:fix
+
+yarn test:unit:coverage
 ```
 
 #### Tuotantoversion buildaus
