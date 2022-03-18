@@ -11,102 +11,83 @@
       </template>
     </ep-tekstikappale-lisays>
 
-    <template v-if="isLisasisaltoLisays">
-      <ep-tekstikappale-lisays
-        v-if="lisasisaltoLisays.length === 1"
-        @save="lisasisaltoLisays[0].save"
-        :tekstikappaleet="perusteenOsat"
-        :paatasovalinta="true"
-        :otsikkoRequired="false"
-        modalId="lisasisaltoLisays"
-        v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-        <template v-slot:lisays-btn-text>
-          {{$t(lisasisaltoLisays[0].label['uusi'])}}
-        </template>
-        <template v-slot:modal-title>
-          {{$t(lisasisaltoLisays[0].label['uusi'])}}
-        </template>
-        <template v-slot:footer-lisays-btn-text>
-          {{$t(lisasisaltoLisays[0].label['lisaa'])}}
-        </template>
-        <template v-slot:header>
-          {{$t(lisasisaltoLisays[0].label['sijainti'])}}
-        </template>
-        <template v-slot:default="{tekstikappale}">
-          <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
-          {{ $kaanna(tekstikappale.label) }}
-        </template>
-      </ep-tekstikappale-lisays>
+    <template v-if="lisasisaltoLisays.length > 0">
+      <template v-for="(lisasisalto, index) in lisasisaltoLisays">
 
-      <b-dropdown v-else-if="lisasisaltoLisays.length > 1 && lisasisaltoLisays[0].linkkiteksti" variant="link" class="lisasisalto-dropdown" toggle-class="text-decoration-none" no-caret>
-        <template v-slot:button-content>
-          <ep-button variant="link" buttonClass="text-decoration-none">
-            <fas class="mr-2" icon="plussa" />
-            {{$t(lisasisaltoLisays[0].linkkiteksti)}}
-          </ep-button>
-        </template>
+        <b-dropdown v-if="lisasisalto.groupedSisalto.length > 0"
+                    :key="'lisasisalto'+index"
+                    variant="link"
+                    class="lisasisalto-dropdown"
+                    toggle-class="text-decoration-none"
+                    no-caret>
+          <template v-slot:button-content>
+            <ep-button variant="link" buttonClass="text-decoration-none">
+              <fas class="mr-2" icon="plussa"/>
+              {{ $t(lisasisalto.linkkiteksti) }}
+            </ep-button>
+          </template>
 
-        <div v-for="(lisasisalto, index) in lisasisaltoLisays" :key="'lisasisalto'+index">
+          <div v-for="(groupedLisasisalto, index) in lisasisalto.groupedSisalto" :key="'groupedLisasisalto'+index">
 
-          <hr v-if="index > 0" class="mt-2 mb-2" />
+            <hr v-if="index > 0" class="mt-2 mb-2"/>
 
-          <ep-tekstikappale-lisays
-            @save="lisasisalto.save"
-            :tekstikappaleet="perusteenOsat"
-            :paatasovalinta="true"
-            :otsikkoRequired="false"
-            :modalId="'lisasisaltoLisays'+index"
-            v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-            <template v-slot:lisays-btn-icon>
-              <span/>
-            </template>
-            <template v-slot:lisays-btn-text>
-              {{$t(lisasisalto.label['uusi'])}}
-            </template>
-            <template v-slot:modal-title>
-              {{$t(lisasisalto.label['uusi'])}}
-            </template>
-            <template v-slot:footer-lisays-btn-text>
-              {{$t(lisasisalto.label['lisaa'])}}
-            </template>
-            <template v-slot:header>
-              {{$t(lisasisalto.label['sijainti'])}}
-            </template>
-            <template v-slot:default="{tekstikappale}">
-              <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
-              {{ $kaanna(tekstikappale.label) }}
-            </template>
-          </ep-tekstikappale-lisays>
+            <ep-tekstikappale-lisays
+              @save="groupedLisasisalto.save"
+              :tekstikappaleet="perusteenOsat"
+              :paatasovalinta="true"
+              :otsikkoRequired="false"
+              :modalId="'groupedLisasisaltoLisays'+index"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+              <template v-slot:lisays-btn-icon>
+                <span/>
+              </template>
+              <template v-slot:lisays-btn-text>
+                {{ $t(groupedLisasisalto.label['uusi']) }}
+              </template>
+              <template v-slot:modal-title>
+                {{ $t(groupedLisasisalto.label['uusi']) }}
+              </template>
+              <template v-slot:footer-lisays-btn-text>
+                {{ $t(groupedLisasisalto.label['lisaa']) }}
+              </template>
+              <template v-slot:header>
+                {{ $t(groupedLisasisalto.label['sijainti']) }}
+              </template>
+              <template v-slot:default="{tekstikappale}">
+                <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
+                {{ $kaanna(tekstikappale.label) }}
+              </template>
+            </ep-tekstikappale-lisays>
 
-        </div>
-      </b-dropdown>
+          </div>
+        </b-dropdown>
 
-      <template v-else-if="lisasisaltoLisays.length > 1">
         <ep-tekstikappale-lisays
-            v-for="(lisasisalto, index) in lisasisaltoLisays" :key="'lisasisalto'+index"
-            @save="lisasisalto.save"
-            :tekstikappaleet="perusteenOsat"
-            :paatasovalinta="true"
-            :otsikkoRequired="false"
-            :modalId="'lisasisaltoLisays'+index"
-            v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-            <template v-slot:lisays-btn-text>
-              {{$t(lisasisalto.label['uusi'])}}
-            </template>
-            <template v-slot:modal-title>
-              {{$t(lisasisalto.label['uusi'])}}
-            </template>
-            <template v-slot:footer-lisays-btn-text>
-              {{$t(lisasisalto.label['lisaa'])}}
-            </template>
-            <template v-slot:header>
-              {{$t(lisasisalto.label['sijainti'])}}
-            </template>
-            <template v-slot:default="{tekstikappale}">
-              <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
-              {{ $kaanna(tekstikappale.label) }}
-            </template>
-          </ep-tekstikappale-lisays>
+          v-else
+          :key="'lisasisalto'+index"
+          @save="lisasisalto.save"
+          :tekstikappaleet="perusteenOsat"
+          :paatasovalinta="true"
+          :otsikkoRequired="false"
+          :modalId="'lisasisaltoLisays'+index"
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+          <template v-slot:lisays-btn-text>
+            {{ $t(lisasisalto.label['uusi']) }}
+          </template>
+          <template v-slot:modal-title>
+            {{ $t(lisasisalto.label['uusi']) }}
+          </template>
+          <template v-slot:footer-lisays-btn-text>
+            {{ $t(lisasisalto.label['lisaa']) }}
+          </template>
+          <template v-slot:header>
+            {{ $t(lisasisalto.label['sijainti']) }}
+          </template>
+          <template v-slot:default="{tekstikappale}">
+            <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
+            {{ $kaanna(tekstikappale.label) }}
+          </template>
+        </ep-tekstikappale-lisays>
       </template>
 
     </template>
@@ -345,6 +326,7 @@ export default class EpSisallonLisays extends Vue {
     return {
       [Koulutustyyppi.vapaasivistystyo]: [
         {
+          groupedSisalto: [],
           save: this.tallennaUusiOpintokokonaisuus,
           label: {
             'uusi': 'uusi-opintokokonaisuus',
@@ -354,6 +336,7 @@ export default class EpSisallonLisays extends Vue {
         }],
       [Koulutustyyppi.vapaasivistystyolukutaito]: [
         {
+          groupedSisalto: [],
           save: this.tallennaUusiTavoitesisaltoalue,
           label: {
             'uusi': 'tavoitteet-ja-sisaltoalueet',
@@ -364,22 +347,27 @@ export default class EpSisallonLisays extends Vue {
       [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus]: [
         {
           linkkiteksti: 'tavoitteet-ja-keskeiset-sisallot',
-          save: this.tallennaKotoKielitaito,
-          label: {
-            'uusi': 'kielitaitotasot',
-            'lisaa': 'lisaa-kielitaitotaso',
-            'sijainti': 'kielitaitotasot-sijainti',
-          },
+          groupedSisalto: [
+            {
+              save: this.tallennaKotoKielitaito,
+              label: {
+                'uusi': 'kielitaitotasot',
+                'lisaa': 'lisaa-kielitaitotaso',
+                'sijainti': 'kielitaitotasot-sijainti',
+              },
+            },
+            {
+              save: this.tallennaKotoOpinto,
+              label: {
+                'uusi': 'tyoelama-ja-yhteiskuntataitojen-opinnot',
+                'lisaa': 'lisaa-tyoelama-ja-yhteiskuntataitojen-opinto',
+                'sijainti': 'tyoelama-ja-yhteiskuntataitojen-opinnot-sijainti',
+              },
+            },
+          ],
         },
         {
-          save: this.tallennaKotoOpinto,
-          label: {
-            'uusi': 'tyoelama-ja-yhteiskuntataitojen-opinnot',
-            'lisaa': 'lisaa-tyoelama-ja-yhteiskuntataitojen-opinto',
-            'sijainti': 'tyoelama-ja-yhteiskuntataitojen-opinnot-sijainti',
-          },
-        },
-        {
+          groupedSisalto: [],
           save: this.tallennaUusiKotoLaajaAlainenOsaaminen,
           label: {
             'uusi': 'uusi-laaja-alainen-osaaminen',
@@ -390,6 +378,7 @@ export default class EpSisallonLisays extends Vue {
       ],
       [Koulutustyyppi.tutkintoonvalmentava]: [
         {
+          groupedSisalto: [],
           save: this.tallennaUusiKoulutuksenOsa,
           label: {
             'uusi': 'uusi-koulutuksenosa',
@@ -398,6 +387,7 @@ export default class EpSisallonLisays extends Vue {
           },
         },
         {
+          groupedSisalto: [],
           save: this.tallennaUusiLaajaAlainenOsaaminen,
           label: {
             'uusi': 'uusi-laaja-alainen-osaaminen',
@@ -423,7 +413,7 @@ export default class EpSisallonLisays extends Vue {
   .btn {
     &.dropdown-toggle {
       padding: 0;
-      border:0;
+      border: 0;
 
       .btn {
         padding-top: 0px;
@@ -432,7 +422,7 @@ export default class EpSisallonLisays extends Vue {
   }
 }
 
-.lisasisalto-dropdown ::v-deep .dropdown-menu .ep-button .btn{
+.lisasisalto-dropdown ::v-deep .dropdown-menu .ep-button .btn {
   color: $black;
   padding: 0;
 }
