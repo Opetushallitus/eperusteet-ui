@@ -316,6 +316,7 @@ export default class EpSisallonLisays extends Vue {
   }
 
   async tallennaUusiKotoLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
+    window.alert('Ei vielä toteutettu!!!');
     // try {
     //   const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
     //   const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
