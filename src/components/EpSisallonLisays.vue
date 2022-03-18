@@ -325,22 +325,24 @@ export default class EpSisallonLisays extends Vue {
 
   get koulutustyypinLisasisaltoLisays() {
     return {
-      [Koulutustyyppi.vapaasivistystyo]: [{
-        save: this.tallennaUusiOpintokokonaisuus,
-        label: {
-          'uusi': 'uusi-opintokokonaisuus',
-          'lisaa': 'lisaa-opintokokonaisuus',
-          'sijainti': 'opintokokonaisuuden-sijainti',
-        },
-      }],
-      [Koulutustyyppi.vapaasivistystyolukutaito]: [{
-        save: this.tallennaUusiTavoitesisaltoalue,
-        label: {
-          'uusi': 'tavoitteet-ja-sisaltoalueet',
-          'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
-          'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
-        },
-      }],
+      [Koulutustyyppi.vapaasivistystyo]: [
+        {
+          save: this.tallennaUusiOpintokokonaisuus,
+          label: {
+            'uusi': 'uusi-opintokokonaisuus',
+            'lisaa': 'lisaa-opintokokonaisuus',
+            'sijainti': 'opintokokonaisuuden-sijainti',
+          },
+        }],
+      [Koulutustyyppi.vapaasivistystyolukutaito]: [
+        {
+          save: this.tallennaUusiTavoitesisaltoalue,
+          label: {
+            'uusi': 'tavoitteet-ja-sisaltoalueet',
+            'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
+            'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
+          },
+        }],
       [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus]: [
         {
           linkkiteksti: 'tavoitteet-ja-keskeiset-sisallot',
@@ -359,21 +361,23 @@ export default class EpSisallonLisays extends Vue {
             'sijainti': 'tyoelama-ja-yhteiskuntataitojen-opinnot-sijainti',
           },
         }],
-      [Koulutustyyppi.tutkintoonvalmentava]: [{
-        save: this.tallennaUusiKoulutuksenOsa,
-        label: {
-          'uusi': 'uusi-koulutuksenosa',
-          'lisaa': 'lisaa-koulutuksenosa',
-          'sijainti': 'koulutuksen-osan-sijainti',
+      [Koulutustyyppi.tutkintoonvalmentava]: [
+        {
+          save: this.tallennaUusiKoulutuksenOsa,
+          label: {
+            'uusi': 'uusi-koulutuksenosa',
+            'lisaa': 'lisaa-koulutuksenosa',
+            'sijainti': 'koulutuksen-osan-sijainti',
+          },
         },
-      }, {
-        save: this.tallennaUusiLaajaAlainenOsaaminen,
-        label: {
-          'uusi': 'uusi-laaja-alainen-osaaminen',
-          'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
-          'sijainti': 'laaja-alaisen-osaamisen-sijainti',
+        {
+          save: this.tallennaUusiLaajaAlainenOsaaminen,
+          label: {
+            'uusi': 'uusi-laaja-alainen-osaaminen',
+            'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
+            'sijainti': 'laaja-alaisen-osaamisen-sijainti',
+          },
         },
-      },
       ],
     };
   }
