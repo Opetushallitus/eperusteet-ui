@@ -17,7 +17,7 @@
         <b-dropdown v-if="lisasisalto.groupedSisalto.length > 0"
                     :key="'lisasisalto'+index"
                     variant="link"
-                    class="lisasisalto-dropdown"
+                    class="lisasisalto-dropdown mt-2"
                     toggle-class="text-decoration-none"
                     no-caret>
           <template v-slot:button-content>
