@@ -315,6 +315,23 @@ export default class EpSisallonLisays extends Vue {
     }
   }
 
+  async tallennaUusiKotoLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
+    // try {
+    //   const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
+    //   const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+    //   await this.perusteStore.updateNavigation();
+    //   await this.$router.push({
+    //     name: 'laajaalainenosaaminen',
+    //     params: {
+    //       laajaalainenosaaminenId: '' + tallennettu!.id,
+    //     },
+    //   });
+    // }
+    // catch (e) {
+    //   this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
+    // }
+  }
+
   get isLisasisaltoLisays() {
     return !!this.peruste && !!this.koulutustyypinLisasisaltoLisays[this.peruste.koulutustyyppi!];
   }
@@ -360,7 +377,16 @@ export default class EpSisallonLisays extends Vue {
             'lisaa': 'lisaa-tyoelama-ja-yhteiskuntataitojen-opinto',
             'sijainti': 'tyoelama-ja-yhteiskuntataitojen-opinnot-sijainti',
           },
-        }],
+        },
+        {
+          save: this.tallennaUusiKotoLaajaAlainenOsaaminen,
+          label: {
+            'uusi': 'uusi-laaja-alainen-osaaminen',
+            'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
+            'sijainti': 'laaja-alaisen-osaamisen-sijainti',
+          },
+        },
+      ],
       [Koulutustyyppi.tutkintoonvalmentava]: [
         {
           save: this.tallennaUusiKoulutuksenOsa,
