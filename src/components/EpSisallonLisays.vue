@@ -23,7 +23,7 @@
           <template v-slot:button-content>
             <ep-button variant="link" buttonClass="text-decoration-none">
               <fas class="mr-2" icon="plussa"/>
-              {{ $t(lisasisalto.linkkiteksti) }}
+              {{ $t(lisasisalto.groupedLinkkiteksti) }}
             </ep-button>
           </template>
 
@@ -346,7 +346,7 @@ export default class EpSisallonLisays extends Vue {
         }],
       [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus]: [
         {
-          linkkiteksti: 'tavoitteet-ja-keskeiset-sisallot',
+          groupedLinkkiteksti: 'tavoitteet-ja-keskeiset-sisallot',
           groupedSisalto: [
             {
               save: this.tallennaKotoKielitaito,
