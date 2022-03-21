@@ -297,21 +297,21 @@ export default class EpSisallonLisays extends Vue {
   }
 
   async tallennaUusiKotoLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
-    window.alert('Ei vielä toteutettu!!!');
-    // try {
-    //   const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
-    //   const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-    //   await this.perusteStore.updateNavigation();
-    //   await this.$router.push({
-    //     name: 'laajaalainenosaaminen',
-    //     params: {
-    //       laajaalainenosaaminenId: '' + tallennettu!.id,
-    //     },
-    //   });
-    // }
-    // catch (e) {
-    //   this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    // }
+    // window.alert('Ei vielä toteutettu!!!');
+    try {
+      // const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
+      // const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+      // await this.perusteStore.updateNavigation();
+      await this.$router.push({
+        name: 'koto_laajaalainenosaaminen',
+        params: {
+          kotoLaajaalainenOsaaminenId: '' + 1,
+        },
+      });
+    }
+    catch (e) {
+      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
+    }
   }
 
   get isLisasisaltoLisays() {

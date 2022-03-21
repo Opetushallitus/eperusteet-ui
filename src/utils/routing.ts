@@ -68,6 +68,11 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
       type: 'koto_opinto',
       id: Number(route.params?.kotoOpintoId!),
     };
+  case 'koto_laajaalainenosaaminen':
+    return {
+      type: 'koto_laajaalainenosaaminen',
+      id: Number(route.params?.kotoLaajaalainenOsaaminenId!),
+    };
   default:
     console.error('Unknown route', route.name, route);
     break;
@@ -152,6 +157,14 @@ export function nodeToRoute(node: NavigationNodeDto): Location | null {
         kotoOpintoId: _.toString(node.id),
       },
     };
+  case 'koto_laajaalainenosaaminen':
+    return {
+      name: 'koto_laajaalainenosaaminen',
+      params: {
+        kotoLaajaalainenOsaaminenId: _.toString(node.id),
+      },
+    };
+
   case 'kvliite':
     return {
       name: 'kvliite',
