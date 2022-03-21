@@ -209,6 +209,15 @@
                 </div>
               </template>
 
+              <template v-slot:koto_laajaalainenosaaminen="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'koto_laajaalainenosaaminen', params: { kotoLaajaalainenOsaaminenId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-koto-laaja-alainen-osaaminen') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:kvliite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'kvliite' }">
