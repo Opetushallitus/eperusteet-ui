@@ -34,7 +34,7 @@ import { OpintokokonaisuusStore } from './stores/OpintokokonaisuusStore';
 import { KoulutuksenOsaStore } from './stores/KoulutuksenOsaStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
 import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
-import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
+import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import { registerIconColorSchemeChange } from '@shared/utils/icon';
 
 import router from './router';

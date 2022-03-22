@@ -70,7 +70,7 @@ import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import EpKotoTaitotasot from '@shared/components/EpKotoTaitotasot/EpKotoTaitotasot.vue';
-import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
+import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import { Murupolku } from '@shared/stores/murupolku';
 
 @Component({
