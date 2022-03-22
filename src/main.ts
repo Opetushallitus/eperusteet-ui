@@ -33,7 +33,7 @@ import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
 import { OpintokokonaisuusStore } from './stores/OpintokokonaisuusStore';
 import { KoulutuksenOsaStore } from './stores/KoulutuksenOsaStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
-import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
+import { KotoKielitaitotasoStore } from '@/stores/Koto/KotoKielitaitotasoStore';
 import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import { registerIconColorSchemeChange } from '@shared/utils/icon';
 
