@@ -6,8 +6,7 @@ import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { minLength, required } from 'vuelidate/lib/validators';
-import { allTranslations, minValue, translated, warning } from '@shared/validators/required';
+import { required } from 'vuelidate/lib/validators';
 
 Vue.use(VueCompositionApi);
 
