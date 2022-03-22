@@ -273,8 +273,7 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue, ProvideReactive } from 'vue-property-decorator';
-import { Location } from 'vue-router';
+import { Prop, Component, ProvideReactive } from 'vue-property-decorator';
 
 import * as _ from 'lodash';
 
@@ -288,7 +287,7 @@ import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavib
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
-import { Koulutustyyppi, NavigationNodeDto } from '@shared/tyypit';
+import { Koulutustyyppi } from '@shared/tyypit';
 import {
   NavigationNodeDtoTypeEnum,
   PerusteDtoTilaEnum,
