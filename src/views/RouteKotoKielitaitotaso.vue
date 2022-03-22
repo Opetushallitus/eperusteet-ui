@@ -69,7 +69,7 @@ import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler'
 import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
-import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
+import { KotoKielitaitotasoStore } from '@/stores/Koto/KotoKielitaitotasoStore';
 import EpKotoTaitotasot from '@shared/components/EpKotoTaitotasot/EpKotoTaitotasot.vue';
 import { Murupolku } from '@shared/stores/murupolku';
 
