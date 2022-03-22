@@ -107,7 +107,7 @@ import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import { TavoitesisaltoalueStore } from '@/stores/TavoitesisaltoalueStore';
 import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
-import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
+import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
 import { NavigationNodeDtoTypeEnum } from '@shared/api/eperusteet';

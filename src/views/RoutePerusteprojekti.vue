@@ -299,13 +299,7 @@ import {
 import { Meta } from '@shared/utils/decorators';
 
 import { PerusteStore } from '@/stores/PerusteStore';
-import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
-import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
-import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
-import { TavoitesisaltoalueStore } from '@/stores/TavoitesisaltoalueStore';
-import { KotoKielitaitotasoStore } from '@/stores/KotoKielitaitotasoStore';
-import { KotoOpintoStore } from '@/stores/KotoOpintoStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSisallonLisays from '@/components/EpSisallonLisays.vue';
 import { routeToNode, LinkkiHandler } from '@/utils/routing';
