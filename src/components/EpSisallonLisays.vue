@@ -112,6 +112,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
 import { NavigationNodeDtoTypeEnum } from '@shared/api/eperusteet';
 import { chapterStringSort } from '@shared/utils/NavigationBuilder';
+import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 
 @Component({
   components: {
@@ -297,19 +298,19 @@ export default class EpSisallonLisays extends Vue {
   }
 
   async tallennaUusiKotoLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
-    // window.alert('Ei vielä toteutettu!!!');
     try {
-      // const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
-      // const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      // await this.perusteStore.updateNavigation();
+      const kotoStore = new KotoLaajaalainenOsaaminenStore(this.peruste!.id!, 0);
+      const tallennettu = await kotoStore.create(otsikko, tekstikappaleIsa);
+      await this.perusteStore.updateNavigation();
       await this.$router.push({
         name: 'koto_laajaalainenosaaminen',
         params: {
-          kotoLaajaalainenOsaaminenId: '' + 1,
+          kotoLaajaalainenOsaaminenId: '' + tallennettu!.id,
         },
       });
     }
     catch (e) {
+      console.log(e);
       this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
     }
   }
