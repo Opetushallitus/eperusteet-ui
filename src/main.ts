@@ -43,6 +43,7 @@ import { stores } from '@/stores';
 import { getKaannokset } from '@shared/api/eperusteet';
 import { TavoitesisaltoalueStore } from './stores/TavoitesisaltoalueStore';
 import { LaajaalainenOsaaminenStore } from './stores/LaajaalainenOsaaminenStore';
+import {KotoLaajaalainenOsaaminenStore} from "@/stores/Koto/KotoLaajaalainenOsaaminenStore";
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
@@ -133,6 +134,11 @@ Vue.use(KotoKielitaitotasoStore, {
 });
 
 Vue.use(KotoOpintoStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(KotoLaajaalainenOsaaminenStore, {
   perusteStore: stores.perusteStore,
   router,
 });
