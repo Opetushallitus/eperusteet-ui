@@ -1,7 +1,7 @@
 <template>
   <EpEditointi v-if="editointiStore" :store="editointiStore">
     <template v-slot:header="{ data }">
-      <h2 class="m-0" v-if="data.nimi" >{{ data.nimi }}</h2>
+      <h2 class="m-0" v-if="data.nimi" >{{ $kaanna(data.nimi) }}</h2>
       <h2 class="m-0" v-else >{{ $t('nimeton-opinto') }}</h2>
     </template>
     <template v-slot:default="{ data, isEditing, validation }">
@@ -19,7 +19,7 @@
         <b-col lg="8">
           <b-form-group required>
             <div v-if="isEditing" slot="label">{{$t('kappaleen-teksti')}}</div>
-            <ep-content v-model="data.kuvaus"
+            <ep-content v-model="data.yleiskuvaus"
                         layout="normal"
                         :is-editable="isEditing"
                         :kasiteHandler="kasiteHandler"
@@ -71,12 +71,10 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
 
   @Watch('kotoLaajaalainenOsaaminenId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
-    debugger;
     if (!id || id === oldId) {
       return;
     }
 
-    debugger;
     await this.perusteStore.blockUntilInitialized();
     const kotoStore = new KotoLaajaalainenOsaaminenStore(this.perusteId!, Number(id));
     this.editointiStore = new EditointiStore(kotoStore);
