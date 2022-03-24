@@ -70,13 +70,12 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
   }
 
   public async remove() {
-    debugger;
-    // await Sisallot.removeSisaltoViite(this.perusteId!, KotoOpintoStore.config?.perusteStore.perusteSuoritustapa.value!, this.kotoOpintoId!);
-    // KotoOpintoStore.config!.perusteStore!.removeNavigationEntry({
-    //   id: this.kotoOpintoId!,
-    //   type: 'koto_opinto',
-    // });
-    // KotoOpintoStore.config.router.push({ name: 'perusteprojekti' });
+    await Sisallot.removeSisaltoViite(this.perusteId!, KotoLaajaalainenOsaaminenStore.config?.perusteStore.perusteSuoritustapa.value!, this.kotoLaajaalainenOsaaminenId!);
+    KotoLaajaalainenOsaaminenStore.config!.perusteStore!.removeNavigationEntry({
+      id: this.kotoLaajaalainenOsaaminenId!,
+      type: 'koto_laajaalainenosaaminen',
+    });
+    KotoLaajaalainenOsaaminenStore.config.router.push({ name: 'perusteprojekti' });
   }
 
   public async lock() {
