@@ -41,15 +41,14 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
 
   public async fetch() {
     try {
-      debugger;
       this.state.kotoLaajaalainenOsaaminen = (await Perusteenosat.getPerusteenOsatByViite(this.kotoLaajaalainenOsaaminenId!)).data;
     }
     catch (err) {
+      console.log(err);
     }
   }
 
   public async load() {
-    debugger;
     await this.fetch();
     return this.kotoLaajaalainenOsaaminen.value;
   }
@@ -59,19 +58,15 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
   }
 
   public async save(data: any) {
-    // TODO
-    debugger;
-    return {};
-    // data.nimi = data.nimiKoodi.nimi;
-    // const res = await Perusteenosat.updatePerusteenOsa(this.id.value!, data);
-    //
-    // KotoOpintoStore.config!.perusteStore!.updateNavigationEntry({
-    //   id: this.kotoOpintoId!,
-    //   type: 'koto_opinto',
-    //   label: (res.data as any).nimi as any,
-    // });
-    //
-    // return res.data;
+    const res = await Perusteenosat.updatePerusteenOsa(this.id.value!, data);
+
+    KotoLaajaalainenOsaaminenStore.config!.perusteStore!.updateNavigationEntry({
+      id: this.kotoLaajaalainenOsaaminenId!,
+      type: 'koto_laajaalainenosaaminen',
+      label: (res.data as any).nimi as any,
+    });
+
+    return res.data;
   }
 
   public async remove() {
@@ -85,27 +80,22 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
   }
 
   public async lock() {
-    debugger;
-    return {};
-    // try {
-    //   const res = await Perusteenosat.checkPerusteenOsaLock(this.id.value!);
-    //   return res.data;
-    // }
-    // catch (err) {
-    //   return null;
-    // }
+    try {
+      const res = await Perusteenosat.checkPerusteenOsaLock(this.id.value!);
+      return res.data;
+    }
+    catch (err) {
+      return null;
+    }
   }
 
   public async acquire() {
-    debugger;
-    return {};
-    // const res = await Perusteenosat.lockPerusteenOsa(this.id.value!);
-    // return res.data;
+    const res = await Perusteenosat.lockPerusteenOsa(this.id.value!);
+    return res.data;
   }
 
   public async release() {
-    debugger;
-    // await Perusteenosat.unlockPerusteenOsa(this.id.value!);
+    await Perusteenosat.unlockPerusteenOsa(this.id.value!);
   }
 
   public async create(otsikko, tekstikappaleIsa) {
@@ -121,7 +111,6 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
         KotoLaajaalainenOsaaminenStore.config?.perusteStore.perusteSuoritustapa.value!,
         perusteenOsa
       ));
-      debugger;
       return tallennettu.data;
     }
     else {
