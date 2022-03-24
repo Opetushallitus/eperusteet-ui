@@ -5,6 +5,7 @@ import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import _ from 'lodash';
+import { Revision } from '@shared/tyypit';
 
 Vue.use(VueCompositionApi);
 
@@ -95,6 +96,15 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
 
   public async release() {
     await Perusteenosat.unlockPerusteenOsa(this.id.value!);
+  }
+
+  public async revisions() {
+    const res = await Perusteenosat.getPerusteenOsaVersiot(this.id.value!);
+    return res.data as Revision[];
+  }
+
+  public async restore(rev: number) {
+    await Perusteenosat.revertPerusteenOsaToVersio(this.id.value!, rev);
   }
 
   public async create(otsikko, tekstikappaleIsa) {
