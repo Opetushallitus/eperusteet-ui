@@ -116,6 +116,10 @@ https://app.travis-ci.com/github/Opetushallitus/eperusteet-ui
 
 Suositeltava resurssi [Vue style guide](https://vuejs.org/v2/style-guide)
 
+### 6. Tekninen velka
+
+- Yarn.lock tiedostoa on jouduttu muokkaamaan käsin. Tämä ongelma pitää selvittää kunhan depsuja seuraavan kerran päivitetään.
+
 ## ePerusteet-projektit
 
 |Projekti|Build status|Maintainability|Test Coverage|Known Vulnerabilities|
