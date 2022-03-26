@@ -28,6 +28,20 @@
         </b-col>
       </b-row>
 
+      <b-row class="mt-4">
+        <b-col lg="8">
+          <b-dropdown v-if="isEditing" :text="$t('lisaa-laaja-alainen-osaaminen')" variant="primary" class="mb-4">
+            <b-dropdown-item-button
+              v-for="(laajaAlainenKoodi, index) in laajaAlaisetKoodit"
+              @click="addLaajaAlainenOsaaminen(laajaAlainenKoodi)"
+              :key="index+'addlaaja'"
+              :disabled="laajaAlainenKoodi.hasPaikallinenKuvaus">
+              {{ $kaanna(laajaAlainenKoodi.nimi) }}
+            </b-dropdown-item-button>
+          </b-dropdown>
+        </b-col>
+      </b-row>
+
     </template>
   </EpEditointi>
   <EpSpinner v-else />
@@ -47,6 +61,7 @@ import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler'
 import { TermitStore } from '@/stores/TermitStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
+import { Koodisto } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -64,6 +79,36 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
   kotoLaajaalainenOsaaminenId!: number;
 
   private editointiStore: EditointiStore | null = null;
+  private laajaAlaisetKoodit;
+
+  async mounted() {
+    try {
+      const koodit = (await Koodisto.kaikki(
+        'laajaalainenosaaminenkoto2022')).data;
+
+      this.laajaAlaisetKoodit = koodit
+        .sort(x => parseInt(x.koodiArvo!))
+        .reverse()
+        .map(koodi => ({
+          koodi: koodi.koodiArvo,
+          nimi: this.extractNimi(koodi),
+        }));
+      debugger;
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
+
+  private extractNimi(koodi) {
+    const nimet: { [locale: string]: string } = {};
+
+    koodi.metadata!.forEach(meta => {
+      nimet[meta.kieli!.toLowerCase()] = meta.nimi;
+    });
+
+    return nimet;
+  }
 
   get perusteId() {
     return this.perusteStore.perusteId.value;
@@ -78,6 +123,11 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
     await this.perusteStore.blockUntilInitialized();
     const kotoStore = new KotoLaajaalainenOsaaminenStore(this.perusteId!, Number(id));
     this.editointiStore = new EditointiStore(kotoStore);
+  }
+
+  addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
+    // TODO
+    debugger;
   }
 
   get kasiteHandler() {
