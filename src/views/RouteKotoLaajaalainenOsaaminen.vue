@@ -32,12 +32,14 @@
         <b-col lg="8">
           <div v-for="(osaamisalue, index) in data.osaamisAlueet"
                :key="index+'kotoLaajaAlainenOsaaminen'">
-            <div slot="header">
+            <div slot="header" class="mt-4">
                 <span>
                   <h3 class="d-inline">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
-                  <b-button variant="link" @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)" v-if="isEditing">
-                    <fas icon="roskalaatikko" />
-                    {{$t('poista')}}
+                  <b-button variant="link"
+                            @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)"
+                            v-if="isEditing">
+                    <fas icon="roskalaatikko"/>
+                    {{ $t('poista') }}
                   </b-button>
                 </span>
             </div>
