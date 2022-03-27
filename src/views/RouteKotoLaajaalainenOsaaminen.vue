@@ -28,7 +28,7 @@
         </b-col>
       </b-row>
 
-      <b-row class="mt-4">
+      <b-row v-if="data.osaamisAlueet.length > 0" class="mt-4">
         <b-col lg="8">
           <div class="paikallinen-laaja-alainen" v-for="(osaamisalue, index) in data.osaamisAlueet"
                :key="index+'kotoLaajaAlainenOsaaminen'">
