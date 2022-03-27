@@ -30,6 +30,27 @@
 
       <b-row class="mt-4">
         <b-col lg="8">
+          <div class="paikallinen-laaja-alainen" v-for="(osaamisalue, index) in data.osaamisAlueet"
+               :key="index+'kotoLaajaAlainenOsaaminen'">
+            <div slot="header">
+                <span>
+                  <h3 class="d-inline">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
+                  <b-button variant="link" @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)" v-if="isEditing">
+                    <fas icon="roskalaatikko" />
+                    {{$t('poista')}}
+                  </b-button>
+                </span>
+            </div>
+            <ep-content
+              layout="normal"
+              v-model="osaamisalue.kuvaus"
+              :is-editable="isEditing"></ep-content>
+          </div>
+        </b-col>
+      </b-row>
+
+      <b-row class="mt-4">
+        <b-col lg="8">
           <b-dropdown v-if="isEditing" :text="$t('lisaa-laaja-alainen-osaaminen')" variant="primary" class="mb-4">
             <b-dropdown-item-button
               v-for="(laajaAlainenKoodi, index) in laajaAlaisetKoodit"
@@ -63,6 +84,13 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { Koodisto } from '@shared/api/eperusteet';
 
+interface LaajaaAlainenOsaaminenKoodi {
+  nimi: { [locale: string]: string };
+  arvo: string;
+  uri: string;
+  koodisto: string;
+}
+
 @Component({
   components: {
     EpEditointi,
@@ -79,7 +107,7 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
   kotoLaajaalainenOsaaminenId!: number;
 
   private editointiStore: EditointiStore | null = null;
-  private laajaAlaisetKoodit;
+  private laajaAlaisetKoodit: LaajaaAlainenOsaaminenKoodi[] = [];
 
   async mounted() {
     try {
@@ -90,7 +118,9 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
         .sort(x => parseInt(x.koodiArvo!))
         .reverse()
         .map(koodi => ({
-          koodi: koodi.koodiArvo,
+          uri: koodi.koodiUri!,
+          arvo: koodi.koodiArvo!,
+          koodisto: koodi.koodisto!.koodistoUri!,
           nimi: this.extractNimi(koodi),
         }));
       debugger;
@@ -125,9 +155,8 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
     this.editointiStore = new EditointiStore(kotoStore);
   }
 
-  addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
-    // TODO
-    debugger;
+  private addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
+    this.editointiStore!.data.value.osaamisAlueet.push({ koodi: laajaAlainenKoodi });
   }
 
   get kasiteHandler() {
