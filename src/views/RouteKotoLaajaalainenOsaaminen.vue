@@ -56,7 +56,7 @@
               v-for="(laajaAlainenKoodi, index) in laajaAlaisetKoodit"
               @click="addLaajaAlainenOsaaminen(laajaAlainenKoodi)"
               :key="index+'addlaaja'"
-              :disabled="laajaAlainenKoodi.hasPaikallinenKuvaus">
+              :disabled="laajaAlainenKoodi.isAlreadySelected">
               {{ $kaanna(laajaAlainenKoodi.nimi) }}
             </b-dropdown-item-button>
           </b-dropdown>
@@ -89,6 +89,7 @@ interface LaajaaAlainenOsaaminenKoodi {
   arvo: string;
   uri: string;
   koodisto: string;
+  isAlreadySelected: boolean
 }
 
 @Component({
@@ -122,8 +123,8 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
           arvo: koodi.koodiArvo!,
           koodisto: koodi.koodisto!.koodistoUri!,
           nimi: this.extractNimi(koodi),
+          isAlreadySelected: false,
         }));
-      debugger;
     }
     catch (err) {
       console.error(err);
@@ -156,7 +157,15 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
   }
 
   private addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
+    this.setKoodiSelected(laajaAlainenKoodi.arvo);
     this.editointiStore!.data.value.osaamisAlueet.push({ koodi: laajaAlainenKoodi });
+  }
+
+  private setKoodiSelected(koodiarvo) {
+    let selectedOsaaminen = this.laajaAlaisetKoodit.find(koodi => koodi.arvo === koodiarvo);
+    if (selectedOsaaminen) {
+      selectedOsaaminen.isAlreadySelected = true;
+    }
   }
 
   get kasiteHandler() {
