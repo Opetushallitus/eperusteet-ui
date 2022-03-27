@@ -168,6 +168,20 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
     }
   }
 
+  private async removeLaajaAlainenOsaaminen(index, koodiarvo) {
+    if (await this.$vahvista(this.$t('vahvista-poisto') as string, this.$t('poista-koto-laaja-alainen-osaamisalue') as string)) {
+      this.editointiStore!.data.value.osaamisAlueet.splice(index, 1);
+      this.setKoodiNotSelected(koodiarvo);
+    }
+  }
+
+  private setKoodiNotSelected(koodiarvo) {
+    let selectedOsaaminen = this.laajaAlaisetKoodit.find(koodi => koodi.arvo === koodiarvo);
+    if (selectedOsaaminen) {
+      selectedOsaaminen.isAlreadySelected = false;
+    }
+  }
+
   get kasiteHandler() {
     return createKasiteHandler(new TermitStore(this.perusteId!));
   }
