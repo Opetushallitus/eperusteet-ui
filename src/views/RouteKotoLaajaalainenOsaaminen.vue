@@ -59,7 +59,7 @@
               @click="addLaajaAlainenOsaaminen(laajaAlainenKoodi)"
               :key="index+'addlaaja'"
               :disabled="laajaAlainenKoodi.isAlreadySelected">
-              {{ $kaanna(laajaAlainenKoodi.nimi) }}
+              {{ laajaAlainenKoodi.arvo + '. ' + $kaanna(laajaAlainenKoodi.nimi) }}
             </b-dropdown-item-button>
           </b-dropdown>
         </b-col>
