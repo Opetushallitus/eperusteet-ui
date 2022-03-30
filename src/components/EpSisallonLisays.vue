@@ -320,7 +320,7 @@ export default class EpSisallonLisays extends Vue {
   }
 
   get lisasisaltoLisays() {
-    return this.koulutustyypinLisasisaltoLisays[this.peruste!.koulutustyyppi!];
+    return this.koulutustyypinLisasisaltoLisays[this.peruste!.koulutustyyppi!] || [];
   }
 
   get koulutustyypinLisasisaltoLisays() {
