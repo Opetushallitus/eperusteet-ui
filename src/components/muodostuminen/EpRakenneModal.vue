@@ -194,24 +194,23 @@ export default class EpRakenneModal extends Vue {
     this.tempModel = _.cloneDeep(this.innerModel);
     this.setDefaultNimi();
 
-    if (!this.innerModel.muodostumisSaanto) {
-      this.$emit('input', { ...this.innerModel,
-        muodostumisSaanto: {
-          laajuus: {
-            minimi: null,
-            maksimi: null,
-          },
-        },
+    this.$emit('input',
+      {
+        ...this.innerModel,
+        ...(this.innerModel.tutkintonimike
+          && {
+            tutkintonimike: _.find(this.selectableTutkintonimikkeet, tutkintonimike => this.innerModel.tutkintonimike.uri === tutkintonimike.uri),
+          }),
+        ...((!this.innerModel.muodostumisSaanto || this.innerModel.muodostumisSaanto === null)
+          && {
+            muodostumisSaanto: {
+              laajuus: {
+                minimi: null,
+                maksimi: null,
+              },
+            },
+          }),
       });
-    }
-
-    if (this.innerModel.tutkintonimike) {
-      this.$emit('input',
-        {
-          ...this.innerModel,
-          tutkintonimike: _.find(this.selectableTutkintonimikkeet, tutkintonimike => this.innerModel.tutkintonimike.uri === tutkintonimike.uri),
-        });
-    }
   }
 
   save() {
