@@ -15,7 +15,7 @@
           <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore"/>
         </div>
         <div class="col">
-          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :tyyppi="perusteTyyppi"/>
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
           <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
         </div>
         <div class="col">
-          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :peruste="peruste"/>
+          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :tyyppi="perusteTyyppi"/>
         </div>
       </div>
     </div>
@@ -99,6 +99,10 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
 
   get peruste() {
     return this.perusteStore.peruste.value;
+  }
+
+  get perusteTyyppi() {
+    return _.get(this.peruste, 'tyyppi');
   }
 }
 </script>
