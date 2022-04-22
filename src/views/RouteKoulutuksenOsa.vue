@@ -1,7 +1,7 @@
 <template>
   <EpEditointi v-if="store" :store="store">
     <template #header="{ data }">
-      <h2 class="m-0">{{ $kaanna(data.nimi) || $t('nimeton-koulutuksen-osa') }}</h2>
+      <h2 class="m-0">{{ $kaanna(data.nimiKoodi ? data.nimiKoodi.nimi : data.nimi) || $t('nimeton-koulutuksen-osa') }}</h2>
     </template>
      <template #default="{ data, isEditing, validation }">
        <b-row class="mb-4">
