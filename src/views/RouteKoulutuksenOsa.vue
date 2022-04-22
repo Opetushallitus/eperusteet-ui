@@ -16,8 +16,7 @@
                 v-model="data.koulutusOsanKoulutustyyppi"
                 :value="type"
                 name="koulutustyyppi"
-                :validation="validation.koulutusOsanKoulutustyyppi"
-                @input="onSelectKoulutusTyyppi()">
+                :validation="validation.koulutusOsanKoulutustyyppi">
                 {{ $t(type) }}
               </b-form-radio>
             </template>
@@ -29,45 +28,47 @@
       <b-row class="mb-4">
         <b-col md="6">
           <b-form-group :label="$t('koulutuksen-osan-nimi') + (isEditing ? ' *' : '')" required>
-            <template v-if="isTuvaKoulutusTyyppi">
-              <EpKoodistoSelect
-                :store="koodisto"
-                v-model="data.nimiKoodi"
-                :is-editing="isEditing"
-                :naytaArvo="false"
-                @add="onNimiKoodiAdd()">
-                <template #default="{ open }">
-                  <b-input-group>
-                    <b-form-input
-                      :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                      disabled>
-                    </b-form-input>
-                    <b-input-group-append>
-                      <b-button
-                        @click="open"
-                        icon="plus"
-                        variant="primary">
-                        {{ $t('hae-koodistosta') }}
-                      </b-button>
-                    </b-input-group-append>
-                  </b-input-group>
-                </template>
-              </EpKoodistoSelect>
-              <EpInput
-                class="sr-only"
-                aria-hidden="true"
-                :value="data.nimi"
-                @input="data.nimi = setNimiValue(data.nimiKoodi)"
-                :is-editing="isEditing"
-                :validation="validation.nimi"
-                ref="inputNimi"/>
-            </template>
-            <EpInput
-              v-else
-              v-model="data.nimi"
+            <EpKoodistoSelect
+              :store="koodisto"
+              v-model="data.nimiKoodi"
               :is-editing="isEditing"
-              :validation="validation.nimi"/>
-            <p v-if="!isEditing && !data.nimi" class="font-italic">{{ $t('ei-asetettu') }}</p>
+              :naytaArvo="false"
+              @add="onNimiKoodiAdd()">
+              <template #default="{ open }">
+                <b-input-group>
+                  <b-form-input
+                    v-if="data.nimi && !data.nimiKoodi"
+                    class="font-italic"
+                    :value="$kaanna(data.nimi)"
+                    disabled>
+                  </b-form-input>
+                  <b-form-input
+                    v-else
+                    :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
+                    disabled>
+                  </b-form-input>
+                  <b-input-group-append>
+                    <b-button
+                      @click="open"
+                      icon="plus"
+                      variant="primary">
+                      {{ $t('hae-koodistosta') }}
+                    </b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </template>
+              <div slot="empty" v-if="data.nimi">
+                {{$kaanna(data.nimi)}}
+              </div>
+            </EpKoodistoSelect>
+            <EpInput
+              class="sr-only"
+              aria-hidden="true"
+              :value="data.nimi"
+              @input="data.nimi = setNimiValue(data.nimiKoodi)"
+              :is-editing="isEditing"
+              :validation="validation.nimi"
+              ref="inputNimi"/>
           </b-form-group>
         </b-col>
         <b-col md="4">
@@ -318,34 +319,6 @@ export default class RouteKoulutuksenOsa extends Vue {
     return mappedByLang;
   }
 
-  onSelectKoulutusTyyppi() {
-    const sisaltokieli = Kielet.getSisaltoKieli.value;
-    const storeData = this.store?.data.value!;
-    const hasNimiEquality = storeData.nimi?.[sisaltokieli] === storeData.nimiKoodi?.nimi[sisaltokieli];
-
-    if (storeData.nimi && !hasNimiEquality) {
-      this.tempNimiValue = storeData.nimi;
-    }
-
-    if (this.isTuvaKoulutusTyyppi && !storeData.nimiKoodi?.nimi[sisaltokieli]) {
-      this.setStoreNimiValue(null);
-    }
-    else if (this.isTuvaKoulutusTyyppi && storeData.nimiKoodi?.nimi[sisaltokieli]) {
-      this.setStoreNimiValue(this.setNimiValue(storeData.nimiKoodi));
-    }
-
-    if (!this.isTuvaKoulutusTyyppi) {
-      this.setStoreNimiValue(this.tempNimiValue);
-    }
-  }
-
-  private setStoreNimiValue(nameValue) {
-    this.store?.setData({
-      ...this.store?.data.value,
-      nimi: nameValue,
-    });
-  }
-
   get perusteId() {
     return this.perusteStore.perusteId.value;
   }
@@ -396,10 +369,6 @@ export default class RouteKoulutuksenOsa extends Vue {
         name: 'arvioinnit',
       },
     };
-  }
-
-  get isTuvaKoulutusTyyppi(): boolean {
-    return this.store?.data.value.koulutusOsanKoulutustyyppi === _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA);
   }
 }
 </script>

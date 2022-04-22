@@ -59,11 +59,8 @@ export class KoulutuksenOsaStore implements IEditoitava {
   }
 
   public async save(data: KoulutuksenOsaDto) {
-    if (data.koulutusOsanKoulutustyyppi === _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA)) {
+    if (data.nimiKoodi) {
       data.nimi = data.nimiKoodi?.nimi;
-    }
-    else if (data.nimiKoodi) {
-      data.nimiKoodi = undefined;
     }
     const res = await Perusteenosat.updatePerusteenOsa(this.id.value!, data as any);
 
