@@ -1,0 +1,11 @@
+name: Eperusteet-ui build
+#TODO muuta kunhan valmis
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - EP-3157-github-actions
+    # Workflow ajetaan jos jokin muu kuin markdown tiedosto muuttui
+    paths-ignore:
+      - '**.md'
+
