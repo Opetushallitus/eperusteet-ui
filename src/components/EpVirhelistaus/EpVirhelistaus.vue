@@ -9,28 +9,30 @@
                      :border-bottom="cid < categories.length - 1"
                      :tyyppi="category">
           <template v-slot:header>
-            <h3 class="pb-3" :class="{ 'mt-4': cid !== 0 }">
+            <h3>
               {{ $t('validointi-kategoria-' + category) }}
             </h3>
           </template>
-          <ep-virhelistaus-table
-            v-if="infot[StatusValidointiStatusTypeEnum.VIRHE]"
-            :infot="infot[StatusValidointiStatusTypeEnum.VIRHE]">
-            <template #heading>{{ $t('julkaisun-estavat-virheet') }}</template>
-            <template v-slot:viesti="{info}">
-              <router-link :to="info.route" v-if="info.route">
-                {{$t(info.viesti)}}
-              </router-link>
-              <span v-else>
-                {{$t(info.viesti)}}
-              </span>
-            </template>
-          </ep-virhelistaus-table>
-          <ep-virhelistaus-table
-            v-if="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]"
-            :infot="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]">
-            <template #heading>{{ $t('huomautukset') }}</template>
-          </ep-virhelistaus-table>
+          <div class="pt-3" :class="{ 'mb-4': cid !== 0 }">
+            <ep-virhelistaus-table
+              v-if="infot[StatusValidointiStatusTypeEnum.VIRHE]"
+              :infot="infot[StatusValidointiStatusTypeEnum.VIRHE]">
+              <template #heading>{{ $t('julkaisun-estavat-virheet') }}</template>
+              <template v-slot:viesti="{info}">
+                <router-link :to="info.route" v-if="info.route">
+                  {{$t(info.viesti)}}
+                </router-link>
+                <span v-else>
+                  {{$t(info.viesti)}}
+                </span>
+              </template>
+            </ep-virhelistaus-table>
+            <ep-virhelistaus-table
+              v-if="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]"
+              :infot="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]">
+              <template #heading>{{ $t('huomautukset') }}</template>
+            </ep-virhelistaus-table>
+          </div>
         </ep-collapse>
       </div>
     </div>
