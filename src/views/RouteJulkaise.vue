@@ -7,17 +7,20 @@
       </EpButton>
     </div>
 
-    <div>{{ $t('julkaisunakyma-kuvaus') }}</div>
+    <template v-if="!isPohja">
+      <div>{{ $t('julkaisunakyma-kuvaus') }}</div>
 
-    <div class="mt-4">
-      <h3>{{ $t('julkaisu-vaikutukset') }}</h3>
-      <ul>
-        <li>{{ $t('julkaisusta-julkinen') }}</li>
-        <li>{{ $t('julkaisusta-luodaan-pdf') }}</li>
-        <li>{{ $t('julkaisusta-vanhat-versiot-sailyvat') }}</li>
-        <li v-if="isAmmatillinen">{{ $t('tutkinnon-muodostumisessa-lisatyt-uudet-osaamisalat-ja-tutkintonimikkeet-viedaan-koodistoon') }}</li>
-      </ul>
-    </div>
+      <div class="mt-4">
+        <h3>{{ $t('julkaisu-vaikutukset') }}</h3>
+        <ul>
+          <li>{{ $t('julkaisusta-julkinen') }}</li>
+          <li>{{ $t('julkaisusta-luodaan-pdf') }}</li>
+          <li>{{ $t('julkaisusta-vanhat-versiot-sailyvat') }}</li>
+          <li v-if="isAmmatillinen">{{ $t('tutkinnon-muodostumisessa-lisatyt-uudet-osaamisalat-ja-tutkintonimikkeet-viedaan-koodistoon') }}</li>
+        </ul>
+      </div>
+    </template>
+
     <div>
       <h3>{{ $t('tarkistukset') }}</h3>
       <ep-virhelistaus v-if="status"
@@ -25,7 +28,7 @@
       <EpSpinner v-else />
     </div>
 
-    <div v-if="peruste && julkaisuMahdollinen">
+    <div v-if="peruste && julkaisuMahdollinen && !isPohja">
       <hr class="mt-4 mb-4">
       <h3>{{ $t('perusteen-tiedot') }}</h3>
       <b-container fluid>
@@ -78,23 +81,25 @@
       </b-container>
     </div>
 
-    <div v-if="julkaisuMahdollinen">
-      <hr class="mt-4 mb-4">
+    <template v-if="!isPohja">
+      <div v-if="julkaisuMahdollinen">
+        <hr class="mt-4 mb-4">
 
-      <h3>{{ $t('uusi-julkaisu') }}</h3>
+        <h3>{{ $t('uusi-julkaisu') }}</h3>
 
-      <b-form-group :label="$t('julkaisutiedot')" class="mt-4">
-        <div class="mb-3">{{ $t('teksti-naytetaan-taman-sivun-julkaisuhistoriassa') }}</div>
-        <ep-content v-model="julkaisu.tiedote"
-                    layout="simplified"
-                    :is-editable="true" />
-        <EpJulkaisuButton class="mt-3" :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }"/>
-      </b-form-group>
-    </div>
+        <b-form-group :label="$t('julkaisutiedot')" class="mt-4">
+          <div class="mb-3">{{ $t('teksti-naytetaan-taman-sivun-julkaisuhistoriassa') }}</div>
+          <ep-content v-model="julkaisu.tiedote"
+                      layout="simplified"
+                      :is-editable="true" />
+          <EpJulkaisuButton class="mt-3" :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }"/>
+        </b-form-group>
+      </div>
 
-    <EpJulkaisuHistoria :julkaisut="julkaisut" :palauta="palautaJulkaisu">
-      <div slot="empty">{{ $t('perusteella-ei-julkaisuja') }}</div>
-    </EpJulkaisuHistoria>
+      <EpJulkaisuHistoria :julkaisut="julkaisut" :palauta="palautaJulkaisu">
+        <div slot="empty">{{ $t('perusteella-ei-julkaisuja') }}</div>
+      </EpJulkaisuHistoria>
+    </template>
 
   </div>
 </template>
@@ -125,7 +130,6 @@ import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpJulkaisuHistoria from '@shared/components/EpJulkaisuHistoria/EpJulkaisuHistoria.vue';
 import { Route } from 'vue-router';
 import EpJulkaisuButton from '@shared/components/EpJulkaisuButton/EpJulkaisuButton.vue';
-import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 
 @Component({
   components: {
@@ -158,18 +162,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   private julkaisu = {
     tiedote: {},
   };
-
-  get isAmmatillinen() {
-    return this.perusteStore?.isAmmatillinen.value;
-  }
-
-  get peruste() {
-    return this.perusteStore?.peruste?.value || null;
-  }
-
-  get projekti() {
-    return this.perusteStore?.projekti?.value || null;
-  }
 
   get julkaisuMahdollinen() {
     return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.status?.vaihtoOk;

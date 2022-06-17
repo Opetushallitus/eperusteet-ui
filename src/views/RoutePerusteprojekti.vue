@@ -11,8 +11,13 @@
                 <b-button class="px-3 py-1" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
                   {{$t('aseta-valmiiksi')}}
                 </b-button>
-                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="!isPohja && tila && !isJulkaistu && !isArkistoitu">
-                  {{ $t('siirry-julkaisunakymaan') }}
+                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="tila && !isJulkaistu && !isArkistoitu">
+                  <span v-if="!isPohja">
+                    {{ $t('siirry-julkaisunakymaan') }}
+                  </span>
+                  <span v-if="isPohja && validationStats && validationStats.fails > 0">
+                    {{ $t('tarkista-virheet') }}
+                  </span>
                 </b-button>
               </div>
 
@@ -579,12 +584,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       this,
       this.palautusMeta,
     );
-  }
-
-  get isPohja() {
-    if (this.peruste) {
-      return this.peruste.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA);
-    }
   }
 
   async asetaValmiiksi() {
