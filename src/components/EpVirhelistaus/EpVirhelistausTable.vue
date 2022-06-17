@@ -27,7 +27,7 @@
             <div v-if="info.validointi && info.validointi.ongelmat && info.validointi.ongelmat.length > 0" class="pt-1">
               <div v-for="ongelma in info.validointi.ongelmat" :key="ongelma.ongelma" class="ml-4 mb-2">
                 <div v-if="ongelma.ryhma">{{$kaanna(ongelma.ryhma.teksti)}}</div>
-                <div class="pl-4">{{ $t(ongelma.ongelma) }}</div>
+                <div :class="{'pl-4': ongelma.ryhma}">{{ $t(ongelma.ongelma) }}</div>
               </div>
             </div>
           </td>
