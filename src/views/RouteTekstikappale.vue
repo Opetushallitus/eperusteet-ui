@@ -1,6 +1,6 @@
 <template>
   <div v-if="store">
-    <EpEditointi :store="store">
+    <EpEditointi :store="store" :versionumero="versionumero">
       <template v-slot:header="{ data }">
         <h2 class="m-0">{{ $kaanna(data.nimi) }}</h2>
       </template>
@@ -173,9 +173,22 @@ export default class RouteTekstikappale extends Vue {
       return;
     }
 
+    await this.fetch();
+  }
+
+  async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const tkstore = new TekstikappaleStore(this.perusteId!, Number(id));
+    const tkstore = new TekstikappaleStore(this.perusteId!, Number(this.tekstikappaleId), this.versionumero);
     this.store = new EditointiStore(tkstore);
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
   }
 
   get tekstikappale() {

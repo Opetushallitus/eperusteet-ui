@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { translated } from '@shared/validators/required';
+import { PerusteenOsaDto } from '@shared/generated/eperusteet';
 // import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
@@ -20,7 +21,7 @@ interface TekstikappaleStoreConfig {
 
 export class TekstikappaleStore implements IEditoitava {
   private state = reactive({
-    tekstikappale: null as Laaja | null,
+    tekstikappale: null as Laaja | PerusteenOsaDto | null,
   });
 
   private static config: TekstikappaleStoreConfig;
@@ -35,6 +36,7 @@ export class TekstikappaleStore implements IEditoitava {
   constructor(
     private readonly perusteId: number,
     private readonly tekstiKappaleViiteId: number,
+    public versionumero?: number,
   ) {
     // if (!TekstikappaleStore.config?.notifikaatiotStore) {
     //   throw new Error('NotifikaatiotStore missing');
@@ -49,7 +51,14 @@ export class TekstikappaleStore implements IEditoitava {
 
   public async fetch() {
     try {
-      this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleViiteId)).data;
+      if (this.versionumero) {
+        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.tekstiKappaleViiteId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        this.state.tekstikappale = (await Perusteenosat.getPerusteenOsaVersioByViite(this.tekstiKappaleViiteId, rev.numero)).data;
+      }
+      else {
+        this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleViiteId)).data;
+      }
     }
     catch (err) {
     }
@@ -135,7 +144,9 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async restore(rev: number) {
+    await this.acquire();
     await Perusteenosat.revertPerusteenOsaToVersio(this.id.value!, rev);
+    await this.release();
   }
 
   public async validate() {
