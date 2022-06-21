@@ -11,7 +11,7 @@
                 <b-button class="px-3 py-1" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
                   {{$t('aseta-valmiiksi')}}
                 </b-button>
-                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="tila && !isJulkaistu && !isArkistoitu">
+                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="julkaisuNakymaSiirtymaSallittu">
                   <span v-if="!isPohja">
                     {{ $t('siirry-julkaisunakymaan') }}
                   </span>
@@ -322,6 +322,7 @@ interface ValidationStats {
   ok: number;
   warnings: number;
   total: number;
+  fails: number;
 }
 
 @Component({
@@ -577,6 +578,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get isLuonnos() {
     return this.peruste?.tila === _.toLower(PerusteDtoTilaEnum.LUONNOS);
+  }
+
+  get julkaisuNakymaSiirtymaSallittu() {
+    return (!this.isPohja && this.tila && !this.isJulkaistu && !this.isArkistoitu) || (this.isPohja && this.validationStats && this.validationStats.fails > 0);
   }
 
   async palauta() {
