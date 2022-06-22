@@ -2,9 +2,15 @@
   <div class="p-4">
      <div class="d-flex justify-content-between">
       <h2>{{ $t('julkaisunakyma') }}</h2>
-      <EpButton v-if="$isAdmin() && valmiiksiMahdollinen" @click="asetaValmiiksi">
-        {{$t('aseta-peruste-valmiiksi')}}
-      </EpButton>
+
+      <div class="d-flex flex-column">
+        <EpButton v-if="$isAdmin() && valmiiksiMahdollinen" @click="asetaValmiiksi">
+          {{$t('aseta-peruste-valmiiksi')}}
+        </EpButton>
+        <EpButton v-if="$isAdmin() && !valmiiksiMahdollinen" @click="avaaPeruste">
+          {{$t('avaa-peruste')}}
+        </EpButton>
+      </div>
     </div>
 
     <template v-if="!isPohja">
@@ -270,6 +276,28 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       }
       catch (e) {
         this.$fail(this.$t('tilan-vaihto-valmis-epaonnistui') as string);
+      }
+    }
+  }
+
+  async avaaPeruste() {
+    const avaa = await this.$bvModal.msgBoxConfirm(this.$t('peruste-avaus-varmistus') as any, {
+      title: this.$t('avaa-peruste') as any,
+      okVariant: 'primary',
+      okTitle: this.$t('avaa') as any,
+      cancelVariant: 'link',
+      cancelTitle: this.$t('peruuta') as any,
+      centered: true,
+    });
+
+    if (avaa) {
+      try {
+        await Perusteprojektit.avaaPerusteProjekti(_.toNumber(this.$route.params.projektiId));
+        await this.perusteStore.updateCurrent();
+        this.$success(this.$t('tilan-vaihto-onnistui') as string);
+      }
+      catch (e) {
+        this.$fail(this.$t('tilan-vaihto-epaonnistui') as string);
       }
     }
   }
