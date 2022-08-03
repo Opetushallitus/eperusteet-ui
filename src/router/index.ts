@@ -43,6 +43,7 @@ import RouteKotoKielitaitotaso from '@/views/RouteKotoKielitaitotaso.vue';
 import RouteKotoOpinto from '@/views/RouteKotoOpinto.vue';
 import RouteKotoLaajaalainenOsaaminen from '@/views/RouteKotoLaajaalainenOsaaminen.vue';
 import RouteMaaraykset from '@/views/RouteMaaraykset.vue';
+import RoutePoistetutSisallot from '@/views/RoutePoistetutSisallot.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -187,6 +188,10 @@ const router = new VueRouter({
           icon: 'kasitteet',
           text: 'kasitteet',
         }, {
+          route: 'poistetutsisallot',
+          icon: 'roskalaatikko',
+          text: 'poistetut',
+        }, {
           separator: true,
         }, {
           icon: ['far', 'folder'],
@@ -264,9 +269,9 @@ const router = new VueRouter({
         component: RouteProjektiTiedot,
         props,
       }, {
-        path: 'poistetut',
-        name: 'poistetut',
-        component: RoutePerusteenTiedot,
+        path: 'poistetutsisallot',
+        name: 'poistetutsisallot',
+        component: RoutePoistetutSisallot,
         props,
       }, {
         path: 'tutkinnonosat/:tutkinnonOsaId',
@@ -345,6 +350,10 @@ const router = new VueRouter({
           route: 'opasKasitteet',
           icon: 'kasitteet',
           text: 'kasitteet',
+        }, {
+          route: 'poistetutsisallot',
+          icon: 'roskalaatikko',
+          text: 'poistetut',
         }, {
           separator: true,
         }, {
