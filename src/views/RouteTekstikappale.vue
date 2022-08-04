@@ -1,6 +1,6 @@
 <template>
   <div v-if="store">
-    <EpEditointi :store="store" :versionumero="versionumero">
+    <EpEditointi :store="store" :versionumero="versionumero" :confirmRemove="false" :postRemove="postRemove">
       <template v-slot:header="{ data }">
         <h2 class="m-0">{{ $kaanna(data.nimi) }}</h2>
       </template>
@@ -241,6 +241,14 @@ export default class RouteTekstikappale extends Vue {
 
   get kuvaHandler() {
     return createKuvaHandler(new KuvaStore(this.perusteId!));
+  }
+
+  get postRemove() {
+    return () => {
+      this.$router.push({
+        name: 'poistetutsisallot',
+      });
+    };
   }
 }
 </script>
