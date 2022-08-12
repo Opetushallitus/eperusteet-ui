@@ -43,7 +43,7 @@ import { stores } from '@/stores';
 import { getKaannokset } from '@shared/api/eperusteet';
 import { TavoitesisaltoalueStore } from './stores/TavoitesisaltoalueStore';
 import { LaajaalainenOsaaminenStore } from './stores/LaajaalainenOsaaminenStore';
-import {KotoLaajaalainenOsaaminenStore} from "@/stores/Koto/KotoLaajaalainenOsaaminenStore";
+import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
