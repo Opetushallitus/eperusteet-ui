@@ -5,6 +5,7 @@
                               :new-route="{ name: 'perusteprojektiLuonti' }"
                               :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
       <h2 slot="upperheader">{{ $t('perusteprojektisi') }}</h2>
+      <h2 slot="published-header">{{ $t('julkaistut-perusteet') }}</h2>
       <h2 slot="lowerheader">{{ $t('kaikki-perusteprojektit') }}</h2>
     </EpPerusteprojektiListaus>
   </EpMainView>

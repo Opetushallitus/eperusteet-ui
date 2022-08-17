@@ -7,6 +7,7 @@
                               :filters="['koulutustyyppi', 'peruste', 'tila']"
                               :showCards="!$isAdmin() && !$hasOphCrud()">
       <h2 slot="upperheader">{{ $t('Oppaasi') }}</h2>
+      <h2 slot="published-header">{{ $t('julkaistut-oppaat') }}</h2>
       <h3 slot="cardsEmpty">{{ $t('ei-oppaita')}}</h3>
       <template v-slot:lowerheader>
         <div class="d-flex">
