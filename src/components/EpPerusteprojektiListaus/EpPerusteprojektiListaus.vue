@@ -39,11 +39,29 @@
           </div>
         </div>
 
-        <template v-if="ownProjects && !$hasOphCrud() && ownProjects.length === 0">
+        <template v-if="ownProjects && !$hasOphCrud() && ownProjects.length === 0 && ownPublishedProjects && ownPublishedProjects.length === 0">
           <slot name="cardsEmpty">
             <h3>{{$t('ei-perusteprojekteja')}}</h3>
           </slot>
         </template>
+
+        <div class="mt-2" v-if="ownPublishedProjects && !$hasOphCrud() && ownPublishedProjects.length > 0">
+          <slot name="published-header"><h2>{{$t('julkaistut-perusteet')}}</h2></slot>
+          <div class="d-flex flex-wrap pt-4">
+            <div class="card-wrapper" v-for="project in ownPublishedProjects" :key="project.id">
+              <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
+                            :koulutustyyppi="project.peruste.koulutustyyppi"
+                            :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
+                <template slot="lower" class="small-text">
+                  {{ $t('tila-' + project.tila) }}
+                </template>
+                <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
+                  {{ project.nimi }}
+                </div>
+              </ProjektiCard>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -382,7 +400,15 @@ export default class EpPerusteprojektiListaus extends Vue {
   }
 
   get ownProjects() {
-    return this.provider.ownProjects.value;
+    if (this.provider.ownProjects.value) {
+      return _.filter(this.provider.ownProjects.value, project => project.tila === 'laadinta');
+    }
+  }
+
+  get ownPublishedProjects() {
+    if (this.provider.ownProjects.value) {
+      return _.filter(this.provider.ownProjects.value, project => project.tila === 'julkaistu');
+    }
   }
 
   get items() {

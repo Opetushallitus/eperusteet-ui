@@ -33,8 +33,8 @@ export class PerusteetStore implements IProjektiProvider {
   public readonly projects = computed(() => this.state.projects);
 
   public async updateOwnProjects() {
-    const res = await Perusteprojektit.getOmatPerusteprojektit();
-    this.state.ownProjects = res.data;
+    const res = _.map(await Promise.all([Perusteprojektit.getOmatPerusteprojektit(), Perusteprojektit.getOmatJulkaistutPerusteprojektit()]), 'data') as any;
+    this.state.ownProjects = [...res[0], ...res[1]];
   }
 
   public clear() {
