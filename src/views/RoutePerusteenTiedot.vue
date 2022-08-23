@@ -270,14 +270,9 @@
               <b-form-group>
                 <h3 slot="label">{{$t('koulutusviennin-ohje')}}</h3>
                 <ep-spinner v-if="!liitteet" />
-                <div v-else>
-                  <template v-if="isEditing && !koulutusvienninOhje">
-                    <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
-                    <div class="liiteohje" v-html="$t('koulutusviennin-lataus-ohje')"></div>
-                    <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="koulutusvienninOhjeFile" :as-binary="true" v-if="!koulutusvienninOhjeFile" />
-                  </template>
-                  <b-table v-if="koulutusvienninOhje"
-                          :items="[koulutusvienninOhje]"
+                <div>
+                  <b-table v-if="koulutusvienninOhjeet.length > 0"
+                          :items="koulutusvienninOhjeet"
                           :fields="koulutusvientiOhjeFields"
                           responsive
                           borderless
@@ -285,8 +280,8 @@
                           fixed
                           hover>
 
-                    <template v-slot:cell(diaarinumero)>
-                      <EpInput type="string" :isEditing="isEditing" :placeholder="$t('kirjoita-diaarinumero')" v-model="koulutusvienninOhje.lisatieto"/>
+                    <template v-slot:cell(diaarinumero)="row">
+                      <EpInput type="string" :isEditing="isEditing" :placeholder="$t('kirjoita-diaarinumero')" v-model="koulutusvienninOhjeet[row.index].lisatieto"/>
                     </template>
 
                     <template v-slot:cell(toiminnot)="data">
@@ -297,6 +292,11 @@
                       </div>
                     </template>
                   </b-table>
+                  <div>
+                    <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                    <div class="liiteohje" v-html="$t('koulutusviennin-lataus-ohje')"></div>
+                    <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="koulutusvienninOhjeFile" :as-binary="true" />
+                  </div>
                 </div>
               </b-form-group>
               <hr/>
@@ -470,8 +470,8 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     return _.reject(this.liitteet, liite => liite.tyyppi === 'KOULUTUSVIENNINOHJE');
   }
 
-  get koulutusvienninOhje() {
-    return _.find(this.liitteet, liite => liite.tyyppi === 'KOULUTUSVIENNINOHJE');
+  get koulutusvienninOhjeet() {
+    return _.filter(this.liitteet, liite => liite.tyyppi === 'KOULUTUSVIENNINOHJE');
   }
 
   get siirtymat() {
@@ -721,8 +721,9 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   }
 
   async tallennaKoulutusvienninOhjeDiaari() {
-    if (this.koulutusvienninOhje) {
-      await Liitetiedostot.paivitaLisatieto(this.perusteId!, this.koulutusvienninOhje.id, this.koulutusvienninOhje.lisatieto);
+    if (!_.isEmpty(this.koulutusvienninOhjeet)) {
+      await Promise.all(_.map(this.koulutusvienninOhjeet, liite =>
+        Liitetiedostot.paivitaLisatieto(this.perusteId!, liite.id, liite.lisatieto)));
     }
   }
 }
