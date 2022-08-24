@@ -292,7 +292,7 @@
                       </div>
                     </template>
                   </b-table>
-                  <div>
+                  <div v-if="isEditing">
                     <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
                     <div class="liiteohje" v-html="$t('koulutusviennin-lataus-ohje')"></div>
                     <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="koulutusvienninOhjeFile" :as-binary="true" />
@@ -463,7 +463,10 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 
   async fetchLiitteet() {
     const res = await Liitetiedostot.getAllLiitteet(Number(this.perusteId!));
-    this.liitteet = res.data;
+    this.liitteet = _.map(res.data, liite => ({
+      ...liite,
+      lisatieto: liite.lisatieto || '',
+    }));
   }
 
   get liitteetFiltered() {
