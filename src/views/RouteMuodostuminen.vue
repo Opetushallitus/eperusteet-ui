@@ -152,11 +152,13 @@
                                 <ep-input class="koodi-input flex-grow-1"
                                   v-if="!ryhma.osaamisala.osaamisalakoodiUri.startsWith('temporary')"
                                   :value="$kaanna(ryhma.nimi) + ' (' + ryhma.osaamisala.osaamisalakoodiArvo + ')'"
+                                  :placeholder="$kaanna(ryhma.nimi) + ' (' + ryhma.osaamisala.osaamisalakoodiArvo + ')'"
                                   :isEditing="true"
                                   :disabled="true"/>
                                 <ep-input class="koodi-input flex-grow-1"
                                   v-else
                                   v-model="ryhma.nimi"
+                                  :placeholder="$kaanna(ryhma.nimi)"
                                   :isEditing="true"
                                   :disabled="false"
                                   :change="() => osaamisalaNimiChange(ryhma, index)"/>
@@ -199,11 +201,13 @@
                                 <ep-input class="koodi-input flex-grow-1"
                                   v-if="!ryhma.tutkintonimike.uri.startsWith('temporary')"
                                   :value="$kaanna(ryhma.nimi) + ' (' + ryhma.tutkintonimike.arvo + ')'"
+                                  :placeholder="$kaanna(ryhma.nimi) + ' (' + ryhma.tutkintonimike.arvo + ')'"
                                   :isEditing="true"
                                   :disabled="true"/>
                                 <ep-input class="koodi-input flex-grow-1"
                                   v-else
                                   v-model="ryhma.nimi"
+                                  :placeholder="$kaanna(ryhma.nimi)"
                                   :isEditing="true"
                                   :disabled="!ryhma.tutkintonimike.uri.startsWith('temporary')"
                                   :change="() => tutkintonimikeNimiChange(ryhma, index)"/>
