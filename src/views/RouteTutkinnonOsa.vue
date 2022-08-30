@@ -27,7 +27,7 @@
           </ep-error-wrapper>
         </div>
 
-        <b-row>
+        <b-row class="mb-4">
           <b-col md="8">
             <b-form-group :label="$t('tutkinnon-osan-nimi')">
               <ep-koodisto-select v-if="isEditing || !nimi"
@@ -67,7 +67,17 @@
               <ep-laajuus-input v-model="data.laajuus" :is-editing="isEditing" :validation="validation.laajuus" />
             </b-form-group>
           </b-col>
+        </b-row>
 
+        <b-row class="mb-4">
+          <b-col>
+            <b-form-group :label="$t('koodi')">
+              <div v-if="data.tutkinnonOsa.koodi">{{data.tutkinnonOsa.koodi.arvo}}</div>
+            </b-form-group>
+          </b-col>
+        </b-row>
+
+        <b-row>
           <b-col>
             <b-form-group :label="$t('kuvaus')">
               <ep-content v-model="data.tutkinnonOsa.kuvaus"

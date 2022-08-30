@@ -203,7 +203,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
         recoverable: data?.tutkinnonOsa?.tila !== 'valmis'
           && ((!data?.tutkinnonOsa?.alkuperainenPeruste && _.size(this.projektitJoissaKaytossa) <= 1)
           || data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
-        copyable: !data?.tutkinnonOsa?.alkuperainenPeruste && (data?.tutkinnonOsa?.tila === 'valmis' || _.size(this.projektitJoissaKaytossa) > 1),
+        copyable: data?.tutkinnonOsa?.alkuperainenPeruste?.id !== this.perusteId && (data?.tutkinnonOsa?.tila === 'valmis' || _.size(this.projektitJoissaKaytossa) > 1),
       } as EditoitavaFeatures;
     });
   }
