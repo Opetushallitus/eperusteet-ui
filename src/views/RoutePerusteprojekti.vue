@@ -8,6 +8,11 @@
               <div class="d-flex flex-column align-items-center">
                 <div class="mb-1">{{$t(projektiTila)}}</div>
 
+                <div class="d-flex text-center julkaisemattomia-muutoksia" v-if="peruste.globalVersion.aikaleima && peruste.viimeisinJulkaisuAika && peruste.globalVersion.aikaleima > peruste.viimeisinJulkaisuAika">
+                  <span class="material-icons-outlined mr-1">info</span>
+                  <div class="font-size-08">{{$t('perusteessa-on-julkaisemattomia-muutoksia')}}</div>
+                </div>
+
                 <b-button class="px-3 py-1" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
                   {{$t('aseta-valmiiksi')}}
                 </b-button>
@@ -678,6 +683,11 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 .not-supported {
   font-size: 0.8rem;
   color: $gray-lighten-8;
+}
+
+.julkaisemattomia-muutoksia {
+  width: 15rem;
+  margin-left: -1.75rem;
 }
 
 </style>
