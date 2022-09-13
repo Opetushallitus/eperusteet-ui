@@ -8,7 +8,7 @@
               <div class="d-flex flex-column align-items-center">
                 <div class="mb-1">{{$t(projektiTila)}}</div>
 
-                <div class="d-flex text-center julkaisemattomia-muutoksia" v-if="peruste.globalVersion.aikaleima && peruste.viimeisinJulkaisuAika && peruste.globalVersion.aikaleima > peruste.viimeisinJulkaisuAika">
+                <div class="d-flex text-center julkaisemattomia-muutoksia" v-if="julkaisemattomiaMuutoksia">
                   <span class="material-icons-outlined mr-1">info</span>
                   <div class="font-size-08">{{$t('perusteessa-on-julkaisemattomia-muutoksia')}}</div>
                 </div>
@@ -587,6 +587,12 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get julkaisuNakymaSiirtymaSallittu() {
     return (!this.isPohja && this.tila && !this.isJulkaistu && !this.isArkistoitu) || (this.isPohja && this.validationStats && this.validationStats.fails > 0);
+  }
+
+  get julkaisemattomiaMuutoksia() {
+    if (this.peruste) {
+      return this.peruste!.globalVersion!.aikaleima! > this.peruste.viimeisinJulkaisuAika!;
+    }
   }
 
   async palauta() {
