@@ -3,7 +3,7 @@
     <Portal to="headerExtension">
       <div class="portal-menu d-flex">
         <div class="upper-left">
-          <ep-progress-popover :slices="progressSlices" :popup-style="popupStyle" height="60" width="60">
+          <ep-progress-popover :slices="progressSlices" :popup-style="popupStyle">
             <template v-slot:header>
               <div class="d-flex flex-column align-items-center">
                 <div class="mb-1">{{$t(projektiTila)}}</div>
@@ -16,7 +16,7 @@
                 <b-button class="px-3 py-1" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
                   {{$t('aseta-valmiiksi')}}
                 </b-button>
-                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="julkaisuNakymaSiirtymaSallittu">
+                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="!julkaisemattomiaMuutoksia && julkaisuNakymaSiirtymaSallittu">
                   <span v-if="!isPohja">
                     {{ $t('siirry-julkaisunakymaan') }}
                   </span>
@@ -28,7 +28,7 @@
 
             </template>
 
-            <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-if="isJulkaistu">
+            <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-if="julkaisemattomiaMuutoksia && julkaisuNakymaSiirtymaSallittu">
               {{ $t('siirry-julkaisunakymaan') }}
             </b-button>
 
@@ -586,12 +586,12 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get julkaisuNakymaSiirtymaSallittu() {
-    return (!this.isPohja && this.tila && !this.isJulkaistu && !this.isArkistoitu) || (this.isPohja && this.validationStats && this.validationStats.fails > 0);
+    return (!this.isPohja && this.tila && !this.isArkistoitu) || (this.isPohja && this.validationStats && this.validationStats.fails > 0);
   }
 
   get julkaisemattomiaMuutoksia() {
     if (this.peruste) {
-      return this.peruste!.globalVersion!.aikaleima! > this.peruste.viimeisinJulkaisuAika!;
+      return this.isJulkaistu && this.peruste!.globalVersion!.aikaleima! > this.peruste.viimeisinJulkaisuAika!;
     }
   }
 
