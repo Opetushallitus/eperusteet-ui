@@ -1,11 +1,9 @@
 import Vue from 'vue';
 import VueCompositionApi, { ref, computed, reactive } from '@vue/composition-api';
 import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
-
 import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import EpPerusteprojektiListaus from './EpPerusteprojektiListaus.vue';
 import { IProjektiProvider } from './types';
-import * as _ from 'lodash';
 import { Page } from '@shared/tyypit';
 import '@shared/config/bootstrap';
 import '@shared/config/fontawesome';
@@ -75,6 +73,7 @@ describe('Projektilistaus', () => {
         nimi: 'projekti 42',
         tila: 'valmis',
         peruste: {
+          tyyppi: 'normaali',
           koulutustyyppi: 'koulutustyyppi_11',
         },
       }] as any,
@@ -138,6 +137,7 @@ describe('Projektilistaus', () => {
         id: 42,
         nimi: 'projekti 42',
         peruste: {
+          tyyppi: 'normaali',
           koulutustyyppi: 'koulutustyyppi_11',
         },
         tila: 'valmis',
