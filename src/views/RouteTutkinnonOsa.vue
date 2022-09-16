@@ -3,13 +3,10 @@
     <div v-if="store">
       <EpEditointi :store="store" :labelCopyConfirm="'kopioidaanko-tutkinnonosa'" :labelRemove="'poista-tutkinnonosa'">
       <template v-slot:header="{ data }">
-        <h2 class="m-0">
-          <span>
-            {{ $kaanna(data.tutkinnonOsa.nimi) || $t('nimeton-tutkinnonosa') }}{{ data.laajuus ? ',' : '' }}
-          </span>
-          <span v-if="data.laajuus">
-            {{ data.laajuus }} {{ $t('OSAAMISPISTE') }}
-          </span>
+        <h2 class="m-0" style="white-space: pre">
+          <span v-if="data.tutkinnonOsa.nimi">{{$kaanna(data.tutkinnonOsa.nimi)}}</span>
+          <span v-else> {{$t('nimeton-tutkinnonosa')}}</span>
+          <span v-if="data.laajuus">, {{ data.laajuus }} {{ $t('OSAAMISPISTE') }}</span>
         </h2>
       </template>
 

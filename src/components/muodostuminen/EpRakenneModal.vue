@@ -191,6 +191,10 @@ export default class EpRakenneModal extends Vue {
       this.tyyppi = this.defaultTyyppi;
     }
 
+    if (this.tyyppi !== 'rakenne-moduuli-paikalliset') {
+      this.nimiValinta = null;
+    }
+
     this.tempModel = _.cloneDeep(this.innerModel);
     this.setDefaultNimi();
 
@@ -342,6 +346,9 @@ export default class EpRakenneModal extends Vue {
         nimi: this.getNimi(this.tyyppi),
         osaamisala,
       });
+    }
+    else if (this.tyyppi && this.tyyppi === 'rakenne-moduuli-paikalliset') {
+      this.nimiValintaChange(this.nimiValinta, this.nimiValinta);
     }
     else if (oldVal) {
       this.$emit('input', { ...this.innerModel, nimi: null });
