@@ -143,7 +143,7 @@
             </template>
             <template v-slot:cell(nimi)="data">
               <router-link :to="{ name: editRoute, params: { projektiId: data.item.id } }">
-                {{ getProjektiNimi(data.item)}}
+                {{ data.value }}
               </router-link>
             </template>
             <template v-slot:cell(koulutustyyppi)="data">
@@ -201,7 +201,6 @@ import ProjektiCard from './ProjektiCard.vue';
 import * as _ from 'lodash';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
-import { Kielet } from '@shared/stores/kieli';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -366,10 +365,6 @@ export default class EpPerusteprojektiListaus extends Vue {
     return _.includes(rights, 'tilanvaihto');
   }
 
-  getProjektiNimi(item) {
-    return item.peruste.tyyppi.toUpperCase() === 'OPAS' ? Kielet.kaanna(item.peruste.nimi, false, false) : item.nimi;
-  }
-
   get vaihtoehdotKoulutustyypit() {
     return EperusteetKoulutustyypit;
   }
@@ -430,13 +425,14 @@ export default class EpPerusteprojektiListaus extends Vue {
         ? this.$sd(value)
         : '-';
     };
-
+    const self = this;
     return [{
       key: 'nimi',
       label: this.$t('projektin-nimi') as string,
       sortable: true,
+      sortByFormatted: true,
       formatter(value: any, key: string, item: PerusteprojektiKevytDto) {
-        return item.nimi;
+        return _.upperCase(item.peruste!.tyyppi) === 'OPAS' ? self.$kaanna(item.peruste!.nimi!) : item.nimi;
       },
     }, {
       key: 'koulutustyyppi',

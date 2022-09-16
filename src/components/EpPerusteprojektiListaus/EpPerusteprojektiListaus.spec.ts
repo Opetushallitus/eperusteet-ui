@@ -73,7 +73,6 @@ describe('Projektilistaus', () => {
         nimi: 'projekti 42',
         tila: 'valmis',
         peruste: {
-          tyyppi: 'normaali',
           koulutustyyppi: 'koulutustyyppi_11',
         },
       }] as any,
@@ -137,7 +136,6 @@ describe('Projektilistaus', () => {
         id: 42,
         nimi: 'projekti 42',
         peruste: {
-          tyyppi: 'normaali',
           koulutustyyppi: 'koulutustyyppi_11',
         },
         tila: 'valmis',
