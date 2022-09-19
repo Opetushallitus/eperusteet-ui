@@ -143,7 +143,7 @@
             </template>
             <template v-slot:cell(nimi)="data">
               <router-link :to="{ name: editRoute, params: { projektiId: data.item.id } }">
-                {{ data.item.nimi }}
+                {{ data.value }}
               </router-link>
             </template>
             <template v-slot:cell(koulutustyyppi)="data">
@@ -425,13 +425,14 @@ export default class EpPerusteprojektiListaus extends Vue {
         ? this.$sd(value)
         : '-';
     };
-
+    const self = this;
     return [{
       key: 'nimi',
       label: this.$t('projektin-nimi') as string,
       sortable: true,
+      sortByFormatted: true,
       formatter(value: any, key: string, item: PerusteprojektiKevytDto) {
-        return item.nimi;
+        return _.upperCase(item.peruste!.tyyppi) === 'OPAS' ? self.$kaanna(item.peruste!.nimi!) : item.nimi;
       },
     }, {
       key: 'koulutustyyppi',
