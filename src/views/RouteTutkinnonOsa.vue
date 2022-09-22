@@ -191,7 +191,6 @@ import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimuk
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
 import { YhdistettyGeneerinen } from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
-import { LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
@@ -345,9 +344,7 @@ export default class RouteTutkinnonosa extends Vue {
 
   @Watch('versionumero', { immediate: true })
   async versionumeroChange() {
-    await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(this.perusteId!, Number(this.tutkinnonOsaId), this, this.versionumero);
-    this.store = new EditointiStore(store);
+    await this.fetch();
   }
 
   @Watch('tutkinnonOsaId', { immediate: true })
@@ -357,8 +354,12 @@ export default class RouteTutkinnonosa extends Vue {
     }
     this.arviointiStore.fetchArviointiasteikot();
     this.arviointiStore.fetchGeneeriset();
+    await this.fetch();
+  }
+
+  async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(this.perusteId!, id ? Number(id!) : undefined, this);
+    const store = new TutkinnonOsaEditStore(this.perusteId!, Number(this.tutkinnonOsaId), this, this.versionumero);
     this.store = new EditointiStore(store);
   }
 
