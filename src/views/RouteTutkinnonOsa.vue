@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="store">
-      <EpEditointi :store="store" :labelCopyConfirm="'kopioidaanko-tutkinnonosa'" :labelRemove="'poista-tutkinnonosa'">
+      <EpEditointi :store="store" :versionumero="versionumero" :labelCopyConfirm="'kopioidaanko-tutkinnonosa'" :labelRemove="'poista-tutkinnonosa'">
       <template v-slot:header="{ data }">
         <h2 class="m-0" style="white-space: pre">
           <span v-if="data.tutkinnonOsa.nimi">{{$kaanna(data.tutkinnonOsa.nimi)}}</span>
@@ -191,7 +191,6 @@ import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimuk
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
 import { YhdistettyGeneerinen } from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
-import { LokalisoituTekstiDto } from '@shared/tyypit';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
@@ -339,16 +338,28 @@ export default class RouteTutkinnonosa extends Vue {
     return _.filter(this.arviointiStore.geneeriset.value, 'julkaistu');
   }
 
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
+  }
+
   @Watch('tutkinnonOsaId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
+    if (!id || id === _.toString(oldId)) {
       return;
     }
-
     this.arviointiStore.fetchArviointiasteikot();
     this.arviointiStore.fetchGeneeriset();
+    await this.fetch();
+  }
+
+  async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(this.perusteId!, id ? Number(id!) : undefined, this);
+    const store = new TutkinnonOsaEditStore(this.perusteId!, Number(this.tutkinnonOsaId), this, this.versionumero);
     this.store = new EditointiStore(store);
   }
 
