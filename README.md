@@ -110,15 +110,13 @@ Testiympäristöjen swaggerit löytyvät seuraavista osoitteista
 
 ### 4.4. Continuous integration
 
-https://app.travis-ci.com/github/Opetushallitus/eperusteet-ui
+https://github.com/Opetushallitus/eperusteet-ui/actions
 
 ### 5. Koodityyli
 
-Suositeltava resurssi [Vue style guide](https://vuejs.org/v2/style-guide)
-
-### 6. Tekninen velka
-
-- Yarn.lock tiedostoa on jouduttu muokkaamaan käsin. Tämä ongelma pitää selvittää kunhan depsuja seuraavan kerran päivitetään.
+Suositeltavia resursseja: 
+ - [Vue style guide](https://vuejs.org/v2/style-guide)
+ - [BootstrapVue](https://bootstrap-vue.org/docs)
 
 ## ePerusteet-projektit
 
