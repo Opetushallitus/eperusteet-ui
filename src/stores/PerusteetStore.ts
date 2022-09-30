@@ -34,7 +34,7 @@ export class PerusteetStore implements IProjektiProvider {
 
   public async updateOwnProjects() {
     const res = _.map(await Promise.all([Perusteprojektit.getOmatPerusteprojektit(), Perusteprojektit.getOmatJulkaistutPerusteprojektit()]), 'data') as any;
-    this.state.ownProjects = [...res[0], ...res[1]];
+    this.state.ownProjects = _.uniqBy([...res[0], ...res[1]], projekti => projekti.id);
   }
 
   public clear() {
