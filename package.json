@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve-dev": "set USE_SOURCEMAP=true && vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "TZ=Europe/Helsinki vue-cli-service test:unit --ci --coverage --no-cache",
     "test:unit:notz": "vue-cli-service test:unit --ci --coverage --no-cache",
