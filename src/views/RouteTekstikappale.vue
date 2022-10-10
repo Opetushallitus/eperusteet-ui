@@ -5,24 +5,30 @@
         <h2 class="m-0">{{ $kaanna(data.nimi) }}</h2>
       </template>
       <template v-slot:default="{ data, isEditing, validation }">
-        <div class="mt-1" v-if="isEditing">
+        <div class="mt-1 otsikko" v-if="isEditing">
 
           <div v-if="osaamisalat.length > 0" class="mb-4">
             <h3>{{$t('osaamisalat')}}</h3>
-            <ep-select :items="osaamisalat" v-model="data.osaamisala" :is-editing="true">
-              <template #default="{ item }">
-                {{$kaanna(item.nimi)}}
+            <EpMultiSelect v-model="data.osaamisala" :is-editing="true" :options="osaamisalat" :multiple="false" trackBy="uri" class="multiselect">
+              <template slot="singleLabel" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
               </template>
-            </ep-select>
+              <template slot="option" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
+              </template>
+            </EpMultiSelect>
           </div>
 
           <div v-if="tutkintonimikkeet.length > 0" class="mb-4">
             <h3>{{$t('tutkintonimikkeet')}}</h3>
-            <ep-select :items="tutkintonimikkeet" v-model="data.tutkintonimike" :is-editing="true">
-              <template #default="{ item }">
-                {{$kaanna(item.nimi)}}
+            <EpMultiSelect v-model="data.tutkintonimike" :is-editing="true" :options="tutkintonimikkeet" :multiple="false" trackBy="uri" class="multiselect">
+              <template slot="singleLabel" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
               </template>
-            </ep-select>
+              <template slot="option" slot-scope="{ option }">
+                {{ $kaanna(option.nimi) }}
+              </template>
+            </EpMultiSelect>
           </div>
 
           <h3>{{$t('otsikko')}}</h3>
@@ -50,6 +56,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
@@ -80,6 +87,7 @@ interface koodistoryhma {
     EpButton,
     EpToggle,
     EpSelect,
+    EpMultiSelect,
   },
 })
 export default class RouteTekstikappale extends Vue {
@@ -280,6 +288,14 @@ export default class RouteTekstikappale extends Vue {
 
     }
 
+  }
+
+  .otsikko {
+    .multiselect {
+      ::v-deep .multiselect__content-wrapper {
+        width: 100%;
+      }
+    }
   }
 
 </style>
