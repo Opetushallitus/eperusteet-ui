@@ -237,11 +237,16 @@ export default class RouteTiedotteet extends Vue {
       sortable: false,
       thStyle: { width: '35%', borderBottom: '0px' },
       formatter: (value: any, key: any, item: any) => {
-        return _.chain(value)
-          .sortBy(julkaisupaikka => julkaisupaikkaSort[julkaisupaikka])
-          .map((julkaisupaikka) => this.$t('tiedote-julkaisupaikka-' + julkaisupaikka))
-          .join(', ')
-          .value();
+        return _.join(
+          [
+            ..._.chain(value)
+              .sortBy(julkaisupaikka => julkaisupaikkaSort[julkaisupaikka])
+              .map((julkaisupaikka) => this.$t('tiedote-julkaisupaikka-' + julkaisupaikka))
+              .value(),
+            ..._.map(item.koulutustyypit, kt => this.$t(kt)),
+          ],
+          ', '
+        );
       },
     }];
   }
