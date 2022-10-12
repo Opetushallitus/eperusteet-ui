@@ -227,7 +227,7 @@ export default class EpAmosaaTilastot extends Vue {
     return _.chain(this.toteutussuunnitelmatFilled)
       .map(toteutussuunnitelma => {
         return {
-          text: this.$t(toteutussuunnitelma.koulutustyyppi as string),
+          text: toteutussuunnitelma.koulutustyyppi ? this.$t(toteutussuunnitelma.koulutustyyppi as string) : this.$t('null'),
           value: toteutussuunnitelma.koulutustyyppi,
         };
       })
