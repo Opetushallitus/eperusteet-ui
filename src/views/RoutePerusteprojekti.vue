@@ -388,7 +388,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   get ratasvalintaFiltered() {
     return _.chain(this.ratasvalinnat)
       .reject(ratasvalinta => _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila)
-      .filter(ratasvalinta => !ratasvalinta.meta?.oikeus || this.$hasOikeus(ratasvalinta.meta?.oikeus.oikeus, 'peruste'))
+      .filter(ratasvalinta => !ratasvalinta.meta?.oikeus || this.$hasOikeus(ratasvalinta.meta?.oikeus.oikeus))
       .map(ratasvalinta => {
         return {
           ...ratasvalinta,
