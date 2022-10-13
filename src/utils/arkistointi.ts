@@ -1,7 +1,7 @@
 import { Perusteprojektit } from '@shared/api/eperusteet';
 
 export async function vaihdaPerusteTilaConfirm(el, meta) {
-  const arkistoi = await el.$bvModal.msgBoxConfirm(el.$t(meta.confirm) as any, {
+  const vaihdaTila = await el.$bvModal.msgBoxConfirm(el.$t(meta.confirm) as any, {
     title: el.$t(meta.title),
     okVariant: 'primary',
     okTitle: el.$t(meta.okTitle ? meta.okTitle : 'kylla') as any,
@@ -10,7 +10,7 @@ export async function vaihdaPerusteTilaConfirm(el, meta) {
     centered: true,
   });
 
-  if (arkistoi) {
+  if (vaihdaTila) {
     try {
       await Perusteprojektit.updatePerusteprojektiTila(meta.projektiId ? meta.projektiId : el.$route.params.projektiId, meta.tila);
       el.$success(el.$t('tilan-vaihto-' + meta.tila + '-onnistui'));
