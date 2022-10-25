@@ -3,63 +3,15 @@
     <Portal to="headerExtension">
       <div class="portal-menu d-flex">
         <div class="upper-left">
-          <ep-progress-popover :slices="progressSlices" :popup-style="popupStyle">
-            <template v-slot:header>
-              <div class="d-flex flex-column align-items-center">
-                <div class="mb-1">{{$t(projektiTila)}}</div>
-
-                <div class="d-flex text-center julkaisemattomia-muutoksia" v-if="julkaisemattomiaMuutoksia">
-                  <span class="material-icons-outlined mr-1">info</span>
-                  <div class="font-size-08">{{$t('perusteessa-on-julkaisemattomia-muutoksia')}}</div>
-                </div>
-
-                <b-button class="px-3 py-1" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" variant="primary" v-if="isLuonnos && isPohja && validationStats && validationStats.fails === 0" @click="asetaValmiiksi">
-                  {{$t('aseta-valmiiksi')}}
-                </b-button>
-                <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-else-if="!julkaisemattomiaMuutoksia && julkaisuNakymaSiirtymaSallittu">
-                  <span v-if="!isPohja">
-                    {{ $t('siirry-julkaisunakymaan') }}
-                  </span>
-                  <span v-if="isPohja && validationStats && validationStats.fails > 0">
-                    {{ $t('tarkista-virheet') }}
-                  </span>
-                </b-button>
-              </div>
-
-            </template>
-
-            <b-button class="px-3 py-1" variant="primary" :to="julkaisuRoute" v-if="julkaisemattomiaMuutoksia && julkaisuNakymaSiirtymaSallittu">
-              {{ $t('siirry-julkaisunakymaan') }}
-            </b-button>
-
-            <div v-if="isArkistoitu" class="d-flex flex-column align-items-center text-center">
-              <b-button class="px-3 py-1" variant="primary" @click="palauta" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-                {{ $t('palauta') }}
-              </b-button>
-              <div class="font-size-08 mt-1">{{$t('voit-palauttaa-arkistoidun-perusteen-luonnostilaan')}}</div>
-            </div>
-
-            <div v-else-if="validationStats">
-              <div v-if="validationStats.warnings > 0" class="pl-3 pt-2 pb-1 d-flex align-items-center">
-                <fas class="text-warning mr-3" icon="info-circle" />
-                <span>{{ $t('perusteessa-huomautuksia') }}</span>
-              </div>
-              <template v-if="validationCategories">
-                <div class="pl-3 pt-2 pb-1 d-flex align-items-center" v-for="c in validationStats.categories" :key="c.category">
-                  <template v-if="c.failcount === 0">
-                    <fas class="text-success mr-3" icon="check-circle" />
-                    <span>{{ $t(c.category + '-validation-ok') }}</span>
-                  </template>
-                  <template v-if="c.failcount > 0">
-                    <fas class="text-danger mr-3" icon="info-circle" />
-                    <span>{{ $t(c.category + '-validation-error') }}</span>
-                  </template>
-                </div>
-              </template>
-            </div>
-            <ep-spinner v-else />
-
-          </ep-progress-popover>
+          <EpValidPopover
+            :validoitava="peruste"
+            :validoinnit="validoinnit"
+            :julkaisemattomiaMuutoksia="julkaisemattomiaMuutoksia"
+            :julkaistava="!isPohja"
+            @asetaValmiiksi="asetaValmiiksi"
+            @palauta="palauta"
+            tyyppi="peruste"
+          />
         </div>
         <div class="flex-grow-1 align-self-center">
           <div class="mb-5 p-2" v-if="peruste && projekti">
@@ -312,6 +264,7 @@ import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSisallonLisays from '@/components/EpSisallonLisays.vue';
 import { routeToNode, LinkkiHandler } from '@/utils/routing';
+import EpValidPopover from '@shared/components/EpValidPopover/EpValidPopover.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -342,6 +295,7 @@ interface ValidationStats {
     EpTekstikappaleLisays,
     EpButton,
     EpSisallonLisays,
+    EpValidPopover,
   },
   inject: [],
 })
@@ -477,60 +431,11 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     return 'tekstikappale';
   }
 
-  get validationStats() {
-    if (this.validationCategories) {
-      let kategoriat = _.chain(this.validationCategories)
-        .map(kategoria => {
-          return {
-            category: _.lowerCase(kategoria),
-            ok: 0,
-            failcount: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiKategoria === kategoria)),
-            total: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiKategoria === kategoria)),
-          } as ValidationCategory;
-        })
-        .filter(c => c.category !== 'null')
-        .value();
-
-      if (_.size(kategoriat) === 0) {
-        kategoriat = [{
-          category: 'validation-category-peruste',
-          ok: 0,
-          failcount: 0,
-          total: 0,
-        }];
-      }
-
-      return {
-        categories: kategoriat,
-        ok: 0,
-        warnings: _.size(_.filter(this.perusteStore.projektiStatus.value?.infot, info => info.validointiStatusType === StatusValidointiStatusTypeEnum.HUOMAUTUS)),
-        fails: _.sum(_.map(kategoriat, 'failcount')),
-        total: _.size(kategoriat),
-      } as ValidationStats;
-    }
-  }
-
-  get validationCategories() {
-    if (this.perusteStore.projektiStatus.value) {
-      return _.chain(this.perusteStore.projektiStatus.value.infot)
-        .keyBy('validointiKategoria')
-        .keys()
-        .value();
-    }
-  }
-
-  get progressSlices() {
-    if (this.tila) {
-      if (this.isArkistoitu) {
-        return [0];
-      }
-
-      if (this.validationCategories) {
-        return _.chain(this.validationCategories)
-          .map(kategoria => 0.5)
-          .value();
-      }
-    }
+  get validoinnit() {
+    return {
+      virheet: _.map(_.filter(this.perusteStore.projektiStatus.value?.infot, info => _.get(info, 'validointiStatusType') === StatusValidointiStatusTypeEnum.VIRHE), 'viesti'),
+      huomautukset: _.map(_.filter(this.perusteStore.projektiStatus.value?.infot, info => _.get(info, 'validointiStatusType') === StatusValidointiStatusTypeEnum.HUOMAUTUS), 'viesti'),
+    };
   }
 
   ratasClick(clickFn, meta) {
@@ -586,7 +491,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get julkaisuNakymaSiirtymaSallittu() {
-    return (!this.isPohja && this.tila && !this.isArkistoitu) || (this.isPohja && this.validationStats && this.validationStats.fails > 0);
+    return (!this.isPohja && this.tila && !this.isArkistoitu) || (this.isPohja && _.size(this.validoinnit.virheet) > 0);
   }
 
   get julkaisemattomiaMuutoksia() {
