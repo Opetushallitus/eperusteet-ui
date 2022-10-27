@@ -495,9 +495,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get julkaisemattomiaMuutoksia() {
-    if (this.peruste) {
-      return this.isJulkaistu && this.peruste!.globalVersion!.aikaleima! > this.peruste.viimeisinJulkaisuAika!;
-    }
+    return this.perusteStore.julkaisemattomiaMuutoksia.value;
   }
 
   async palauta() {
