@@ -23,6 +23,7 @@ export class PerusteStore implements IEditoitava {
     julkaisut: null as any,
     initializing: false,
     projektiStatus: null as TilaUpdateStatus | null,
+    julkaisemattomiaMuutoksia: null as boolean | null,
   });
 
   public readonly projekti = computed(() => this.state.projekti);
@@ -39,6 +40,7 @@ export class PerusteStore implements IEditoitava {
   public readonly isPohja = computed(() => this.state.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA));
   public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.peruste.value?.koulutustyyppi));
   public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.peruste.value?.koulutustyyppi));
+  public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {
@@ -96,6 +98,8 @@ export class PerusteStore implements IEditoitava {
         this.state.projektiStatus = {};
       }
     }
+
+    await this.fetchJulkaisemattomiaMuutoksia();
   }
 
   async init(projektiId: number) {
@@ -228,6 +232,10 @@ export class PerusteStore implements IEditoitava {
 
   async fetchJulkaisut() {
     this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
+  }
+
+  public async fetchJulkaisemattomiaMuutoksia() {
+    this.state.julkaisemattomiaMuutoksia = (await Julkaisut.onkoMuutoksia(this.state.perusteId!)).data;
   }
 
   async acquire() {
