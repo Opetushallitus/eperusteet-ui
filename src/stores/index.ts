@@ -24,11 +24,11 @@ import { PoistetutStore } from './PoistetutStore';
 
 const arviointiStore = new ArviointiStore(Kielet);
 const kayttajaStore = Kayttajat;
-const perusteOppaatStore = new PerusteetStore({ tyyppi: 'OPAS' } as any);
+const perusteOppaatStore = new PerusteetStore({ tyyppi: ['OPAS'] } as any);
 const perusteStore = new PerusteStore();
-const perusteetStore = new PerusteetStore({ tyyppi: 'NORMAALI' } as any);
+const perusteetStore = new PerusteetStore({ tyyppi: ['NORMAALI', 'AMOSAA_YHTEINEN'] } as any);
 const perusteprojektiStore = new PerusteprojektiStore();
-const pohjatStore = new PerusteetStore({ tyyppi: 'POHJA' } as any);
+const pohjatStore = new PerusteetStore({ tyyppi: ['POHJA'] } as any);
 const ulkopuolisetStore = new UlkopuolisetStore();
 const tutkinnonOsaStore = new TutkinnonOsaStore(perusteStore);
 const muokkaustietoStore = new MuokkaustietoStore();
