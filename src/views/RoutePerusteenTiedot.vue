@@ -84,6 +84,13 @@
                 <div v-else>{{ $t('' + data.koulutusvienti) }}</div>
               </b-form-group>
             </b-col>
+
+            <b-col lg="6" v-if="tyypinVaihtoSallittu" class="mb-4">
+              <b-form-group :label="$t('tyyppi')">
+                <b-form-select v-model="data.tyyppi" :options="perusteenTyypit" v-if="isEditing" ></b-form-select>
+                <div v-else>{{ $t('perustetyyppi-' + data.tyyppi) }}</div>
+              </b-form-group>
+            </b-col>
           </b-row>
 
           <b-row no-gutters v-if="data.kvliite">
@@ -728,6 +735,17 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       await Promise.all(_.map(this.koulutusvienninOhjeet, liite =>
         Liitetiedostot.paivitaLisatieto(this.perusteId!, liite.id, liite.lisatieto)));
     }
+  }
+
+  get tyypinVaihtoSallittu() {
+    return this.isAmmatillinen && this.$isAdmin() && _.includes(_.map(this.perusteenTyypit, 'value'), this.peruste.tyyppi);
+  }
+
+  get perusteenTyypit() {
+    return [
+      { text: this.$t('perustetyyppi-normaali'), value: 'normaali' },
+      { text: this.$t('perustetyyppi-amosaayhteinen'), value: 'amosaayhteinen' },
+    ];
   }
 }
 
