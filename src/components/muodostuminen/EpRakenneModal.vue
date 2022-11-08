@@ -50,6 +50,11 @@
         </b-form-group>
 
         <b-form-group :label="$t('osaamisala') + ' *'" v-if="tyyppi ==='osaamisala'">
+          <div>
+            <span v-if="selectableOsaamisalat.length === 0">{{$t('ei-valittavia-osaamisaloja')}} </span>
+            <span v-else>{{$t('valitse-osaamisala')}} </span>
+            <span>{{$t('uusia-osaamisaloja-voit-luoda-tutkinnon-muodostumisen-nakymasta')}}</span>
+          </div>
           <b-form-radio v-for="(osaamisala, index) in selectableOsaamisalat" :key='"osaamisala"+index'
               class="ml-1" v-model="innerModel.osaamisala" :value="osaamisala" name="osaamisalaValinta">
             {{ $kaanna(osaamisala.nimi) }}
@@ -57,6 +62,11 @@
         </b-form-group>
 
         <b-form-group :label="$t('tutkintonimike') + ' *'" v-if="tyyppi ==='tutkintonimike'">
+          <div>
+            <span v-if="selectableOsaamisalat.length === 0">{{$t('ei-valittavia-tutkintonimikkeita')}} </span>
+            <span v-else>{{$t('valitse-tutkintonimike')}} </span>
+            <span>{{$t('uusia-tutkintonimikkeita-voit-luoda-tutkinnon-muodostumisen-nakymasta')}}</span>
+          </div>
           <b-form-radio v-for="(tutkintonimike, index) in selectableTutkintonimikkeet" :key='"tutkintonimike"+index'
               class="ml-1" v-model="innerModel.tutkintonimike" :value="tutkintonimike" name="tutkintonimikeValinta">
             {{ $kaanna(tutkintonimike.nimi) }}
@@ -186,6 +196,8 @@ export default class EpRakenneModal extends Vue {
     (this.$refs.rakenneModal as any).show();
     if (isNew) {
       this.tyyppi = null;
+      this.innerModel.tutkintonimike = null;
+      this.innerModel.osaamisala = null;
     }
     else {
       this.tyyppi = this.defaultTyyppi;
@@ -324,7 +336,7 @@ export default class EpRakenneModal extends Vue {
       if (this.nimiValinta !== 'muu') {
         this.$emit('input', { ...this.innerModel, nimi: this.getNimi(this.nimiValintaTekstit[this.nimiValinta]) });
       }
-      else if (oldVal) {
+      else {
         this.$emit('input', { ...this.innerModel, nimi: null });
       }
     }
@@ -376,6 +388,13 @@ export default class EpRakenneModal extends Vue {
   get invalid() {
     if (this.tosa) {
       return false;
+    }
+
+    if (this.tyyppi === 'osaamisala') {
+      return !this.innerModel.osaamisala?.osaamisalakoodiUri;
+    }
+    else if (this.tyyppi === 'tutkintonimike') {
+      return !this.innerModel.tutkintonimike?.uri;
     }
 
     if (this.innerModel.nimi) {

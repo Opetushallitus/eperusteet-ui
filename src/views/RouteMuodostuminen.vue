@@ -138,7 +138,7 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('osaamisalat') }}</h5>
                     <div>
-                      <ep-button @click="lisaaOsaamisala" icon="plus" variant="outline">
+                      <ep-button @click="lisaaOsaamisala" icon="plus" variant="outline" class="mb-2">
                         {{ $t('lisaa-osaamisala') }}
                       </ep-button>
                       <draggable :value="osaamisalatPaged" v-bind="optionsKoodit" tag="div">
@@ -186,7 +186,7 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('tutkintonimikkeet') }}</h5>
                     <div>
-                      <ep-button @click="lisaaTutkintonimike" icon="plus" variant="outline">
+                      <ep-button @click="lisaaTutkintonimike" icon="plus" variant="outline" class="mb-2">
                         {{ $t('lisaa-tutkintonimike') }}
                       </ep-button>
 
