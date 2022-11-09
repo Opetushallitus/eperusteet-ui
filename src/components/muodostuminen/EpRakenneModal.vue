@@ -53,7 +53,9 @@
           <div>
             <span v-if="selectableOsaamisalat.length === 0">{{$t('ei-valittavia-osaamisaloja')}} </span>
             <span v-else>{{$t('valitse-osaamisala')}} </span>
-            <span>{{$t('uusia-osaamisaloja-voit-luoda-tutkinnon-muodostumisen-nakymasta')}}</span>
+            <span>{{$t('uusia-osaamisaloja-voit-luoda')}} </span>
+            <a class="btn-link" @click="cancel()">{{$t('tutkinnon-muodostumisen')}} </a>
+            <span>{{$t('nakymasta')}}</span>
           </div>
           <b-form-radio v-for="(osaamisala, index) in selectableOsaamisalat" :key='"osaamisala"+index'
               class="ml-1" v-model="innerModel.osaamisala" :value="osaamisala" name="osaamisalaValinta">
@@ -65,7 +67,9 @@
           <div>
             <span v-if="selectableOsaamisalat.length === 0">{{$t('ei-valittavia-tutkintonimikkeita')}} </span>
             <span v-else>{{$t('valitse-tutkintonimike')}} </span>
-            <span>{{$t('uusia-tutkintonimikkeita-voit-luoda-tutkinnon-muodostumisen-nakymasta')}}</span>
+            <span>{{$t('uusia-tutkintonimikkeita-voit-luoda')}} </span>
+            <a class="btn-link" @click="cancel()">{{$t('tutkinnon-muodostumisen')}} </a>
+            <span>{{$t('nakymasta')}}</span>
           </div>
           <b-form-radio v-for="(tutkintonimike, index) in selectableTutkintonimikkeet" :key='"tutkintonimike"+index'
               class="ml-1" v-model="innerModel.tutkintonimike" :value="tutkintonimike" name="tutkintonimikeValinta">
