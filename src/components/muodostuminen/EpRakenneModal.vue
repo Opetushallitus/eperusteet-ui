@@ -50,7 +50,7 @@
         </b-form-group>
 
         <b-form-group :label="$t('osaamisala') + ' *'" v-if="tyyppi ==='osaamisala'">
-          <div>
+          <div class="mb-2">
             <span v-if="selectableOsaamisalat.length === 0">{{$t('ei-valittavia-osaamisaloja')}} </span>
             <span v-else>{{$t('valitse-osaamisala')}} </span>
             <span>{{$t('uusia-osaamisaloja-voit-luoda')}} </span>
@@ -64,7 +64,7 @@
         </b-form-group>
 
         <b-form-group :label="$t('tutkintonimike') + ' *'" v-if="tyyppi ==='tutkintonimike'">
-          <div>
+          <div class="mb-2">
             <span v-if="selectableOsaamisalat.length === 0">{{$t('ei-valittavia-tutkintonimikkeita')}} </span>
             <span v-else>{{$t('valitse-tutkintonimike')}} </span>
             <span>{{$t('uusia-tutkintonimikkeita-voit-luoda')}} </span>
