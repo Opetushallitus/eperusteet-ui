@@ -41,6 +41,7 @@ export class PerusteStore implements IEditoitava {
   public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.peruste.value?.koulutustyyppi));
   public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.peruste.value?.koulutustyyppi));
   public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
+  public readonly isJulkaistu = computed(() => (_.size(this.julkaisut.value) > 0 || this.peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {
