@@ -432,10 +432,12 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get validoinnit() {
-    return {
-      virheet: _.map(_.filter(this.perusteStore.projektiStatus.value?.infot, info => _.get(info, 'validointiStatusType') === StatusValidointiStatusTypeEnum.VIRHE), 'viesti'),
-      huomautukset: _.map(_.filter(this.perusteStore.projektiStatus.value?.infot, info => _.get(info, 'validointiStatusType') === StatusValidointiStatusTypeEnum.HUOMAUTUS), 'viesti'),
-    };
+    if (this.perusteStore.projektiStatus.value) {
+      return {
+        virheet: _.map(_.filter(this.perusteStore.projektiStatus.value?.infot, info => _.get(info, 'validointiStatusType') === StatusValidointiStatusTypeEnum.VIRHE), 'viesti'),
+        huomautukset: _.map(_.filter(this.perusteStore.projektiStatus.value?.infot, info => _.get(info, 'validointiStatusType') === StatusValidointiStatusTypeEnum.HUOMAUTUS), 'viesti'),
+      };
+    }
   }
 
   ratasClick(clickFn, meta) {
@@ -488,10 +490,6 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
   get isLuonnos() {
     return this.peruste?.tila === _.toLower(PerusteDtoTilaEnum.LUONNOS);
-  }
-
-  get julkaisuNakymaSiirtymaSallittu() {
-    return (!this.isPohja && this.tila && !this.isArkistoitu) || (this.isPohja && _.size(this.validoinnit.virheet) > 0);
   }
 
   get julkaisemattomiaMuutoksia() {

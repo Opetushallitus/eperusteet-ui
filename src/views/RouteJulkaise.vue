@@ -98,7 +98,7 @@
           <ep-content v-model="julkaisu.tiedote"
                       layout="simplified"
                       :is-editable="true" />
-          <EpJulkaisuButton class="mt-3" :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }"/>
+          <EpJulkaisuButton class="mt-3" :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" :julkaisuKesken="julkaisuKesken"/>
         </b-form-group>
       </div>
 
@@ -178,7 +178,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   get julkaisut() {
-    return this.perusteStore.julkaisut.value || [];
+    return this.perusteStore.julkaisut.value;
   }
 
   get julkaisutMapped() {
@@ -200,7 +200,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   protected async onProjektiChange() {
-    this.perusteStore!.fetchJulkaisut();
   }
 
   async julkaise() {
@@ -210,7 +209,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       });
 
       this.julkaisu.tiedote = {};
-      this.$success(this.$t('julkaistu') as string);
+      this.$success(this.$t('julkaisu-kaynnistetty') as string);
     }
     catch (err) {
       this.$fail(this.$t('julkaisu-epaonnistui-peruste-' + err.response?.data?.syy) as string);
@@ -225,6 +224,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     catch (err) {
       this.$fail(this.$t('palautus-epaonnistui') as string);
     }
+  }
+
+  get julkaisuKesken() {
+    return this.perusteStore?.viimeisinJulkaisuTila.value === 'KESKEN';
   }
 
   get statusRoute() {
