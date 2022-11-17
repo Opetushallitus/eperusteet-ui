@@ -3,7 +3,7 @@ import { NavigationNodeDto } from '@shared/tyypit';
 import * as _ from 'lodash';
 import { ILinkkiHandler } from '@shared/components/EpContent/LinkkiHandler';
 
-const ignoredRouteNames = ['kasitteet', 'opasKasitteet', 'poistetut', 'opas', 'oppaanTiedot'];
+const ignoredRouteNames = ['kasitteet', 'opasKasitteet', 'poistetut', 'opas', 'oppaanTiedot', 'julkaise', 'perusteprojekti', 'perusteenTiedot'];
 
 export function routeToNode(route: Location): NavigationNodeDto | null {
   if (!route || _.includes(ignoredRouteNames, route.name)) {

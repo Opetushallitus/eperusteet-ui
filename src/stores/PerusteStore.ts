@@ -24,6 +24,8 @@ export class PerusteStore implements IEditoitava {
     initializing: false,
     projektiStatus: null as TilaUpdateStatus | null,
     julkaisemattomiaMuutoksia: null as boolean | null,
+    viimeisinJulkaisuTila: null as string | null,
+    tilaPolling: null as any | null,
   });
 
   public readonly projekti = computed(() => this.state.projekti);
@@ -42,6 +44,7 @@ export class PerusteStore implements IEditoitava {
   public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.peruste.value?.koulutustyyppi));
   public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
   public readonly isJulkaistu = computed(() => (_.size(this.julkaisut.value) > 0 || this.peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
+  public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {
@@ -216,9 +219,31 @@ export class PerusteStore implements IEditoitava {
   async julkaise(tiedot: any) {
     const projektiId = this.state.projekti?.id;
     if (projektiId) {
-      const res = await Julkaisut.teeJulkaisu(projektiId, tiedot);
-      this.state.julkaisut = [...this.state.julkaisut, res.data];
+      await Julkaisut.teeJulkaisu(projektiId, tiedot);
+      await this.fetchJulkaisut();
+    }
+  }
+
+  async fetchJulkaisut() {
+    this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
+    await this.fetchViimeisinJulkaisuTila();
+    await this.pollTila();
+  }
+
+  async fetchViimeisinJulkaisuTila() {
+    this.state.viimeisinJulkaisuTila = (await Julkaisut.viimeisinJulkaisuTila(this.state.perusteId!)).data;
+
+    if (this.state.viimeisinJulkaisuTila !== 'KESKEN' && this.state.tilaPolling !== null) {
+      clearInterval(this.state.tilaPolling);
+      this.state.tilaPolling = null;
+      this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
       await this.updateCurrent();
+    }
+  }
+
+  async pollTila() {
+    if (this.state.viimeisinJulkaisuTila === 'KESKEN') {
+      this.state.tilaPolling = setInterval(() => this.fetchViimeisinJulkaisuTila(), 2500);
     }
   }
 
@@ -229,10 +254,6 @@ export class PerusteStore implements IEditoitava {
       this.state.julkaisut = [...this.state.julkaisut, res.data];
       await this.updateCurrent();
     }
-  }
-
-  async fetchJulkaisut() {
-    this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
   }
 
   public async fetchJulkaisemattomiaMuutoksia() {
