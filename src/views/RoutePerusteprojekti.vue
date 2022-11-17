@@ -35,7 +35,7 @@
                     v-if="ratasvalinta.click"
                     @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)"
                     :disabled="ratasvalinta.disabled"
-                    v-oikeustarkastelu="ratasvalinta.meta.oikeus">
+                    v-oikeustarkastelu="ratasvalinta.meta.oikeus()">
                     <fas :icon="ratasvalinta.icon" />
                     {{ $t(ratasvalinta.text) }}
                   </b-dropdown-item>
@@ -342,7 +342,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   get ratasvalintaFiltered() {
     return _.chain(this.ratasvalinnat)
       .reject(ratasvalinta => _.get(ratasvalinta, 'meta.tila') === this.peruste?.tila)
-      .filter(ratasvalinta => !ratasvalinta.meta?.oikeus || this.$hasOikeus(ratasvalinta.meta?.oikeus.oikeus, ratasvalinta.meta?.oikeus.kohde))
+      .filter(ratasvalinta => !ratasvalinta.meta?.oikeus || this.$hasOikeus(ratasvalinta.meta?.oikeus().oikeus, ratasvalinta.meta?.oikeus().kohde))
       .map(ratasvalinta => {
         return {
           ...ratasvalinta,
@@ -479,7 +479,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get isJulkaistu() {
-    return (_.size(this.julkaisut) > 0 || this.peruste?.tila === PerusteDtoTilaEnum.VALMIS) && !this.isArkistoitu;
+    return this.perusteStore.isJulkaistu.value;
   }
 
   get isArkistoitu() {

@@ -198,7 +198,7 @@ const router = new VueRouter({
           text: 'arkistoi-peruste',
           click: vaihdaPerusteTilaConfirm,
           meta: {
-            oikeus: { oikeus: 'hallinta', kohde: 'pohja' },
+            oikeus: () => stores.perusteStore.isJulkaistu.value ? { oikeus: 'hallinta', kohde: 'pohja' } : { oikeus: 'muokkaus' },
             title: 'arkistoi-peruste',
             confirm: 'arkistoi-peruste-vahvistus',
             reroute: () => stores.perusteStore.isPohja.value ? 'pohjat' : 'perusteprojektit',
@@ -361,7 +361,7 @@ const router = new VueRouter({
           text: 'arkistoi-opas',
           click: vaihdaPerusteTilaConfirm,
           meta: {
-            oikeus: { oikeus: 'hallinta', kohde: 'pohja' },
+            oikeus: () => stores.perusteStore.isJulkaistu.value ? { oikeus: 'hallinta', kohde: 'pohja' } : { oikeus: 'muokkaus' },
             title: 'arkistoi-opas',
             confirm: 'arkistoi-opas-vahvistus',
             reroute: () => 'oppaat',
