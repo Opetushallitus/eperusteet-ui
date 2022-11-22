@@ -226,14 +226,16 @@ export class PerusteStore implements IEditoitava {
 
   async fetchJulkaisut() {
     this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
-    await this.fetchViimeisinJulkaisuTila();
-    await this.pollTila();
+    if (_.includes(_.map(this.state.julkaisut, 'tila'), 'KESKEN')) {
+      await this.fetchViimeisinJulkaisuTila();
+      await this.pollTila();
+    }
   }
 
   async fetchViimeisinJulkaisuTila() {
     this.state.viimeisinJulkaisuTila = (await Julkaisut.viimeisinJulkaisuTila(this.state.perusteId!)).data;
 
-    if (this.state.viimeisinJulkaisuTila !== 'KESKEN' && this.state.tilaPolling !== null) {
+    if (this.state.viimeisinJulkaisuTila !== 'KESKEN') {
       clearInterval(this.state.tilaPolling);
       this.state.tilaPolling = null;
       this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
