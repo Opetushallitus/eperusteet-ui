@@ -181,20 +181,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     return this.perusteStore.julkaisut.value;
   }
 
-  get julkaisutMapped() {
-    return _.chain(this.julkaisut)
-      .map(julkaisu => {
-        return {
-          ...julkaisu,
-          nimi: parsiEsitysnimi(julkaisu.kayttajanTieto),
-          fixedRevision: '1.' + julkaisu.revision,
-        };
-      })
-      .sortBy('luotu')
-      .reverse()
-      .value();
-  }
-
   get status() {
     return this.perusteStore?.projektiStatus?.value || null;
   }
