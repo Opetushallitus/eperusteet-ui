@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isKoulutustyyppiPdfTuettu } from '@shared/utils/perusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
+import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
 
 Vue.use(VueCompositionApi);
@@ -20,7 +20,7 @@ export class PerusteStore implements IEditoitava {
     navigation: null as NavigationNodeDto | null,
     perusteId: null as number | null,
     isInitialized: false,
-    julkaisut: null as any,
+    julkaisut: null as JulkaisuBaseDto[] | null,
     initializing: false,
     projektiStatus: null as TilaUpdateStatus | null,
     julkaisemattomiaMuutoksia: null as boolean | null,
@@ -226,7 +226,7 @@ export class PerusteStore implements IEditoitava {
 
   async fetchJulkaisut() {
     this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
-    if (_.includes(_.map(this.state.julkaisut, 'tila'), 'KESKEN')) {
+    if (_.includes(_.map(this.state.julkaisut, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
       await this.fetchViimeisinJulkaisuTila();
       await this.pollTila();
     }
@@ -235,7 +235,7 @@ export class PerusteStore implements IEditoitava {
   async fetchViimeisinJulkaisuTila() {
     this.state.viimeisinJulkaisuTila = (await Julkaisut.viimeisinJulkaisuTila(this.state.perusteId!)).data;
 
-    if (this.state.viimeisinJulkaisuTila !== 'KESKEN') {
+    if (this.state.viimeisinJulkaisuTila !== JulkaisuBaseDtoTilaEnum.KESKEN) {
       clearInterval(this.state.tilaPolling);
       this.state.tilaPolling = null;
       this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
@@ -244,7 +244,7 @@ export class PerusteStore implements IEditoitava {
   }
 
   async pollTila() {
-    if (this.state.viimeisinJulkaisuTila === 'KESKEN') {
+    if (this.state.viimeisinJulkaisuTila === JulkaisuBaseDtoTilaEnum.KESKEN) {
       this.state.tilaPolling = setInterval(() => this.fetchViimeisinJulkaisuTila(), 2500);
     }
   }
@@ -252,8 +252,8 @@ export class PerusteStore implements IEditoitava {
   async palautaJulkaisu(julkaisu: any) {
     const projektiId = this.state.projekti?.id;
     if (projektiId) {
-      const res = await Julkaisut.aktivoiJulkaisu(projektiId, julkaisu.revision);
-      this.state.julkaisut = [...this.state.julkaisut, res.data];
+      const res = (await Julkaisut.aktivoiJulkaisu(projektiId, julkaisu.revision)).data as any;
+      this.state.julkaisut = [...this.state.julkaisut!, res.data];
       await this.updateCurrent();
     }
   }
