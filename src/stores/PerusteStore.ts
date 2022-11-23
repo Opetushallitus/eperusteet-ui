@@ -221,6 +221,9 @@ export class PerusteStore implements IEditoitava {
     if (projektiId) {
       await Julkaisut.teeJulkaisu(projektiId, tiedot);
       await this.fetchJulkaisut();
+      if (!_.includes(_.map(this.state.julkaisut, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
+        await this.updateCurrent();
+      }
     }
   }
 
