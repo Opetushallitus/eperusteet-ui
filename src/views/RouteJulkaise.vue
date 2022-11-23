@@ -2,14 +2,22 @@
   <div class="p-4">
      <div class="d-flex justify-content-between">
       <h2>{{ $t('julkaisunakyma') }}</h2>
-
-      <div class="d-flex flex-column">
-        <EpButton v-if="$isAdmin() && valmiiksiMahdollinen" @click="asetaValmiiksi">
-          {{$t('aseta-peruste-valmiiksi')}}
-        </EpButton>
-        <EpButton v-if="$isAdmin() && !valmiiksiMahdollinen" @click="avaaPeruste">
-          {{$t('avaa-peruste')}}
-        </EpButton>
+      <div class="d-flex flex-column" v-if="$isAdmin()">
+        <EpSpinner v-if="hallintaLoading" />
+        <b-dropdown v-else class="asetukset" size="lg" variant="link" dropleft toggle-class="text-decoration-none" no-caret>
+          <template v-slot:button-content>
+            {{$t('hallinta')}} <fas icon="ratas" class="hallinta" />
+          </template>
+          <EpButton variant="link" :disabled="!valmiiksiMahdollinen" @click="asetaValmiiksi">
+            {{$t('aseta-peruste-valmiiksi')}}
+          </EpButton>
+          <EpButton variant="link" :disabled="valmiiksiMahdollinen" @click="avaaPeruste">
+            {{$t('avaa-peruste')}}
+          </EpButton>
+          <EpButton variant="link" @click="kooditaPeruste">
+            {{$t('koodita-peruste')}}
+          </EpButton>
+        </b-dropdown>
       </div>
     </div>
 
@@ -123,7 +131,7 @@ import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
-import { PerusteDtoTilaEnum, NavigationNodeDto, Status, Perusteprojektit, PerusteprojektiDtoTilaEnum } from '@shared/api/eperusteet';
+import { PerusteDtoTilaEnum, NavigationNodeDto, Status, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
@@ -168,6 +176,8 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   private julkaisu = {
     tiedote: {},
   };
+
+  private hallintaLoading: boolean = false;
 
   get julkaisuMahdollinen() {
     return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.status?.vaihtoOk;
@@ -259,12 +269,16 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
     if (asetaValmiiksi) {
       try {
+        this.hallintaLoading = true;
         await Perusteprojektit.updateProjektiTilaOnly(_.toNumber(this.$route.params.projektiId), 'valmis');
         await this.perusteStore.updateCurrent();
         this.$success(this.$t('tilan-vaihto-valmis-onnistui') as string);
       }
       catch (e) {
         this.$fail(this.$t('tilan-vaihto-valmis-epaonnistui') as string);
+      }
+      finally {
+        this.hallintaLoading = false;
       }
     }
   }
@@ -281,12 +295,42 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
     if (avaa) {
       try {
+        this.hallintaLoading = true;
         await Perusteprojektit.avaaPerusteProjekti(_.toNumber(this.$route.params.projektiId));
         await this.perusteStore.updateCurrent();
         this.$success(this.$t('tilan-vaihto-onnistui') as string);
       }
       catch (e) {
         this.$fail(this.$t('tilan-vaihto-epaonnistui') as string);
+      }
+      finally {
+        this.hallintaLoading = false;
+      }
+    }
+  }
+
+  async kooditaPeruste() {
+    const avaa = await this.$bvModal.msgBoxConfirm(this.$t('peruste-kooditus-varmistus') as any, {
+      title: this.$t('koodita-peruste') as any,
+      okVariant: 'primary',
+      okTitle: this.$t('koodita') as any,
+      cancelVariant: 'link',
+      cancelTitle: this.$t('peruuta') as any,
+      centered: true,
+    });
+
+    if (avaa) {
+      try {
+        this.hallintaLoading = true;
+        await Julkaisut.kooditaPeruste(_.toNumber(this.perusteId));
+        await this.perusteStore.updateCurrent();
+        this.$success(this.$t('kooditus-onnistui') as string);
+      }
+      catch (e) {
+        this.$fail(this.$t('kooditus-epaonnistui') as string);
+      }
+      finally {
+        this.hallintaLoading = false;
       }
     }
   }
