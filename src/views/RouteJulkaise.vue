@@ -17,6 +17,9 @@
           <EpButton variant="link" @click="kooditaPeruste">
             {{$t('koodita-peruste')}}
           </EpButton>
+          <EpButton variant="link" @click="nollaaJulkaisuTila">
+            {{$t('nollaa-julkaisu-tila')}}
+          </EpButton>
         </b-dropdown>
       </div>
     </div>
@@ -328,6 +331,32 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       }
       catch (e) {
         this.$fail(this.$t('kooditus-epaonnistui') as string);
+      }
+      finally {
+        this.hallintaLoading = false;
+      }
+    }
+  }
+
+  async nollaaJulkaisuTila() {
+    const avaa = await this.$bvModal.msgBoxConfirm(this.$t('nollaa-julkaisu-tila-varmistus') as any, {
+      title: this.$t('nollaa-julkaisu-tila') as any,
+      okVariant: 'primary',
+      okTitle: this.$t('ok') as any,
+      cancelVariant: 'link',
+      cancelTitle: this.$t('peruuta') as any,
+      centered: true,
+    });
+
+    if (avaa) {
+      try {
+        this.hallintaLoading = true;
+        await Julkaisut.nollaaJulkaisuTila(_.toNumber(this.perusteId));
+        await this.perusteStore.fetchJulkaisut();
+        this.$success(this.$t('nollaus-onnistui') as string);
+      }
+      catch (e) {
+        this.$fail(this.$t('nollaus-epaonnistui') as string);
       }
       finally {
         this.hallintaLoading = false;
