@@ -235,6 +235,7 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
     this.arviointiStore.fetchGeneeriset();
     await this.perusteStore.blockUntilInitialized();
     const store = new OsaalueStore(
+      Number(this.perusteId),
       Number(this.tutkinnonOsaId),
       this.osaalueId,
       this.$router);
