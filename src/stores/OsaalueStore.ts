@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { TutkinnonOsaViiteDto, OsaAlueet } from '@shared/api/eperusteet';
-import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { TutkinnonOsaViiteDto, OsaAlueet, TutkinnonRakenne } from '@shared/api/eperusteet';
+import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
 import { required } from 'vuelidate/lib/validators';
@@ -16,6 +16,7 @@ interface OsaalueStoreConfig {
 
 export class OsaalueStore implements IEditoitava {
   constructor(
+    private readonly perusteId: number,
     private tovId: number,
     private osaalueId: number | string,
     private router: VueRouter,
@@ -27,7 +28,7 @@ export class OsaalueStore implements IEditoitava {
     OsaalueStore.config = config;
   }
 
-  public async load() {
+  public async load(supportDataProvider) {
     if (this.osaalueId === 'uusi') {
       return {
         piilotaValinnaiset: false,
@@ -42,6 +43,9 @@ export class OsaalueStore implements IEditoitava {
       };
     }
     else {
+      const tutkinnonOsaViite = (await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, OsaalueStore.config?.perusteStore.perusteSuoritustapa.value!, this.tovId)).data;
+      supportDataProvider(tutkinnonOsaViite);
+
       return (await OsaAlueet.getOsaAlueV2(this.tovId, Number(this.osaalueId))).data;
     }
   }
@@ -113,4 +117,12 @@ export class OsaalueStore implements IEditoitava {
       },
     };
   });
+
+  public features(data: any, supportData: any) {
+    return computed(() => {
+      return {
+        editable: supportData?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId,
+      } as EditoitavaFeatures;
+    });
+  }
 }

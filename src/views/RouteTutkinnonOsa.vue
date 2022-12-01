@@ -164,7 +164,7 @@
                 </template>
               </EpBalloonList>
             </div>
-            <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" icon="plus" v-if="!isEditing">
+            <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" icon="plus" v-if="!isEditing && tutkinnonOsaEditable">
               {{ $t('lisaa-osa-alue') }}
             </ep-button>
           </ep-collapse>
@@ -249,6 +249,10 @@ export default class RouteTutkinnonosa extends Vue {
       };
     },
   });
+
+  get tutkinnonOsaEditable() {
+    return this.store?.features.value?.editable;
+  }
 
   get tutkinnonosaKoodistoKaytossaField() {
     return [{
