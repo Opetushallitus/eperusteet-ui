@@ -17,7 +17,7 @@
         <EpSpinner v-if="!data" />
         <div v-else>
           <b-row>
-            <b-col md="6">
+            <b-col md="5">
               <b-form-group :label="$t('osaalue-nimi') + (isEditing ? ' *' : '')">
                 <ep-input v-model="data.nimi"
                           :is-editing="isEditing"
@@ -25,13 +25,32 @@
               </b-form-group>
             </b-col>
 
-            <b-col md="6">
+            <b-col md="4">
               <b-form-group :label="$t('koodi') + (isEditing ? ' *' : '')">
                 <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing">
                   <template #default="{ open }">
                     <b-input-group>
                       <b-form-input
                         :value="data.koodi ? ($kaanna(data.koodi.nimi) + ' (' + data.koodi.arvo + ')') : ''"
+                        disabled></b-form-input>
+                      <b-input-group-append>
+                        <b-button @click="open" icon="plus" variant="primary">
+                          {{ $t('hae-koodistosta') }}
+                        </b-button>
+                      </b-input-group-append>
+                    </b-input-group>
+                  </template>
+                </ep-koodisto-select>
+              </b-form-group>
+            </b-col>
+
+            <b-col md="3">
+              <b-form-group :label="$t('osa-alue-kieli')">
+                <ep-koodisto-select :store="kielikoodisto" v-model="data.kielikoodi" :is-editing="isEditing">
+                  <template #default="{ open }">
+                    <b-input-group>
+                      <b-form-input
+                        :value="data.kielikoodi ? ($kaanna(data.kielikoodi.nimi) + ' (' + data.kielikoodi.arvo + ')') : ''"
                         disabled></b-form-input>
                       <b-input-group-append>
                         <b-button @click="open" icon="plus" variant="primary">
@@ -81,22 +100,6 @@
                                 :is-editing="isEditing" />
         </ep-collapse>
 
-        <ep-collapse tyyppi="kieli" :border-bottom="false" :border-top="true">
-          <h3 slot="header">{{ $t('osa-alue-kieli') }} </h3>
-          <EpSelect
-            v-if="isEditing || data.kieli"
-            class="kieli-select"
-            :is-editing="isEditing"
-            :items="kielet"
-            v-model="data.kieli"
-            help="osa-alue-kieli-valinta-ohjeteksti">
-            <template #default="{ item }">
-              <span>{{$t(item)}}</span>
-            </template>
-          </EpSelect>
-          <span v-if="!isEditing && !data.kieli">{{$t('kielta-ei-valittu')}}</span>
-        </ep-collapse>
-
       </template>
       </EpEditointi>
     </div>
@@ -129,6 +132,7 @@ import { findDeep } from 'deepdash-es/standalone';
 
 import _ from 'lodash';
 import { UiKielet } from '@shared/stores/kieli';
+import { Koodistot } from '@shared/utils/koodi';
 
 @Component({
   components: {
@@ -217,7 +221,18 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
 
   private readonly koodisto = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('ammatillisenoppiaineet', query, {
+      return (await Koodisto.kaikkiSivutettuna(Koodistot.AMMATILLISENOPPIAINEET, query, {
+        params: {
+          sivu,
+          sivukoko: 10,
+        },
+      })).data as any;
+    },
+  });
+
+  private readonly kielikoodisto = new KoodistoSelectStore({
+    async query(query: string, sivu = 0) {
+      return (await Koodisto.kaikkiSivutettuna(Koodistot.KIELIKOODISTO_OPETUSHALLINTO, query, {
         params: {
           sivu,
           sivukoko: 10,
