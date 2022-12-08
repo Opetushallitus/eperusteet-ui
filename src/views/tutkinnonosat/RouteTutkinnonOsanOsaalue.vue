@@ -232,7 +232,7 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
 
   private readonly kielikoodisto = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna(Koodistot.KIELIKOODISTO_OPETUSHALLINTO, query, {
+      return (await Koodisto.kaikkiSivutettuna(Koodistot.KIELIVALIKOIMA, query, {
         params: {
           sivu,
           sivukoko: 10,
