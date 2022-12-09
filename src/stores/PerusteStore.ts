@@ -258,6 +258,7 @@ export class PerusteStore implements IEditoitava {
       const res = (await Julkaisut.aktivoiJulkaisu(projektiId, julkaisu.revision)).data as any;
       this.state.julkaisut = [...this.state.julkaisut!, res.data];
       await this.updateCurrent();
+      await this.fetchJulkaisut();
     }
   }
 
