@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { computed } from '@vue/composition-api';
-import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Perusteenosat } from '@shared/api/eperusteet';
+import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Perusteenosat, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
@@ -200,7 +200,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   public features(data: any) {
     return computed(() => {
       return {
-        editable: data?.tutkinnonOsa?.tila !== 'valmis'
+        editable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS)
           && ((!data?.tutkinnonOsa?.alkuperainenPeruste && _.size(this.projektitJoissaKaytossa) <= 1)
           || data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
         removable: true,
