@@ -114,6 +114,11 @@
       </div>
 
       <EpJulkaisuHistoria :julkaisut="julkaisut" :palauta="palautaJulkaisu">
+        <template slot="katsele" slot-scope="{ julkaisu }">
+          <ep-external-link :url="opintopolkuKatseluUrl(julkaisu)">
+            {{$t('katsele-perustetta')}}
+          </ep-external-link>
+        </template>
         <div slot="empty">{{ $t('perusteella-ei-julkaisuja') }}</div>
       </EpJulkaisuHistoria>
     </template>
@@ -143,10 +148,13 @@ import EpValidation from '@shared/mixins/EpValidation';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpJulkaisuHistoria from '@shared/components/EpJulkaisuHistoria/EpJulkaisuHistoria.vue';
 import { Route } from 'vue-router';
 import EpJulkaisuButton from '@shared/components/EpJulkaisuButton/EpJulkaisuButton.vue';
+import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
+import { buildKatseluUrl } from '@shared/utils/esikatselu';
+import { koulutustyyppiTheme } from '@shared/utils/perusteet';
+import { Kielet } from '@shared/stores/kieli';
 
 @Component({
   components: {
@@ -167,6 +175,7 @@ import EpJulkaisuButton from '@shared/components/EpJulkaisuButton/EpJulkaisuButt
     PerustetyoryhmaSelect,
     EpJulkaisuHistoria,
     EpJulkaisuButton,
+    EpExternalLink,
   },
 })
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
@@ -362,6 +371,15 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
         this.hallintaLoading = false;
       }
     }
+  }
+
+  opintopolkuKatseluUrl(julkaisu) {
+    let revision = julkaisu.revision;
+    if (revision === _.max(_.map(this.julkaisut, 'revision'))) {
+      revision = null;
+    }
+
+    return buildKatseluUrl(Kielet.getSisaltoKieli.value, `/${koulutustyyppiTheme(this.perusteStore.peruste.value!.koulutustyyppi!)}/${julkaisu.peruste.id}`, revision);
   }
 }
 
