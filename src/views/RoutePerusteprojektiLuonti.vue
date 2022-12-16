@@ -75,7 +75,7 @@
             <ep-input v-model="data.nimi" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')" :validation="$v.data.nimi"/>
           </b-form-group>
 
-          <b-form-group :label="$t('projektin-diaarinumero') + '*'" required>
+          <b-form-group :label="$t('projektin-diaarinumero')">
             <ep-input v-model="data.diaarinumero" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-diaarinumero')" :validation="$v.data.diaarinumero"/>
           </b-form-group>
 
@@ -515,7 +515,6 @@ export default class RoutePerusteprojektiLuonti extends Vue {
     if (this.currentStep && this.currentStep.key === 'tiedot') {
       return {
         nimi: notNull(),
-        diaarinumero: notNull(),
         koulutustyyppi: notNull(),
       };
     }
