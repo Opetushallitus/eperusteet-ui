@@ -15,10 +15,10 @@
           <ep-error-wrapper>
             <b-form-group :label="$t('tyyppi')">
               <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="normaali">
-                {{ $t('tutkintokohtainen') }}
+                {{ $t('ammatillinen-tutkinnon-osa') }}
               </b-form-radio>
               <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="reformi_tutke2">
-                {{ $t('yhteinen') }}
+                {{ $t('yhteinen-tutkinnon-osa') }}
               </b-form-radio>
             </b-form-group>
           </ep-error-wrapper>
