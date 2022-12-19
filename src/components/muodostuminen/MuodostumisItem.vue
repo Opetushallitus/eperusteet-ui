@@ -163,7 +163,7 @@ export default class MuodostumisItem extends Vue {
   osanLaajuusRecursive(osa) {
     return _(osa.osat)
       .map(osa => {
-        return this.osanLaajuusRecursive(osa) + osa?.muodostumisSaanto?.laajuus?.maksimi
+        return this.osanLaajuusRecursive(osa) + _.max([osa?.muodostumisSaanto?.laajuus?.minimi, osa?.muodostumisSaanto?.laajuus?.maksimi])
             || (osa._tutkinnonOsaViite && this.tutkinnonOsatMap[osa._tutkinnonOsaViite] && this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
             || 0;
       })
@@ -198,10 +198,14 @@ export default class MuodostumisItem extends Vue {
     }
   }
 
+  get isPaikallinen() {
+    return this.value?.rooli === 'määrittelemätön';
+  }
+
   get validity() {
     if (this.isRyhma) {
       return {
-        isValid: this.laskettu >= this.laajuusValidointi,
+        isValid: this.isPaikallinen || this.laskettu >= this.laajuusValidointi,
       };
     }
     else {
