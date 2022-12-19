@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ep-spinner v-if="!store || !peruste" />
+    <ep-spinner v-if="(!store || !peruste || !tutkinnonOsatRaw)" />
     <EpEditointi v-else :store="store" :allowSave="tarkistaTallennusLeikelauta" :allowCancel="tarkistaPeruutusLeikelauta">
       <template #header="{ data }">
         <h2>{{ $t('tutkinnon-muodostuminen') }}</h2>
