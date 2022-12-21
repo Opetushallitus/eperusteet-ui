@@ -47,11 +47,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   get geneerinenId() {
-    if (this.geneeriset) {
-      let geneerinen = _.find(this.geneeriset, geneerinen => geneerinen.oletusvalinta);
-      return geneerinen ? Number((geneerinen as any).id) : null;
-    }
-    return null;
+    return _.toNumber(_.get(_.find(this.geneeriset, 'oletusvalinta'), 'id'));
   }
 
   public async load() {
