@@ -289,22 +289,6 @@ export default class RouteTutkinnonosa extends Vue {
     }
   }
 
-  @Watch('geneeriset')
-  onGeneerisetChange() {
-    if (this.isNew && this.store && this.store.data.value && this.store.data.value.tutkinnonOsa) {
-      let geneerinen = _.find(this.geneeriset, geneerinen => geneerinen.oletusvalinta);
-      if (geneerinen) {
-        this.store?.setData({
-          ...this.store?.data.value,
-          tutkinnonOsa: {
-            ...this.store?.data.value.tutkinnonOsa,
-            _geneerinenArviointiasteikko: Number((geneerinen as any).id),
-          },
-        });
-      }
-    }
-  }
-
   get tutkinnonOsaId() {
     return this.$route.params.tutkinnonOsaId;
   }
@@ -372,14 +356,14 @@ export default class RouteTutkinnonosa extends Vue {
     if (!id || id === _.toString(oldId)) {
       return;
     }
-    this.arviointiStore.fetchArviointiasteikot();
-    this.arviointiStore.fetchGeneeriset();
+    await this.arviointiStore.fetchArviointiasteikot();
+    await this.arviointiStore.fetchGeneeriset();
     await this.fetch();
   }
 
   async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(this.perusteId!, Number(this.tutkinnonOsaId), this, this.versionumero);
+    const store = new TutkinnonOsaEditStore(this.perusteId!, Number(this.tutkinnonOsaId), this, this.versionumero, this.isNew ? this.geneeriset : undefined);
     this.store = new EditointiStore(store);
   }
 

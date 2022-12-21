@@ -36,6 +36,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     private readonly tutkinnonOsaViiteId?: number,
     private readonly el?: any,
     public versionumero?: number,
+    private geneeriset?: any,
   ) {
     if (!TutkinnonOsaEditStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -43,6 +44,14 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     if (!TutkinnonOsaEditStore.config?.router) {
       throw new Error('VueRouter missing');
     }
+  }
+
+  get geneerinenId() {
+    if (this.geneeriset) {
+      let geneerinen = _.find(this.geneeriset, geneerinen => geneerinen.oletusvalinta);
+      return geneerinen ? Number((geneerinen as any).id) : null;
+    }
+    return null;
   }
 
   public async load() {
@@ -63,6 +72,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
             kohdealueet: [],
           },
           vapaatTekstit: [],
+          _geneerinenArviointiasteikko: this.geneerinenId,
         },
       };
     }
