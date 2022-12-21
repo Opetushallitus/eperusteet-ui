@@ -356,14 +356,14 @@ export default class RouteTutkinnonosa extends Vue {
     if (!id || id === _.toString(oldId)) {
       return;
     }
-    this.arviointiStore.fetchArviointiasteikot();
-    this.arviointiStore.fetchGeneeriset();
+    await this.arviointiStore.fetchArviointiasteikot();
+    await this.arviointiStore.fetchGeneeriset();
     await this.fetch();
   }
 
   async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(this.perusteId!, Number(this.tutkinnonOsaId), this, this.versionumero);
+    const store = new TutkinnonOsaEditStore(this.perusteId!, Number(this.tutkinnonOsaId), this, this.versionumero, this.isNew ? this.geneeriset : undefined);
     this.store = new EditointiStore(store);
   }
 
