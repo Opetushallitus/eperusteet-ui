@@ -20,6 +20,11 @@
         <div class="kohde-otsikko">{{ $t('arvioinnin-kohde') }}</div>
         <ep-input v-model="inner.kohde" :is-editing="isEditing" />
       </div>
+      <div class="mt-4" v-if="inner.julkaistu">
+        <div class="kohde-otsikko">{{ $t('oletusvalinta') }}</div>
+        <b-form-checkbox v-model="inner.oletusvalinta" v-if="isEditing" switch></b-form-checkbox>
+        <div v-else>{{ $t('' + inner.oletusvalinta) }}</div>
+      </div>
       <div class="mt-4">
         <b-table
             striped
@@ -72,8 +77,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpBulletEditor from '@/components/EpBulletEditor/EpBulletEditor.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
-import { BvTableFieldArray } from 'bootstrap-vue';
+import { GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import * as _ from 'lodash';
 import { KayttajaStore } from '@/stores/kayttaja';
@@ -157,11 +161,6 @@ export default class GeneerinenArviointi extends Vue {
     this.isEditing = true;
   }
 
-  onCancel() {
-    this.inner = this.value;
-    this.isEditing = false;
-  }
-
   async onSave() {
     try {
       this.inner!.osaamistasonKriteerit = _.map(this.inner!.osaamistasonKriteerit, osaamiskriteeri => {
@@ -175,6 +174,7 @@ export default class GeneerinenArviointi extends Vue {
       await this.arviointiStore.save(this.inner!);
     }
     finally {
+      await this.arviointiStore.fetchGeneeriset();
       this.isEditing = false;
       this.isLoading = false;
     }
@@ -205,7 +205,6 @@ export default class GeneerinenArviointi extends Vue {
   }
 
   async onRemove() {
-    const poistosuccess = this.$t('arvioinnin-poisto-onnistui') as any;
     const poisto = await this.$bvModal.msgBoxConfirm(
       this.$t('poistetaanko-geneerinen-arviointi-kuvaus') as any, {
         title: this.$t('vahvista-poisto') as any,
