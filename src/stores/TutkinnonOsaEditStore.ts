@@ -145,7 +145,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
 
   public async lock() {
     try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.tutkinnonOsaId!);
+      const res = await Perusteenosat.checkLockByTutkinnonOsaViite(this.tutkinnonOsaViiteId!);
       return res.data;
     }
     catch (err) {
@@ -155,7 +155,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
 
   public async acquire() {
     if (this.tutkinnonOsaId) {
-      const res = await Perusteenosat.lockPerusteenOsa(this.tutkinnonOsaId);
+      const res = await Perusteenosat.lockByTutkinnonOsaViite(this.tutkinnonOsaViiteId!);
       return res.data;
     }
     else {
@@ -165,7 +165,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
 
   public async release() {
     if (this.tutkinnonOsaId) {
-      await Perusteenosat.unlockPerusteenOsa(this.tutkinnonOsaId);
+      await Perusteenosat.unlockByTutkinnonOsaViite(this.tutkinnonOsaViiteId!);
     }
   }
 
