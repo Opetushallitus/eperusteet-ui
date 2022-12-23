@@ -192,7 +192,7 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto, Perusteet, PerusteKevytDto } from '@shared/api/eperusteet';
+import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto, Perusteet, PerusteKevytDto, PerusteprojektiQuery } from '@shared/api/eperusteet';
 import { EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import { Page } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
@@ -257,9 +257,9 @@ export default class EpPerusteprojektiListaus extends Vue {
     sivu: 0,
     sivukoko: 10,
     koulutustyyppi: null as unknown,
-    voimassaolo: true,
-    siirtyma: true,
-    tuleva: true,
+    voimassaolo: false,
+    siirtyma: false,
+    tuleva: false,
     poistunut: false,
     koulutusvienti: true,
     tila: this.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU'],
@@ -267,7 +267,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     jarjestysOrder: false,
     jarjestysTapa: 'nimi',
     perusteet: [],
-  } as PerusteQuery;
+  } as PerusteprojektiQuery;
 
   private perusteet: PerusteKevytDto[] = [];
 
@@ -319,23 +319,21 @@ export default class EpPerusteprojektiListaus extends Vue {
 
     switch (tila) {
     case 'tuleva':
-      this.query = { ...defaults, tuleva: true };
+      this.query = { ...this.query, ...defaults, tuleva: true };
       break;
     case 'voimassaolo':
-      this.query = { ...defaults, voimassaolo: true };
+      this.query = { ...this.query, ...defaults, voimassaolo: true };
       break;
     case 'siirtyma':
-      this.query = { ...defaults, siirtyma: true };
+      this.query = { ...this.query, ...defaults, siirtyma: true };
       break;
     case 'poistunut':
-      this.query = { ...defaults, poistunut: true };
+      this.query = { ...this.query, ...defaults, poistunut: true };
       break;
     default:
       this.query = {
+        ...this.query,
         ...defaults,
-        voimassaolo: true,
-        tuleva: true,
-        siirtyma: true,
       };
       break;
     }
