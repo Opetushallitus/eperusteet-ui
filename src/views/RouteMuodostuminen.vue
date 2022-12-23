@@ -171,7 +171,12 @@
                             </template>
                           </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
-                            <ep-button @click="poistaOsaamisala(index)" variant="link" icon="roskalaatikko"  v-if="isEditing"></ep-button>
+                            <ep-button v-if="isEditing"
+                                       @click="poistaOsaamisala(index)"
+                                       variant="link"
+                                       icon="roskalaatikko"
+                                       :disabled="ryhma.osaamisala.rakenteessa">
+                            </ep-button>
                           </div>
                         </div>
                       </draggable>
@@ -220,7 +225,11 @@
                             </template>
                           </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
-                            <ep-button @click="poistaTutkintonimike(index)" variant="link" icon="roskalaatikko" v-if="isEditing"></ep-button>
+                            <ep-button v-if="isEditing"
+                                       @click="poistaTutkintonimike(index)"
+                                       variant="link" icon="roskalaatikko"
+                                       :disabled="ryhma.tutkintonimike.rakenteessa">
+                            </ep-button>
                           </div>
                         </div>
                       </draggable>
@@ -284,7 +293,7 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
-import { Watch, Prop, Component, Vue, Provide, ProvideReactive } from 'vue-property-decorator';
+import { Watch, Prop, Component, ProvideReactive } from 'vue-property-decorator';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
 import draggable from 'vuedraggable';
@@ -292,7 +301,7 @@ import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
-import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, RakenneModuuliType, rakenneNodecolor } from '@/components/muodostuminen/utils';
+import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolor } from '@/components/muodostuminen/utils';
 
 @Component({
   components: {
@@ -592,16 +601,6 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     (this.$refs['root'] as any).toggleDescription(this.naytaKuvaukset);
   }
 
-  toggleRange() {
-    this.uusi.useRange = !this.uusi.useRange;
-    if (this.uusi.useRange) {
-      this.uusi.ryhma.muodostumisSaanto.laajuus.maksimi = 0;
-    }
-    else {
-      delete this.uusi.ryhma.muodostumisSaanto.laajuus.maksimi;
-    }
-  }
-
   addUusi(root) {
     const template = ryhmaTemplate(this.uusi.tyyppi, this);
     if (this.uusi) {
@@ -627,6 +626,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           nimi: tutkintonimike.nimi,
           uri: tutkintonimike.tutkintonimikeUri,
           arvo: tutkintonimike.tutkintonimikeArvo,
+          rakenteessa: _.some(this.rakenteenOsat, osa => osa.tutkintonimike && osa.tutkintonimike.arvo === tutkintonimike.tutkintonimikeArvo),
         },
       };
     });
@@ -684,6 +684,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           nimi: osaamisala.nimi,
           'osaamisalakoodiArvo': osaamisala.arvo,
           'osaamisalakoodiUri': osaamisala.uri,
+          rakenteessa: _.some(this.rakenteenOsat, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiArvo === osaamisala.arvo),
         },
       };
     });
@@ -741,11 +742,12 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       });
   }
 
-  get addModalInvalid() {
-    if (this.uusi.ryhma.nimi) {
-      return _.isEmpty(this.uusi.ryhma.nimi[Kielet.getSisaltoKieli.value]) || this.uusi.tyyppi === null;
-    }
-    return true;
+  recursiveFlattenRakenneOsat(osat) {
+    return _.flatMap(osat, osa => osa.osat ? [osa, ...this.recursiveFlattenRakenneOsat(osa.osat)] : osa);
+  }
+
+  get rakenteenOsat() {
+    return this.recursiveFlattenRakenneOsat(this.store?.data.value.rakenne.osat);
   }
 
   get osaamisalatPaged() {
