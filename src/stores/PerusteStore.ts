@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Ulkopuoliset, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto } from '@shared/api/eperusteet';
+import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isKoulutustyyppiPdfTuettu } from '@shared/utils/perusteet';
@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
+import { Virheet } from '@shared/stores/virheet';
 
 Vue.use(VueCompositionApi);
 
@@ -139,6 +140,7 @@ export class PerusteStore implements IEditoitava {
     }
     catch (err) {
       console.error(err);
+      Virheet.lisaaVirhe({ err: JSON.stringify(err) });
     }
     finally {
       this.state.initializing = false;
