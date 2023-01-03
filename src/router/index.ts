@@ -53,6 +53,8 @@ import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
+import { SovellusVirhe } from '@shared/tyypit';
+import { Virheet } from '@shared/stores/virheet';
 
 Vue.use(VueRouter);
 Vue.use(VueMeta, {
@@ -426,8 +428,18 @@ const router = new VueRouter({
         props,
       },
       ],
-    },
-    ],
+    }, {
+      path: '*',
+      redirect: (to) => {
+        console.log('Unknown route', to);
+        return {
+          name: 'virhe',
+          query: {
+            errorMessage: Kielet.kaannaOlioTaiTeksti('virhe-sivua-ei-loytynyt'),
+          },
+        };
+      },
+    }],
   }],
 });
 
@@ -437,6 +449,22 @@ window.addEventListener('beforeunload', e => {
     // Vanhemmat selainversiot vaativat erillisen varmistustekstin
     e.returnValue = Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti');
   }
+});
+
+Virheet.onError((virhe: SovellusVirhe) => {
+  if (virhe.err) {
+    let error = JSON.parse(virhe.err);
+    router.push({
+      name: 'virhe',
+      query: {
+        errorMessage: '' + error.message + (error.config ? ' from ' + error.config.baseURL + error.config.url : ''),
+      },
+    });
+    return;
+  }
+  router.push({
+    name: 'virhe',
+  });
 });
 
 router.beforeEach(async (to, from, next) => {
