@@ -8,7 +8,6 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
-import { Virheet } from '@shared/stores/virheet';
 
 Vue.use(VueCompositionApi);
 
@@ -140,7 +139,6 @@ export class PerusteStore implements IEditoitava {
     }
     catch (err) {
       console.error(err);
-      Virheet.lisaaVirhe({ err: JSON.stringify(err) });
     }
     finally {
       this.state.initializing = false;
