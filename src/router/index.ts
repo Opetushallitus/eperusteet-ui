@@ -451,22 +451,6 @@ window.addEventListener('beforeunload', e => {
   }
 });
 
-Virheet.onError((virhe: SovellusVirhe) => {
-  if (virhe.err) {
-    let error = JSON.parse(virhe.err);
-    router.push({
-      name: 'virhe',
-      query: {
-        errorMessage: '' + error.message + (error.config ? ' from ' + error.config.baseURL + error.config.url : ''),
-      },
-    });
-    return;
-  }
-  router.push({
-    name: 'virhe',
-  });
-});
-
 router.beforeEach(async (to, from, next) => {
   if (EditointiStore.anyEditing()) {
     const value = await router.app.$bvModal.msgBoxConfirm(
