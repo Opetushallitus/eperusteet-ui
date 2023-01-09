@@ -20,7 +20,11 @@
             </div>
             <div v-if="info.nimet && info.nimet.length > 0"  class="pt-1">
               <div v-for="nimi in info.nimet" :key="nimi._id" class="ml-4">
-                <router-link :to="nimi.route" v-if="nimi.route">{{ $kaanna(nimi) }}</router-link>
+                <router-link :to="nimi.route" v-if="nimi.route">
+                  <span v-if="nimi.navigationNode.label">{{ $kaanna(nimi.navigationNode.label) }}</span>
+                  <span v-else-if="nimi[kieli]">{{ $kaanna(nimi[kieli]) }}</span>
+                  <span v-else>{{ $t('nimeton-'+nimi.navigationNode.type) }}</span>
+                </router-link>
                 <span v-else>{{ $kaanna(nimi) }}</span>
               </div>
             </div>
@@ -42,6 +46,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Status, StatusValidointiStatusTypeEnum } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { navigationNodeDtoToPerusteRoute } from '@shared/utils/NavigationBuilder';
+import { Kielet } from '@shared/stores/kieli';
 
 @Component
 export default class EpVirhelistausTable extends Vue {
@@ -49,6 +54,10 @@ export default class EpVirhelistausTable extends Vue {
   infot!: Status[];
 
   StatusValidointiStatusTypeEnum = StatusValidointiStatusTypeEnum;
+
+  get kieli() {
+    return Kielet.getSisaltoKieli.value;
+  }
 
   get infotRoute() {
     return _.map(this.infot, info => {

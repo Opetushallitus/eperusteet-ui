@@ -29,6 +29,7 @@ const perusteStore = new PerusteStore();
 const perusteetStore = new PerusteetStore({ tyyppi: ['NORMAALI', 'AMOSAA_YHTEINEN'] } as any);
 const perusteprojektiStore = new PerusteprojektiStore();
 const pohjatStore = new PerusteetStore({ tyyppi: ['POHJA'] } as any);
+const digitaalisetOsaamisetStore = new PerusteetStore({ tyyppi: ['DIGITAALINEN_OSAAMINEN'] } as any);
 const ulkopuolisetStore = new UlkopuolisetStore();
 const tutkinnonOsaStore = new TutkinnonOsaStore(perusteStore);
 const muokkaustietoStore = new MuokkaustietoStore();
@@ -54,6 +55,7 @@ export const stores = Object.freeze({
   perusteOppaatStore,
   perusteStore,
   perusteetStore,
+  digitaalisetOsaamisetStore,
   perusteprojektiStore,
   pohjatStore,
   tiedotteetStore,

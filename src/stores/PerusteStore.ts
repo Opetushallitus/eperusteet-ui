@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
+import { fail } from '@shared/utils/notifications';
 
 Vue.use(VueCompositionApi);
 
@@ -45,6 +46,7 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
   public readonly isJulkaistu = computed(() => (_.size(this.julkaisut.value) > 0 || this.peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
   public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
+  public readonly arkistointiReroute = computed(() => this.peruste.value?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {
@@ -96,6 +98,7 @@ export class PerusteStore implements IEditoitava {
         }
         catch (e) {
           this.state.projektiStatus = {};
+          fail('validointi-epaonnistui');
         }
       }
       else {

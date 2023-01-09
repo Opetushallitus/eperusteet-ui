@@ -78,7 +78,7 @@
               </div>
             </b-form-group>
           </b-col>
-          <b-col lg="6">
+          <b-col lg="6" v-if="peruste.koulutustyyppi">
             <b-form-group :label="$t('koulutustyyppi')">
               <ep-koulutustyyppi-select :value="peruste.koulutustyyppi" />
             </b-form-group>

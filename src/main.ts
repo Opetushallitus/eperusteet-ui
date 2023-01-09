@@ -44,6 +44,8 @@ import { getKaannokset } from '@shared/api/eperusteet';
 import { TavoitesisaltoalueStore } from './stores/TavoitesisaltoalueStore';
 import { LaajaalainenOsaaminenStore } from './stores/LaajaalainenOsaaminenStore';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
+import { OsaamiskokonaisuusStore } from './stores/OsaamiskokonaisuusStore';
+import { OsaamiskokonaisuusPaaAlueStore } from './stores/OsaamiskokonaisuusPaaAlueStore';
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);
@@ -139,6 +141,16 @@ Vue.use(KotoOpintoStore, {
 });
 
 Vue.use(KotoLaajaalainenOsaaminenStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(OsaamiskokonaisuusStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+Vue.use(OsaamiskokonaisuusPaaAlueStore, {
   perusteStore: stores.perusteStore,
   router,
 });

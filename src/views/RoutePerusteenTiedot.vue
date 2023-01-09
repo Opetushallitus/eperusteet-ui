@@ -393,6 +393,13 @@ import _ from 'lodash';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
+const perustetyyppiTietoFilters = [
+  {
+    tyyppi: ['digitaalinen_osaaminen'],
+    filters: ['diaarinumero', 'paatospaivamaara', 'voimassaolo', 'siirtymaPaattyy', 'perusteenkieli'],
+  },
+];
+
 const koulutustyyppiTietoFilters = [
   {
     koulutustyypit: ['default'],
@@ -691,7 +698,8 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   }
 
   get koulutustyyppiFilters() {
-    return _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, this.peruste.koulutustyyppi));
+    return _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, this.peruste.koulutustyyppi))
+      || _.find(perustetyyppiTietoFilters, filter => _.includes(filter.tyyppi, this.peruste.tyyppi));
   }
 
   get tietoFilters() {

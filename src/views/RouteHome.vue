@@ -26,6 +26,7 @@
         <TileOppaat :perusteOppaatStore="perusteOppaatStore"/>
         <TileMaaraykset :maarayksetStore="maarayksetStore"/>
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
+        <TileDigitaalinenOsaaminen :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TileVirheellisetPerusteet :virheellisetPerusteetStore="virheellisetPerusteetStore" v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TilePalautteet v-oikeustarkastelu="{oikeus:'hallinta'}"/>
@@ -46,6 +47,7 @@ import TileKoulutuskoodiOngelmat from './tiles/TileKoulutuskoodiOngelmat.vue';
 import TileOppaat from './tiles/TileOppaat.vue';
 import TilePerusteprojektit from './tiles/TilePerusteprojektit.vue';
 import TilePohjat from './tiles/TilePohjat.vue';
+import TileDigitaalinenOsaaminen from './tiles/TileDigitaalinenOsaaminen.vue';
 import TileTiedotteet from './tiles/TileTiedotteet.vue';
 import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
@@ -76,6 +78,7 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
     TilePalautteet,
     EpFeedbackModal,
     TileMaaraykset,
+    TileDigitaalinenOsaaminen,
   },
 })
 export default class Home extends Vue {
@@ -96,6 +99,9 @@ export default class Home extends Vue {
 
   @Prop({ required: true })
   private maarayksetStore!: MaarayksetStore;
+
+  @Prop({ required: true })
+  private digitaalisetOsaamisetStore!: PerusteetStore;
 
   private rajain = '';
 
