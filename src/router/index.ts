@@ -35,7 +35,6 @@ import RouteTilastot from '@/views/RouteTilastot.vue';
 import RouteTutkinnonOsa from '@/views/RouteTutkinnonOsa.vue';
 import RouteTutkinnonOsanOsaalue from '@/views/tutkinnonosat/RouteTutkinnonOsanOsaalue.vue';
 import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
-import RouteVirhe from '@/views/RouteVirhe.vue';
 import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import RouteTavoitesisaltoalue from '@/views/RouteTavoitesisaltoalue.vue';
@@ -44,6 +43,8 @@ import RouteKotoOpinto from '@/views/RouteKotoOpinto.vue';
 import RouteKotoLaajaalainenOsaaminen from '@/views/RouteKotoLaajaalainenOsaaminen.vue';
 import RouteMaaraykset from '@/views/RouteMaaraykset.vue';
 import RoutePoistetutSisallot from '@/views/RoutePoistetutSisallot.vue';
+import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
+import EpErrorPage from '@shared/components/EpErrorPage/EpErrorPage.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -51,10 +52,6 @@ import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 import { getCasKayttajaKieli } from '@shared/api/common';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
-
-import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { SovellusVirhe } from '@shared/tyypit';
-import { Virheet } from '@shared/stores/virheet';
 
 Vue.use(VueRouter);
 Vue.use(VueMeta, {
@@ -94,7 +91,7 @@ const router = new VueRouter({
     }, {
       path: 'virhe',
       name: 'virhe',
-      component: RouteVirhe,
+      component: EpErrorPage,
     }, {
       path: 'oppaat',
       name: 'oppaat',
