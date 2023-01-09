@@ -25,6 +25,8 @@ import RoutePerusteprojekti from '@/views/RoutePerusteprojekti.vue';
 import RoutePerusteprojektiLuonti from '@/views/RoutePerusteprojektiLuonti.vue';
 import RoutePerusteprojektit from '@/views/RoutePerusteprojektit.vue';
 import RoutePohjat from '@/views/RoutePohjat.vue';
+import RouteDigitaalisetOsaamiset from '@/views/RouteDigitaalisetOsaamiset.vue';
+import RouteDigitaalisetOsaamisetLuonti from '@/views/RouteDigitaalisetOsaamisetLuonti.vue';
 import RoutePohjatLuonti from '@/views/RoutePohjatLuonti.vue';
 import RouteProjektiTiedot from '@/views/RouteProjektiTiedot.vue';
 import RouteRoot from '@/views/RouteRoot.vue';
@@ -45,6 +47,8 @@ import RouteMaaraykset from '@/views/RouteMaaraykset.vue';
 import RoutePoistetutSisallot from '@/views/RoutePoistetutSisallot.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpErrorPage from '@shared/components/EpErrorPage/EpErrorPage.vue';
+import RouteOsaamiskokonaisuus from '@/views/RouteOsaamiskokonaisuus.vue';
+import RouteOsaamiskokonaisuusPaaAlue from '@/views/RouteOsaamiskokonaisuusPaaAlue.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -108,6 +112,11 @@ const router = new VueRouter({
       component: RoutePohjat,
       props,
     }, {
+      path: 'digitaalisetosaamiset',
+      name: 'digitaalisetosaamiset',
+      component: RouteDigitaalisetOsaamiset,
+      props,
+    }, {
       path: 'tiedotteet',
       name: 'tiedotteet',
       component: RouteTiedotteet,
@@ -164,6 +173,11 @@ const router = new VueRouter({
       component: RouteOppaatLuonti,
       props,
     }, {
+      path: 'digitaalisetosaamiset/uusi',
+      name: 'digitaalinenOsaaminenLuonti',
+      component: RouteDigitaalisetOsaamisetLuonti,
+      props,
+    }, {
       path: 'perusteprojekti/:projektiId',
       component: RoutePerusteprojekti,
       name: 'perusteprojekti',
@@ -200,7 +214,7 @@ const router = new VueRouter({
             oikeus: () => stores.perusteStore.isJulkaistu.value ? { oikeus: 'hallinta', kohde: 'pohja' } : { oikeus: 'muokkaus' },
             title: 'arkistoi-peruste',
             confirm: 'arkistoi-peruste-vahvistus',
-            reroute: () => stores.perusteStore.isPohja.value ? 'pohjat' : 'perusteprojektit',
+            reroute: () => stores.perusteStore.arkistointiReroute.value,
             tila: 'poistettu',
             callback: async () => stores.perusteStore.updateCurrent(),
           },
@@ -326,6 +340,16 @@ const router = new VueRouter({
         path: 'koto/laajaalainenosaaminen/:kotoLaajaalainenOsaaminenId',
         name: 'koto_laajaalainenosaaminen',
         component: RouteKotoLaajaalainenOsaaminen,
+        props,
+      }, {
+        path: 'osaamiskokonaisuus/:osaamiskokonaisuusId',
+        name: 'osaamiskokonaisuus',
+        component: RouteOsaamiskokonaisuus,
+        props,
+      }, {
+        path: 'osaamiskokonaisuuspaaalue/:osaamiskokonaisuusPaaAlueId',
+        name: 'osaamiskokonaisuus_paa_alue',
+        component: RouteOsaamiskokonaisuusPaaAlue,
         props,
       },
       ],

@@ -3,6 +3,7 @@
     <div v-if="koulutustyyppi" class="p-2 pl-4 flex-shrink-1">
       <EpColorIndicator size="16" :kind="koulutustyyppi" />
     </div>
+    <div v-else-if=" tileImage" :style="style" class="w-100 h-100"></div>
     <div v-else></div>
     <div class="flex-grow-1 mainslot h-100">
       <slot />
@@ -35,8 +36,18 @@ export default class ProjektiCard extends Vue {
   @Prop()
   link!: any;
 
+  @Prop({ required: false })
+  tileImage!: any;
+
   @Prop({ required: false, default: () => [] })
   eiTuetutKoulutustyypit!: string[];
+
+  get style() {
+    return {
+      'background-repeat': 'no-repeat',
+      ...this.tileImage,
+    };
+  }
 
   get classes() {
     if (this.fullBackground) {

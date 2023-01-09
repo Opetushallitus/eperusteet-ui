@@ -7,51 +7,56 @@
         </slot>
 
         <EpSpinner v-if="!ownProjects" />
-        <div class="d-flex flex-wrap pt-4" v-else>
-          <div class="card-wrapper" v-oikeustarkastelu="luontioikeus">
-            <ProjektiCard :full-background="true" :link="newRoute">
-              <div class="d-flex align-items-center flex-column h-100">
-                <div class="h-50 text-center d-flex align-items-center pt-4">
-                  <div class="ikoni">
-                    <fas icon="plus" />
+        <div class="mt-5" v-else>
+          <slot name="unpublished-header"></slot>
+          <div class="d-flex flex-wrap pt-4">
+            <div class="card-wrapper" v-oikeustarkastelu="luontioikeus">
+              <ProjektiCard :full-background="true" :link="newRoute">
+                <div class="d-flex align-items-center flex-column h-100">
+                  <div class="h-50 text-center d-flex align-items-center pt-4">
+                    <div class="ikoni">
+                      <fas icon="plus" />
+                    </div>
+                  </div>
+                  <div class="h-50 text-center d-flex align-items-center pb-5">
+                    <div class="teksti">
+                      {{ $t('luo-uusi') }}
+                    </div>
                   </div>
                 </div>
-                <div class="h-50 text-center d-flex align-items-center pb-5">
-                  <div class="teksti">
-                    {{ $t('luo-uusi') }}
-                  </div>
+              </ProjektiCard>
+            </div>
+            <EpSpinner v-if="!ownProjects" class="m-5"/>
+            <div v-else class="card-wrapper" v-for="project in ownProjects" :key="project.id">
+              <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
+                            :koulutustyyppi="project.peruste.koulutustyyppi"
+                            :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"
+                            :tileImage="project.tileImage">
+                <template slot="lower" class="small-text">
+                  {{ $t('tila-' + project.tila) }}
+                </template>
+                <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
+                  {{ project.nimi }}
                 </div>
-              </div>
-            </ProjektiCard>
-          </div>
-          <EpSpinner v-if="!ownProjects" class="m-5"/>
-          <div v-else class="card-wrapper" v-for="project in ownProjects" :key="project.id">
-            <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                          :koulutustyyppi="project.peruste.koulutustyyppi"
-                          :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
-              <template slot="lower" class="small-text">
-                {{ $t('tila-' + project.tila) }}
-              </template>
-              <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
-                {{ project.nimi }}
-              </div>
-            </ProjektiCard>
+              </ProjektiCard>
+            </div>
           </div>
         </div>
 
-        <template v-if="ownProjects && !$hasOphCrud() && ownProjects.length === 0 && ownPublishedProjects && ownPublishedProjects.length === 0">
+        <template v-if="ownProjects && naytaVainKortit && ownProjects.length === 0 && ownPublishedProjects && ownPublishedProjects.length === 0">
           <slot name="cardsEmpty">
             <h3>{{$t('ei-perusteprojekteja')}}</h3>
           </slot>
         </template>
 
-        <div class="mt-2" v-if="ownPublishedProjects && !$hasOphCrud() && ownPublishedProjects.length > 0">
+        <div class="mt-4" v-if="ownPublishedProjects && naytaVainKortit && ownPublishedProjects.length > 0">
           <slot name="published-header"><h2>{{$t('julkaistut-perusteet')}}</h2></slot>
           <div class="d-flex flex-wrap pt-4">
             <div class="card-wrapper" v-for="project in ownPublishedProjects" :key="project.id">
               <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
                             :koulutustyyppi="project.peruste.koulutustyyppi"
-                            :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
+                            :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"
+                            :tileImage="project.tileImage">
                 <template slot="lower" class="small-text">
                   {{ $t('tila-' + project.tila) }}
                 </template>
@@ -66,7 +71,7 @@
       </div>
     </div>
 
-    <div v-oikeustarkastelu="{oikeus:'hallinta'}">
+    <div v-oikeustarkastelu="{oikeus:'hallinta'}" v-if="!naytaVainKortit">
       <div class="lower" :class="{'mt-0': !showCards}">
         <slot name="lowerheader">
           <h1 class="bg-danger">slot: lowerheader</h1>
@@ -201,6 +206,7 @@ import ProjektiCard from './ProjektiCard.vue';
 import * as _ from 'lodash';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
+import { perusteTile } from '@shared/utils/bannerIcons';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -233,6 +239,9 @@ export default class EpPerusteprojektiListaus extends Vue {
 
   @Prop({ required: false, default: false })
   isPohja!: boolean;
+
+  @Prop({ required: false, default: false })
+  vainKortit!: boolean;
 
   @Prop({ required: false })
   fieldKeys!: string[];
@@ -284,7 +293,7 @@ export default class EpPerusteprojektiListaus extends Vue {
   async onQueryChange(query: PerusteQuery) {
     this.isLoading = true;
     try {
-      if (this.$hasOphCrud()) {
+      if (!this.naytaVainKortit) {
         await this.provider.updateQuery({
           ...query,
         });
@@ -399,14 +408,21 @@ export default class EpPerusteprojektiListaus extends Vue {
 
   get ownProjects() {
     if (this.provider.ownProjects.value) {
-      return _.filter(this.provider.ownProjects.value, project => project.tila === 'laadinta');
+      return _.map(_.filter(this.provider.ownProjects.value, project => project.tila === 'laadinta'), projekti => this.setTileImage(projekti));
     }
   }
 
   get ownPublishedProjects() {
     if (this.provider.ownProjects.value) {
-      return _.filter(this.provider.ownProjects.value, project => project.tila === 'julkaistu');
+      return _.map(_.filter(this.provider.ownProjects.value, project => project.tila === 'julkaistu'), projekti => this.setTileImage(projekti));
     }
+  }
+
+  setTileImage(projekti) {
+    return {
+      ...projekti,
+      tileImage: perusteTile(projekti.peruste),
+    };
   }
 
   get items() {
@@ -484,6 +500,10 @@ export default class EpPerusteprojektiListaus extends Vue {
     );
     await this.onQueryChange(this.query);
     await this.provider.updateOwnProjects();
+  }
+
+  get naytaVainKortit() {
+    return this.vainKortit || !this.$hasOphCrud();
   }
 }
 </script>

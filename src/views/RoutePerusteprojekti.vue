@@ -180,6 +180,24 @@
                 </div>
               </template>
 
+              <template v-slot:osaamiskokonaisuus="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'osaamiskokonaisuus', params: { osaamiskokonaisuusId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-osaamiskokonaisuus') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:osaamiskokonaisuus_paa_alue="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'osaamiskokonaisuus_paa_alue', params: { osaamiskokonaisuusPaaAlueId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-osaamiskokonaisuus_paa_alue') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:kvliite="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'kvliite' }">

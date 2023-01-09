@@ -164,6 +164,20 @@ export function nodeToRoute(node: NavigationNodeDto): Location | null {
         kotoLaajaalainenOsaaminenId: _.toString(node.id),
       },
     };
+  case 'osaamiskokonaisuus':
+    return {
+      name: 'osaamiskokonaisuus',
+      params: {
+        osaamiskokonaisuusId: _.toString(node.id),
+      },
+    };
+  case 'osaamiskokonaisuus_paa_alue':
+    return {
+      name: 'osaamiskokonaisuus_paa_alue',
+      params: {
+        osaamiskokonaisuusPaaAlueId: _.toString(node.id),
+      },
+    };
 
   case 'kvliite':
     return {

@@ -110,9 +110,10 @@ import { KotoKielitaitotasoStore } from '@/stores/Koto/KotoKielitaitotasoStore';
 import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
-import { NavigationNodeDtoTypeEnum } from '@shared/api/eperusteet';
+import { NavigationNodeDtoTypeEnum, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { chapterStringSort } from '@shared/utils/NavigationBuilder';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
+import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 
 @Component({
   components: {
@@ -196,131 +197,106 @@ export default class EpSisallonLisays extends Vue {
   }
 
   async tallennaUusiOpintokokonaisuus(otsikko, tekstikappaleIsa) {
-    try {
-      const tkstore = new OpintokokonaisuusStore(this.peruste!.id!, 0);
-      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'opintokokonaisuus',
-        params: {
-          opintokokonaisuusId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
+    const tkstore = new OpintokokonaisuusStore(this.peruste!.id!, 0);
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'opintokokonaisuus',
+      params: {
+        opintokokonaisuusId: '' + tallennettu!.id,
+      },
+    });
   }
 
   async tallennaUusiTavoitesisaltoalue(otsikko, tekstikappaleIsa) {
-    try {
-      const tkstore = new TavoitesisaltoalueStore(this.peruste!.id!, 0);
-      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'tavoitesisaltoalue',
-        params: {
-          tavoitesisaltoalueId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
+    const tkstore = new TavoitesisaltoalueStore(this.peruste!.id!, 0);
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'tavoitesisaltoalue',
+      params: {
+        tavoitesisaltoalueId: '' + tallennettu!.id,
+      },
+    });
   }
 
   async tallennaUusiKoulutuksenOsa(otsikko, tekstikappaleIsa) {
-    try {
-      const tkstore = new KoulutuksenOsaStore(this.peruste!.id!, 0);
-      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'koulutuksenosa',
-        params: {
-          koulutuksenosaId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
+    const tkstore = new KoulutuksenOsaStore(this.peruste!.id!, 0);
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'koulutuksenosa',
+      params: {
+        koulutuksenosaId: '' + tallennettu!.id,
+      },
+    });
   }
 
   async tallennaUusiLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
-    try {
-      const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
-      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'laajaalainenosaaminen',
-        params: {
-          laajaalainenosaaminenId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
+    const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'laajaalainenosaaminen',
+      params: {
+        laajaalainenosaaminenId: '' + tallennettu!.id,
+      },
+    });
   }
 
   async tallennaKotoKielitaito(otsikko, tekstikappaleIsa) {
-    try {
-      const tkstore = new KotoKielitaitotasoStore();
-      const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'koto_kielitaitotaso',
-        params: {
-          kotokielitaitotasoId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      console.log(e);
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
+    const tkstore = new KotoKielitaitotasoStore();
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'koto_kielitaitotaso',
+      params: {
+        kotokielitaitotasoId: '' + tallennettu!.id,
+      },
+    });
   }
 
   async tallennaKotoOpinto(otsikko, tekstikappaleIsa) {
-    try {
-      const tallennettu = await new KotoOpintoStore().create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'koto_opinto',
-        params: {
-          kotoOpintoId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
+    const tallennettu = await new KotoOpintoStore().create(otsikko, tekstikappaleIsa);
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'koto_opinto',
+      params: {
+        kotoOpintoId: '' + tallennettu!.id,
+      },
+    });
   }
 
   async tallennaUusiKotoLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
-    try {
-      const kotoStore = new KotoLaajaalainenOsaaminenStore(this.peruste!.id!, 0);
-      const tallennettu = await kotoStore.create(otsikko, tekstikappaleIsa);
-      await this.perusteStore.updateNavigation();
-      await this.$router.push({
-        name: 'koto_laajaalainenosaaminen',
-        params: {
-          kotoLaajaalainenOsaaminenId: '' + tallennettu!.id,
-        },
-      });
-    }
-    catch (e) {
-      console.log(e);
-      this.$fail(this.$t('sisallon-lisaaminen-epaonnistui') as string);
-    }
+    const kotoStore = new KotoLaajaalainenOsaaminenStore(this.peruste!.id!, 0);
+    const tallennettu = await kotoStore.create(otsikko, tekstikappaleIsa);
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'koto_laajaalainenosaaminen',
+      params: {
+        kotoLaajaalainenOsaaminenId: '' + tallennettu!.id,
+      },
+    });
+  }
+
+  async tallennaUusiOsaamiskokonaisuus(otsikko, tekstikappaleIsa) {
+    const osaamiskokonaisuusStore = new OsaamiskokonaisuusStore(this.peruste!.id!, 0);
+    const tallennettu = await osaamiskokonaisuusStore.create(tekstikappaleIsa);
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'osaamiskokonaisuus',
+      params: {
+        osaamiskokonaisuusId: '' + tallennettu!.id,
+      },
+    });
   }
 
   get isLisasisaltoLisays() {
-    return !!this.peruste && !!this.koulutustyypinLisasisaltoLisays[this.peruste.koulutustyyppi!];
+    return !!this.peruste && (!!this.koulutustyypinLisasisaltoLisays[this.peruste.koulutustyyppi!] || !!this.perusteTyyppiSisaltoLisays[this.peruste.tyyppi!]);
   }
 
   get lisasisaltoLisays() {
-    return this.koulutustyypinLisasisaltoLisays[this.peruste!.koulutustyyppi!] || [];
+    return this.koulutustyypinLisasisaltoLisays[this.peruste!.koulutustyyppi!] || this.perusteTyyppiSisaltoLisays[this.peruste!.tyyppi!] || [];
   }
 
   get koulutustyypinLisasisaltoLisays() {
@@ -397,6 +373,21 @@ export default class EpSisallonLisays extends Vue {
           },
         },
       ],
+    };
+  }
+
+  get perusteTyyppiSisaltoLisays() {
+    return {
+      [_.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN)]: [
+        {
+          groupedSisalto: [],
+          save: this.tallennaUusiOsaamiskokonaisuus,
+          label: {
+            'uusi': 'uusi-osaamiskokonaisuus',
+            'lisaa': 'lisaa-osaamiskokonaisuus',
+            'sijainti': 'osaamiskokonaisuuden-sijainti',
+          },
+        }],
     };
   }
 }

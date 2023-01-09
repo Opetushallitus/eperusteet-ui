@@ -1,8 +1,11 @@
 <template>
   <div class="validation">
-    <h3 class="peruste">
+    <h3 class="peruste" v-if="nimi">
       <router-link :to="route">{{ nimi }}</router-link>
     </h3>
+    <div v-if="validation.vaihtoOk" class="d-flex">
+      <div class="material-icons no-errors">check_circle</div><div class="ml-2">{{$t('validointi-ei-virheita')}}</div>
+    </div>
     <div v-if="categories">
       <div v-for="(infot, category, cid) in categories" :key="category">
         <ep-collapse :use-padding="false"
@@ -92,12 +95,17 @@ export default class EpVirhelistaus extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '@shared/styles/_variables.scss';
 .validation {
   border: 1px solid #ccc;
   box-shadow: 0px 0px 20px #eee;
   border-radius: 10px;
   margin-bottom: 10px;
   padding: 20px;
+}
+
+.no-errors {
+ color: $green;
 }
 
 </style>
