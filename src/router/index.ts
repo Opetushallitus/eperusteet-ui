@@ -432,7 +432,7 @@ const router = new VueRouter({
         return {
           name: 'virhe',
           query: {
-            errorMessage: Kielet.kaannaOlioTaiTeksti('virhe-sivua-ei-loytynyt'),
+            virhekoodi: '404',
           },
         };
       },
