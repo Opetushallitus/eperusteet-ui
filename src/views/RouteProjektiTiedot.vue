@@ -25,6 +25,12 @@
                 <perustetyoryhma-select v-model="data.ryhmaOid"
                                         :ulkopuoliset-store="ulkopuolisetStore"
                                         :is-editing="isEditing" />
+                <ep-button v-if="isEditing"
+                           class="btn-tyhjenna"
+                           variant="link"
+                           :paddingx="false"
+                           :disabled="!data.ryhmaOid"
+                           @click="data.ryhmaOid = null">{{ $t('tyhjenna-valinta') }}</ep-button>
               </b-form-group>
             </b-col>
             <b-col lg="6">
@@ -84,7 +90,7 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -97,7 +103,6 @@ import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteprojektiEditStore } from '@/stores/PerusteprojektiEditStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
-import _ from 'lodash';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
@@ -158,5 +163,9 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
 <style lang="scss" scoped>
 /deep/ .form-group {
   padding-right: 30px !important;
+}
+
+.btn-tyhjenna {
+  float: right;
 }
 </style>
