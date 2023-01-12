@@ -501,6 +501,9 @@ router.beforeEach(async (to, from, next) => {
       next();
     }
     catch (err) {
+      if (err.response.status === 404) {
+        router.push({ name: 'virhe' });
+      }
       throw new Error(err);
     }
   }
