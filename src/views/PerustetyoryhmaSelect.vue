@@ -1,26 +1,29 @@
 <template>
-  <div v-if="tyoryhmat">
-    <EpMultiSelect v-model="inner"
-                   v-if="isEditing"
-                   :placeholder="$t('valitse-tyoryhma')"
-                   :search-identity="tyoryhmaSearchIdentity"
-                   :options="tyoryhmat">
-    <template slot="singleLabel" slot-scope="{ option }">
-      {{ $kaanna(option.nimi) }}
-    </template>
-    <template slot="option" slot-scope="{ option }">
-      {{ $kaanna(option.nimi) }}
-    </template>
-    </EpMultiSelect>
-    <div v-else-if="inner">
-      {{ $kaanna(inner.nimi) }}
+  <div>
+    <div v-if="tyoryhmat && tyoryhmat.length > 0">
+      <EpMultiSelect v-model="inner"
+                     v-if="isEditing"
+                     :placeholder="$t('valitse-tyoryhma')"
+                     :search-identity="tyoryhmaSearchIdentity"
+                     :options="tyoryhmat"
+                     :clear-on-select="true">
+        <template slot="singleLabel" slot-scope="{ option }">
+          {{ $kaanna(option.nimi) }}
+        </template>
+        <template slot="option" slot-scope="{ option }">
+          {{ $kaanna(option.nimi) }}
+        </template>
+      </EpMultiSelect>
+      <div v-else-if="inner">
+        {{ $kaanna(inner.nimi) }}
+      </div>
     </div>
+    <EpSpinner v-else :small="true"/>
   </div>
-  <EpSpinner v-else />
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
@@ -55,7 +58,7 @@ export default class PerustetyoryhmaSelect extends Vue {
   }
 
   set inner(value: any) {
-    this.$emit('input', value.oid);
+    this.$emit('input', value ? value.oid : null);
   }
 
   async mounted() {
