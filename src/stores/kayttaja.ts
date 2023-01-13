@@ -2,8 +2,8 @@ import _ from 'lodash';
 import Vue from 'vue';
 import { Kayttajat as KayttajatApi, KayttajanTietoDto, Perusteprojektit } from '@shared/api/eperusteet';
 import { createLogger } from '@shared/utils/logger';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { getSovellusoikeudet, IOikeusProvider, Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
+import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { getSovellusoikeudet, IOikeusProvider } from '@shared/plugins/oikeustarkastelu';
 import { getCasKayttaja } from '@shared/api/common';
 
 Vue.use(VueCompositionApi);
@@ -91,6 +91,7 @@ export class KayttajaStore implements IOikeusProvider {
     }
     catch (err) {
       logger.error('Ei oikeuksia', err.message);
+      throw err;
     }
   }
 
