@@ -365,7 +365,7 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Watch, Prop, Component } from 'vue-property-decorator';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
@@ -378,8 +378,8 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { Api, Liitetiedostot, Koodisto, PerusteprojektiKevytDtoTyyppiEnum } from '@shared/api/eperusteet';
-import { SallitutKoulutustyyppisiirtymat, LokalisoituTekstiDto, Koulutustyyppi } from '@shared/tyypit';
+import { Api, Liitetiedostot, Koodisto } from '@shared/api/eperusteet';
+import { SallitutKoulutustyyppisiirtymat, Koulutustyyppi } from '@shared/tyypit';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteEditStore } from '@/stores/PerusteEditStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
@@ -497,7 +497,11 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   }
 
   get tutkintonimikkeet() {
-    return this.data?.tutkintonimikkeet || [];
+    return this.store?.data?.value?.tutkintonimikkeet || [];
+  }
+
+  get osaamisalat() {
+    return this.store?.data?.value?.osaamisalat || [];
   }
 
   get korvattavatDiaarinumerot() {
@@ -518,10 +522,6 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       ...this.korvattavatPerusteet,
       ...uudet,
     };
-  }
-
-  get osaamisalat() {
-    return this.data?.osaamisalat || [];
   }
 
   get fields() {
