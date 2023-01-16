@@ -1,15 +1,11 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-
-import { minLength, required, minValue } from 'vuelidate/lib/validators';
+import { required } from 'vuelidate/lib/validators';
 import _ from 'lodash';
-
 import { Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
-import { translated } from '@shared/validators/required';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TuvaLaajaAlainenOsaaminenDto } from '@shared/generated/eperusteet';
 
@@ -37,6 +33,7 @@ export class LaajaalainenOsaaminenStore implements IEditoitava {
   constructor(
     private readonly perusteId: number,
     private readonly laajaalainenosaaminenId: number,
+    public versionumero?: number,
   ) {
     if (!LaajaalainenOsaaminenStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -48,7 +45,14 @@ export class LaajaalainenOsaaminenStore implements IEditoitava {
 
   public async fetch() {
     try {
-      this.state.laajaalainenosaaminen = (await Perusteenosat.getPerusteenOsatByViite(this.laajaalainenosaaminenId)).data;
+      if (this.versionumero && this.laajaalainenosaaminenId) {
+        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.laajaalainenosaaminenId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        this.state.laajaalainenosaaminen = (await Perusteenosat.getPerusteenOsaVersioByViite(this.laajaalainenosaaminenId, rev.numero)).data;
+      }
+      else {
+        this.state.laajaalainenosaaminen = (await Perusteenosat.getPerusteenOsatByViite(this.laajaalainenosaaminenId)).data;
+      }
     }
     catch (err) {
     }

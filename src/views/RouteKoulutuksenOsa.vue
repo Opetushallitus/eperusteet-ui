@@ -1,29 +1,29 @@
 <template>
-  <EpEditointi v-if="store" :store="store">
+  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
     <template #header="{ data }">
       <h2 class="m-0">{{ $kaanna(data.nimiKoodi ? data.nimiKoodi.nimi : data.nimi) || $t('nimeton-koulutuksen-osa') }}</h2>
     </template>
-     <template #default="{ data, isEditing, validation }">
-       <b-row class="mb-4">
-         <b-col>
-           <b-form-group :label="$t('koulutustyyppi') + (isEditing ? ' *' : '')" required>
-            <p v-if="isEditing" class="font-size-08">{{ $t('koulutustyyppi-info') }}</p>
-            <template v-if="isEditing">
-              <b-form-radio
-                v-for="type in koulutusOsanKoulutustyypit"
-                :key="type"
-                class="ml-1"
-                v-model="data.koulutusOsanKoulutustyyppi"
-                :value="type"
-                name="koulutustyyppi"
-                :validation="validation.koulutusOsanKoulutustyyppi">
-                {{ $t(type) }}
-              </b-form-radio>
-            </template>
-            <template v-else>{{ $t(data.koulutusOsanKoulutustyyppi) }}</template>
-            <p v-if="!isEditing && !data.koulutusOsanKoulutustyyppi" class="font-italic">{{ $t('ei-asetettu') }}</p>
+    <template #default="{ data, isEditing, validation }">
+      <b-row class="mb-4">
+        <b-col>
+          <b-form-group :label="$t('koulutustyyppi') + (isEditing ? ' *' : '')" required>
+          <p v-if="isEditing" class="font-size-08">{{ $t('koulutustyyppi-info') }}</p>
+          <template v-if="isEditing">
+            <b-form-radio
+              v-for="type in koulutusOsanKoulutustyypit"
+              :key="type"
+              class="ml-1"
+              v-model="data.koulutusOsanKoulutustyyppi"
+              :value="type"
+              name="koulutustyyppi"
+              :validation="validation.koulutusOsanKoulutustyyppi">
+              {{ $t(type) }}
+            </b-form-radio>
+          </template>
+          <template v-else>{{ $t(data.koulutusOsanKoulutustyyppi) }}</template>
+          <p v-if="!isEditing && !data.koulutusOsanKoulutustyyppi" class="font-italic">{{ $t('ei-asetettu') }}</p>
           </b-form-group>
-         </b-col>
+        </b-col>
       </b-row>
       <b-row class="mb-4">
         <b-col md="6">
@@ -65,7 +65,7 @@
               class="sr-only"
               aria-hidden="true"
               :value="data.nimi"
-              @input="data.nimi = setNimiValue(data.nimiKoodi)"
+              @input="data.nimi = this.setNimiValue(data.nimiKoodi)"
               :is-editing="isEditing"
               :validation="validation.nimi"
               ref="inputNimi"/>
@@ -95,21 +95,21 @@
       </b-row>
       <b-row class="mb-4">
         <b-col>
-           <b-form-group :label="$t('opintojen-tyyppi') + (isEditing ? ' *' : '')" required>
-            <template v-if="isEditing">
-              <b-form-radio
-                v-for="type in koulutusOsanTyypit"
-                :key="type"
-                class="ml-1"
-                v-model="data.koulutusOsanTyyppi"
-                :value="type"
-                name="koulutusOsanTyyppi"
-                :validation="validation.koulutusOsanTyyppi">
-                {{ $t(type) }}
-              </b-form-radio>
-            </template>
-            <template v-else>{{ $t(data.koulutusOsanTyyppi) }}</template>
-            <p v-if="!isEditing && !data.koulutusOsanTyyppi" class="font-italic">{{ $t('ei-asetettu') }}</p>
+          <b-form-group :label="$t('opintojen-tyyppi') + (isEditing ? ' *' : '')" required>
+          <template v-if="isEditing">
+            <b-form-radio
+              v-for="type in koulutusOsanTyypit"
+              :key="type"
+              class="ml-1"
+              v-model="data.koulutusOsanTyyppi"
+              :value="type"
+              name="koulutusOsanTyyppi"
+              :validation="validation.koulutusOsanTyyppi">
+              {{ $t(type) }}
+            </b-form-radio>
+          </template>
+          <template v-else>{{ $t(data.koulutusOsanTyyppi) }}</template>
+          <p v-if="!isEditing && !data.koulutusOsanTyyppi" class="font-italic">{{ $t('ei-asetettu') }}</p>
           </b-form-group>
          </b-col>
       </b-row>
@@ -175,19 +175,19 @@
         </b-col>
       </b-row>
       <hr/>
-       <b-row>
-        <b-col md="10">
-          <b-form-group>
-            <h3 slot="label">{{ $t('laaja-alainen-osaaminen') }}</h3>
-            <EpContent
-              v-if="isEditing || !isEditing && data.laajaAlaisenOsaamisenKuvaus"
-              v-model="data.laajaAlaisenOsaamisenKuvaus"
-              layout="normal"
-              :is-editable="isEditing"
-              :kuvaHandler="kuvaHandler"/>
-            <EpAlert v-if="!isEditing && !data.laajaAlaisenOsaamisenKuvaus" :text="$t('ei-sisaltoa')" />
-          </b-form-group>
-        </b-col>
+      <b-row>
+      <b-col md="10">
+        <b-form-group>
+          <h3 slot="label">{{ $t('laaja-alainen-osaaminen') }}</h3>
+          <EpContent
+            v-if="isEditing || !isEditing && data.laajaAlaisenOsaamisenKuvaus"
+            v-model="data.laajaAlaisenOsaamisenKuvaus"
+            layout="normal"
+            :is-editable="isEditing"
+            :kuvaHandler="kuvaHandler"/>
+          <EpAlert v-if="!isEditing && !data.laajaAlaisenOsaamisenKuvaus" :text="$t('ei-sisaltoa')" />
+        </b-form-group>
+      </b-col>
       </b-row>
       <hr/>
       <b-row>
@@ -226,14 +226,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-
 import * as _ from 'lodash';
 import draggable from 'vuedraggable';
-
 import { PerusteStore } from '@/stores/PerusteStore';
 import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 import { KuvaStore } from '@/stores/KuvaStore';
-
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
@@ -243,9 +240,12 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
-import { Koodisto, KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum, KoulutuksenOsaDtoKoulutusOsanTyyppiEnum } from '@shared/api/eperusteet';
+import {
+  Koodisto,
+  KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum,
+  KoulutuksenOsaDtoKoulutusOsanTyyppiEnum,
+} from '@shared/api/eperusteet';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
-import { Kielet } from '@shared/stores/kieli';
 
 @Component({
   components: {
@@ -262,9 +262,6 @@ import { Kielet } from '@shared/stores/kieli';
 export default class RouteKoulutuksenOsa extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
-
-  @Prop({ required: true })
-  koulutuksenosaId!: number;
 
   private store: EditointiStore | null = null;
   private tempNimiValue = null;
@@ -285,8 +282,17 @@ export default class RouteKoulutuksenOsa extends Vue {
     if (!id || id === oldId) {
       return;
     }
+    await this.fetch();
+  }
+
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
+  }
+
+  public async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const tkstore = new KoulutuksenOsaStore(this.perusteId!, Number(id));
+    const tkstore = new KoulutuksenOsaStore(this.perusteId!, Number(this.koulutuksenosaId), this.versionumero);
     this.store = new EditointiStore(tkstore);
     this.tempNimiValue = null;
   }
@@ -315,8 +321,15 @@ export default class RouteKoulutuksenOsa extends Vue {
   setNimiValue(nimiKoodi) {
     const julkaisukielet = this.perusteStore.julkaisukielet.value;
     const sourceLang = _.includes(julkaisukielet as string[], 'fi') ? 'fi' : julkaisukielet[0];
-    const mappedByLang = julkaisukielet.reduce((obj, key) => ({ ...obj, [key]: nimiKoodi.nimi?.[sourceLang] }), {});
-    return mappedByLang;
+    return julkaisukielet.reduce((obj, key) => ({ ...obj, [key]: nimiKoodi.nimi?.[sourceLang] }), {});
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  get koulutuksenosaId() {
+    return this.$route.params.koulutuksenosaId;
   }
 
   get perusteId() {
@@ -358,15 +371,6 @@ export default class RouteKoulutuksenOsa extends Vue {
       ...this.defaultDragOptions,
       group: {
         name: 'tavoitteet',
-      },
-    };
-  }
-
-  get arvioinnitOptions() {
-    return {
-      ...this.defaultDragOptions,
-      group: {
-        name: 'arvioinnit',
       },
     };
   }

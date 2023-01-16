@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi v-if="store" :store="store">
+  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
     <template v-slot:header="{ data }">
       <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
       <h2 class="m-0" v-else >{{ $t('nimeton-opinto') }}</h2>
@@ -45,7 +45,6 @@
             :kasiteHandler="kasiteHandler"
             :kuvaHandler="kuvaHandler"
             taitotasoTyyppi="opintokokonaisuus"/>
-
         </b-col>
       </b-row>
 
@@ -71,6 +70,7 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import EpKotoTaitotasot from '@shared/components/EpKotoTaitotasot/EpKotoTaitotasot.vue';
 import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import { Murupolku } from '@shared/stores/murupolku';
+import * as _ from 'lodash';
 
 @Component({
   components: {
@@ -85,28 +85,19 @@ export default class RouteKotoOpinto extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
-  @Prop({ required: true })
-  kotoOpintoId!: number;
-
   private store: EditointiStore | null = null;
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
 
   @Watch('kotoOpintoId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
     if (!id || id === oldId) {
       return;
     }
-
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new KotoOpintoStore(this.perusteId!, Number(id));
-    this.store = new EditointiStore(tkstore);
+    await this.fetch();
   }
 
-  get kotoSisalto() {
-    return this.store?.data?.value || null;
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
   }
 
   @Watch('kotoSisalto')
@@ -116,6 +107,12 @@ export default class RouteKotoOpinto extends Vue {
         name: 'koto_opinto',
       });
     }
+  }
+
+  async fetch() {
+    await this.perusteStore.blockUntilInitialized();
+    const tkstore = new KotoOpintoStore(this.perusteId!, Number(this.kotoOpintoId), this.versionumero);
+    this.store = new EditointiStore(tkstore);
   }
 
   private readonly tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
@@ -129,6 +126,22 @@ export default class RouteKotoOpinto extends Vue {
       return data as any;
     },
   });
+
+  get kotoOpintoId() {
+    return this.$route.params.kotoOpintoId;
+  }
+
+  get perusteId() {
+    return this.perusteStore.perusteId.value;
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  get kotoSisalto() {
+    return this.store?.data?.value || null;
+  }
 
   get kasiteHandler() {
     return createKasiteHandler(new TermitStore(this.perusteId!));
@@ -144,11 +157,11 @@ export default class RouteKotoOpinto extends Vue {
 @import "@shared/styles/_variables.scss";
 
   ::v-deep fieldset {
-    padding-right: 0px;
+    padding-right: 0;
   }
 
   ::v-deep .input-wrapper {
-    flex: 1 1 0%;
+    flex: 1 1 0;
 
     input {
       border-top-right-radius: 0;

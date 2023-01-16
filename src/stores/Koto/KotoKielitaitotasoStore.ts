@@ -32,6 +32,7 @@ export class KotoKielitaitotasoStore implements IEditoitava {
   constructor(
     private readonly perusteId?: number,
     private readonly kotokielitaitotasoId?: number,
+    public versionumero?: number,
   ) {
     if (!KotoKielitaitotasoStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -43,7 +44,14 @@ export class KotoKielitaitotasoStore implements IEditoitava {
 
   public async fetch() {
     try {
-      this.state.kotokielitaitotaso = (await Perusteenosat.getPerusteenOsatByViite(this.kotokielitaitotasoId!)).data;
+      if (this.versionumero && this.kotokielitaitotasoId) {
+        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.kotokielitaitotasoId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        this.state.kotokielitaitotaso = (await Perusteenosat.getPerusteenOsaVersioByViite(this.kotokielitaitotasoId, rev.numero)).data;
+      }
+      else {
+        this.state.kotokielitaitotaso = (await Perusteenosat.getPerusteenOsatByViite(this.kotokielitaitotasoId!)).data;
+      }
     }
     catch (err) {
     }

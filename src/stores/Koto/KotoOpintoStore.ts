@@ -32,6 +32,7 @@ export class KotoOpintoStore implements IEditoitava {
   constructor(
     private readonly perusteId?: number,
     private readonly kotoOpintoId?: number,
+    public versionumero?: number,
   ) {
     if (!KotoOpintoStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -43,7 +44,14 @@ export class KotoOpintoStore implements IEditoitava {
 
   public async fetch() {
     try {
-      this.state.kotoopinto = (await Perusteenosat.getPerusteenOsatByViite(this.kotoOpintoId!)).data;
+      if (this.versionumero && this.kotoOpintoId) {
+        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.kotoOpintoId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        this.state.kotoopinto = (await Perusteenosat.getPerusteenOsaVersioByViite(this.kotoOpintoId, rev.numero)).data;
+      }
+      else {
+        this.state.kotoopinto = (await Perusteenosat.getPerusteenOsatByViite(this.kotoOpintoId!)).data;
+      }
     }
     catch (err) {
     }

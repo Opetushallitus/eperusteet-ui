@@ -1,15 +1,12 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-
-import { minLength, required, minValue } from 'vuelidate/lib/validators';
+import { required, minValue } from 'vuelidate/lib/validators';
 import _ from 'lodash';
-
-import { KoulutuksenOsaDto, KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum, Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
+import { KoulutuksenOsaDto, Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import { translated } from '@shared/validators/required';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-
 import { PerusteStore } from '@/stores/PerusteStore';
 
 Vue.use(VueCompositionApi);
@@ -36,6 +33,7 @@ export class KoulutuksenOsaStore implements IEditoitava {
   constructor(
     private readonly perusteId: number,
     private readonly koulutuksenosaId: number,
+    public versionumero?: number,
   ) {
     if (!KoulutuksenOsaStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -47,7 +45,14 @@ export class KoulutuksenOsaStore implements IEditoitava {
 
   public async fetch() {
     try {
-      this.state.koulutuksenosa = (await Perusteenosat.getPerusteenOsatByViite(this.koulutuksenosaId)).data;
+      if (this.versionumero && this.koulutuksenosaId) {
+        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.koulutuksenosaId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        this.state.koulutuksenosa = (await Perusteenosat.getPerusteenOsaVersioByViite(this.koulutuksenosaId, rev.numero)).data;
+      }
+      else {
+        this.state.koulutuksenosa = (await Perusteenosat.getPerusteenOsatByViite(this.koulutuksenosaId)).data;
+      }
     }
     catch (err) {
     }

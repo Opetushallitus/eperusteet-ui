@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi v-if="store" :store="store">
+  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
     <template v-slot:header="{ data }">
       <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
       <h2 class="m-0" v-else >{{ $t('nimeton-kielitaitotaso') }}</h2>
@@ -86,28 +86,14 @@ export default class RouteTavoitesisaltoalue extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
-  @Prop({ required: true })
-  kotokielitaitotasoId!: number;
-
   private store: EditointiStore | null = null;
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
 
   @Watch('kotokielitaitotasoId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
     if (!id || id === oldId) {
       return;
     }
-
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new KotoKielitaitotasoStore(this.perusteId!, Number(id));
-    this.store = new EditointiStore(tkstore);
-  }
-
-  get kotoSisalto() {
-    return this.store?.data?.value || null;
+    await this.fetch();
   }
 
   @Watch('kotoSisalto')
@@ -117,6 +103,17 @@ export default class RouteTavoitesisaltoalue extends Vue {
         name: 'koto_kielitaitotaso',
       });
     }
+  }
+
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
+  }
+
+  public async fetch() {
+    await this.perusteStore.blockUntilInitialized();
+    const tkstore = new KotoKielitaitotasoStore(this.perusteId!, Number(this.kotokielitaitotasoId), this.versionumero);
+    this.store = new EditointiStore(tkstore);
   }
 
   private readonly tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
@@ -130,6 +127,22 @@ export default class RouteTavoitesisaltoalue extends Vue {
       return data as any;
     },
   });
+
+  get kotoSisalto() {
+    return this.store?.data?.value || null;
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  get perusteId() {
+    return this.perusteStore.perusteId.value;
+  }
+
+  get kotokielitaitotasoId() {
+    return this.$route.params.kotokielitaitotasoId;
+  }
 
   get kasiteHandler() {
     return createKasiteHandler(new TermitStore(this.perusteId!));
@@ -145,11 +158,11 @@ export default class RouteTavoitesisaltoalue extends Vue {
 @import "@shared/styles/_variables.scss";
 
   ::v-deep fieldset {
-    padding-right: 0px;
+    padding-right: 0;
   }
 
   ::v-deep .input-wrapper {
-    flex: 1 1 0%;
+    flex: 1 1 0;
 
     input {
       border-top-right-radius: 0;

@@ -8,7 +8,6 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { koodistoKoodiValidator, requiredOneLang } from '@shared/validators/required';
-import { Kielet } from '@shared/stores/kieli';
 
 Vue.use(VueCompositionApi);
 
@@ -34,6 +33,7 @@ export class TavoitesisaltoalueStore implements IEditoitava {
   constructor(
     private readonly perusteId: number,
     private readonly tavoitesisaltoalueId: number,
+    public versionumero?: number,
   ) {
     if (!TavoitesisaltoalueStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -45,7 +45,14 @@ export class TavoitesisaltoalueStore implements IEditoitava {
 
   public async fetch() {
     try {
-      this.state.tavoitesisaltoalue = (await Perusteenosat.getPerusteenOsatByViite(this.tavoitesisaltoalueId)).data;
+      if (this.versionumero && this.tavoitesisaltoalueId) {
+        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.tavoitesisaltoalueId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        this.state.tavoitesisaltoalue = (await Perusteenosat.getPerusteenOsaVersioByViite(this.tavoitesisaltoalueId, rev.numero)).data;
+      }
+      else {
+        this.state.tavoitesisaltoalue = (await Perusteenosat.getPerusteenOsatByViite(this.tavoitesisaltoalueId)).data;
+      }
     }
     catch (err) {
     }

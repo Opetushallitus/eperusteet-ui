@@ -31,6 +31,7 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
   constructor(
     private readonly perusteId?: number,
     private readonly kotoLaajaalainenOsaaminenId?: number,
+    public versionumero?: number,
   ) {
     if (!KotoLaajaalainenOsaaminenStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -40,22 +41,25 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
     }
   }
 
-  public async fetch() {
-    try {
-      this.state.kotoLaajaalainenOsaaminen = (await Perusteenosat.getPerusteenOsatByViite(this.kotoLaajaalainenOsaaminenId!)).data;
-    }
-    catch (err) {
-      console.log(err);
-    }
-  }
-
   public async load() {
     await this.fetch();
     return this.kotoLaajaalainenOsaaminen.value;
   }
 
-  async editAfterLoad() {
-    return false;
+  public async fetch() {
+    try {
+      if (this.versionumero && this.kotoLaajaalainenOsaaminenId) {
+        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.kotoLaajaalainenOsaaminenId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        this.state.kotoLaajaalainenOsaaminen = (await Perusteenosat.getPerusteenOsaVersioByViite(this.kotoLaajaalainenOsaaminenId, rev.numero)).data;
+      }
+      else {
+        this.state.kotoLaajaalainenOsaaminen = (await Perusteenosat.getPerusteenOsatByViite(this.kotoLaajaalainenOsaaminenId!)).data;
+      }
+    }
+    catch (err) {
+      console.log(err);
+    }
   }
 
   public async save(data: any) {
@@ -77,6 +81,10 @@ export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
       type: 'koto_laajaalainenosaaminen',
     });
     KotoLaajaalainenOsaaminenStore.config.router.push({ name: 'perusteprojekti' });
+  }
+
+  async editAfterLoad() {
+    return false;
   }
 
   public async lock() {

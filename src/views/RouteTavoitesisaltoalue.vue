@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi v-if="store" :store="store">
+  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
     <template v-slot:header="{ data }">
       <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
     </template>
@@ -83,9 +83,6 @@ export default class RouteTavoitesisaltoalue extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
-  @Prop({ required: true })
-  tavoitesisaltoalueId!: number;
-
   private store: EditointiStore | null = null;
 
   get perusteId() {
@@ -97,9 +94,17 @@ export default class RouteTavoitesisaltoalue extends Vue {
     if (!id || id === oldId) {
       return;
     }
+    await this.fetch();
+  }
 
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
+  }
+
+  public async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const tkstore = new TavoitesisaltoalueStore(this.perusteId!, Number(id));
+    const tkstore = new TavoitesisaltoalueStore(this.perusteId!, Number(this.tavoitesisaltoalueId), this.versionumero);
     this.store = new EditointiStore(tkstore);
   }
 
@@ -115,6 +120,14 @@ export default class RouteTavoitesisaltoalue extends Vue {
     },
   });
 
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  get tavoitesisaltoalueId() {
+    return this.$route.params.tavoitesisaltoalueId;
+  }
+
   get kasiteHandler() {
     return createKasiteHandler(new TermitStore(this.perusteId!));
   }
@@ -129,11 +142,11 @@ export default class RouteTavoitesisaltoalue extends Vue {
 @import "@shared/styles/_variables.scss";
 
   ::v-deep fieldset {
-    padding-right: 0px;
+    padding-right: 0;
   }
 
   ::v-deep .input-wrapper {
-    flex: 1 1 0%;
+    flex: 1 1 0;
 
     input {
       border-top-right-radius: 0;

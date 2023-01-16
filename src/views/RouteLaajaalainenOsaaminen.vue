@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi v-if="store" :store="store">
+  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
     <template v-slot:header="{ data }">
       <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
     </template>
@@ -76,23 +76,24 @@ export default class RouteLaajaalainenOsaaminen extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
-  @Prop({ required: true })
-  laajaalainenosaaminenId!: number;
-
   private store: EditointiStore | null = null;
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
 
   @Watch('laajaalainenosaaminenId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
     if (!id || id === oldId) {
       return;
     }
+    await this.fetch();
+  }
 
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
+  }
+
+  public async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const tkstore = new LaajaalainenOsaaminenStore(this.perusteId!, Number(id));
+    const tkstore = new LaajaalainenOsaaminenStore(this.perusteId!, Number(this.laajaalainenosaaminenId), this.versionumero);
     this.store = new EditointiStore(tkstore);
   }
 
@@ -108,6 +109,18 @@ export default class RouteLaajaalainenOsaaminen extends Vue {
     },
   });
 
+  get perusteId() {
+    return this.perusteStore.perusteId.value;
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  get laajaalainenosaaminenId() {
+    return this.$route.params.laajaalainenosaaminenId;
+  }
+
   get kasiteHandler() {
     return createKasiteHandler(new TermitStore(this.perusteId!));
   }
@@ -122,11 +135,11 @@ export default class RouteLaajaalainenOsaaminen extends Vue {
 @import "@shared/styles/_variables.scss";
 
   ::v-deep fieldset {
-    padding-right: 0px;
+    padding-right: 0;
   }
 
   ::v-deep .input-wrapper {
-    flex: 1 1 0%;
+    flex: 1 1 0;
 
     input {
       border-top-right-radius: 0;

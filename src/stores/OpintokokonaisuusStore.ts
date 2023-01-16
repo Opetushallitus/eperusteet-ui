@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { minLength, required } from 'vuelidate/lib/validators';
-import { allTranslations, minValue, translated, warning } from '@shared/validators/required';
+import { allTranslations, translated } from '@shared/validators/required';
 
 Vue.use(VueCompositionApi);
 
@@ -33,6 +33,7 @@ export class OpintokokonaisuusStore implements IEditoitava {
   constructor(
     private readonly perusteId: number,
     private readonly opintokokonaisuusId: number,
+    public versionumero?: number,
   ) {
     if (!OpintokokonaisuusStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -44,7 +45,14 @@ export class OpintokokonaisuusStore implements IEditoitava {
 
   public async fetch() {
     try {
-      this.state.opintokokonaisuus = (await Perusteenosat.getPerusteenOsatByViite(this.opintokokonaisuusId)).data;
+      if (this.versionumero && this.opintokokonaisuusId) {
+        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.opintokokonaisuusId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        this.state.opintokokonaisuus = (await Perusteenosat.getPerusteenOsaVersioByViite(this.opintokokonaisuusId, rev.numero)).data;
+      }
+      else {
+        this.state.opintokokonaisuus = (await Perusteenosat.getPerusteenOsatByViite(this.opintokokonaisuusId)).data;
+      }
     }
     catch (err) {
     }

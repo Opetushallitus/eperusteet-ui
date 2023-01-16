@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi v-if="editointiStore" :store="editointiStore">
+  <EpEditointi v-if="editointiStore" :store="editointiStore" :versionumero="versionumero">
     <template v-slot:header="{ data }">
       <h2 class="m-0" v-if="data.nimi" >{{ $kaanna(data.nimi) }}</h2>
       <h2 class="m-0" v-else >{{ $t('nimeton-opinto') }}</h2>
@@ -85,6 +85,7 @@ import { TermitStore } from '@/stores/TermitStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { Koodisto } from '@shared/api/eperusteet';
+import * as _ from 'lodash';
 
 interface LaajaaAlainenOsaaminenKoodi {
   nimi: { [locale: string]: string };
@@ -105,9 +106,6 @@ interface LaajaaAlainenOsaaminenKoodi {
 export default class RouteKotoLaajaalainenOsaaminen extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
-
-  @Prop({ required: true })
-  kotoLaajaalainenOsaaminenId!: number;
 
   private editointiStore: EditointiStore | null = null;
   private laajaAlaisetKoodit: LaajaaAlainenOsaaminenKoodi[] = [];
@@ -133,6 +131,25 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
     }
   }
 
+  @Watch('kotoLaajaalainenOsaaminenId', { immediate: true })
+  async onParamChange(id: string, oldId: string) {
+    if (!id || id === oldId) {
+      return;
+    }
+    await this.fetch();
+  }
+
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
+  }
+
+  public async fetch() {
+    await this.perusteStore.blockUntilInitialized();
+    const kotoStore = new KotoLaajaalainenOsaaminenStore(this.perusteId!, Number(this.kotoLaajaalainenOsaaminenId), this.versionumero);
+    this.editointiStore = new EditointiStore(kotoStore);
+  }
+
   private extractNimi(koodi) {
     const nimet: { [locale: string]: string } = {};
 
@@ -141,21 +158,6 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
     });
 
     return nimet;
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  @Watch('kotoLaajaalainenOsaaminenId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-
-    await this.perusteStore.blockUntilInitialized();
-    const kotoStore = new KotoLaajaalainenOsaaminenStore(this.perusteId!, Number(id));
-    this.editointiStore = new EditointiStore(kotoStore);
   }
 
   private addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
@@ -182,6 +184,18 @@ export default class RouteKotoLaajaalainenOsaaminen extends Vue {
     if (selectedOsaaminen) {
       selectedOsaaminen.isAlreadySelected = false;
     }
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  get kotoLaajaalainenOsaaminenId() {
+    return this.$route.params.kotoLaajaalainenOsaaminenId;
+  }
+
+  get perusteId() {
+    return this.perusteStore.perusteId.value;
   }
 
   get kasiteHandler() {
