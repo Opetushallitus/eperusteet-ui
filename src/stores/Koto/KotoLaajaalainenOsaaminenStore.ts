@@ -1,11 +1,9 @@
 import { PerusteStore } from '@/stores/PerusteStore';
 import VueRouter from 'vue-router';
 import Vue from 'vue';
-import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
+import VueCompositionApi from '@vue/composition-api';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
-import _ from 'lodash';
-import { Revision } from '@shared/tyypit';
+import { AbstractPerusteenOsaViiteStore } from '@/stores/AbstractPerusteenOsaViiteStore';
 
 Vue.use(VueCompositionApi);
 
@@ -14,131 +12,26 @@ interface KotoLaajaalainenOsaaminenStoreConfig {
   router: VueRouter;
 }
 
-export class KotoLaajaalainenOsaaminenStore implements IEditoitava {
-  private state = reactive({
-    kotoLaajaalainenOsaaminen: null as Matala | null,
-  });
-
+export class KotoLaajaalainenOsaaminenStore extends AbstractPerusteenOsaViiteStore implements IEditoitava {
   private static config: KotoLaajaalainenOsaaminenStoreConfig;
 
   public static install(vue: typeof Vue, config: KotoLaajaalainenOsaaminenStoreConfig) {
     KotoLaajaalainenOsaaminenStore.config = config;
   }
 
-  public readonly kotoLaajaalainenOsaaminen = computed(() => this.state.kotoLaajaalainenOsaaminen);
-  public readonly id = computed(() => this.state.kotoLaajaalainenOsaaminen?.id);
-
   constructor(
-    private readonly perusteId?: number,
-    private readonly kotoLaajaalainenOsaaminenId?: number,
+    public perusteId?: number,
+    public kotoLaajaalainenOsaaminenId?: number,
     public versionumero?: number,
   ) {
-    if (!KotoLaajaalainenOsaaminenStore.config?.perusteStore) {
-      throw new Error('PerusteStore missing');
-    }
-    if (!KotoLaajaalainenOsaaminenStore.config?.router) {
-      throw new Error('VueRouter missing');
-    }
+    super(perusteId, kotoLaajaalainenOsaaminenId, versionumero, KotoLaajaalainenOsaaminenStore.config);
   }
 
   public async load() {
-    await this.fetch();
-    return this.kotoLaajaalainenOsaaminen.value;
+    return this.fetchPerusteenOsat();
   }
 
-  public async fetch() {
-    try {
-      if (this.versionumero && this.kotoLaajaalainenOsaaminenId) {
-        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.kotoLaajaalainenOsaaminenId)).data as Revision[];
-        const rev = revisions[revisions.length - this.versionumero];
-        this.state.kotoLaajaalainenOsaaminen = (await Perusteenosat.getPerusteenOsaVersioByViite(this.kotoLaajaalainenOsaaminenId, rev.numero)).data;
-      }
-      else {
-        this.state.kotoLaajaalainenOsaaminen = (await Perusteenosat.getPerusteenOsatByViite(this.kotoLaajaalainenOsaaminenId!)).data;
-      }
-    }
-    catch (err) {
-      console.log(err);
-    }
-  }
-
-  public async save(data: any) {
-    const res = await Perusteenosat.updatePerusteenOsa(this.id.value!, data);
-
-    KotoLaajaalainenOsaaminenStore.config!.perusteStore!.updateNavigationEntry({
-      id: this.kotoLaajaalainenOsaaminenId!,
-      type: 'koto_laajaalainenosaaminen',
-      label: (res.data as any).nimi as any,
-    });
-
-    return res.data;
-  }
-
-  public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId!, KotoLaajaalainenOsaaminenStore.config?.perusteStore.perusteSuoritustapa.value!, this.kotoLaajaalainenOsaaminenId!);
-    KotoLaajaalainenOsaaminenStore.config!.perusteStore!.removeNavigationEntry({
-      id: this.kotoLaajaalainenOsaaminenId!,
-      type: 'koto_laajaalainenosaaminen',
-    });
-    KotoLaajaalainenOsaaminenStore.config.router.push({ name: 'perusteprojekti' });
-  }
-
-  async editAfterLoad() {
-    return false;
-  }
-
-  public async lock() {
-    try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.id.value!);
-      return res.data;
-    }
-    catch (err) {
-      return null;
-    }
-  }
-
-  public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.id.value!);
-    return res.data;
-  }
-
-  public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.id.value!);
-  }
-
-  public async revisions() {
-    const res = await Perusteenosat.getPerusteenOsaVersiot(this.id.value!);
-    return res.data as Revision[];
-  }
-
-  public async restore(rev: number) {
-    await Perusteenosat.revertPerusteenOsaToVersio(this.id.value!, rev);
-  }
-
-  public async create(otsikko, tekstikappaleIsa) {
-    const perusteenOsa = {
-      perusteenOsa: {
-        osanTyyppi: 'koto_laajaalainenosaaminen',
-      } as any,
-    };
-
-    if (_.isEmpty(tekstikappaleIsa)) {
-      const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
-        KotoLaajaalainenOsaaminenStore.config.perusteStore.perusteId.value!,
-        KotoLaajaalainenOsaaminenStore.config?.perusteStore.perusteSuoritustapa.value!,
-        perusteenOsa
-      ));
-      return tallennettu.data;
-    }
-    else {
-      const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
-        KotoLaajaalainenOsaaminenStore.config.perusteStore.perusteId.value!,
-        KotoLaajaalainenOsaaminenStore.config?.perusteStore.perusteSuoritustapa.value!,
-        tekstikappaleIsa.id,
-        perusteenOsa
-      ));
-
-      return tallennettu.data;
-    }
+  getOsanType() {
+    return 'koto_laajaalainenosaaminen';
   }
 }
