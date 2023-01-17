@@ -15,7 +15,7 @@
         </b-col>
       </b-row>
 
-      <b-row>
+      <b-row class="mb-4">
         <b-col md="8">
           <b-form-group :label="$t('osaamiskokonaisuuden-kuvaus')">
             <ep-content v-model="data.kuvaus"
@@ -27,7 +27,7 @@
         </b-col>
       </b-row>
 
-      <h3 class="mt-4">{{ $kaanna(data.nimi) }} {{$t('varhaiskasvatuksessa-ja-esi-ja-perusopetuksessa')}}</h3>
+      <h3>{{ $kaanna(data.nimi) }} {{$t('varhaiskasvatuksessa-ja-esi-ja-perusopetuksessa')}}</h3>
 
       <b-tabs>
         <b-tab :title="$t(kasitteisto.taso.toLowerCase())" v-for="kasitteisto in data.kasitteistot" :key="'kasitteisto' + kasitteisto.taso">
@@ -38,18 +38,25 @@
                         :kasiteHandler="kasiteHandler"
                         :kuvaHandler="kuvaHandler"></ep-content>
           </b-form-group>
+        </b-tab>
+      </b-tabs>
 
-          <hr/>
+      <hr/>
 
-          <b-form-group :label="$t('keskeinen-kasitteisto')">
-            <ep-content v-model="kasitteisto.keskeinenKasitteisto"
+      <b-row>
+        <b-col md="8">
+          <b-form-group>
+            <div slot="label">
+              <h3>{{$t('keskeinen-kasitteisto')}}</h3>
+            </div>
+            <ep-content v-model="data.keskeinenKasitteisto"
                         layout="normal"
                         :is-editable="isEditing"
                         :kasiteHandler="kasiteHandler"
                         :kuvaHandler="kuvaHandler"></ep-content>
           </b-form-group>
-        </b-tab>
-      </b-tabs>
+        </b-col>
+      </b-row>
 
       <hr/>
 
