@@ -83,7 +83,26 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     }
     this.projektitJoissaKaytossa = (await (Perusteenosat.getOwningProjektit((res.data as any).tutkinnonOsa.id))).data;
     this.tutkinnonOsaId = Number((res.data as any)._tutkinnonOsa);
-    return res.data;
+    return {
+      ...res.data,
+      tutkinnonOsa: {
+        ...res.data.tutkinnonOsa,
+        arviointi: {
+          ...res.data.tutkinnonOsa.arviointi,
+          arvioinninKohdealueet: _.map(res.data.tutkinnonOsa.arviointi.arvioinninKohdealueet, aka => {
+            return {
+              ...aka,
+              arvioinninKohteet: _.map(aka.arvioinninKohteet, ak => {
+                return {
+                  ...ak,
+                  osaamistasonKriteerit: _.sortBy(ak.osaamistasonKriteerit, '_osaamistaso'),
+                };
+              }),
+            };
+          }),
+        },
+      },
+    };
   }
 
   public async save(data: TutkinnonOsaViiteUpdateDto) {
