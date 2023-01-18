@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi v-if="store" :store="store">
+  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
     <template v-slot:header="{ data }">
       <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
     </template>
@@ -119,7 +119,6 @@
                 <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poista(arviointi, 'arvioinnit')"/>
               </b-col>
             </b-row>
-
           </draggable>
 
           <ep-button variant="outline" icon="plus" @click="lisaa('arvioinnit')" v-if="isEditing">
@@ -133,7 +132,6 @@
               {{$kaanna(arviointi)}}
             </li>
           </ul>
-
         </div>
       </b-form-group>
 
@@ -164,6 +162,7 @@ import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { generateTemporaryKoodiUri } from '@shared/utils/koodi';
+import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 
 @Component({
   components: {
@@ -181,23 +180,24 @@ export default class RouteOpintokokonaisuus extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
-  @Prop({ required: true })
-  opintokokonaisuusId!: number;
-
   private store: EditointiStore | null = null;
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
 
   @Watch('opintokokonaisuusId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
     if (!id || id === oldId) {
       return;
     }
+    await this.fetch();
+  }
 
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
+  }
+
+  public async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const tkstore = new OpintokokonaisuusStore(this.perusteId!, Number(id));
+    const tkstore = new OpintokokonaisuusStore(this.perusteId!, Number(this.opintokokonaisuusId), this.versionumero);
     this.store = new EditointiStore(tkstore);
   }
 
@@ -229,6 +229,18 @@ export default class RouteOpintokokonaisuus extends Vue {
       ...this.store?.data.value,
       [array]: _.filter(_.get(this.store?.data.value, array), rivi => rivi !== poistettavaRivi),
     });
+  }
+
+  get perusteId() {
+    return this.perusteStore.perusteId.value;
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  get opintokokonaisuusId() {
+    return this.$route.params.opintokokonaisuusId;
   }
 
   get sisaltokieli() {

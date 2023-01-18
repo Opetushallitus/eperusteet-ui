@@ -69,7 +69,6 @@ export class OsaamiskokonaisuusStore implements IEditoitava {
 
     OsaamiskokonaisuusStore.config!.perusteStore!.updateNavigationEntry({
       id: this.osaamiskokonaisuusViiteId!,
-      type: 'osaamiskokonaisuus',
       label: (res.data as any).nimi as any,
     });
 
@@ -80,7 +79,6 @@ export class OsaamiskokonaisuusStore implements IEditoitava {
     await Sisallot.removeSisaltoViite(this.perusteId!, OsaamiskokonaisuusStore.config?.perusteStore.perusteSuoritustapa.value!, this.osaamiskokonaisuusViiteId!);
     OsaamiskokonaisuusStore.config!.perusteStore!.removeNavigationEntry({
       id: this.osaamiskokonaisuusViiteId!,
-      type: 'osaamiskokonaisuus',
     });
     OsaamiskokonaisuusStore.config.router.push({ name: 'perusteprojekti' });
   }
