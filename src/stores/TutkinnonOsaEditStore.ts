@@ -96,7 +96,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
 
         TutkinnonOsaEditStore.config!.perusteStore!.updateNavigationEntry({
           id: data.id!,
-          type: 'tutkinnonosaviite',
           label: data.tutkinnonOsa!.nimi as any,
         });
 
@@ -138,7 +137,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     await TutkinnonRakenne.removeTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
     TutkinnonOsaEditStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tutkinnonOsaViiteId,
-      type: 'tutkinnonosa',
     });
     TutkinnonOsaEditStore.config.router.push({ name: 'tutkinnonosat' });
   }

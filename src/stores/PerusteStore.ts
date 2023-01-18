@@ -163,33 +163,32 @@ export class PerusteStore implements IEditoitava {
     this.state.navigation = res.data;
   }
 
-  public removeNavigationEntry(item: { id: number, type: string }) {
+  public removeNavigationEntry(item: { id: number }) {
     if (this.state.navigation) {
       this.state.navigation = this.removeImpl(this.state.navigation, item);
     }
   }
 
-  removeImpl(node: NavigationNodeDto, item: { id: number, type: string }): NavigationNodeDto {
+  removeImpl(node: NavigationNodeDto, item: { id: number }): NavigationNodeDto {
     node.children = _(node.children || [])
-      .reject(child => child.id === item.id && child.type === item.type)
+      .reject(child => child.id === item.id)
       .map(child => this.removeImpl(child, item))
       .value();
     return node;
   }
 
-  public updateNavigationEntry(item: { id: number, type: string, label: { [key: string]: string }}) {
+  public updateNavigationEntry(item: { id: number, label: { [key: string]: string }}) {
     if (this.state.navigation) {
       this.state.navigation = this.updateImpl(this.state.navigation, item);
     }
   }
 
-  updateImpl(node: NavigationNodeDto, item: { id: number, type: string, label: { [key: string]: string }}): NavigationNodeDto {
+  updateImpl(node: NavigationNodeDto, item: { id: number, label: { [key: string]: string }}): NavigationNodeDto {
     node.children = _(node.children || [])
       .map(child => {
-        if (child.id === item.id && child.type === item.type) {
+        if (child.id === item.id) {
           return { ...child, label: item.label };
         }
-
         return child;
       })
       .map(child => this.updateImpl(child, item))

@@ -3,8 +3,7 @@ import VueRouter from 'vue-router';
 import Vue from 'vue';
 import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { Matala, OsaamiskokonaisuusDto, OsaamiskokonaisuusPaaAlueDto, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
-import _ from 'lodash';
+import { Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import { requiredOneLang } from '@shared/validators/required';
 
@@ -67,7 +66,6 @@ export class OsaamiskokonaisuusPaaAlueStore implements IEditoitava {
 
     OsaamiskokonaisuusPaaAlueStore.config!.perusteStore!.updateNavigationEntry({
       id: this.osaamiskokonaisuusPaaAlueViiteId!,
-      type: 'osaamiskokonaisuus_paa_alue',
       label: (res.data as any).nimi as any,
     });
 
@@ -78,7 +76,6 @@ export class OsaamiskokonaisuusPaaAlueStore implements IEditoitava {
     await Sisallot.removeSisaltoViite(this.perusteId!, OsaamiskokonaisuusPaaAlueStore.config?.perusteStore.perusteSuoritustapa.value!, this.osaamiskokonaisuusPaaAlueViiteId!);
     OsaamiskokonaisuusPaaAlueStore.config!.perusteStore!.removeNavigationEntry({
       id: this.osaamiskokonaisuusPaaAlueViiteId!,
-      type: 'osaamiskokonaisuus_paa_alue',
     });
     OsaamiskokonaisuusPaaAlueStore.config.router.push({ name: 'perusteprojekti' });
   }

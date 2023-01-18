@@ -1,15 +1,13 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Matala, Perusteenosat, Sisallot, PerusteprojektiListausDto, PerusteDtoTyyppiEnum, Laaja } from '@shared/api/eperusteet';
-import { Revision, Page } from '@shared/tyypit';
-import { Debounced } from '@shared/utils/delay';
+import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { Matala, Perusteenosat, Sisallot, PerusteDtoTyyppiEnum, Laaja } from '@shared/api/eperusteet';
+import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { translated } from '@shared/validators/required';
 import { PerusteenOsaDto } from '@shared/generated/eperusteet';
-// import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
 
@@ -77,7 +75,6 @@ export class TekstikappaleStore implements IEditoitava {
 
     TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
       id: this.tekstiKappaleViiteId,
-      type: 'viite',
       label: (res.data as any).nimi as any,
     });
 
@@ -95,7 +92,6 @@ export class TekstikappaleStore implements IEditoitava {
     await Sisallot.removeSisaltoViite(this.perusteId, TekstikappaleStore.config?.perusteStore.perusteSuoritustapa.value!, this.tekstiKappaleViiteId);
     TekstikappaleStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tekstiKappaleViiteId,
-      type: 'viite',
     });
     TekstikappaleStore.config.router.push({ name: 'perusteprojekti' });
   }

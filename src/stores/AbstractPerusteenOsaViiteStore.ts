@@ -3,10 +3,23 @@ import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
 import { Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
+import { PerusteStore } from '@/stores/PerusteStore';
+import VueRouter from 'vue-router';
 
 Vue.use(VueCompositionApi);
 
+interface AbstractPerusteenOsaViiteStoreStoreConfig {
+  perusteStore: PerusteStore;
+  router: VueRouter;
+}
+
 export abstract class AbstractPerusteenOsaViiteStore {
+  protected static config: AbstractPerusteenOsaViiteStoreStoreConfig;
+
+  public static install(vue: typeof Vue, config: AbstractPerusteenOsaViiteStoreStoreConfig) {
+    AbstractPerusteenOsaViiteStore.config = config;
+  }
+
   private state = reactive({
     perusteenOsaId: null as number | null,
   });
@@ -16,12 +29,11 @@ export abstract class AbstractPerusteenOsaViiteStore {
   protected constructor(
     public perusteId?: number,
     public perusteenOsaViiteId?: number,
-    public versionumero?: number,
-    public config?: any) {
-    if (!this.config?.perusteStore) {
+    public versionumero?: number) {
+    if (!AbstractPerusteenOsaViiteStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
     }
-    if (!this.config?.router) {
+    if (!AbstractPerusteenOsaViiteStore.config?.router) {
       throw new Error('VueRouter missing');
     }
   }
@@ -52,21 +64,19 @@ export abstract class AbstractPerusteenOsaViiteStore {
     }
     const res = await Perusteenosat.updatePerusteenOsa(this.perusteenOsaId.value!, data);
 
-    this.config.perusteStore!.updateNavigationEntry({
+    AbstractPerusteenOsaViiteStore.config.perusteStore!.updateNavigationEntry({
       id: this.perusteenOsaViiteId!,
-      type: '',
       label: (res.data as any).nimi as any,
     });
     return res.data;
   }
 
   public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId!, this.config?.perusteStore.perusteSuoritustapa.value!, this.perusteenOsaViiteId!);
-    this.config!.perusteStore!.removeNavigationEntry({
+    await Sisallot.removeSisaltoViite(this.perusteId!, AbstractPerusteenOsaViiteStore.config.perusteStore.perusteSuoritustapa.value!, this.perusteenOsaViiteId!);
+    AbstractPerusteenOsaViiteStore.config!.perusteStore!.removeNavigationEntry({
       id: this.perusteenOsaViiteId!,
-      type: '',
     });
-    this.config.router.push({ name: 'perusteprojekti' });
+    AbstractPerusteenOsaViiteStore.config.router.push({ name: 'perusteprojekti' });
   }
 
   public async create(otsikko, tekstikappaleIsa) {
@@ -78,16 +88,16 @@ export abstract class AbstractPerusteenOsaViiteStore {
 
     if (_.isEmpty(tekstikappaleIsa)) {
       const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
-        this.config.perusteStore.perusteId.value!,
-        this.config?.perusteStore.perusteSuoritustapa.value!,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value!,
+        AbstractPerusteenOsaViiteStore.config?.perusteStore.perusteSuoritustapa.value!,
         perusteenOsa
       ));
       return tallennettu.data;
     }
     else {
       const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
-        this.config.perusteStore.perusteId.value!,
-        this.config?.perusteStore.perusteSuoritustapa.value!,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value!,
+        AbstractPerusteenOsaViiteStore.config?.perusteStore.perusteSuoritustapa.value!,
         tekstikappaleIsa.id,
         perusteenOsa
       ));
