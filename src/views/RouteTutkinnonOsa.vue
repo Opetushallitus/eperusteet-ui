@@ -139,6 +139,42 @@
                 </tbody>
               </table>
             </b-form-group>
+
+            <div v-if="data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.arvioinninKohdealueet">
+              <div v-for="(arvioinninKohdeAlue, index) in data.tutkinnonOsa.arviointi.arvioinninKohdealueet" :key="'arvioinninKohdeAlue' + index">
+                <b-form-group :label="$kaanna(arvioinninKohdeAlue.otsikko)">
+                  <div v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
+                    <div class="font-weight-bold mb-2">
+                      <EpInput :isEditing="isEditing" v-model="arvioinninKohde.otsikko" />
+                    </div>
+                    <div class="mb-3">
+                      <EpInput :isEditing="isEditing" v-model="arvioinninKohde.selite" />
+                    </div>
+                    <b-row v-for="osaamistasonkriteeri in arvioinninKohde.osaamistasonKriteerit" :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso">
+                      <b-col cols="1" >{{$kaanna(arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko].osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko)}}</b-col>
+                      <b-col class="d-flex flex-column">
+                        <template v-if="!isEditing">
+                          <ul>
+                            <li v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex">
+                              {{$kaanna(osaamistasonkriteeri.kriteerit[kriteeriIndex])}}
+                            </li>
+                          </ul>
+                        </template>
+
+                        <template v-else>
+                          <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
+                            <EpInput class="w-100" :isEditing="isEditing" v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]" />
+                          </div>
+                        </template>
+                      </b-col>
+                    </b-row>
+                  </div>
+
+                </b-form-group>
+              </div>
+
+            </div>
+
             <EpAlert :text="$t('arviointia-ei-asetettu')" v-else />
           </ep-collapse>
 
@@ -295,6 +331,15 @@ export default class RouteTutkinnonosa extends Vue {
 
   get arviointiasteikot() {
     return this.arviointiStore.arviointiasteikot.value;
+  }
+
+  get arviointiasteikotKeyById() {
+    return _.keyBy(_.map(this.arviointiasteikot, arviointiasteikko => {
+      return {
+        ...arviointiasteikko,
+        osaamistasot: _.keyBy(arviointiasteikko.osaamistasot, 'id'),
+      };
+    }), 'id');
   }
 
   get kaikkiGeneeriset() {
