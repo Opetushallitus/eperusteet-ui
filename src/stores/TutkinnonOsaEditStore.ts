@@ -87,20 +87,22 @@ export class TutkinnonOsaEditStore implements IEditoitava {
       ...res.data,
       tutkinnonOsa: {
         ...res.data.tutkinnonOsa,
-        arviointi: {
-          ...res.data.tutkinnonOsa.arviointi,
-          arvioinninKohdealueet: _.map(res.data.tutkinnonOsa.arviointi.arvioinninKohdealueet, aka => {
-            return {
-              ...aka,
-              arvioinninKohteet: _.map(aka.arvioinninKohteet, ak => {
-                return {
-                  ...ak,
-                  osaamistasonKriteerit: _.sortBy(ak.osaamistasonKriteerit, '_osaamistaso'),
-                };
-              }),
-            };
-          }),
-        },
+        ...(res.data.tutkinnonOsa.arviointi && {
+          arviointi: {
+            ...res.data.tutkinnonOsa.arviointi,
+            arvioinninKohdealueet: _.map(res.data.tutkinnonOsa.arviointi?.arvioinninKohdealueet, aka => {
+              return {
+                ...aka,
+                arvioinninKohteet: _.map(aka.arvioinninKohteet, ak => {
+                  return {
+                    ...ak,
+                    osaamistasonKriteerit: _.sortBy(ak.osaamistasonKriteerit, '_osaamistaso'),
+                  };
+                }),
+              };
+            }),
+          },
+        }),
       },
     };
   }
