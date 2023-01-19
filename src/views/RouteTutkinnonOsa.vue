@@ -103,42 +103,44 @@
 
           <ep-collapse tyyppi="osaamisen-arviointi" :border-bottom="false" :border-top="true">
             <h3 slot="header">{{ $t('osaamisen-arviointi') }}</h3>
-            <b-form-group v-if="isEditing">
-              <b-form-radio
-                v-for="geneerinen in geneeriset"
-                v-model="data.tutkinnonOsa._geneerinenArviointiasteikko"
-                name="geneerinen"
-                :value="'' + geneerinen.id"
-                :key="'geneerinen-' + geneerinen.id">
-                {{ $kaanna(geneerinen.nimi) }}
-              </b-form-radio>
-            </b-form-group>
-            <b-form-group v-else-if="valittuGeneerinen">
-              <div class="mt-3 mb-4">
-                <div class="font-weight-bold">{{ $t('arvioinnin-kohde') }}</div>
-                <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
-              </div>
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th width="20%">{{ $t('osaamistaso') }}</th>
-                    <th>{{ $t('kriteerit') }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(ot, idx) in valittuGeneerinen.osaamistasot" :key="'ot-' + idx">
-                    <td>{{ $kaanna(ot.otsikko) }}</td>
-                    <td>
-                      <ul class="pl-4">
-                        <li v-for="(kriteeri, idx) in ot.kriteerit" :key="idx">
-                          {{ $kaanna(kriteeri) }}
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </b-form-group>
+            <div class="mb-4">
+              <b-form-group v-if="isEditing">
+                <b-form-radio
+                  v-for="geneerinen in geneeriset"
+                  v-model="data.tutkinnonOsa._geneerinenArviointiasteikko"
+                  name="geneerinen"
+                  :value="'' + geneerinen.id"
+                  :key="'geneerinen-' + geneerinen.id">
+                  {{ $kaanna(geneerinen.nimi) }}
+                </b-form-radio>
+              </b-form-group>
+              <b-form-group v-else-if="valittuGeneerinen">
+                <div class="mt-3 mb-4">
+                  <div class="font-weight-bold">{{ $t('arvioinnin-kohde') }}</div>
+                  <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
+                </div>
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th width="20%">{{ $t('osaamistaso') }}</th>
+                      <th>{{ $t('kriteerit') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(ot, idx) in valittuGeneerinen.osaamistasot" :key="'ot-' + idx">
+                      <td>{{ $kaanna(ot.otsikko) }}</td>
+                      <td>
+                        <ul class="pl-4">
+                          <li v-for="(kriteeri, idx) in ot.kriteerit" :key="idx">
+                            {{ $kaanna(kriteeri) }}
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </b-form-group>
+            </div>
 
             <div v-if="data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.arvioinninKohdealueet">
               <div v-for="(arvioinninKohdeAlue, index) in data.tutkinnonOsa.arviointi.arvioinninKohdealueet" :key="'arvioinninKohdeAlue' + index">
@@ -175,7 +177,7 @@
 
             </div>
 
-            <EpAlert :text="$t('arviointia-ei-asetettu')" v-else />
+            <EpAlert :text="$t('arviointia-ei-asetettu')" v-if="!isEditing && !data.tutkinnonOsa.arviointi && !valittuGeneerinen" />
           </ep-collapse>
 
           <ep-collapse tyyppi="ammattitaidon-osoittamistavat" :border-bottom="false" :border-top="true">
