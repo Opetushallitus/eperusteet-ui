@@ -6,110 +6,11 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import { requiredOneLang } from '@shared/validators/required';
+import { AbstractPerusteenOsaViiteStore } from './AbstractPerusteenOsaViiteStore';
 
 Vue.use(VueCompositionApi);
 
-interface OsaamiskokonaisuusPaaAlueStoreConfig {
-  perusteStore: PerusteStore;
-  router: VueRouter;
-}
-
-export class OsaamiskokonaisuusPaaAlueStore implements IEditoitava {
-  private state = reactive({
-    osaamiskokonaisuusPaaAlue: null as Matala | null,
-  });
-
-  private static config: OsaamiskokonaisuusPaaAlueStoreConfig;
-
-  public static install(vue: typeof Vue, config: OsaamiskokonaisuusPaaAlueStoreConfig) {
-    OsaamiskokonaisuusPaaAlueStore.config = config;
-  }
-
-  public readonly osaamiskokonaisuusPaaAlue = computed(() => this.state.osaamiskokonaisuusPaaAlue);
-  public readonly id = computed(() => this.state.osaamiskokonaisuusPaaAlue?.id);
-
-  constructor(
-    private readonly perusteId?: number,
-    private readonly osaamiskokonaisuusPaaAlueViiteId?: number,
-    public readonly versionumero?: number,
-  ) {
-    if (!OsaamiskokonaisuusPaaAlueStore.config?.perusteStore) {
-      throw new Error('PerusteStore missing');
-    }
-    if (!OsaamiskokonaisuusPaaAlueStore.config?.router) {
-      throw new Error('VueRouter missing');
-    }
-  }
-
-  public async fetch() {
-    if (this.versionumero) {
-      const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.osaamiskokonaisuusPaaAlueViiteId!)).data as Revision[];
-      const rev = revisions[revisions.length - this.versionumero];
-      this.state.osaamiskokonaisuusPaaAlue = (await Perusteenosat.getPerusteenOsaVersioByViite(this.osaamiskokonaisuusPaaAlueViiteId!, rev.numero)).data;
-    }
-    else {
-      this.state.osaamiskokonaisuusPaaAlue = (await Perusteenosat.getPerusteenOsatByViite(this.osaamiskokonaisuusPaaAlueViiteId!)).data;
-    }
-  }
-
-  public async load() {
-    await this.fetch();
-    return this.osaamiskokonaisuusPaaAlue.value;
-  }
-
-  async editAfterLoad() {
-    return false;
-  }
-
-  public async save(data: any) {
-    const res = await Perusteenosat.updatePerusteenOsa(this.id.value!, data);
-
-    OsaamiskokonaisuusPaaAlueStore.config!.perusteStore!.updateNavigationEntry({
-      id: this.osaamiskokonaisuusPaaAlueViiteId!,
-      label: (res.data as any).nimi as any,
-    });
-
-    return res.data;
-  }
-
-  public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId!, OsaamiskokonaisuusPaaAlueStore.config?.perusteStore.perusteSuoritustapa.value!, this.osaamiskokonaisuusPaaAlueViiteId!);
-    OsaamiskokonaisuusPaaAlueStore.config!.perusteStore!.removeNavigationEntry({
-      id: this.osaamiskokonaisuusPaaAlueViiteId!,
-    });
-    OsaamiskokonaisuusPaaAlueStore.config.router.push({ name: 'perusteprojekti' });
-  }
-
-  public async lock() {
-    try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.id.value!);
-      return res.data;
-    }
-    catch (err) {
-      return null;
-    }
-  }
-
-  public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.id.value!);
-    return res.data;
-  }
-
-  public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.id.value!);
-  }
-
-  public async revisions() {
-    const res = await Perusteenosat.getPerusteenOsaVersiot(this.id.value!);
-    return res.data as Revision[];
-  }
-
-  public async restore(rev: number) {
-    await this.acquire();
-    await Perusteenosat.revertPerusteenOsaToVersio(this.id.value!, rev);
-    await this.release();
-  }
-
+export class OsaamiskokonaisuusPaaAlueStore extends AbstractPerusteenOsaViiteStore {
   public readonly validator = computed(() => {
     return {
       nimi: {
@@ -133,6 +34,10 @@ export class OsaamiskokonaisuusPaaAlueStore implements IEditoitava {
       },
     };
   });
+
+  public getOsanType() {
+    return 'osaamiskokonaisuus_paa_alue';
+  }
 
   public static async create(osaamiskokonaisuusId) {
     const perusteenOsa = {
