@@ -89,7 +89,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpOsaAlue from '@/components/EpOsaamiskokonaisuus/EpOsaAlue.vue';
+import EpOsaAlue from '@shared/components/EpOsaamiskokonaisuus/EpOsaAlue.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
 import draggable from 'vuedraggable';
 

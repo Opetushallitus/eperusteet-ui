@@ -5,6 +5,7 @@ import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { PerusteStore } from '@/stores/PerusteStore';
 import VueRouter from 'vue-router';
+import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 
 Vue.use(VueCompositionApi);
 
@@ -13,7 +14,7 @@ interface AbstractPerusteenOsaViiteStoreStoreConfig {
   router: VueRouter;
 }
 
-export abstract class AbstractPerusteenOsaViiteStore {
+export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
   protected static config: AbstractPerusteenOsaViiteStoreStoreConfig;
 
   public static install(vue: typeof Vue, config: AbstractPerusteenOsaViiteStoreStoreConfig) {
@@ -26,7 +27,7 @@ export abstract class AbstractPerusteenOsaViiteStore {
 
   public readonly perusteenOsaId = computed(() => this.state.perusteenOsaId);
 
-  protected constructor(
+  public constructor(
     public perusteId?: number,
     public perusteenOsaViiteId?: number,
     public versionumero?: number) {
@@ -36,6 +37,10 @@ export abstract class AbstractPerusteenOsaViiteStore {
     if (!AbstractPerusteenOsaViiteStore.config?.router) {
       throw new Error('VueRouter missing');
     }
+  }
+
+  public async load(supportDataProvider?) {
+    return this.fetchPerusteenOsat();
   }
 
   public async fetchPerusteenOsat() {
