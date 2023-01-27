@@ -39,7 +39,7 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
     }
   }
 
-  public async load() {
+  public async load(supportDataProvider?) {
     return this.fetchPerusteenOsat();
   }
 
