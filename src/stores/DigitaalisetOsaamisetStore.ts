@@ -24,7 +24,12 @@ export class DigitaalisetOsaamisetStore implements IProjektiProvider {
   public readonly projects = computed(() => this.state.projects);
 
   public async updateOwnProjects() {
-    const res = _.map(await Promise.all([Perusteprojektit.getOmatPerusteprojektit(), Perusteprojektit.getOmatJulkaistutPerusteprojektit()]), 'data') as any;
+    const res = _.map(await Promise.all(
+      [
+        this.findPerusteet({ tila: ['LAADINTA'] }),
+        this.findPerusteet({ tila: ['JULKAISTU'] }),
+      ]
+    ), 'data') as any;
     this.state.ownProjects = _.uniqBy([...res[0], ...res[1]], projekti => projekti.id);
   }
 
@@ -35,10 +40,23 @@ export class DigitaalisetOsaamisetStore implements IProjektiProvider {
 
   @Debounced(300)
   public async updateQuery(query: PerusteQuery) {
-    this.state.projects = (await this.findPerusteet());
+    this.state.projects = (await this.findPerusteet({ tila: ['POISTETTU'] }));
+
+    if (_.size(this.state.projects.data) > 0) {
+      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(_.map(this.state.projects.data, 'id') as number[])).data;
+      const resWithRights = {
+        ...this.state.projects,
+        data: (this.state.projects).data.map(proj => ({
+          ...proj,
+          oikeudet: rights[proj.id!],
+        })),
+      };
+
+      this.state.projects = resWithRights;
+    }
   }
 
-  public async findPerusteet() {
+  public async findPerusteet(query) {
     const res = await getPerusteprojektit({
       sivu: 0,
       sivukoko: 100,
@@ -46,12 +64,12 @@ export class DigitaalisetOsaamisetStore implements IProjektiProvider {
       siirtyma: false,
       tuleva: false,
       poistunut: false,
-      tila: ['POISTETTU'],
       tyyppi: ['DIGITAALINEN_OSAAMINEN'],
       nimi: '',
       jarjestysOrder: false,
       jarjestysTapa: 'nimi',
       perusteet: [],
+      ...query,
     });
     return res.data as Page<PerusteprojektiKevytDto>;
   }

@@ -21,6 +21,7 @@ import { TilastotStore } from '@/stores/TilastotStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
 import { MaarayksetStore } from '@/stores/MaarayksetStore';
 import { PoistetutStore } from './PoistetutStore';
+import { DigitaalisetOsaamisetStore } from './DigitaalisetOsaamisetStore';
 
 const arviointiStore = new ArviointiStore(Kielet);
 const kayttajaStore = Kayttajat;
@@ -29,7 +30,7 @@ const perusteStore = new PerusteStore();
 const perusteetStore = new PerusteetStore({ tyyppi: ['NORMAALI', 'AMOSAA_YHTEINEN'] } as any);
 const perusteprojektiStore = new PerusteprojektiStore();
 const pohjatStore = new PerusteetStore({ tyyppi: ['POHJA'] } as any);
-const digitaalisetOsaamisetStore = new PerusteetStore({ tyyppi: ['DIGITAALINEN_OSAAMINEN'] } as any);
+const digitaalisetOsaamisetStore = new DigitaalisetOsaamisetStore({ tyyppi: ['DIGITAALINEN_OSAAMINEN'] } as any);
 const ulkopuolisetStore = new UlkopuolisetStore();
 const tutkinnonOsaStore = new TutkinnonOsaStore(perusteStore);
 const muokkaustietoStore = new MuokkaustietoStore();
