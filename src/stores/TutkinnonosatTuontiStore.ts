@@ -4,7 +4,7 @@ import { Debounced } from '@shared/utils/delay';
 import * as _ from 'lodash';
 import { Page } from '@shared/tyypit';
 import { getAllPerusteetInternal, PerusteDto, PerusteHakuInternalDto, Tutkinnonosat, TutkinnonOsaViiteKontekstiDto, TutkinnonRakenne, TutkinnonOsaViiteLuontiDto } from '@shared/api/eperusteet';
-import { ammatillisetKoulutustyypit, perusteenSuoritustapa } from '@shared/utils/perusteet';
+import { AmmatillisetKoulutustyypit, perusteenSuoritustapa } from '@shared/utils/perusteet';
 
 Vue.use(VueCompositionApi);
 
@@ -28,7 +28,7 @@ export class TutkinnonosatTuontiStore {
     this.state.perusteet = (await getAllPerusteetInternal({
       sivukoko: 100,
       nimi: query,
-      koulutustyyppi: ammatillisetKoulutustyypit,
+      koulutustyyppi: AmmatillisetKoulutustyypit,
       tila: ['valmis', 'luonnos'],
     })).data as any;
   }

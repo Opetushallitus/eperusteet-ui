@@ -14,7 +14,7 @@ Vue.use(VueCompositionApi);
 export class OsaamiskokonaisuusStore extends AbstractPerusteenOsaViiteStore {
   public async load(supportDataProvider) {
     const data = await this.fetchPerusteenOsat();
-    const viiteLapsilla = (await Perusteenosat.getPerusteenOsaViiteLapsilla(this.perusteId!, this.perusteenOsaId.value!)).data;
+    const viiteLapsilla = (await Perusteenosat.getPerusteenOsaViiteLapsilla(this.perusteId!, this.perusteenOsaViiteId!)).data;
     supportDataProvider({ paaAlueet: _.filter(viiteLapsilla.lapset, lapsi => _.get(lapsi.perusteenOsa, 'osanTyyppi') === 'osaamiskokonaisuus_paa_alue') });
     return data;
   }
