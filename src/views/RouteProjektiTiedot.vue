@@ -68,7 +68,7 @@
         <h3>{{ $t('esikatselu-ja-lataus') }}</h3>
         <b-container fluid>
           <b-row no-gutters>
-            <b-col lg="6">
+            <b-col lg="6" :class="{'disabled-events': data.tila === 'poistettu'}">
               <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing" v-if="isEditing || !data.esikatseltavissa">
                 {{$t('salli-perusteen-esikatselu')}}
               </ep-toggle>
