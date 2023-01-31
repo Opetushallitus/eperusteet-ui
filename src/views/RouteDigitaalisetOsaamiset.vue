@@ -42,13 +42,12 @@ import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { PerusteetStore } from '@/stores/PerusteetStore';
 import * as _ from 'lodash';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import EpArkistoidutModal from '@shared/components/EpArkistoidutModal/EpArkistoidutModal.vue';
-import { PerusteprojektiDtoTilaEnum } from '@shared/api/eperusteet';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
+import { DigitaalisetOsaamisetStore } from '@/stores/DigitaalisetOsaamisetStore';
 
 @Component({
   components: {
@@ -63,7 +62,7 @@ import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 })
 export default class RouteDigitaalisetOsaamiset extends Vue {
   @Prop({ required: true })
-  digitaalisetOsaamisetStore!: PerusteetStore;
+  digitaalisetOsaamisetStore!: DigitaalisetOsaamisetStore;
 
   async mounted() {
     this.digitaalisetOsaamisetStore.clear();
