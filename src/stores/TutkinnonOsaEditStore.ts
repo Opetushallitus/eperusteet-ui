@@ -50,7 +50,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     return _.toNumber(_.get(_.find(this.geneeriset, 'oletusvalinta'), 'id'));
   }
 
-  public async load() {
+  public async load(supportDataProvider) {
     if (!this.tutkinnonOsaViiteId) {
       return {
         tyyppi: 'normaali',
@@ -83,6 +83,8 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     }
     this.projektitJoissaKaytossa = (await (Perusteenosat.getOwningProjektit((res.data as any).tutkinnonOsa.id))).data;
     this.tutkinnonOsaId = Number((res.data as any)._tutkinnonOsa);
+    supportDataProvider({ projektitJoissaKaytossa: this.projektitJoissaKaytossa });
+
     return {
       ...res.data,
       tutkinnonOsa: {
@@ -225,15 +227,13 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   public features(data: any) {
     return computed(() => {
       return {
-        editable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS)
-          && ((!data?.tutkinnonOsa?.alkuperainenPeruste && _.size(this.projektitJoissaKaytossa) <= 1)
-          || data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
+        editable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) <= 1,
         removable: true,
         hideable: false,
         recoverable: data?.tutkinnonOsa?.tila !== 'valmis'
           && ((!data?.tutkinnonOsa?.alkuperainenPeruste && _.size(this.projektitJoissaKaytossa) <= 1)
           || data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
-        copyable: data?.tutkinnonOsa?.alkuperainenPeruste?.id !== this.perusteId && (data?.tutkinnonOsa?.tila === 'valmis' || _.size(this.projektitJoissaKaytossa) > 1),
+        copyable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) > 1,
       } as EditoitavaFeatures;
     });
   }

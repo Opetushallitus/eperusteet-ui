@@ -10,6 +10,15 @@
         </h2>
       </template>
 
+      <template v-slot:kopioi="{ data, supportData }">
+        <EpTutkinnonOsaKaytossaModal
+          v-if="supportData.projektitJoissaKaytossa.length > 1"
+          :alkuperainenPeruste="data.tutkinnonOsa.alkuperainenPeruste"
+          :projektit="supportData.projektitJoissaKaytossa"
+          :kopioi="kopioiTutkinnonoOsa"
+          :muokkaa="muokkaaTutkinnonOsaa"/>
+      </template>
+
       <template v-slot:default="{ data, isEditing, validation }">
         <div class="mt-1" v-if="isEditing && isNew">
           <ep-error-wrapper>
@@ -238,6 +247,7 @@ import { Koodisto, TutkinnonosatPrivate } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { Kielet } from '@shared/stores/kieli';
+import EpTutkinnonOsaKaytossaModal from '@/components/EpTutkinnonOsaKaytossaModal.vue';
 
 @Component({
   components: {
@@ -253,6 +263,7 @@ import { Kielet } from '@shared/stores/kieli';
     EpLaajuusInput,
     EpSpinner,
     EpKoodistoSelect,
+    EpTutkinnonOsaKaytossaModal,
   },
 })
 export default class RouteTutkinnonosa extends Vue {
@@ -505,6 +516,15 @@ export default class RouteTutkinnonosa extends Vue {
     finally {
       this.koodiTallennus = false;
     }
+  }
+
+  async kopioiTutkinnonoOsa() {
+    await this.store?.copy();
+    this.$success(this.$t('tutkinnon-osa-kopioitu') as string);
+  }
+
+  async muokkaaTutkinnonOsaa() {
+    await this.store?.start();
   }
 }
 </script>
