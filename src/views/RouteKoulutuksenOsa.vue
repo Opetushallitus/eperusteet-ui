@@ -65,7 +65,7 @@
               class="sr-only"
               aria-hidden="true"
               :value="data.nimi"
-              @input="data.nimi = this.setNimiValue(data.nimiKoodi)"
+              @input="data.nimi = setNimiValue(data.nimiKoodi)"
               :is-editing="isEditing"
               :validation="validation.nimi"
               ref="inputNimi"/>
