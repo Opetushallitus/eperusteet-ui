@@ -9,7 +9,12 @@
             <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
-                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('perustepohjaa') }}</b-form-radio>
+                <b-form-radio class="p-2 d-flex" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">
+                  <div class="d-flex">
+                    <div>{{ $t('perustepohjaa') }}</div>
+                    <EpSpinner v-if="!pohjat" small/>
+                  </div>
+                </b-form-radio>
                 <div v-if="tyyppi === 'pohjasta'">
                   <EpMultiSelect
                     v-if="pohjat"
@@ -26,10 +31,14 @@
                       {{ $kaanna(option.nimi) }}
                     </template>
                   </EpMultiSelect>
-                  <EpSpinner v-else />
                 </div>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">{{ $t('toista-perusteprojektia') }}</b-form-radio>
+                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">
+                  <div class="d-flex">
+                    <div>{{ $t('toista-perusteprojektia') }}</div>
+                    <EpSpinner v-if="!perusteet" small/>
+                  </div>
+                </b-form-radio>
                 <div v-if="tyyppi === 'perusteesta'">
                   <EpMultiSelect
                     v-if="perusteet"
@@ -53,7 +62,6 @@
                       </span>
                     </template>
                   </EpMultiSelect>
-                  <EpSpinner v-else />
                 </div>
 
                 <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi-ilman-pohjaa') }}</b-form-radio>
