@@ -421,7 +421,7 @@ export default class RouteTutkinnonosa extends Vue {
 
   async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(this.perusteId!, Number(this.tutkinnonOsaId), this, this.versionumero, this.isNew ? this.geneeriset : undefined);
+    const store = new TutkinnonOsaEditStore(this.perusteId!, !this.isNew ? this.tutkinnonOsaId : undefined, this, this.versionumero, this.isNew ? this.geneeriset : undefined);
     this.store = new EditointiStore(store);
   }
 
