@@ -33,7 +33,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   constructor(
     private readonly perusteId: number,
     // Jos undefined, luodaan uusi
-    private readonly tutkinnonOsaViiteId?: number,
+    private readonly tutkinnonOsaViiteId?: any,
     private readonly el?: any,
     public versionumero?: number,
     private geneeriset?: any,
@@ -227,13 +227,14 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   public features(data: any) {
     return computed(() => {
       return {
-        editable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) <= 1,
+        editable: (TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) <= 1)
+          || (data.tutkinnonOsa.tyyppi !== 'normaali' && data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
         removable: true,
         hideable: false,
         recoverable: data?.tutkinnonOsa?.tila !== 'valmis'
           && ((!data?.tutkinnonOsa?.alkuperainenPeruste && _.size(this.projektitJoissaKaytossa) <= 1)
           || data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
-        copyable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) > 1,
+        copyable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) > 1 && data.tutkinnonOsa.tyyppi === 'normaali',
       } as EditoitavaFeatures;
     });
   }

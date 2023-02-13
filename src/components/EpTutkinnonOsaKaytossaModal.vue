@@ -16,7 +16,11 @@
 
       <div class="font-weight-bold mt-4 mb-2">{{$t('perusteet-jotka-muuttuvat-kun-tutkinnon-osaa-muokataan')}}:</div>
       <div v-for="peruste in perusteet" :key="'peruste'+peruste.id">
-        {{$kaanna(peruste.nimi)}} <span v-if="peruste.alkuperainen" class="font-italic">({{$t('tutkinnon-osa-on-luotu-tassa-perusteessa')}})</span>
+        {{$kaanna(peruste.nimi)}}
+        <span v-if="peruste.voimassaoloAlkaa || peruste.voimassaoloLoppuu">
+          (<span v-if="peruste.voimassaoloAlkaa">{{$sd(peruste.voimassaoloAlkaa)}}</span> - <span v-if="peruste.voimassaoloLoppuu">{{$sd(peruste.voimassaoloLoppuu)}}</span>)
+        </span>
+        <span v-if="peruste.alkuperainen" class="font-italic">({{$t('tutkinnon-osa-on-luotu-tassa-perusteessa')}})</span>
       </div>
 
       <template v-if="!kasitellaanAlkuperaista">
