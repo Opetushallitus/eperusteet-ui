@@ -266,9 +266,45 @@
               <b-form-group :label="$t('muutosmaaraykset')">
                 <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
                                     :is-editing="isEditing"
-                                    :liitteet="liitteet" />
+                                    :liitteet="liitteetFiltered" />
               </b-form-group>
             </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col class="mb-4">
+              <hr/>
+              <b-form-group>
+                <h3 slot="label">{{$t('saamen-kielelle-kaannetyt-perusteet')}}</h3>
+                <ep-spinner v-if="!liitteet" />
+                <div v-if="isEditing" class="mb-4">
+                  <div class="lataaliite mb-3">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                  <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="kaannosFile" :as-binary="true" />
+                </div>
+                <b-table v-if="kaannokset.length > 0"
+                        :items="kaannokset"
+                        :fields="kaannoksetFields"
+                        responsive
+                        borderless
+                        striped
+                        fixed
+                        hover>
+                  <template v-slot:cell(nimi)="data">
+                    <a class="btn btn-link pl-0" :href="data.item.url" target="_blank" rel="noopener noreferrer" variant="link">
+                      {{ data.item.nimi }}
+                    </a>
+                  </template>
+                  <template v-slot:cell(toiminnot)="data">
+                    <div class="text-center" v-if="isEditing">
+                      <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                        {{ $t('poista') }}
+                      </ep-button>
+                    </div>
+                  </template>
+                </b-table>
+              </b-form-group>
+            </b-col>
+
           </b-row>
 
           <b-row v-if="isAmmatillinen">
@@ -378,7 +414,7 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { Api, Liitetiedostot, Koodisto } from '@shared/api/eperusteet';
+import { Api, Liitetiedostot, Koodisto, LiiteDtoTyyppiEnum, LiitetiedostotParam, baseURL } from '@shared/api/eperusteet';
 import { SallitutKoulutustyyppisiirtymat, Koulutustyyppi } from '@shared/tyypit';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteEditStore } from '@/stores/PerusteEditStore';
@@ -440,6 +476,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   private store: EditointiStore | null = null;
   private file: any | null = null;
   private koulutusvienninOhjeFile: any | null = null;
+  private kaannosFile: any | null = null;
   private liitteet: any[] | null = null;
   private liitteenNimi = '';
   private korvattavatPerusteet: { [diaari: string]: any } = {};
@@ -480,15 +517,20 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     this.liitteet = _.map(res.data, liite => ({
       ...liite,
       lisatieto: liite.lisatieto || '',
+      url: baseURL + LiitetiedostotParam.getLiite(this.perusteId!, liite.id!).url,
     }));
   }
 
   get liitteetFiltered() {
-    return _.reject(this.liitteet, liite => liite.tyyppi === 'KOULUTUSVIENNINOHJE');
+    return _.reject(this.liitteet, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KOULUTUSVIENNINOHJE) || liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KAANNOS));
   }
 
   get koulutusvienninOhjeet() {
-    return _.filter(this.liitteet, liite => liite.tyyppi === 'KOULUTUSVIENNINOHJE');
+    return _.filter(this.liitteet, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KOULUTUSVIENNINOHJE));
+  }
+
+  get kaannokset() {
+    return _.filter(this.liitteet, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KAANNOS));
   }
 
   get siirtymat() {
@@ -599,6 +641,27 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     }, {
       key: 'diaarinumero',
       label: this.$t('diaarinumero'),
+      sortable: false,
+    }, {
+      key: 'luotu',
+      label: this.$t('julkaistu'),
+      sortable: false,
+      formatter: (value: any, key: any, item: any) => {
+        return (this as any).$sdt(value);
+      },
+    }, {
+      key: 'toiminnot',
+      label: '',
+      thStyle: { width: '10%' },
+      sortable: false,
+    }];
+  }
+
+  get kaannoksetFields() {
+    return [{
+      key: 'nimi',
+      label: this.$t('nimi'),
+      thStyle: { width: '40%' },
       sortable: false,
     }, {
       key: 'luotu',
@@ -735,6 +798,27 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       this.$success(this.$t('koulutusvienninohje-tallennettu') as string);
       this.fetchLiitteet();
       this.koulutusvienninOhjeFile = null;
+    }
+  }
+
+  @Watch('kaannosFile')
+  async kaannosFileChange() {
+    if (this.kaannosFile) {
+      const data = new FormData();
+      data.append('file', window.btoa(this.kaannosFile.binary));
+      data.set('nimi', this.kaannosFile.file.name);
+      data.set('tyyppi', 'kaannos');
+      await Api.request({
+        method: 'POST',
+        url: `perusteet/${this.perusteId!}/liitteet/b64`,
+        data,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      this.$success(this.$t('kaannos-tallennettu') as string);
+      this.fetchLiitteet();
+      this.kaannosFile = null;
     }
   }
 
