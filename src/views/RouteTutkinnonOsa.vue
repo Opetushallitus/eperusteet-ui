@@ -151,7 +151,7 @@
               </b-form-group>
             </div>
 
-            <div v-if="data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.arvioinninKohdealueet">
+            <div v-if="!valittuGeneerinen && data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.arvioinninKohdealueet">
               <div v-for="(arvioinninKohdeAlue, index) in data.tutkinnonOsa.arviointi.arvioinninKohdealueet" :key="'arvioinninKohdeAlue' + index">
                 <b-form-group :label="$kaanna(arvioinninKohdeAlue.otsikko)">
                   <div v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
