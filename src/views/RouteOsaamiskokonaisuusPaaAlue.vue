@@ -160,25 +160,29 @@ export default class RouteOsaamiskokonaisuusPaaAlue extends Vue {
           tasokuvaukset: [
             {
               taso: 'VARHAISKASVATUS',
-              kuvaukset: [],
+              osaamiset: [],
             },
             {
               taso: 'ESIOPETUS',
-              kuvaukset: [],
+              edelleenKehittyvatOsaamiset: [],
+              osaamiset: [],
             },
             {
               taso: 'VUOSILUOKKA_12',
-              kuvaukset: [],
+              edelleenKehittyvatOsaamiset: [],
+              osaamiset: [],
               edistynytOsaaminenKuvaukset: [],
             },
             {
               taso: 'VUOSILUOKKA_3456',
-              kuvaukset: [],
+              edelleenKehittyvatOsaamiset: [],
+              osaamiset: [],
               edistynytOsaaminenKuvaukset: [],
             },
             {
               taso: 'VUOSILUOKKA_789',
-              kuvaukset: [],
+              edelleenKehittyvatOsaamiset: [],
+              osaamiset: [],
               edistynytOsaaminenKuvaukset: [],
             },
           ],
