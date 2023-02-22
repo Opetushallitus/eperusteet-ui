@@ -73,7 +73,7 @@ export class PerusteStore implements IEditoitava {
       return null;
     }
 
-    if (isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi)) {
+    if (isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi) && !this.isOpas.value) {
       return {
         ...this.state.navigation,
         children: [
