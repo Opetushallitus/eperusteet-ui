@@ -110,9 +110,6 @@ export default class RouteOsaamiskokonaisuusPaaAlue extends Vue {
   editointiStore: EditointiStore | null = null;
 
   @Prop({ required: true })
-  osaamiskokonaisuusId!: number;
-
-  @Prop({ required: true })
   osaamiskokonaisuusPaaAlueId!: number;
 
   @Watch('osaamiskokonaisuusPaaAlueId', { immediate: true })
