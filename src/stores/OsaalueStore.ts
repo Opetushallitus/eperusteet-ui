@@ -52,8 +52,13 @@ export class OsaalueStore implements IEditoitava {
 
   async lock() {
     try {
-      const res = await OsaAlueet.getOsaAlueLock(this.tovId, Number(this.osaalueId));
-      return res.data;
+      if (this.osaalueId !== 'uusi') {
+        const res = await OsaAlueet.getOsaAlueLock(this.tovId, Number(this.osaalueId));
+        return res.data;
+      }
+      else {
+        return null;
+      }
     }
     catch (err) {
       return null;
