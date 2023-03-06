@@ -152,38 +152,11 @@
             </div>
 
             <div v-if="!valittuGeneerinen && data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.arvioinninKohdealueet">
-              <div v-for="(arvioinninKohdeAlue, index) in data.tutkinnonOsa.arviointi.arvioinninKohdealueet" :key="'arvioinninKohdeAlue' + index">
-                <b-form-group :label="$kaanna(arvioinninKohdeAlue.otsikko)">
-                  <div v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
-                    <div class="font-weight-bold mb-2">
-                      <EpInput :isEditing="isEditing" v-model="arvioinninKohde.otsikko" />
-                    </div>
-                    <div class="mb-3">
-                      <EpInput :isEditing="isEditing" v-model="arvioinninKohde.selite" />
-                    </div>
-                    <b-row v-for="osaamistasonkriteeri in arvioinninKohde.osaamistasonKriteerit" :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso">
-                      <b-col cols="1" >{{$kaanna(arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko].osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko)}}</b-col>
-                      <b-col class="d-flex flex-column">
-                        <template v-if="!isEditing">
-                          <ul>
-                            <li v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex">
-                              {{$kaanna(osaamistasonkriteeri.kriteerit[kriteeriIndex])}}
-                            </li>
-                          </ul>
-                        </template>
-
-                        <template v-else>
-                          <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
-                            <EpInput class="w-100" :isEditing="isEditing" v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]" />
-                          </div>
-                        </template>
-                      </b-col>
-                    </b-row>
-                  </div>
-
-                </b-form-group>
-              </div>
-
+              <EpArviointi v-for="(arvioinninKohdeAlue, index) in data.tutkinnonOsa.arviointi.arvioinninKohdealueet"
+                :key="'arvioinninKohdeAlue' + index"
+                v-model="data.tutkinnonOsa.arviointi.arvioinninKohdealueet[index]"
+                :isEditing="isEditing"
+                :arviointiasteikot="arviointiasteikot" />
             </div>
 
             <EpAlert :text="$t('arviointia-ei-asetettu')" v-if="!isEditing && !data.tutkinnonOsa.arviointi && !valittuGeneerinen" />
@@ -248,6 +221,7 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpTutkinnonOsaKaytossaModal from '@/components/EpTutkinnonOsaKaytossaModal.vue';
+import EpArviointi from '@/views/tutkinnonosat/EpArviointi.vue';
 
 @Component({
   components: {
@@ -264,6 +238,7 @@ import EpTutkinnonOsaKaytossaModal from '@/components/EpTutkinnonOsaKaytossaModa
     EpSpinner,
     EpKoodistoSelect,
     EpTutkinnonOsaKaytossaModal,
+    EpArviointi,
   },
 })
 export default class RouteTutkinnonosa extends Vue {
