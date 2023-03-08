@@ -45,6 +45,10 @@ export class PerusteprojektiRoute extends Vue {
     return this.perusteStore?.projekti?.value || null;
   }
 
+  protected get julkaisukielet() {
+    return this.perusteStore.julkaisukielet.value;
+  }
+
   protected get isPohja() {
     if (this.peruste) {
       return this.peruste.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA);

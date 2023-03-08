@@ -101,22 +101,22 @@
     <template v-if="!isPohja">
       <div v-if="julkaisuMahdollinen">
         <hr class="mt-4 mb-4">
-
         <h3>{{ $t('uusi-julkaisu') }}</h3>
-
-        <b-form-group :label="$t('julkaisutiedot')" class="mt-4">
-          <div class="mb-3">{{ $t('teksti-naytetaan-taman-sivun-julkaisuhistoriassa') }}</div>
-          <ep-content v-model="julkaisu.tiedote"
-                      layout="simplified"
-                      :is-editable="true" />
-          <EpJulkaisuButton class="mt-3" :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" :julkaisuKesken="julkaisuKesken"/>
+        <EpJulkaisuForm :julkaisu="julkaisu"
+                        :peruste-id="perusteId"
+                        :julkaisukielet="julkaisukielet">
+        </EpJulkaisuForm>
+        <b-form-group>
+          <EpJulkaisuButton :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" :julkaisuKesken="julkaisuKesken"/>
         </b-form-group>
       </div>
+
+      <hr class="mt-4 mb-4">
 
       <EpJulkaisuHistoria :julkaisut="julkaisut" :palauta="palautaJulkaisu">
         <template slot="katsele" slot-scope="{ julkaisu }">
           <ep-external-link :url="opintopolkuKatseluUrl(julkaisu)">
-            {{$t('katsele-perustetta')}}
+            {{$t('katsele')}}
           </ep-external-link>
         </template>
         <div slot="empty">{{ $t('perusteella-ei-julkaisuja') }}</div>
@@ -127,7 +127,7 @@
 </template>
 
 <script lang="ts">
-import { Mixins, Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Mixins, Prop, Component } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -138,7 +138,6 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import EpMuutosmaaraykset from '@/components/EpMuutosmaaraykset.vue';
 import { PerusteDtoTilaEnum, NavigationNodeDto, Status, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -155,6 +154,7 @@ import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue
 import { buildKatseluUrl } from '@shared/utils/esikatselu';
 import { koulutustyyppiTheme } from '@shared/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
+import EpJulkaisuForm from '@/components/EpJulkaisuForm/EpJulkaisuForm.vue';
 
 @Component({
   components: {
@@ -168,7 +168,6 @@ import { Kielet } from '@shared/stores/kieli';
     EpKoulutustyyppiSelect,
     EpMainView,
     EpMultiSelect,
-    EpMuutosmaaraykset,
     EpSpinner,
     EpToggle,
     EpVirhelistaus,
@@ -176,6 +175,7 @@ import { Kielet } from '@shared/stores/kieli';
     EpJulkaisuHistoria,
     EpJulkaisuButton,
     EpExternalLink,
+    EpJulkaisuForm,
   },
 })
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
@@ -187,6 +187,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
   private julkaisu = {
     tiedote: {},
+    julkinenTiedote: {},
+    julkinen: false,
+    muutosmaaraysVoimaan: null,
+    muutosmaaraykset: [],
   };
 
   private hallintaLoading: boolean = false;
@@ -214,9 +218,16 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     try {
       await this.perusteStore!.julkaise({
         tiedote: this.julkaisu.tiedote,
+        julkinenTiedote: this.julkaisu.julkinenTiedote,
+        julkinen: this.julkaisu.julkinen,
+        muutosmaaraysVoimaan: this.julkaisu.muutosmaaraysVoimaan,
+        muutosmaaraykset: this.julkaisu.muutosmaaraykset,
       });
 
       this.julkaisu.tiedote = {};
+      this.julkaisu.julkinenTiedote = {};
+      this.julkaisu.julkinen = false;
+      this.julkaisu.muutosmaaraysVoimaan = null;
       this.$success(this.$t('julkaisu-kaynnistetty') as string);
     }
     catch (err) {
@@ -378,7 +389,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     if (revision === _.max(_.map(this.julkaisut, 'revision'))) {
       revision = null;
     }
-
     return buildKatseluUrl(Kielet.getSisaltoKieli.value, `/${koulutustyyppiTheme(this.perusteStore.peruste.value!.koulutustyyppi!)}/${julkaisu.peruste.id}`, revision);
   }
 }
@@ -404,10 +414,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 .lataaliite {
   font-size: 0.9rem;
   font-weight: 600;
-}
-
-.julkaisuhistoria {
-  padding-top: 60px;
 }
 
 .julkaisu:nth-of-type(even) {
