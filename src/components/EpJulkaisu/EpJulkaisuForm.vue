@@ -53,7 +53,7 @@
       </ep-toggle>
     </b-form-group>
     <b-form-group v-if="julkaisu.julkinen" :label="$t('tiedote-julkiselle-sivustolle')" class="mt-4">
-      <div class="mt-4 mb-3">{{ $t('tiedote-naytetaan-perusteen-tiedot-näkyman-julkaisuhistoriassa') }}</div>
+      <div class="mb-3">{{ $t('tiedote-naytetaan-perusteen-tiedot-näkyman-julkaisuhistoriassa') }}</div>
       <ep-content v-model="julkaisu.julkinenTiedote"
                   layout="simplified"
                   :is-editable="true" />
@@ -71,10 +71,10 @@ import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import EpJulkaisuMuutosmaaraykset from '@/components/EpJulkaisuMuutosmaaraykset.vue';
+import EpJulkaisuMuutosmaaraykset from './EpJulkaisuMuutosmaaraykset.vue';
 import { Validations } from 'vuelidate-property-decorators';
-import { koodistoKoodiValidator, requiredLokalisoituTeksti, requiredOneLang } from '@shared/validators/required';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { requiredIf } from 'vuelidate/lib/validators';
+import { PerusteStore } from '@/stores/PerusteStore';
 
 @Component({
   components: {
@@ -89,13 +89,10 @@ import { required, requiredIf } from 'vuelidate/lib/validators';
 })
 export default class EpJulkaisuForm extends Vue {
   @Prop({ required: true })
+  private store!: PerusteStore;
+
+  @Prop({ required: true })
   private julkaisu: any;
-
-  @Prop({ required: true })
-  private perusteId: any;
-
-  @Prop({ required: true })
-  private julkaisukielet: any;
 
   private file: any | null = null;
   private liitteenNimi = '';
@@ -108,6 +105,14 @@ export default class EpJulkaisuForm extends Vue {
         required: requiredIf((value) => this.julkaisu.muutosmaaraykset && this.julkaisu.muutosmaaraykset.length > 0),
       },
     },
+  }
+
+  get perusteId() {
+    return this.store.perusteId.value;
+  }
+
+  get julkaisukielet() {
+    return this.store.julkaisukielet.value;
   }
 
   async mounted() {
@@ -182,7 +187,7 @@ export default class EpJulkaisuForm extends Vue {
       sortable: true,
     }, {
       key: 'luotu',
-      label: this.$t('lisätty'),
+      label: this.$t('lisatty'),
       sortable: true,
       formatter: (value: any) => {
         return (this as any).$sdt(value);

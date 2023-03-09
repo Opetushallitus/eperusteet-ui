@@ -56,7 +56,6 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { LiiteDto } from '@shared/api/eperusteet';
-import * as _ from 'lodash';
 
 @Component({
   components: {
@@ -123,7 +122,6 @@ export default class EpJulkaisuMuutosmaaraykset extends Vue {
 </script>
 
 <style lang="scss" scoped>
-
 .w-30 {
   width: 30% !important;
 }

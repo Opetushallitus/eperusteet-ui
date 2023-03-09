@@ -102,9 +102,8 @@
       <div v-if="julkaisuMahdollinen">
         <hr class="mt-4 mb-4">
         <h3>{{ $t('uusi-julkaisu') }}</h3>
-        <EpJulkaisuForm :julkaisu="julkaisu"
-                        :peruste-id="perusteId"
-                        :julkaisukielet="julkaisukielet">
+        <EpJulkaisuForm :store="perusteStore"
+                        :julkaisu="julkaisu">
         </EpJulkaisuForm>
         <b-form-group>
           <EpJulkaisuButton :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" :julkaisuKesken="julkaisuKesken"/>
@@ -113,7 +112,8 @@
 
       <hr class="mt-4 mb-4">
 
-      <EpJulkaisuHistoria :julkaisut="julkaisut" :palauta="palautaJulkaisu">
+      <EpJulkaisuHistoria :store="perusteStore"
+                          :palauta="palautaJulkaisu">
         <template slot="katsele" slot-scope="{ julkaisu }">
           <ep-external-link :url="opintopolkuKatseluUrl(julkaisu)">
             {{$t('katsele')}}
@@ -147,14 +147,14 @@ import EpValidation from '@shared/mixins/EpValidation';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpJulkaisuHistoria from '@shared/components/EpJulkaisuHistoria/EpJulkaisuHistoria.vue';
+import EpJulkaisuHistoria from '@/components/EpJulkaisu/EpJulkaisuHistoria.vue';
 import { Route } from 'vue-router';
 import EpJulkaisuButton from '@shared/components/EpJulkaisuButton/EpJulkaisuButton.vue';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 import { buildKatseluUrl } from '@shared/utils/esikatselu';
 import { koulutustyyppiTheme } from '@shared/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
-import EpJulkaisuForm from '@/components/EpJulkaisuForm/EpJulkaisuForm.vue';
+import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
 
 @Component({
   components: {
