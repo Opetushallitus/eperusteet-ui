@@ -4,8 +4,8 @@
       <thead>
         <tr>
           <th class="w-50">{{ $t('nimi') }}</th>
-          <th class="w-20">{{ $t('kieli') }}</th>
-          <th class="w-30">{{ $t('tiedosto') }}</th>
+          <th class="w-30">{{ $t('kieli') }}</th>
+          <th class="w-20">{{ $t('tiedosto') }}</th>
         </tr>
       </thead>
       <tbody>

@@ -7,8 +7,8 @@
           <thead>
           <tr>
             <th class="w-50">{{ $t('nimi') }}</th>
-            <th class="w-20">{{ $t('kieli') }}</th>
-            <th class="w-30"></th>
+            <th class="w-30">{{ $t('kieli') }}</th>
+            <th class="w-20"></th>
           </tr>
           </thead>
           <tbody>
@@ -28,14 +28,12 @@
               </ep-multi-select>
             </td>
             <td>
-              <div class="text-center">
-                <b-button @click="peruutaLiite()" variant="secondary">
-                  {{ $t('peruuta') }}
-                </b-button>
-                <b-button @click="asetaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi || !liitteenKieli">
-                  {{ $t('lisaa-liite') }}
-                </b-button>
-              </div>
+              <b-button @click="peruutaLiite()" variant="secondary">
+                {{ $t('peruuta') }}
+              </b-button>
+              <b-button @click="lisaaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi || !liitteenKieli">
+                {{ $t('lisaa-liite') }}
+              </b-button>
             </td>
           </tr>
           </tbody>
@@ -114,7 +112,7 @@ export default class EpJulkaisuForm extends Vue {
   private liitteenNimi = '';
   private liitteenKieli = '';
 
-  async asetaLiite() {
+  async lisaaLiite() {
     this.julkaisuLiitteet.push({
       data: window.btoa(this.file.binary),
       kieli: this.liitteenKieli,
