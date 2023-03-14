@@ -9,12 +9,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(muutos, idx) in value" :key="'muutos' + idx">
+        <tr v-for="(julkaisuLiite, idx) in value" :key="'muutos' + idx">
           <td>
-            <ep-input v-model="muutos.nimi" :is-editing="true"></ep-input>
+            <ep-input v-model="julkaisuLiite.nimi" :is-editing="true"></ep-input>
           </td>
           <td>
-            <ep-multi-select :value="muutos.kieli"
+            <ep-multi-select v-model="julkaisuLiite.kieli"
+                             :value="julkaisuLiite.kieli"
                              @input="updateKieli(idx, $event)"
                              :options="julkaisukielet"
                              :searchable="false"
@@ -26,7 +27,8 @@
             </ep-multi-select>
           </td>
           <td>
-            <ep-multi-select :value="muutos.liitteet ? muutos.liitteet[muutos.kieli] : null"
+            <ep-multi-select v-model="julkaisuLiite.liite"
+                             :value="julkaisuLiite.liite ? julkaisuLiite.liite.nimi : null"
                              @input="updateLiite(idx, $event)"
                              :options="liitteet"
                              :searchable="false"
@@ -64,7 +66,7 @@ import { LiiteDto } from '@shared/api/eperusteet';
     EpMultiSelect,
   },
 })
-export default class EpJulkaisuMuutosmaaraykset extends Vue {
+export default class EpJulkaisuLiitteet extends Vue {
   @Prop({ required: true })
   private value!: any[];
 
@@ -80,10 +82,8 @@ export default class EpJulkaisuMuutosmaaraykset extends Vue {
   lisaa() {
     this.$emit('input', [
       ...this.value, {
-        nimi: {},
-        liitteet: {
-          fi: '',
-        },
+        nimi: '',
+        liite: {},
         kieli: '',
       }]);
   }
@@ -91,13 +91,12 @@ export default class EpJulkaisuMuutosmaaraykset extends Vue {
   updateKieli(idx, kieli) {
     const temp = this.value;
     Vue.set(temp[idx], 'kieli', kieli);
-    Vue.set(temp[idx], 'liitteet', this.asetaKieli(kieli));
     this.$emit('input', temp);
   }
 
   updateLiite(idx, liite) {
     const temp = this.value;
-    Vue.set(temp[idx].liitteet, temp[idx].kieli, { ...liite });
+    Vue.set(temp[idx], 'liite', liite);
     this.$emit('input', temp);
   }
 
@@ -105,18 +104,6 @@ export default class EpJulkaisuMuutosmaaraykset extends Vue {
     const temp = [...this.value];
     Vue.delete(temp, idx);
     this.$emit('input', temp);
-  }
-
-  asetaKieli(kieli) {
-    if (kieli === 'fi') {
-      return { fi: '' };
-    }
-    else if (kieli === 'sv') {
-      return { sv: '' };
-    }
-    else if (kieli === 'en') {
-      return { en: '' };
-    }
   }
 }
 </script>

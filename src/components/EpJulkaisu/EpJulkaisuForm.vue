@@ -1,22 +1,48 @@
 <template>
   <div>
-    <b-form-group :label="$t('lataa-uusi-muutosmaaraus')" class="mt-4">
+    <b-form-group :label="$t('lataa-uusi-muutosmaaraus')">
       <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!file" />
       <div v-if="file">
-        <b-input-group>
-          <b-form-input v-model="liitteenNimi"></b-form-input>
-          <b-input-group-append>
-            <b-button @click="peruutaLiite()" variant="secondary">
-              {{ $t('peruuta') }}
-            </b-button>
-            <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
-              {{ $t('lisaa-liite') }}
-            </b-button>
-          </b-input-group-append>
-        </b-input-group>
+        <table class="table">
+          <thead>
+          <tr>
+            <th class="w-50">{{ $t('nimi') }}</th>
+            <th class="w-20">{{ $t('kieli') }}</th>
+            <th class="w-30"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>
+              <ep-input v-model="liitteenNimi" :is-editing="true"></ep-input>
+            </td>
+            <td>
+              <ep-multi-select v-model="liitteenKieli"
+                               :options="julkaisukielet"
+                               :searchable="false"
+                               :clear-on-select="false"
+                               :allowEmpty="false">
+                <template v-slot:singleLabel="{ option }">{{ $t(option) }}</template>
+                <template v-slot:option="{ option }">{{ $t(option) }}</template>
+                <template v-slot:tag="{ option }">{{ $t(option) }}</template>
+              </ep-multi-select>
+            </td>
+            <td>
+              <div class="text-center">
+                <b-button @click="peruutaLiite()" variant="secondary">
+                  {{ $t('peruuta') }}
+                </b-button>
+                <b-button @click="asetaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi || !liitteenKieli">
+                  {{ $t('lisaa-liite') }}
+                </b-button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
-      <b-table v-if="julkaisuMuutosMaaraysLiitteet && julkaisuMuutosMaaraysLiitteet.length > 0"
-               :items="julkaisuMuutosMaaraysLiitteet"
+      <b-table v-if="julkaisuLiitteet && julkaisuLiitteet.length > 0"
+               :items="julkaisuLiitteet"
                :fields="liitetableFields"
                responsive
                borderless
@@ -25,22 +51,14 @@
                hover>
         <template v-slot:cell(toiminnot)="data">
           <div class="text-center">
-            <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
-              {{ $t('poista') }}
-            </ep-button>
+            <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.index)"></ep-button>
           </div>
         </template>
       </b-table>
     </b-form-group>
 
-    <b-form-group v-if="julkaisuMuutosMaaraysLiitteet && julkaisuMuutosMaaraysLiitteet.length > 0" :label="$t('muutosmaaraykset')">
-      <EpJulkaisuMuutosmaaraykset v-model="muutosmaaraykset"
-                                  :liitteet="julkaisuMuutosMaaraysLiitteet"
-                                  :julkaisukielet="julkaisukielet"/>
-    </b-form-group>
-
     <b-form-group :label="$t('muutosmaarays-astuu-voimaan')" class="mt-4 col-lg-3">
-      <ep-datepicker v-model="julkaisu.muutosmaaraysVoimaan" :is-editing="true" :validation="validations.julkaisu.muutosmaaraysVoimaan"/>
+      <ep-datepicker v-model="julkaisu.muutosmaaraysVoimaan" :is-editing="true"/>
     </b-form-group>
 
     <b-form-group :label="$t('tiedote-hallintanakymaan')" class="mt-4">
@@ -62,8 +80,6 @@
 </template>
 
 <script lang="ts">
-import { Api, baseURL, LiiteDtoTyyppiEnum, Liitetiedostot, LiitetiedostotParam } from '@shared/api/eperusteet';
-import _ from 'lodash';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -71,10 +87,9 @@ import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import EpJulkaisuMuutosmaaraykset from './EpJulkaisuMuutosmaaraykset.vue';
-import { Validations } from 'vuelidate-property-decorators';
-import { requiredIf } from 'vuelidate/lib/validators';
+import EpJulkaisuLiitteet from './EpJulkaisuLiitteet.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
+import EpInput from '@shared/components/forms/EpInput.vue';
 
 @Component({
   components: {
@@ -83,8 +98,9 @@ import { PerusteStore } from '@/stores/PerusteStore';
     EpDatepicker,
     EpToggle,
     EpButton,
-    EpJulkaisuMuutosmaaraykset,
+    EpJulkaisuLiitteet,
     EpMultiSelect,
+    EpInput,
   },
 })
 export default class EpJulkaisuForm extends Vue {
@@ -96,15 +112,32 @@ export default class EpJulkaisuForm extends Vue {
 
   private file: any | null = null;
   private liitteenNimi = '';
-  private liitteet: any[] | null = null;
+  private liitteenKieli = '';
 
-  @Validations()
-  validations = {
-    julkaisu: {
-      muutosmaaraysVoimaan: {
-        required: requiredIf((value) => this.julkaisu.muutosmaaraykset && this.julkaisu.muutosmaaraykset.length > 0),
+  async asetaLiite() {
+    this.julkaisuLiitteet.push({
+      data: window.btoa(this.file.binary),
+      kieli: this.liitteenKieli,
+      liite: {
+        nimi: this.liitteenNimi,
+        tyyppi: 'julkaisumuutosmaarays',
       },
-    },
+    });
+    this.resetValues();
+  }
+
+  peruutaLiite() {
+    this.resetValues();
+  }
+
+  resetValues() {
+    this.file = null;
+    this.liitteenNimi = '';
+    this.liitteenKieli = '';
+  }
+
+  async poistaLiite(index) {
+    Vue.delete(this.julkaisuLiitteet, index);
   }
 
   get perusteId() {
@@ -115,87 +148,30 @@ export default class EpJulkaisuForm extends Vue {
     return this.store.julkaisukielet.value;
   }
 
-  async mounted() {
-    await this.fetchLiitteet();
-  }
-
-  async fetchLiitteet() {
-    const res = await Liitetiedostot.getAllLiitteet(Number(this.perusteId!));
-    this.liitteet = _.map(res.data, liite => ({
-      ...liite,
-      lisatieto: liite.lisatieto || '',
-      url: baseURL + LiitetiedostotParam.getLiite(this.perusteId!, liite.id!).url,
-    }));
-  }
-
-  async tallennaLiite() {
-    if (!this.file) {
-      return;
-    }
-    const data = new FormData();
-    data.append('file', window.btoa(this.file.binary));
-    data.set('nimi', this.liitteenNimi);
-    data.set('tyyppi', 'julkaisumuutosmaarays');
-    await Api.request({
-      method: 'POST',
-      url: `perusteet/${this.perusteId!}/liitteet/b64`,
-      data,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    this.$success(this.$t('liitetiedosto-tallennettu') as string);
-    await this.fetchLiitteet();
-    this.file = null;
-    this.liitteenNimi = '';
-  }
-
-  peruutaLiite() {
-    this.file = null;
-    this.liitteenNimi = '';
-  }
-
-  async poistaLiite(item: any) {
-    try {
-      await Liitetiedostot._delete(Number(this.perusteId!), item.id);
-      this.$success(this.$t('liitetiedoston-poisto-onnistui') as string);
-      await this.fetchLiitteet();
-    }
-    catch (err) {
-      this.$fail(this.$t('liitetiedoston-poisto-epaonnistui') as string);
-      console.log(err);
-    }
-  }
-
-  get muutosmaaraykset() {
-    return this.julkaisu.muutosmaaraykset;
-  }
-
-  set muutosmaaraykset(maaraykset) {
-    this.julkaisu.muutosmaaraykset = maaraykset;
-  }
-
-  get julkaisuMuutosMaaraysLiitteet() {
-    return _.filter(this.liitteet, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.JULKAISUMUUTOSMAARAYS));
+  get julkaisuLiitteet() {
+    return this.julkaisu.liitteet;
   }
 
   get liitetableFields() {
     return [{
-      key: 'nimi',
+      key: 'liite.nimi',
       label: this.$t('nimi'),
-      thStyle: { width: '60%' },
+      thStyle: { width: '50%' },
       sortable: true,
-    }, {
-      key: 'luotu',
-      label: this.$t('lisatty'),
+    },
+    {
+      key: 'kieli',
+      label: this.$t('kieli'),
       sortable: true,
+      thStyle: { width: '30%' },
       formatter: (value: any) => {
-        return (this as any).$sdt(value);
+        return (this as any).$t(value);
       },
-    }, {
+    },
+    {
       key: 'toiminnot',
       label: '',
-      thStyle: { width: '10%', borderBottom: '0px' },
+      thStyle: { width: '20%', borderBottom: '0px' },
       sortable: false,
     }];
   }
@@ -209,6 +185,6 @@ export default class EpJulkaisuForm extends Vue {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 </style>

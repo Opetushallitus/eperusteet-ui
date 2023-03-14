@@ -101,12 +101,15 @@
     <template v-if="!isPohja">
       <div v-if="julkaisuMahdollinen">
         <hr class="mt-4 mb-4">
-        <h3>{{ $t('uusi-julkaisu') }}</h3>
+        <h3 class="mb-4">{{ $t('uusi-julkaisu') }}</h3>
         <EpJulkaisuForm :store="perusteStore"
                         :julkaisu="julkaisu">
         </EpJulkaisuForm>
         <b-form-group>
-          <EpJulkaisuButton :julkaise="julkaise" v-oikeustarkastelu="{ oikeus: 'muokkaus' }" :julkaisuKesken="julkaisuKesken"/>
+          <EpJulkaisuButton :julkaise="julkaise"
+                            v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+                            :julkaisuKesken="julkaisuKesken"
+                            :disabled="!hasRequiredData"/>
         </b-form-group>
       </div>
 
@@ -190,7 +193,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     julkinenTiedote: {},
     julkinen: false,
     muutosmaaraysVoimaan: null,
-    muutosmaaraykset: [],
+    liitteet: [],
   };
 
   private hallintaLoading: boolean = false;
@@ -221,13 +224,14 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
         julkinenTiedote: this.julkaisu.julkinenTiedote,
         julkinen: this.julkaisu.julkinen,
         muutosmaaraysVoimaan: this.julkaisu.muutosmaaraysVoimaan,
-        muutosmaaraykset: this.julkaisu.muutosmaaraykset,
+        liitteet: this.julkaisu.liitteet,
       });
 
       this.julkaisu.tiedote = {};
       this.julkaisu.julkinenTiedote = {};
       this.julkaisu.julkinen = false;
       this.julkaisu.muutosmaaraysVoimaan = null;
+      this.julkaisu.liitteet = [];
       this.$success(this.$t('julkaisu-kaynnistetty') as string);
     }
     catch (err) {
@@ -243,6 +247,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     catch (err) {
       this.$fail(this.$t('palautus-epaonnistui') as string);
     }
+  }
+
+  get hasRequiredData() {
+    return (this.julkaisu.liitteet.length > 0 && this.julkaisu.muutosmaaraysVoimaan) || (this.julkaisu.liitteet.length === 0 && !this.julkaisu.muutosmaaraysVoimaan);
   }
 
   get julkaisuKesken() {
@@ -389,7 +397,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     if (revision === _.max(_.map(this.julkaisut, 'revision'))) {
       revision = null;
     }
-    return buildKatseluUrl(Kielet.getSisaltoKieli.value, `/${koulutustyyppiTheme(this.perusteStore.peruste.value!.koulutustyyppi!)}/${julkaisu.peruste.id}`, revision);
+    if (julkaisu.peruste && julkaisu.peruste.id) {
+      return buildKatseluUrl(Kielet.getSisaltoKieli.value, `/${koulutustyyppiTheme(this.perusteStore.peruste.value!.koulutustyyppi!)}/${julkaisu.peruste.id}`, revision);
+    }
+    return null;
   }
 }
 

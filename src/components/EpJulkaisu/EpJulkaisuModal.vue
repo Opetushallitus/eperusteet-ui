@@ -42,16 +42,17 @@ export default class EpJulkaisuModal extends Vue {
   async tallenna() {
     try {
       await this.store.updateJulkaisu({
-        revisio: this.muokattavaJulkaisu.revisio,
-        tiedote: this.muokattavaJulkaisu.tiedote,
-        julkinenTiedote: this.muokattavaJulkaisu.julkinenTiedote,
+        revision: this.muokattavaJulkaisu.revision,
+        tiedote: this.muokattavaJulkaisu.tiedote || {},
+        julkinenTiedote: this.muokattavaJulkaisu.julkinenTiedote || {},
         julkinen: this.muokattavaJulkaisu.julkinen,
         muutosmaaraysVoimaan: this.muokattavaJulkaisu.muutosmaaraysVoimaan,
-        muutosmaaraykset: this.muokattavaJulkaisu.muutosmaaraykset,
-      }
-      );
+        liitteet: this.muokattavaJulkaisu.liitteet,
+      });
+      this.$success(this.$t('julkaisun-paivitys-onnistui') as string);
     }
     catch (err) {
+      this.$fail(this.$t('julkaisun-paivitys-epaonnistui') as string);
     }
   }
 
@@ -62,6 +63,6 @@ export default class EpJulkaisuModal extends Vue {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 </style>

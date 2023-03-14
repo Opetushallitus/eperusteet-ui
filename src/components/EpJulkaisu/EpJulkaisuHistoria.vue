@@ -46,8 +46,8 @@
             </div>
           </div>
           <div v-if="julkaisu.muutosmaaraysVoimaan">
-            <div v-for="(muutosmaarays, index) in julkaisu.muutosmaaraykset" :key="'maarays'+index" class="maarayslinkit">
-              <a :href="muutosmaarays.url" target="_blank" rel="noopener noreferrer">{{ $kaanna(muutosmaarays.nimi) }}</a>
+            <div v-for="(liiteData, index) in julkaisu.liitteet" :key="'maarays'+index" class="maarayslinkit">
+              <a :href="liiteData.url" target="_blank" rel="noopener noreferrer">{{ liiteData.liite.nimi }}</a>
             </div>
             <span>- {{ $sd(julkaisu.muutosmaaraysVoimaan) }} {{ $t('alkaen') }}</span>
           </div>
@@ -84,7 +84,7 @@ interface Julkaisu {
   luoja?: string;
   kayttajanTieto?: any;
   tila?: 'JULKAISTU' | 'KESKEN' | 'VIRHE';
-  muutosmaaraykset?: any;
+  liitteet?: any;
 }
 
 @Component({
@@ -125,7 +125,7 @@ export default class EpJulkaisuHistoria extends Vue {
           ...(julkaisu.kayttajanTieto && { nimi: parsiEsitysnimi(julkaisu.kayttajanTieto) }),
           tila: julkaisu.tila || 'JULKAISTU',
           palautuksessa: this.palautuksessa === julkaisu.revision,
-          muutosmaaraykset: this.muutosmaaraysUrl(julkaisu),
+          liitteet: this.muutosmaaraysLiite(julkaisu),
         };
       })
       .sortBy('revision')
@@ -153,18 +153,15 @@ export default class EpJulkaisuHistoria extends Vue {
     }
   }
 
-  muutosmaaraysUrl(julkaisu) {
-    if (julkaisu.muutosmaaraykset && julkaisu.muutosmaaraykset.length > 0) {
-      julkaisu.muutosmaaraykset.forEach(muutosmaarays => {
-        let liiteId = _.get(muutosmaarays.liitteet, 'fi.id') || _.get(muutosmaarays.liitteet, 'sv.id') || _.get(muutosmaarays.liitteet, 'en.id');
-        if (liiteId) {
-          muutosmaarays.url = `/eperusteet-service/api/perusteet/${julkaisu.peruste.id!}/liitteet/${liiteId}`;
-        }
+  muutosmaaraysLiite(julkaisu) {
+    if (julkaisu.liitteet && julkaisu.liitteet.length > 0) {
+      julkaisu.liitteet.forEach(liiteData => {
+        liiteData.url = `/eperusteet-service/api/perusteet/${julkaisu.peruste.id!}/julkaisu/liitteet/${liiteData.liite.id}`;
       });
-      return julkaisu.muutosmaaraykset;
+      return julkaisu.liitteet;
     }
     else {
-      return null;
+      return [];
     }
   }
 
