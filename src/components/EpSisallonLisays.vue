@@ -1,7 +1,7 @@
 <template>
   <div class="mt-2">
     <ep-tekstikappale-lisays
-      @save="tallennaUusiTekstikappale"
+      :tallenna="tallennaUusiTekstikappale"
       :tekstikappaleet="perusteenOsat"
       :paatasovalinta="true"
       v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
@@ -12,10 +12,9 @@
     </ep-tekstikappale-lisays>
 
     <template v-if="lisasisaltoLisays.length > 0">
-      <template v-for="(lisasisalto, index) in lisasisaltoLisays">
+      <div v-for="(lisasisalto, index) in lisasisaltoLisays" :key="'lisasisalto'+index">
 
         <b-dropdown v-if="lisasisalto.groupedSisalto.length > 0"
-                    :key="'lisasisalto'+index"
                     variant="link"
                     class="lisasisalto-dropdown mt-2"
                     toggle-class="text-decoration-none"
@@ -32,7 +31,7 @@
             <hr v-if="index > 0" class="mt-2 mb-2"/>
 
             <ep-tekstikappale-lisays
-              @save="groupedLisasisalto.save"
+              :tallenna="groupedLisasisalto.save"
               :tekstikappaleet="perusteenOsat"
               :paatasovalinta="true"
               :otsikkoRequired="false"
@@ -64,8 +63,7 @@
 
         <ep-tekstikappale-lisays
           v-else
-          :key="'lisasisalto'+index"
-          @save="lisasisalto.save"
+          :tallenna="lisasisalto.save"
           :tekstikappaleet="perusteenOsat"
           :paatasovalinta="true"
           :otsikkoRequired="false"
@@ -88,7 +86,7 @@
             {{ $kaanna(tekstikappale.label) }}
           </template>
         </ep-tekstikappale-lisays>
-      </template>
+      </div>
 
     </template>
 
