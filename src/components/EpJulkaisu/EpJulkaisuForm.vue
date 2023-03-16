@@ -15,7 +15,8 @@
           <tbody>
           <tr v-for="(liiteData, index) in julkaisuLiitteet" :key="'liite'+index">
             <td>
-              <ep-input v-model="liiteData.nimi" :is-editing="true"></ep-input>
+              <ep-input v-model="liiteData.nimi" :is-editing="true">
+              </ep-input>
             </td>
             <td>
               <ep-multi-select v-model="liiteData.kieli"
@@ -41,7 +42,8 @@
     </b-form-group>
 
     <b-form-group :label="$t('muutosmaarays-astuu-voimaan')" class="mt-4 col-lg-3">
-      <ep-datepicker v-model="julkaisu.muutosmaaraysVoimaan" :is-editing="true"/>
+      <ep-datepicker v-model="julkaisu.muutosmaaraysVoimaan"
+                     :is-editing="true"/>
     </b-form-group>
 
     <b-form-group :label="$t('tiedote-hallintanakymaan')" class="mt-4">
@@ -64,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
@@ -73,7 +75,9 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import _ from 'lodash';
+import { Validations } from 'vuelidate-property-decorators';
+import { validationMixin } from 'vuelidate';
+import { notNull } from '@shared/validators/required';
 
 @Component({
   components: {
@@ -86,7 +90,7 @@ import _ from 'lodash';
     EpInput,
   },
 })
-export default class EpJulkaisuForm extends Vue {
+export default class EpJulkaisuForm extends Mixins(validationMixin) {
   @Prop({ required: true })
   private store!: PerusteStore;
 
@@ -94,6 +98,19 @@ export default class EpJulkaisuForm extends Vue {
   private julkaisu: any;
 
   private file: any | null = null;
+
+  @Validations()
+  validations = {
+    julkaisu: {
+      liitteet: {
+        $each: {
+          nimi: notNull(),
+          kieli: notNull(),
+        },
+      },
+      muutosmaaraysVoimaan: notNull(),
+    },
+  }
 
   lisaaLiite() {
     this.julkaisuLiitteet.push({
@@ -142,16 +159,7 @@ export default class EpJulkaisuForm extends Vue {
   }
 
   checkValidity() {
-    let isInvalid = true;
-    if (this.julkaisu.liitteet.length > 0 && this.julkaisu.muutosmaaraysVoimaan) {
-      isInvalid = _.some(this.julkaisu.liitteet, liite => {
-        return _.isEmpty(_.get(liite, 'nimi')) || _.isEmpty(_.get(liite, 'kieli'));
-      });
-    }
-    else if (this.julkaisu.liitteet.length === 0 && !this.julkaisu.muutosmaaraysVoimaan) {
-      isInvalid = false;
-    }
-    this.$emit('setInvalid', isInvalid);
+    this.$emit('setInvalid', this.$v.$invalid);
   }
 };
 </script>
