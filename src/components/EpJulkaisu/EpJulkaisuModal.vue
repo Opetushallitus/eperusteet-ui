@@ -20,7 +20,7 @@
     </EpJulkaisuForm>
     <div class="float-right">
       <EpButton @click="sulje"
-                :show-spinner="tallennetaan">
+                variant="link">
         {{ $t('peruuta') }}
       </EpButton>
       <EpButton @click="tallenna"

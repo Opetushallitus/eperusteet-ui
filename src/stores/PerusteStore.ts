@@ -232,7 +232,7 @@ export class PerusteStore implements IEditoitava {
   async updateJulkaisu(julkaisuData: any) {
     const perusteId = this.state.peruste?.id;
     if (perusteId) {
-      await Julkaisut.update(perusteId, julkaisuData);
+      await Julkaisut.updateJulkaisu(perusteId, julkaisuData);
       await this.fetchJulkaisut();
       if (!_.includes(_.map(this.state.julkaisut, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
         await this.updateCurrent();
