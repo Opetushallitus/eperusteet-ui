@@ -1,3 +1,4 @@
+import { Kielet } from '@shared/stores/kieli';
 import { Kieli } from '@shared/tyypit';
 import { v4 as genUuid } from 'uuid';
 
@@ -96,13 +97,13 @@ export function rakenneNodecolor(node, parentMandatory, el) {
       return ColorMap[mapped];
     }
     if (node.rooli === 'määritelty') {
-      if (el.$kaanna(node.nimi) === el.$t('rakenne-moduuli-pakollinen')) {
+      if (node.nimi[Kielet.getUiKieli.value] === el.$t('rakenne-moduuli-pakollinen')) {
         return ColorMap.pakollinen;
       }
-      else if (el.$kaanna(node.nimi) === el.$t('rakenne-moduuli-ammatilliset')) {
+      else if (node.nimi[Kielet.getUiKieli.value] === el.$t('rakenne-moduuli-ammatilliset')) {
         return ColorMap.ammatilliset;
       }
-      else if (el.$kaanna(node.nimi) === el.$t('rakenne-moduuli-yhteiset')) {
+      else if (node.nimi[Kielet.getUiKieli.value] === el.$t('rakenne-moduuli-yhteiset')) {
         return ColorMap.yhteiset;
       }
     }
