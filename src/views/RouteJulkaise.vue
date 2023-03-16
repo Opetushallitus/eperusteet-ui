@@ -103,13 +103,14 @@
         <hr class="mt-4 mb-4">
         <h3 class="mb-4">{{ $t('uusi-julkaisu') }}</h3>
         <EpJulkaisuForm :store="perusteStore"
-                        :julkaisu="julkaisu">
+                        :julkaisu="julkaisu"
+                        @setInvalid="hasRequiredData">
         </EpJulkaisuForm>
         <b-form-group>
           <EpJulkaisuButton :julkaise="julkaise"
                             v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
                             :julkaisuKesken="julkaisuKesken"
-                            :disabled="!hasRequiredData"/>
+                            :disabled="invalid"/>
         </b-form-group>
       </div>
 
@@ -197,6 +198,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   };
 
   private hallintaLoading: boolean = false;
+  private invalid: boolean = false;
 
   get julkaisuMahdollinen() {
     return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.status?.vaihtoOk;
@@ -249,8 +251,8 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     }
   }
 
-  get hasRequiredData() {
-    return (this.julkaisu.liitteet.length > 0 && this.julkaisu.muutosmaaraysVoimaan) || (this.julkaisu.liitteet.length === 0 && !this.julkaisu.muutosmaaraysVoimaan);
+  hasRequiredData(value) {
+    this.invalid = value;
   }
 
   get julkaisuKesken() {

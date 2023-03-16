@@ -47,7 +47,7 @@
           </div>
           <div v-if="julkaisu.muutosmaaraysVoimaan">
             <div v-for="(liiteData, index) in julkaisu.liitteet" :key="'maarays'+index" class="maarayslinkit">
-              <a :href="liiteData.url" target="_blank" rel="noopener noreferrer">{{ liiteData.liite.nimi }}</a>
+              <a :href="liiteData.url" target="_blank" rel="noopener noreferrer">{{ liiteData.nimi }}</a>
             </div>
             <span>- {{ $sd(julkaisu.muutosmaaraysVoimaan) }} {{ $t('alkaen') }}</span>
           </div>
@@ -72,8 +72,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
-import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 import EpJulkaisuModal from './EpJulkaisuModal.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 
@@ -91,8 +89,6 @@ interface Julkaisu {
   components: {
     EpButton,
     EpSpinner,
-    EpToggle,
-    EpExternalLink,
     EpJulkaisuModal,
   },
 })
