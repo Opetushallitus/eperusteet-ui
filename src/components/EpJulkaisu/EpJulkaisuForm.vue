@@ -131,7 +131,7 @@ export default class EpJulkaisuForm extends Vue {
     }
   }
 
-  @Watch('julkaisuLiitteet')
+  @Watch('julkaisuLiitteet', { deep: true })
   liitteetChange() {
     this.checkValidity();
   }
