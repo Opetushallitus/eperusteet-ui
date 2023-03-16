@@ -46,6 +46,7 @@ import _ from 'lodash';
 import { v4 as genUuid } from 'uuid';
 import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType } from '@/components/muodostuminen/utils';
 import MuodostumisItem from './MuodostumisItem.vue';
+import { Kielet } from '@shared/stores/kieli';
 
 function disassoc<T>(array: T[], idx: number): T[] {
   if (!_.isNumber(idx)) {
@@ -141,10 +142,10 @@ export default class MuodostumisNode extends Vue {
         return ColorMap[mapped];
       }
       if (node.rooli === 'määritelty') {
-        if (this.$kaanna(node.nimi) === this.$t('rakenne-moduuli-pakollinen')) {
+        if (node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-pakollinen')) {
           return ColorMap.pakollinen;
         }
-        else if (this.$kaanna(node.nimi) === this.$t('rakenne-moduuli-ammatilliset')) {
+        else if (node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-ammatilliset')) {
           return ColorMap.ammatilliset;
         }
       }
@@ -228,7 +229,7 @@ export default class MuodostumisNode extends Vue {
   }
 
   pakollinen(node) {
-    return (node.rooli === 'määritelty' && this.$kaanna(node.nimi) === this.$t('rakenne-moduuli-pakollinen')) || node.pakollinen;
+    return (node.rooli === 'määritelty' && node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-pakollinen')) || node.pakollinen;
   }
 
   async add(element) {

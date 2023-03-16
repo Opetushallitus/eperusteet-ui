@@ -297,7 +297,7 @@ export default class EpRakenneModal extends Vue {
       'rakenne-moduuli-pakollinen',
     ];
     for (const rt of rakennetyypit) {
-      if (this.value?.nimi?.fi === this.$t(rt, 'fi')) {
+      if (this.value?.nimi && this.value.nimi[Kielet.getUiKieli.value] === this.$t(rt)) {
         return rt;
       }
     }
