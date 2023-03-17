@@ -183,6 +183,7 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
 
 .file-name {
   vertical-align: middle;
+  overflow: auto;
 }
 
 </style>
