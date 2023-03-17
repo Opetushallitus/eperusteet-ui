@@ -6,17 +6,16 @@
         <table class="table">
           <thead>
           <tr>
-            <th class="w-50">{{ $t('nimi') }}</th>
+            <th class="w-40">{{ $t('nimi') }}</th>
             <th class="w-20">{{ $t('kieli') }}</th>
-            <th class="w-20">{{ $t('tiedosto') }}</th>
-            <th class="w-10"></th>
+            <th class="w-30">{{ $t('tiedosto') }}</th>
+            <th class="w-10">{{ $t('poista') }}</th>
           </tr>
           </thead>
           <tbody>
           <tr v-for="(liiteData, index) in julkaisuLiitteet" :key="'liite'+index">
             <td>
-              <ep-input v-model="liiteData.nimi" :is-editing="true">
-              </ep-input>
+              <ep-input v-model="liiteData.nimi" :is-editing="true"></ep-input>
             </td>
             <td>
               <ep-multi-select v-model="liiteData.kieli"
@@ -29,7 +28,7 @@
                 <template v-slot:tag="{ option }">{{ $t(option) }}</template>
               </ep-multi-select>
             </td>
-            <td class="vertical-center">
+            <td class="file-name">
               <span>{{ liiteData.liite.nimi }}</span>
             </td>
             <td>
@@ -166,15 +165,23 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
 
 <style lang="scss" scoped>
 
+::v-deep table {
+  table-layout: fixed;
+}
+
 .w-10 {
-  width: 10% !important;
+  width: 10%;
 }
 
 .w-20 {
-  width: 20% !important;
+  width: 20%;
 }
 
-.vertical-center {
+.w-30 {
+  width: 30%;
+}
+
+.file-name {
   vertical-align: middle;
 }
 
