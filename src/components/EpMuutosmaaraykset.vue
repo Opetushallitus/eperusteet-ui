@@ -41,15 +41,11 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import { UiKielet } from '@shared/stores/kieli';
 import { LiiteDto } from '@shared/api/eperusteet';
-import _ from 'lodash';
 
 @Component({
   components: {
@@ -58,7 +54,7 @@ import _ from 'lodash';
     EpMultiSelect,
   },
 })
-export default class RouteProjektiTiedot extends Vue {
+export default class EpMuutosmaaraykset extends Vue {
   @Prop({ required: true })
   private value!: any[];
 

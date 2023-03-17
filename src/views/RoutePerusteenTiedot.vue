@@ -209,7 +209,7 @@
                             {{ $t('peruuta') }}
                           </b-button>
                           <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
-                            {{ $t('lisaa-liite') }}
+                            {{ $t('tallenna-liite') }}
                           </b-button>
                         </b-input-group-append>
                       </b-input-group>
