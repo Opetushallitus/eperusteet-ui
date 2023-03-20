@@ -69,7 +69,6 @@
 <script lang="ts">
 import _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpJulkaisuModal from './EpJulkaisuModal.vue';
@@ -117,14 +116,12 @@ export default class EpJulkaisuHistoria extends Vue {
     return _.chain(this.julkaisut)
       .filter(julkaisu => julkaisu !== undefined)
       .map(julkaisu => {
-        if (julkaisu) {
-          return {
-            ...julkaisu,
-            tila: julkaisu.tila || 'JULKAISTU',
-            palautuksessa: this.palautuksessa === julkaisu.revision,
-            liitteet: this.muutosmaaraysLiite(julkaisu),
-          };
-        }
+        return {
+          ...julkaisu,
+          tila: julkaisu.tila || 'JULKAISTU',
+          palautuksessa: this.palautuksessa === julkaisu.revision,
+          liitteet: this.muutosmaaraysLiite(julkaisu),
+        };
       })
       .sortBy('revision')
       .reverse()
@@ -132,7 +129,7 @@ export default class EpJulkaisuHistoria extends Vue {
   }
 
   get latestJulkaisuRevision() {
-    return _.find(this.julkaisutMapped, julkaisu => julkaisu!.tila === 'JULKAISTU');
+    return _.find(this.julkaisutMapped, julkaisu => julkaisu.tila === 'JULKAISTU');
   }
 
   async palautaConfirm(julkaisu) {
