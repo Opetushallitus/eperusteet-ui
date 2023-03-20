@@ -14,7 +14,8 @@
         </div>
       </div>
     </template>
-    <EpJulkaisuForm :store="store"
+    <EpJulkaisuForm :is-editing="!isLatest"
+                    :store="store"
                     :julkaisu="muokattavaJulkaisu"
                     @setInvalid="hasRequiredData">
     </EpJulkaisuForm>
@@ -52,6 +53,7 @@ export default class EpJulkaisuModal extends Vue {
   private muokattavaJulkaisu: any | null = null;
   private invalid: boolean = false;
   private tallennetaan: boolean = false;
+  private isLatest: boolean = false;
 
   async tallenna() {
     this.tallennetaan = true;
@@ -78,7 +80,8 @@ export default class EpJulkaisuModal extends Vue {
     (this.$refs['julkaisuModal'] as any).hide();
   }
 
-  muokkaa(julkaisu) {
+  muokkaa(julkaisu, isLatest) {
+    this.isLatest = isLatest;
     this.muokattavaJulkaisu = _.cloneDeep(julkaisu);
     (this.$refs['julkaisuModal'] as any).show();
   }

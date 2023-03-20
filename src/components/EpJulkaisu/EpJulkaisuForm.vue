@@ -50,7 +50,7 @@
       <ep-content v-model="julkaisu.tiedote"
                   layout="simplified"
                   :is-editable="true" />
-      <ep-toggle v-model="julkaisu.julkinen" :isSWitch="false" class="mt-4">
+      <ep-toggle v-model="julkaisu.julkinen" :isSWitch="false" class="mt-4" :is-editing="isEditing">
         {{$t('julkaisu-naytetaan-julkisen-sivuston-julkaisuhistoriassa')}}
       </ep-toggle>
     </b-form-group>
@@ -95,6 +95,9 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
 
   @Prop({ required: true })
   private julkaisu: any;
+
+  @Prop({ default: false, type: Boolean })
+  private isEditing!: boolean;
 
   private file: any | null = null;
 

@@ -162,7 +162,7 @@ export default class EpJulkaisuHistoria extends Vue {
   }
 
   avaaMuokkausModal(julkaisu) {
-    (this.$refs['julkaisuModal'] as any).muokkaa(julkaisu);
+    (this.$refs['julkaisuModal'] as any).muokkaa(julkaisu, this.latestJulkaisuRevision!.revision === julkaisu.revision);
   }
 }
 </script>
