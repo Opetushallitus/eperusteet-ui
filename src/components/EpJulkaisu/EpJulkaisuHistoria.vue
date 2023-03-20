@@ -115,14 +115,16 @@ export default class EpJulkaisuHistoria extends Vue {
 
   get julkaisutMapped() {
     return _.chain(this.julkaisut)
+      .filter(julkaisu => julkaisu !== undefined)
       .map(julkaisu => {
-        return {
-          ...julkaisu,
-          ...(julkaisu.kayttajanTieto && { nimi: parsiEsitysnimi(julkaisu.kayttajanTieto) }),
-          tila: julkaisu.tila || 'JULKAISTU',
-          palautuksessa: this.palautuksessa === julkaisu.revision,
-          liitteet: this.muutosmaaraysLiite(julkaisu),
-        };
+        if (julkaisu) {
+          return {
+            ...julkaisu,
+            tila: julkaisu.tila || 'JULKAISTU',
+            palautuksessa: this.palautuksessa === julkaisu.revision,
+            liitteet: this.muutosmaaraysLiite(julkaisu),
+          };
+        }
       })
       .sortBy('revision')
       .reverse()
@@ -130,7 +132,7 @@ export default class EpJulkaisuHistoria extends Vue {
   }
 
   get latestJulkaisuRevision() {
-    return _.find(this.julkaisutMapped, julkaisu => julkaisu.tila === 'JULKAISTU');
+    return _.find(this.julkaisutMapped, julkaisu => julkaisu!.tila === 'JULKAISTU');
   }
 
   async palautaConfirm(julkaisu) {
