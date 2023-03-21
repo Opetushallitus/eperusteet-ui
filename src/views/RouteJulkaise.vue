@@ -102,7 +102,8 @@
       <div v-if="julkaisuMahdollinen">
         <hr class="mt-4 mb-4">
         <h3 class="mb-4">{{ $t('uusi-julkaisu') }}</h3>
-        <EpJulkaisuForm :store="perusteStore"
+        <EpJulkaisuForm :is-editing="false"
+                        :store="perusteStore"
                         :julkaisu="julkaisu"
                         @setInvalid="hasRequiredData">
         </EpJulkaisuForm>
@@ -192,7 +193,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   private julkaisu = {
     tiedote: {},
     julkinenTiedote: {},
-    julkinen: false,
+    julkinen: true,
     muutosmaaraysVoimaan: null,
     liitteet: [],
   };
