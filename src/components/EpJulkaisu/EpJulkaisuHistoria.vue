@@ -11,7 +11,7 @@
           <div class="d-flex justify-content-between align-items-center">
             <div>
               <span class="font-bold font-size pr-3 ">{{ $sdt(julkaisu.luotu) }}</span>
-              <span class="pr-3">{{ julkaisu.luoja }}</span>
+              <span v-if="julkaisu.nimi" class="pr-3">{{ julkaisu.nimi }}</span>
               <span v-if="latestJulkaisuRevision && latestJulkaisuRevision.revision === julkaisu.revision" class="julkaistu">{{$t('uusin-versio')}}</span>
               <span v-if ="julkaisu.tila === 'KESKEN'" class="julkaistu julkaistu--kesken">{{$t('julkaisu-kesken')}}</span>
               <span v-if ="julkaisu.tila === 'VIRHE'" class="julkaistu julkaistu--virhe">{{$t('julkaisu-epaonnistui')}}</span>
@@ -73,12 +73,12 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpJulkaisuModal from './EpJulkaisuModal.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
+import { parsiEsitysnimi } from '@/stores/kayttaja';
 
 interface Julkaisu {
   revision?: number;
   tiedote?: { [key: string]: string; };
   luotu?: Date;
-  luoja?: string;
   kayttajanTieto?: any;
   tila?: 'JULKAISTU' | 'KESKEN' | 'VIRHE';
   liitteet?: any;
@@ -118,6 +118,7 @@ export default class EpJulkaisuHistoria extends Vue {
       .map(julkaisu => {
         return {
           ...julkaisu,
+          ...(julkaisu.kayttajanTieto && { nimi: parsiEsitysnimi(julkaisu.kayttajanTieto) }),
           tila: julkaisu.tila || 'JULKAISTU',
           palautuksessa: this.palautuksessa === julkaisu.revision,
           liitteet: this.muutosmaaraysLiite(julkaisu),
