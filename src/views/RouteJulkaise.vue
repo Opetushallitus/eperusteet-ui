@@ -232,9 +232,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
       this.julkaisu.tiedote = {};
       this.julkaisu.julkinenTiedote = {};
-      this.julkaisu.julkinen = false;
+      this.julkaisu.julkinen = true;
       this.julkaisu.muutosmaaraysVoimaan = null;
       this.julkaisu.liitteet = [];
+      this.invalid = false;
       this.$success(this.$t('julkaisu-kaynnistetty') as string);
     }
     catch (err) {
