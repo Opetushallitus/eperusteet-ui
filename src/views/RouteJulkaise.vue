@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-     <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between">
       <h2>{{ $t('julkaisunakyma') }}</h2>
       <div class="d-flex flex-column" v-if="$isAdmin()">
         <EpSpinner v-if="hallintaLoading" />
