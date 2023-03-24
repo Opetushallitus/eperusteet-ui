@@ -77,6 +77,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import { Validations } from 'vuelidate-property-decorators';
 import { validationMixin } from 'vuelidate';
 import { notNull } from '@shared/validators/required';
+import { requiredIf } from 'vuelidate/lib/validators';
 
 @Component({
   components: {
@@ -109,8 +110,11 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
           nimi: notNull(),
           kieli: notNull(),
         },
+        required: requiredIf(() => this.julkaisu.muutosmaaraysVoimaan),
       },
-      muutosmaaraysVoimaan: notNull(),
+      muutosmaaraysVoimaan: {
+        required: requiredIf(() => this.julkaisu.liitteet.length > 0),
+      },
     },
   }
 

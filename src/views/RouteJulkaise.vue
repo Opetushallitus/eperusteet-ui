@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-     <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between">
       <h2>{{ $t('julkaisunakyma') }}</h2>
       <div class="d-flex flex-column" v-if="$isAdmin()">
         <EpSpinner v-if="hallintaLoading" />
@@ -120,7 +120,7 @@
       <EpJulkaisuHistoria :store="perusteStore"
                           :palauta="palautaJulkaisu">
         <template slot="katsele" slot-scope="{ julkaisu }">
-          <ep-external-link :url="opintopolkuKatseluUrl(julkaisu)">
+          <ep-external-link v-if="julkaisu" :url="opintopolkuKatseluUrl(julkaisu)">
             {{$t('katsele')}}
           </ep-external-link>
         </template>
@@ -232,9 +232,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
       this.julkaisu.tiedote = {};
       this.julkaisu.julkinenTiedote = {};
-      this.julkaisu.julkinen = false;
+      this.julkaisu.julkinen = true;
       this.julkaisu.muutosmaaraysVoimaan = null;
       this.julkaisu.liitteet = [];
+      this.invalid = false;
       this.$success(this.$t('julkaisu-kaynnistetty') as string);
     }
     catch (err) {
