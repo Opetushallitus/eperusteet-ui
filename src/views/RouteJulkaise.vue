@@ -120,7 +120,7 @@
       <EpJulkaisuHistoria :store="perusteStore"
                           :palauta="palautaJulkaisu">
         <template slot="katsele" slot-scope="{ julkaisu }">
-          <ep-external-link :url="opintopolkuKatseluUrl(julkaisu)">
+          <ep-external-link v-if="julkaisu" :url="opintopolkuKatseluUrl(julkaisu)">
             {{$t('katsele')}}
           </ep-external-link>
         </template>
