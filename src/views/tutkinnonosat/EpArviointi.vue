@@ -1,5 +1,9 @@
 <template>
-  <b-form-group :label="$kaanna(arvioinninKohdeAlue.otsikko)">
+  <b-form-group>
+    <div slot="label">
+      <div v-if="isEditing" class="mb-2">{{$t('otsikko')}}</div>
+      <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
+    </div>
     <div v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
       <div class="font-weight-bold mb-2">
         <EpInput :isEditing="isEditing" v-model="arvioinninKohde.otsikko" />
