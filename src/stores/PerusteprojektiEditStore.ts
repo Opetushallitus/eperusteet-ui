@@ -6,7 +6,7 @@ import { buildEsikatseluUrl } from '@shared/utils/esikatselu';
 import { Kielet } from '@shared/stores/kieli';
 import { PerusteStore } from './PerusteStore';
 import * as _ from 'lodash';
-import { koulutustyyppiTheme } from '@shared/utils/perusteet';
+import { koulutustyyppiTheme, tyyppiTheme } from '@shared/utils/perusteet';
 
 export class PerusteprojektiEditStore implements IEditoitava {
   constructor(private projektiId: number, private perusteStore: PerusteStore) {
@@ -25,8 +25,16 @@ export class PerusteprojektiEditStore implements IEditoitava {
 
     return {
       ...res.data,
-      esikatseluUrl: buildEsikatseluUrl(Kielet.getSisaltoKieli.value, `/${koulutustyyppiTheme(this.perusteStore.peruste.value!.koulutustyyppi!)}/${_.get(res.data, '_peruste')}`),
+      esikatseluUrl: buildEsikatseluUrl(Kielet.getSisaltoKieli.value, `/${this.perusteTheme(this.perusteStore.peruste.value)}/${_.get(res.data, '_peruste')}`),
     };
+  }
+
+  perusteTheme(peruste) {
+    if (peruste?.koulutustyyppi) {
+      return koulutustyyppiTheme(this.perusteStore.peruste.value!.koulutustyyppi!);
+    }
+
+    return tyyppiTheme(peruste.tyyppi);
   }
 
   async save(data: any) {
