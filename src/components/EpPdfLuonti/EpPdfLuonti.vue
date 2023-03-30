@@ -78,7 +78,7 @@ export default class EpPdfLuonti extends Vue {
   }
 
   luoPdf() {
-    this.store?.luoPdf(this.kieli);
+    this.store?.luoPdf();
   }
 
   get isPolling() {
