@@ -24,7 +24,7 @@ import { Kielet } from '@shared/stores/kieli';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import EpPdfLuonti from '../components/EpPdfLuonti/EpPdfLuonti.vue';
+import EpPdfLuonti from '@shared/components/EpPdfLuonti/EpPdfLuonti.vue';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { DokumenttiStore } from '@/stores/DokumenttiStore';
 import { PerusteDto } from '@shared/api/eperusteet';
@@ -47,10 +47,10 @@ export default class RoutePdfLuonti extends PerusteprojektiRoute {
 
   async onProjektiChange(projektiId: number, perusteId: number) {
     this.perusteDokumenttiStore = new DokumenttiStore(this.peruste, this.perusteenSuoritustapa, 'uusi');
-    await this.perusteDokumenttiStore.haePdf(this.kieli);
+    this.perusteDokumenttiStore.init();
 
     this.kvliiteStore = new DokumenttiStore(this.peruste, this.perusteenSuoritustapa, 'kvliite');
-    await this.kvliiteStore.haePdf(this.kieli);
+    this.kvliiteStore.init();
   }
 
   get perusteenSuoritustapa(): string {
@@ -73,8 +73,8 @@ export default class RoutePdfLuonti extends PerusteprojektiRoute {
 
   @Watch('kieli')
   async kieliChanged() {
-    await this.perusteDokumenttiStore?.haePdf(this.kieli);
-    await this.kvliiteStore?.haePdf(this.kieli);
+    await this.perusteDokumenttiStore?.init();
+    await this.kvliiteStore?.init();
   }
 
   get kvliite() {
