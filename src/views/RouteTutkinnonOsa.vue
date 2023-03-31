@@ -172,6 +172,24 @@
             </b-form-group>
           </ep-collapse>
 
+          <ep-collapse :border-bottom="false" :border-top="true" v-if="data.tutkinnonOsa.tavoitteet">
+            <h3 slot="header">{{ $t('tavoitteet') }}</h3>
+            <b-form-group>
+              <ep-content v-model="data.tutkinnonOsa.tavoitteet"
+                          layout="normal"
+                          :is-editable="isEditing"></ep-content>
+            </b-form-group>
+          </ep-collapse>
+
+          <ep-collapse :border-bottom="false" :border-top="true" v-if="data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.lisatiedot">
+            <h3 slot="header">{{ $t('arviointi') }}</h3>
+            <b-form-group>
+              <ep-content v-model="data.tutkinnonOsa.arviointi.lisatiedot"
+                          layout="normal"
+                          :is-editable="isEditing"></ep-content>
+            </b-form-group>
+          </ep-collapse>
+
         </div>
         <div v-else>
           <ep-collapse tyyppi="osa-alueet" :border-bottom="false" :border-top="true">
