@@ -231,7 +231,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
           || (data.tutkinnonOsa.tyyppi !== 'normaali' && data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
         removable: true,
         hideable: false,
-        recoverable: data?.tutkinnonOsa?.tila !== 'valmis'
+        recoverable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS)
           && ((!data?.tutkinnonOsa?.alkuperainenPeruste && _.size(this.projektitJoissaKaytossa) <= 1)
           || data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
         copyable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) > 1 && data.tutkinnonOsa.tyyppi === 'normaali',
