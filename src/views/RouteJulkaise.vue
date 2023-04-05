@@ -404,7 +404,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     if (julkaisu.peruste && julkaisu.peruste.id) {
       return buildKatseluUrl(Kielet.getSisaltoKieli.value, `/${koulutustyyppiTheme(this.perusteStore.peruste.value!.koulutustyyppi!)}/${julkaisu.peruste.id}`, revision);
     }
-    return null;
+    return '';
   }
 }
 
