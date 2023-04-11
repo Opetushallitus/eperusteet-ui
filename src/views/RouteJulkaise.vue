@@ -20,6 +20,9 @@
           <EpButton variant="link" @click="nollaaJulkaisuTila">
             {{$t('nollaa-julkaisu-tila')}}
           </EpButton>
+          <EpButton variant="link" @click="pakotaJulkaisu">
+            {{$t('pakota-julkaisu')}}
+          </EpButton>
         </b-dropdown>
       </div>
     </div>
@@ -143,7 +146,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import { PerusteDtoTilaEnum, NavigationNodeDto, Status, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut } from '@shared/api/eperusteet';
+import { PerusteDtoTilaEnum, NavigationNodeDto, Status, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut, Maintenance } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
@@ -389,6 +392,32 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       }
       catch (e) {
         this.$fail(this.$t('nollaus-epaonnistui') as string);
+      }
+      finally {
+        this.hallintaLoading = false;
+      }
+    }
+  }
+
+  async pakotaJulkaisu() {
+    const pakota = await this.$bvModal.msgBoxConfirm(this.$t('pakota-julkaisu-varmistus') as any, {
+      title: this.$t('pakota-julkaisu') as any,
+      okVariant: 'primary',
+      okTitle: this.$t('ok') as any,
+      cancelVariant: 'link',
+      cancelTitle: this.$t('peruuta') as any,
+      centered: true,
+    });
+
+    if (pakota) {
+      try {
+        this.hallintaLoading = true;
+        await Maintenance.teeMaintenanceJulkaisu(_.toNumber(this.perusteId), this.$t('pakotettu-julkaisu-tiedote') as string);
+        await this.perusteStore.fetchJulkaisut();
+        this.$success(this.$t('julkaisu-pakotettu') as string);
+      }
+      catch (e) {
+        this.$fail(this.$t('julkaisu-pakotettu-epaonnistui') as string);
       }
       finally {
         this.hallintaLoading = false;
