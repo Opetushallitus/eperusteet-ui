@@ -1,13 +1,13 @@
 <template>
   <div>
-    <b-form-group :label="$t('lataa-uusi-muutosmaaraus')">
+    <b-form-group :label="muutosmaaraysLabel">
       <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!file" />
       <div v-if="julkaisuLiitteet && julkaisuLiitteet.length > 0">
         <table class="table">
           <thead>
           <tr>
-            <th class="w-40">{{ $t('nimi') }}</th>
-            <th class="w-20">{{ $t('kieli') }}</th>
+            <th class="w-40">{{ $t('nimi') }}*</th>
+            <th class="w-20">{{ $t('kieli') }}*</th>
             <th class="w-30">{{ $t('tiedosto') }}</th>
             <th class="w-10">{{ $t('poista') }}</th>
           </tr>
@@ -40,7 +40,7 @@
       </div>
     </b-form-group>
 
-    <b-form-group :label="$t('muutosmaarays-astuu-voimaan')" class="mt-4 col-lg-3">
+    <b-form-group :label="muutosmaaraysVoimaanLabel" class="mt-4 col-lg-3">
       <ep-datepicker v-model="julkaisu.muutosmaaraysVoimaan"
                      :is-editing="true"/>
     </b-form-group>
@@ -145,6 +145,14 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
 
   get julkaisuLiitteet() {
     return this.julkaisu.liitteet;
+  }
+
+  get muutosmaaraysLabel() {
+    return this.$v.$invalid ? this.$t('lataa-uusi-muutosmaaraus') + '*' : this.$t('lataa-uusi-muutosmaaraus');
+  }
+
+  get muutosmaaraysVoimaanLabel() {
+    return this.$v.$invalid ? this.$t('muutosmaarays-astuu-voimaan') + '*' : this.$t('muutosmaarays-astuu-voimaan');
   }
 
   @Watch('file')
