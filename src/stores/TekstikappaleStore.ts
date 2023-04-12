@@ -6,7 +6,7 @@ import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { translated } from '@shared/validators/required';
+import { requiredOneLang } from '@shared/validators/required';
 import { PerusteenOsaDto } from '@shared/generated/eperusteet';
 
 Vue.use(VueCompositionApi);
@@ -120,9 +120,8 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public readonly validator = computed(() => {
-    const julkaisukielet = TekstikappaleStore.config!.perusteStore.julkaisukielet.value;
     return {
-      nimi: translated(julkaisukielet),
+      nimi: requiredOneLang(),
     };
   });
 
