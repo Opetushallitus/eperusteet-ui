@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form-group :label="muutosmaaraysLabel">
+    <b-form-group :label="$t('lataa-uusi-muutosmaaraus') + asterisk">
       <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!file" />
       <div v-if="julkaisuLiitteet && julkaisuLiitteet.length > 0">
         <table class="table">
@@ -40,7 +40,7 @@
       </div>
     </b-form-group>
 
-    <b-form-group :label="muutosmaaraysVoimaanLabel" class="mt-4 col-lg-3">
+    <b-form-group :label="$t('muutosmaarays-astuu-voimaan') + asterisk" class="mt-4 col-lg-3">
       <ep-datepicker v-model="julkaisu.muutosmaaraysVoimaan"
                      :is-editing="true"/>
     </b-form-group>
@@ -147,12 +147,12 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
     return this.julkaisu.liitteet;
   }
 
-  get muutosmaaraysLabel() {
-    return this.$v.$invalid ? this.$t('lataa-uusi-muutosmaaraus') + '*' : this.$t('lataa-uusi-muutosmaaraus');
+  get isMuutosmaaraysDataRequired() {
+    return this.julkaisuLiitteet.length > 0 || this.julkaisu.muutosmaaraysVoimaan;
   }
 
-  get muutosmaaraysVoimaanLabel() {
-    return this.$v.$invalid ? this.$t('muutosmaarays-astuu-voimaan') + '*' : this.$t('muutosmaarays-astuu-voimaan');
+  get asterisk() {
+    return this.isMuutosmaaraysDataRequired ? '*' : '';
   }
 
   @Watch('file')
