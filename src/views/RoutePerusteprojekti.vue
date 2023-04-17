@@ -225,6 +225,51 @@
                 </div>
               </template>
 
+              <template v-slot:aipevaihe="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'aipevaihe', params: { vaiheId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-vaihe') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:aipekurssi="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'aipekurssi', params: { kurssiId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-kurssi') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:aipeoppiaine="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-oppiaine') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:aipe_laajaalaisetosaamiset="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'aipeLaajaAlaisetOsaamiset' }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $t('laaja-alaiset-osaamiset') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:aipe_laajaalainenosaaminen="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'aipelaajaAlainenOsaaminen', params: { laoId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-laaja-alainen-osaaminen') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:new>
                 <EpSisallonLisays :perusteStore="perusteStore" :naviStore="naviStore" />
               </template>
@@ -283,6 +328,8 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSisallonLisays from '@/components/EpSisallonLisays.vue';
 import { routeToNode, LinkkiHandler } from '@/utils/routing';
 import EpValidPopover from '@shared/components/EpValidPopover/EpValidPopover.vue';
+import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
+import { KuvaStore } from '@/stores/KuvaStore';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -530,6 +577,11 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     });
 
     await this.perusteStore.updateCurrent();
+  }
+
+  @ProvideReactive('kuvaHandler')
+  get kuvaHandler() {
+    return createKuvaHandler(new KuvaStore(this.perusteId!));
   }
 }
 </script>

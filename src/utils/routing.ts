@@ -73,6 +73,38 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
       type: 'koto_laajaalainenosaaminen',
       id: Number(route.params?.kotoLaajaalainenOsaaminenId!),
     };
+  case 'aipelaajaAlainenOsaaminen':
+    return {
+      type: 'aipe_laajaalainenosaaminen',
+      id: Number(route.params?.laoId!),
+    };
+  case 'aipeLaajaAlaisetOsaamiset':
+    return {
+      type: 'aipe_laajaalainenosaaminen',
+    };
+  case 'aipevaihe':
+    return {
+      type: 'aipevaihe',
+      id: Number(route.params?.vaiheId!),
+    };
+  case 'aipeoppiaine':
+    if (route.params?.oppiaineId) {
+      return {
+        type: 'aipeoppiaine',
+        id: Number(route.params?.oppiaineId!),
+      };
+    }
+
+    return {
+      type: 'aipevaihe',
+      id: Number(route.params?.vaiheId!),
+    };
+  case 'aipekurssi':
+    return {
+      type: 'aipekurssi',
+      id: Number(route.params?.kurssiId!),
+    };
+
   default:
     console.error('Unknown route', route.name, route);
     break;
