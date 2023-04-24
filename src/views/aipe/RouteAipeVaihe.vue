@@ -34,7 +34,7 @@
             </draggable>
           </b-form-group>
 
-          <ep-button variant="outline-primary" icon="plussa" @click="lisaaOppiaine" v-if="!isEditing">
+          <ep-button variant="outline-primary" icon="plussa" @click="lisaaOppiaine" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
             {{ $t('lisaa-oppiaine') }}
           </ep-button>
 

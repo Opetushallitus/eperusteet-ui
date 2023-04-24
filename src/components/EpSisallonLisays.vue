@@ -63,6 +63,7 @@
 
         <ep-button
           v-else-if="lisasisalto.call"
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           variant="link"
           buttonClass="text-decoration-none"
           @click="lisasisalto.call">

@@ -57,7 +57,7 @@
               </draggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="plussa" @click="lisaaOppimaara" v-if="!isEditing">
+            <ep-button variant="outline-primary" icon="plussa" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>
@@ -79,7 +79,7 @@
               </draggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="plussa" @click="lisaaKurssi" v-if="!isEditing">
+            <ep-button variant="outline-primary" icon="plussa" @click="lisaaKurssi" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
               {{ $t('lisaa-kurssi') }}
             </ep-button>
           </template>

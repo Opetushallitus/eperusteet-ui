@@ -8,7 +8,7 @@
     </template>
     <template #default="{ data, isEditing }">
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="plus" @click="lisaaLaajaAlainenOsaaminen" :disabled="isEditing">
+        <EpButton variant="outline" icon="plus" @click="lisaaLaajaAlainenOsaaminen" :disabled="isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
           {{ $t('uusi-laaja-alainen-osaaminen')}}
         </EpButton>
       </div>
