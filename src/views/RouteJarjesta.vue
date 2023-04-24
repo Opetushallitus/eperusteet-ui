@@ -24,9 +24,21 @@
             childField="lapset"
             group="sisaltoJarjestysGroup"
             :is-editable="isEditing">
+            <template #default="{ node }">
+              <span>
+                {{ $kaanna(node.perusteenOsa.nimi) }}
+              </span>
+            </template>
+          </EpJarjesta>
+        </b-tab>
+        <b-tab :title="$t('vaiheet')" v-if="data.vaiheet">
+          <EpJarjesta
+            v-model="data.vaiheet.vaiheet"
+            group="sisaltoJarjestysGroup"
+            :is-editable="isEditing">
           <template #default="{ node }">
             <span>
-              {{ $kaanna(node.perusteenOsa.nimi) }}
+              {{ $kaanna(node.nimi) }}
             </span>
           </template>
           </EpJarjesta>
@@ -50,6 +62,8 @@ import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 
 import { PerusteStore } from '@/stores/PerusteStore';
+import { Koulutustyyppi } from '@shared/tyypit';
+import { AipeVaiheetStore } from '@/stores/AipeVaiheetStore';
 
 @Component({
   components: {
@@ -72,6 +86,10 @@ export default class RouteJarjesta extends PerusteprojektiRoute {
 
       if (this.isAmmatillinen) {
         this.stores.tutkinnonOsat = new TutkinnonOsaStore(this.perusteStore);
+      }
+
+      if (this.peruste?.koulutustyyppi === Koulutustyyppi.aikuistenperusopetus) {
+        this.stores.vaiheet = new AipeVaiheetStore(this.perusteId, this.perusteStore);
       }
 
       this.store = new EditointiStore(new JarjestysStore(this.stores));

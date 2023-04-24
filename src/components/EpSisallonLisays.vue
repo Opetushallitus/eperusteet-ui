@@ -61,6 +61,15 @@
           </div>
         </b-dropdown>
 
+        <ep-button
+          v-else-if="lisasisalto.call"
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+          variant="link"
+          buttonClass="text-decoration-none"
+          @click="lisasisalto.call">
+          <fas class="mr-2" icon="plussa" /> {{ $t(lisasisalto.label['uusi']) }}
+        </ep-button>
+
         <ep-tekstikappale-lisays
           v-else
           :tallenna="lisasisalto.save"
@@ -289,6 +298,10 @@ export default class EpSisallonLisays extends Vue {
     });
   }
 
+  async uusiVaihe() {
+    this.$router.push({ name: 'aipevaihe' });
+  }
+
   get isLisasisaltoLisays() {
     return !!this.peruste && (!!this.koulutustyypinLisasisaltoLisays[this.peruste.koulutustyyppi!] || !!this.perusteTyyppiSisaltoLisays[this.peruste.tyyppi!]);
   }
@@ -299,6 +312,15 @@ export default class EpSisallonLisays extends Vue {
 
   get koulutustyypinLisasisaltoLisays() {
     return {
+      [Koulutustyyppi.aikuistenperusopetus]: [
+        {
+          groupedSisalto: [],
+          call: this.uusiVaihe,
+          label: {
+            'uusi': 'uusi-vaihe',
+          },
+        },
+      ],
       [Koulutustyyppi.vapaasivistystyo]: [
         {
           groupedSisalto: [],

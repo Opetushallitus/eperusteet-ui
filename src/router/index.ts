@@ -49,6 +49,11 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpErrorPage from '@shared/components/EpErrorPage/EpErrorPage.vue';
 import RouteOsaamiskokonaisuus from '@/views/RouteOsaamiskokonaisuus.vue';
 import RouteOsaamiskokonaisuusPaaAlue from '@/views/RouteOsaamiskokonaisuusPaaAlue.vue';
+import RouteAipeKurssi from '@/views/aipe/RouteAipeKurssi.vue';
+import RouteAipeLaajaAlainenOsaaminen from '@/views/aipe/RouteAipeLaajaAlainenOsaaminen.vue';
+import RouteAipeLaajaAlaisetOsaamiset from '@/views/aipe/RouteAipeLaajaAlaisetOsaamiset.vue';
+import RouteAipeOppiaine from '@/views/aipe/RouteAipeOppiaine.vue';
+import RouteAipeVaihe from '@/views/aipe/RouteAipeVaihe.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -350,6 +355,36 @@ const router = new VueRouter({
         path: 'osaamiskokonaisuuspaaalue/:osaamiskokonaisuusPaaAlueId',
         name: 'osaamiskokonaisuus_paa_alue',
         component: RouteOsaamiskokonaisuusPaaAlue,
+        props,
+      }, {
+        path: 'aipe/laajaalaisetosaamiset',
+        name: 'aipeLaajaAlaisetOsaamiset',
+        component: RouteAipeLaajaAlaisetOsaamiset,
+        props,
+      }, {
+        path: 'aipe/laajaalainenosaaminen/:laoId?',
+        name: 'aipelaajaAlainenOsaaminen',
+        component: RouteAipeLaajaAlainenOsaaminen,
+        props,
+      }, {
+        path: 'aipe/vaihe/:vaiheId?',
+        name: 'aipevaihe',
+        component: RouteAipeVaihe,
+        props,
+      }, {
+        path: 'aipe/vaihe/:vaiheId/oppiaine/:oppiaineId?',
+        name: 'aipeoppiaine',
+        component: RouteAipeOppiaine,
+        props,
+      }, {
+        path: 'aipe/vaihe/:vaiheId/oppiaine/:parentId',
+        name: 'aipeoppimaara',
+        component: RouteAipeOppiaine,
+        props,
+      }, {
+        path: 'aipe/vaihe/:vaiheId/oppiaine/:oppiaineId/kurssi/:kurssiId?',
+        name: 'aipekurssi',
+        component: RouteAipeKurssi,
         props,
       },
       ],
