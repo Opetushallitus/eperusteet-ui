@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form-group :label="$t('lataa-uusi-muutosmaaraus') + asterisk">
-      <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!file" />
+      <ep-tiedosto-lataus ref="tiedostoLataus" :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!file" />
       <div v-if="julkaisuLiitteet && julkaisuLiitteet.length > 0">
         <table class="table">
           <thead>
@@ -129,6 +129,7 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
       },
     });
     this.file = null;
+    (this.$refs['tiedostoLataus'] as any).resetFile();
   }
 
   async poistaLiite(index) {
