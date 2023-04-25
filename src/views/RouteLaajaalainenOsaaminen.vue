@@ -124,10 +124,6 @@ export default class RouteLaajaalainenOsaaminen extends Vue {
   get kasiteHandler() {
     return createKasiteHandler(new TermitStore(this.perusteId!));
   }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
 }
 </script>
 
