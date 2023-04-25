@@ -25,6 +25,7 @@ export class DokumenttiStore {
   public readonly dokumenttiHref = computed(() => this.state.dokumenttiHref);
 
   async init() {
+    this.state.dokumentti = null;
     if (this.peruste && this.suoritustapa) {
       await this.getDokumenttiTila();
       this.setHref();
