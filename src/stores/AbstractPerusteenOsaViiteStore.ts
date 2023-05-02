@@ -84,7 +84,7 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
     AbstractPerusteenOsaViiteStore.config.router.push({ name: 'perusteprojekti' });
   }
 
-  public async create(otsikko, tekstikappaleIsa) {
+  public async create(otsikko?, tekstikappaleIsa?) {
     const perusteenOsa = {
       perusteenOsa: {
         osanTyyppi: this.getOsanType(),

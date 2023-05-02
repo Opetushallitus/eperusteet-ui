@@ -15,7 +15,7 @@
 
         <hr v-if="isEditing" class="mt-5"/>
 
-        <EpAipeSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava']" />
+        <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava']" />
 
         <template v-if="vaiheId">
           <b-form-group :label="$t('oppiaineet')">
@@ -95,7 +95,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import EpAipeSisaltoTekstikappaleet from '@/views/aipe/yleiset/EpAipeSisaltoTekstikappaleet.vue';
+import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 
 @Component({
   components: {
@@ -105,7 +105,7 @@ import EpAipeSisaltoTekstikappaleet from '@/views/aipe/yleiset/EpAipeSisaltoTeks
     EpButton,
     draggable,
     EpCollapse,
-    EpAipeSisaltoTekstikappaleet,
+    EpSisaltoTekstikappaleet,
   },
 })
 export default class RouteAipeVaihe extends Vue {

@@ -54,6 +54,7 @@ import RouteAipeLaajaAlainenOsaaminen from '@/views/aipe/RouteAipeLaajaAlainenOs
 import RouteAipeLaajaAlaisetOsaamiset from '@/views/aipe/RouteAipeLaajaAlaisetOsaamiset.vue';
 import RouteAipeOppiaine from '@/views/aipe/RouteAipeOppiaine.vue';
 import RouteAipeVaihe from '@/views/aipe/RouteAipeVaihe.vue';
+import RouteTaiteenala from '@/views/tpo/RouteTaiteenala.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -385,6 +386,11 @@ const router = new VueRouter({
         path: 'aipe/vaihe/:vaiheId/oppiaine/:oppiaineId/kurssi/:kurssiId?',
         name: 'aipekurssi',
         component: RouteAipeKurssi,
+        props,
+      }, {
+        path: 'tpo/taiteenala/:taiteenalaId?/:uusi?',
+        name: 'taiteenala',
+        component: RouteTaiteenala,
         props,
       },
       ],

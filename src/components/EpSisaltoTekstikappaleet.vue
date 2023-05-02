@@ -6,12 +6,15 @@
 
     <ep-collapse class="collapsable" v-for="(avain, index) in sisaltoTekstiAvaimet" :key="avain" :collapsable="!isEditing" :border-bottom="isEditing">
       <template #header>
-        <h4  v-if="!isEditing">{{ $kaanna(model[avain].otsikko)}}</h4>
+        <h4 v-if="!isEditing">
+          <span v-if="model[avain][sisaltoTekstiOtsikkoField]">{{ $kaanna(model[avain][sisaltoTekstiOtsikkoField])}}</span>
+          <span v-else>{{ $t(avain)}}</span>
+        </h4>
       </template>
-      <h4  v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-otsikko')}}</h4>
-      <ep-input v-if="isEditing" v-model="model[avain].otsikko" :is-editing="isEditing"></ep-input>
+      <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-otsikko')}}</h4>
+      <ep-input v-if="isEditing" v-model="model[avain][sisaltoTekstiOtsikkoField]" :is-editing="isEditing" :placeholder="$t(avain)"></ep-input>
 
-      <h4  v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
+      <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
       <ep-content layout="normal" v-model="model[avain].teksti" :is-editable="isEditing"> </ep-content>
 
       <div class="d-flex justify-content-between mt-1" v-if="isEditing">
@@ -28,12 +31,12 @@
 
     <ep-collapse class="collapsable" v-for="(teksti, index) in model.vapaatTekstit" :key="'teksti' +index" :collapsable="!isEditing" :border-bottom="isEditing">
       <template #header>
-        <h4  v-if="!isEditing">{{ $kaanna(teksti.nimi)}}</h4>
+        <h4 v-if="!isEditing">{{ $kaanna(teksti.nimi)}}</h4>
       </template>
-      <h4  v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-otsikko')}}</h4>
+      <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-otsikko')}}</h4>
       <ep-input v-if="isEditing" v-model="teksti.nimi" :is-editing="isEditing"></ep-input>
 
-      <h4  v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
+      <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
       <ep-content layout="normal" v-model="teksti.teksti" :is-editable="isEditing"> </ep-content>
 
       <div class="d-flex justify-content-between mt-1" v-if="isEditing">
@@ -71,9 +74,12 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
     EpContent,
   },
 })
-export default class EpAipeSisaltoTekstikappaleet extends Vue {
+export default class EpSisaltoTekstikappaleet extends Vue {
   @Prop({ required: true })
   value!: any;
+
+  @Prop({ required: false, default: 'otsikko' })
+  sisaltoTekstiOtsikkoField!: any;
 
   @Prop({ required: true })
   isEditing!: boolean;
