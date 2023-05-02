@@ -94,7 +94,6 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
         id: Number(route.params?.oppiaineId!),
       };
     }
-
     return {
       type: 'aipevaihe',
       id: Number(route.params?.vaiheId!),
@@ -104,7 +103,11 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
       type: 'aipekurssi',
       id: Number(route.params?.kurssiId!),
     };
-
+  case 'taiteenala':
+    return {
+      type: 'taiteenala',
+      id: Number(route.params?.taiteenalaId!),
+    };
   default:
     console.error('Unknown route', route.name, route);
     break;

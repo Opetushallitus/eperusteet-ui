@@ -38,7 +38,7 @@
 
       <b-row>
         <b-col cols="11">
-          <EpAipeSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['tehtava', 'tyotavat', 'ohjaus', 'arviointi', 'sisaltoalueinfo']" />
+          <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['tehtava', 'tyotavat', 'ohjaus', 'arviointi', 'sisaltoalueinfo']" />
 
           <template v-if="!data['_oppiaine'] && oppiaineId && (!data.kurssit || data.kurssit.length == 0)">
             <b-form-group :label="$t('oppimaarat')">
@@ -137,7 +137,7 @@ import draggable from 'vuedraggable';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import EpAipeSisaltoTekstikappaleet from '@/views/aipe/yleiset/EpAipeSisaltoTekstikappaleet.vue';
+import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpAipeOppiaineenTavoite from '@/views/aipe/yleiset/EpAipeOppiaineenTavoite.vue';
@@ -150,7 +150,7 @@ import EpAipeOppiaineenTavoite from '@/views/aipe/yleiset/EpAipeOppiaineenTavoit
     EpButton,
     draggable,
     EpKoodistoSelect,
-    EpAipeSisaltoTekstikappaleet,
+    EpSisaltoTekstikappaleet,
     EpCollapse,
     EpAipeOppiaineenTavoite,
   },
