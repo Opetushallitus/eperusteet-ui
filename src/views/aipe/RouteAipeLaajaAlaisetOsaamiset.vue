@@ -13,7 +13,7 @@
         </EpButton>
       </div>
 
-      <b-row class="border-bottom-1">
+      <b-row class="border-bottom-1 m-0">
         <b-col cols="5" class="font-weight-bold">{{$t('nimi')}}</b-col>
         <b-col cols="5" class="font-weight-bold">{{$t('muokattu')}}</b-col>
       </b-row>
@@ -23,13 +23,13 @@
         tag="div"
         v-model="data.laajaAlaisetOsaamiset">
 
-        <b-row v-for="(lao, index) in data.laajaAlaisetOsaamiset" :key="'lao'+index" class="taulukko-rivi-varitys py-3">
+        <b-row v-for="(lao, index) in data.laajaAlaisetOsaamiset" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
           <b-col cols="5" class="d-flex">
             <div class="order-handle mr-2" v-if="isEditing">
               <fas icon="grip-vertical"></fas>
             </div>
             <div>
-              {{$kaanna(lao.nimi)}}
+              <router-link :to="{ name: 'aipelaajaAlainenOsaaminen', params: { laoId: lao.id } }">{{ $kaanna(lao.nimi) }}</router-link>
             </div>
           </b-col>
           <b-col cols="5">
