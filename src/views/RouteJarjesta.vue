@@ -28,7 +28,12 @@
               <span>
                 {{ $kaanna(node.perusteenOsa.nimi) }}
               </span>
-              <fas v-if="node.perusteenOsa.liite" icon="liite"></fas>
+              <fas v-if="node.perusteenOsa.liite" :ref="node.id" icon="liite"></fas>
+              <b-tooltip :target="() => $refs[node.id]"
+                         placement="right"
+                         triggers="hover">
+                {{ $t('tekstikappale-naytetaan-liitteena') }}
+              </b-tooltip>
             </template>
           </EpJarjesta>
         </b-tab>

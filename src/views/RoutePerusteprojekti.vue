@@ -114,6 +114,12 @@
                     <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-tekstikappale') }}
                   </router-link>
+                  <fas icon="liite" :ref="item.id"></fas>
+                  <b-tooltip :target="() => $refs[item.id]"
+                             placement="right"
+                             triggers="hover">
+                    {{ $t('tekstikappale-naytetaan-liitteena') }}
+                  </b-tooltip>
                 </div>
               </template>
 
