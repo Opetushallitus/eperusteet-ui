@@ -28,6 +28,7 @@
               <span>
                 {{ $kaanna(node.perusteenOsa.nimi) }}
               </span>
+              <fas v-if="node.perusteenOsa.liite" icon="liite"></fas>
             </template>
           </EpJarjesta>
         </b-tab>
