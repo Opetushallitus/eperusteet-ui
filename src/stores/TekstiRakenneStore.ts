@@ -1,18 +1,14 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Matala, Perusteenosat, Sisallot, PerusteprojektiListausDto } from '@shared/api/eperusteet';
-import { Revision, Page } from '@shared/tyypit';
-import { Debounced } from '@shared/utils/delay';
+import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { Matala, Sisallot } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-// import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
 
 interface TekstiRakenneStoreConfig {
-  // notifikaatiotStore: NotifikaatiotStore;
   perusteStore: PerusteStore;
   router: VueRouter;
 }
@@ -32,9 +28,6 @@ export class TekstiRakenneStore implements IEditoitava {
   public readonly id = computed(() => this.state.tekstikappale?.id);
 
   constructor(private readonly perusteId: number) {
-    // if (!TekstiRakenneStore.config?.notifikaatiotStore) {
-    //   throw new Error('NotifikaatiotStore missing');
-    // }
     if (!TekstiRakenneStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
     }
@@ -44,7 +37,7 @@ export class TekstiRakenneStore implements IEditoitava {
   }
 
   public async load() {
-    const res = await Sisallot.getSuoritustapaSisaltoUUSI(this.perusteId, TekstiRakenneStore.config?.perusteStore.perusteSuoritustapa.value!);
+    const res = await Sisallot.getSuoritustapaSisaltoUUSI(this.perusteId, TekstiRakenneStore.config?.perusteStore.perusteSuoritustapa.value!, 'laaja');
     return res.data;
   }
 
@@ -52,9 +45,18 @@ export class TekstiRakenneStore implements IEditoitava {
     function pick(obj: Matala) {
       return {
         id: obj.id,
-        lapset: _.map(obj.lapset, pick),
+        lapset: _.map(sortPerusteenOsat(obj.lapset), pick),
         perusteenOsa: null,
       };
+    }
+
+    function sortPerusteenOsat(lapset) {
+      // Sortataan, että tutkinnon muodostuminen on ensimmäisenä
+      const sortedByRakenne = _.sortBy(lapset, lapsi => {
+        return lapsi.perusteenOsa.tunniste !== 'rakenne';
+      });
+      // Liitteet perälle
+      return _.sortBy(sortedByRakenne, 'perusteenOsa.liite');
     }
 
     const filtered = pick(data);
