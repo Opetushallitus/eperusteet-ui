@@ -66,7 +66,8 @@
           v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           variant="link"
           buttonClass="text-decoration-none"
-          @click="lisasisalto.call">
+          @click="makeCall(lisasisalto.call)"
+          :showSpinner="loading">
           <fas class="mr-2" icon="plussa" /> {{ $t(lisasisalto.label['uusi']) }}
         </ep-button>
 
@@ -121,6 +122,7 @@ import { NavigationNodeDtoTypeEnum, PerusteDtoTyyppiEnum } from '@shared/api/epe
 import { chapterStringSort } from '@shared/utils/NavigationBuilder';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
+import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
 
 @Component({
   components: {
@@ -134,6 +136,8 @@ export default class EpSisallonLisays extends Vue {
 
   @Prop({ required: true })
   naviStore!: EpTreeNavibarStore;
+
+  loading: boolean = false;
 
   get projekti() {
     return this.perusteStore.projekti.value;
@@ -189,6 +193,12 @@ export default class EpSisallonLisays extends Vue {
     }
 
     return 'tekstikappale';
+  }
+
+  async makeCall(call) {
+    this.loading = true;
+    await call();
+    this.loading = false;
   }
 
   async tallennaUusiTekstikappale(otsikko, tekstikappaleIsa) {
@@ -302,6 +312,19 @@ export default class EpSisallonLisays extends Vue {
     this.$router.push({ name: 'aipevaihe' });
   }
 
+  async uusiTaiteenala() {
+    const taiteenalaStore = new TaiteenalaStore(this.peruste!.id!, 0);
+    const tallennettu = await taiteenalaStore.create();
+    await this.perusteStore.updateNavigation();
+    await this.$router.push({
+      name: 'taiteenala',
+      params: {
+        taiteenalaId: '' + tallennettu!.id,
+        uusi: 'uusi',
+      },
+    });
+  }
+
   get isLisasisaltoLisays() {
     return !!this.peruste && (!!this.koulutustyypinLisasisaltoLisays[this.peruste.koulutustyyppi!] || !!this.perusteTyyppiSisaltoLisays[this.peruste.tyyppi!]);
   }
@@ -318,6 +341,15 @@ export default class EpSisallonLisays extends Vue {
           call: this.uusiVaihe,
           label: {
             'uusi': 'uusi-vaihe',
+          },
+        },
+      ],
+      [Koulutustyyppi.tpo]: [
+        {
+          groupedSisalto: [],
+          call: this.uusiTaiteenala,
+          label: {
+            'uusi': 'uusi-taiteenala',
           },
         },
       ],

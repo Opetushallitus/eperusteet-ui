@@ -276,6 +276,15 @@
                 </div>
               </template>
 
+              <template v-slot:taiteenala="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'taiteenala', params: { taiteenalaId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-taiteenala') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:new>
                 <EpSisallonLisays :perusteStore="perusteStore" :naviStore="naviStore" />
               </template>

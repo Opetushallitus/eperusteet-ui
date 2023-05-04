@@ -31,7 +31,6 @@ export const EiTuetutKoulutustyypit = [
   KoulutusTyyppi.LUKIOKOULUTUS,
   KoulutusTyyppi.LUKIOVALMISTAVAKOULUTUS,
   KoulutusTyyppi.AIKUISLUKIOKOULUTUS,
-  KoulutusTyyppi.TAITEEN_PERUSOPETUS,
   KoulutusTyyppi.PERUSOPETUKSEEN_VALMISTAVA,
   KoulutusTyyppi.LISAOPETUS,
 ];
