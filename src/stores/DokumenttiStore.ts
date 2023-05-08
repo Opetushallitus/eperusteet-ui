@@ -2,7 +2,6 @@ import Vue from 'vue';
 import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
 import { Dokumentit, PerusteDto, DokumenttiDto, DokumenttiDtoTilaEnum, baseURL, DokumentitParams } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
-import { Kieli } from '@shared/tyypit';
 import { Debounced } from '@shared/utils/delay';
 import { Kielet } from '@shared/stores/kieli';
 
@@ -11,8 +10,10 @@ Vue.use(VueCompositionApi);
 export class DokumenttiStore {
   private state = reactive({
     dokumentti: null as DokumenttiDto | null,
+    dokumenttiJulkaisu: null as DokumenttiDto | null,
     polling: null as any | null,
     dokumenttiHref: null as string | null,
+    dokumenttiJulkaisuHref: null as string | null,
   });
 
   private pollingFrequency = 1000;
@@ -21,8 +22,10 @@ export class DokumenttiStore {
   }
 
   public readonly dokumentti = computed(() => this.state.dokumentti);
+  public readonly dokumenttiJulkaisu = computed(() => this.state.dokumenttiJulkaisu);
   public readonly polling = computed(() => this.state.polling);
   public readonly dokumenttiHref = computed(() => this.state.dokumenttiHref);
+  public readonly dokumenttiJulkaisuHref = computed(() => this.state.dokumenttiJulkaisuHref);
 
   async init() {
     this.state.dokumentti = null;
@@ -39,6 +42,11 @@ export class DokumenttiStore {
     }
     else {
       this.state.dokumentti = (await Dokumentit.queryDokumenttiTila((this.state.dokumentti?.id as number))).data;
+    }
+
+    if (!this.state.dokumentti.julkaisuDokumentti && !this.state.dokumenttiJulkaisu && this.version === 'uusi') {
+      this.state.dokumenttiJulkaisu = (await Dokumentit.getJulkaistuDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value)).data;
+      this.state.dokumenttiJulkaisuHref = baseURL + DokumentitParams.getDokumentti(_.toString(this.state.dokumenttiJulkaisu.id)).url;
     }
 
     if (_.kebabCase(this.state.dokumentti.tila) === _.kebabCase(DokumenttiDtoTilaEnum.EPAONNISTUI)
