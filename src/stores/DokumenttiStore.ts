@@ -46,7 +46,9 @@ export class DokumenttiStore {
 
     if (!this.state.dokumentti.julkaisuDokumentti && !this.state.dokumenttiJulkaisu && this.version === 'uusi') {
       this.state.dokumenttiJulkaisu = (await Dokumentit.getJulkaistuDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value)).data;
-      this.state.dokumenttiJulkaisuHref = baseURL + DokumentitParams.getDokumentti(_.toString(this.state.dokumenttiJulkaisu.id)).url;
+      if (this.state.dokumenttiJulkaisu.id) {
+        this.state.dokumenttiJulkaisuHref = baseURL + DokumentitParams.getDokumentti(_.toString(this.state.dokumenttiJulkaisu.id)).url;
+      }
     }
 
     if (_.kebabCase(this.state.dokumentti.tila) === _.kebabCase(DokumenttiDtoTilaEnum.EPAONNISTUI)
