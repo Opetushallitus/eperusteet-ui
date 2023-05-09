@@ -29,6 +29,7 @@ export class DokumenttiStore {
 
   async init() {
     this.state.dokumentti = null;
+    this.state.dokumenttiJulkaisu = null;
     if (this.peruste && this.suoritustapa) {
       await this.getDokumenttiTila();
       this.setHref();
