@@ -4,6 +4,9 @@
       <template v-slot:header="{ data }">
         <h2 class="m-0">{{ $kaanna(data.nimi) }}</h2>
       </template>
+      <template v-slot:postHeader="{ data }">
+        <span v-if="data.liite"><b>{{ $t('liite') }}. </b></span>
+      </template>
       <template v-slot:default="{ data, isEditing, validation }">
         <div class="mt-1 otsikko" v-if="isEditing">
 
