@@ -55,6 +55,10 @@ import RouteAipeLaajaAlaisetOsaamiset from '@/views/aipe/RouteAipeLaajaAlaisetOs
 import RouteAipeOppiaine from '@/views/aipe/RouteAipeOppiaine.vue';
 import RouteAipeVaihe from '@/views/aipe/RouteAipeVaihe.vue';
 import RouteTaiteenala from '@/views/tpo/RouteTaiteenala.vue';
+import RouteLaajaAlaisetOsaamiset from '@/views/lukio/RouteLaajaAlaisetOsaamiset.vue';
+import RouteModuuli from '@/views/lukio/RouteModuuli.vue';
+import RouteOppiaine from '@/views/lukio/RouteOppiaine.vue';
+import RouteOppiaineet from '@/views/lukio/RouteOppiaineet.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -391,6 +395,26 @@ const router = new VueRouter({
         path: 'tpo/taiteenala/:taiteenalaId?/:uusi?',
         name: 'taiteenala',
         component: RouteTaiteenala,
+        props,
+      }, {
+        path: 'lukio/laajaalaisetosaamiset',
+        name: 'lukio_laajaAlaisetOsaamiset',
+        component: RouteLaajaAlaisetOsaamiset,
+        props,
+      }, {
+        path: 'lukio/oppiaineet',
+        name: 'lukio_oppiaineet',
+        component: RouteOppiaineet,
+        props,
+      }, {
+        path: 'lukio/oppiaine/:oppiaineId?',
+        name: 'lukio_oppiaine',
+        component: RouteOppiaine,
+        props,
+      }, {
+        path: 'lukio/oppiaine/:oppiaineId/moduuli/:moduuliId?',
+        name: 'moduuli',
+        component: RouteModuuli,
         props,
       },
       ],
