@@ -226,6 +226,53 @@
                 </div>
               </template>
 
+              <template v-slot:laajaalaiset="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'lukio_laajaAlaisetOsaamiset' }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $t('laaja-alaisen-osaamisen-osa-alueet') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:oppiaineet="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'lukio_oppiaineet' }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $t('oppiaineet') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:oppiaine="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: item.id } }">
+                    {{ $kaanna(item.label) || $t('nimeton-oppiaine') }} <span v-if="item.koodi">({{item.koodi}})</span>
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:moduuli="{ item }">
+                <div class="menu-item">
+                  <ep-color-indicator :kind="item.meta.pakollinen ? 'pakollinen' : 'valinnainen'" class="mr-1"/>
+                  <router-link :to="{ name: 'moduuli', params: { moduuliId: item.id } }">
+                    {{ $kaanna(item.label) || $t('nimeton-moduuli') }} <span v-if="item.koodi">({{item.koodi}})</span>
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:oppimaarat>
+                <div class="menu-item text-muted">
+                  {{ $t('oppimaarat') }}
+                </div>
+              </template>
+
+              <template v-slot:moduulit>
+                <div class="menu-item text-muted">
+                  {{ $t('moduulit') }}
+                </div>
+              </template>
+
               <template v-slot:aipevaihe="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'aipevaihe', params: { vaiheId: item.id } }">
@@ -340,6 +387,9 @@ import { routeToNode, LinkkiHandler } from '@/utils/routing';
 import EpValidPopover from '@shared/components/EpValidPopover/EpValidPopover.vue';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
+import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
+import { TermitStore } from '@/stores/TermitStore';
+import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -371,6 +421,7 @@ interface ValidationStats {
     EpButton,
     EpSisallonLisays,
     EpValidPopover,
+    EpColorIndicator,
   },
   inject: [],
 })
@@ -592,6 +643,11 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   @ProvideReactive('kuvaHandler')
   get kuvaHandler() {
     return createKuvaHandler(new KuvaStore(this.perusteId!));
+  }
+
+  @ProvideReactive('kasiteHandler')
+  get kasiteHandler() {
+    return createKasiteHandler(new TermitStore(this.perusteId!));
   }
 }
 </script>

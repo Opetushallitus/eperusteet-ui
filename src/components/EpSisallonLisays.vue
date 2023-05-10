@@ -14,7 +14,7 @@
     <template v-if="lisasisaltoLisays.length > 0">
       <div v-for="(lisasisalto, index) in lisasisaltoLisays" :key="'lisasisalto'+index">
 
-        <b-dropdown v-if="lisasisalto.groupedSisalto.length > 0"
+        <b-dropdown v-if="lisasisalto.groupedSisalto && lisasisalto.groupedSisalto.length > 0"
                     variant="link"
                     class="lisasisalto-dropdown mt-2"
                     toggle-class="text-decoration-none"
@@ -312,6 +312,22 @@ export default class EpSisallonLisays extends Vue {
     this.$router.push({ name: 'aipevaihe' });
   }
 
+  async uusiLukioOppiaine(oppiaineId?) {
+    this.$router.push({
+      name: 'lukio_oppiaine',
+      ...(oppiaineId && { params: { parentId: oppiaineId } }),
+    });
+  }
+
+  async uusiLukioModuuli(oppiaineId) {
+    this.$router.push({
+      name: 'moduuli',
+      params: {
+        oppiaineId,
+      },
+    });
+  }
+
   async uusiTaiteenala() {
     const taiteenalaStore = new TaiteenalaStore(this.peruste!.id!, 0);
     const tallennettu = await taiteenalaStore.create();
@@ -333,6 +349,43 @@ export default class EpSisallonLisays extends Vue {
     return this.koulutustyypinLisasisaltoLisays[this.peruste!.koulutustyyppi!] || this.perusteTyyppiSisaltoLisays[this.peruste!.tyyppi!] || [];
   }
 
+  get oppiaineId() {
+    return this.$route.params?.oppiaineId;
+  }
+
+  get lukioSisaltoLisays() {
+    return [
+      ...(this.oppiaineId && !this.currentLukioOppimaara ? [
+        {
+          call: () => this.uusiLukioOppiaine(this.oppiaineId),
+          label: {
+            'uusi': 'uusi-oppimaara',
+          },
+        },
+      ] : []),
+      ...(this.oppiaineId ? [
+        {
+          call: () => this.uusiLukioModuuli(this.oppiaineId),
+          label: {
+            'uusi': 'uusi-moduuli',
+          },
+        },
+      ] : []),
+      {
+        call: this.uusiLukioOppiaine,
+        label: {
+          'uusi': 'uusi-oppiaine',
+        },
+      },
+    ];
+  }
+
+  get currentLukioOppimaara() {
+    if (this.oppiaineId) {
+      return _.get(_.find(this.naviStore.connected.value, node => node.id === _.toNumber(this.oppiaineId)), 'depth') === 3;
+    }
+  }
+
   get koulutustyypinLisasisaltoLisays() {
     return {
       [Koulutustyyppi.aikuistenperusopetus]: [
@@ -352,6 +405,12 @@ export default class EpSisallonLisays extends Vue {
             'uusi': 'uusi-taiteenala',
           },
         },
+      ],
+      [Koulutustyyppi.lukiokoulutus]: [
+        ...this.lukioSisaltoLisays,
+      ],
+      [Koulutustyyppi.aikuistenlukiokoulutus]: [
+        ...this.lukioSisaltoLisays,
       ],
       [Koulutustyyppi.vapaasivistystyo]: [
         {

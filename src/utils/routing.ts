@@ -108,6 +108,24 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
       type: 'taiteenala',
       id: Number(route.params?.taiteenalaId!),
     };
+  case 'lukio_oppiaine':
+    return {
+      type: 'oppiaine',
+      id: Number(route.params?.oppiaineId!),
+    };
+  case 'moduuli':
+    return {
+      type: 'moduuli',
+      id: Number(route.params?.moduuliId!),
+    };
+  case 'lukio_oppiaineet':
+    return {
+      type: 'lukio_oppiaineet',
+    };
+  case 'lukio_laajaAlaisetOsaamiset':
+    return {
+      type: 'lukio_laajaAlaisetOsaamiset',
+    };
   default:
     console.error('Unknown route', route.name, route);
     break;

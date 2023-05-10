@@ -28,9 +28,7 @@ const LUKIOKOULUTUS = [
 
 export const EiTuetutKoulutustyypit = [
   KoulutusTyyppi.PERUSOPETUS,
-  KoulutusTyyppi.LUKIOKOULUTUS,
   KoulutusTyyppi.LUKIOVALMISTAVAKOULUTUS,
-  KoulutusTyyppi.AIKUISLUKIOKOULUTUS,
   KoulutusTyyppi.PERUSOPETUKSEEN_VALMISTAVA,
   KoulutusTyyppi.LISAOPETUS,
   KoulutusTyyppi.MUU,
