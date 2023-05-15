@@ -1,4 +1,3 @@
-import { KoulutustyyppiToteutus } from '@shared/tyypit';
 import { EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import _ from 'lodash';
 
@@ -18,6 +17,7 @@ enum KoulutusTyyppi {
   PERUSOPETUKSEEN_VALMISTAVA = 'koulutustyyppi_22',
   LUKIOVALMISTAVAKOULUTUS = 'koulutustyyppi_23',
   TAITEEN_PERUSOPETUS = 'koulutustyyppi_999907',
+  MUU = 'koulutustyyppi_muu',
 }
 
 const LUKIOKOULUTUS = [
@@ -33,6 +33,7 @@ export const EiTuetutKoulutustyypit = [
   KoulutusTyyppi.AIKUISLUKIOKOULUTUS,
   KoulutusTyyppi.PERUSOPETUKSEEN_VALMISTAVA,
   KoulutusTyyppi.LISAOPETUS,
+  KoulutusTyyppi.MUU,
 ];
 
 export const TuetutKoulutustyypit = _.filter(EperusteetKoulutustyypit, koulutustyyppi => !_.includes(EiTuetutKoulutustyypit, koulutustyyppi));
