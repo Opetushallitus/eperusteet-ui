@@ -85,7 +85,9 @@
           </div>
           <div class="m-2 flex-fill" v-if="filtersInclude('koulutustyyppi')">
             <label>{{ $t('koulutustyyppi') }}</label>
-            <koulutustyyppi-select v-model="koulutustyyppi" :isEditing="true"/>
+            <koulutustyyppi-select v-model="koulutustyyppi"
+                                   :koulutustyypit="koulutustyyppiOptions"
+                                   :isEditing="true"/>
           </div>
           <div class="m-2 flex-fill" v-if="filtersInclude('peruste')">
             <label>{{ $t('peruste') }}</label>
@@ -372,7 +374,10 @@ export default class EpPerusteprojektiListaus extends Vue {
     return _.includes(rights, 'tilanvaihto');
   }
 
-  get vaihtoehdotKoulutustyypit() {
+  get koulutustyyppiOptions() {
+    if (_.upperCase(this.editRoute) === 'OPAS') {
+      return [...EperusteetKoulutustyypit, 'koulutustyyppi_muu'];
+    }
     return EperusteetKoulutustyypit;
   }
 
