@@ -61,7 +61,11 @@
           <b-form-group :label="$t('koulutus-tutkintotyyppi')" required class="pl-0">
 
             <div class="row" v-for="(koulutustyyppi, index) in data.koulutustyypit" :key="'koulutustyyppi'+index">
-              <koulutustyyppi-select v-model="data.koulutustyypit[index]" :isEditing="true" required class="mb-2 col-11"/>
+              <koulutustyyppi-select
+                v-model="data.koulutustyypit[index]"
+                :isEditing="true"
+                :koulutustyypit="koulutustyyppiOptions"
+                required class="mb-2 col-11"/>
               <div class="col-1">
                 <ep-button v-if="index > 0 " buttonClass="p-0 pt-2 roskalaatikko" variant="link" icon="roskalaatikko" @click="poistaKoulutustyyppi(index)"/>
               </div>
@@ -93,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue, Mixins } from 'vue-property-decorator';
+import { Watch, Prop, Component, Mixins } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -107,13 +111,12 @@ import EpSteps from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
-import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { OppaatStore } from '@/stores/OppaatStore';
 import * as _ from 'lodash';
 import { themes, koulutustyyppiRyhmaSort, EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import { validationMixin } from 'vuelidate';
-import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
+import { requiredOneLang } from '../../eperusteet-frontend-utils/vue/src/validators/required';
 import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 
@@ -174,6 +177,10 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
         null,
       ],
     };
+  }
+
+  get koulutustyyppiOptions() {
+    return [...EperusteetKoulutustyypit, 'koulutustyyppi_muu'];
   }
 
   get oppaat() {
