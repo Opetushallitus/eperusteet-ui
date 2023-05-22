@@ -41,6 +41,11 @@
       </div>
     </template>
 
+    <div v-if="isValidating" class="validointi">
+      <EpSpinner />
+      <div>{{ $t('validointi-kaynnissa') }}</div>
+    </div>
+
     <div>
       <h3>{{ $t('tarkistukset') }}</h3>
       <ep-virhelistaus v-if="status"
@@ -202,7 +207,12 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   };
 
   private hallintaLoading: boolean = false;
+  private isValidating: boolean = false;
   private invalid: boolean = false;
+
+  mounted() {
+    this.validoi();
+  }
 
   get julkaisuMahdollinen() {
     return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.status?.vaihtoOk;
@@ -221,6 +231,12 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   protected async onProjektiChange() {
+  }
+
+  async validoi() {
+    this.isValidating = true;
+    await this.perusteStore.updateValidointi();
+    this.isValidating = false;
   }
 
   async julkaise() {
@@ -436,6 +452,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
 <style lang="scss" scoped>
 @import '@shared/styles/_variables';
+
+.validointi {
+  text-align: center;
+}
 
 .valiviiva {
   display: block;

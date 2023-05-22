@@ -8,10 +8,11 @@
             :validoinnit="validoinnit"
             :julkaisemattomiaMuutoksia="julkaisemattomiaMuutoksia"
             :julkaistava="!isPohja"
+            :is-validating="isValidating"
             @asetaValmiiksi="asetaValmiiksi"
             @palauta="palauta"
-            tyyppi="peruste"
-          />
+            @validoi="validoi"
+            tyyppi="peruste"/>
         </div>
         <div class="flex-grow-1 align-self-center">
           <div class="mb-5 p-2" v-if="peruste && projekti">
@@ -26,7 +27,7 @@
 
                   <hr v-if="ratasvalinta.separator && index !== (ratasvalintaFiltered.length - 1)" class="mt-2 mb-2" />
 
-                  <b-dropdown-item v-if="ratasvalinta.route " :to="{ name: ratasvalinta.route }" :disabled="ratasvalinta.disabled">
+                  <b-dropdown-item v-if="ratasvalinta.route" :to="{ name: ratasvalinta.route }" :disabled="ratasvalinta.disabled">
                     <fas :icon="ratasvalinta.icon" />
                     {{ $t(ratasvalinta.text) }}
                   </b-dropdown-item>
@@ -373,7 +374,6 @@ import { Koulutustyyppi } from '@shared/tyypit';
 import {
   NavigationNodeDtoTypeEnum,
   PerusteDtoTilaEnum,
-  PerusteDtoTyyppiEnum,
   PerusteDtoToteutusEnum,
   StatusValidointiStatusTypeEnum,
 } from '@shared/api/eperusteet';
@@ -442,7 +442,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   private jarjestaRoute!: any;
 
   private naviStore: EpTreeNavibarStore | null = null;
-  private loading = false;
+  private isValidating: boolean = false;
   private query = '';
 
   @Meta
@@ -636,8 +636,12 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       confirm: 'pohja-valmis-varmistus',
       okTitle: 'aseta-valmiiksi',
     });
+  }
 
+  async validoi() {
+    this.isValidating = true;
     await this.perusteStore.updateCurrent();
+    this.isValidating = false;
   }
 
   @ProvideReactive('kuvaHandler')
