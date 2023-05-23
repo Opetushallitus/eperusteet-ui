@@ -24,14 +24,7 @@ export class LukioOppiaineStore implements IEditoitava {
   }
 
   async load(supportDataProvider) {
-    let oppiaine = {
-      tehtava: {},
-      laajaAlaisetOsaamiset: {},
-      arviointi: {},
-      tavoitteet: {
-        tavoitealueet: [],
-      },
-    } as any;
+    let oppiaine = {} as any;
 
     if (this.oppiaineId) {
       oppiaine = {
@@ -40,7 +33,15 @@ export class LukioOppiaineStore implements IEditoitava {
       };
     }
 
-    return oppiaine;
+    return {
+      ...oppiaine,
+      tehtava: oppiaine.tehtava || {},
+      laajaAlaisetOsaamiset: oppiaine.laajaAlaisetOsaamiset || {},
+      arviointi: oppiaine.arviointi || {},
+      tavoitteet: oppiaine.tavoitteet || {
+        tavoitealueet: [],
+      },
+    };
   }
 
   async save(data: any) {
