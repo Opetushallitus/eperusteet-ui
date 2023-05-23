@@ -27,10 +27,6 @@ export class LukioModuuliStore implements IEditoitava {
   async load(supportDataProvider) {
     let moduuli = {
       pakollinen: this.pakollinen,
-      sisallot: [],
-      tavoitteet: {
-        tavoitteet: [],
-      },
     } as any;
 
     if (this.moduuliId) {
@@ -40,7 +36,11 @@ export class LukioModuuliStore implements IEditoitava {
       };
     }
 
-    return moduuli;
+    return {
+      ...moduuli,
+      sisallot: moduuli.sisallot || [],
+      tavoitteet: moduuli.tavoitteet || { tavoitteet: [] },
+    };
   }
 
   async save(data: Lops2019ModuuliDto) {
