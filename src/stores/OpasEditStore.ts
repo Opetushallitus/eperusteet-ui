@@ -42,7 +42,6 @@ export class OpasEditStore implements IEditoitava {
   async save(data: any) {
     await Perusteet.updatePeruste(this.perusteId, data.peruste);
     await Perusteprojektit.updatePerusteprojekti(this.projektiId, data);
-    await this.perusteStore.updateCurrent();
     return data;
   }
 
