@@ -24,15 +24,21 @@ export class LukioOppiaineStore implements IEditoitava {
   }
 
   async load(supportDataProvider) {
+    let oppiaine = {} as any;
+
     if (this.oppiaineId) {
-      return (await Lops2019.getOppiaine(this.perusteId, this.oppiaineId)).data;
+      oppiaine = {
+        ...oppiaine,
+        ...(await Lops2019.getOppiaine(this.perusteId, this.oppiaineId)).data,
+      };
     }
 
     return {
-      tehtava: {},
-      laajaAlaisetOsaamiset: {},
-      arviointi: {},
-      tavoitteet: {
+      ...oppiaine,
+      tehtava: oppiaine.tehtava || {},
+      laajaAlaisetOsaamiset: oppiaine.laajaAlaisetOsaamiset || {},
+      arviointi: oppiaine.arviointi || {},
+      tavoitteet: oppiaine.tavoitteet || {
         tavoitealueet: [],
       },
     };

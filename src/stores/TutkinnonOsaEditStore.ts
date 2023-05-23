@@ -4,7 +4,7 @@ import VueCompositionApi, { computed } from '@vue/composition-api';
 import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Perusteenosat, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
-import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { Kielet } from '@shared/stores/kieli';
 
@@ -129,6 +129,8 @@ export class TutkinnonOsaEditStore implements IEditoitava {
         this.perusteId,
         TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!,
         data as any);
+      await EditointiStore.cancelAll();
+      await TutkinnonOsaEditStore.config.perusteStore.updateNavigation();
       setTimeout(() => {
         TutkinnonOsaEditStore.config.router.replace({
           name: 'tutkinnonosa',

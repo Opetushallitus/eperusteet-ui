@@ -25,16 +25,21 @@ export class LukioModuuliStore implements IEditoitava {
   }
 
   async load(supportDataProvider) {
+    let moduuli = {
+      pakollinen: this.pakollinen,
+    } as any;
+
     if (this.moduuliId) {
-      return (await Lops2019.getModuuli(this.perusteId, this.oppiaineId, this.moduuliId)).data;
+      moduuli = {
+        ...moduuli,
+        ...(await Lops2019.getModuuli(this.perusteId, this.oppiaineId, this.moduuliId)).data,
+      };
     }
 
     return {
-      pakollinen: this.pakollinen,
-      sisallot: [],
-      tavoitteet: {
-        tavoitteet: [],
-      },
+      ...moduuli,
+      sisallot: moduuli.sisallot || [],
+      tavoitteet: moduuli.tavoitteet || { tavoitteet: [] },
     };
   }
 
