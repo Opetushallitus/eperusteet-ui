@@ -77,14 +77,6 @@
                 </div>
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="filtersContain('koulutusvienti')" class="mb-4">
-              <b-form-group :label="$t('koulutusvienti')">
-                <b-form-checkbox v-model="data.koulutusvienti" v-if="isEditing" switch>
-                </b-form-checkbox>
-                <div v-else>{{ $t('' + data.koulutusvienti) }}</div>
-              </b-form-group>
-            </b-col>
-
             <b-col lg="6" v-if="tyypinVaihtoSallittu" class="mb-4">
               <b-form-group :label="$t('tyyppi')">
                 <b-form-select v-model="data.tyyppi" :options="perusteenTyypit" v-if="isEditing" ></b-form-select>
