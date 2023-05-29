@@ -199,9 +199,8 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto, Perusteet, PerusteKevytDto, PerusteprojektiQuery } from '@shared/api/eperusteet';
+import { PerusteQuery, PerusteprojektiKevytDto, Perusteet, PerusteKevytDto, PerusteprojektiQuery } from '@shared/api/eperusteet';
 import { EperusteetKoulutustyypit } from '@shared/utils/perusteet';
-import { Page } from '@shared/tyypit';
 import { BvTableFieldArray } from 'bootstrap-vue';
 import { IProjektiProvider } from './types';
 import ProjektiCard from './ProjektiCard.vue';
@@ -485,6 +484,11 @@ export default class EpPerusteprojektiListaus extends Vue {
       key: 'peruste.voimassaoloLoppuu',
       sortable: true,
       label: this.$t('voimassaolo-loppuu') as string,
+      formatter: dateFormatter,
+    }, {
+      key: 'peruste.paatospvm',
+      sortable: true,
+      label: this.$t('maarayksen-paatospaivamaara') as string,
       formatter: dateFormatter,
     }];
   }
