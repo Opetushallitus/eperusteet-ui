@@ -9,9 +9,27 @@
       </template>
       <template v-slot:default="{ data, isEditing, validation }">
         <div class="mt-1 otsikko" v-if="isEditing">
-
-          <div v-if="osaamisalat.length > 0" class="mb-4">
-            <h3>{{$t('osaamisalat')}}</h3>
+          <div class="mb-4" v-if="osaamisalat.length > 0 || tutkintonimikkeet.length > 0">
+            <b-form-radio v-if="osaamisalat.length > 0"
+                          v-model="tekstikappaleTyyppi"
+                          value="osaamisala"
+                          name="tekstikappaleTyyppi">{{ $t('osaamisala') }}</b-form-radio>
+            <b-form-radio v-if="tutkintonimikkeet.length > 0"
+                          v-model="tekstikappaleTyyppi"
+                          value="tutkintonimike"
+                          name="tekstikappaleTyyppi">{{ $t('tutkintonimike') }}</b-form-radio>
+            <b-form-radio v-model="tekstikappaleTyyppi"
+                          value="tekstikappale"
+                          name="tekstikappaleTyyppi">{{ $t('tekstikappale') }}</b-form-radio>
+          </div>
+          <div v-if="tekstikappaleTyyppi === 'osaamisala'" class="mb-4">
+            <div class="d-flex">
+              <h3>{{$t('osaamisala')}}</h3>
+              <fas aria-hidden="true"
+                   icon="info"
+                   class="info-icon"
+                   v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"/>
+            </div>
             <EpMultiSelect v-model="data.osaamisala" :is-editing="true" :options="osaamisalat" :multiple="false" trackBy="uri" class="multiselect">
               <template slot="singleLabel" slot-scope="{ option }">
                 {{ $kaanna(option.nimi) }}
@@ -22,8 +40,14 @@
             </EpMultiSelect>
           </div>
 
-          <div v-if="tutkintonimikkeet.length > 0" class="mb-4">
-            <h3>{{$t('tutkintonimikkeet')}}</h3>
+          <div v-if="tekstikappaleTyyppi === 'tutkintonimike'" class="mb-4">
+            <div class="d-flex">
+              <h3>{{$t('tutkintonimike')}}</h3>
+              <fas aria-hidden="true"
+                   icon="info"
+                   class="info-icon"
+                   v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"/>
+            </div>
             <EpMultiSelect v-model="data.tutkintonimike" :is-editing="true" :options="tutkintonimikkeet" :multiple="false" trackBy="uri" class="multiselect">
               <template slot="singleLabel" slot-scope="{ option }">
                 {{ $kaanna(option.nimi) }}
@@ -34,8 +58,10 @@
             </EpMultiSelect>
           </div>
 
-          <h3>{{$t('otsikko')}}</h3>
-          <ep-input v-model="data.nimi" :is-editing="true" :validation="validation.nimi" :disabled="!!data.osaamisala || !!data.tutkintonimike"></ep-input>
+          <div v-if="tekstikappaleTyyppi === 'tekstikappale'" class="mb-4">
+            <h3>{{$t('otsikko')}}</h3>
+            <ep-input v-model="data.nimi" :is-editing="true" :validation="validation.nimi" :disabled="!!data.osaamisala || !!data.tutkintonimike"></ep-input>
+          </div>
           <ep-toggle class="mt-4" v-model="data.liite">{{$t('nayta-tekstikappale-liitteena')}}</ep-toggle>
         </div>
         <div :class="{ 'mt-4': isEditing }">
@@ -95,7 +121,7 @@ export default class RouteTekstikappale extends Vue {
   perusteStore!: PerusteStore;
 
   private store: EditointiStore | null = null;
-  private blockChange = false;
+  private tekstikappaleTyyppi: 'osaamisala' | 'tutkintonimike' | 'tekstikappale' | null = null;
 
   get projektiId() {
     return this.$route.params.projektiId;
@@ -125,40 +151,6 @@ export default class RouteTekstikappale extends Vue {
     });
   }
 
-  async doWatchBlock(watch) {
-    if (!this.blockChange) {
-      this.blockChange = true;
-      await watch();
-      this.blockChange = false;
-    }
-  }
-
-  @Watch('store.data.value.osaamisala', { immediate: true })
-  async onOsaamisalaChange(val, oldVal) {
-    await this.doWatchBlock(async () => {
-      if (val) {
-        this.store?.setData({
-          ...this.store?.data.value,
-          tutkintonimike: null,
-        });
-      }
-      this.koodiNimikeChange(val, oldVal);
-    });
-  }
-
-  @Watch('store.data.value.tutkintonimike', { immediate: true })
-  async onTutkintonimikeChange(val, oldVal) {
-    await this.doWatchBlock(async () => {
-      if (val) {
-        this.store?.setData({
-          ...this.store?.data.value,
-          osaamisala: null,
-        });
-      }
-      this.koodiNimikeChange(val, oldVal);
-    });
-  }
-
   koodiNimikeChange(val, oldVal) {
     if (!val) {
       val = { nimi: this.oldNimi };
@@ -172,7 +164,32 @@ export default class RouteTekstikappale extends Vue {
   }
 
   get oldNimi() {
-    return this.store?.data.value.originalNimi;
+    return this.store?.data.value?.originalNimi;
+  }
+
+  async fetch() {
+    await this.perusteStore.blockUntilInitialized();
+    const tkstore = new TekstikappaleStore(this.perusteId!, Number(this.tekstikappaleId), this.versionumero);
+    this.store = new EditointiStore(tkstore);
+  }
+
+  get tekstikappale() {
+    return this.store?.data?.value || null;
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
+  }
+
+  @Watch('store.isEditing.value')
+  onEditingChange() {
+    this.koodiNimikeChange(null, null);
+    this.tekstikappaleTyyppiInit();
+  }
+
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.fetch();
   }
 
   @Watch('tekstikappaleId', { immediate: true })
@@ -184,32 +201,79 @@ export default class RouteTekstikappale extends Vue {
     await this.fetch();
   }
 
-  async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new TekstikappaleStore(this.perusteId!, Number(this.tekstikappaleId), this.versionumero);
-    this.store = new EditointiStore(tkstore);
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
-
-  get tekstikappale() {
-    return this.store?.data?.value || null;
-  }
-
   @Watch('tekstikappale')
   onDataChange(tk) {
     if (tk) {
       Murupolku.aseta('tekstikappale', this.$kaanna(tk.nimi), {
         name: 'tekstikappale',
       });
+      if (!this.tekstikappaleTyyppi) {
+        this.tekstikappaleTyyppiInit();
+      }
     }
+  }
+
+  @Watch('tekstikappaleTyyppi')
+  async onTekstikappaleTyyppiChange() {
+    if (this.store?.isEditing.value) {
+      this.resetTutkintonimike();
+      this.resetOsaamisala();
+      this.resetNimi();
+    }
+  }
+
+  @Watch('store.data.value.osaamisala')
+  async onOsaamisalaChange(val, oldVal) {
+    this.handleDropdownValueChange(val, oldVal);
+  }
+
+  @Watch('store.data.value.tutkintonimike')
+  async onTutkintonimikeChange(val, oldVal) {
+    this.handleDropdownValueChange(val, oldVal);
+  }
+
+  tekstikappaleTyyppiInit() {
+    if (this.store?.data.value.id) {
+      if (this.store?.data.value?.tutkintonimike) {
+        this.tekstikappaleTyyppi = 'tutkintonimike';
+      }
+      else if (this.store?.data.value?.osaamisala) {
+        this.tekstikappaleTyyppi = 'osaamisala';
+      }
+      else {
+        this.tekstikappaleTyyppi = 'tekstikappale';
+      }
+    }
+  }
+
+  handleDropdownValueChange(val, oldVal) {
+    if (val) {
+      this.koodiNimikeChange(val, oldVal);
+    }
+    else {
+      this.resetNimi();
+    }
+  }
+
+  resetNimi() {
+    this.store?.setData({
+      ...this.store?.data.value,
+      nimi: null,
+    });
+  }
+
+  resetTutkintonimike() {
+    this.store?.setData({
+      ...this.store?.data.value,
+      tutkintonimike: null,
+    });
+  }
+
+  resetOsaamisala() {
+    this.store?.setData({
+      ...this.store?.data.value,
+      osaamisala: null,
+    });
   }
 
   get fields() {
@@ -282,12 +346,13 @@ export default class RouteTekstikappale extends Vue {
             cursor: pointer;
             margin: 0px 10px;
           }
-
         }
       }
-
     }
+  }
 
+  .info-icon {
+    margin-left: 5px;
   }
 
   .otsikko {
