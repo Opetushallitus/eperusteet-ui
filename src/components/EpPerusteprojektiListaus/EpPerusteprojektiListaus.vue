@@ -488,7 +488,7 @@ export default class EpPerusteprojektiListaus extends Vue {
     }, {
       key: 'peruste.paatospvm',
       sortable: true,
-      label: this.$t('maarayksen-paatospaivamaara') as string,
+      label: this.$t('paatospaivamaara') as string,
       formatter: dateFormatter,
     }];
   }
