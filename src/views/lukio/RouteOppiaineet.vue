@@ -47,7 +47,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { LukioOppiaineetStore } from '@/stores/LukioOppiaineetStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
@@ -57,7 +56,6 @@ import draggable from 'vuedraggable';
 @Component({
   components: {
     EpButton,
-    EpMainView,
     EpSpinner,
     draggable,
     EpEditointi,

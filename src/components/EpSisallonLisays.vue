@@ -123,6 +123,7 @@ import { chapterStringSort } from '@shared/utils/NavigationBuilder';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
+import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 
 @Component({
   components: {
@@ -197,8 +198,12 @@ export default class EpSisallonLisays extends Vue {
 
   async makeCall(call) {
     this.loading = true;
-    await call();
-    this.loading = false;
+    try {
+      await call();
+    }
+    finally {
+      this.loading = false;
+    }
   }
 
   async tallennaUusiTekstikappale(otsikko, tekstikappaleIsa) {
@@ -341,6 +346,12 @@ export default class EpSisallonLisays extends Vue {
     });
   }
 
+  async uusiPerusopetusoppiaine() {
+    const newOppiaine = await PerusopetusOppiaineStore.create(this.peruste!.id!, this.$route.params?.oppiaineId);
+    await this.perusteStore.updateNavigation();
+    this.$router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
+  }
+
   get isLisasisaltoLisays() {
     return !!this.peruste && (!!this.koulutustyypinLisasisaltoLisays[this.peruste.koulutustyyppi!] || !!this.perusteTyyppiSisaltoLisays[this.peruste.tyyppi!]);
   }
@@ -403,6 +414,15 @@ export default class EpSisallonLisays extends Vue {
           call: this.uusiTaiteenala,
           label: {
             'uusi': 'uusi-taiteenala',
+          },
+        },
+      ],
+      [Koulutustyyppi.perusopetus]: [
+        {
+          groupedSisalto: [],
+          call: this.uusiPerusopetusoppiaine,
+          label: {
+            'uusi': this.$route.params?.oppiaineId ? 'uusi-oppimaara' : 'uusi-oppiaine',
           },
         },
       ],

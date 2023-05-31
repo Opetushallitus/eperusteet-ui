@@ -136,6 +136,33 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
       type: 'osaamiskokonaisuus_paa_alue',
       id: Number(route.params?.osaamiskokonaisuusPaaAlueId),
     };
+  case 'perusopetusoppiaine':
+    return {
+      type: 'perusopetusoppiaine',
+      id: Number(route.params?.oppiaineId!),
+    };
+  case 'perusopetusOppiaineet':
+    return {
+      type: 'perusopetusOppiaineet',
+    };
+  case 'perusopetusLaajaAlaisetOsaamiset':
+    return {
+      type: 'perusopetusLaajaAlaisetOsaamiset',
+    };
+  case 'perusopetusVuosiluokkakokonaisuudet':
+    return {
+      type: 'perusopetusVuosiluokkakokonaisuudet',
+    };
+  case 'perusopetusLaajaAlainenOsaaminen':
+    return {
+      type: 'perusopetuslaajaalainenosaaminen',
+      id: Number(route.params?.laoId!),
+    };
+  case 'perusopetusVuosiluokkakokonaisuus':
+    return {
+      type: 'vuosiluokkakokonaisuus',
+      id: Number(route.params?.vlkId!),
+    };
   default:
     console.error('Unknown route', route.name, route);
     break;

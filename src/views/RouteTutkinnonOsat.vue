@@ -77,7 +77,6 @@
 import { TutoriaaliStore } from '@shared/stores/tutoriaali';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpAlert from '@shared/components/EpAlert/EpAlert.vue';

@@ -51,6 +51,29 @@
       </b-dropdown-item-button>
     </b-dropdown>
 
+    <template v-if="sisaltoalueetValinnat">
+      <h4 class="mt-4">{{$t('sisaltoalueet')}}</h4>
+      <ep-collapse class="mb-3" v-for="(sisaltoalue, index) in sisaltoalueet" :key="'sisaltoalue' + index" :border-bottom="false" :usePadding="false" chevronLocation="left" :expandedByDefault="false">
+        <template #header>
+          <div class="d-flex">
+            <div>{{ $kaanna(sisaltoalue.nimi)}}</div>
+            <fas v-if="isEditing" icon="roskalaatikko" class="default-icon clickable ml-3 mt-1" @click="poistaSisaltoalue(sisaltoalue)"/>
+          </div>
+        </template>
+        <ep-content class="ml-4 pl-1" layout="normal" v-model="sisaltoalue.kuvaus" :is-editable="false"> </ep-content>
+      </ep-collapse>
+
+      <b-dropdown v-if="isEditing" :text="$t('lisaa-sisaltoalue')" variant="primary">
+        <b-dropdown-item-button
+          @click="lisaaSisaltoalue(sisaltoalue)"
+          v-for="(sisaltoalue, index) in sisaltoalueetValinnat"
+          :key="index+'addSisaltoalue'"
+          :disabled="sisaltoalue.valittu">
+          {{ $kaanna(sisaltoalue.nimi) }}
+        </b-dropdown-item-button>
+      </b-dropdown>
+    </template>
+
     <h4 class="mt-4">{{$t('arvoinnin-kohde')}}</h4>
     <ep-input v-model="model.arvioinninKuvaus" :is-editing="isEditing"></ep-input>
 
@@ -107,6 +130,11 @@
       :is-editable="isEditing"> </ep-content>
     <div v-else class="disabled-text">{{ $t('ei-sisaltoa') }}</div>
 
+    <div class="text-right" v-if="isEditing">
+      <ep-button variant="link" icon="roskalaatikko" @click="poistaTavoite">
+        {{ $t('poista-tavoite') }}
+      </ep-button>
+    </div>
   </div>
 </template>
 
@@ -122,6 +150,12 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 
+interface OppiaineenTavoiteSupportData {
+  kohdealueet: any[];
+  laajaAlaisetOsaamiset: any[];
+  sisaltoalueet?: any[];
+}
+
 @Component({
   components: {
     EpContent,
@@ -132,12 +166,12 @@ import draggable from 'vuedraggable';
     draggable,
   },
 })
-export default class EpAipeOppiaineenTavoite extends Vue {
+export default class EpOppiaineenTavoite extends Vue {
   @Prop({ required: true })
   value!: any;
 
   @Prop({ required: true })
-  supportData!: any;
+  supportData!: OppiaineenTavoiteSupportData;
 
   @Prop({ required: false, default: false })
   isEditing!: boolean;
@@ -187,6 +221,32 @@ export default class EpAipeOppiaineenTavoite extends Vue {
     this.model.laajattavoitteet = _.filter(this.model.laajattavoitteet, laajatavoite => laajatavoite !== _.toString(lao.id));
   }
 
+  get sisaltoalueetValinnat() {
+    if (this.supportData.sisaltoalueet) {
+      return _.map(this.supportData.sisaltoalueet, sisaltoalue => {
+        return {
+          ...sisaltoalue,
+          valittu: _.includes(this.model.sisaltoalueet, _.toString(sisaltoalue.id)),
+        };
+      });
+    }
+  }
+
+  get sisaltoalueet() {
+    return _.filter(this.supportData.sisaltoalueet, sisaltoalue => _.includes(this.model.sisaltoalueet, _.toString(sisaltoalue.id)));
+  }
+
+  lisaaSisaltoalue(sisaltoalue) {
+    this.model.sisaltoalueet = [
+      ...this.model.sisaltoalueet,
+      _.toString(sisaltoalue.id),
+    ];
+  }
+
+  poistaSisaltoalue(poistettavaSisaltoalue) {
+    this.model.sisaltoalueet = _.filter(this.model.sisaltoalueet, sisaltoalue => sisaltoalue !== _.toString(poistettavaSisaltoalue.id));
+  }
+
   get arvosanat() {
     return [10, 9, 8, 7, 6, 5, 1];
   }
@@ -214,6 +274,10 @@ export default class EpAipeOppiaineenTavoite extends Vue {
         name: 'arvioinnit',
       },
     };
+  }
+
+  poistaTavoite() {
+    this.$emit('poista', this.model);
   }
 }
 </script>
