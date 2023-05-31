@@ -104,7 +104,7 @@
                     <h4 class="mb-0">{{$kaanna(tavoite.tavoite)}}</h4>
                   </div>
 
-                  <EpAipeOppiaineenTavoite v-model="data.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="supportData"/>
+                  <EpOppiaineenTavoite v-model="data.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="supportData" @poista="poistaTavoite(tavoite)"/>
 
                 </EpCollapse>
             </draggable>
@@ -140,7 +140,7 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import EpAipeOppiaineenTavoite from '@/views/aipe/yleiset/EpAipeOppiaineenTavoite.vue';
+import EpOppiaineenTavoite from '@/views/aipe/yleiset/EpOppiaineenTavoite.vue';
 
 @Component({
   components: {
@@ -152,7 +152,7 @@ import EpAipeOppiaineenTavoite from '@/views/aipe/yleiset/EpAipeOppiaineenTavoit
     EpKoodistoSelect,
     EpSisaltoTekstikappaleet,
     EpCollapse,
-    EpAipeOppiaineenTavoite,
+    EpOppiaineenTavoite,
   },
 })
 export default class RouteAipeOppiaine extends Vue {
@@ -262,6 +262,15 @@ export default class RouteAipeOppiaine extends Vue {
             arvioinninkohteet: [],
           },
         ],
+      }
+    );
+  }
+
+  poistaTavoite(poistettavaTavoite) {
+    this.store?.setData(
+      {
+        ...this.store.data.value,
+        tavoitteet: _.reject(this.store.data.value.tavoitteet, poistettavaTavoite),
       }
     );
   }

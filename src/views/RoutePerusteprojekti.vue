@@ -328,6 +328,54 @@
                 </div>
               </template>
 
+              <template v-slot:perusopetuslaajaalaisetosaamiset="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'perusopetusLaajaAlaisetOsaamiset' }">
+                    {{ $t('laaja-alaiset-osaamiset') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:perusopetuslaajaalainenosaaminen="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'perusopetusLaajaAlainenOsaaminen', params: { laoId: item.id } }">
+                    {{ $kaanna(item.label) || $t('nimeton-laaja-alainen-osaaminen') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:vuosiluokkakokonaisuudet="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'perusopetusVuosiluokkakokonaisuudet' }">
+                    {{ $t('vuosiluokkakokonaisuudet') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:vuosiluokkakokonaisuus="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'perusopetusVuosiluokkakokonaisuus', params: { vlkId: item.id } }">
+                    {{ $kaanna(item.label) || $t('nimeton-vuosiluokkakokonaisuus') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:perusopetusoppiaineet="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'perusopetusOppiaineet' }">
+                    {{ $t('oppiaineet') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template v-slot:perusopetusoppiaine="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: item.id } }">
+                    {{ $kaanna(item.label) || (item.meta && item.meta.oppimaara ? $t('nimeton-oppimaara') : $t('nimeton-oppiaine')) }}
+                  </router-link>
+                </div>
+              </template>
+
               <template v-slot:new>
                 <EpSisallonLisays :perusteStore="perusteStore" :naviStore="naviStore" />
               </template>

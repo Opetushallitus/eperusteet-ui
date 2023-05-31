@@ -4,9 +4,9 @@
       <h3 v-if="isEditing" class="mt-4">{{ $t('tekstikappaleet') }}</h3>
     </template>
 
-    <ep-collapse class="collapsable" v-for="(avain, index) in sisaltoTekstiAvaimet" :key="avain" :collapsable="!isEditing" :border-bottom="isEditing">
+    <ep-collapse class="collapsable" v-for="(avain, index) in sisaltoTekstiAvaimet" :key="avain" :collapsable="!isEditing" :border-bottom="isEditing" :class="{'mb-4': !isEditing}">
       <template #header>
-        <h4 v-if="!isEditing">
+        <h4 v-if="!isEditing" class="mb-0">
           <span v-if="model[avain][sisaltoTekstiOtsikkoField]">{{ $kaanna(model[avain][sisaltoTekstiOtsikkoField])}}</span>
           <span v-else>{{ $t(avain)}}</span>
         </h4>
@@ -29,7 +29,7 @@
       </div>
     </ep-collapse>
 
-    <ep-collapse class="collapsable" v-for="(teksti, index) in model.vapaatTekstit" :key="'teksti' +index" :collapsable="!isEditing" :border-bottom="isEditing">
+    <ep-collapse class="collapsable" v-for="(teksti, index) in model.vapaatTekstit" :key="'teksti' +index" :collapsable="!isEditing" :border-bottom="isEditing" :class="{'mb-4': !isEditing}">
       <template #header>
         <h4 v-if="!isEditing">{{ $kaanna(teksti.nimi)}}</h4>
       </template>
@@ -81,7 +81,7 @@ export default class EpSisaltoTekstikappaleet extends Vue {
   @Prop({ required: false, default: 'otsikko' })
   sisaltoTekstiOtsikkoField!: any;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: false })
   isEditing!: boolean;
 
   @Prop({ required: true })

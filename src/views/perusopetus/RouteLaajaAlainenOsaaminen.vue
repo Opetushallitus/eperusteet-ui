@@ -27,7 +27,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { AipeLaajaAlainenOsaaminenStore } from '@/stores/AipeLaajaAlainenOsaaminenStore';
+import { PerusopetusLaajaAlainenOsaaminenStore } from '@/stores/PerusopetusLaajaAlainenOsaaminenStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 
@@ -38,7 +38,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
     EpContent,
   },
 })
-export default class RouteAipeLaajaAlainenOsaaminen extends Vue {
+export default class RouteLaajaAlainenOsaaminen extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
@@ -49,7 +49,7 @@ export default class RouteAipeLaajaAlainenOsaaminen extends Vue {
 
   @Watch('laoId', { immediate: true })
   async laoChange() {
-    const store = new AipeLaajaAlainenOsaaminenStore(this.perusteId!, this.laoId, this.perusteStore, this);
+    const store = new PerusopetusLaajaAlainenOsaaminenStore(this.perusteId!, this.laoId, this.perusteStore, this);
     this.store = new EditointiStore(store);
   }
 

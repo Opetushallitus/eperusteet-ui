@@ -58,6 +58,12 @@ import RouteLaajaAlaisetOsaamiset from '@/views/lukio/RouteLaajaAlaisetOsaamiset
 import RouteModuuli from '@/views/lukio/RouteModuuli.vue';
 import RouteOppiaine from '@/views/lukio/RouteOppiaine.vue';
 import RouteOppiaineet from '@/views/lukio/RouteOppiaineet.vue';
+import RouteVuosiluokkakokonaisuudet from '@/views/perusopetus/RouteVuosiluokkakokonaisuudet.vue';
+import RouteVuosiluokkakokonaisuus from '@/views/perusopetus/RouteVuosiluokkakokonaisuus.vue';
+import RoutePerusopetusOppiaineet from '@/views/perusopetus/RouteOppiaineet.vue';
+import RoutePerusopetusLaajaAlaisetOsaamiset from '@/views/perusopetus/RouteLaajaAlaisetOsaamiset.vue';
+import RoutePerusopetusLaajaAlainenOsaaminen from '@/views/perusopetus/RouteLaajaAlainenOsaaminen.vue';
+import RoutePerusopetusOppiaine from '@/views/perusopetus/RouteOppiaine.vue';
 
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
@@ -409,6 +415,36 @@ const router = new VueRouter({
         path: 'lukio/oppiaine/:oppiaineId/moduuli/:moduuliId?',
         name: 'moduuli',
         component: RouteModuuli,
+        props,
+      }, {
+        path: 'perusopetus/laajaalaisetosaamiset',
+        name: 'perusopetusLaajaAlaisetOsaamiset',
+        component: RoutePerusopetusLaajaAlaisetOsaamiset,
+        props,
+      }, {
+        path: 'perusopetus/laajaalainenosaaminen/:laoId?',
+        name: 'perusopetusLaajaAlainenOsaaminen',
+        component: RoutePerusopetusLaajaAlainenOsaaminen,
+        props,
+      }, {
+        path: 'perusopetus/vuosiluokkakokonaisuudet',
+        name: 'perusopetusVuosiluokkakokonaisuudet',
+        component: RouteVuosiluokkakokonaisuudet,
+        props,
+      }, {
+        path: 'perusopetus/vuosiluokkakokonaisuus/:vlkId?',
+        name: 'perusopetusVuosiluokkakokonaisuus',
+        component: RouteVuosiluokkakokonaisuus,
+        props,
+      }, {
+        path: 'perusopetus/oppiaineet',
+        name: 'perusopetusOppiaineet',
+        component: RoutePerusopetusOppiaineet,
+        props,
+      }, {
+        path: 'perusopetus/oppiaine/:oppiaineId/:uusi?',
+        name: 'perusopetusoppiaine',
+        component: RoutePerusopetusOppiaine,
         props,
       },
       ],

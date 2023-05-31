@@ -1,5 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import EpAipeOppiaineenTavoite from '@/views/aipe/yleiset/EpAipeOppiaineenTavoite.vue';
+import EpOppiaineenTavoite from '@/views/aipe/yleiset/EpOppiaineenTavoite.vue';
 import VueI18n from 'vue-i18n';
 import { Kielet } from '@shared/stores/kieli';
 import { mock, mocks } from '@shared/utils/jestutils';
@@ -126,7 +126,7 @@ import BootstrapVue from 'bootstrap-vue';
 
 Vue.use(BootstrapVue);
 
-describe('EpAipeOppiaineenTavoite', () => {
+describe('EpOppiaineenTavoite', () => {
   const localVue = createLocalVue();
   localVue.use(VueI18n);
   localVue.use(Kielet, {
@@ -137,7 +137,7 @@ describe('EpAipeOppiaineenTavoite', () => {
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallowMount(EpAipeOppiaineenTavoite, {
+    wrapper = shallowMount(EpOppiaineenTavoite, {
       localVue,
       mocks: {
         ...mocks,
