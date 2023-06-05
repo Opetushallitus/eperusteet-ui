@@ -126,6 +126,16 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
     return {
       type: 'lukio_laajaAlaisetOsaamiset',
     };
+  case 'osaamiskokonaisuus':
+    return {
+      type: 'osaamiskokonaisuus',
+      id: Number(route.params?.osaamiskokonaisuusId),
+    };
+  case 'osaamiskokonaisuus_paa_alue':
+    return {
+      type: 'osaamiskokonaisuus_paa_alue',
+      id: Number(route.params?.osaamiskokonaisuusPaaAlueId),
+    };
   default:
     console.error('Unknown route', route.name, route);
     break;
