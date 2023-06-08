@@ -172,11 +172,18 @@
                           </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
                             <ep-button v-if="isEditing"
+                                       :id="'poista-osaamisala-' + index"
                                        @click="poistaOsaamisala(index)"
                                        variant="link"
                                        icon="roskalaatikko"
                                        :disabled="ryhma.osaamisala.rakenteessa">
                             </ep-button>
+                            <b-popover v-if="ryhma.osaamisala.rakenteessa"
+                                       :target="'poista-osaamisala-' + index"
+                                       triggers="hover"
+                                       placement="top">
+                              {{ $t('ei-voi-poistaa-koska-loytyy-rakenteesta') }}
+                            </b-popover>
                           </div>
                         </div>
                       </draggable>
@@ -226,10 +233,17 @@
                           </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
                             <ep-button v-if="isEditing"
+                                       :id="'poista-tutkintonimike-' + index"
                                        @click="poistaTutkintonimike(index)"
                                        variant="link" icon="roskalaatikko"
                                        :disabled="ryhma.tutkintonimike.rakenteessa">
                             </ep-button>
+                            <b-popover v-if="ryhma.tutkintonimike.rakenteessa"
+                                       :target="'poista-tutkintonimike-' + index"
+                                       triggers="hover"
+                                       placement="top">
+                              {{ $t('ei-voi-poistaa-koska-loytyy-rakenteesta') }}
+                            </b-popover>
                           </div>
                         </div>
                       </draggable>
@@ -626,7 +640,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           nimi: tutkintonimike.nimi,
           uri: tutkintonimike.tutkintonimikeUri,
           arvo: tutkintonimike.tutkintonimikeArvo,
-          rakenteessa: _.some(this.rakenteenOsat, osa => osa.tutkintonimike && osa.tutkintonimike.arvo === tutkintonimike.tutkintonimikeArvo),
+          rakenteessa: _.some(this.rakenteenOsat, osa => osa.tutkintonimike && osa.tutkintonimike.uri === tutkintonimike.tutkintonimikeUri),
         },
       };
     });
@@ -684,7 +698,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           nimi: osaamisala.nimi,
           'osaamisalakoodiArvo': osaamisala.arvo,
           'osaamisalakoodiUri': osaamisala.uri,
-          rakenteessa: _.some(this.rakenteenOsat, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiArvo === osaamisala.arvo),
+          rakenteessa: _.some(this.rakenteenOsat, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri === osaamisala.uri),
         },
       };
     });
