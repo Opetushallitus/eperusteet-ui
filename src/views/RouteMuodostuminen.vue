@@ -640,14 +640,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           nimi: tutkintonimike.nimi,
           uri: tutkintonimike.tutkintonimikeUri,
           arvo: tutkintonimike.tutkintonimikeArvo,
-          rakenteessa: _.some(this.rakenteenOsat, osa => {
-            if (osa.tutkintonimike) {
-              return tutkintonimike.tutkintonimikeArvo
-                ? osa.tutkintonimike.tutkintonimikeArvo === tutkintonimike.tutkintonimikeArvo
-                : osa.tutkintonimike.uri === tutkintonimike.tutkintonimikeUri;
-            }
-            return false;
-          }),
+          rakenteessa: _.some(this.rakenteenOsat, osa => osa.tutkintonimike && osa.tutkintonimike.uri === tutkintonimike.tutkintonimikeUri),
         },
       };
     });
@@ -705,14 +698,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
           nimi: osaamisala.nimi,
           'osaamisalakoodiArvo': osaamisala.arvo,
           'osaamisalakoodiUri': osaamisala.uri,
-          rakenteessa: _.some(this.rakenteenOsat, osa => {
-            if (osa.osaamisala) {
-              return osaamisala.arvo
-                ? osa.osaamisala.osaamisalakoodiArvo === osaamisala.arvo
-                : osa.osaamisala.osaamisalakoodiUri === osaamisala.uri;
-            }
-            return false;
-          }),
+          rakenteessa: _.some(this.rakenteenOsat, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri === osaamisala.uri),
         },
       };
     });
