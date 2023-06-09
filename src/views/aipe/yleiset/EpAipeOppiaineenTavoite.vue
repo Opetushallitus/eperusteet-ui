@@ -62,10 +62,10 @@
 
     <b-row class="mt-4 border-bottom-2 mx-1">
       <b-col cols="4">
-        <h5>{{ $t('osaamisen-kuvaus') }}</h5>
+        <h5>{{ $t('arviointitaulukko-arvosana-otsikko') }}</h5>
       </b-col>
       <b-col cols="8">
-        <h5>{{ $t('arvion-kuvaus') }}</h5>
+        <h5>{{ $t('arviointitaulukko-osaaminen-otsikko') }}</h5>
       </b-col>
     </b-row>
 
