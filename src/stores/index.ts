@@ -1,6 +1,5 @@
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import { BreadcrumbStore } from '@/stores/BreadcrumbStore';
 import { Kayttajat } from '@/stores/kayttaja';
 import { Kielet } from '@shared/stores/kieli';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
@@ -12,7 +11,6 @@ import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { tutoriaaliStore } from '@shared/stores/tutoriaali';
-import { virheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import { OppaatStore } from '@/stores/OppaatStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
@@ -64,7 +62,6 @@ export const stores = Object.freeze({
   tutoriaaliStore,
   tyoryhmaStore,
   ulkopuolisetStore,
-  virheellisetPerusteetStore,
   termitStore,
   tilastotStore,
   palautteetStore,

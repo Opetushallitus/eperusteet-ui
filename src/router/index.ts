@@ -37,7 +37,6 @@ import RouteTilastot from '@/views/RouteTilastot.vue';
 import RouteTutkinnonOsa from '@/views/RouteTutkinnonOsa.vue';
 import RouteTutkinnonOsanOsaalue from '@/views/tutkinnonosat/RouteTutkinnonOsanOsaalue.vue';
 import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
-import RouteVirheellisetPerusteet from '@/views/RouteVirheellisetPerusteet.vue';
 import RouteYleisnakyma from '@/views/RouteYleisnakyma.vue';
 import RouteTavoitesisaltoalue from '@/views/RouteTavoitesisaltoalue.vue';
 import RouteKotoKielitaitotaso from '@/views/RouteKotoKielitaitotaso.vue';
@@ -162,11 +161,6 @@ const router = new VueRouter({
         component: RouteArviointiasteikot,
         props,
       }],
-    }, {
-      path: 'virheelliset',
-      name: 'virheellisetperusteet',
-      component: RouteVirheellisetPerusteet,
-      props,
     }, {
       path: 'perusteprojektit/uusi',
       name: 'perusteprojektiLuonti',
