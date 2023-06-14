@@ -1,5 +1,5 @@
 <template>
-  <div class="validation">
+  <div>
     <h3 class="peruste" v-if="nimi">
       <router-link :to="route">{{ nimi }}</router-link>
     </h3>
@@ -102,13 +102,6 @@ export default class EpVirhelistaus extends Vue {
 
 <style lang="scss" scoped>
 @import '@shared/styles/_variables.scss';
-.validation {
-  border: 1px solid #ccc;
-  box-shadow: 0 0 20px #eee;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  padding: 20px;
-}
 
 .no-errors {
  color: $green;
