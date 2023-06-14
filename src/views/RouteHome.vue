@@ -43,7 +43,6 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import TileArkistoidut from './tiles/TileArkistoidut.vue';
-import TileKoulutuskoodiOngelmat from './tiles/TileKoulutuskoodiOngelmat.vue';
 import TileOppaat from './tiles/TileOppaat.vue';
 import TilePerusteprojektit from './tiles/TilePerusteprojektit.vue';
 import TilePohjat from './tiles/TilePohjat.vue';
@@ -67,7 +66,6 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
   components: {
     EpSearch,
     TileArkistoidut,
-    TileKoulutuskoodiOngelmat,
     TileOppaat,
     TilePerusteprojektit,
     TilePohjat,
