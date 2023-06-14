@@ -4,38 +4,40 @@
       <router-link :to="route">{{ nimi }}</router-link>
     </h3>
     <div v-if="validation.vaihtoOk" class="d-flex">
-      <div class="material-icons no-errors">check_circle</div><div class="ml-2">{{$t('validointi-ei-virheita')}}</div>
+      <div class="material-icons no-errors">check_circle</div>
+      <div class="ml-2">{{$t('ei-julkaisua-estavia-virheita')}}</div>
+    </div>
+    <div v-else class="d-flex">
+      <div class="material-icons errors">info</div>
+      <div class="ml-2">{{$t('loytyi-julkaisun-estavia-virheita')}}</div>
     </div>
     <div v-if="categories">
-      <div v-for="(infot, category, cid) in categories" :key="category">
-        <ep-collapse :use-padding="false"
-                     :border-bottom="cid < categories.length - 1"
+      <div v-for="(infot, category) in categories" :key="category">
+        <ep-collapse :use-padding="true"
+                     :border-bottom="false"
                      :tyyppi="category">
+
           <template v-slot:header>
-            <h3>
-              {{ $t('validointi-kategoria-' + category) }}
-            </h3>
+            <h3>{{ $t('validointi-kategoria-' + category) }}</h3>
           </template>
-          <div class="pt-3" :class="{ 'mb-4': cid !== 0 }">
-            <ep-virhelistaus-table
-              v-if="infot[StatusValidointiStatusTypeEnum.VIRHE]"
-              :infot="infot[StatusValidointiStatusTypeEnum.VIRHE]">
-              <template #heading>{{ $t('julkaisun-estavat-virheet') }}</template>
-              <template v-slot:viesti="{info}">
-                <router-link :to="info.route" v-if="info.route">
-                  {{$t(info.viesti)}}
-                </router-link>
-                <span v-else>
-                  {{$t(info.viesti)}}
-                </span>
-              </template>
-            </ep-virhelistaus-table>
-            <ep-virhelistaus-table
-              v-if="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]"
-              :infot="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]">
-              <template #heading>{{ $t('huomautukset') }}</template>
-            </ep-virhelistaus-table>
-          </div>
+
+          <ep-virhelistaus-table v-if="infot[StatusValidointiStatusTypeEnum.VIRHE]"
+                                 :infot="infot[StatusValidointiStatusTypeEnum.VIRHE]">
+            <template v-slot:viesti="{info}">
+              <router-link :to="info.route" v-if="info.route">
+                {{$t(info.viesti)}}
+              </router-link>
+              <span v-else>
+                {{$t(info.viesti)}}
+              </span>
+            </template>
+          </ep-virhelistaus-table>
+
+          <ep-virhelistaus-table v-if="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]"
+                                 :infot="infot[StatusValidointiStatusTypeEnum.HUOMAUTUS]">
+            <template #heading>{{ $t('huomautukset') }}</template>
+          </ep-virhelistaus-table>
+
         </ep-collapse>
       </div>
     </div>
@@ -83,6 +85,10 @@ export default class EpVirhelistaus extends Vue {
     return categoriesGroupedByStatus;
   }
 
+  get categoryCount() {
+    return Object.keys(this.categories).length;
+  }
+
   get route() {
     return {
       name: 'perusteprojekti',
@@ -98,7 +104,7 @@ export default class EpVirhelistaus extends Vue {
 @import '@shared/styles/_variables.scss';
 .validation {
   border: 1px solid #ccc;
-  box-shadow: 0px 0px 20px #eee;
+  box-shadow: 0 0 20px #eee;
   border-radius: 10px;
   margin-bottom: 10px;
   padding: 20px;
@@ -106,6 +112,15 @@ export default class EpVirhelistaus extends Vue {
 
 .no-errors {
  color: $green;
+}
+
+.errors {
+  color: $invalid;
+}
+
+::v-deep .ep-collapse {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
 }
 
 </style>
