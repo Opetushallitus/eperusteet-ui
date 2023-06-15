@@ -188,7 +188,7 @@ export default class EpAipeOppiaineenTavoite extends Vue {
   }
 
   get arvosanat() {
-    return [10, 9, 8, 7, 6, 5];
+    return [10, 9, 8, 7, 6, 5, 1];
   }
 
   lisaaArvosanaRivi() {
