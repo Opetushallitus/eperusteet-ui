@@ -28,7 +28,6 @@
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileDigitaalinenOsaaminen :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileVirheellisetPerusteet :virheellisetPerusteetStore="virheellisetPerusteetStore" v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TilePalautteet v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
       </div>
@@ -48,7 +47,6 @@ import TilePerusteprojektit from './tiles/TilePerusteprojektit.vue';
 import TilePohjat from './tiles/TilePohjat.vue';
 import TileDigitaalinenOsaaminen from './tiles/TileDigitaalinenOsaaminen.vue';
 import TileTiedotteet from './tiles/TileTiedotteet.vue';
-import TileVirheellisetPerusteet from './tiles/TileVirheellisetPerusteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import TileTilastot from './tiles/TileTilastot.vue';
 import TilePalautteet from './tiles/TilePalautteet.vue';
@@ -57,7 +55,6 @@ import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
 import { PerusteetStore } from '@/stores/PerusteetStore';
-import { VirheellisetPerusteetStore } from '@/stores/VirheellisetPerusteetStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
 import EpFeedbackModal from '@shared/components/EpFeedback/EpFeedbackModal.vue';
 import { MaarayksetStore } from '@/stores/MaarayksetStore';
@@ -70,7 +67,6 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
     TilePerusteprojektit,
     TilePohjat,
     TileTiedotteet,
-    TileVirheellisetPerusteet,
     TileArviointiasteikot,
     TileTilastot,
     TilePalautteet,
@@ -88,9 +84,6 @@ export default class Home extends Vue {
 
   @Prop({ required: true })
   private perusteOppaatStore!: PerusteetStore;
-
-  @Prop({ required: true })
-  private virheellisetPerusteetStore!: VirheellisetPerusteetStore;
 
   @Prop({ required: true })
   private palautteetStore!: PalautteetStore;
