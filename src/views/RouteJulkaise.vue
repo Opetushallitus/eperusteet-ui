@@ -240,21 +240,28 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   async julkaise() {
-    await this.perusteStore!.julkaise({
-      tiedote: this.julkaisu.tiedote,
-      julkinenTiedote: this.julkaisu.julkinenTiedote,
-      julkinen: this.julkaisu.julkinen,
-      muutosmaaraysVoimaan: this.julkaisu.muutosmaaraysVoimaan,
-      liitteet: this.julkaisu.liitteet,
-    });
+    try {
+      await this.perusteStore!.julkaise({
+        tiedote: this.julkaisu.tiedote,
+        julkinenTiedote: this.julkaisu.julkinenTiedote,
+        julkinen: this.julkaisu.julkinen,
+        muutosmaaraysVoimaan: this.julkaisu.muutosmaaraysVoimaan,
+        liitteet: this.julkaisu.liitteet,
+      });
 
-    this.julkaisu.tiedote = {};
-    this.julkaisu.julkinenTiedote = {};
-    this.julkaisu.julkinen = true;
-    this.julkaisu.muutosmaaraysVoimaan = null;
-    this.julkaisu.liitteet = [];
-    this.invalid = false;
-    this.$success(this.$t('julkaisu-kaynnistetty') as string);
+      this.julkaisu.tiedote = {};
+      this.julkaisu.julkinenTiedote = {};
+      this.julkaisu.julkinen = true;
+      this.julkaisu.muutosmaaraysVoimaan = null;
+      this.julkaisu.liitteet = [];
+      this.$success(this.$t('julkaisu-kaynnistetty') as string);
+    }
+    catch (err) {
+      this.$fail(this.$t('julkaisu-epaonnistui') as string);
+    }
+    finally {
+      this.invalid = false;
+    }
   }
 
   async palautaJulkaisu(julkaisu) {
