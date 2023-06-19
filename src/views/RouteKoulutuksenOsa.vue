@@ -73,7 +73,7 @@
         </b-col>
         <b-col md="4">
           <b-form-group :label="$t('laajuus') + (isEditing ? ' *' : '')" required>
-            <div v-if="isEditing || !isEditing && data.laajuusMinimi && data.laajuusMaksimi" class="d-flex align-items-center">
+            <div v-if="isEditing || !isEditing && laajuusAnnettu" class="d-flex align-items-center">
               <EpInput
                 v-model="data.laajuusMinimi"
                 :is-editing="isEditing"
@@ -373,6 +373,10 @@ export default class RouteKoulutuksenOsa extends Vue {
         name: 'tavoitteet',
       },
     };
+  }
+
+  get laajuusAnnettu() {
+    return !_.isNull(this.store?.data.value.laajuusMinimi) && !_.isNull(this.store?.data.value.laajuusMaksimi);
   }
 }
 </script>
