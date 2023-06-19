@@ -41,16 +41,16 @@
       </div>
     </template>
 
-    <div v-if="isValidating" class="validointi">
-      <EpSpinner />
-      <div>{{ $t('validointi-kaynnissa') }}</div>
-    </div>
-
     <div>
       <h3>{{ $t('tarkistukset') }}</h3>
-      <ep-virhelistaus v-if="status"
-                       :validation="statusRoute" />
-      <EpSpinner v-else />
+      <div class="validation">
+        <div v-if="isValidating" class="validointi">
+          <EpSpinner />
+          <div>{{ $t('validointi-kaynnissa') }}</div>
+        </div>
+        <ep-virhelistaus v-if="status && !isValidating"
+                         :validation="statusRoute" />
+      </div>
     </div>
 
     <div v-if="peruste && julkaisuMahdollinen && !isPohja">
@@ -459,6 +459,14 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
 <style lang="scss" scoped>
 @import '@shared/styles/_variables';
+
+.validation {
+  border: 1px solid #ccc;
+  box-shadow: 0 0 20px #eee;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 20px;
+}
 
 .validointi {
   text-align: center;
