@@ -1,27 +1,19 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Api, UpdateDtoRakenneModuuliDto, RakenneModuuliDto, TutkinnonRakenne, Perusteet } from '@shared/api/eperusteet';
-import { Revision, Page } from '@shared/tyypit';
-import { Debounced } from '@shared/utils/delay';
+import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { Api, TutkinnonRakenne, Perusteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { config } from 'vue/types/umd';
-import { perusteenSuoritustapa } from '@shared/utils/perusteet';
-// import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
 
 Vue.use(VueCompositionApi);
 
 interface MuodostuminenStoreConfig {
-  // notifikaatiotStore: NotifikaatiotStore;
   perusteStore: PerusteStore;
   router: VueRouter;
 }
 
 export class MuodostuminenStore implements IEditoitava {
-  private state = reactive({ });
-
   private static config: MuodostuminenStoreConfig;
 
   public static install(vue: typeof Vue, config: MuodostuminenStoreConfig) {
@@ -29,9 +21,6 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   constructor(private readonly perusteId: number) {
-    // if (!MuodostuminenStore.config?.notifikaatiotStore) {
-    //   throw new Error('NotifikaatiotStore missing');
-    // }
     if (!MuodostuminenStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
     }
@@ -41,18 +30,23 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async load() {
-    const res = await TutkinnonRakenne.getRakenne(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!);
+    let data;
+    let peruste;
+    [peruste, data] = _.map(await (Promise.all([
+      Perusteet.getPerusteenTiedot(this.perusteId),
+      TutkinnonRakenne.getRakenne(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!),
+    ])), 'data');
     return {
       rakenne: {
-        ...res.data,
-        muodostumisSaanto: res.data.muodostumisSaanto || {
+        ...data,
+        muodostumisSaanto: data.muodostumisSaanto || {
           laajuus: {
             minimi: 0,
           },
         },
       },
-      osaamisalat: MuodostuminenStore.config?.perusteStore.peruste.value?.osaamisalat || [],
-      tutkintonimikkeet: MuodostuminenStore.config?.perusteStore.peruste.value?.tutkintonimikkeet || [],
+      osaamisalat: peruste.osaamisalat || [],
+      tutkintonimikkeet: peruste.tutkintonimikkeet || [],
     };
   }
 
