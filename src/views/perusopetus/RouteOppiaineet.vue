@@ -21,7 +21,11 @@
       <b-row v-for="(oppiaine, index) in oppiaineet" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
         <b-col cols="5" class="d-flex">
           <div>
-            <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppiaine.id } }">{{ $kaanna(oppiaine.nimi) }} <span v-if="oppiaine.koodiArvo">({{ oppiaine.koodiArvo }})</span></router-link>
+            <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppiaine.id } }">
+              <span v-if="oppiaine.nimi">{{ $kaanna(oppiaine.nimi) }}</span>
+              <span v-else>{{$t('nimeton-oppiaine')}}</span>
+              <span v-if="oppiaine.koodiArvo"> ({{ oppiaine.koodiArvo }})</span>
+            </router-link>
           </div>
         </b-col>
       </b-row>
@@ -65,7 +69,9 @@ export default class RouteOppiaineet extends Vue {
   }
 
   get oppiaineet() {
-    return this.store?.oppiaineet.value;
+    if (this.store?.oppiaineet.value) {
+      return _.sortBy(this.store?.oppiaineet.value, oppiaine => this.$kaanna(oppiaine.nimi));
+    }
   }
 
   get fields() {

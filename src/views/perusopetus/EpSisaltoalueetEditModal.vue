@@ -154,8 +154,16 @@ export default class EpSisaltoalueetEditModal extends Vue {
 
   async tallenna() {
     this.tallennetaan = true;
-    this.model = await PerusopetusOppiaineStore.updateOppiaineenVuosiluokkakokonaisuus(this.perusteId, this.oppiaineId, this.model);
-    this.sulje();
+    try {
+      this.model = await PerusopetusOppiaineStore.updateOppiaineenVuosiluokkakokonaisuus(this.perusteId, this.oppiaineId, this.model);
+      this.sulje();
+    }
+    catch (e) {
+      this.$fail(this.$t('virhe-palvelu-virhe') as string);
+    }
+    finally {
+      this.tallennetaan = false;
+    }
   }
 
   peruuta() {

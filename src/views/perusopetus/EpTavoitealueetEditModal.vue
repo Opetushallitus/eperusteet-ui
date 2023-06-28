@@ -103,8 +103,16 @@ export default class EpTavoitealueetEditModal extends Vue {
 
   async tallenna() {
     this.tallennetaan = true;
-    this.model.kohdealueet = await PerusopetusOppiaineStore.saveTavoitealueet(this.perusteId, this.oppiaineId, this.model.kohdealueet);
-    this.sulje();
+    try {
+      this.model.kohdealueet = await PerusopetusOppiaineStore.saveTavoitealueet(this.perusteId, this.oppiaineId, this.model.kohdealueet);
+      this.sulje();
+    }
+    catch (e) {
+      this.$fail(this.$t('virhe-palvelu-virhe') as string);
+    }
+    finally {
+      this.tallennetaan = false;
+    }
   }
 
   peruuta() {

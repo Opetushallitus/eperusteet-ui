@@ -1,5 +1,5 @@
 import { PerusopetuksenPerusteenSisalto, PerusopetusOppiaineLukko, PerusopetusOppiaineVlkLukko } from '@shared/api/eperusteet';
-import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { computed } from '@vue/composition-api';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
@@ -31,6 +31,7 @@ export class PerusopetusOppiaineStore implements IEditoitava {
         return _.first(_.sortBy(perusteenVuosiluokkakokonaisuus?.vuosiluokat));
       }),
       kohdealueet: _.sortBy(oppiaine.kohdealueet, 'id'),
+      oppimaarat: _.sortBy(oppiaine.oppimaarat, oppimaara => this.el.$kaanna(oppimaara.nimi)),
     };
 
     supportDataProvider({ perusteenVuosiluokkakokonaisuudet, tavoitealueet, laajaAlaisetOsaamiset });
@@ -42,6 +43,11 @@ export class PerusopetusOppiaineStore implements IEditoitava {
   async save(data: any) {
     await PerusopetuksenPerusteenSisalto.updatePerusopetusOppiaine(this.perusteId, this.oppiaineId, data);
     await this.perusteStore.updateNavigation();
+
+    if (this.el.$route.params?.uusi) {
+      await EditointiStore.cancelAll();
+      this.el.$router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(this.oppiaineId) } });
+    }
   }
 
   public async remove() {
@@ -84,14 +90,33 @@ export class PerusopetusOppiaineStore implements IEditoitava {
     };
   });
 
+  public features(data: any) {
+    return computed(() => {
+      return {
+        removable: _.size(data.oppimaarat) === 0,
+      } as EditoitavaFeatures;
+    });
+  }
+
   public static async create(perusteId, parentId?) {
+    let tallennettavaParentId = parentId;
+    if (parentId) {
+      let parentOppiaine = (await PerusopetuksenPerusteenSisalto.getPerusopetusOppiaine(perusteId, parentId)).data;
+      if (_.get(parentOppiaine, '_oppiaine')) {
+        tallennettavaParentId = _.get(parentOppiaine, '_oppiaine');
+      }
+      else {
+        await PerusopetusOppiaineStore.setOppiaineKoosteinen(perusteId, parentId);
+      }
+    }
+
     return (await PerusopetuksenPerusteenSisalto.addPerusopetusOppiaine(
       perusteId,
       {
         vapaatTekstit: [],
         kohdealueet: [],
         vuosiluokkakokonaisuudet: [],
-        ...(parentId && { _oppiaine: _.toNumber(parentId) }),
+        ...(tallennettavaParentId && { _oppiaine: _.toNumber(tallennettavaParentId) }),
       }
     )).data;
   }
