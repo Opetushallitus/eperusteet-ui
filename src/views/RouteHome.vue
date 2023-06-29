@@ -10,13 +10,6 @@
             </div>
           </div>
         </div>
-        <!--
-        <div class="row">
-          <div class="col-md-4 mt-2 mb-5">
-            <EpSearch v-model="rajain" />
-          </div>
-        </div>
-        -->
       </div>
     </Portal>
     <div class="container tile-container">
