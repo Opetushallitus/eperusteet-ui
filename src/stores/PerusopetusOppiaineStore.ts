@@ -31,7 +31,7 @@ export class PerusopetusOppiaineStore implements IEditoitava {
         return _.first(_.sortBy(perusteenVuosiluokkakokonaisuus?.vuosiluokat));
       }),
       kohdealueet: _.sortBy(oppiaine.kohdealueet, 'id'),
-      oppimaarat: _.sortBy(oppiaine.oppimaarat, oppimaara => this.el.$kaanna(oppimaara.nimi)),
+      oppimaarat: _.sortBy(oppiaine.oppimaarat, 'jnro'),
     };
 
     supportDataProvider({ perusteenVuosiluokkakokonaisuudet, tavoitealueet, laajaAlaisetOsaamiset });

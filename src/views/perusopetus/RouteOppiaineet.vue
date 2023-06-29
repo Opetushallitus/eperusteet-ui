@@ -1,37 +1,45 @@
 <template>
-  <EpContentView>
-    <template v-slot:header>
-      <h3 class="mb-0">
-        {{ $t('oppiaineet') }}
-      </h3>
+  <EpEditointi :store="store">
+    <template #header>
+      <h3>{{$t('oppiaineet')}}</h3>
     </template>
-
-    <EpSpinner v-if="!oppiaineet"/>
-    <div v-else>
+    <template #muokkaa>
+      {{$t('muokkaa-jarjestysta')}}
+    </template>
+    <template #default="{ data, isEditing }">
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="plus" @click="lisaaOppiaine" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+        <EpButton variant="outline" :disabled="isEditing" icon="plus" @click="lisaaOppiaine" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
           {{ $t('uusi-oppiaine')}}
         </EpButton>
       </div>
 
-      <b-row class="border-bottom-1 m-0 pb-2" v-if="oppiaineet.length > 0">
+      <b-row class="border-bottom-1 m-0 pb-2" v-if="data.oppiaineet.length > 0">
         <b-col cols="5" class="font-weight-bold">{{$t('nimi')}}</b-col>
       </b-row>
 
-      <b-row v-for="(oppiaine, index) in oppiaineet" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
-        <b-col cols="5" class="d-flex">
-          <div>
-            <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppiaine.id } }">
-              <span v-if="oppiaine.nimi">{{ $kaanna(oppiaine.nimi) }}</span>
-              <span v-else>{{$t('nimeton-oppiaine')}}</span>
-              <span v-if="oppiaine.koodiArvo"> ({{ oppiaine.koodiArvo }})</span>
-            </router-link>
-          </div>
-        </b-col>
-      </b-row>
-    </div>
+      <draggable
+        v-bind="defaultDragOptions"
+        tag="div"
+        v-model="data.oppiaineet">
 
-  </EpContentView>
+        <b-row v-for="(oppiaine, index) in data.oppiaineet" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
+          <b-col cols="5" class="d-flex">
+            <div class="order-handle mr-2" v-if="isEditing">
+              <fas icon="grip-vertical"></fas>
+            </div>
+            <div>
+              <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppiaine.id } }">
+                <span v-if="oppiaine.nimi">{{ $kaanna(oppiaine.nimi) }}</span>
+                <span v-else>{{$t('nimeton-oppiaine')}}</span>
+                <span v-if="oppiaine.koodiArvo"> ({{ oppiaine.koodiArvo }})</span>
+              </router-link>
+            </div>
+          </b-col>
+        </b-row>
+      </draggable>
+    </template>
+
+  </EpEditointi>
 </template>
 
 <script lang="ts">
@@ -41,37 +49,31 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusopetusOppiaineetStore } from '@/stores/PerusopetusOppiaineetStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import EpContentView from '@shared/components/EpContentView/EpContentView.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
+import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
+import draggable from 'vuedraggable';
+import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 
 @Component({
   components: {
     EpButton,
     EpEditointi,
-    EpContentView,
-    EpSpinner,
+    draggable,
   },
 })
 export default class RouteOppiaineet extends Vue {
   @Prop({ required: true })
   perusteStore!: PerusteStore;
 
-  store: PerusopetusOppiaineetStore | null = null;
+  store: EditointiStore | null = null;
 
   async mounted() {
-    this.store = new PerusopetusOppiaineetStore(this.perusteId!);
+    const store = new PerusopetusOppiaineetStore(this.perusteId!, this.perusteStore);
+    this.store = new EditointiStore(store);
   }
 
   get perusteId() {
     return this.perusteStore.perusteId.value;
-  }
-
-  get oppiaineet() {
-    if (this.store?.oppiaineet.value) {
-      return _.sortBy(this.store?.oppiaineet.value, oppiaine => this.$kaanna(oppiaine.nimi));
-    }
   }
 
   get fields() {
@@ -87,6 +89,20 @@ export default class RouteOppiaineet extends Vue {
     await this.perusteStore.updateNavigation();
     await EditointiStore.cancelAll();
     this.$router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
+  }
+
+  get defaultDragOptions() {
+    return {
+      ...DEFAULT_DRAGGABLE_PROPERTIES,
+      disabled: !this.isEditing,
+      group: {
+        name: 'oppiaineet',
+      },
+    };
+  }
+
+  get isEditing() {
+    return this.store?.isEditing.value;
   }
 }
 </script>
