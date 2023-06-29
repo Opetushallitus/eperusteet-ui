@@ -77,9 +77,19 @@
 
           <template v-if="!isOppimaara">
             <b-form-group :label="$t('oppimaarat')" v-if="!isEditing || (data.oppimaarat && data.oppimaarat.length > 0)">
-              <div class="taulukko-rivi-varitys p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-              </div>
+              <draggable
+                v-bind="oppiaineetDragOptions"
+                tag="div"
+                v-model="data.oppimaarat">
+                  <div class="taulukko-rivi-varitys p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
+                    <div class="order-handle mr-2" v-if="isEditing">
+                      <fas icon="grip-vertical" v-if="isEditing"></fas>
+                    </div>
+                    <div>
+                      <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
+                    </div>
+                  </div>
+              </draggable>
             </b-form-group>
 
             <ep-button variant="outline-primary" icon="plussa" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
@@ -302,6 +312,16 @@ export default class RouteOppiaine extends Vue {
     return {
       ...this.store!.supportData.value,
       kohdealueet: this.store!.data.value.kohdealueet,
+    };
+  }
+
+  get oppiaineetDragOptions() {
+    return {
+      ...DEFAULT_DRAGGABLE_PROPERTIES,
+      disabled: !this.isEditing,
+      group: {
+        name: 'oppiaineet',
+      },
     };
   }
 }
