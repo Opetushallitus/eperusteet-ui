@@ -1,5 +1,7 @@
 <template>
   <div class="home-container minfull">
+    <EpTestiymparisto />
+
     <div class="header" ref="header">
       <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet"/>
       <PortalTarget ref="innerPortal" name="headerExtension" />
@@ -22,11 +24,13 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 
 import { PerusteStore } from '@/stores/PerusteStore';
 import { Meta } from '@shared/utils/decorators';
+import EpTestiymparisto from '@shared/components/EpTestiymparisto/EpTestiymparisto.vue';
 
 @Component({
   components: {
     EpNavbar,
     EpFooter,
+    EpTestiymparisto,
   },
   directives: {
     Sticky,
