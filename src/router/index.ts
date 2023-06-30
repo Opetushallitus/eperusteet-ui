@@ -604,28 +604,29 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-router.beforeEach(async (to, from, next) => {
-  const perusteprojektiId = Number(to.params.projektiId);
-  const oldId = Number(from.params.projektiId);
-  if (!perusteprojektiId) {
-    stores.kayttajaStore.clear();
-    next();
-  }
-  else if (perusteprojektiId === oldId) {
-    next();
-  }
-  else {
-    try {
-      await stores.kayttajaStore.setPerusteprojekti(perusteprojektiId);
-      next();
-    }
-    catch (err) {
-      if (err.response.status === 404) {
-        router.push({ name: 'virhe' });
-      }
-      throw new Error(err);
-    }
-  }
-});
+// router.beforeEach(async (to, from, next) => {
+//   const perusteprojektiId = Number(to.params.projektiId);
+//   const oldId = Number(from.params.projektiId);
+
+//   if (!perusteprojektiId) {
+//     stores.kayttajaStore.clear();
+//     next();
+//   }
+//   else if (perusteprojektiId === oldId) {
+//     next();
+//   }
+//   else {
+//     try {
+//       // await stores.kayttajaStore.setPerusteprojekti(perusteprojektiId);
+//       next();
+//     }
+//     catch (err) {
+//       if (err.response.status === 404) {
+//         router.push({ name: 'virhe' });
+//       }
+//       throw new Error(err);
+//     }
+//   }
+// });
 
 export default router;

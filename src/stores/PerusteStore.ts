@@ -122,7 +122,6 @@ export class PerusteStore implements IEditoitava {
       this.state.projektiStatus = null;
       this.state.julkaisut = null;
       Murupolku.tyhjenna();
-
       this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
       const perusteId = Number((this.state.projekti as any)._peruste);
       this.state.perusteId = perusteId;

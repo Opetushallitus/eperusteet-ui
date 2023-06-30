@@ -60,9 +60,12 @@ export class KayttajaStore implements IOikeusProvider {
   public readonly hasOphCrud = computed(() => _.some(this.state.tiedot?.oikeudet || [], oikeus => _.includes(OphCrudOids, oikeus)));
   public readonly casKayttaja = computed(() => this.state.casKayttaja);
   public readonly sovellusOikeudet = computed(() => getSovellusoikeudet(this.state.casKayttaja?.groups, 'APP_EPERUSTEET'));
+  // public readonly isDeveloper = computed(() => _.includes(window.location.origin, 'localhost'));
 
   public async init() {
     try {
+      await this.doLoginRedirect();
+
       logger.info('Haetaan käyttäjän tiedot');
       this.state.casKayttaja = await getCasKayttaja();
       this.state.tiedot = (await KayttajatApi.getKirjautunutKayttajat()).data;
@@ -71,6 +74,15 @@ export class KayttajaStore implements IOikeusProvider {
     catch (err) {
       logger.error('Käyttäjän tietojen lataus epäonnistui', err.message);
     }
+  }
+
+  public async doLoginRedirect() {
+    // if (!this.isDeveloper) {
+    const redirect = (await KayttajatApi.haeLoginRedirectUrl(_.toString(window.location))).data;
+    if (redirect) {
+      window.location.replace(redirect);
+    }
+    // }
   }
 
   public async clear() {
