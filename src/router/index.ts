@@ -611,27 +611,10 @@ router.beforeEach((to, from, next) => {
 });
 
 router.beforeEach(async (to, from, next) => {
-  const perusteprojektiId = Number(to.params.projektiId);
-  const oldId = Number(from.params.projektiId);
-  if (!perusteprojektiId) {
+  if (!Number(to.params.projektiId)) {
     stores.kayttajaStore.clear();
-    next();
   }
-  else if (perusteprojektiId === oldId) {
-    next();
-  }
-  else {
-    try {
-      await stores.kayttajaStore.setPerusteprojekti(perusteprojektiId);
-      next();
-    }
-    catch (err) {
-      if (err.response.status === 404) {
-        router.push({ name: 'virhe' });
-      }
-      throw new Error(err);
-    }
-  }
+  next();
 });
 
 export default router;

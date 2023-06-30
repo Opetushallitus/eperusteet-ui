@@ -3,6 +3,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
 import { PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import { KayttajaStore } from '@/stores/kayttaja';
 
 const browserStore = new BrowserStore();
 
@@ -10,6 +11,9 @@ const browserStore = new BrowserStore();
 export class PerusteprojektiRoute extends Vue {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
+
+  @Prop({ required: true })
+  private kayttajaStore!: KayttajaStore;
 
   protected get showNavigation() {
     return browserStore.navigationVisible.value;
@@ -65,11 +69,11 @@ export class PerusteprojektiRoute extends Vue {
       this.isInitingProjekti = true;
       window.scrollTo(0, 0);
       try {
-        await Promise.all([
-          this.perusteStore.init(projektiId),
-          this.perusteStore.blockUntilInitialized(),
-          this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!),
-        ]);
+        await this.perusteStore.init(projektiId);
+        await this.perusteStore.blockUntilInitialized();
+        await this.kayttajaStore.clear();
+        await this.kayttajaStore.setPerusteprojekti(projektiId);
+        await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
       }
       catch (err) {
         console.error(err);
