@@ -10,6 +10,8 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Kayttajat } from '@/stores/kayttaja';
 import { delay } from '@shared/utils/delay';
 import EpNotification from '@shared/components/EpNotification/EpNotification.vue';
+import { Kielet } from '@shared/stores/kieli';
+import { getKaannokset } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -23,6 +25,7 @@ export default class App extends Vue {
       color: '#2E5FD1',
     });
     await Kayttajat.init();
+    Kielet.load(await getKaannokset('eperusteet'));
     await delay(500);
     this.isInitializing = false;
     loader.hide();
