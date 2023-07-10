@@ -305,15 +305,39 @@
               <b-form-group>
                 <h3 slot="label">{{$t('koulutusviennin-ohje')}}</h3>
                 <ep-spinner v-if="!liitteet" />
-                <div>
+
+                <div v-if="isEditing">
+                  <div class="mb-4">
+                    <b-form-radio-group stacked v-model="data.poikkeamismaaraysTyyppi" class="mb-3">
+                      <b-form-radio value="ei_tarvita_ohjetta"
+                                    name="poikkeamismaaraysTyyppi">{{ $t('voi-kayttaa tutkintoviennissa') }}</b-form-radio>
+                      <b-form-radio value="ei_voi_poiketa"
+                                    name="poikkeamismaaraysTyyppi">{{ $t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa') }}</b-form-radio>
+                      <b-form-radio value="koulutusvientiliite"
+                                    name="poikkeamismaaraysTyyppi">{{ $t('maarays-tutkinnon-perusteista-poikkeamiseen-tutkintoviennissa') }}</b-form-radio>
+                    </b-form-radio-group>
+                  </div>
+                </div>
+                <div v-else>
+                  <span>{{ poikkeamismaaraysTyyppiText }}</span>
+                </div>
+
+                <div v-if="data.poikkeamismaaraysTyyppi === 'koulutusvientiliite'">
+                  <div v-if="isEditing">
+                    <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                    <div class="liiteohje" v-html="$t('koulutusviennin-lataus-ohje')"></div>
+                    <ep-tiedosto-lataus :fileTypes="['application/pdf']"
+                                        v-model="koulutusvienninOhjeFile"
+                                        :as-binary="true" />
+                  </div>
                   <b-table v-if="koulutusvienninOhjeet.length > 0"
-                          :items="koulutusvienninOhjeet"
-                          :fields="koulutusvientiOhjeFields"
-                          responsive
-                          borderless
-                          striped
-                          fixed
-                          hover>
+                           :items="koulutusvienninOhjeet"
+                           :fields="koulutusvientiOhjeFields"
+                           responsive
+                           borderless
+                           striped
+                           fixed
+                           hover>
 
                     <template v-slot:cell(diaarinumero)="row">
                       <EpInput type="string" :isEditing="isEditing" :placeholder="$t('kirjoita-diaarinumero')" v-model="koulutusvienninOhjeet[row.index].lisatieto"/>
@@ -327,12 +351,15 @@
                       </div>
                     </template>
                   </b-table>
-                  <div v-if="isEditing">
-                    <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
-                    <div class="liiteohje" v-html="$t('koulutusviennin-lataus-ohje')"></div>
-                    <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="koulutusvienninOhjeFile" :as-binary="true" />
-                  </div>
                 </div>
+
+                <b-form-group :label="$t('tarkennus')" class="mt-4">
+                  <ep-content
+                    v-model="data.poikkeamismaaraysTarkennus"
+                    layout="normal"
+                    :is-editable="isEditing"></ep-content>
+                </b-form-group>
+
               </b-form-group>
               <hr/>
             </b-col>
@@ -473,6 +500,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   private liitteenNimi = '';
   private korvattavatPerusteet: { [diaari: string]: any } = {};
   private korvattavaDiaarinumero = '';
+  private poikkeamismaaraysTyyppi: 'ei_tarvita_ohjetta' | 'ei_voi_poiketa' | 'koulutusvientiliite' | null = null;
 
   get maarayskirje() {
     return this.store?.data.value?.maarayskirje?.liitteet[this.$slang.value] || null;
@@ -668,6 +696,16 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       thStyle: { width: '10%' },
       sortable: false,
     }];
+  }
+
+  get poikkeamismaaraysTyyppiText() {
+    if (this.store?.data?.value?.poikkeamismaaraysTyyppi === 'ei_tarvita_ohjetta') {
+      return this.$t('voi-kayttaa tutkintoviennissa');
+    }
+    else if (this.store?.data?.value?.poikkeamismaaraysTyyppi === 'ei_voi_poiketa') {
+      return this.$t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa');
+    }
+    return '';
   }
 
   private koulutuskoodisto = new KoodistoSelectStore({
