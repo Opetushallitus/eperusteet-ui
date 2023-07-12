@@ -34,6 +34,7 @@ import RouteTekstikappale from '@/views/RouteTekstikappale.vue';
 import RouteTermisto from '@/views/RouteTermisto.vue';
 import RouteTiedotteet from '@/views/RouteTiedotteet.vue';
 import RouteTilastot from '@/views/RouteTilastot.vue';
+import RouteYllapito from '@/views/RouteYllapito.vue';
 import RouteTutkinnonOsa from '@/views/RouteTutkinnonOsa.vue';
 import RouteTutkinnonOsanOsaalue from '@/views/tutkinnonosat/RouteTutkinnonOsanOsaalue.vue';
 import RouteTutkinnonOsat from '@/views/RouteTutkinnonOsat.vue';
@@ -145,6 +146,11 @@ const router = new VueRouter({
       path: 'tilastot',
       name: 'tilastot',
       component: RouteTilastot,
+      props,
+    }, {
+      path: 'yllapito',
+      name: 'yllapito',
+      component: RouteYllapito,
       props,
     }, {
       path: 'palautteet',
