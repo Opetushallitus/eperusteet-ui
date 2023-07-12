@@ -23,6 +23,7 @@
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TilePalautteet v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
+        <TileYllapito v-oikeustarkastelu="{oikeus:'hallinta'}"/>
       </div>
     </div>
 
@@ -44,6 +45,7 @@ import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import TileTilastot from './tiles/TileTilastot.vue';
 import TilePalautteet from './tiles/TilePalautteet.vue';
 import TileMaaraykset from './tiles/TileMaaraykset.vue';
+import TileYllapito from './tiles/TileYllapito.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
@@ -54,6 +56,7 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
 
 @Component({
   components: {
+    TileYllapito,
     EpSearch,
     TileArkistoidut,
     TileOppaat,
