@@ -310,7 +310,7 @@
                   <div class="mb-4">
                     <b-form-radio-group stacked v-model="data.poikkeamismaaraysTyyppi" class="mb-3">
                       <b-form-radio value="ei_tarvita_ohjetta"
-                                    name="poikkeamismaaraysTyyppi">{{ $t('voi-kayttaa tutkintoviennissa') }}</b-form-radio>
+                                    name="poikkeamismaaraysTyyppi">{{ $t('voi-kayttaa-tutkintoviennissa') }}</b-form-radio>
                       <b-form-radio value="ei_voi_poiketa"
                                     name="poikkeamismaaraysTyyppi">{{ $t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa') }}</b-form-radio>
                       <b-form-radio value="koulutusvientiliite"
@@ -700,7 +700,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 
   get poikkeamismaaraysTyyppiText() {
     if (this.store?.data?.value?.poikkeamismaaraysTyyppi === 'ei_tarvita_ohjetta') {
-      return this.$t('voi-kayttaa tutkintoviennissa');
+      return this.$t('voi-kayttaa-tutkintoviennissa');
     }
     else if (this.store?.data?.value?.poikkeamismaaraysTyyppi === 'ei_voi_poiketa') {
       return this.$t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa');
