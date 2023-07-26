@@ -10,6 +10,9 @@
         <b-col lg="8">
           <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
             <ep-koodisto-select :store="tavoitesisaltoalueotsikkoKoodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
+              <template slot="koodisto">
+                ({{ koodistoNimi }})
+              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -87,6 +90,8 @@ export default class RouteTavoitesisaltoalue extends Vue {
   perusteStore!: PerusteStore;
 
   private store: EditointiStore | null = null;
+
+  private koodistoNimi: string = 'tavoitesisaltoalueenotsikko';
 
   @Watch('kotokielitaitotasoId', { immediate: true })
   async onParamChange(id: string, oldId: string) {

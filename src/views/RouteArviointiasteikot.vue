@@ -76,26 +76,28 @@
                       :is-editing="true"/>
                   </b-form-group>
 
-                  <b-form-group
-                    class="w-40">
+                  <b-form-group class="w-40">
                     <ep-koodisto-select
                       :store="koodisto"
                       v-model="taso.koodi"
                       :is-editing="isEditing"
                       :naytaArvo="true">
-                    <template #default="{ open }">
-                      <b-input-group>
-                        <b-form-input
-                          :value="taso.koodi ? $kaanna(taso.koodi.nimi) : ''"
-                          disabled></b-form-input>
-                        <b-input-group-append>
-                          <b-button @click="open" icon="plus" variant="primary">
-                            {{ $t('hae-koodistosta') }}
-                          </b-button>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </template>
-                  </ep-koodisto-select>
+                      <template slot="koodisto">
+                        ({{ koodistoNimi }})
+                      </template>
+                      <template #default="{ open }">
+                        <b-input-group>
+                          <b-form-input
+                            :value="taso.koodi ? $kaanna(taso.koodi.nimi) : ''"
+                            disabled></b-form-input>
+                          <b-input-group-append>
+                            <b-button @click="open" icon="plus" variant="primary">
+                              {{ $t('hae-koodistosta') }}
+                            </b-button>
+                          </b-input-group-append>
+                        </b-input-group>
+                      </template>
+                    </ep-koodisto-select>
                   </b-form-group>
 
                   <b-form-group>
@@ -135,7 +137,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import { ArviointiAsteikkoDto, Koodisto, OsaamistasoDto } from '@shared/api/eperusteet';
+import { ArviointiAsteikkoDto, Koodisto } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import * as _ from 'lodash';
 import VueScrollTo from 'vue-scrollto';
@@ -158,6 +160,7 @@ export default class RouteArviointiasteikot extends Vue {
   private isEditing: boolean | null = false;
   private isSaving = false;
   private arviointiasteikot: ArviointiAsteikkoDto[] | null = null;
+  private koodistoNimi: string = 'arviointiasteikkoammatillinen15';
 
   mounted() {
     this.init();

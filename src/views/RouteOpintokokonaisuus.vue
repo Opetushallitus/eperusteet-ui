@@ -9,6 +9,9 @@
         <b-col md="8">
           <b-form-group :label="$t('opintokokonaisuuden-nimi') + (isEditing ? ' *' : '')" required>
             <ep-koodisto-select :store="koodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
+              <template slot="koodisto">
+                ({{ koodistoNimi }})
+              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -162,7 +165,6 @@ import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { generateTemporaryKoodiUri } from '@shared/utils/koodi';
-import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 
 @Component({
   components: {
@@ -181,6 +183,8 @@ export default class RouteOpintokokonaisuus extends Vue {
   perusteStore!: PerusteStore;
 
   private store: EditointiStore | null = null;
+
+  private koodistoNimi: string = 'opintokokonaisuusnimet';
 
   @Watch('opintokokonaisuusId', { immediate: true })
   async onParamChange(id: string, oldId: string) {

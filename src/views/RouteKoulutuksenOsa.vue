@@ -34,6 +34,9 @@
               :is-editing="isEditing"
               :naytaArvo="false"
               @add="onNimiKoodiAdd()">
+              <template slot="koodisto">
+                ({{ koodistoNimi }})
+              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -265,6 +268,7 @@ export default class RouteKoulutuksenOsa extends Vue {
 
   private store: EditointiStore | null = null;
   private tempNimiValue = null;
+  private koodistoNimi: string = 'koulutuksenosattuva';
 
   private readonly koodisto = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {

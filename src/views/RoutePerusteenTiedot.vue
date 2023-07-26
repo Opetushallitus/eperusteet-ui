@@ -129,6 +129,9 @@
                 <ep-koodisto-select @add="addKoulutuskoodi(data, $event)"
                   :store="koulutuskoodisto"
                   v-if="isEditing">
+                  <template slot="koodisto">
+                    ({{ koodistoKoulutus }})
+                  </template>
                   <template v-slot:default="{ open }">
                     <ep-button @click="open" icon="plus" variant="outline">
                       {{ $t('lisaa-koulutus') }}

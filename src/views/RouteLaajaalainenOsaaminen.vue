@@ -9,6 +9,9 @@
         <b-col lg="8">
           <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
             <ep-koodisto-select :store="laajaalainenOsaaminenKoodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
+              <template slot="koodisto">
+                ({{ koodistoNimi }})
+              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -58,8 +61,6 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import * as _ from 'lodash';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
 import { TermitStore } from '@/stores/TermitStore';
-import { KuvaStore } from '@/stores/KuvaStore';
-import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 
@@ -77,6 +78,8 @@ export default class RouteLaajaalainenOsaaminen extends Vue {
   perusteStore!: PerusteStore;
 
   private store: EditointiStore | null = null;
+
+  private koodistoNimi: string = 'tutkintokoulutukseenvalmentavakoulutuslaajaalainenosaaminen';
 
   @Watch('laajaalainenosaaminenId', { immediate: true })
   async onParamChange(id: string, oldId: string) {

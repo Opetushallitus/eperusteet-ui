@@ -43,6 +43,9 @@
                 :naytaArvo="false"
                 :additionalFields="tutkinnonosaKoodistoKaytossaField"
                 @add="tutkinnonOsaNimiKoodiLisays">
+                <template slot="koodisto">
+                  ({{ koodistoNimi }})
+                </template>
                 <template #default="{ open }">
                   <div class="d-flex">
                     <b-input-group>
@@ -268,6 +271,7 @@ export default class RouteTutkinnonosa extends Vue {
 
   private store: EditointiStore | null = null;
   private koodiTallennus = false;
+  private koodistoNimi: string = 'tutkinnonosat';
 
   private readonly tutkinnonosaKoodisto = new KoodistoSelectStore({
     async query(query: string, sivu = 0) {

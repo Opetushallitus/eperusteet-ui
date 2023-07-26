@@ -11,6 +11,9 @@
         <b-col cols="8" v-if="isEditing">
           <b-form-group :label="$t('oppiaineen-nimi')">
             <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+              <template slot="koodisto">
+                ({{ koodistoNimi }})
+              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -169,6 +172,8 @@ export default class RouteAipeOppiaine extends Vue {
   parentId: any;
 
   store: EditointiStore | null = null;
+
+  private koodistoNimi: string = 'oppiaineetyleissivistava2';
 
   @Watch('oppiaineId', { immediate: true })
   async oppiaineChange() {

@@ -28,6 +28,9 @@
             <b-col md="4">
               <b-form-group :label="$t('koodi') + (isEditing ? ' *' : '')">
                 <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing">
+                  <template slot="koodisto">
+                    ({{ koodistoAmmatillisetoppiaineet }})
+                  </template>
                   <template #default="{ open }">
                     <b-input-group>
                       <b-form-input
@@ -47,6 +50,9 @@
             <b-col md="3">
               <b-form-group :label="$t('osa-alue-kieli')">
                 <ep-koodisto-select :store="kielikoodisto" v-model="data.kielikoodi" :is-editing="isEditing">
+                  <template slot="koodisto">
+                    ({{ koodistoKielet }})
+                  </template>
                   <template #default="{ open }">
                     <b-input-group>
                       <b-form-input
@@ -108,7 +114,7 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -162,6 +168,9 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   private arviointiStore!: ArviointiStore;
 
   private store: EditointiStore | null = null;
+
+  private koodistoAmmatillisetoppiaineet: string = Koodistot.AMMATILLISENOPPIAINEET;
+  private koodistoKielet: string = Koodistot.KIELIVALIKOIMA;
 
   get isNew() {
     return this.osaalueId === 'uusi';
