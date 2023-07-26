@@ -11,6 +11,9 @@
         <b-col cols="8" v-if="isEditing" class="mb-3">
           <b-form-group :label="$t('moduulin-nimi')">
             <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+              <template slot="koodisto">
+                ({{ koodistoNimi }})
+              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -226,6 +229,8 @@ export default class RouteModuuli extends Vue {
   pakollinen!: boolean;
 
   store: EditointiStore | null = null;
+
+  private koodistoNimi: string = 'moduulikoodistolops2021';
 
   @Watch('moduuliId', { immediate: true })
   async oppiaineChange() {

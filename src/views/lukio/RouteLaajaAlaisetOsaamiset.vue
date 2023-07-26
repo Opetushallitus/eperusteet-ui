@@ -16,6 +16,9 @@
                 <div class="col-10" v-if="isEditing">
                   <b-form-group :label="$t('laaja-alaisen-osaamisen-otsikko')">
                     <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+                      <template slot="koodisto">
+                        ({{ koodistoNimi }})
+                      </template>
                       <template #default="{ open }">
                         <b-input-group>
                           <b-form-input
@@ -102,6 +105,8 @@ export default class RouteLaajaAlaisetOsaamiset extends Vue {
   perusteStore!: PerusteStore;
 
   store: EditointiStore | null = null;
+
+  private koodistoNimi: string = 'laajaalainenosaaminenlops2021';
 
   async mounted() {
     const store = new LukioLaajaAlaisetOsaamisetStore(this.perusteId!);
