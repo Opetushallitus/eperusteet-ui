@@ -212,7 +212,7 @@
                           </div>
                           <ep-koodisto-select :store="tutkintonimikeStore" v-if="isEditing" :value="index" @add="tutkintonimikeKoodiLisays" class="w-100">
                             <template slot="koodisto">
-                             ({{ koodistoTutkintonimikkeet }})
+                              ({{ koodistoTutkintonimikkeet }})
                             </template>
                             <template #default="{ open }">
                               <b-input-group class="w-100 d-flex">
