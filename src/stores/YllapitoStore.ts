@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-import { Maintenance } from '@shared/api/eperusteet';
-import { YllapitoDto } from '@shared/generated/eperusteet';
-import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { Maintenance, YllapitoDto } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
