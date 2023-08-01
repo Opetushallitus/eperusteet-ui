@@ -21,7 +21,7 @@
           </template>
 
           <template v-slot:cell(key)="data">
-            <ep-input v-model="data.item.key" :is-editing="isEditing" />
+            <ep-input v-model="data.item.key" :is-editing="false" />
           </template>
 
           <template v-slot:cell(value)="data">
