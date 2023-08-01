@@ -21,9 +21,9 @@
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileDigitaalinenOsaaminen :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TilePalautteet v-oikeustarkastelu="{oikeus:'hallinta'}"/>
+        <TilePalautteet v-if="$isAdmin()"/>
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileYllapito v-oikeustarkastelu="{oikeus:'hallinta'}"/>
+        <TileYllapito v-if="$isAdmin()"/>
       </div>
     </div>
 
