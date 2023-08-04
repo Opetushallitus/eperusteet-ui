@@ -10,9 +10,6 @@
         <b-col lg="8">
           <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
             <ep-koodisto-select :store="tavoitesisaltoalueotsikkoKoodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
-              <template slot="koodisto">
-                ({{ koodistoNimi }})
-              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -91,8 +88,6 @@ export default class RouteTavoitesisaltoalue extends Vue {
 
   private store: EditointiStore | null = null;
 
-  private koodistoNimi: string = 'tavoitesisaltoalueenotsikko';
-
   @Watch('kotokielitaitotasoId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
     if (!id || id === oldId) {
@@ -122,8 +117,9 @@ export default class RouteTavoitesisaltoalue extends Vue {
   }
 
   private readonly tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      const { data } = (await Koodisto.kaikkiSivutettuna('tavoitesisaltoalueenotsikko', query, {
+    koodisto: 'tavoitesisaltoalueenotsikko',
+    async query(query: string, sivu = 0, koodisto: string) {
+      const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

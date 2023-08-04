@@ -9,9 +9,6 @@
         <b-col md="8">
           <b-form-group :label="$t('opintokokonaisuuden-nimi') + (isEditing ? ' *' : '')" required>
             <ep-koodisto-select :store="koodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
-              <template slot="koodisto">
-                ({{ koodistoNimi }})
-              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -184,8 +181,6 @@ export default class RouteOpintokokonaisuus extends Vue {
 
   private store: EditointiStore | null = null;
 
-  private koodistoNimi: string = 'opintokokonaisuusnimet';
-
   @Watch('opintokokonaisuusId', { immediate: true })
   async onParamChange(id: string, oldId: string) {
     if (!id || id === oldId) {
@@ -206,8 +201,9 @@ export default class RouteOpintokokonaisuus extends Vue {
   }
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('opintokokonaisuusnimet', query, {
+    koodisto: 'opintokokonaisuusnimet',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

@@ -11,9 +11,6 @@
         <b-col cols="8" v-if="isEditing" class="mb-3">
           <b-form-group :label="$t('moduulin-nimi')">
             <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
-              <template slot="koodisto">
-                ({{ koodistoNimi }})
-              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -230,8 +227,6 @@ export default class RouteModuuli extends Vue {
 
   store: EditointiStore | null = null;
 
-  private koodistoNimi: string = 'moduulikoodistolops2021';
-
   @Watch('moduuliId', { immediate: true })
   async oppiaineChange() {
     const store = new LukioModuuliStore(this.perusteId!, this.oppiaineId, this.moduuliId, this.pakollinen, this.perusteStore, this);
@@ -243,8 +238,9 @@ export default class RouteModuuli extends Vue {
   }
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('moduulikoodistolops2021', query, {
+    koodisto: 'moduulikoodistolops2021',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

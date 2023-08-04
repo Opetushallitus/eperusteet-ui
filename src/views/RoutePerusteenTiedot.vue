@@ -129,9 +129,6 @@
                 <ep-koodisto-select @add="addKoulutuskoodi(data, $event)"
                   :store="koulutuskoodisto"
                   v-if="isEditing">
-                  <template slot="koodisto">
-                    ({{ koodistoKoulutus }})
-                  </template>
                   <template v-slot:default="{ open }">
                     <ep-button @click="open" icon="plus" variant="outline">
                       {{ $t('lisaa-koulutus') }}
@@ -712,8 +709,9 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   }
 
   private koulutuskoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('koulutus', query, {
+    koodisto: 'koulutus',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

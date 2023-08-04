@@ -28,9 +28,6 @@
             <b-col md="4">
               <b-form-group :label="$t('koodi') + (isEditing ? ' *' : '')">
                 <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing">
-                  <template slot="koodisto">
-                    ({{ koodistoAmmatillisetoppiaineet }})
-                  </template>
                   <template #default="{ open }">
                     <b-input-group>
                       <b-form-input
@@ -50,9 +47,6 @@
             <b-col md="3">
               <b-form-group :label="$t('osa-alue-kieli')">
                 <ep-koodisto-select :store="kielikoodisto" v-model="data.kielikoodi" :is-editing="isEditing">
-                  <template slot="koodisto">
-                    ({{ koodistoKielet }})
-                  </template>
                   <template #default="{ open }">
                     <b-input-group>
                       <b-form-input
@@ -169,9 +163,6 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
 
   private store: EditointiStore | null = null;
 
-  private koodistoAmmatillisetoppiaineet: string = Koodistot.AMMATILLISENOPPIAINEET;
-  private koodistoKielet: string = Koodistot.KIELIVALIKOIMA;
-
   get isNew() {
     return this.osaalueId === 'uusi';
   }
@@ -229,8 +220,9 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   }
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna(Koodistot.AMMATILLISENOPPIAINEET, query, {
+    koodisto: Koodistot.AMMATILLISENOPPIAINEET,
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
@@ -240,8 +232,9 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   });
 
   private readonly kielikoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna(Koodistot.KIELIVALIKOIMA, query, {
+    koodisto: Koodistot.KIELIVALIKOIMA,
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

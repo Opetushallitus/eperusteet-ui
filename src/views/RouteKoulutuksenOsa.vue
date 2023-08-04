@@ -34,9 +34,6 @@
               :is-editing="isEditing"
               :naytaArvo="false"
               @add="onNimiKoodiAdd()">
-              <template slot="koodisto">
-                ({{ koodistoNimi }})
-              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -268,11 +265,11 @@ export default class RouteKoulutuksenOsa extends Vue {
 
   private store: EditointiStore | null = null;
   private tempNimiValue = null;
-  private koodistoNimi: string = 'koulutuksenosattuva';
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('koulutuksenosattuva', query, {
+    koodisto: 'koulutuksenosattuva',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

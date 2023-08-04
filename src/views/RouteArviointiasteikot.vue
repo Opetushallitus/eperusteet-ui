@@ -82,9 +82,6 @@
                       v-model="taso.koodi"
                       :is-editing="isEditing"
                       :naytaArvo="true">
-                      <template slot="koodisto">
-                        ({{ koodistoNimi }})
-                      </template>
                       <template #default="{ open }">
                         <b-input-group>
                           <b-form-input
@@ -160,7 +157,6 @@ export default class RouteArviointiasteikot extends Vue {
   private isEditing: boolean | null = false;
   private isSaving = false;
   private arviointiasteikot: ArviointiAsteikkoDto[] | null = null;
-  private koodistoNimi: string = 'arviointiasteikkoammatillinen15';
 
   mounted() {
     this.init();
@@ -215,8 +211,9 @@ export default class RouteArviointiasteikot extends Vue {
   }
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      const { data } = await Koodisto.kaikkiSivutettuna('arviointiasteikkoammatillinen15', query, {
+    koodisto: 'arviointiasteikkoammatillinen15',
+    async query(query: string, sivu = 0, koodisto: string) {
+      const { data } = await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

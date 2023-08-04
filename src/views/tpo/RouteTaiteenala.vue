@@ -11,9 +11,6 @@
         <b-col cols="11">
           <b-form-group :label="$t('taiteenala') + ' *'">
             <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
-              <template slot="koodisto">
-                ({{ koodistoNimi }})
-              </template>
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
@@ -89,8 +86,6 @@ export default class RouteTaiteenala extends Vue {
 
   store: EditointiStore | null = null;
 
-  private koodistoNimi: string = 'oppiaineetyleissivistava2';
-
   @Watch('taiteenalaId', { immediate: true })
   async taiteenalaChange() {
     await this.fetch();
@@ -108,8 +103,9 @@ export default class RouteTaiteenala extends Vue {
   }
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('oppiaineetyleissivistava2', query, {
+    koodisto: 'oppiaineetyleissivistava2',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
