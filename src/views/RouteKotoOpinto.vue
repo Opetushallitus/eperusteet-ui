@@ -116,8 +116,9 @@ export default class RouteKotoOpinto extends Vue {
   }
 
   private readonly tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      const { data } = (await Koodisto.kaikkiSivutettuna('tavoitesisaltoalueenotsikko', query, {
+    koodisto: 'tavoitesisaltoalueenotsikko',
+    async query(query: string, sivu = 0, koodisto: string) {
+      const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

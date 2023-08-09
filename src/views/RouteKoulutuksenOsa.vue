@@ -267,8 +267,9 @@ export default class RouteKoulutuksenOsa extends Vue {
   private tempNimiValue = null;
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('koulutuksenosattuva', query, {
+    koodisto: 'koulutuksenosattuva',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

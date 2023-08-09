@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -220,8 +220,9 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   }
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna(Koodistot.AMMATILLISENOPPIAINEET, query, {
+    koodisto: Koodistot.AMMATILLISENOPPIAINEET,
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
@@ -231,8 +232,9 @@ export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
   });
 
   private readonly kielikoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna(Koodistot.KIELIVALIKOIMA, query, {
+    koodisto: Koodistot.KIELIVALIKOIMA,
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

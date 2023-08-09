@@ -709,8 +709,9 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   }
 
   private koulutuskoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('koulutus', query, {
+    koodisto: 'koulutus',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

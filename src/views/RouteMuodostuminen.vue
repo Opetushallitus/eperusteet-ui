@@ -207,7 +207,7 @@
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }">
                             <fas icon="grip-vertical"/>
                           </div>
-                           <ep-koodisto-select :store="tutkintonimikeStore" v-if="isEditing" :value="index" @add="tutkintonimikeKoodiLisays" class="w-100">
+                          <ep-koodisto-select :store="tutkintonimikeStore" v-if="isEditing" :value="index" @add="tutkintonimikeKoodiLisays" class="w-100">
                             <template #default="{ open }">
                               <b-input-group class="w-100 d-flex">
                                 <ep-input class="koodi-input flex-grow-1"
@@ -358,8 +358,9 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   private leikelauta: any[] = [];
 
   private osaamisalaStore = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('osaamisala', query, {
+    koodisto: 'osaamisala',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
@@ -369,8 +370,9 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   });
 
   private tutkintonimikeStore = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('tutkintonimikkeet', query, {
+    koodisto: 'tutkintonimikkeet',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

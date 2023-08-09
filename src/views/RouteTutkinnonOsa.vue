@@ -270,8 +270,9 @@ export default class RouteTutkinnonosa extends Vue {
   private koodiTallennus = false;
 
   private readonly tutkinnonosaKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      const koodit = (await Koodisto.kaikkiSivutettuna('tutkinnonosat', query, {
+    koodisto: 'tutkinnonosat',
+    async query(query: string, sivu = 0, koodisto: string) {
+      const koodit = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

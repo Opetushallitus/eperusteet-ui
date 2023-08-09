@@ -162,7 +162,6 @@ import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { generateTemporaryKoodiUri } from '@shared/utils/koodi';
-import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 
 @Component({
   components: {
@@ -202,8 +201,9 @@ export default class RouteOpintokokonaisuus extends Vue {
   }
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('opintokokonaisuusnimet', query, {
+    koodisto: 'opintokokonaisuusnimet',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

@@ -329,8 +329,9 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   }
 
   private tutkinnonOsatKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('tutkinnonosat', query, {
+    koodisto: 'tutkinnonosat',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
@@ -340,8 +341,9 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   });
 
   private osaamisalaKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('osaamisala', query, {
+    koodisto: 'osaamisala',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
@@ -351,8 +353,9 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   });
 
   private oppiaineKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('oppiaineetjaoppimaaratlops2021', query, {
+    koodisto: 'oppiaineetjaoppimaaratlops2021',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
@@ -362,8 +365,9 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   });
 
   private opintokokonaisuusKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('opintokokonaisuusnimet', query, {
+    koodisto: 'opintokokonaisuusnimet',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
@@ -373,8 +377,9 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   });
 
   private koulutuksenosaKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('koulutuksenosattuva', query, {
+    koodisto: 'koulutuksenosattuva',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

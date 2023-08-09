@@ -58,8 +58,6 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import * as _ from 'lodash';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
 import { TermitStore } from '@/stores/TermitStore';
-import { KuvaStore } from '@/stores/KuvaStore';
-import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 
@@ -98,8 +96,9 @@ export default class RouteLaajaalainenOsaaminen extends Vue {
   }
 
   private readonly laajaalainenOsaaminenKoodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      const { data } = (await Koodisto.kaikkiSivutettuna('tutkintokoulutukseenvalmentavakoulutuslaajaalainenosaaminen', query, {
+    koodisto: 'tutkintokoulutukseenvalmentavakoulutuslaajaalainenosaaminen',
+    async query(query: string, sivu = 0, koodisto: string) {
+      const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,

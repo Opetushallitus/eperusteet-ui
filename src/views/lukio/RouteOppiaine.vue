@@ -231,8 +231,9 @@ export default class RouteOppiaine extends Vue {
   }
 
   private readonly koodisto = new KoodistoSelectStore({
-    async query(query: string, sivu = 0) {
-      return (await Koodisto.kaikkiSivutettuna('oppiaineetjaoppimaaratlops2021', query, {
+    koodisto: 'oppiaineetjaoppimaaratlops2021',
+    async query(query: string, sivu = 0, koodisto: string) {
+      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
         params: {
           sivu,
           sivukoko: 10,
