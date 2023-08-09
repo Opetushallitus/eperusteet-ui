@@ -76,7 +76,12 @@ export class DokumenttiStore {
 
   async luoPdf() {
     this.state.polling = true;
-    this.state.dokumentti = (await Dokumentit.createDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value, this.suoritustapa, this.version)).data;
-    await this.getDokumenttiTila();
+    try {
+      this.state.dokumentti = (await Dokumentit.createDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value, this.suoritustapa, this.version)).data;
+      await this.getDokumenttiTila();
+    }
+    catch (e) {
+      this.state.polling = false;
+    }
   }
 }
