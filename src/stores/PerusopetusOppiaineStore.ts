@@ -122,6 +122,14 @@ export class PerusopetusOppiaineStore implements IEditoitava {
   }
 
   public static async saveTavoitealueet(perusteId, oppiaineId, kohdealueet) {
+    kohdealueet = await Promise.all(_.map(kohdealueet, async (kohdealue) => {
+      if (!kohdealue.id) {
+        return (await PerusopetuksenPerusteenSisalto.addOppiaineenKohdealue(perusteId, oppiaineId, kohdealue)).data;
+      }
+
+      return kohdealue;
+    }));
+
     return (await PerusopetuksenPerusteenSisalto.updateKohdealueet(perusteId, oppiaineId, kohdealueet)).data;
   }
 
