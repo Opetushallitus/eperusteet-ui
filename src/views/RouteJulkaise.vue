@@ -161,13 +161,14 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpJulkaisuHistoria from '@/components/EpJulkaisu/EpJulkaisuHistoria.vue';
-import { Route } from 'vue-router';
 import EpJulkaisuButton from '@shared/components/EpJulkaisuButton/EpJulkaisuButton.vue';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 import { buildKatseluUrl } from '@shared/utils/esikatselu';
 import { koulutustyyppiTheme } from '@shared/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
+import { nodeToRoute } from '@/utils/routing';
+import { Location } from 'vue-router';
 
 @Component({
   components: {
@@ -196,7 +197,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   protected perusteStore!: PerusteStore;
 
   @Prop({ required: true })
-  protected tiedotSivu!: Route;
+  protected tiedotSivu!: Location;
 
   private julkaisu = {
     tiedote: {},
@@ -296,7 +297,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     }
   }
 
-  routeToNode(navigationNode: NavigationNodeDto | undefined): Route | null {
+  routeToNode(navigationNode: NavigationNodeDto | undefined): Location | null {
     if (!navigationNode) {
       return null;
     }
@@ -304,12 +305,8 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     switch (navigationNode.type) {
     case 'tiedot':
       return this.tiedotSivu;
-    case 'muodostuminen':
-      return {
-        name: 'muodostuminen',
-      } as any;
     default:
-      return null;
+      return nodeToRoute(navigationNode as any);
     }
   }
 
