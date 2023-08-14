@@ -290,14 +290,14 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
         infot: _.map((this.status.infot as Status[]), info => {
           return {
             ...info,
-            route: this.routeToNode(info.navigationNode),
+            route: this.nodeToRoute(info.navigationNode),
           };
         }),
       };
     }
   }
 
-  routeToNode(navigationNode: NavigationNodeDto | undefined): Location | null {
+  nodeToRoute(navigationNode: NavigationNodeDto | undefined): Location | null {
     if (!navigationNode) {
       return null;
     }
