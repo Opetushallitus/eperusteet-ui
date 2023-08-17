@@ -44,12 +44,28 @@
     <div>
       <h3>{{ $t('tarkistukset') }}</h3>
       <div class="validation">
-        <div v-if="isValidating" class="validointi">
+        <div v-if="!validoinnit" class="validointi-spinner">
           <EpSpinner />
           <div>{{ $t('validointi-kaynnissa') }}</div>
         </div>
-        <ep-virhelistaus v-if="status && !isValidating"
-                         :validation="statusRoute" />
+        <div v-else>
+          <div v-if="isValid" class="d-flex">
+            <div class="material-icons no-errors">check_circle</div>
+            <div class="ml-2">{{$t('ei-julkaisua-estavia-virheita')}}</div>
+          </div>
+          <div v-else class="d-flex">
+            <div class="material-icons errors">info</div>
+            <div class="ml-2">{{$t('loytyi-julkaisun-estavia-virheita')}}</div>
+          </div>
+
+          <div v-for="(validointi, idx) in validoinnit" :key="'validointi'+idx">
+            <ep-collapse v-if="validointi.virheet.length > 0 || validointi.huomautukset.length > 0"
+                        :borderBottom="false">
+              <h3 slot="header">{{ $t('validointi-kategoria-' + validointi.kategoria) }}</h3>
+              <EpJulkaisuValidointi :validointi="validointi" />
+            </ep-collapse>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -145,13 +161,12 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import EpVirhelistaus from '@/components/EpVirhelistaus/EpVirhelistaus.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import { PerusteDtoTilaEnum, NavigationNodeDto, Status, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut, Maintenance } from '@shared/api/eperusteet';
+import { PerusteDtoTilaEnum, NavigationNodeDto, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut, Maintenance } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
@@ -169,6 +184,7 @@ import { Kielet } from '@shared/stores/kieli';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
 import { nodeToRoute } from '@/utils/routing';
 import { Location } from 'vue-router';
+import EpJulkaisuValidointi from '@shared/components/EpJulkaisuValidointi/EpJulkaisuValidointi.vue';
 
 @Component({
   components: {
@@ -184,12 +200,12 @@ import { Location } from 'vue-router';
     EpMultiSelect,
     EpSpinner,
     EpToggle,
-    EpVirhelistaus,
     PerustetyoryhmaSelect,
     EpJulkaisuHistoria,
     EpJulkaisuButton,
     EpExternalLink,
     EpJulkaisuForm,
+    EpJulkaisuValidointi,
   },
 })
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
@@ -208,7 +224,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   };
 
   private hallintaLoading: boolean = false;
-  private isValidating: boolean = false;
   private invalid: boolean = false;
 
   mounted() {
@@ -216,7 +231,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   get julkaisuMahdollinen() {
-    return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.status?.vaihtoOk;
+    return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.isValid;
   }
 
   get valmiiksiMahdollinen() {
@@ -227,17 +242,32 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     return this.perusteStore.julkaisut.value;
   }
 
-  get status() {
-    return this.perusteStore?.projektiStatus?.value || null;
+  get validoinnit() {
+    if (this.perusteStore.validoinnit.value) {
+      return _.map(this.perusteStore.validoinnit.value, validointi => {
+        return {
+          ...validointi,
+          virheet: this.listNodeToRoute(validointi.virheet),
+          huomautukset: this.listNodeToRoute(validointi.huomautukset),
+          huomiot: this.listNodeToRoute(validointi.huomiot),
+        };
+      });
+    }
+  }
+
+  listNodeToRoute(list) {
+    return _.map(list, item => ({ ...item, route: this.nodeToRoute(item.navigationNode) }));
+  }
+
+  get isValid() {
+    return _.every(this.validoinnit, validointi => _.isEmpty(validointi.virheet));
   }
 
   protected async onProjektiChange() {
   }
 
   async validoi() {
-    this.isValidating = true;
     await this.perusteStore.updateValidointi();
-    this.isValidating = false;
   }
 
   async julkaise() {
@@ -281,20 +311,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
   get julkaisuKesken() {
     return this.perusteStore?.viimeisinJulkaisuTila.value === 'KESKEN';
-  }
-
-  get statusRoute() {
-    if (this.status) {
-      return {
-        ...this.status,
-        infot: _.map((this.status.infot as Status[]), info => {
-          return {
-            ...info,
-            route: this.nodeToRoute(info.navigationNode),
-          };
-        }),
-      };
-    }
   }
 
   nodeToRoute(navigationNode: NavigationNodeDto | undefined): Location | null {
@@ -463,6 +479,18 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   border-radius: 10px;
   margin-bottom: 10px;
   padding: 20px;
+}
+
+.validointi-spinner {
+  text-align: center;
+}
+
+.no-errors {
+  color: $green;
+}
+
+.errors {
+  color: $invalid;
 }
 
 .validointi {
