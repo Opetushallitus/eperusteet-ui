@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto } from '@shared/api/eperusteet';
+import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isKoulutustyyppiPdfTuettu } from '@shared/utils/perusteet';
@@ -23,7 +23,7 @@ export class PerusteStore implements IEditoitava {
     isInitialized: false,
     julkaisut: null as JulkaisuBaseDto[] | null,
     initializing: false,
-    projektiStatus: null as TilaUpdateStatus | null,
+    validoinnit: null as Array<Validointi> | null,
     julkaisemattomiaMuutoksia: null as boolean | null,
     viimeisinJulkaisuTila: null as string | null,
     tilaPolling: null as any | null,
@@ -36,7 +36,7 @@ export class PerusteStore implements IEditoitava {
   public readonly projektiId = computed(() => this.state.projekti?.id);
   public readonly tutkinnonOsat = computed(() => this.state.perusteId);
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
-  public readonly projektiStatus = computed(() => this.state.projektiStatus);
+  public readonly validoinnit = computed(() => this.state.validoinnit);
   public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly isVapaasivistystyo = computed(() => isVapaasivistystyoKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly julkaisut = computed(() => this.state.julkaisut);
@@ -90,19 +90,19 @@ export class PerusteStore implements IEditoitava {
 
   public async updateValidointi() {
     if (this.state.projekti?.id) {
-      this.state.projektiStatus = null;
+      this.state.validoinnit = null;
       if (this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
         try {
           const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
-          this.state.projektiStatus = res.data;
+          this.state.validoinnit = res.data;
         }
         catch (e) {
-          this.state.projektiStatus = {};
+          this.state.validoinnit = [];
           fail('validointi-epaonnistui');
         }
       }
       else {
-        this.state.projektiStatus = {};
+        this.state.validoinnit = [];
       }
     }
 
@@ -119,7 +119,7 @@ export class PerusteStore implements IEditoitava {
       this.state.isInitialized = false;
       this.state.peruste = null;
       this.state.projekti = null;
-      this.state.projektiStatus = null;
+      this.state.validoinnit = null;
       this.state.julkaisut = null;
       Murupolku.tyhjenna();
 

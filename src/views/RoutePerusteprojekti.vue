@@ -423,7 +423,6 @@ import {
   NavigationNodeDtoTypeEnum,
   PerusteDtoTilaEnum,
   PerusteDtoToteutusEnum,
-  StatusValidointiStatusTypeEnum,
 } from '@shared/api/eperusteet';
 import { Meta } from '@shared/utils/decorators';
 
@@ -606,10 +605,18 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get validoinnit() {
-    if (this.perusteStore.projektiStatus.value) {
+    if (this.perusteStore.validoinnit.value) {
       return {
-        virheet: _.map(_.filter(this.perusteStore.projektiStatus.value?.infot, info => _.get(info, 'validointiStatusType') === StatusValidointiStatusTypeEnum.VIRHE), 'viesti'),
-        huomautukset: _.map(_.filter(this.perusteStore.projektiStatus.value?.infot, info => _.get(info, 'validointiStatusType') === StatusValidointiStatusTypeEnum.HUOMAUTUS), 'viesti'),
+        virheet: _.chain(this.perusteStore.validoinnit.value)
+          .map('virheet')
+          .flatMap()
+          .map('kuvaus')
+          .value(),
+        huomautukset: _.chain(this.perusteStore.validoinnit.value)
+          .map('huomautukset')
+          .flatMap()
+          .map('kuvaus')
+          .value(),
       };
     }
   }
