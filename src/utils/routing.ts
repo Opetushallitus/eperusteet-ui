@@ -268,7 +268,13 @@ export function nodeToRoute(node: NavigationNodeDto): Location | null {
         osaamiskokonaisuusPaaAlueId: _.toString(node.id),
       },
     };
-
+  case 'perusopetusoppiaine':
+    return {
+      name: 'perusopetusoppiaine',
+      params: {
+        oppiaineId: _.toString(node.id),
+      },
+    };
   case 'kvliite':
     return {
       name: 'kvliite',
