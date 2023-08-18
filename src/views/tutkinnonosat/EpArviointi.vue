@@ -12,7 +12,7 @@
         <EpInput :isEditing="isEditing" v-model="arvioinninKohde.selite" />
       </div>
       <b-row v-for="osaamistasonkriteeri in arvioinninKohde.osaamistasonKriteerit" :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso">
-        <b-col cols="1" >{{$kaanna(arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko].osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko)}}</b-col>
+        <b-col cols="1">{{$kaanna(arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko].osaamistasot[_.toString(osaamistasonkriteeri.osaamistaso.id)].otsikko)}}</b-col>
         <b-col class="d-flex flex-column">
           <template v-if="!isEditing">
             <ul>
