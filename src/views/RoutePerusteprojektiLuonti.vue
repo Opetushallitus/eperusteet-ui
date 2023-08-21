@@ -36,10 +36,9 @@
                 <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">
                   <div class="d-flex">
                     <div>{{ $t('toista-perusteprojektia') }}</div>
-                    <fas aria-hidden="true"
-                         icon="info"
-                         class="info-icon"
-                         v-b-popover="{content: $t('vain-ammatilliset-tutkinnot'), trigger: 'hover', placement: 'top', variant: 'primary'}"/>
+                    <EpInfoPopover class="ml-2">
+                      {{$t('vain-ammatilliset-tutkinnot')}}
+                    </EpInfoPopover>
                     <EpSpinner v-if="!perusteet" small/>
                   </div>
                 </b-form-radio>
@@ -244,6 +243,7 @@ import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
+import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import { PerusteAikatauluDtoTapahtumaEnum, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
@@ -275,6 +275,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpDatepicker,
     KoulutustyyppiSelect,
     EpToggle,
+    EpInfoPopover,
   },
   validations() {
     return {
