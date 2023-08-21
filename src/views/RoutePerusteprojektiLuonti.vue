@@ -5,7 +5,7 @@
 
         <template v-slot:pohja>
 
-           <div class="row">
+          <div class="row">
             <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
@@ -36,6 +36,10 @@
                 <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">
                   <div class="d-flex">
                     <div>{{ $t('toista-perusteprojektia') }}</div>
+                    <fas aria-hidden="true"
+                         icon="info"
+                         class="info-icon"
+                         v-b-popover="{content: $t('vain-ammatilliset-tutkinnot'), trigger: 'hover', placement: 'top', variant: 'primary'}"/>
                     <EpSpinner v-if="!perusteet" small/>
                   </div>
                 </b-form-radio>
@@ -75,7 +79,7 @@
 
               </b-form-group>
             </div>
-           </div>
+          </div>
         </template>
 
         <template v-slot:tiedot>
@@ -326,7 +330,8 @@ export default class RoutePerusteprojektiLuonti extends Vue {
 
   get perusteet() {
     if (this.perusteprojektiStore.perusteet.value) {
-      return _.sortBy(this.setIsDisabled(this.perusteprojektiStore.perusteet.value), peruste => _.toLower(this.$kaanna(peruste.nimi!)));
+      let ammatilliset = _.filter(this.perusteprojektiStore.perusteet.value, peruste => isKoulutustyyppiAmmatillinen(peruste.koulutustyyppi!));
+      return _.sortBy(ammatilliset, peruste => _.toLower(this.$kaanna(peruste.nimi!)));
     }
   }
 
@@ -577,6 +582,11 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   .voimassaolo {
     font-size:0.9rem;
   }
+}
+
+.info-icon {
+  margin-left: 5px;
+  align-self: center;
 }
 
 </style>
