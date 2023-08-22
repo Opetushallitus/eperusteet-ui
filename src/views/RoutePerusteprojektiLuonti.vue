@@ -5,7 +5,7 @@
 
         <template v-slot:pohja>
 
-           <div class="row">
+          <div class="row">
             <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
@@ -36,6 +36,9 @@
                 <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">
                   <div class="d-flex">
                     <div>{{ $t('toista-perusteprojektia') }}</div>
+                    <EpInfoPopover class="ml-2">
+                      {{$t('vain-ammatilliset-tutkinnot')}}
+                    </EpInfoPopover>
                     <EpSpinner v-if="!perusteet" small/>
                   </div>
                 </b-form-radio>
@@ -75,7 +78,7 @@
 
               </b-form-group>
             </div>
-           </div>
+          </div>
         </template>
 
         <template v-slot:tiedot>
@@ -240,6 +243,7 @@ import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
+import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import { PerusteAikatauluDtoTapahtumaEnum, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
@@ -271,6 +275,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpDatepicker,
     KoulutustyyppiSelect,
     EpToggle,
+    EpInfoPopover,
   },
   validations() {
     return {
@@ -326,7 +331,8 @@ export default class RoutePerusteprojektiLuonti extends Vue {
 
   get perusteet() {
     if (this.perusteprojektiStore.perusteet.value) {
-      return _.sortBy(this.setIsDisabled(this.perusteprojektiStore.perusteet.value), peruste => _.toLower(this.$kaanna(peruste.nimi!)));
+      let ammatilliset = _.filter(this.perusteprojektiStore.perusteet.value, peruste => isKoulutustyyppiAmmatillinen(peruste.koulutustyyppi!));
+      return _.sortBy(ammatilliset, peruste => _.toLower(this.$kaanna(peruste.nimi!)));
     }
   }
 
@@ -577,6 +583,11 @@ export default class RoutePerusteprojektiLuonti extends Vue {
   .voimassaolo {
     font-size:0.9rem;
   }
+}
+
+.info-icon {
+  margin-left: 5px;
+  align-self: center;
 }
 
 </style>
