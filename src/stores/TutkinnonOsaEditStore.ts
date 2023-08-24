@@ -36,7 +36,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     private readonly tutkinnonOsaViiteId?: any,
     private readonly el?: any,
     public versionumero?: number,
-    private geneeriset?: any,
   ) {
     if (!TutkinnonOsaEditStore.config?.perusteStore) {
       throw new Error('PerusteStore missing');
@@ -44,10 +43,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     if (!TutkinnonOsaEditStore.config?.router) {
       throw new Error('VueRouter missing');
     }
-  }
-
-  get geneerinenId() {
-    return _.toNumber(_.get(_.find(this.geneeriset, 'oletusvalinta'), 'id'));
   }
 
   public async load(supportDataProvider) {
@@ -68,7 +63,10 @@ export class TutkinnonOsaEditStore implements IEditoitava {
             kohdealueet: [],
           },
           vapaatTekstit: [],
-          _geneerinenArviointiasteikko: this.geneerinenId,
+          _geneerinenArviointiasteikko: null,
+          arviointi: {
+            arvioinninKohdealueet: [],
+          },
         },
       };
     }
@@ -89,7 +87,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
       ...res.data,
       tutkinnonOsa: {
         ...res.data.tutkinnonOsa,
-        ...(res.data.tutkinnonOsa.arviointi && {
+        ...(res.data.tutkinnonOsa.arviointi ? {
           arviointi: {
             ...res.data.tutkinnonOsa.arviointi,
             arvioinninKohdealueet: _.map(res.data.tutkinnonOsa.arviointi?.arvioinninKohdealueet, aka => {
@@ -103,6 +101,10 @@ export class TutkinnonOsaEditStore implements IEditoitava {
                 }),
               };
             }),
+          },
+        } : {
+          arviointi: {
+            arvioinninKohdealueet: [],
           },
         }),
       },

@@ -112,9 +112,20 @@
 
           <ep-collapse tyyppi="osaamisen-arviointi" :border-bottom="false" :border-top="true">
             <h3 slot="header">{{ $t('osaamisen-arviointi') }}</h3>
-            <div class="mb-4">
+
+            <EpButton
+              v-if="isEditing && !valittuArviointiTyyppi"
+              variant="outline"
+              icon="plus"
+              @click="arvioinninTyyppi = 'geneerinen'">
+              {{$t('lisaa-geneerinen-arviointi')}}
+            </EpButton>
+
+            <div class="mb-4" v-if="valittuArviointiTyyppi === 'geneerinen'">
+              <div class="font-weight-600">{{$t('geneerinen-arviointi')}}</div>
               <b-form-group v-if="isEditing">
                 <b-form-radio
+                  class="ml-1"
                   v-for="geneerinen in geneeriset"
                   v-model="data.tutkinnonOsa._geneerinenArviointiasteikko"
                   name="geneerinen"
@@ -149,14 +160,23 @@
                   </tbody>
                 </table>
               </b-form-group>
+
+              <EpButton
+                v-if="isEditing"
+                class="no-padding"
+                variant="link"
+                icon="roskalaatikko"
+                @click="poistaGeneerinenaArviointi">
+                {{$t('poista-geneerinen-arviointi')}}
+              </EpButton>
             </div>
 
-            <div v-if="!valittuGeneerinen && data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.arvioinninKohdealueet">
-              <EpArviointi v-for="(arvioinninKohdeAlue, index) in data.tutkinnonOsa.arviointi.arvioinninKohdealueet"
-                :key="'arvioinninKohdeAlue' + index"
-                v-model="data.tutkinnonOsa.arviointi.arvioinninKohdealueet[index]"
+            <div v-if="valittuArviointiTyyppi !== 'geneerinen'">
+              <EpArvioinninKohdeAlueet
+                v-model="data.tutkinnonOsa.arviointi.arvioinninKohdealueet"
                 :isEditing="isEditing"
-                :arviointiasteikot="arviointiasteikot" />
+                :arviointiasteikot="arviointiasteikot"
+              />
             </div>
 
             <EpAlert :text="$t('arviointia-ei-asetettu')" v-if="!isEditing && !data.tutkinnonOsa.arviointi && !valittuGeneerinen" />
@@ -239,7 +259,7 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpTutkinnonOsaKaytossaModal from '@/components/EpTutkinnonOsaKaytossaModal.vue';
-import EpArviointi from '@/views/tutkinnonosat/EpArviointi.vue';
+import EpArvioinninKohdeAlueet from '@/views/tutkinnonosat/EpArvioinninKohdeAlueet.vue';
 
 @Component({
   components: {
@@ -256,7 +276,7 @@ import EpArviointi from '@/views/tutkinnonosat/EpArviointi.vue';
     EpSpinner,
     EpKoodistoSelect,
     EpTutkinnonOsaKaytossaModal,
-    EpArviointi,
+    EpArvioinninKohdeAlueet,
   },
 })
 export default class RouteTutkinnonosa extends Vue {
@@ -268,6 +288,7 @@ export default class RouteTutkinnonosa extends Vue {
 
   private store: EditointiStore | null = null;
   private koodiTallennus = false;
+  private arvioinninTyyppi: 'geneerinen' | 'tutkinnonosa-kohtainen' | null = null;
 
   private readonly tutkinnonosaKoodisto = new KoodistoSelectStore({
     koodisto: 'tutkinnonosat',
@@ -415,7 +436,7 @@ export default class RouteTutkinnonosa extends Vue {
 
   async fetch() {
     await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(this.perusteId!, !this.isNew ? this.tutkinnonOsaId : undefined, this, this.versionumero, this.isNew ? this.geneeriset : undefined);
+    const store = new TutkinnonOsaEditStore(this.perusteId!, !this.isNew ? this.tutkinnonOsaId : undefined, this, this.versionumero);
     this.store = new EditointiStore(store);
   }
 
@@ -519,6 +540,30 @@ export default class RouteTutkinnonosa extends Vue {
 
   async muokkaaTutkinnonOsaa() {
     await this.store?.start();
+  }
+
+  get valittuArviointiTyyppi() {
+    if (this.valittuGeneerinen) {
+      return 'geneerinen';
+    }
+
+    if (_.size(this.store?.data.value?.tutkinnonOsa?.arviointi?.arvioinninKohdealueet) > 0) {
+      return 'tutkinnonosa-kohtainen';
+    }
+
+    return this.arvioinninTyyppi;
+  }
+
+  poistaGeneerinenaArviointi() {
+    this.store?.setData({
+      ...this.store?.data.value,
+      tutkinnonOsa: {
+        ...this.store?.data.value.tutkinnonOsa,
+        _geneerinenArviointiasteikko: null,
+      },
+    });
+
+    this.arvioinninTyyppi = null;
   }
 }
 </script>
