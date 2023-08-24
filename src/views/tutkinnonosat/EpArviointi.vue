@@ -1,41 +1,60 @@
 <template>
   <b-form-group>
     <div slot="label">
-      <div v-if="isEditing" class="mb-2">{{$t('otsikko')}}</div>
+      <div v-if="isEditing" class="mb-2">{{$t('tavoitealueen-otsikko')}}</div>
       <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
     </div>
-    <div v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
-      <div class="font-weight-bold mb-2">
+    <div class="ml-3" v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
+
+      <div class="mb-2">
+        <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)">{{$t('arvioinnin-kohteen-otsikko')}}</div>
         <EpInput :isEditing="isEditing" v-model="arvioinninKohde.otsikko" />
       </div>
       <div class="mb-3">
+        <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.selite)">{{$t('arvioinnin-kohde')}}</div>
         <EpInput :isEditing="isEditing" v-model="arvioinninKohde.selite" />
       </div>
-      <b-row v-for="osaamistasonkriteeri in arvioinninKohde.osaamistasonKriteerit" :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso">
-        <b-col cols="1" >{{$kaanna(arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko].osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko)}}</b-col>
-        <b-col class="d-flex flex-column">
-          <template v-if="!isEditing">
-            <ul>
-              <li v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex">
-                {{$kaanna(osaamistasonkriteeri.kriteerit[kriteeriIndex])}}
-              </li>
-            </ul>
-          </template>
 
-          <template v-else>
-            <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
-              <div class="d-flex">
-                <EpInput class="w-100" :isEditing="isEditing" v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]" />
-                <EpButton v-if="isEditing" variant="link" icon="roskalaatikko" @click="poistaKriteeri(osaamistasonkriteeri, kriteeri)"/>
-              </div>
-            </div>
-            <EpButton v-if="isEditing" class="mb-3" variant="outline-primary" icon="plussa" @click="lisaaKriteeri(osaamistasonkriteeri)">
-              {{ $t('lisaa-kriteeri') }}
-            </EpButton>
-          </template>
-        </b-col>
-      </b-row>
+      <template v-if="!arvioinninKohde._arviointiAsteikko">
+        <div class="font-weight-600">{{$t('arviointi-asteikon-valinta')}}</div>
+        <b-form-radio-group v-model="arvioinninKohde._arviointiAsteikko" stacked @input="arviointiVaihdos(arvioinninKohde)" class="mt-2">
+          <b-form-radio
+            class="mt-2"
+            v-for="arviointiasteikko in arviointiasteikot"
+            name="arviointiasteikko"
+            :value="arviointiasteikko.id"
+            :key="'arviointiasteikko-' + arviointiasteikko.id">
+
+            <span v-for="(osaamistaso, index) in arviointiasteikko.osaamistasot" :key="'osaamistaso' + osaamistaso.id">
+              <span v-if="index > 0"> / </span>
+              {{$kaanna(osaamistaso.otsikko)}}
+            </span>
+
+          </b-form-radio>
+        </b-form-radio-group>
+      </template>
+
+      <OsaamistasonKriteeri
+        class="mb-3 ml-0 p-1 taulukko-rivi-varitys"
+        v-for="(osaamistasonkriteeri, osaamistasoIndex) in arvioinninKohde.osaamistasonKriteerit"
+        :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso"
+        v-model="arvioinninKohde.osaamistasonKriteerit[osaamistasoIndex]"
+        :isEditing="isEditing"
+        :arviointiasteikko="arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko]"
+      />
+
+      <EpButton class="mt-4 no-padding" v-if="isEditing" variant="link" icon="roskalaatikko" @click="poistaArvioinninKohde(arvioinninKohde)">
+        {{$t('poista-arvioinnin-kohde')}}
+      </EpButton>
+
+      <hr v-if="isEditing || arvindex < arvioinninKohdeAlue.arvioinninKohteet.length -1"/>
     </div>
+
+    <div class="d-flex justify-content-between">
+      <EpButton v-if="isEditing" variant="outline" icon="plus" @click="lisaaArvionninkohde">{{$t('lisaa-arvioinnin-kohdealueen-arvioinnin-kohde')}}</EpButton>
+      <slot name="poisto" />
+    </div>
+
   </b-form-group>
 </template>
 
@@ -44,14 +63,16 @@ import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import OsaamistasonKriteeri from '@/views/tutkinnonosat/OsaamistasonKriteeri.vue';
 
 @Component({
   components: {
     EpInput,
     EpButton,
+    OsaamistasonKriteeri,
   },
 })
-export default class Template extends Vue {
+export default class EpArviointi extends Vue {
   @Prop({ required: true })
   private value!: any;
 
@@ -78,15 +99,32 @@ export default class Template extends Vue {
     }), 'id');
   }
 
-  lisaaKriteeri(osaamistasonkriteeri) {
-    osaamistasonkriteeri.kriteerit = [
-      ...osaamistasonkriteeri.kriteerit,
+  lisaaArvionninkohde() {
+    this.arvioinninKohdeAlue.arvioinninKohteet = [
+      ...this.arvioinninKohdeAlue.arvioinninKohteet,
       {},
     ];
   }
 
-  poistaKriteeri(osaamistasonkriteeri, poistettavaKriteeri) {
-    osaamistasonkriteeri.kriteerit = _.filter(osaamistasonkriteeri.kriteerit, kriteeri => kriteeri !== poistettavaKriteeri);
+  poistaArvioinninKohde(poistettavaKohde) {
+    this.arvioinninKohdeAlue.arvioinninKohteet = _.filter(this.arvioinninKohdeAlue.arvioinninKohteet, arvioinninKohde => arvioinninKohde !== poistettavaKohde);
+  }
+
+  arviointiVaihdos(muokattavaArvioinninKohde) {
+    this.arvioinninKohdeAlue.arvioinninKohteet = _.map(this.arvioinninKohdeAlue.arvioinninKohteet, arvioinninKohde => {
+      if (arvioinninKohde === muokattavaArvioinninKohde) {
+        const arviointiasteikko = this.arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko];
+        return {
+          ...arvioinninKohde,
+          osaamistasonKriteerit: _.map(arviointiasteikko.osaamistasot, osaamistaso => ({
+            _osaamistaso: _.toString(osaamistaso.id),
+            kriteerit: [],
+          })),
+        };
+      }
+
+      return arvioinninKohde;
+    });
   }
 }
 </script>
