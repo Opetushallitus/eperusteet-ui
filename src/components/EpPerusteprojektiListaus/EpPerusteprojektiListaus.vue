@@ -27,19 +27,21 @@
               </ProjektiCard>
             </div>
             <EpSpinner v-if="!ownProjects" class="m-5"/>
-            <div v-else class="card-wrapper" v-for="project in ownProjects" :key="project.id">
-              <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                            :koulutustyyppi="project.peruste.koulutustyyppi"
-                            :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"
-                            :tileImage="project.tileImage">
-                <template slot="lower" class="small-text">
-                  {{ $t('tila-' + project.tila) }}
-                </template>
-                <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
-                  {{ project.nimi }}
-                </div>
-              </ProjektiCard>
-            </div>
+            <template v-else>
+              <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
+                <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
+                              :koulutustyyppi="project.peruste.koulutustyyppi"
+                              :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"
+                              :tileImage="project.tileImage">
+                  <template slot="lower" class="small-text">
+                    {{ $t('tila-' + project.tila) }}
+                  </template>
+                  <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
+                    {{ project.nimi }}
+                  </div>
+                </ProjektiCard>
+              </div>
+            </template>
           </div>
         </div>
 
