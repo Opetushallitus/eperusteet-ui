@@ -19,7 +19,7 @@
         <TileOppaat :perusteOppaatStore="perusteOppaatStore"/>
         <TileMaaraykset :maarayksetStore="maarayksetStore"/>
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
-        <TileDigitaalinenOsaaminen :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
+        <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TilePalautteet v-if="$isAdmin()"/>
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
