@@ -220,7 +220,7 @@ export default class RouteKasite extends PerusteprojektiRoute {
         padding-bottom: 10px;
       }
 
-      /deep/ p {
+      ::v-deep p {
         margin: 0;
       }
 
@@ -237,7 +237,7 @@ export default class RouteKasite extends PerusteprojektiRoute {
       white-space: nowrap;
       text-overflow: ellipsis;
 
-      /deep/ p {
+      ::v-deep p {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;

@@ -87,7 +87,7 @@ export default class RoutePoistetutSisallot extends PerusteprojektiRoute {
 
 .poistetut {
 
-  /deep/ .tabs .nav-item a {
+  ::v-deep .tabs .nav-item a {
     margin: 0;
     padding: 10px;
   }
