@@ -1,7 +1,10 @@
 <template>
   <div class="mt-5">
     <div class="d-flex align-items-sm-center justify-content-sm-between flex-sm-row flex-column mb-1">
-      <h2 class="m-0">{{ $t('arviointiasteikot') }}</h2>
+      <div class="d-flex">
+        <h2 class="m-0">{{ $t('arviointiasteikot') }}</h2>
+        <EpInfoPopover class="ml-3">{{ $t('arviointiasteikot-muokkaus-huomio-teksti') }}</EpInfoPopover>
+      </div>
       <div class="mt-sm-0 mt-3">
         <div>
           <ep-button
@@ -138,6 +141,7 @@ import { ArviointiAsteikkoDto, Koodisto } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import * as _ from 'lodash';
 import VueScrollTo from 'vue-scrollto';
+import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 
 @Component({
   components: {
@@ -148,6 +152,7 @@ import VueScrollTo from 'vue-scrollto';
     EpSpinner,
     EpInput,
     EpKoodistoSelect,
+    EpInfoPopover,
   },
 })
 export default class RouteArviointiasteikot extends Vue {
