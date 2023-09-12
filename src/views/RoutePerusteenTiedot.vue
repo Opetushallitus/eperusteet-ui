@@ -125,6 +125,9 @@
                   <template v-slot:cell(nimi)="data">
                     {{ $kaanna(data.item.nimi) }}
                   </template>
+                  <template v-slot:cell(poista)="data">
+                    <div v-if="isEditing" class="material-icons default-icon clickable" @click="poistaKoulutusKoodi(data)">delete</div>
+                  </template>
                 </b-table>
                 <ep-koodisto-select @add="addKoulutuskoodi(data, $event)"
                   :store="koulutuskoodisto"
@@ -610,6 +613,9 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     }, {
       key: 'nimi',
       label: this.$t('koulutuksen-nimi'),
+    }, {
+      key: 'poista',
+      label: '',
     }];
   }
 
@@ -869,6 +875,13 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       { text: this.$t('perustetyyppi-normaali'), value: 'normaali' },
       { text: this.$t('perustetyyppi-amosaayhteinen'), value: 'amosaayhteinen' },
     ];
+  }
+
+  poistaKoulutusKoodi({ item }) {
+    this.store!.setData({
+      ...this.store?.data.value,
+      koulutukset: _.filter(this.store?.data.value.koulutukset, koulutus => koulutus.koulutuskoodiUri !== item.koulutuskoodiUri),
+    });
   }
 }
 
