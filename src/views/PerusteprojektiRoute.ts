@@ -69,10 +69,10 @@ export class PerusteprojektiRoute extends Vue {
       this.isInitingProjekti = true;
       window.scrollTo(0, 0);
       try {
+        this.kayttajaStore.clear();
+        await this.kayttajaStore.setPerusteprojekti(projektiId);
         await this.perusteStore.init(projektiId);
         await this.perusteStore.blockUntilInitialized();
-        await this.kayttajaStore.clear();
-        await this.kayttajaStore.setPerusteprojekti(projektiId);
         await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
       }
       catch (err) {
