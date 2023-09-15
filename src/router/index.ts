@@ -613,6 +613,7 @@ router.beforeEach((to, from, next) => {
 router.beforeEach(async (to, from, next) => {
   if (!Number(to.params.projektiId)) {
     stores.kayttajaStore.clear();
+    stores.perusteStore.clear();
   }
   next();
 });

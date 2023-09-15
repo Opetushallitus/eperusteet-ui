@@ -24,6 +24,10 @@ export class TiedotteetStore implements ITiedotteetProvider {
   public readonly isLoading = computed(() => this.state.isLoading);
   public readonly options = computed(() => this.state.query);
 
+  clear() {
+    this.state.tiedotteetPage = null;
+  }
+
   async init(query: TiedoteQuery) {
     this.state.query = query;
     this.state.tiedotteetPage = null;

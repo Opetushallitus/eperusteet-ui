@@ -109,6 +109,13 @@ export class PerusteStore implements IEditoitava {
     await this.fetchJulkaisemattomiaMuutoksia();
   }
 
+  clear() {
+    this.state.peruste = null;
+    this.state.projekti = null;
+    this.state.validoinnit = null;
+    this.state.julkaisut = null;
+  }
+
   async init(projektiId: number) {
     if (this.state.initializing || (this.state.isInitialized && projektiId === this.projektiId.value)) {
       return;
@@ -275,7 +282,7 @@ export class PerusteStore implements IEditoitava {
   }
 
   public async fetchJulkaisemattomiaMuutoksia() {
-    this.state.julkaisemattomiaMuutoksia = (await Julkaisut.onkoMuutoksia(this.state.perusteId!)).data;
+    this.state.julkaisemattomiaMuutoksia = !_.isEmpty((await Julkaisut.julkaisuversioMuutokset(this.state.perusteId!)).data);
   }
 
   async acquire() {

@@ -4,6 +4,11 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
 import { PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { KayttajaStore } from '@/stores/kayttaja';
+import { TiedotteetStore } from '@/stores/TiedotteetStore';
+import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
+import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
+import { AikatauluStore } from '@/stores/AikatauluStore';
+import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 
 const browserStore = new BrowserStore();
 
@@ -13,7 +18,19 @@ export class PerusteprojektiRoute extends Vue {
   protected perusteStore!: PerusteStore;
 
   @Prop({ required: true })
-  private kayttajaStore!: KayttajaStore;
+  protected kayttajaStore!: KayttajaStore;
+
+  @Prop({ required: true })
+  protected tiedotteetStore!: TiedotteetStore;
+
+  @Prop({ required: true })
+  protected muokkaustietoStore!: MuokkaustietoStore;
+
+  @Prop({ required: true })
+  protected aikatauluStore!: AikatauluStore;
+
+  @Prop({ required: true })
+  protected tyoryhmaStore!: TyoryhmaStore;
 
   protected get showNavigation() {
     return browserStore.navigationVisible.value;
@@ -69,10 +86,14 @@ export class PerusteprojektiRoute extends Vue {
       this.isInitingProjekti = true;
       window.scrollTo(0, 0);
       try {
+        this.kayttajaStore.clear();
+        this.muokkaustietoStore.clear();
+        this.aikatauluStore.clear();
+        this.tiedotteetStore.clear();
+        this.tyoryhmaStore.clear();
+        await this.kayttajaStore.setPerusteprojekti(projektiId);
         await this.perusteStore.init(projektiId);
         await this.perusteStore.blockUntilInitialized();
-        await this.kayttajaStore.clear();
-        await this.kayttajaStore.setPerusteprojekti(projektiId);
         await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
       }
       catch (err) {
