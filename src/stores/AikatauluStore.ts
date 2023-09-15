@@ -15,6 +15,10 @@ export class AikatauluStore {
   public readonly aikataulutapahtumat = computed(() => this.state.peruste?.perusteenAikataulut);
   public readonly peruste = computed(() => this.state.peruste);
 
+  clear() {
+    this.state.aikataulutapahtumat = null;
+  }
+
   async init(peruste) {
     this.state.peruste = peruste;
   }

@@ -14,6 +14,10 @@ export class MuokkaustietoStore implements IMuokkaustietoProvider {
     hakuLukumaara: 8 as number,
   });
 
+  clear() {
+    this.state.muokkaustiedot = null;
+  }
+
   async init(perusteId: number) {
     this.state.perusteId = perusteId;
     this.state.muokkaustiedot = null;

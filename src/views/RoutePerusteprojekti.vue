@@ -384,7 +384,7 @@
           </div>
         </template>
 
-        <template v-slot:view>
+        <template v-slot:view v-if="peruste && projekti">
           <router-view />
         </template>
 
