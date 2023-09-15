@@ -64,19 +64,7 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 })
 export default class RouteYleisnakyma extends PerusteprojektiRoute {
   @Prop({ required: true })
-  private tiedotteetStore!: TiedotteetStore;
-
-  @Prop({ required: true })
   private tutkinnonOsaStore!: TutkinnonOsaStore;
-
-  @Prop({ required: true })
-  private muokkaustietoStore!: MuokkaustietoStore;
-
-  @Prop({ required: true })
-  private aikatauluStore!: AikatauluStore;
-
-  @Prop({ required: true })
-  private tyoryhmaStore!: TyoryhmaStore;
 
   @Prop({ required: false, default: 'peruste' })
   private tyyppi!: 'opas' | 'peruste';
