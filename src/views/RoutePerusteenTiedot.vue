@@ -126,7 +126,9 @@
                     {{ $kaanna(data.item.nimi) }}
                   </template>
                   <template v-slot:cell(poista)="data">
-                    <div v-if="isEditing" class="material-icons default-icon clickable" @click="poistaKoulutusKoodi(data)">delete</div>
+                    <div v-if="isEditing" class="default-icon clickable" @click="poistaKoulutusKoodi(data)">
+                      <EpMaterialIcon>delete</EpMaterialIcon>
+                    </div>
                   </template>
                 </b-table>
                 <ep-koodisto-select @add="addKoulutuskoodi(data, $event)"
@@ -444,7 +446,7 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-
+import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { UiKielet } from '@shared/stores/kieli';
 import _ from 'lodash';
@@ -489,6 +491,7 @@ const koulutustyyppiTietoFilters = [
     EpTiedostoLataus,
     EpToggle,
     PerustetyoryhmaSelect,
+    EpMaterialIcon,
   },
 })
 export default class RoutePerusteenTiedot extends PerusteprojektiRoute {

@@ -2,7 +2,7 @@
   <EpHomeTile icon="pdflataus"
               :route="{ name: 'maaraykset' }">
     <template slot="fas">
-      <span class="material-icons-outlined ikoni">picture_as_pdf</span>
+      <EpMaterialIcon class="ikoni" icon-shape="outlined">picture_as_pdf</EpMaterialIcon>
     </template>
     <template slot="header">
       <span>{{ $t('tile-maaraykset') }}</span>
@@ -29,18 +29,20 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Provide } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
 import { MaarayksetStore } from '@/stores/MaarayksetStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import * as _ from 'lodash';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
     EpHomeTile,
     EpSpinner,
     EpButton,
+    EpMaterialIcon,
   },
 })
 export default class TileMaaraykset extends Vue {

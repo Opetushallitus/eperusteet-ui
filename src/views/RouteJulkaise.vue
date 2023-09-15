@@ -6,7 +6,7 @@
         <EpSpinner v-if="hallintaLoading" />
         <b-dropdown v-else class="asetukset" size="lg" variant="link" dropleft toggle-class="text-decoration-none" no-caret>
           <template v-slot:button-content>
-            {{$t('hallinta')}} <fas icon="ratas" class="hallinta" />
+            {{$t('hallinta')}} <EpMaterialIcon icon-shape="outlined">settings</EpMaterialIcon>
           </template>
           <EpButton variant="link" :disabled="!valmiiksiMahdollinen" @click="asetaValmiiksi">
             {{$t('aseta-peruste-valmiiksi')}}
@@ -50,11 +50,11 @@
         </div>
         <div v-else>
           <div v-if="isValid" class="d-flex">
-            <div class="material-icons no-errors">check_circle</div>
+            <EpMaterialIcon :color="'#4c7f00'">check_circle</EpMaterialIcon>
             <div class="ml-2">{{$t('ei-julkaisua-estavia-virheita')}}</div>
           </div>
           <div v-else class="d-flex">
-            <div class="material-icons errors">info</div>
+            <EpMaterialIcon :color="'#dc3545'">info</EpMaterialIcon>
             <div class="ml-2">{{$t('loytyi-julkaisun-estavia-virheita')}}</div>
           </div>
 
@@ -185,6 +185,7 @@ import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
 import { nodeToRoute } from '@/utils/routing';
 import { Location } from 'vue-router';
 import EpJulkaisuValidointi from '@shared/components/EpJulkaisuValidointi/EpJulkaisuValidointi.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -206,6 +207,7 @@ import EpJulkaisuValidointi from '@shared/components/EpJulkaisuValidointi/EpJulk
     EpExternalLink,
     EpJulkaisuForm,
     EpJulkaisuValidointi,
+    EpMaterialIcon,
   },
 })
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
@@ -483,14 +485,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
 .validointi-spinner {
   text-align: center;
-}
-
-.no-errors {
-  color: $green;
-}
-
-.errors {
-  color: $invalid;
 }
 
 .validointi {
