@@ -296,7 +296,6 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJarjesta from '@shared/components/EpJarjesta/EpJarjesta.vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -322,7 +321,6 @@ import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolo
     EpButton,
     EpContent,
     EpEditointi,
-    EpIcon,
     EpInput,
     EpJarjesta,
     EpKoodistoSelect,

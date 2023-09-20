@@ -1,5 +1,5 @@
 <template>
-<EpHomeTile icon="pylvas-asteikko" :route="{ name: 'geneerinen' }">
+<EpHomeTile icon="bar_chart" :route="{ name: 'geneerinen' }">
   <template slot="header">
     <span>{{ $t('arviointi') }}</span>
   </template>

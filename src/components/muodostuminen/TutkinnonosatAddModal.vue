@@ -66,20 +66,15 @@
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
-import { Kieli } from '@shared/tyypit';
-import { Kielet } from '@shared/stores/kieli';
-import { Prop, Component, Vue, Watch, Inject, InjectReactive } from 'vue-property-decorator';
+import { Prop, Component, Vue, InjectReactive } from 'vue-property-decorator';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
-import { ryhmaTemplate } from './utils';
 
 @Component({
   components: {
     EpButton,
     EpContent,
-    EpIcon,
     EpInput,
     EpToggle,
     EpSearch,

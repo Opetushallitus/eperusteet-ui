@@ -73,31 +73,26 @@
 </template>
 
 <script lang="ts">
-import { Watch, Prop, Component, Vue, Mixins } from 'vue-property-decorator';
+import { Watch, Prop, Component, Mixins } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms/EpMultiListSelect.vue';
+import EpMultiListSelect from '@shared/components/forms/EpMultiListSelect.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSteps from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
-import { PerusteprojektiLuontiDto, PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiLuontiDtoTyyppiEnum, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { PerusteprojektiLuontiDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { Page, Kieli } from '@shared/tyypit';
-import { BvTableFieldArray } from 'bootstrap-vue';
 import * as _ from 'lodash';
 import { themes, koulutustyyppiRyhmaSort, EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import { validationMixin } from 'vuelidate';
-import { required } from 'vuelidate/lib/validators';
-import { computed } from '@vue/composition-api';
-import { requiredOneLang, translated } from '../../eperusteet-frontend-utils/vue/src/validators/required';
+import { requiredOneLang } from '../../eperusteet-frontend-utils/vue/src/validators/required';
 import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perusteet';
@@ -107,7 +102,6 @@ import { EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perus
     EpAikataulu,
     EpButton,
     EpColorIndicator,
-    EpIcon,
     EpInput,
     EpMainView,
     EpMultiSelect,

@@ -1,9 +1,6 @@
 <template>
-  <EpHomeTile icon="pdflataus"
+  <EpHomeTile icon="picture_as_pdf"
               :route="{ name: 'maaraykset' }">
-    <template slot="fas">
-      <EpMaterialIcon class="ikoni" icon-shape="outlined">picture_as_pdf</EpMaterialIcon>
-    </template>
     <template slot="header">
       <span>{{ $t('tile-maaraykset') }}</span>
     </template>

@@ -230,7 +230,6 @@
 <script lang="ts">
 import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
@@ -263,7 +262,6 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpAikataulu,
     EpButton,
     EpColorIndicator,
-    EpIcon,
     EpInput,
     EpMainView,
     EpMultiSelect,

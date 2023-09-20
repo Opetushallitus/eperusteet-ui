@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+import { Prop, Component, Vue } from 'vue-property-decorator';
 import { MaarayksetStore } from '@/stores/MaarayksetStore';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';

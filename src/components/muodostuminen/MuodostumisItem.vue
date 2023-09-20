@@ -70,14 +70,11 @@
 <script lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import _ from 'lodash';
-import { Watch, Prop, Component, Vue, Inject } from 'vue-property-decorator';
-import { RakenneModuuliDto } from '@shared/api/eperusteet';
-import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType, DefaultRyhma, ryhmaTemplate } from './utils';
-import { v4 as genUuid } from 'uuid';
+import { Prop, Component, Vue } from 'vue-property-decorator';
+import { DefaultRyhma, ryhmaTemplate } from './utils';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';

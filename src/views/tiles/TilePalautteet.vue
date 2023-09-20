@@ -1,6 +1,6 @@
 <template>
   <EpHomeTile
-    icon="feedback"
+    icon="campaign"
     :route="{ name: 'palautteet' }">
     <template slot="header">
       <span>{{ $t('tile-palautteet') }}</span>

@@ -130,7 +130,6 @@
 import { Prop, Component, Vue } from 'vue-property-decorator';
 
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
@@ -146,7 +145,6 @@ import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 @Component({
   components: {
     EpMainView,
-    EpIcon,
     EpJulkiLista,
     EpButton,
     EpSpinner,

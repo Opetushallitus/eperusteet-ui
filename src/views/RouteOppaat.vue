@@ -53,7 +53,6 @@
 import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import * as _ from 'lodash';
@@ -63,7 +62,6 @@ import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
 
 @Component({
   components: {
-    EpIcon,
     EpMainView,
     EpPerusteprojektiListaus,
     EpColorIndicator,

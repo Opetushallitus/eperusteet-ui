@@ -142,7 +142,6 @@
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
 import { Kieli } from '@shared/tyypit';
@@ -153,7 +152,6 @@ import { Prop, Component, Vue, Watch, InjectReactive } from 'vue-property-decora
   components: {
     EpButton,
     EpContent,
-    EpIcon,
     EpInput,
     EpToggle,
   },

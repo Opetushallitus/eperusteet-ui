@@ -405,10 +405,7 @@
 
 <script lang="ts">
 import { Prop, Component, ProvideReactive } from 'vue-property-decorator';
-
 import * as _ from 'lodash';
-
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
@@ -457,7 +454,6 @@ interface ValidationStats {
 
 @Component({
   components: {
-    EpIcon,
     EpMultiSelect,
     EpSearch,
     EpSidebar,

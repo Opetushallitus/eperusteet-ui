@@ -52,9 +52,8 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJarjesta from '@shared/components/EpJarjesta/EpJarjesta.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
@@ -63,15 +62,12 @@ import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
-
-import { PerusteStore } from '@/stores/PerusteStore';
 import { Koulutustyyppi } from '@shared/tyypit';
 import { AipeVaiheetStore } from '@/stores/AipeVaiheetStore';
 
 @Component({
   components: {
     EpEditointi,
-    EpIcon,
     EpJarjesta,
     EpMainView,
     EpSpinner,

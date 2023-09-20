@@ -1,7 +1,7 @@
 <template>
   <ep-main-view :tutoriaaliStore="tutoriaaliStore">
     <template slot="icon">
-      <ep-icon class="float-right" icon="luo-uusi">
+      <ep-icon class="float-right" icon="add">
       </ep-icon>
     </template>
     <template slot="header">
