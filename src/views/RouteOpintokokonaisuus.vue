@@ -15,7 +15,7 @@
                     :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -81,7 +81,7 @@
             </b-row>
           </draggable>
 
-          <ep-button variant="outline" icon="plus" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')" v-if="isEditing">
+          <ep-button v-if="isEditing" variant="outline" micon="add" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')">
             {{ $t('lisaa-tavoite') }}
           </ep-button>
         </div>
@@ -121,7 +121,7 @@
             </b-row>
           </draggable>
 
-          <ep-button variant="outline" icon="plus" @click="lisaa('arvioinnit')" v-if="isEditing">
+          <ep-button v-if="isEditing" variant="outline" micon="add" @click="lisaa('arvioinnit')">
             {{ $t('lisaa-arvioinnin-kohde') }}
           </ep-button>
         </div>

@@ -67,10 +67,15 @@
                 :koulutustyypit="koulutustyyppiOptions"
                 required class="mb-2 col-11"/>
               <div class="col-1">
-                <ep-button v-if="index > 0 " buttonClass="p-0 pt-2 roskalaatikko" variant="link" icon="roskalaatikko" @click="poistaKoulutustyyppi(index)"/>
+                <ep-button v-if="index > 0"
+                           buttonClass="p-0 pt-2 roskalaatikko"
+                           variant="link"
+                           micon="delete"
+                           @click="poistaKoulutustyyppi(index)"
+                           inherit-style/>
               </div>
             </div>
-            <ep-button buttonClass="pl-0" variant="outline-primary" icon="plussa" @click="lisaaKoulutustyyppi">
+            <ep-button buttonClass="pl-0" variant="outline-primary" micon="add" @click="lisaaKoulutustyyppi">
               {{$t('lisaa-koulutus-tutkintotyyppi')}}
             </ep-button>
           </b-form-group>

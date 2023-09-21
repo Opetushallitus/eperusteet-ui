@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ep-button variant="link" @click="avaa" icon="kyna">{{ $t('muokkaa') }}</ep-button>
+    <ep-button variant="link" @click="avaa" micon="edit" inherit-style>{{ $t('muokkaa') }}</ep-button>
 
     <b-modal
       id="EpTutkinnonOsaKaytossaModal"

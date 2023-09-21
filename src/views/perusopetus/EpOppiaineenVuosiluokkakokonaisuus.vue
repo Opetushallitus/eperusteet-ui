@@ -39,7 +39,7 @@
           </EpCollapse>
       </draggable>
 
-      <ep-button @click="lisaaTavoite" variant="outline" icon="plus" v-if="isEditing">
+      <ep-button @click="lisaaTavoite" variant="outline" micon="add" v-if="isEditing">
         {{ $t('lisaa-tavoite') }}
       </ep-button>
     </b-form-group>

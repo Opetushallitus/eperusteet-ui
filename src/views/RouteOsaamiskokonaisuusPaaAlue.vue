@@ -58,7 +58,7 @@
           </b-row>
         </draggable>
 
-        <ep-button @click="lisaaOsaalue()" variant="outline" icon="plus" class="mt-2">
+        <ep-button @click="lisaaOsaalue()" variant="outline" micon="add" class="mt-2">
           {{ $t('lisaa-osa-alue') }}
         </ep-button>
       </template>
@@ -77,7 +77,6 @@
 
 <script lang="ts">
 import { KuvaStore } from '@/stores/KuvaStore';
-import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TermitStore } from '@/stores/TermitStore';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';

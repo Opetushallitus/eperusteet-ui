@@ -1,9 +1,5 @@
 <template>
   <ep-main-view :tutoriaaliStore="tutoriaaliStore">
-    <template slot="icon">
-      <ep-icon class="float-right" icon="luo-uusi">
-      </ep-icon>
-    </template>
     <template slot="header">
       <div class="d-flex justify-content-between">
         <h1>{{ $t('maaraykset') }}</h1>
@@ -59,6 +55,7 @@ import { MaaraysDto } from '@shared/api/eperusteet';
 import EpMaaraysModal from '@/components/EpMaarays/EpMaaraysModal.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -68,6 +65,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
     EpSpinner,
     EpMaaraysModal,
     EpButton,
+    EpMaterialIcon,
   },
 })
 export default class RouteMaaraykset extends Vue {

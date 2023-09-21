@@ -32,7 +32,7 @@
               <span>{{ liiteData.liite.nimi }}</span>
             </td>
             <td>
-              <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(index)"></ep-button>
+              <ep-button variant="link" micon="delete" @click="poistaLiite(index)" inherit-style></ep-button>
             </td>
           </tr>
           </tbody>
@@ -78,6 +78,7 @@ import { Validations } from 'vuelidate-property-decorators';
 import { validationMixin } from 'vuelidate';
 import { notNull } from '@shared/validators/required';
 import { requiredIf } from 'vuelidate/lib/validators';
+import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -88,6 +89,7 @@ import { requiredIf } from 'vuelidate/lib/validators';
     EpButton,
     EpMultiSelect,
     EpInput,
+    EpMaterialIcon,
   },
 })
 export default class EpJulkaisuForm extends Mixins(validationMixin) {

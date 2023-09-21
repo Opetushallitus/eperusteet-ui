@@ -34,7 +34,7 @@
                         :value="data.koodi ? ($kaanna(data.koodi.nimi) + ' (' + data.koodi.arvo + ')') : ''"
                         disabled></b-form-input>
                       <b-input-group-append>
-                        <b-button @click="open" icon="plus" variant="primary">
+                        <b-button @click="open" variant="primary">
                           {{ $t('hae-koodistosta') }}
                         </b-button>
                       </b-input-group-append>
@@ -53,7 +53,7 @@
                         :value="data.kielikoodi ? ($kaanna(data.kielikoodi.nimi) + ' (' + data.kielikoodi.arvo + ')') : ''"
                         disabled></b-form-input>
                       <b-input-group-append>
-                        <b-button @click="open" icon="plus" variant="primary">
+                        <b-button @click="open" variant="primary">
                           {{ $t('hae-koodistosta') }}
                         </b-button>
                       </b-input-group-append>
@@ -77,11 +77,11 @@
           <h3 slot="header">{{ $t('valinnaiset-osaamistavoitteet') }}</h3>
 
           <div v-if="isEditing" class="mb-3">
-            <ep-button @click="poistaValinnaisetOsaamistavoitteet()" variant="link" icon="roskalaatikko" v-if="data.valinnaisetOsaamistavoitteet">
+            <ep-button v-if="data.valinnaisetOsaamistavoitteet" @click="poistaValinnaisetOsaamistavoitteet()" variant="link" micon="delete" inherit-style>
               {{ $t('poista-valinnaiset-osaamistavoitteet') }}
             </ep-button>
 
-            <ep-button @click="lisaaValinnaisetOsaamistavoitteet()" variant="outline" icon="plus" v-else>
+            <ep-button v-else @click="lisaaValinnaisetOsaamistavoitteet()" variant="outline" micon="add">
               {{ $t('lisaa-valinnaiset-osaamistavoitteet') }}
             </ep-button>
           </div>
@@ -129,7 +129,6 @@ import { OsaalueStore } from '@/stores/OsaalueStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import { PerusteprojektiRoute } from '../PerusteprojektiRoute';
 import { findDeep } from 'deepdash-es/standalone';
-
 import _ from 'lodash';
 import { UiKielet } from '@shared/stores/kieli';
 import { Koodistot } from '@shared/utils/koodi';

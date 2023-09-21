@@ -168,11 +168,11 @@
             <template v-slot:cell(tila)="data">
               <div class="d-flex">
                 {{ $t(data.item.tila) }}
-                <ep-button
-                  v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
-                  variant="link py-0"
-                  icon="peruuta"
-                  @click="restore(data.item)">
+                <ep-button v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
+                           variant="link py-0"
+                           micon="keyboard_return"
+                           @click="restore(data.item)"
+                           inherit-style>
                   {{ $t('palauta') }}
                 </ep-button>
               </div>

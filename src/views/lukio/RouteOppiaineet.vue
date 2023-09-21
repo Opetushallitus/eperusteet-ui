@@ -8,7 +8,7 @@
     </template>
     <template #default="{ data, isEditing }">
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="plus" @click="lisaaOppiaine" :disabled="isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+        <EpButton variant="outline" micon="add" @click="lisaaOppiaine" :disabled="isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
           {{ $t('uusi-oppiaine')}}
         </EpButton>
       </div>
@@ -42,7 +42,6 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { LukioOppiaineetStore } from '@/stores/LukioOppiaineetStore';
 import { PerusteStore } from '@/stores/PerusteStore';

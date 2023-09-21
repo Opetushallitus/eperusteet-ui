@@ -5,7 +5,7 @@
     <div v-else>
       <div class="d-flex justify-content-between">
         <ep-search class="mb-3" v-model="query" :placeholder="$t('etsi')"></ep-search>
-        <ep-button variant="outline" @click="avaaMuokkausModal()" icon="plussa" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-kasite') }}</ep-button>
+        <ep-button variant="outline" @click="avaaMuokkausModal()" micon="add" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-kasite') }}</ep-button>
       </div>
       <div class="kasitelista m-3" v-if="termit.length > 0">
         <div class="row align-items-start" :class="{open: !termi.closed}" v-for="(termi, idx) in termitFiltered" :key="idx">
@@ -71,7 +71,7 @@ import _ from 'lodash';
 
 import { Component, Prop } from 'vue-property-decorator';
 import { validationMixin } from 'vuelidate';
-import { Kielet, UiKielet } from '@shared/stores/kieli';
+import { Kielet } from '@shared/stores/kieli';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';

@@ -70,7 +70,7 @@
           </router-link>
         </div>
 
-        <ep-button @click="lisaaPaaAlue()" variant="outline" icon="plus" class="mt-2">
+        <ep-button @click="lisaaPaaAlue()" variant="outline" micon="add" class="mt-2">
           {{ $t('lisaa-paa-alue') }}
         </ep-button>
 

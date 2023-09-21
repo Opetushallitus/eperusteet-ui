@@ -12,10 +12,10 @@
           <ep-search v-model="query" />
         </div>
         <div>
-          <ep-button @click="lisaaTutkinnonOsa" variant="outline" icon="plus">
+          <ep-button @click="lisaaTutkinnonOsa" variant="outline" micon="add">
             {{ $t('lisaa-tutkinnon-osa') }}
           </ep-button>
-          <ep-button @click="tuoTutkinnonOsa" variant="outline" icon="plus">
+          <ep-button @click="tuoTutkinnonOsa" variant="outline" micon="add">
             {{ $t('tuo-tutkinnon-osa') }}
           </ep-button>
           <EpTutkinnonosaTuontiModal ref="tutkinnonosaTuontiModal" :peruste="peruste" @refresh="refresh"/>
@@ -76,7 +76,7 @@
 <script lang="ts">
 import { TutoriaaliStore } from '@shared/stores/tutoriaali';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpAlert from '@shared/components/EpAlert/EpAlert.vue';

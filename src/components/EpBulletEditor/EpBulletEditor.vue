@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="mt-2" v-if="allowStructureChange">
-      <ep-button variant="outline-primary" icon="plus" @click="add">
+      <ep-button variant="outline-primary" micon="add" @click="add">
         <slot name="add">
           {{ $t('lisaa') }}
         </slot>
@@ -28,9 +28,7 @@
 </template>
 
 <script lang="ts">
-import _ from 'lodash';
 import { Watch, Vue, Component, Prop } from 'vue-property-decorator';
-
 import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';

@@ -10,20 +10,22 @@
           <ep-button
             v-if="!isEditing"
             variant="link"
-            icon="kyna"
+            micon="edit"
             @click="toggleEdit()"
             class="mt-sm-0 mt-3"
-            v-oikeustarkastelu="{oikeus:'hallinta'}">
+            v-oikeustarkastelu="{oikeus:'hallinta'}"
+            inherit-style>
             {{ $t('muokkaa') }}
           </ep-button>
           <ep-button
             v-if="!isEditing"
             variant="link"
-            icon="plus"
+            micon="add"
             @click="lisaaArviointiasteikko()"
             class="mt-sm-0 mt-3"
-            v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
-          {{ $t('lisaa-uusi') }}
+            v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
+            inherit-style>
+            {{ $t('lisaa-uusi') }}
           </ep-button>
         </div>
         <div>
@@ -54,8 +56,9 @@
                 v-if="isEditing"
                 @click="poistaArviointiasteikko(asteikko)"
                 variant="link"
-                icon="roskalaatikko"
-                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+                micon="delete"
+                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
+                inherit-style>
                 {{ $t('poista-arviointiasteikko') }}
               </ep-button>
             </div>
@@ -91,7 +94,7 @@
                             :value="taso.koodi ? $kaanna(taso.koodi.nimi) : ''"
                             disabled></b-form-input>
                           <b-input-group-append>
-                            <b-button @click="open" icon="plus" variant="primary">
+                            <b-button @click="open" variant="primary">
                               {{ $t('hae-koodistosta') }}
                             </b-button>
                           </b-input-group-append>
@@ -111,7 +114,7 @@
               </div>
               <ep-button
                 variant="outline"
-                icon="plus"
+                micon="add"
                 @click="lisaaOsaamistaso(asteikko)"
                 v-if="isEditing"
                 v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
@@ -128,7 +131,6 @@
 
 <script lang="ts">
 import { Prop, Component, Vue } from 'vue-property-decorator';
-
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';

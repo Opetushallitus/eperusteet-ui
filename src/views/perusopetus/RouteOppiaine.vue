@@ -20,7 +20,7 @@
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -92,7 +92,7 @@
               </draggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="plussa" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button variant="outline-primary" micon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>

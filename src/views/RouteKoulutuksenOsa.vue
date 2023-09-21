@@ -50,7 +50,6 @@
                   <b-input-group-append>
                     <b-button
                       @click="open"
-                      icon="plus"
                       variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
@@ -157,7 +156,7 @@
               </draggable>
               <EpButton
                 variant="outline"
-                icon="plus"
+                micon="add"
                 @click="onAddListItem('tavoitteet')"
                 v-if="isEditing">
                 {{ $t('lisaa-tavoite') }}

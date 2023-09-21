@@ -48,13 +48,13 @@
                     <b-input-group>
                       <b-form-input v-model="nimi" :disabled="data.tutkinnonOsa.koodi !== null || koodiTallennus"></b-form-input>
                       <b-input-group-append>
-                        <b-button @click="open" icon="plus" variant="primary">
+                        <b-button @click="open" variant="primary">
                           {{ $t('hae-koodistosta') }}
                         </b-button>
                       </b-input-group-append>
                     </b-input-group>
 
-                    <ep-button icon="roskalaatikko" variant="link" v-if="data.tutkinnonOsa.koodi" @click="tyhjennaTutkinnonosaKoodi"/>
+                    <ep-button v-if="data.tutkinnonOsa.koodi" micon="delete" variant="link" @click="tyhjennaTutkinnonosaKoodi" inherit-style/>
                     <ep-button variant="link" v-if="!data.tutkinnonOsa.koodi" @click="lisaaTutkinnonosaNimiKoodistoon" :disabled="!hasNimi">
                       {{$t('vie-koodistoon')}}
                     </ep-button>
@@ -113,11 +113,10 @@
           <ep-collapse tyyppi="osaamisen-arviointi" :border-bottom="false" :border-top="true">
             <h3 slot="header">{{ $t('osaamisen-arviointi') }}</h3>
 
-            <EpButton
-              v-if="isEditing && !valittuArviointiTyyppi"
-              variant="outline"
-              icon="plus"
-              @click="arvioinninTyyppi = 'geneerinen'">
+            <EpButton v-if="isEditing && !valittuArviointiTyyppi"
+                      variant="outline"
+                      micon="add"
+                      @click="arvioinninTyyppi = 'geneerinen'">
               {{$t('lisaa-geneerinen-arviointi')}}
             </EpButton>
 
@@ -161,12 +160,12 @@
                 </table>
               </b-form-group>
 
-              <EpButton
-                v-if="isEditing"
-                class="no-padding"
-                variant="link"
-                icon="roskalaatikko"
-                @click="poistaGeneerinenaArviointi">
+              <EpButton v-if="isEditing"
+                        class="no-padding"
+                        variant="link"
+                        micon="delete"
+                        @click="poistaGeneerinenaArviointi"
+                        inherit-style>
                 {{$t('poista-geneerinen-arviointi')}}
               </EpButton>
             </div>
@@ -222,7 +221,7 @@
                 </template>
               </EpBalloonList>
             </div>
-            <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" icon="plus" v-if="!isEditing && tutkinnonOsaEditable">
+            <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" micon="add" v-if="!isEditing && tutkinnonOsaEditable">
               {{ $t('lisaa-osa-alue') }}
             </ep-button>
           </ep-collapse>

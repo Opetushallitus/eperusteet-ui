@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ep-button icon="kyna" @click="avaa" variant="link" v-if="isEditing" class="muokkaa mb-3 ml-1">
+    <ep-button v-if="isEditing" micon="edit" @click="avaa" variant="link" class="muokkaa mb-3 ml-1" inherit-style>
       {{$t('muokkaa-tavoitealueita')}}
     </ep-button>
 

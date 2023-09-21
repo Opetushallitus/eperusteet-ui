@@ -15,7 +15,7 @@
                     :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -56,7 +56,9 @@ import { Koodisto } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import * as _ from 'lodash';
+import { KuvaStore } from '@/stores/KuvaStore';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
+import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { TermitStore } from '@/stores/TermitStore';
 import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
@@ -122,6 +124,10 @@ export default class RouteLaajaalainenOsaaminen extends Vue {
 
   get kasiteHandler() {
     return createKasiteHandler(new TermitStore(this.perusteId!));
+  }
+
+  get kuvaHandler() {
+    return createKuvaHandler(new KuvaStore(this.perusteId!));
   }
 }
 </script>

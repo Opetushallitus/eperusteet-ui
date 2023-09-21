@@ -135,7 +135,7 @@
                   :store="koulutuskoodisto"
                   v-if="isEditing">
                   <template v-slot:default="{ open }">
-                    <ep-button @click="open" icon="plus" variant="outline">
+                    <ep-button @click="open" micon="add" variant="outline">
                       {{ $t('lisaa-koulutus') }}
                     </ep-button>
                   </template>
@@ -170,7 +170,7 @@
                   </template>
                   <template v-slot:cell(toiminnot)="data">
                     <div class="text-center" v-if="isEditing">
-                      <ep-button variant="link" icon="roskalaatikko" @click="poistaKorvattava(data.item)">
+                      <ep-button variant="link" micon="delete" @click="poistaKorvattava(data.item)" inherit-style>
                         {{ $t('poista') }}
                       </ep-button>
                     </div>
@@ -179,7 +179,7 @@
                 <b-input-group v-if="isEditing">
                   <b-form-input v-model="korvattavaDiaarinumero"></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="lisaaDiaarinumero" icon="plus" variant="primary" :disabled="!korvattavaDiaarinumero">
+                    <b-button @click="lisaaDiaarinumero" variant="primary" :disabled="!korvattavaDiaarinumero">
                       {{ $t('lisaa-peruste') }}
                     </b-button>
                   </b-input-group-append>
@@ -205,7 +205,7 @@
                           <b-button @click="peruutaLiite()" variant="secondary">
                             {{ $t('peruuta') }}
                           </b-button>
-                          <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
+                          <b-button @click="tallennaLiite()" variant="primary" :disabled="!liitteenNimi">
                             {{ $t('tallenna-liite') }}
                           </b-button>
                         </b-input-group-append>
@@ -222,7 +222,7 @@
                           hover>
                     <template v-slot:cell(toiminnot)="data">
                       <div class="text-center" v-if="isEditing">
-                        <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                        <ep-button variant="link" micon="delete" @click="poistaLiite(data.item)" inherit-style>
                           {{ $t('poista') }}
                         </ep-button>
                       </div>
@@ -293,7 +293,7 @@
                   </template>
                   <template v-slot:cell(toiminnot)="data">
                     <div class="text-center" v-if="isEditing">
-                      <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                      <ep-button variant="link" micon="delete" @click="poistaLiite(data.item)" inherit-style>
                         {{ $t('poista') }}
                       </ep-button>
                     </div>
@@ -350,7 +350,7 @@
 
                     <template v-slot:cell(toiminnot)="data">
                       <div class="text-center" v-if="isEditing">
-                        <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                        <ep-button variant="link" micon="delete" @click="poistaLiite(data.item)" inherit-style>
                           {{ $t('poista') }}
                         </ep-button>
                       </div>

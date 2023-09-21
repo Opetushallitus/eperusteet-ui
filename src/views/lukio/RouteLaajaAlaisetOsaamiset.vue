@@ -22,7 +22,7 @@
                             :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
                             disabled></b-form-input>
                           <b-input-group-append>
-                            <b-button @click="open" icon="plus" variant="primary">
+                            <b-button @click="open" variant="primary">
                               {{ $t('hae-koodistosta') }}
                             </b-button>
                           </b-input-group-append>
@@ -52,7 +52,7 @@
               </b-form-group>
 
               <div v-if="isEditing" class="d-flex justify-content-end">
-                <ep-button variant="link" icon="roskalaatikko" @click="poistaLaajaAlainenOsaaminen(data)">
+                <ep-button variant="link" micon="delete" @click="poistaLaajaAlainenOsaaminen(data)" inherit-style>
                   {{ $t('poista-laaja-alainen') }}
                 </ep-button>
               </div>
@@ -60,7 +60,7 @@
 
           </EpDraggableCollapse>
 
-          <ep-button @click="lisaaLaajaAlainenOsaaminen()" variant="outline" icon="plus" v-if="isEditing" class="ml-3 mt-3">
+          <ep-button @click="lisaaLaajaAlainenOsaaminen()" variant="outline" micon="add" v-if="isEditing" class="ml-3 mt-3">
             {{ $t('uusi-laaja-alainen') }}
           </ep-button>
         </b-col>

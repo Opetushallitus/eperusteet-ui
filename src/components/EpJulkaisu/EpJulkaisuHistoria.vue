@@ -22,25 +22,25 @@
                 <EpMaterialIcon :color="'#4c7f00'">check_circle</EpMaterialIcon>
                 <div class="ml-2">{{$t('nakyy-muutoshistoriassa')}}</div>
               </div>
-              <EpButton
-                v-if="julkaisu.tila === 'JULKAISTU'"
-                variant="link"
-                icon="pen"
-                @click="avaaMuokkausModal(julkaisu)"
-                v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+              <EpButton v-if="julkaisu.tila === 'JULKAISTU'"
+                        micon="edit"
+                        variant="link"
+                        @click="avaaMuokkausModal(julkaisu)"
+                        v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+                        inherit-style>
                 {{ $t('muokkaa') }}
               </EpButton>
 
               <div class="btn btn-link btn-md btn-link">
                 <slot name="katsele" :julkaisu="julkaisu" v-if="julkaisu.tila !== 'VIRHE'"></slot>
               </div>
-              <EpButton
-                v-if="latestJulkaisuRevision && latestJulkaisuRevision.revision !== julkaisu.revision && julkaisu.tila === 'JULKAISTU'"
-                variant="link"
-                icon="peruuta"
-                :showSpinner="julkaisu.palautuksessa"
-                @click="palautaConfirm(julkaisu)"
-                v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+              <EpButton v-if="latestJulkaisuRevision && latestJulkaisuRevision.revision !== julkaisu.revision && julkaisu.tila === 'JULKAISTU'"
+                        micon="keyboard_return"
+                        variant="link"
+                        :showSpinner="julkaisu.palautuksessa"
+                        @click="palautaConfirm(julkaisu)"
+                        v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+                        inherit-style>
                 {{ $t('palauta') }}
               </EpButton>
             </div>

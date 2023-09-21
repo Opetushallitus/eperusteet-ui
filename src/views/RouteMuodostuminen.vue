@@ -20,7 +20,7 @@
                   {{ laskettuLaajuus }}
                 </span>
                 / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
-              <ep-button variant="link" icon="pen" @click="editMuodostuminen" v-if="isEditing"></ep-button>
+              <ep-button variant="link" micon="edit" @click="editMuodostuminen" v-if="isEditing" inherit-style></ep-button>
             </h5>
             <div class="filters">
               <ep-search v-model="query" :placeholder="$t('etsi-rakenteesta')" />
@@ -32,7 +32,7 @@
                     <ep-button @click="toggleDescription" variant="link">
                       {{ $t('nayta-ryhmien-kuvaukset') }}
                     </ep-button>
-                    <ep-button @click="addRyhma" variant="outline" icon="plus" v-if="isEditing">
+                    <ep-button @click="addRyhma" variant="outline" micon="add" v-if="isEditing">
                       {{ $t('lisaa-ryhma-rakenteeseen') }}
                     </ep-button>
                     <EpRakenneModal
@@ -138,7 +138,7 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('osaamisalat') }}</h5>
                     <div>
-                      <ep-button @click="lisaaOsaamisala" icon="plus" variant="outline" class="mb-2">
+                      <ep-button @click="lisaaOsaamisala" micon="add" variant="outline" class="mb-2">
                         {{ $t('lisaa-osaamisala') }}
                       </ep-button>
                       <draggable :value="osaamisalatPaged" v-bind="optionsKoodit" tag="div">
@@ -163,7 +163,7 @@
                                   :disabled="false"
                                   :change="() => osaamisalaNimiChange(ryhma, index)"/>
                                 <b-input-group-append>
-                                  <b-button @click="open" icon="plus" variant="primary">
+                                  <b-button @click="open" variant="primary">
                                     {{ $t('hae') }}
                                   </b-button>
                                 </b-input-group-append>
@@ -175,8 +175,9 @@
                                        :id="'poista-osaamisala-' + index"
                                        @click="poistaOsaamisala(index)"
                                        variant="link"
-                                       icon="roskalaatikko"
-                                       :disabled="ryhma.osaamisala.rakenteessa">
+                                       micon="delete"
+                                       :disabled="ryhma.osaamisala.rakenteessa"
+                                       inherit-style>
                             </ep-button>
                             <b-popover v-if="ryhma.osaamisala.rakenteessa"
                                        :target="'poista-osaamisala-' + index"
@@ -198,7 +199,7 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('tutkintonimikkeet') }}</h5>
                     <div>
-                      <ep-button @click="lisaaTutkintonimike" icon="plus" variant="outline" class="mb-2">
+                      <ep-button @click="lisaaTutkintonimike" micon="add" variant="outline" class="mb-2">
                         {{ $t('lisaa-tutkintonimike') }}
                       </ep-button>
 
@@ -224,7 +225,7 @@
                                   :disabled="!ryhma.tutkintonimike.uri.startsWith('temporary')"
                                   :change="() => tutkintonimikeNimiChange(ryhma, index)"/>
                                 <b-input-group-append>
-                                  <b-button @click="open" icon="plus" variant="primary">
+                                  <b-button @click="open" variant="primary">
                                     {{ $t('hae') }}
                                   </b-button>
                                 </b-input-group-append>
@@ -235,8 +236,10 @@
                             <ep-button v-if="isEditing"
                                        :id="'poista-tutkintonimike-' + index"
                                        @click="poistaTutkintonimike(index)"
-                                       variant="link" icon="roskalaatikko"
-                                       :disabled="ryhma.tutkintonimike.rakenteessa">
+                                       variant="link"
+                                       micon="delete"
+                                       :disabled="ryhma.tutkintonimike.rakenteessa"
+                                       inherit-style>
                             </ep-button>
                             <b-popover v-if="ryhma.tutkintonimike.rakenteessa"
                                        :target="'poista-tutkintonimike-' + index"

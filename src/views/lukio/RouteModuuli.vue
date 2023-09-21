@@ -17,7 +17,7 @@
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -105,7 +105,7 @@
                 </div>
           </draggable>
 
-          <EpButton class="mt-2" variant="outline" icon="plus" @click="lisaaTavoite()">{{ $t('lisaa-tavoite') }}</EpButton>
+          <EpButton class="mt-2" variant="outline" micon="add" @click="lisaaTavoite()">{{ $t('lisaa-tavoite') }}</EpButton>
         </template>
 
         <template v-else>
@@ -155,7 +155,7 @@
                       {{ $t('lisaa-sisalto') }}
                     </template>
                     <template #footer>
-                      <EpButton icon="roskalaatikko" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)">{{ $t('poista-sisaltoalue') }}</EpButton>
+                      <EpButton micon="delete" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)" inherit-style>{{ $t('poista-sisaltoalue') }}</EpButton>
                     </template>
                   </EpTavoitealueTavoitteet>
                 </div>
@@ -163,7 +163,7 @@
             </div>
           </draggable>
 
-          <EpButton class="mt-2" variant="outline" icon="plus" @click="lisaaSisaltoalue()">{{ $t('lisaa-sisaltoalue') }}</EpButton>
+          <EpButton class="mt-2" variant="outline" micon="add" @click="lisaaSisaltoalue()">{{ $t('lisaa-sisaltoalue') }}</EpButton>
 
         </div>
 
