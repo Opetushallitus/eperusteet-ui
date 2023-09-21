@@ -170,7 +170,7 @@
                 {{ $t(data.item.tila) }}
                 <ep-button v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
                            variant="link py-0"
-                           micon="keyboard_return"
+                           icon="keyboard_return"
                            @click="restore(data.item)"
                            inherit-style>
                   {{ $t('palauta') }}

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ep-button v-if="isEditing" micon="edit" @click="avaa" variant="link" class="muokkaa mb-3" inherit-style>
+    <ep-button v-if="isEditing" icon="edit" @click="avaa" variant="link" class="muokkaa mb-3" inherit-style>
       {{$t('muokkaa-sisaltoalueita')}}
     </ep-button>
 
@@ -47,19 +47,19 @@
           </div>
 
           <div class="d-flex justify-content-between mt-1 ml-3">
-            <ep-button variant="outline-primary" micon="add" v-if="model.sisaltoalueet && index+1 === model.sisaltoalueet.length" @click="lisaaSisaltoalue()">
+            <ep-button variant="outline-primary" icon="add" v-if="model.sisaltoalueet && index+1 === model.sisaltoalueet.length" @click="lisaaSisaltoalue()">
               {{ $t('lisaa-sisaltoalue') }}
             </ep-button>
             <div v-else/>
 
-            <ep-button variant="link" micon="delete" @click="poistaSisaltoalue(sisaltoalue)" inherit-style>
+            <ep-button variant="link" icon="delete" @click="poistaSisaltoalue(sisaltoalue)" inherit-style>
               {{ $t('poista-sisaltoalue') }}
             </ep-button>
           </div>
         </div>
       </draggable>
 
-      <ep-button variant="outline-primary" micon="add" v-if="model.sisaltoalueet && model.sisaltoalueet.length === 0" @click="lisaaSisaltoalue()" class="mt-3">
+      <ep-button variant="outline-primary" icon="add" v-if="model.sisaltoalueet && model.sisaltoalueet.length === 0" @click="lisaaSisaltoalue()" class="mt-3">
         {{ $t('lisaa-sisaltoalue') }}
       </ep-button>
 

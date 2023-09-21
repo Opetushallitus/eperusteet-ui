@@ -58,7 +58,7 @@
           </b-row>
         </draggable>
 
-        <ep-button @click="lisaaOsaalue()" variant="outline" micon="add" class="mt-2">
+        <ep-button @click="lisaaOsaalue()" variant="outline" icon="add" class="mt-2">
           {{ $t('lisaa-osa-alue') }}
         </ep-button>
       </template>

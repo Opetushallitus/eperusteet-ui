@@ -13,7 +13,7 @@
         <div class="d-flex">
           <h2 class="pt-2 flex-grow-1">{{ $t('oppaat') }}</h2>
           <router-link :to="{ name: 'opasLuonti' }">
-            <ep-button class="m-0 p-0" variant="outline" micon="add">{{$t('lisaa-opas')}}</ep-button>
+            <ep-button class="m-0 p-0" variant="outline" icon="add">{{$t('lisaa-opas')}}</ep-button>
           </router-link>
         </div>
       </template>

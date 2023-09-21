@@ -70,12 +70,12 @@
                 <ep-button v-if="index > 0"
                            buttonClass="p-0 pt-2 roskalaatikko"
                            variant="link"
-                           micon="delete"
+                           icon="delete"
                            @click="poistaKoulutustyyppi(index)"
                            inherit-style/>
               </div>
             </div>
-            <ep-button buttonClass="pl-0" variant="outline-primary" micon="add" @click="lisaaKoulutustyyppi">
+            <ep-button buttonClass="pl-0" variant="outline-primary" icon="add" @click="lisaaKoulutustyyppi">
               {{$t('lisaa-koulutus-tutkintotyyppi')}}
             </ep-button>
           </b-form-group>

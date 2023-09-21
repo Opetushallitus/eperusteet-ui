@@ -10,7 +10,7 @@
           <ep-button
             v-if="!isEditing"
             variant="link"
-            micon="edit"
+            icon="edit"
             @click="toggleEdit()"
             class="mt-sm-0 mt-3"
             v-oikeustarkastelu="{oikeus:'hallinta'}"
@@ -20,7 +20,7 @@
           <ep-button
             v-if="!isEditing"
             variant="link"
-            micon="add"
+            icon="add"
             @click="lisaaArviointiasteikko()"
             class="mt-sm-0 mt-3"
             v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
@@ -56,7 +56,7 @@
                 v-if="isEditing"
                 @click="poistaArviointiasteikko(asteikko)"
                 variant="link"
-                micon="delete"
+                icon="delete"
                 v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
                 inherit-style>
                 {{ $t('poista-arviointiasteikko') }}
@@ -114,7 +114,7 @@
               </div>
               <ep-button
                 variant="outline"
-                micon="add"
+                icon="add"
                 @click="lisaaOsaamistaso(asteikko)"
                 v-if="isEditing"
                 v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">

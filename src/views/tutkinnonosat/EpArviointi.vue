@@ -43,7 +43,7 @@
         :arviointiasteikko="arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko]"
       />
 
-      <EpButton class="mt-4 no-padding" v-if="isEditing" variant="link" micon="delete" @click="poistaArvioinninKohde(arvioinninKohde)" inherit-style>
+      <EpButton class="mt-4 no-padding" v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohde(arvioinninKohde)" inherit-style>
         {{$t('poista-arvioinnin-kohde')}}
       </EpButton>
 
@@ -51,7 +51,7 @@
     </div>
 
     <div class="d-flex justify-content-between">
-      <EpButton v-if="isEditing" variant="outline" micon="add" @click="lisaaArvionninkohde">{{$t('lisaa-arvioinnin-kohdealueen-arvioinnin-kohde')}}</EpButton>
+      <EpButton v-if="isEditing" variant="outline" icon="add" @click="lisaaArvionninkohde">{{$t('lisaa-arvioinnin-kohdealueen-arvioinnin-kohde')}}</EpButton>
       <slot name="poisto" />
     </div>
 

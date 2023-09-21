@@ -9,7 +9,7 @@
     <EpSpinner v-if="!laajaAlaisetOsaamiset"/>
     <div v-else>
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" micon="add" @click="lisaaLaajaAlainenOsaaminen" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+        <EpButton variant="outline" icon="add" @click="lisaaLaajaAlainenOsaaminen" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
           {{ $t('uusi-laaja-alainen-osaaminen')}}
         </EpButton>
       </div>

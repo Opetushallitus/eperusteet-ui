@@ -11,7 +11,7 @@
 
     <template #modal-footer>
       <div class="d-flex justify-content-end w-100">
-        <ep-button @click="remove" micon="delete" variant="link" class="flex-grow-1" v-if="muokkaus" inherit-style>
+        <ep-button @click="remove" icon="delete" variant="link" class="flex-grow-1" v-if="muokkaus" inherit-style>
           {{$t('poista')}}
         </ep-button>
         <ep-button @click="cancel" variant="link">

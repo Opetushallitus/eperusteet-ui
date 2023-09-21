@@ -17,7 +17,7 @@
                 <EpButton
                   slot="palauta"
                   variant="link"
-                  micon="keyboard_return"
+                  icon="keyboard_return"
                   @click="onRestore(data.item)"
                   v-if="palautusoikeus(data.item)"
                   inherit-style>

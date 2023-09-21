@@ -5,7 +5,7 @@
     <div v-else>
       <div class="d-flex justify-content-between">
         <ep-search class="mb-3" v-model="query" :placeholder="$t('etsi')"></ep-search>
-        <ep-button variant="outline" @click="avaaMuokkausModal()" micon="add" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-kasite') }}</ep-button>
+        <ep-button variant="outline" @click="avaaMuokkausModal()" icon="add" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-kasite') }}</ep-button>
       </div>
       <div class="kasitelista m-3" v-if="termit.length > 0">
         <div class="row align-items-start" :class="{open: !termi.closed}" v-for="(termi, idx) in termitFiltered" :key="idx">

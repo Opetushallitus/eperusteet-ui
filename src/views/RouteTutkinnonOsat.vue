@@ -12,10 +12,10 @@
           <ep-search v-model="query" />
         </div>
         <div>
-          <ep-button @click="lisaaTutkinnonOsa" variant="outline" micon="add">
+          <ep-button @click="lisaaTutkinnonOsa" variant="outline" icon="add">
             {{ $t('lisaa-tutkinnon-osa') }}
           </ep-button>
-          <ep-button @click="tuoTutkinnonOsa" variant="outline" micon="add">
+          <ep-button @click="tuoTutkinnonOsa" variant="outline" icon="add">
             {{ $t('tuo-tutkinnon-osa') }}
           </ep-button>
           <EpTutkinnonosaTuontiModal ref="tutkinnonosaTuontiModal" :peruste="peruste" @refresh="refresh"/>

@@ -105,7 +105,7 @@
                 </div>
           </draggable>
 
-          <EpButton class="mt-2" variant="outline" micon="add" @click="lisaaTavoite()">{{ $t('lisaa-tavoite') }}</EpButton>
+          <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaTavoite()">{{ $t('lisaa-tavoite') }}</EpButton>
         </template>
 
         <template v-else>
@@ -155,7 +155,7 @@
                       {{ $t('lisaa-sisalto') }}
                     </template>
                     <template #footer>
-                      <EpButton micon="delete" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)" inherit-style>{{ $t('poista-sisaltoalue') }}</EpButton>
+                      <EpButton icon="delete" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)" inherit-style>{{ $t('poista-sisaltoalue') }}</EpButton>
                     </template>
                   </EpTavoitealueTavoitteet>
                 </div>
@@ -163,7 +163,7 @@
             </div>
           </draggable>
 
-          <EpButton class="mt-2" variant="outline" micon="add" @click="lisaaSisaltoalue()">{{ $t('lisaa-sisaltoalue') }}</EpButton>
+          <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaSisaltoalue()">{{ $t('lisaa-sisaltoalue') }}</EpButton>
 
         </div>
 

@@ -22,7 +22,7 @@
         </b-form-radio-group>
       </b-form-group>
     </b-modal>
-    <ep-button @click="onOpen" variant="outline" micon="add">
+    <ep-button @click="onOpen" variant="outline" icon="add">
       <slot name="valinta">{{ $t('valitse-arviointiasteikko') }}</slot>
     </ep-button>
   </div>

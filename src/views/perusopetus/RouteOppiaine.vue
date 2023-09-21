@@ -92,7 +92,7 @@
               </draggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" micon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button variant="outline-primary" icon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>

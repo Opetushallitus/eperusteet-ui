@@ -52,7 +52,7 @@
               </b-form-group>
 
               <div v-if="isEditing" class="d-flex justify-content-end">
-                <ep-button variant="link" micon="delete" @click="poistaLaajaAlainenOsaaminen(data)" inherit-style>
+                <ep-button variant="link" icon="delete" @click="poistaLaajaAlainenOsaaminen(data)" inherit-style>
                   {{ $t('poista-laaja-alainen') }}
                 </ep-button>
               </div>
@@ -60,7 +60,7 @@
 
           </EpDraggableCollapse>
 
-          <ep-button @click="lisaaLaajaAlainenOsaaminen()" variant="outline" micon="add" v-if="isEditing" class="ml-3 mt-3">
+          <ep-button @click="lisaaLaajaAlainenOsaaminen()" variant="outline" icon="add" v-if="isEditing" class="ml-3 mt-3">
             {{ $t('uusi-laaja-alainen') }}
           </ep-button>
         </b-col>

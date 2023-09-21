@@ -119,7 +119,7 @@
       </b-col>
     </b-row>
 
-    <ep-button class="mt-3" @click="lisaaArvosanaRivi" variant="outline" micon="add" v-if="isEditing">
+    <ep-button class="mt-3" @click="lisaaArvosanaRivi" variant="outline" icon="add" v-if="isEditing">
       {{ $t('lisaa-rivi') }}
     </ep-button>
 
@@ -131,7 +131,7 @@
     <div v-else class="disabled-text">{{ $t('ei-sisaltoa') }}</div>
 
     <div class="text-right" v-if="isEditing">
-      <ep-button variant="link" micon="delete" @click="poistaTavoite" inherit-style>
+      <ep-button variant="link" icon="delete" @click="poistaTavoite" inherit-style>
         {{ $t('poista-tavoite') }}
       </ep-button>
     </div>

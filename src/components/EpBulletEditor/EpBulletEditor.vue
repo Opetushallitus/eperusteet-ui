@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="mt-2" v-if="allowStructureChange">
-      <ep-button variant="outline-primary" micon="add" @click="add">
+      <ep-button variant="outline-primary" icon="add" @click="add">
         <slot name="add">
           {{ $t('lisaa') }}
         </slot>

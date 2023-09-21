@@ -20,7 +20,7 @@
                   {{ laskettuLaajuus }}
                 </span>
                 / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
-              <ep-button variant="link" micon="edit" @click="editMuodostuminen" v-if="isEditing" inherit-style></ep-button>
+              <ep-button variant="link" icon="edit" @click="editMuodostuminen" v-if="isEditing" inherit-style></ep-button>
             </h5>
             <div class="filters">
               <ep-search v-model="query" :placeholder="$t('etsi-rakenteesta')" />
@@ -32,7 +32,7 @@
                     <ep-button @click="toggleDescription" variant="link">
                       {{ $t('nayta-ryhmien-kuvaukset') }}
                     </ep-button>
-                    <ep-button @click="addRyhma" variant="outline" micon="add" v-if="isEditing">
+                    <ep-button @click="addRyhma" variant="outline" icon="add" v-if="isEditing">
                       {{ $t('lisaa-ryhma-rakenteeseen') }}
                     </ep-button>
                     <EpRakenneModal
@@ -138,7 +138,7 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('osaamisalat') }}</h5>
                     <div>
-                      <ep-button @click="lisaaOsaamisala" micon="add" variant="outline" class="mb-2">
+                      <ep-button @click="lisaaOsaamisala" icon="add" variant="outline" class="mb-2">
                         {{ $t('lisaa-osaamisala') }}
                       </ep-button>
                       <draggable :value="osaamisalatPaged" v-bind="optionsKoodit" tag="div">
@@ -175,7 +175,7 @@
                                        :id="'poista-osaamisala-' + index"
                                        @click="poistaOsaamisala(index)"
                                        variant="link"
-                                       micon="delete"
+                                       icon="delete"
                                        :disabled="ryhma.osaamisala.rakenteessa"
                                        inherit-style>
                             </ep-button>
@@ -199,7 +199,7 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('tutkintonimikkeet') }}</h5>
                     <div>
-                      <ep-button @click="lisaaTutkintonimike" micon="add" variant="outline" class="mb-2">
+                      <ep-button @click="lisaaTutkintonimike" icon="add" variant="outline" class="mb-2">
                         {{ $t('lisaa-tutkintonimike') }}
                       </ep-button>
 
@@ -237,7 +237,7 @@
                                        :id="'poista-tutkintonimike-' + index"
                                        @click="poistaTutkintonimike(index)"
                                        variant="link"
-                                       micon="delete"
+                                       icon="delete"
                                        :disabled="ryhma.tutkintonimike.rakenteessa"
                                        inherit-style>
                             </ep-button>

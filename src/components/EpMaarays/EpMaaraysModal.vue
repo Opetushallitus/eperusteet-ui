@@ -1,7 +1,7 @@
 <template>
   <div>
     <EpButton
-      micon="add"
+      icon="add"
       variant="outline"
       v-b-modal.maarasModal
       @click="lisaaMaarays"
@@ -41,10 +41,10 @@
 
           <div v-else class="d-flex justify-content-between">
             <div>
-              <EpButton variant="link" micon="edit" @click="editing = true" v-oikeustarkastelu="{oikeus:'hallinta'}" inherit-style>
+              <EpButton variant="link" icon="edit" @click="editing = true" v-oikeustarkastelu="{oikeus:'hallinta'}" inherit-style>
                 {{ $t('muokkaa') }}
               </EpButton>
-              <EpButton variant="link" micon="delete" @click="poista" v-oikeustarkastelu="{oikeus:'hallinta'}" inherit-style>
+              <EpButton variant="link" icon="delete" @click="poista" v-oikeustarkastelu="{oikeus:'hallinta'}" inherit-style>
                 {{ $t('poista') }}
               </EpButton>
             </div>

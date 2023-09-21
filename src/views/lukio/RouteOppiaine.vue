@@ -92,7 +92,7 @@
                             </EpInput>
                         </template>
                         <template #footer>
-                          <EpButton micon="delete" class="mr-5" variant="link" @click="poistaTavoitealue(tavoitealue)" inherit-style>{{ $t('poista-tavoitealue') }}</EpButton>
+                          <EpButton icon="delete" class="mr-5" variant="link" @click="poistaTavoitealue(tavoitealue)" inherit-style>{{ $t('poista-tavoitealue') }}</EpButton>
                         </template>
                       </EpTavoitealueTavoitteet>
                     </div>
@@ -100,7 +100,7 @@
                 </div>
               </draggable>
 
-              <EpButton class="mt-4" variant="outline" micon="add" @click="lisaaTavoitealue()">{{ $t('lisaa-tavoitealue') }}</EpButton>
+              <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaTavoitealue()">{{ $t('lisaa-tavoitealue') }}</EpButton>
 
             </div>
 
@@ -134,7 +134,7 @@
               </router-link>
             </div>
 
-            <EpButton class="mt-4" variant="outline" micon="add" @click="lisaaModuuli(true)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-pakollinen-moduuli') }}</EpButton>
+            <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaModuuli(true)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-pakollinen-moduuli') }}</EpButton>
 
             <h5 class="mt-5">{{$t('valinnaisten-moduulien-kuvaus')}}</h5>
             <ep-content layout="normal" v-model="data.valinnaisetModuulitKuvaus" :is-editable="isEditing" v-if="isEditing || data.pakollisetModuulitKuvaus"/>
@@ -145,7 +145,7 @@
                 <EpModuuli :moduuli="moduuli"/>
               </router-link>
             </div>
-            <EpButton class="mt-4" variant="outline" micon="add" @click="lisaaModuuli(false)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-valinnainen-moduuli') }}</EpButton>
+            <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaModuuli(false)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-valinnainen-moduuli') }}</EpButton>
           </EpCollapse>
 
           <EpCollapse :collapsable="!isEditing" :usePadding="false" :borderBottom="false" class="mt-4" v-if="!data._oppiaine || !data.id">
@@ -165,7 +165,7 @@
                 </div>
             </draggable>
 
-            <EpButton class="mt-2" variant="outline" micon="add" @click="lisaaOppimaara()" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-oppimaara') }}</EpButton>
+            <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaOppimaara()" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-oppimaara') }}</EpButton>
           </EpCollapse>
 
         </b-col>

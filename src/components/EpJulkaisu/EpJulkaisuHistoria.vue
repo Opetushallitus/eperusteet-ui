@@ -23,7 +23,7 @@
                 <div class="ml-2">{{$t('nakyy-muutoshistoriassa')}}</div>
               </div>
               <EpButton v-if="julkaisu.tila === 'JULKAISTU'"
-                        micon="edit"
+                        icon="edit"
                         variant="link"
                         @click="avaaMuokkausModal(julkaisu)"
                         v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
@@ -35,7 +35,7 @@
                 <slot name="katsele" :julkaisu="julkaisu" v-if="julkaisu.tila !== 'VIRHE'"></slot>
               </div>
               <EpButton v-if="latestJulkaisuRevision && latestJulkaisuRevision.revision !== julkaisu.revision && julkaisu.tila === 'JULKAISTU'"
-                        micon="keyboard_return"
+                        icon="keyboard_return"
                         variant="link"
                         :showSpinner="julkaisu.palautuksessa"
                         @click="palautaConfirm(julkaisu)"

@@ -156,7 +156,7 @@
               </draggable>
               <EpButton
                 variant="outline"
-                micon="add"
+                icon="add"
                 @click="onAddListItem('tavoitteet')"
                 v-if="isEditing">
                 {{ $t('lisaa-tavoite') }}

@@ -9,7 +9,7 @@
     <EpSpinner v-if="!vuosiluokkakokonaisuudet"/>
     <div v-else>
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" micon="add" @click="lisaaVuosiluokkakokonaisuus" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+        <EpButton variant="outline" icon="add" @click="lisaaVuosiluokkakokonaisuus" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
           {{ $t('uusi-vuosiluokkakokonaisuus')}}
         </EpButton>
       </div>

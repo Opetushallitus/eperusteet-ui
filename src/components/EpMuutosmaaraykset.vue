@@ -29,7 +29,7 @@
           </td>
           <td v-if="isEditing">
             <div class="text-center">
-              <ep-button variant="link" micon="delete" @click="poista(idx)" inherit-style></ep-button>
+              <ep-button variant="link" icon="delete" @click="poista(idx)" inherit-style></ep-button>
             </div>
           </td>
         </tr>

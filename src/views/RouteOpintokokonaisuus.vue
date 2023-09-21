@@ -81,7 +81,7 @@
             </b-row>
           </draggable>
 
-          <ep-button v-if="isEditing" variant="outline" micon="add" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')">
+          <ep-button v-if="isEditing" variant="outline" icon="add" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')">
             {{ $t('lisaa-tavoite') }}
           </ep-button>
         </div>
@@ -121,7 +121,7 @@
             </b-row>
           </draggable>
 
-          <ep-button v-if="isEditing" variant="outline" micon="add" @click="lisaa('arvioinnit')">
+          <ep-button v-if="isEditing" variant="outline" icon="add" @click="lisaa('arvioinnit')">
             {{ $t('lisaa-arvioinnin-kohde') }}
           </ep-button>
         </div>

@@ -135,7 +135,7 @@
                   :store="koulutuskoodisto"
                   v-if="isEditing">
                   <template v-slot:default="{ open }">
-                    <ep-button @click="open" micon="add" variant="outline">
+                    <ep-button @click="open" icon="add" variant="outline">
                       {{ $t('lisaa-koulutus') }}
                     </ep-button>
                   </template>
@@ -170,7 +170,7 @@
                   </template>
                   <template v-slot:cell(toiminnot)="data">
                     <div class="text-center" v-if="isEditing">
-                      <ep-button variant="link" micon="delete" @click="poistaKorvattava(data.item)" inherit-style>
+                      <ep-button variant="link" icon="delete" @click="poistaKorvattava(data.item)" inherit-style>
                         {{ $t('poista') }}
                       </ep-button>
                     </div>
@@ -222,7 +222,7 @@
                           hover>
                     <template v-slot:cell(toiminnot)="data">
                       <div class="text-center" v-if="isEditing">
-                        <ep-button variant="link" micon="delete" @click="poistaLiite(data.item)" inherit-style>
+                        <ep-button variant="link" icon="delete" @click="poistaLiite(data.item)" inherit-style>
                           {{ $t('poista') }}
                         </ep-button>
                       </div>
@@ -293,7 +293,7 @@
                   </template>
                   <template v-slot:cell(toiminnot)="data">
                     <div class="text-center" v-if="isEditing">
-                      <ep-button variant="link" micon="delete" @click="poistaLiite(data.item)" inherit-style>
+                      <ep-button variant="link" icon="delete" @click="poistaLiite(data.item)" inherit-style>
                         {{ $t('poista') }}
                       </ep-button>
                     </div>
@@ -350,7 +350,7 @@
 
                     <template v-slot:cell(toiminnot)="data">
                       <div class="text-center" v-if="isEditing">
-                        <ep-button variant="link" micon="delete" @click="poistaLiite(data.item)" inherit-style>
+                        <ep-button variant="link" icon="delete" @click="poistaLiite(data.item)" inherit-style>
                           {{ $t('poista') }}
                         </ep-button>
                       </div>

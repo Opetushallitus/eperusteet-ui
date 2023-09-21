@@ -77,11 +77,11 @@
           <h3 slot="header">{{ $t('valinnaiset-osaamistavoitteet') }}</h3>
 
           <div v-if="isEditing" class="mb-3">
-            <ep-button v-if="data.valinnaisetOsaamistavoitteet" @click="poistaValinnaisetOsaamistavoitteet()" variant="link" micon="delete" inherit-style>
+            <ep-button v-if="data.valinnaisetOsaamistavoitteet" @click="poistaValinnaisetOsaamistavoitteet()" variant="link" icon="delete" inherit-style>
               {{ $t('poista-valinnaiset-osaamistavoitteet') }}
             </ep-button>
 
-            <ep-button v-else @click="lisaaValinnaisetOsaamistavoitteet()" variant="outline" micon="add">
+            <ep-button v-else @click="lisaaValinnaisetOsaamistavoitteet()" variant="outline" icon="add">
               {{ $t('lisaa-valinnaiset-osaamistavoitteet') }}
             </ep-button>
           </div>

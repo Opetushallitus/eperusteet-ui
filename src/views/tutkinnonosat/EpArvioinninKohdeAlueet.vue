@@ -7,14 +7,14 @@
         :arviointiasteikot="arviointiasteikot">
 
         <div slot="poisto">
-          <EpButton v-if="isEditing" variant="link" micon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)" inherit-style>{{$t('poista-arvioinnin-kohdealue')}}</EpButton>
+          <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)" inherit-style>{{$t('poista-arvioinnin-kohdealue')}}</EpButton>
         </div>
         </EpArviointi>
     </div>
     <EpButton v-if="isEditing"
               class="mt-3"
               variant="outline"
-              micon="add"
+              icon="add"
               @click="lisaaArvioinninKohdeAlue">
         {{$t(lisaaBtnTeksti)}}
       </EpButton>
