@@ -256,7 +256,7 @@
               <template v-slot:moduuli="{ item }">
                 <div class="menu-item">
                   <ep-color-indicator :kind="item.meta.pakollinen ? 'pakollinen' : 'valinnainen'" class="mr-1"/>
-                  <router-link :to="{ name: 'moduuli', params: { moduuliId: item.id } }">
+                  <router-link :to="{ name: 'moduuli', params: { oppiaineId: item.meta.oppiaineId, moduuliId: item.id } }">
                     {{ $kaanna(item.label) || $t('nimeton-moduuli') }} <span v-if="item.koodi">({{item.koodi}})</span>
                   </router-link>
                 </div>
@@ -283,20 +283,20 @@
                 </div>
               </template>
 
-              <template v-slot:aipekurssi="{ item }">
+              <template v-slot:aipeoppiaine="{ item }">
                 <div class="menu-item">
-                  <router-link :to="{ name: 'aipekurssi', params: { kurssiId: item.id } }">
+                  <router-link :to="{ name: 'aipeoppiaine', params: { vaiheId: item.meta.vaiheId, oppiaineId: item.id } }">
                     <span class="text-muted mr-1">{{ item.chapter }}</span>
-                    {{ $kaanna(item.label) || $t('nimeton-kurssi') }}
+                    {{ $kaanna(item.label) || $t('nimeton-oppiaine') }}
                   </router-link>
                 </div>
               </template>
 
-              <template v-slot:aipeoppiaine="{ item }">
+              <template v-slot:aipekurssi="{ item }">
                 <div class="menu-item">
-                  <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: item.id } }">
+                  <router-link :to="{ name: 'aipekurssi', params: { vaiheId: item.meta.vaiheId, oppiaineId: item.meta.oppiaineId, kurssiId: item.id } }">
                     <span class="text-muted mr-1">{{ item.chapter }}</span>
-                    {{ $kaanna(item.label) || $t('nimeton-oppiaine') }}
+                    {{ $kaanna(item.label) || $t('nimeton-kurssi') }}
                   </router-link>
                 </div>
               </template>
