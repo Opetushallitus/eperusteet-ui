@@ -1,7 +1,6 @@
-import { createLocalVue, mount, RouterLinkStub } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import RoutePohjatLuonti from '../RoutePohjatLuonti.vue';
 import BootstrapVue from 'bootstrap-vue';
-import _ from 'lodash';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { mock } from '@/utils/tests';
 import { mockPohjaPerusteet, mockTyoryhmat } from './data';
@@ -9,7 +8,6 @@ import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { PerusteprojektiDto } from '@shared/api/eperusteet';
 import { delay } from '@shared/utils/delay';
-import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 
 describe('RoutePohjatLuonti component', () => {
   const localVue = createLocalVue();

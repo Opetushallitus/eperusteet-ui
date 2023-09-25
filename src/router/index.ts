@@ -467,20 +467,20 @@ const router = new VueRouter({
           text: 'oppaan-tiedot',
         }, {
           route: 'oppaanPdfLuonti',
-          icon: ['far', 'file-pdf'],
+          icon: 'picture_as_pdf',
           text: 'luo-pdf',
         }, {
           route: 'opasKasitteet',
-          icon: 'kasitteet',
+          icon: 'book',
           text: 'kasitteet',
         }, {
           route: 'poistetutsisallot',
-          icon: 'roskalaatikko',
+          icon: 'delete',
           text: 'poistetut',
         }, {
           separator: true,
         }, {
-          icon: ['far', 'folder'],
+          icon: 'archive',
           text: 'arkistoi-opas',
           click: vaihdaPerusteTilaConfirm,
           meta: {

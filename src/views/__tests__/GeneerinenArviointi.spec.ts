@@ -1,16 +1,10 @@
 import { mock } from '@/utils/tests';
-import { ref, computed, reactive } from '@vue/composition-api';
-import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
+import { mount, createLocalVue, RouterLinkStub } from '@vue/test-utils';
 import { getMockGeneeriset } from './data';
-
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
+import { GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
 import GeneerinenArviointi from '../GeneerinenArviointi.vue';
-import RouteGeneerinenArviointi from '../RouteGeneerinenArviointi.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import * as _ from 'lodash';
-import { Page } from '@shared/tyypit';
 import '@shared/config/bootstrap';
-import '@shared/config/fontawesome';
 import { KayttajaStore } from '@/stores/kayttaja';
 
 describe('GeneerinenArviointi', () => {

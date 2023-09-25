@@ -1,12 +1,11 @@
 import Vue from 'vue';
-import VueCompositionApi, { ref, computed, reactive } from '@vue/composition-api';
+import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
 import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
 import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import EpPerusteprojektiListaus from './EpPerusteprojektiListaus.vue';
 import { IProjektiProvider } from './types';
 import { Page } from '@shared/tyypit';
 import '@shared/config/bootstrap';
-import '@shared/config/fontawesome';
 import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 Vue.use(VueCompositionApi);
 

@@ -14,18 +14,18 @@ const kohdereititysId = {
 };
 
 const kohdeIcon = {
-  viite: 'kyna',
-  opetussuunnitelma: 'opetussuunnitelma',
-  opetussuunnitelma_rakenne: 'jarjesta',
-  termi: 'kasitteet',
-  kommentti: 'kommentti',
+  viite: 'edit',
+  opetussuunnitelma: 'article',
+  opetussuunnitelma_rakenne: 'low_priority',
+  termi: 'book',
+  kommentti: 'comment',
 };
 
 const tapahtumaIcon = {
-  paivitys: 'kyna',
-  luonti: 'plussa',
-  poisto: 'roskalaatikko',
-  palautus: 'peruuta',
+  paivitys: 'edit',
+  luonti: 'add',
+  poisto: 'delete',
+  palautus: 'keyboard_return',
 };
 
 const poistetutTabIndices = {
@@ -61,5 +61,5 @@ export function muokkaustietoIcon(kohde, tapahtuma) {
     return kohdeIcon[kohde];
   }
 
-  return tapahtumaIcon[tapahtuma] ? tapahtumaIcon[tapahtuma] : 'kysymysmerkki';
+  return tapahtumaIcon[tapahtuma] ? tapahtumaIcon[tapahtuma] : 'question_mark';
 }

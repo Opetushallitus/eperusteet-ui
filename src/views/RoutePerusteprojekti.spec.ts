@@ -1,13 +1,8 @@
 import { mock } from '@/utils/tests';
-import { ref, computed, reactive } from '@vue/composition-api';
-import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
-
+import { mount, createLocalVue, RouterLinkStub } from '@vue/test-utils';
 import { PerusteStore } from '@/stores/PerusteStore';
 import RoutePerusteprojekti from './RoutePerusteprojekti.vue';
-import * as _ from 'lodash';
-import { Page } from '@shared/tyypit';
 import '@shared/config/bootstrap';
-import '@shared/config/fontawesome';
 
 window.scrollTo = jest.fn();
 
