@@ -13,9 +13,9 @@
             <div class="card-wrapper" v-oikeustarkastelu="luontioikeus">
               <ProjektiCard :full-background="true" :link="newRoute">
                 <div class="d-flex align-items-center flex-column h-100">
-                  <div class="h-50 text-center d-flex align-items-center pt-4">
+                  <div class="h-50 text-center d-flex align-items-center pt-5">
                     <div class="ikoni">
-                      <fas icon="plus" />
+                      <EpMaterialIcon size="50px">add</EpMaterialIcon>
                     </div>
                   </div>
                   <div class="h-50 text-center d-flex align-items-center pb-5">
@@ -209,6 +209,7 @@ import * as _ from 'lodash';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 import { perusteTile } from '@shared/utils/bannerIcons';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -223,6 +224,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     ProjektiCard,
     KoulutustyyppiSelect,
     EpButton,
+    EpMaterialIcon,
   },
 })
 export default class EpPerusteprojektiListaus extends Vue {
@@ -520,7 +522,6 @@ export default class EpPerusteprojektiListaus extends Vue {
 <style lang="scss" scoped>
 
 .upper {
-  margin-bottom: 3rem;
   margin-bottom: 4rem;
 }
 

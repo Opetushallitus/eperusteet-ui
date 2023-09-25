@@ -25,10 +25,10 @@
           <div v-if="tekstikappaleTyyppi === 'osaamisala'" class="mb-4">
             <div class="d-flex">
               <h3>{{$t('osaamisala')}}</h3>
-              <fas aria-hidden="true"
-                   icon="info"
-                   class="info-icon"
-                   v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"/>
+              <EpMaterialIcon class="ml-2"
+                              icon-shape="outlined"
+                              v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"
+                              size="20px">info</EpMaterialIcon>
             </div>
             <EpMultiSelect v-model="data.osaamisala" :is-editing="true" :options="osaamisalat" :multiple="false" trackBy="uri" class="multiselect">
               <template slot="singleLabel" slot-scope="{ option }">
@@ -43,10 +43,10 @@
           <div v-if="tekstikappaleTyyppi === 'tutkintonimike'" class="mb-4">
             <div class="d-flex">
               <h3>{{$t('tutkintonimike')}}</h3>
-              <fas aria-hidden="true"
-                   icon="info"
-                   class="info-icon"
-                   v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"/>
+              <EpMaterialIcon class="ml-2"
+                              icon-shape="outlined"
+                              v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"
+                              size="20px">info</EpMaterialIcon>
             </div>
             <EpMultiSelect v-model="data.tutkintonimike" :is-editing="true" :options="tutkintonimikkeet" :multiple="false" trackBy="uri" class="multiselect">
               <template slot="singleLabel" slot-scope="{ option }">
@@ -97,6 +97,7 @@ import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler'
 import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 interface koodistoryhma {
   ryhma: string;
@@ -114,6 +115,7 @@ interface koodistoryhma {
     EpToggle,
     EpSelect,
     EpMultiSelect,
+    EpMaterialIcon,
   },
 })
 export default class RouteTekstikappale extends Vue {
@@ -349,10 +351,6 @@ export default class RouteTekstikappale extends Vue {
         }
       }
     }
-  }
-
-  .info-icon {
-    margin-left: 5px;
   }
 
   .otsikko {

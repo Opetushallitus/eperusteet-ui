@@ -66,7 +66,7 @@
                 <div v-for="(tavoitealue, tavoitealueIndex) in data.tavoitteet.tavoitealueet" :key="'tavoite'+tavoitealueIndex" class="mt-4 p-2 tavoitealue editing">
                   <div class="d-flex">
                     <div class="order-handle m-2">
-                      <fas icon="grip-vertical"></fas>
+                      <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
                     <div class="mt-2 w-100">
                       <div class="row">
@@ -87,7 +87,7 @@
                               :is-editing="true"
                               class="input-wrapper">
                               <div class="order-handle m-2" slot="left">
-                                <fas icon="grip-vertical"></fas>
+                                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                               </div>
                             </EpInput>
                         </template>
@@ -156,12 +156,8 @@
               tag="div"
               v-model="data.oppimaarat">
                 <div class="listaus p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                  <div class="order-handle mr-2" v-if="isEditing">
-                    <fas icon="grip-vertical" v-if="isEditing"></fas>
-                  </div>
-                  <div>
-                    <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                  </div>
+                  <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
+                  <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
                 </div>
             </draggable>
 
@@ -193,6 +189,7 @@ import { LukioOppiaineStore } from '@/stores/LukioOppiaineStore';
 import EpTavoitealueTavoitteet from '@shared/components/EpTavoitesisaltoalue/EpTavoitealueTavoitteet.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpModuuli from '@shared/components/EpModuuli/EpModuuli.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -206,6 +203,7 @@ import EpModuuli from '@shared/components/EpModuuli/EpModuuli.vue';
     EpTavoitealueTavoitteet,
     EpColorIndicator,
     EpModuuli,
+    EpMaterialIcon,
   },
 })
 export default class RouteOppiaine extends Vue {

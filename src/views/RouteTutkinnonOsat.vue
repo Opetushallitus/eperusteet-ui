@@ -42,7 +42,7 @@
                        v-bind="options">
               <tr v-for="(item, idx) in raw" :key="idx" role="row">
                 <td>
-                  <fas icon="dragindicator"></fas>
+                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   {{ idx + 1 }}
                 </td>
                 <td>{{ $kaanna(item.tutkinnonOsa.nimi) || $t('nimeton-tutkinnonosa') }}</td>
@@ -87,6 +87,7 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import draggable from 'vuedraggable';
 import _ from 'lodash';
 import EpTutkinnonosaTuontiModal from '@/components/EpTutkinnonosaTuontiModal.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -97,6 +98,7 @@ import EpTutkinnonosaTuontiModal from '@/components/EpTutkinnonosaTuontiModal.vu
     EpSpinner,
     draggable,
     EpTutkinnonosaTuontiModal,
+    EpMaterialIcon,
   },
 })
 export default class RouteTutkinnonosat extends PerusteprojektiRoute {

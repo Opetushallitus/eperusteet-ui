@@ -117,7 +117,7 @@
                       <draggable :value="tutkinnonosatPaged" v-bind="optionsTutkinnonOsat" tag="div">
                         <div v-for="tosa in tutkinnonosatPaged" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pr-3 m-1 tosa draggable tosa">
                           <div class="grip mr-2" v-if="isEditing">
-                            <fas icon="grip-vertical"/>
+                            <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                           </div>
                           <div class="flex-grow-1">
                             {{ $kaanna(tosa.nimi) }} <span v-if="tosa.tutkinnonOsa.koodiArvo">({{tosa.tutkinnonOsa.koodiArvo}})</span>
@@ -144,7 +144,7 @@
                       <draggable :value="osaamisalatPaged" v-bind="optionsKoodit" tag="div">
                         <div v-for="(ryhma, index) in osaamisalatPaged" :key="'osaamisala' + index" class="mb-1 d-flex justify-content-center align-items-center draggable osaamisalat">
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['osaamisala'],  background: colorMap['osaamisala'] }">
-                            <fas icon="grip-vertical"/>
+                            <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                           </div>
                           <ep-koodisto-select :store="osaamisalaStore" v-if="isEditing" :value="index" @add="osaamisalaKoodiLisays" class="w-100">
                             <template #default="{ open }">
@@ -206,7 +206,7 @@
                       <draggable :value="tutkintonimikkeetPaged" v-bind="optionsKoodit" tag="div">
                         <div v-for="(ryhma, index) in tutkintonimikkeetPaged" :key="ryhma.tutkintonimike.uri" class="mb-1 d-flex justify-content-center align-items-center draggable tutkintonimikkeet">
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }">
-                            <fas icon="grip-vertical"/>
+                            <EpMaterialIcon size="20px">drag_indicator</EpMaterialIcon>
                           </div>
                           <ep-koodisto-select :store="tutkintonimikeStore" v-if="isEditing" :value="index" @add="tutkintonimikeKoodiLisays" class="w-100">
                             <template #default="{ open }">
@@ -318,6 +318,7 @@ import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolor } from '@/components/muodostuminen/utils';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -334,6 +335,7 @@ import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolo
     MuodostumisNode,
     draggable,
     EpRakenneModal,
+    EpMaterialIcon,
   },
   inject: [],
 })
@@ -941,16 +943,16 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   }
 
   .colorblock {
-    width: 20px;
+    width: 25px;
     color: $white;
     border-bottom-left-radius: 8px;
     border-top-left-radius: 8px;
-    border-right: 0px;
+    border-right: 0;
   }
 
   .paaryhma-label {
     border: 1px solid $gray-lighten-3;
-    border-left: 0px;
+    border-left: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -963,7 +965,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   }
 
   &.osaamisalat .colorblock, &.tutkintonimikkeet .colorblock{
-    padding: 0.45rem 0.3rem !important;
+    padding: 0.5rem 0.3rem 0.45rem 0 !important;
   }
 
   .koodi-input ::v-deep input{
@@ -976,9 +978,9 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 .actions {
 
   ::v-deep .ep-button .btn-link {
-    padding-left: 0px !important;
+    padding-left: 0 !important;
     .teksti{
-      padding-left: 0px !important;
+      padding-left: 0 !important;
     }
   }
 

@@ -35,7 +35,7 @@
         <div v-for="(sisaltoalue, index) in model.sisaltoalueet" :key="'sisaltoalue' + index" class="mt-4">
           <div class="d-flex" >
             <div class="order-handle mr-3">
-              <fas icon="grip-vertical"></fas>
+              <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <h4>{{ $t('sisaltoalueen-nimi') }}</h4>
           </div>
@@ -84,6 +84,7 @@ import { Kielet } from '@shared/stores/kieli';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import { OppiaineenVuosiluokkaKokonaisuusDto } from '@shared/api/eperusteet';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -92,6 +93,7 @@ import { OppiaineenVuosiluokkaKokonaisuusDto } from '@shared/api/eperusteet';
     EpButton,
     EpContent,
     EpKielivalinta,
+    EpMaterialIcon,
   },
 })
 export default class EpSisaltoalueetEditModal extends Vue {

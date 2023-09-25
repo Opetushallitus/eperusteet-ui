@@ -29,7 +29,7 @@
 
             <div slot="header" class="d-flex">
               <div class="order-handle mr-3" v-if="isEditing">
-                <fas icon="grip-vertical" v-if="isEditing"></fas>
+                <EpMaterialIcon v-if="isEditing">drag_indicator</EpMaterialIcon>
               </div>
               <h4 class="mb-0" v-html="$kaanna(tavoite.tavoite)"></h4>
             </div>
@@ -60,6 +60,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import draggable from 'vuedraggable';
 import EpSisaltoalueetEditModal from '@/views/perusopetus/EpSisaltoalueetEditModal.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -71,6 +72,7 @@ import EpSisaltoalueetEditModal from '@/views/perusopetus/EpSisaltoalueetEditMod
     draggable,
     EpButton,
     EpSisaltoalueetEditModal,
+    EpMaterialIcon,
   },
 })
 export default class EpOppiaineenVuosiluokkakokonaisuus extends Vue {

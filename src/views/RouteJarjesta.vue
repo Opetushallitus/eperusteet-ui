@@ -28,9 +28,9 @@
               <span>
                 {{ $kaanna(node.perusteenOsa.nimi) }}
               </span>
-              <fas icon="liite"
-                   v-if="node.perusteenOsa.liite"
-                   v-b-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}"></fas>
+              <EpMaterialIcon v-if="node.perusteenOsa.liite"
+                              v-b-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}"
+                              size="18px">attach_file</EpMaterialIcon>
             </template>
           </EpJarjesta>
         </b-tab>
@@ -64,6 +64,7 @@ import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { Koulutustyyppi } from '@shared/tyypit';
 import { AipeVaiheetStore } from '@/stores/AipeVaiheetStore';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -71,6 +72,7 @@ import { AipeVaiheetStore } from '@/stores/AipeVaiheetStore';
     EpJarjesta,
     EpMainView,
     EpSpinner,
+    EpMaterialIcon,
   },
 })
 export default class RouteJarjesta extends PerusteprojektiRoute {

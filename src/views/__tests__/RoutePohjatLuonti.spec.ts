@@ -43,9 +43,6 @@ describe('RoutePohjatLuonti component', () => {
           $sd: x => x,
           $router: router,
         },
-        stubs: {
-          fas: '<div />',
-        },
       });
   }
 

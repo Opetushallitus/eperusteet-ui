@@ -59,8 +59,8 @@
           :fields="tutkinnonosatFields">
           <template v-slot:cell(nimi)="{ item }">
             <div class="selectable" @click="selectRow(item)">
-              <fas v-if="item.selected" icon="check-square" class="checked mr-2"/>
-              <fas v-else :icon="['far', 'square']" class="checked mr-2"/>
+              <EpMaterialIcon v-if="item.selected" class="checked mr-2">check_box</EpMaterialIcon>
+              <EpMaterialIcon v-else class="checked mr-2">check_box_outline_blank</EpMaterialIcon>
               <span>{{$kaanna(item.nimi)}}</span>
               <span v-if="item.tutkinnonOsa.koodiArvo">({{item.tutkinnonOsa.koodiArvo}})</span>
             </div>
@@ -99,8 +99,8 @@
 
           <template v-slot:cell(salli-muokkaus)="{ item }">
             <div class="selectable" @click="selectSalliMuokkausRow(item)">
-              <fas v-if="item.kopioiMuokattavaksi" icon="check-square" class="checked mr-2"/>
-              <fas v-else :icon="['far', 'square']" class="checked mr-2"/>
+              <EpMaterialIcon v-if="item.kopioiMuokattavaksi" class="checked mr-2">check_box</EpMaterialIcon>
+              <EpMaterialIcon v-else class="checked mr-2">check_box_outline_blank</EpMaterialIcon>
               <span>{{$t('kylla')}}</span>
             </div>
           </template>
@@ -118,18 +118,16 @@
 
 <script lang="ts">
 import _ from 'lodash';
-import { Prop, Component, Mixins, Vue, Watch } from 'vue-property-decorator';
+import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpField from '@shared/components/forms/EpField.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { TutkinnonosatTuontiStore } from '@/stores/TutkinnonosatTuontiStore';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import { Page } from '@shared/tyypit';
-import { PerusteDto, TutkinnonOsaDto, TutkinnonOsaViiteKontekstiDto, TutkinnonOsaViiteLuontiDto } from '@shared/generated/eperusteet';
-import { Debounced } from '@shared/utils/delay';
+import { PerusteDto, TutkinnonOsaViiteKontekstiDto } from '@shared/generated/eperusteet';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -138,6 +136,7 @@ import { Debounced } from '@shared/utils/delay';
     EpSearch,
     EpMultiSelect,
     EpToggle,
+    EpMaterialIcon,
   },
 })
 export default class EpTutkinnonosaTuontiModal extends Vue {

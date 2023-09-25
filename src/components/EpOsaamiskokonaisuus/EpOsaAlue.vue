@@ -21,12 +21,14 @@
               <b-col cols="11">
                 <ep-input v-model="kuvaus[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
                   <div class="order-handle m-2" slot="left">
-                    <fas icon="grip-vertical"></fas>
+                    <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   </div>
                 </ep-input>
               </b-col>
               <b-col cols="1">
-                <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poistaKuvaus('kuvaukset', kuvaus, tasokuvaus.taso)"/>
+                <div class="default-icon clickable mt-2" @click="poistaKuvaus('kuvaukset', kuvaus, tasokuvaus.taso)">
+                  <EpMaterialIcon>delete</EpMaterialIcon>
+                </div>
               </b-col>
             </b-row>
 
@@ -47,12 +49,14 @@
                 <b-col cols="11">
                   <ep-input v-model="kuvaus[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
                     <div class="order-handle m-2" slot="left">
-                      <fas icon="grip-vertical"></fas>
+                      <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
                   </ep-input>
                 </b-col>
                 <b-col cols="1">
-                  <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poistaKuvaus('edistynytOsaaminenKuvaukset', kuvaus, tasokuvaus.taso)"/>
+                  <div class="default-icon clickable mt-2" @click="poistaKuvaus('edistynytOsaaminenKuvaukset', kuvaus, tasokuvaus.taso)">
+                    <EpMaterialIcon>delete</EpMaterialIcon>
+                  </div>
                 </b-col>
               </b-row>
             </draggable>
@@ -97,12 +101,14 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import { Kielet } from '@shared/stores/kieli';
 import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
     EpInput,
     draggable,
     EpButton,
+    EpMaterialIcon,
   },
 })
 export default class EpOsaAlue extends Vue {

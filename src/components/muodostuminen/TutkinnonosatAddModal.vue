@@ -44,11 +44,11 @@
         :selectable="true"
         @row-selected="onRowSelected"
         select-mode="single"
-        selected-variant=''
-      >
+        selected-variant=''>
+
         <template v-slot:cell(nimi)="{ item }">
-            <fas v-if="item.selected" icon="check-square" class="checked mr-2"/>
-            <fas v-else :icon="['far', 'square']" class="checked mr-2"/>
+          <EpMaterialIcon v-if="item.selected" class="checked mr-2">check_box</EpMaterialIcon>
+          <EpMaterialIcon v-else class="checked mr-2">check_box_outline_blank</EpMaterialIcon>
           {{ $kaanna(item.nimi) }}
         </template>
       </b-table>
@@ -70,6 +70,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
 import { Prop, Component, Vue, InjectReactive } from 'vue-property-decorator';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -78,6 +79,7 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
     EpInput,
     EpToggle,
     EpSearch,
+    EpMaterialIcon,
   },
 })
 

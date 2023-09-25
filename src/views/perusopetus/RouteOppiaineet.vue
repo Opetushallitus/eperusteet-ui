@@ -25,7 +25,7 @@
         <b-row v-for="(oppiaine, index) in data.oppiaineet" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
           <b-col cols="5" class="d-flex">
             <div class="order-handle mr-2" v-if="isEditing">
-              <fas icon="grip-vertical"></fas>
+              <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <div>
               <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppiaine.id } }">
@@ -53,11 +53,13 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
     EpButton,
     EpEditointi,
+    EpMaterialIcon,
     draggable,
   },
 })

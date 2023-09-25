@@ -82,12 +82,8 @@
                 tag="div"
                 v-model="data.oppimaarat">
                   <div class="taulukko-rivi-varitys p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                    <div class="order-handle mr-2" v-if="isEditing">
-                      <fas icon="grip-vertical" v-if="isEditing"></fas>
-                    </div>
-                    <div>
-                      <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                    </div>
+                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
+                    <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
                   </div>
               </draggable>
             </b-form-group>
@@ -123,6 +119,7 @@ import EpOppiaineenVuosiluokkakokonaisuus from '@/views/perusopetus/EpOppiaineen
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpTavoitealueetEditModal from '@/views/perusopetus/EpTavoitealueetEditModal.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -136,6 +133,7 @@ import EpTavoitealueetEditModal from '@/views/perusopetus/EpTavoitealueetEditMod
     EpCollapse,
     EpOppiaineenVuosiluokkakokonaisuus,
     EpTavoitealueetEditModal,
+    EpMaterialIcon,
   },
 })
 export default class RouteOppiaine extends Vue {

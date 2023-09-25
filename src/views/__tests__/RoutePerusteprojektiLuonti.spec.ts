@@ -53,9 +53,6 @@ describe('RoutePohjatLuonti component', () => {
           $router: router,
           $isAdmin: () => true,
         },
-        stubs: {
-          fas: '<div />',
-        },
         attachToDocument: true,
       });
   }

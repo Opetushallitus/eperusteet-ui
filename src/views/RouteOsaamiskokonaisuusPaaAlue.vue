@@ -43,13 +43,13 @@
             <b-col md="8">
               <div class="d-flex">
                 <div class="order-handle mr-3">
-                  <fas icon="grip-vertical"></fas>
+                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
                 <EpOsaAlue v-model="data.osaAlueet[index]" :isEditing="isEditing" class="w-100">
                   <div slot="poisto">
                     <b-button variant="link" @click.stop="poistaOsaAlue(osaAlue)">
-                    <fas icon="roskalaatikko"/>
-                    {{ $t('poista-osa-alue') }}
+                      <EpMaterialIcon>delete</EpMaterialIcon>
+                      {{ $t('poista-osa-alue') }}
                   </b-button>
                   </div>
                 </EpOsaAlue>
@@ -90,6 +90,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpOsaAlue from '@shared/components/EpOsaamiskokonaisuus/EpOsaAlue.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import draggable from 'vuedraggable';
 
 @Component({
@@ -99,6 +100,7 @@ import draggable from 'vuedraggable';
     EpContent,
     EpButton,
     EpOsaAlue,
+    EpMaterialIcon,
     draggable,
   },
 })

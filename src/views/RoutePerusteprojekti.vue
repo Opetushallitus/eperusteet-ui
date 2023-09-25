@@ -20,7 +20,7 @@
               <span>{{nimi}}</span>
               <b-dropdown class="asetukset" size="lg" variant="link" toggle-class="text-decoration-none" no-caret>
                 <template v-slot:button-content>
-                  <fas icon="ratas" class="hallinta" />
+                  <EpMaterialIcon icon-shape="outlined" class="hallinta">settings</EpMaterialIcon>
                 </template>
 
                 <div v-for="(ratasvalinta, index) in ratasvalintaFiltered" :key="'ratasvalinta'+index">
@@ -28,8 +28,8 @@
                   <hr v-if="ratasvalinta.separator && index !== (ratasvalintaFiltered.length - 1)" class="mt-2 mb-2" />
 
                   <b-dropdown-item v-if="ratasvalinta.route" :to="{ name: ratasvalinta.route }" :disabled="ratasvalinta.disabled">
-                    <fas :icon="ratasvalinta.icon" />
-                    {{ $t(ratasvalinta.text) }}
+                    <EpMaterialIcon icon-shape="outlined">{{ ratasvalinta.icon }}</EpMaterialIcon>
+                    <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
                   </b-dropdown-item>
 
                   <b-dropdown-item
@@ -37,8 +37,8 @@
                     @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)"
                     :disabled="ratasvalinta.disabled"
                     v-oikeustarkastelu="ratasvalinta.meta.oikeus()">
-                    <fas :icon="ratasvalinta.icon" />
-                    {{ $t(ratasvalinta.text) }}
+                    <EpMaterialIcon icon-shape="outlined">{{ ratasvalinta.icon }}</EpMaterialIcon>
+                    <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
                   </b-dropdown-item>
                 </div>
               </b-dropdown>
@@ -115,7 +115,7 @@
                     <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-tekstikappale') }}
                   </router-link>
-                  <fas icon="liite" v-b-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}"></fas>
+                  <EpMaterialIcon v-b-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}" size="16px">attach_file</EpMaterialIcon>
                 </div>
               </template>
 
@@ -392,7 +392,7 @@
           <div class="menu-item bottom-menu-item" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
             <router-link :to="jarjestaRoute">
               <span class="text-nowrap">
-                <fas icon="jarjesta" fixed-width />
+                <EpMaterialIcon class="order-icon">reorder</EpMaterialIcon>
                 <a class="btn btn-link btn-link-nav">{{$t('muokkaa-jarjestysta')}}</a>
               </span>
             </router-link>
@@ -422,7 +422,6 @@ import {
   PerusteDtoToteutusEnum,
 } from '@shared/api/eperusteet';
 import { Meta } from '@shared/utils/decorators';
-
 import { PerusteStore } from '@/stores/PerusteStore';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -434,6 +433,7 @@ import { KuvaStore } from '@/stores/KuvaStore';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
 import { TermitStore } from '@/stores/TermitStore';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -465,6 +465,7 @@ interface ValidationStats {
     EpSisallonLisays,
     EpValidPopover,
     EpColorIndicator,
+    EpMaterialIcon,
   },
   inject: [],
 })
@@ -710,6 +711,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 <style lang="scss" scoped>
 @import '@/styles/_variables';
 
+.order-icon {
+  vertical-align: middle;
+}
+
 .portal-menu {
   height: 140px;
 
@@ -720,6 +725,11 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     .asetukset {
       .hallinta {
         color: white;
+      }
+
+      .dropdown-text {
+        margin-left: 5px;
+        vertical-align: text-top;
       }
 
       ::v-deep .dropdown-item {

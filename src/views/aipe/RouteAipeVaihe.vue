@@ -24,12 +24,8 @@
               tag="div"
               v-model="data.oppiaineet">
                 <div class="oppiaine p-3 d-flex" v-for="oppiaine in data.oppiaineet" :key="'oppiaine'+oppiaine.id">
-                  <div class="order-handle mr-2" v-if="isEditing">
-                    <fas icon="grip-vertical" v-if="isEditing"></fas>
-                  </div>
-                  <div>
-                    <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppiaine.id } }">{{ $kaanna(oppiaine.nimi) || $t('nimeton-oppiaine') }}</router-link>
-                  </div>
+                  <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
+                  <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppiaine.id } }">{{ $kaanna(oppiaine.nimi) || $t('nimeton-oppiaine') }}</router-link>
                 </div>
             </draggable>
           </b-form-group>
@@ -52,12 +48,14 @@
                 <b-col cols="11">
                   <ep-input v-model="kohdealue.nimi" :is-editing="isEditing">
                     <div class="order-handle m-2" slot="left">
-                      <fas icon="grip-vertical"></fas>
+                      <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
                   </ep-input>
                 </b-col>
                 <b-col cols="1" v-if="isEditing">
-                  <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poistaKohdealue(kohdealue)"/>
+                  <div class="default-icon clickable mt-2" @click="poistaKohdealue(kohdealue)">
+                    <EpMaterialIcon>delete</EpMaterialIcon>
+                  </div>
                 </b-col>
               </b-row>
             </draggable>
@@ -96,6 +94,7 @@ import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -106,6 +105,7 @@ import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue'
     draggable,
     EpCollapse,
     EpSisaltoTekstikappaleet,
+    EpMaterialIcon,
   },
 })
 export default class RouteAipeVaihe extends Vue {

@@ -104,20 +104,19 @@
                   </b-form-group>
 
                   <b-form-group>
-                    <fas
-                      icon="roskalaatikko"
-                      class="default-icon clickable mb-2 ml-4"
-                      @click="poistaOsaamistaso(asteikko, taso)"
-                      v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"/>
+                    <div class="default-icon clickable mb-2 ml-4"
+                         @click="poistaOsaamistaso(asteikko, taso)"
+                         v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+                      <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
+                    </div>
                   </b-form-group>
                 </div>
               </div>
-              <ep-button
-                variant="outline"
-                icon="add"
-                @click="lisaaOsaamistaso(asteikko)"
-                v-if="isEditing"
-                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+              <ep-button v-if="isEditing"
+                         variant="outline"
+                         icon="add"
+                         @click="lisaaOsaamistaso(asteikko)"
+                         v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
                 {{ $t('lisaa-osaamistaso') }}
               </ep-button>
             </div>
@@ -143,6 +142,7 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import * as _ from 'lodash';
 import VueScrollTo from 'vue-scrollto';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -153,6 +153,7 @@ import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
     EpInput,
     EpKoodistoSelect,
     EpInfoPopover,
+    EpMaterialIcon,
   },
 })
 export default class RouteArviointiasteikot extends Vue {

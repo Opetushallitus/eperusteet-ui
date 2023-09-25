@@ -6,7 +6,7 @@
       </div>
       <div class="flex-shrink-1" v-if="allowStructureChange">
         <b-button variant="link" @click="remove(idx)">
-          <fas icon="roskalaatikko" />
+          <EpMaterialIcon>delete</EpMaterialIcon>
         </b-button>
       </div>
     </div>
@@ -32,12 +32,14 @@ import { Watch, Vue, Component, Prop } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
     draggable,
     EpButton,
     EpInput,
+    EpMaterialIcon,
   },
 })
 export default class EpPrefixList extends Vue {

@@ -15,14 +15,14 @@
           </div>
           <div class="col col-3 text-right toiminnot">
             <button class="btn btn-link" @click="avaaPoistoModal(termi)">
-              <fas :icon="['far','trash-alt']" fixed-width="fixed-width"/>
+              <EpMaterialIcon>delete</EpMaterialIcon>
             </button>
             <button class="btn btn-link" @click="avaaMuokkausModal(termi)">
-              <fas icon="pen" fixed-width />
+              <EpMaterialIcon>edit</EpMaterialIcon>
             </button>
             <button class="btn btn-link" @click="toggleTermi(termi)">
-              <fas icon="chevron-down" v-if="termi.closed" fixed-width></fas>
-              <fas icon="chevron-up" v-else fixed-width></fas>
+              <EpMaterialIcon v-if="termi.closed">expand_more</EpMaterialIcon>
+              <EpMaterialIcon v-else>expand_less</EpMaterialIcon>
             </button>
           </div>
         </div>
@@ -87,6 +87,7 @@ import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue
 import { createLogger } from '@shared/utils/logger';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 const logger = createLogger('RouteKasite');
 
@@ -102,6 +103,7 @@ const logger = createLogger('RouteKasite');
     EpField,
     EpContent,
     EpToggle,
+    EpMaterialIcon,
   },
   mixins: [
     validationMixin,

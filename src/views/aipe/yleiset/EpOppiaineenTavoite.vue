@@ -35,7 +35,9 @@
       <template #header>
         <div class="d-flex">
           <div>{{ $kaanna(lao.nimi)}}</div>
-          <fas v-if="isEditing" icon="roskalaatikko" class="default-icon clickable ml-3 mt-1" @click="poistaLaajaAlainenOsaaminen(lao)"/>
+          <div v-if="isEditing" class="default-icon clickable ml-3 mt-1" @click="poistaLaajaAlainenOsaaminen(lao)">
+            <EpMaterialIcon>delete</EpMaterialIcon>
+          </div>
         </div>
       </template>
       <ep-content class="ml-4 pl-1" layout="normal" v-model="lao.kuvaus" :is-editable="false"> </ep-content>
@@ -57,7 +59,9 @@
         <template #header>
           <div class="d-flex">
             <div>{{ $kaanna(sisaltoalue.nimi)}}</div>
-            <fas v-if="isEditing" icon="roskalaatikko" class="default-icon clickable ml-3 mt-1" @click="poistaSisaltoalue(sisaltoalue)"/>
+            <div v-if="isEditing" class="default-icon clickable ml-3 mt-1" @click="poistaSisaltoalue(sisaltoalue)">
+              <EpMaterialIcon>delete</EpMaterialIcon>
+            </div>
           </div>
         </template>
         <ep-content class="ml-4 pl-1" layout="normal" v-model="sisaltoalue.kuvaus" :is-editable="false"> </ep-content>
@@ -115,7 +119,9 @@
         <ep-input v-model="arvioinninkohde.osaamisenKuvaus" :is-editing="isEditing"></ep-input>
       </b-col>
       <b-col cols="1" class="text-center">
-        <fas v-if="isEditing" icon="roskalaatikko" class="default-icon clickable mt-2" @click="poistaArviointi(arvioinninkohde)"/>
+        <div v-if="isEditing" class="default-icon clickable mt-2" @click="poistaArviointi(arvioinninkohde)">
+          <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
+        </div>
       </b-col>
     </b-row>
 
@@ -147,6 +153,7 @@ import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 
@@ -163,6 +170,7 @@ interface OppiaineenTavoiteSupportData {
     EpSelect,
     EpButton,
     EpCollapse,
+    EpMaterialIcon,
     draggable,
   },
 })

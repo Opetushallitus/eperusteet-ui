@@ -26,7 +26,7 @@
         <b-row v-for="(lao, index) in data.laajaAlaisetOsaamiset" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
           <b-col cols="5" class="d-flex">
             <div class="order-handle mr-2" v-if="isEditing">
-              <fas icon="grip-vertical"></fas>
+              <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <div>
               <router-link :to="{ name: 'aipelaajaAlainenOsaaminen', params: { laoId: lao.id } }">{{ $kaanna(lao.nimi) }}</router-link>
@@ -43,7 +43,6 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { AipeLaajaAlaisetOsaamisetStore } from '@/stores/AipeLaajaAlaisetOsaamisetStore';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -53,6 +52,7 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -60,6 +60,7 @@ import draggable from 'vuedraggable';
     EpSpinner,
     draggable,
     EpEditointi,
+    EpMaterialIcon,
   },
 })
 export default class RouteAipeLaajaAlaisetOsaamiset extends Vue {
