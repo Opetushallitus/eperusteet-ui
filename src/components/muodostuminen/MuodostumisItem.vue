@@ -41,8 +41,8 @@
               <b-dropdown-item-button @click="copy">{{ $t('kopioi-leikelaudalle') }}</b-dropdown-item-button>
               <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
               <b-dropdown-text v-if="isRyhma">
-                <ep-button icon="add" variant="outline" @click="liitaTosa" inherit-style>{{ $t('liita-tutkinnon-osa') }}</ep-button>
-                <ep-button icon="add" variant="outline" @click="lisaaRyhma" inherit-style>{{ $t('lisaa-ryhma') }}</ep-button>
+                <ep-button icon="add" variant="outline" @click="liitaTosa">{{ $t('liita-tutkinnon-osa') }}</ep-button>
+                <ep-button icon="add" variant="outline" @click="lisaaRyhma">{{ $t('lisaa-ryhma') }}</ep-button>
               </b-dropdown-text>
             </template>
           </b-dropdown>

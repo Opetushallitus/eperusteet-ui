@@ -154,7 +154,7 @@
                       {{ $t('lisaa-sisalto') }}
                     </template>
                     <template #footer>
-                      <EpButton icon="delete" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)" inherit-style>{{ $t('poista-sisaltoalue') }}</EpButton>
+                      <EpButton icon="delete" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)">{{ $t('poista-sisaltoalue') }}</EpButton>
                     </template>
                   </EpTavoitealueTavoitteet>
                 </div>

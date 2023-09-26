@@ -14,10 +14,10 @@
         <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
           <div class="d-flex">
             <EpInput class="w-100" :isEditing="isEditing" v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]" />
-            <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaKriteeri(kriteeri)" inherit-style/>
+            <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaKriteeri(kriteeri)"/>
           </div>
         </div>
-        <EpButton :paddingx="false" v-if="isEditing" class="mb-3" variant="link" icon="add" @click="lisaaKriteeri()" inherit-style>
+        <EpButton :paddingx="false" v-if="isEditing" class="mb-3" variant="link" icon="add" @click="lisaaKriteeri()">
           {{ $t('lisaa-kriteeri') }}
         </EpButton>
       </template>

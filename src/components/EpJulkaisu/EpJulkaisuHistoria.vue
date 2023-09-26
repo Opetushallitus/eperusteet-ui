@@ -26,8 +26,7 @@
                         icon="edit"
                         variant="link"
                         @click="avaaMuokkausModal(julkaisu)"
-                        v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
-                        inherit-style>
+                        v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
                 {{ $t('muokkaa') }}
               </EpButton>
 
@@ -39,8 +38,7 @@
                         variant="link"
                         :showSpinner="julkaisu.palautuksessa"
                         @click="palautaConfirm(julkaisu)"
-                        v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
-                        inherit-style>
+                        v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
                 {{ $t('palauta') }}
               </EpButton>
             </div>

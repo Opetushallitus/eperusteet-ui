@@ -13,8 +13,7 @@
             icon="edit"
             @click="toggleEdit()"
             class="mt-sm-0 mt-3"
-            v-oikeustarkastelu="{oikeus:'hallinta'}"
-            inherit-style>
+            v-oikeustarkastelu="{oikeus:'hallinta'}">
             {{ $t('muokkaa') }}
           </ep-button>
           <ep-button
@@ -23,8 +22,7 @@
             icon="add"
             @click="lisaaArviointiasteikko()"
             class="mt-sm-0 mt-3"
-            v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
-            inherit-style>
+            v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
             {{ $t('lisaa-uusi') }}
           </ep-button>
         </div>
@@ -57,8 +55,7 @@
                 @click="poistaArviointiasteikko(asteikko)"
                 variant="link"
                 icon="delete"
-                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
-                inherit-style>
+                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
                 {{ $t('poista-arviointiasteikko') }}
               </ep-button>
             </div>

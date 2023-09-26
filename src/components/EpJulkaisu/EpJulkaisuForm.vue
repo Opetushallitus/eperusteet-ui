@@ -32,7 +32,7 @@
               <span>{{ liiteData.liite.nimi }}</span>
             </td>
             <td>
-              <ep-button variant="link" icon="delete" @click="poistaLiite(index)" inherit-style></ep-button>
+              <ep-button variant="link" icon="delete" @click="poistaLiite(index)"></ep-button>
             </td>
           </tr>
           </tbody>

@@ -23,7 +23,7 @@
         </ep-button>
         <div v-else/>
 
-        <ep-button variant="link" icon="delete" @click="poistaSisaltoteksti(avain)" inherit-style>
+        <ep-button variant="link" icon="delete" @click="poistaSisaltoteksti(avain)">
           {{ $t('poista-tekstikappale') }}
         </ep-button>
       </div>
@@ -45,7 +45,7 @@
         </ep-button>
         <div v-else/>
 
-        <ep-button variant="link" icon="delete" @click="poistaTeksti(teksti)" inherit-style>
+        <ep-button variant="link" icon="delete" @click="poistaTeksti(teksti)">
           {{ $t('poista-tekstikappale') }}
         </ep-button>
       </div>

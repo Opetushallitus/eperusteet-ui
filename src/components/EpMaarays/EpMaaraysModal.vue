@@ -41,10 +41,10 @@
 
           <div v-else class="d-flex justify-content-between">
             <div>
-              <EpButton variant="link" icon="edit" @click="editing = true" v-oikeustarkastelu="{oikeus:'hallinta'}" inherit-style>
+              <EpButton variant="link" icon="edit" @click="editing = true" v-oikeustarkastelu="{oikeus:'hallinta'}">
                 {{ $t('muokkaa') }}
               </EpButton>
-              <EpButton variant="link" icon="delete" @click="poista" v-oikeustarkastelu="{oikeus:'hallinta'}" inherit-style>
+              <EpButton variant="link" icon="delete" @click="poista" v-oikeustarkastelu="{oikeus:'hallinta'}">
                 {{ $t('poista') }}
               </EpButton>
             </div>

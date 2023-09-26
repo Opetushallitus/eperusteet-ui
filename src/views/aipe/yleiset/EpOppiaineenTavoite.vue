@@ -137,7 +137,7 @@
     <div v-else class="disabled-text">{{ $t('ei-sisaltoa') }}</div>
 
     <div class="text-right" v-if="isEditing">
-      <ep-button variant="link" icon="delete" @click="poistaTavoite" inherit-style>
+      <ep-button variant="link" icon="delete" @click="poistaTavoite">
         {{ $t('poista-tavoite') }}
       </ep-button>
     </div>

@@ -71,8 +71,7 @@
                            buttonClass="p-0 pt-2 roskalaatikko"
                            variant="link"
                            icon="delete"
-                           @click="poistaKoulutustyyppi(index)"
-                           inherit-style/>
+                           @click="poistaKoulutustyyppi(index)"/>
               </div>
             </div>
             <ep-button buttonClass="pl-0" variant="outline-primary" icon="add" @click="lisaaKoulutustyyppi">

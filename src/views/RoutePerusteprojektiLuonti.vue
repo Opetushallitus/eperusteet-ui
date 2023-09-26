@@ -150,7 +150,7 @@
             </b-form-group>
             <b-form-group class="col-1 col-sm-1 text-center">
               <template v-slot:label><br/></template>
-              <ep-button @click="poistaTavoite(tpvm)" variant="link" icon="delete" inherit-style></ep-button>
+              <ep-button @click="poistaTavoite(tpvm)" variant="link" icon="delete"></ep-button>
             </b-form-group>
           </div>
           <ep-button variant="outline" icon="add" @click="lisaaTavoite()">

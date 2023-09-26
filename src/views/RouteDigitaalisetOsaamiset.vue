@@ -19,8 +19,7 @@
                   variant="link"
                   icon="keyboard_return"
                   @click="onRestore(data.item)"
-                  v-if="palautusoikeus(data.item)"
-                  inherit-style>
+                  v-if="palautusoikeus(data.item)">
                   {{ $t('palauta') }}
                 </EpButton>
               </template>

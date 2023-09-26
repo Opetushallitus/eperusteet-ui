@@ -54,7 +54,7 @@
                       </b-input-group-append>
                     </b-input-group>
 
-                    <ep-button v-if="data.tutkinnonOsa.koodi" icon="delete" variant="link" @click="tyhjennaTutkinnonosaKoodi" inherit-style/>
+                    <ep-button v-if="data.tutkinnonOsa.koodi" icon="delete" variant="link" @click="tyhjennaTutkinnonosaKoodi"/>
                     <ep-button variant="link" v-if="!data.tutkinnonOsa.koodi" @click="lisaaTutkinnonosaNimiKoodistoon" :disabled="!hasNimi">
                       {{$t('vie-koodistoon')}}
                     </ep-button>
@@ -164,8 +164,7 @@
                         class="no-padding"
                         variant="link"
                         icon="delete"
-                        @click="poistaGeneerinenaArviointi"
-                        inherit-style>
+                        @click="poistaGeneerinenaArviointi">
                 {{$t('poista-geneerinen-arviointi')}}
               </EpButton>
             </div>

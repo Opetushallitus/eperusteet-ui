@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ep-button v-if="isEditing" icon="edit" @click="avaa" variant="link" class="muokkaa mb-3" inherit-style>
+    <ep-button v-if="isEditing" icon="edit" @click="avaa" variant="link" class="muokkaa mb-3">
       {{$t('muokkaa-sisaltoalueita')}}
     </ep-button>
 
@@ -52,7 +52,7 @@
             </ep-button>
             <div v-else/>
 
-            <ep-button variant="link" icon="delete" @click="poistaSisaltoalue(sisaltoalue)" inherit-style>
+            <ep-button variant="link" icon="delete" @click="poistaSisaltoalue(sisaltoalue)">
               {{ $t('poista-sisaltoalue') }}
             </ep-button>
           </div>

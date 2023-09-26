@@ -52,7 +52,7 @@
               </b-form-group>
 
               <div v-if="isEditing" class="d-flex justify-content-end">
-                <ep-button variant="link" icon="delete" @click="poistaLaajaAlainenOsaaminen(data)" inherit-style>
+                <ep-button variant="link" icon="delete" @click="poistaLaajaAlainenOsaaminen(data)">
                   {{ $t('poista-laaja-alainen') }}
                 </ep-button>
               </div>

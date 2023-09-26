@@ -92,7 +92,7 @@
                             </EpInput>
                         </template>
                         <template #footer>
-                          <EpButton icon="delete" class="mr-5" variant="link" @click="poistaTavoitealue(tavoitealue)" inherit-style>{{ $t('poista-tavoitealue') }}</EpButton>
+                          <EpButton icon="delete" class="mr-5" variant="link" @click="poistaTavoitealue(tavoitealue)">{{ $t('poista-tavoitealue') }}</EpButton>
                         </template>
                       </EpTavoitealueTavoitteet>
                     </div>

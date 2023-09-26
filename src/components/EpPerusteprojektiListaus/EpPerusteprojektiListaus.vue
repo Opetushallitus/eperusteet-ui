@@ -171,8 +171,7 @@
                 <ep-button v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
                            variant="link py-0"
                            icon="keyboard_return"
-                           @click="restore(data.item)"
-                           inherit-style>
+                           @click="restore(data.item)">
                   {{ $t('palauta') }}
                 </ep-button>
               </div>

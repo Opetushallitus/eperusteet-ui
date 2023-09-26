@@ -20,7 +20,7 @@
                   {{ laskettuLaajuus }}
                 </span>
                 / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
-              <ep-button variant="link" icon="edit" @click="editMuodostuminen" v-if="isEditing" inherit-style></ep-button>
+              <ep-button variant="link" icon="edit" @click="editMuodostuminen" v-if="isEditing"></ep-button>
             </h5>
             <div class="filters">
               <ep-search v-model="query" :placeholder="$t('etsi-rakenteesta')" />
@@ -176,8 +176,7 @@
                                        @click="poistaOsaamisala(index)"
                                        variant="link"
                                        icon="delete"
-                                       :disabled="ryhma.osaamisala.rakenteessa"
-                                       inherit-style>
+                                       :disabled="ryhma.osaamisala.rakenteessa">
                             </ep-button>
                             <b-popover v-if="ryhma.osaamisala.rakenteessa"
                                        :target="'poista-osaamisala-' + index"
@@ -238,8 +237,7 @@
                                        @click="poistaTutkintonimike(index)"
                                        variant="link"
                                        icon="delete"
-                                       :disabled="ryhma.tutkintonimike.rakenteessa"
-                                       inherit-style>
+                                       :disabled="ryhma.tutkintonimike.rakenteessa">
                             </ep-button>
                             <b-popover v-if="ryhma.tutkintonimike.rakenteessa"
                                        :target="'poista-tutkintonimike-' + index"

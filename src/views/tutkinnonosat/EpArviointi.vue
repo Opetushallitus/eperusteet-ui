@@ -43,7 +43,7 @@
         :arviointiasteikko="arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko]"
       />
 
-      <EpButton class="mt-4 no-padding" v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohde(arvioinninKohde)" inherit-style>
+      <EpButton class="mt-4 no-padding" v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohde(arvioinninKohde)">
         {{$t('poista-arvioinnin-kohde')}}
       </EpButton>
 
