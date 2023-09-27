@@ -1,7 +1,7 @@
 <template>
   <div>
     <EpButton
-      icon="plussa"
+      icon="add"
       variant="outline"
       v-b-modal.maarasModal
       @click="lisaaMaarays"
@@ -41,8 +41,12 @@
 
           <div v-else class="d-flex justify-content-between">
             <div>
-              <EpButton icon="kyna" variant="link" @click="editing = true" v-oikeustarkastelu="{oikeus:'hallinta'}">{{ $t('muokkaa') }}</EpButton>
-              <EpButton icon="roskalaatikko" variant="link" @click="poista" v-oikeustarkastelu="{oikeus:'hallinta'}">{{ $t('poista') }}</EpButton>
+              <EpButton variant="link" icon="edit" @click="editing = true" v-oikeustarkastelu="{oikeus:'hallinta'}">
+                {{ $t('muokkaa') }}
+              </EpButton>
+              <EpButton variant="link" icon="delete" @click="poista" v-oikeustarkastelu="{oikeus:'hallinta'}">
+                {{ $t('poista') }}
+              </EpButton>
             </div>
             <EpButton @click="sulje">{{ $t('sulje') }}</EpButton>
           </div>
@@ -57,17 +61,17 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { MaaraysDto } from '@shared/api/eperusteet';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpField from '@shared/components/forms/EpField.vue';
-import { required } from 'vuelidate/lib/validators';
 import { success, fail } from '@shared/utils/notifications';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { Validations } from 'vuelidate-property-decorators';
 import { requiredLokalisoituTeksti } from '@shared/validators/required';
 import { MaarayksetStore } from '@/stores/MaarayksetStore';
+import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -75,6 +79,7 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
     EpFormContent,
     EpField,
     EpKielivalinta,
+    EpMaterialIcon,
   },
 })
 export default class EpMaaraysModal extends Vue {

@@ -19,28 +19,26 @@
 
             <div class="d-flex align-items-center">
               <div v-if="julkaisu.julkinen" class="d-flex pr-4">
-                <div class="material-icons julkinen">check_circle</div>
+                <EpMaterialIcon :color="'#4c7f00'">check_circle</EpMaterialIcon>
                 <div class="ml-2">{{$t('nakyy-muutoshistoriassa')}}</div>
               </div>
-              <EpButton
-                v-if="julkaisu.tila === 'JULKAISTU'"
-                variant="link"
-                icon="pen"
-                @click="avaaMuokkausModal(julkaisu)"
-                v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+              <EpButton v-if="julkaisu.tila === 'JULKAISTU'"
+                        icon="edit"
+                        variant="link"
+                        @click="avaaMuokkausModal(julkaisu)"
+                        v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
                 {{ $t('muokkaa') }}
               </EpButton>
 
               <div class="btn btn-link btn-md btn-link">
                 <slot name="katsele" :julkaisu="julkaisu" v-if="julkaisu.tila !== 'VIRHE'"></slot>
               </div>
-              <EpButton
-                v-if="latestJulkaisuRevision && latestJulkaisuRevision.revision !== julkaisu.revision && julkaisu.tila === 'JULKAISTU'"
-                variant="link"
-                icon="peruuta"
-                :showSpinner="julkaisu.palautuksessa"
-                @click="palautaConfirm(julkaisu)"
-                v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+              <EpButton v-if="latestJulkaisuRevision && latestJulkaisuRevision.revision !== julkaisu.revision && julkaisu.tila === 'JULKAISTU'"
+                        icon="keyboard_return"
+                        variant="link"
+                        :showSpinner="julkaisu.palautuksessa"
+                        @click="palautaConfirm(julkaisu)"
+                        v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
                 {{ $t('palauta') }}
               </EpButton>
             </div>
@@ -74,6 +72,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpJulkaisuModal from './EpJulkaisuModal.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
+import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 
 interface Julkaisu {
   revision?: number;
@@ -89,6 +88,7 @@ interface Julkaisu {
     EpButton,
     EpSpinner,
     EpJulkaisuModal,
+    EpMaterialIcon,
   },
 })
 export default class EpJulkaisuHistoria extends Vue {

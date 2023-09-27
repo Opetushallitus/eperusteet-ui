@@ -1,7 +1,7 @@
 <template>
   <EpMainView>
     <template slot="icon">
-      <EpIcon class="float-right" icon="tyoryhma" background-color="#82D4FF" />
+      <EpIcon class="float-right" icon="groups" background-color="#82D4FF" />
     </template>
 
     <b-container>

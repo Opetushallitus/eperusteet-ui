@@ -1,5 +1,5 @@
 <template>
-<EpHomeTile icon="opetussuunnitelma" :route="{ name: 'perusteprojektit' }">
+<EpHomeTile icon="article" :route="{ name: 'perusteprojektit' }">
   <template slot="header">
     <span>{{ $t('perusteprojektit') }}</span>
   </template>

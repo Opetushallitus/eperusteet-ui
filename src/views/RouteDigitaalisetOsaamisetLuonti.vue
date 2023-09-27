@@ -58,7 +58,6 @@
 <script lang="ts">
 import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
@@ -71,13 +70,9 @@ import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
-import { PerusteAikatauluDtoTapahtumaEnum, PerusteprojektiLuontiDtoTyyppiEnum, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
+import { PerusteprojektiLuontiDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
-import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { isLukiokoulutus, EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perusteet';
-import { EperusteetKoulutustyypit, isKoulutustyyppiAmmatillinen } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
-import { Kielet } from '@shared/stores/kieli';
 import { notNull } from '@shared/validators/required';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 
@@ -90,7 +85,6 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpAikataulu,
     EpButton,
     EpColorIndicator,
-    EpIcon,
     EpInput,
     EpMainView,
     EpMultiSelect,

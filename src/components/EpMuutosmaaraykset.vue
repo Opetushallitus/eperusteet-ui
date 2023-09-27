@@ -29,8 +29,7 @@
           </td>
           <td v-if="isEditing">
             <div class="text-center">
-              <ep-button variant="link" icon="roskalaatikko" @click="poista(idx)">
-              </ep-button>
+              <ep-button variant="link" icon="delete" @click="poista(idx)"></ep-button>
             </div>
           </td>
         </tr>

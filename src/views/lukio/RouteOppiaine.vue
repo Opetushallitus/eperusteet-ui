@@ -17,7 +17,7 @@
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -66,7 +66,7 @@
                 <div v-for="(tavoitealue, tavoitealueIndex) in data.tavoitteet.tavoitealueet" :key="'tavoite'+tavoitealueIndex" class="mt-4 p-2 tavoitealue editing">
                   <div class="d-flex">
                     <div class="order-handle m-2">
-                      <fas icon="grip-vertical"></fas>
+                      <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
                     <div class="mt-2 w-100">
                       <div class="row">
@@ -87,12 +87,12 @@
                               :is-editing="true"
                               class="input-wrapper">
                               <div class="order-handle m-2" slot="left">
-                                <fas icon="grip-vertical"></fas>
+                                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                               </div>
                             </EpInput>
                         </template>
                         <template #footer>
-                          <EpButton icon="roskalaatikko" class="mr-5" variant="link" @click="poistaTavoitealue(tavoitealue)">{{ $t('poista-tavoitealue') }}</EpButton>
+                          <EpButton icon="delete" class="mr-5" variant="link" @click="poistaTavoitealue(tavoitealue)">{{ $t('poista-tavoitealue') }}</EpButton>
                         </template>
                       </EpTavoitealueTavoitteet>
                     </div>
@@ -100,7 +100,7 @@
                 </div>
               </draggable>
 
-              <EpButton class="mt-4" variant="outline" icon="plus" @click="lisaaTavoitealue()">{{ $t('lisaa-tavoitealue') }}</EpButton>
+              <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaTavoitealue()">{{ $t('lisaa-tavoitealue') }}</EpButton>
 
             </div>
 
@@ -134,7 +134,7 @@
               </router-link>
             </div>
 
-            <EpButton class="mt-4" variant="outline" icon="plus" @click="lisaaModuuli(true)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-pakollinen-moduuli') }}</EpButton>
+            <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaModuuli(true)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-pakollinen-moduuli') }}</EpButton>
 
             <h5 class="mt-5">{{$t('valinnaisten-moduulien-kuvaus')}}</h5>
             <ep-content layout="normal" v-model="data.valinnaisetModuulitKuvaus" :is-editable="isEditing" v-if="isEditing || data.pakollisetModuulitKuvaus"/>
@@ -145,7 +145,7 @@
                 <EpModuuli :moduuli="moduuli"/>
               </router-link>
             </div>
-            <EpButton class="mt-4" variant="outline" icon="plus" @click="lisaaModuuli(false)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-valinnainen-moduuli') }}</EpButton>
+            <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaModuuli(false)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-valinnainen-moduuli') }}</EpButton>
           </EpCollapse>
 
           <EpCollapse :collapsable="!isEditing" :usePadding="false" :borderBottom="false" class="mt-4" v-if="!data._oppiaine || !data.id">
@@ -156,16 +156,12 @@
               tag="div"
               v-model="data.oppimaarat">
                 <div class="listaus p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                  <div class="order-handle mr-2" v-if="isEditing">
-                    <fas icon="grip-vertical" v-if="isEditing"></fas>
-                  </div>
-                  <div>
-                    <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                  </div>
+                  <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
+                  <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
                 </div>
             </draggable>
 
-            <EpButton class="mt-2" variant="outline" icon="plus" @click="lisaaOppimaara()" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-oppimaara') }}</EpButton>
+            <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaOppimaara()" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-oppimaara') }}</EpButton>
           </EpCollapse>
 
         </b-col>
@@ -193,6 +189,7 @@ import { LukioOppiaineStore } from '@/stores/LukioOppiaineStore';
 import EpTavoitealueTavoitteet from '@shared/components/EpTavoitesisaltoalue/EpTavoitealueTavoitteet.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpModuuli from '@shared/components/EpModuuli/EpModuuli.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -206,6 +203,7 @@ import EpModuuli from '@shared/components/EpModuuli/EpModuuli.vue';
     EpTavoitealueTavoitteet,
     EpColorIndicator,
     EpModuuli,
+    EpMaterialIcon,
   },
 })
 export default class RouteOppiaine extends Vue {

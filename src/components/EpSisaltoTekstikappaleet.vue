@@ -18,12 +18,12 @@
       <ep-content layout="normal" v-model="model[avain].teksti" :is-editable="isEditing"> </ep-content>
 
       <div class="d-flex justify-content-between mt-1" v-if="isEditing">
-        <ep-button variant="outline-primary" icon="plussa" v-if="index+1 === sisaltoTekstiAvaimet.length && vapaatTekstit.length === 0" @click="lisaaTekstikappale()">
+        <ep-button variant="outline-primary" icon="add" v-if="index+1 === sisaltoTekstiAvaimet.length && vapaatTekstit.length === 0" @click="lisaaTekstikappale()">
           {{ $t('lisaa-tekstikappale') }}
         </ep-button>
         <div v-else/>
 
-        <ep-button variant="link" icon="roskalaatikko" @click="poistaSisaltoteksti(avain)">
+        <ep-button variant="link" icon="delete" @click="poistaSisaltoteksti(avain)">
           {{ $t('poista-tekstikappale') }}
         </ep-button>
       </div>
@@ -40,18 +40,18 @@
       <ep-content layout="normal" v-model="teksti.teksti" :is-editable="isEditing"> </ep-content>
 
       <div class="d-flex justify-content-between mt-1" v-if="isEditing">
-        <ep-button variant="outline-primary" icon="plussa" v-if="index+1 === vapaatTekstit.length" @click="lisaaTekstikappale()">
+        <ep-button variant="outline-primary" icon="add" v-if="index+1 === vapaatTekstit.length" @click="lisaaTekstikappale()">
           {{ $t('lisaa-tekstikappale') }}
         </ep-button>
         <div v-else/>
 
-        <ep-button variant="link" icon="roskalaatikko" @click="poistaTeksti(teksti)">
+        <ep-button variant="link" icon="delete" @click="poistaTeksti(teksti)">
           {{ $t('poista-tekstikappale') }}
         </ep-button>
       </div>
     </ep-collapse>
 
-    <ep-button variant="outline-primary" icon="plussa" v-if="isEditing && sisaltoTekstiAvaimet.length === 0 && vapaatTekstit.length === 0" @click="lisaaTekstikappale()">
+    <ep-button variant="outline-primary" icon="add" v-if="isEditing && sisaltoTekstiAvaimet.length === 0 && vapaatTekstit.length === 0" @click="lisaaTekstikappale()">
       {{ $t('lisaa-tekstikappale') }}
     </ep-button>
 

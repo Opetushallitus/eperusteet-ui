@@ -1,5 +1,5 @@
 <template>
-  <EpHomeTile icon="tilasto"
+  <EpHomeTile icon="show_chart"
               :route="{ name: 'tilastot' }">
     <template slot="header">
       <span>{{ $t('tile-tilastot') }}</span>
@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Provide } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
 
 @Component({

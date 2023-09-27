@@ -17,7 +17,7 @@
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>

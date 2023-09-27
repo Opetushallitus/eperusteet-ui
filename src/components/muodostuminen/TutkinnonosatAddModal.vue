@@ -44,11 +44,11 @@
         :selectable="true"
         @row-selected="onRowSelected"
         select-mode="single"
-        selected-variant=''
-      >
+        selected-variant=''>
+
         <template v-slot:cell(nimi)="{ item }">
-            <fas v-if="item.selected" icon="check-square" class="checked mr-2"/>
-            <fas v-else :icon="['far', 'square']" class="checked mr-2"/>
+          <EpMaterialIcon v-if="item.selected" class="checked mr-2">check_box</EpMaterialIcon>
+          <EpMaterialIcon v-else class="checked mr-2">check_box_outline_blank</EpMaterialIcon>
           {{ $kaanna(item.nimi) }}
         </template>
       </b-table>
@@ -66,23 +66,20 @@
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
-import { Kieli } from '@shared/tyypit';
-import { Kielet } from '@shared/stores/kieli';
-import { Prop, Component, Vue, Watch, Inject, InjectReactive } from 'vue-property-decorator';
+import { Prop, Component, Vue, InjectReactive } from 'vue-property-decorator';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
-import { ryhmaTemplate } from './utils';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
     EpButton,
     EpContent,
-    EpIcon,
     EpInput,
     EpToggle,
     EpSearch,
+    EpMaterialIcon,
   },
 })
 

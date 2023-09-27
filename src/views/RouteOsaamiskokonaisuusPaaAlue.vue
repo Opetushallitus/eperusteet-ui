@@ -43,13 +43,13 @@
             <b-col md="8">
               <div class="d-flex">
                 <div class="order-handle mr-3">
-                  <fas icon="grip-vertical"></fas>
+                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
                 <EpOsaAlue v-model="data.osaAlueet[index]" :isEditing="isEditing" class="w-100">
                   <div slot="poisto">
                     <b-button variant="link" @click.stop="poistaOsaAlue(osaAlue)">
-                    <fas icon="roskalaatikko"/>
-                    {{ $t('poista-osa-alue') }}
+                      <EpMaterialIcon>delete</EpMaterialIcon>
+                      {{ $t('poista-osa-alue') }}
                   </b-button>
                   </div>
                 </EpOsaAlue>
@@ -58,7 +58,7 @@
           </b-row>
         </draggable>
 
-        <ep-button @click="lisaaOsaalue()" variant="outline" icon="plus" class="mt-2">
+        <ep-button @click="lisaaOsaalue()" variant="outline" icon="add" class="mt-2">
           {{ $t('lisaa-osa-alue') }}
         </ep-button>
       </template>
@@ -77,7 +77,6 @@
 
 <script lang="ts">
 import { KuvaStore } from '@/stores/KuvaStore';
-import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TermitStore } from '@/stores/TermitStore';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
@@ -91,6 +90,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpOsaAlue from '@shared/components/EpOsaamiskokonaisuus/EpOsaAlue.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import draggable from 'vuedraggable';
 
 @Component({
@@ -100,6 +100,7 @@ import draggable from 'vuedraggable';
     EpContent,
     EpButton,
     EpOsaAlue,
+    EpMaterialIcon,
     draggable,
   },
 })

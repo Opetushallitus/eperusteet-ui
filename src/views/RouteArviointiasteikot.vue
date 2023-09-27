@@ -10,7 +10,7 @@
           <ep-button
             v-if="!isEditing"
             variant="link"
-            icon="kyna"
+            icon="edit"
             @click="toggleEdit()"
             class="mt-sm-0 mt-3"
             v-oikeustarkastelu="{oikeus:'hallinta'}">
@@ -19,11 +19,11 @@
           <ep-button
             v-if="!isEditing"
             variant="link"
-            icon="plus"
+            icon="add"
             @click="lisaaArviointiasteikko()"
             class="mt-sm-0 mt-3"
             v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
-          {{ $t('lisaa-uusi') }}
+            {{ $t('lisaa-uusi') }}
           </ep-button>
         </div>
         <div>
@@ -54,7 +54,7 @@
                 v-if="isEditing"
                 @click="poistaArviointiasteikko(asteikko)"
                 variant="link"
-                icon="roskalaatikko"
+                icon="delete"
                 v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
                 {{ $t('poista-arviointiasteikko') }}
               </ep-button>
@@ -91,7 +91,7 @@
                             :value="taso.koodi ? $kaanna(taso.koodi.nimi) : ''"
                             disabled></b-form-input>
                           <b-input-group-append>
-                            <b-button @click="open" icon="plus" variant="primary">
+                            <b-button @click="open" variant="primary">
                               {{ $t('hae-koodistosta') }}
                             </b-button>
                           </b-input-group-append>
@@ -101,20 +101,19 @@
                   </b-form-group>
 
                   <b-form-group>
-                    <fas
-                      icon="roskalaatikko"
-                      class="default-icon clickable mb-2 ml-4"
-                      @click="poistaOsaamistaso(asteikko, taso)"
-                      v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"/>
+                    <div class="default-icon clickable mb-2 ml-4"
+                         @click="poistaOsaamistaso(asteikko, taso)"
+                         v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+                      <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
+                    </div>
                   </b-form-group>
                 </div>
               </div>
-              <ep-button
-                variant="outline"
-                icon="plus"
-                @click="lisaaOsaamistaso(asteikko)"
-                v-if="isEditing"
-                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+              <ep-button v-if="isEditing"
+                         variant="outline"
+                         icon="add"
+                         @click="lisaaOsaamistaso(asteikko)"
+                         v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
                 {{ $t('lisaa-osaamistaso') }}
               </ep-button>
             </div>
@@ -128,9 +127,7 @@
 
 <script lang="ts">
 import { Prop, Component, Vue } from 'vue-property-decorator';
-
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
@@ -142,17 +139,18 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import * as _ from 'lodash';
 import VueScrollTo from 'vue-scrollto';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
     EpMainView,
-    EpIcon,
     EpJulkiLista,
     EpButton,
     EpSpinner,
     EpInput,
     EpKoodistoSelect,
     EpInfoPopover,
+    EpMaterialIcon,
   },
 })
 export default class RouteArviointiasteikot extends Vue {

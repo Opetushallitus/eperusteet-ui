@@ -21,7 +21,7 @@
                     no-caret>
           <template v-slot:button-content>
             <ep-button variant="link" buttonClass="text-decoration-none">
-              <fas class="mr-2" icon="plussa"/>
+              <EpMaterialIcon :color="'inherit'" :background="'inherit'" size="18px">add</EpMaterialIcon>
               {{ $t(lisasisalto.groupedLinkkiteksti) }}
             </ep-button>
           </template>
@@ -68,7 +68,8 @@
           buttonClass="text-decoration-none"
           @click="makeCall(lisasisalto.call)"
           :showSpinner="loading">
-          <fas class="mr-2" icon="plussa" /> {{ $t(lisasisalto.label['uusi']) }}
+          <EpMaterialIcon :color="'inherit'" :background="'inherit'" size="18px">add</EpMaterialIcon>
+          {{ $t(lisasisalto.label['uusi']) }}
         </ep-button>
 
         <ep-tekstikappale-lisays
@@ -124,11 +125,13 @@ import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOs
 import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
     EpTekstikappaleLisays,
     EpButton,
+    EpMaterialIcon,
   },
 })
 export default class EpSisallonLisays extends Vue {

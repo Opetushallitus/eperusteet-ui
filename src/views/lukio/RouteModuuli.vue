@@ -17,7 +17,7 @@
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -84,28 +84,28 @@
           </div>
 
           <div class="mb-2 mt-3 font-weight-bold">{{$t('tavoitteet')}}</div>
-          <draggable
-            v-bind="tavoitteetDragOptions"
-            tag="div"
-            v-model="data.tavoitteet.tavoitteet">
-              <div class="row mb-2" v-for="(tavoite, tavoiteindex) in data.tavoitteet.tavoitteet" :key="'tavoitteet' +tavoiteindex">
-                <div class="col-11">
-                  <EpInput
-                      v-model="data.tavoitteet.tavoitteet[tavoiteindex]"
-                      :is-editing="true"
-                      class="input-wrapper">
-                      <div class="order-handle m-2" slot="left">
-                        <fas icon="grip-vertical"></fas>
-                      </div>
-                    </EpInput>
+          <draggable v-bind="tavoitteetDragOptions"
+                     tag="div"
+                     v-model="data.tavoitteet.tavoitteet">
+            <div class="row mb-2" v-for="(tavoite, tavoiteindex) in data.tavoitteet.tavoitteet" :key="'tavoitteet' +tavoiteindex">
+              <div class="col-11">
+                <EpInput v-model="data.tavoitteet.tavoitteet[tavoiteindex]"
+                         :is-editing="true"
+                         class="input-wrapper">
+                  <div class="order-handle m-2" slot="left">
+                    <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   </div>
-                  <div class="col-1">
-                    <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poistaTavoite(tavoite)"/>
+                </EpInput>
+                </div>
+                <div class="col-1">
+                  <div class="default-icon clickable mt-2" @click="poistaTavoite(tavoite)">
+                    <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
                   </div>
                 </div>
+              </div>
           </draggable>
 
-          <EpButton class="mt-2" variant="outline" icon="plus" @click="lisaaTavoite()">{{ $t('lisaa-tavoite') }}</EpButton>
+          <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaTavoite()">{{ $t('lisaa-tavoite') }}</EpButton>
         </template>
 
         <template v-else>
@@ -129,7 +129,7 @@
             <div v-for="(sisaltoalue, sisaltoIndex) in data.sisallot" :key="'sisalto'+sisaltoIndex" class="mt-4 p-2 tavoitealue editing">
               <div class="d-flex">
                 <div class="order-handle m-2">
-                  <fas icon="grip-vertical"></fas>
+                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
                 <div class="mt-2 w-100">
                   <div class="row">
@@ -142,20 +142,19 @@
                   <div class="mt-3 mb-2 font-weight-bold">{{$t('sisallot')}}</div>
                   <EpTavoitealueTavoitteet v-model="sisaltoalue.sisallot">
                     <template #default="{tavoiteIndex}">
-                      <EpInput
-                          v-model="sisaltoalue.sisallot[tavoiteIndex]"
-                          :is-editing="true"
-                          class="input-wrapper">
-                          <div class="order-handle m-2" slot="left">
-                            <fas icon="grip-vertical"></fas>
-                          </div>
-                        </EpInput>
+                      <EpInput v-model="sisaltoalue.sisallot[tavoiteIndex]"
+                               :is-editing="true"
+                               class="input-wrapper">
+                        <div class="order-handle m-2" slot="left">
+                          <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                        </div>
+                      </EpInput>
                     </template>
                     <template #lisaaBtnText>
                       {{ $t('lisaa-sisalto') }}
                     </template>
                     <template #footer>
-                      <EpButton icon="roskalaatikko" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)">{{ $t('poista-sisaltoalue') }}</EpButton>
+                      <EpButton icon="delete" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)">{{ $t('poista-sisaltoalue') }}</EpButton>
                     </template>
                   </EpTavoitealueTavoitteet>
                 </div>
@@ -163,7 +162,7 @@
             </div>
           </draggable>
 
-          <EpButton class="mt-2" variant="outline" icon="plus" @click="lisaaSisaltoalue()">{{ $t('lisaa-sisaltoalue') }}</EpButton>
+          <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaSisaltoalue()">{{ $t('lisaa-sisaltoalue') }}</EpButton>
 
         </div>
 
@@ -198,6 +197,7 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { LukioModuuliStore } from '@/stores/LukioModuuliStore';
 import EpTavoitealueTavoitteet from '@shared/components/EpTavoitesisaltoalue/EpTavoitealueTavoitteet.vue';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -210,6 +210,7 @@ import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
     EpCollapse,
     EpTavoitealueTavoitteet,
     EpInfoPopover,
+    EpMaterialIcon,
   },
 })
 export default class RouteModuuli extends Vue {

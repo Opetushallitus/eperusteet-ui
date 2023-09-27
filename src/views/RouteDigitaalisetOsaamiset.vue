@@ -17,7 +17,7 @@
                 <EpButton
                   slot="palauta"
                   variant="link"
-                  icon="peruuta"
+                  icon="keyboard_return"
                   @click="onRestore(data.item)"
                   v-if="palautusoikeus(data.item)">
                   {{ $t('palauta') }}
@@ -40,7 +40,6 @@
 import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import * as _ from 'lodash';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
@@ -51,7 +50,6 @@ import { DigitaalisetOsaamisetStore } from '@/stores/DigitaalisetOsaamisetStore'
 
 @Component({
   components: {
-    EpIcon,
     EpMainView,
     EpPerusteprojektiListaus,
     EpColorIndicator,

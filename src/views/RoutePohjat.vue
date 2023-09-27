@@ -16,12 +16,10 @@
 import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 
 @Component({
   components: {
-    EpIcon,
     EpMainView,
     EpPerusteprojektiListaus,
   },

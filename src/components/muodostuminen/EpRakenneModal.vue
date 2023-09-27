@@ -11,7 +11,7 @@
 
     <template #modal-footer>
       <div class="d-flex justify-content-end w-100">
-        <ep-button @click="remove" icon="roskalaatikko" variant="link" class="flex-grow-1" v-if="muokkaus">
+        <ep-button @click="remove" icon="delete" variant="link" class="flex-grow-1" v-if="muokkaus">
           {{$t('poista')}}
         </ep-button>
         <ep-button @click="cancel" variant="link">
@@ -142,7 +142,6 @@
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
 import { Kieli } from '@shared/tyypit';
@@ -153,7 +152,6 @@ import { Prop, Component, Vue, Watch, InjectReactive } from 'vue-property-decora
   components: {
     EpButton,
     EpContent,
-    EpIcon,
     EpInput,
     EpToggle,
   },

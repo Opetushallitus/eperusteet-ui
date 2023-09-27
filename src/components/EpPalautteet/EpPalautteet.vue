@@ -25,14 +25,11 @@
             }">
         </template>
         <template v-slot:cell(stars)="{ item }">
-          <div
-            class="d-flex align-items-center justify-content-start my-2">
-            <fas
-              v-for="rating in ratings"
-              :key="rating"
-              icon="tahti-taytetty"
-              class="icon-tahti fa-lg ml-1"
-              :class="{ 'icon-tahti--active': rating <= item[Review.STARS] }" />
+          <div class="d-flex align-items-center justify-content-start my-2">
+            <EpMaterialIcon v-for="rating in ratings"
+                            :key="rating"
+                            class="icon-tahti fa-lg ml-1"
+                            :class="{ 'icon-tahti--active': rating <= item[Review.STARS] }">star</EpMaterialIcon>
           </div>
         </template>
         <template v-slot:cell(status)="{ item }">
@@ -64,11 +61,8 @@
             </span>
         </template>
         <template v-slot:cell(delete)="{ item }">
-          <div v-if="item.status !== 'POISTETTU'">
-             <fas
-                icon="roskalaatikko"
-                class="default-icon clickable mt-2"
-                @click="paivitaStatus(item, 'POISTETTU')"/>
+          <div v-if="item.status !== 'POISTETTU'" class="default-icon clickable mt-2" @click="paivitaStatus(item, 'POISTETTU')">
+            <EpMaterialIcon>delete</EpMaterialIcon>
           </div>
         </template>
       </b-table>
@@ -93,6 +87,7 @@ import { PalauteDto, PalauteDtoStatusEnum } from '@shared/api/eperusteet';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { Kielet } from '@shared/stores/kieli';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 enum Review {
   STARS = 'stars',
@@ -107,6 +102,7 @@ enum Review {
     EpSpinner,
     EpColorIndicator,
     EpMultiSelect,
+    EpMaterialIcon,
   },
 })
 export default class EpPalautteet extends Vue {

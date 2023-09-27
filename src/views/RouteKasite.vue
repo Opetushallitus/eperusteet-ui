@@ -5,7 +5,7 @@
     <div v-else>
       <div class="d-flex justify-content-between">
         <ep-search class="mb-3" v-model="query" :placeholder="$t('etsi')"></ep-search>
-        <ep-button variant="outline" @click="avaaMuokkausModal()" icon="plussa" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-kasite') }}</ep-button>
+        <ep-button variant="outline" @click="avaaMuokkausModal()" icon="add" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-kasite') }}</ep-button>
       </div>
       <div class="kasitelista m-3" v-if="termit.length > 0">
         <div class="row align-items-start" :class="{open: !termi.closed}" v-for="(termi, idx) in termitFiltered" :key="idx">
@@ -15,14 +15,14 @@
           </div>
           <div class="col col-3 text-right toiminnot">
             <button class="btn btn-link" @click="avaaPoistoModal(termi)">
-              <fas :icon="['far','trash-alt']" fixed-width="fixed-width"/>
+              <EpMaterialIcon>delete</EpMaterialIcon>
             </button>
             <button class="btn btn-link" @click="avaaMuokkausModal(termi)">
-              <fas icon="pen" fixed-width />
+              <EpMaterialIcon>edit</EpMaterialIcon>
             </button>
             <button class="btn btn-link" @click="toggleTermi(termi)">
-              <fas icon="chevron-down" v-if="termi.closed" fixed-width></fas>
-              <fas icon="chevron-up" v-else fixed-width></fas>
+              <EpMaterialIcon v-if="termi.closed">expand_more</EpMaterialIcon>
+              <EpMaterialIcon v-else>expand_less</EpMaterialIcon>
             </button>
           </div>
         </div>
@@ -71,7 +71,7 @@ import _ from 'lodash';
 
 import { Component, Prop } from 'vue-property-decorator';
 import { validationMixin } from 'vuelidate';
-import { Kielet, UiKielet } from '@shared/stores/kieli';
+import { Kielet } from '@shared/stores/kieli';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
@@ -87,6 +87,7 @@ import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue
 import { createLogger } from '@shared/utils/logger';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 const logger = createLogger('RouteKasite');
 
@@ -102,6 +103,7 @@ const logger = createLogger('RouteKasite');
     EpField,
     EpContent,
     EpToggle,
+    EpMaterialIcon,
   },
   mixins: [
     validationMixin,

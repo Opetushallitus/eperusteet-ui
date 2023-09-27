@@ -126,14 +126,16 @@
                     {{ $kaanna(data.item.nimi) }}
                   </template>
                   <template v-slot:cell(poista)="data">
-                    <div v-if="isEditing" class="material-icons default-icon clickable" @click="poistaKoulutusKoodi(data)">delete</div>
+                    <div v-if="isEditing" class="default-icon clickable" @click="poistaKoulutusKoodi(data)">
+                      <EpMaterialIcon>delete</EpMaterialIcon>
+                    </div>
                   </template>
                 </b-table>
                 <ep-koodisto-select @add="addKoulutuskoodi(data, $event)"
                   :store="koulutuskoodisto"
                   v-if="isEditing">
                   <template v-slot:default="{ open }">
-                    <ep-button @click="open" icon="plus" variant="outline">
+                    <ep-button @click="open" icon="add" variant="outline">
                       {{ $t('lisaa-koulutus') }}
                     </ep-button>
                   </template>
@@ -168,7 +170,7 @@
                   </template>
                   <template v-slot:cell(toiminnot)="data">
                     <div class="text-center" v-if="isEditing">
-                      <ep-button variant="link" icon="roskalaatikko" @click="poistaKorvattava(data.item)">
+                      <ep-button variant="link" icon="delete" @click="poistaKorvattava(data.item)">
                         {{ $t('poista') }}
                       </ep-button>
                     </div>
@@ -177,7 +179,7 @@
                 <b-input-group v-if="isEditing">
                   <b-form-input v-model="korvattavaDiaarinumero"></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="lisaaDiaarinumero" icon="plus" variant="primary" :disabled="!korvattavaDiaarinumero">
+                    <b-button @click="lisaaDiaarinumero" variant="primary" :disabled="!korvattavaDiaarinumero">
                       {{ $t('lisaa-peruste') }}
                     </b-button>
                   </b-input-group-append>
@@ -203,7 +205,7 @@
                           <b-button @click="peruutaLiite()" variant="secondary">
                             {{ $t('peruuta') }}
                           </b-button>
-                          <b-button @click="tallennaLiite()" icon="plus" variant="primary" :disabled="!liitteenNimi">
+                          <b-button @click="tallennaLiite()" variant="primary" :disabled="!liitteenNimi">
                             {{ $t('tallenna-liite') }}
                           </b-button>
                         </b-input-group-append>
@@ -220,7 +222,7 @@
                           hover>
                     <template v-slot:cell(toiminnot)="data">
                       <div class="text-center" v-if="isEditing">
-                        <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                        <ep-button variant="link" icon="delete" @click="poistaLiite(data.item)">
                           {{ $t('poista') }}
                         </ep-button>
                       </div>
@@ -291,7 +293,7 @@
                   </template>
                   <template v-slot:cell(toiminnot)="data">
                     <div class="text-center" v-if="isEditing">
-                      <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                      <ep-button variant="link" icon="delete" @click="poistaLiite(data.item)">
                         {{ $t('poista') }}
                       </ep-button>
                     </div>
@@ -348,7 +350,7 @@
 
                     <template v-slot:cell(toiminnot)="data">
                       <div class="text-center" v-if="isEditing">
-                        <ep-button variant="link" icon="roskalaatikko" @click="poistaLiite(data.item)">
+                        <ep-button variant="link" icon="delete" @click="poistaLiite(data.item)">
                           {{ $t('poista') }}
                         </ep-button>
                       </div>
@@ -444,7 +446,7 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-
+import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { UiKielet } from '@shared/stores/kieli';
 import _ from 'lodash';
@@ -489,6 +491,7 @@ const koulutustyyppiTietoFilters = [
     EpTiedostoLataus,
     EpToggle,
     PerustetyoryhmaSelect,
+    EpMaterialIcon,
   },
 })
 export default class RoutePerusteenTiedot extends PerusteprojektiRoute {

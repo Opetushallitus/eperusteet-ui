@@ -13,9 +13,9 @@
             <div class="card-wrapper" v-oikeustarkastelu="luontioikeus">
               <ProjektiCard :full-background="true" :link="newRoute">
                 <div class="d-flex align-items-center flex-column h-100">
-                  <div class="h-50 text-center d-flex align-items-center pt-4">
+                  <div class="h-50 text-center d-flex align-items-center pt-5">
                     <div class="ikoni">
-                      <fas icon="plus" />
+                      <EpMaterialIcon size="50px">add</EpMaterialIcon>
                     </div>
                   </div>
                   <div class="h-50 text-center d-flex align-items-center pb-5">
@@ -168,11 +168,10 @@
             <template v-slot:cell(tila)="data">
               <div class="d-flex">
                 {{ $t(data.item.tila) }}
-                <ep-button
-                  v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
-                  variant="link py-0"
-                  icon="peruuta"
-                  @click="restore(data.item)">
+                <ep-button v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
+                           variant="link py-0"
+                           icon="keyboard_return"
+                           @click="restore(data.item)">
                   {{ $t('palauta') }}
                 </ep-button>
               </div>
@@ -194,7 +193,6 @@
 <script lang="ts">
 import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
@@ -210,13 +208,13 @@ import * as _ from 'lodash';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 import { perusteTile } from '@shared/utils/bannerIcons';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
 @Component({
   components: {
     EpColorIndicator,
-    EpIcon,
     EpMainView,
     EpMultiSelect,
     EpPagination,
@@ -225,6 +223,7 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     ProjektiCard,
     KoulutustyyppiSelect,
     EpButton,
+    EpMaterialIcon,
   },
 })
 export default class EpPerusteprojektiListaus extends Vue {
@@ -522,7 +521,6 @@ export default class EpPerusteprojektiListaus extends Vue {
 <style lang="scss" scoped>
 
 .upper {
-  margin-bottom: 3rem;
   margin-bottom: 4rem;
 }
 

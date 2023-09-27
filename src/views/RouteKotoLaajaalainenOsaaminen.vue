@@ -38,7 +38,7 @@
                   <b-button variant="link"
                             @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)"
                             v-if="isEditing">
-                    <fas icon="roskalaatikko"/>
+                    <EpMaterialIcon>delete</EpMaterialIcon>
                     {{ $t('poista') }}
                   </b-button>
                 </span>
@@ -71,7 +71,6 @@
 </template>
 
 <script lang="ts">
-
 import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
@@ -86,6 +85,7 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 interface LaajaaAlainenOsaaminenKoodi {
   nimi: { [locale: string]: string };
@@ -101,6 +101,7 @@ interface LaajaaAlainenOsaaminenKoodi {
     EpSpinner,
     EpContent,
     EpInput,
+    EpMaterialIcon,
   },
 })
 export default class RouteKotoLaajaalainenOsaaminen extends Vue {

@@ -22,7 +22,7 @@
         </b-form-radio-group>
       </b-form-group>
     </b-modal>
-    <ep-button @click="onOpen" variant="outline" icon="plus">
+    <ep-button @click="onOpen" variant="outline" icon="add">
       <slot name="valinta">{{ $t('valitse-arviointiasteikko') }}</slot>
     </ep-button>
   </div>
@@ -34,10 +34,7 @@ import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
-import { BvTableFieldArray } from 'bootstrap-vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import * as _ from 'lodash';
 
 @Component({
   components: {

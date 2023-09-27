@@ -8,7 +8,7 @@
     </template>
     <template #default="{ data, isEditing }">
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="plus" @click="lisaaOppiaine" :disabled="isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+        <EpButton variant="outline" icon="add" @click="lisaaOppiaine" :disabled="isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
           {{ $t('uusi-oppiaine')}}
         </EpButton>
       </div>
@@ -25,7 +25,7 @@
         <b-row v-for="(oppiaine, index) in data.oppiaineet" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
           <b-col cols="5" class="d-flex">
             <div class="order-handle mr-2" v-if="isEditing">
-              <fas icon="grip-vertical"></fas>
+              <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <div>
               <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppiaine.id } }">{{ $kaanna(oppiaine.nimi) }}</router-link>
@@ -42,7 +42,6 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { LukioOppiaineetStore } from '@/stores/LukioOppiaineetStore';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -50,6 +49,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 
@@ -59,6 +59,7 @@ import draggable from 'vuedraggable';
     EpSpinner,
     draggable,
     EpEditointi,
+    EpMaterialIcon,
   },
 })
 export default class RouteOppiaineet extends Vue {

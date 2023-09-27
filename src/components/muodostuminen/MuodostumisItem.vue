@@ -3,8 +3,8 @@
     <div class="d-flex align-items-center flex-grow-1 h-100">
       <div class="pl-1" v-if="hasChildren">
         <b-button variant="link" @click="toggleOpen">
-          <fas v-if="isOpen" icon="chevron-up" />
-          <fas v-else icon="chevron-down" />
+          <EpMaterialIcon v-if="isOpen">expand_less</EpMaterialIcon>
+          <EpMaterialIcon v-else>expand_more</EpMaterialIcon>
         </b-button>
       </div>
       <div class="flex-grow-1 h-100 p-2 nimi">
@@ -31,7 +31,8 @@
             toggle-class="text-decoration-none"
             no-caret>
             <template v-slot:button-content>
-              <fas icon="ellipsis-h" /><span class="sr-only">{{ $t('muokkaa-ryhmaa') }}</span>
+              <EpMaterialIcon>more_horiz</EpMaterialIcon>
+              <span class="sr-only">{{ $t('muokkaa-ryhmaa') }}</span>
             </template>
             <b-dropdown-item-button @click="edit">{{ $t('muokkaa') }}</b-dropdown-item-button>
             <b-dropdown-item-button @click="remove">{{ $t('poista') }}</b-dropdown-item-button>
@@ -40,8 +41,8 @@
               <b-dropdown-item-button @click="copy">{{ $t('kopioi-leikelaudalle') }}</b-dropdown-item-button>
               <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
               <b-dropdown-text v-if="isRyhma">
-                <ep-button icon="plus" variant="outline" @click="liitaTosa">{{ $t('liita-tutkinnon-osa') }}</ep-button>
-                <ep-button icon="plus" variant="outline" @click="lisaaRyhma">{{ $t('lisaa-ryhma') }}</ep-button>
+                <ep-button icon="add" variant="outline" @click="liitaTosa">{{ $t('liita-tutkinnon-osa') }}</ep-button>
+                <ep-button icon="add" variant="outline" @click="lisaaRyhma">{{ $t('lisaa-ryhma') }}</ep-button>
               </b-dropdown-text>
             </template>
           </b-dropdown>
@@ -54,7 +55,7 @@
       </div>
       <div class="text-center description-button">
         <b-button variant="link" @click="toggleDescription()">
-          <fas icon="ellipsis-h" />
+          <EpMaterialIcon>more_horiz</EpMaterialIcon>
         </b-button>
       </div>
     </div>
@@ -70,18 +71,16 @@
 <script lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import _ from 'lodash';
-import { Watch, Prop, Component, Vue, Inject } from 'vue-property-decorator';
-import { RakenneModuuliDto } from '@shared/api/eperusteet';
-import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType, DefaultRyhma, ryhmaTemplate } from './utils';
-import { v4 as genUuid } from 'uuid';
+import { Prop, Component, Vue } from 'vue-property-decorator';
+import { DefaultRyhma, ryhmaTemplate } from './utils';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { rakenneNodecolor } from '@shared/utils/perusterakenne';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   name: 'MuodostumisItem',
@@ -93,6 +92,7 @@ import { rakenneNodecolor } from '@shared/utils/perusterakenne';
     EpRakenneModal,
     TutkinnonosatAddModal,
     EpColorIndicator,
+    EpMaterialIcon,
   },
 })
 export default class MuodostumisItem extends Vue {

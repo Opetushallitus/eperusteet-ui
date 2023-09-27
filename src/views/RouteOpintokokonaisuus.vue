@@ -15,7 +15,7 @@
                     :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -71,17 +71,19 @@
               <b-col cols="10" lg="8">
                 <ep-input v-model="tavoite.nimi" :is-editing="isEditing" :disabled="!tavoite.uri.startsWith('temporary')">
                   <div class="order-handle m-2" slot="left">
-                    <fas icon="grip-vertical"></fas>
+                    <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   </div>
                 </ep-input>
               </b-col>
               <b-col cols="1" v-if="isEditing">
-                <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poista(tavoite, 'opetuksenTavoitteet')"/>
+                <div class="default-icon clickable mt-2" @click="poista(tavoite, 'opetuksenTavoitteet')">
+                  <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
+                </div>
               </b-col>
             </b-row>
           </draggable>
 
-          <ep-button variant="outline" icon="plus" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')" v-if="isEditing">
+          <ep-button v-if="isEditing" variant="outline" icon="add" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')">
             {{ $t('lisaa-tavoite') }}
           </ep-button>
         </div>
@@ -111,17 +113,19 @@
               <b-col cols="10" lg="8">
                 <ep-input v-model="arviointi[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
                   <div class="order-handle m-2" slot="left">
-                    <fas icon="grip-vertical"></fas>
+                    <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   </div>
                 </ep-input>
               </b-col>
               <b-col cols="1" v-if="isEditing">
-                <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poista(arviointi, 'arvioinnit')"/>
+                <div class="default-icon clickable mt-2" @click="poista(arviointi, 'arvioinnit')">
+                  <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
+                </div>
               </b-col>
             </b-row>
           </draggable>
 
-          <ep-button variant="outline" icon="plus" @click="lisaa('arvioinnit')" v-if="isEditing">
+          <ep-button v-if="isEditing" variant="outline" icon="add" @click="lisaa('arvioinnit')">
             {{ $t('lisaa-arvioinnin-kohde') }}
           </ep-button>
         </div>
@@ -162,6 +166,7 @@ import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { generateTemporaryKoodiUri } from '@shared/utils/koodi';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -172,6 +177,7 @@ import { generateTemporaryKoodiUri } from '@shared/utils/koodi';
     EpLaajuusInput,
     EpKoodistoSelect,
     EpButton,
+    EpMaterialIcon,
     draggable,
   },
 })

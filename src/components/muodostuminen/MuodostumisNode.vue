@@ -38,13 +38,10 @@
 
 <script lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import { Prop, Component, Vue } from 'vue-property-decorator';
-import { RakenneModuuliDto } from '@shared/api/eperusteet';
 import draggable from 'vuedraggable';
 import _ from 'lodash';
-import { v4 as genUuid } from 'uuid';
-import { RooliToTheme, ColorMap, RakenneMainType, RakenneModuuliType } from '@/components/muodostuminen/utils';
+import { RooliToTheme, ColorMap } from '@/components/muodostuminen/utils';
 import MuodostumisItem from './MuodostumisItem.vue';
 import { Kielet } from '@shared/stores/kieli';
 

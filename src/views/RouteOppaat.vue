@@ -13,7 +13,7 @@
         <div class="d-flex">
           <h2 class="pt-2 flex-grow-1">{{ $t('oppaat') }}</h2>
           <router-link :to="{ name: 'opasLuonti' }">
-            <ep-button class="m-0 p-0" variant="outline" icon="plus">{{$t('lisaa-opas')}}</ep-button>
+            <ep-button class="m-0 p-0" variant="outline" icon="add">{{$t('lisaa-opas')}}</ep-button>
           </router-link>
         </div>
       </template>
@@ -53,7 +53,6 @@
 import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import * as _ from 'lodash';
@@ -63,7 +62,6 @@ import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
 
 @Component({
   components: {
-    EpIcon,
     EpMainView,
     EpPerusteprojektiListaus,
     EpColorIndicator,

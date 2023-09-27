@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
-
 import RouteArviointi from '@/views/RouteArviointi.vue';
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue';
 import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';
@@ -209,21 +208,21 @@ const router = new VueRouter({
           text: 'perusteen-tiedot',
         }, {
           route: 'perusteenPdfLuonti',
-          icon: ['far', 'file-pdf'],
+          icon: 'picture_as_pdf',
           text: 'luo-pdf',
           disabled: () => !stores.perusteStore.pdfEnabled.value,
         }, {
           route: 'kasitteet',
-          icon: 'kasitteet',
+          icon: 'book',
           text: 'kasitteet',
         }, {
           route: 'poistetutsisallot',
-          icon: 'roskalaatikko',
+          icon: 'delete',
           text: 'poistetut',
         }, {
           separator: true,
         }, {
-          icon: ['far', 'folder'],
+          icon: 'archive',
           text: 'arkistoi-peruste',
           click: vaihdaPerusteTilaConfirm,
           meta: {
@@ -468,20 +467,20 @@ const router = new VueRouter({
           text: 'oppaan-tiedot',
         }, {
           route: 'oppaanPdfLuonti',
-          icon: ['far', 'file-pdf'],
+          icon: 'picture_as_pdf',
           text: 'luo-pdf',
         }, {
           route: 'opasKasitteet',
-          icon: 'kasitteet',
+          icon: 'book',
           text: 'kasitteet',
         }, {
           route: 'poistetutsisallot',
-          icon: 'roskalaatikko',
+          icon: 'delete',
           text: 'poistetut',
         }, {
           separator: true,
         }, {
-          icon: ['far', 'folder'],
+          icon: 'archive',
           text: 'arkistoi-opas',
           click: vaihdaPerusteTilaConfirm,
           meta: {

@@ -9,7 +9,7 @@
     <EpSpinner v-if="!vuosiluokkakokonaisuudet"/>
     <div v-else>
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="plus" @click="lisaaVuosiluokkakokonaisuus" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+        <EpButton variant="outline" icon="add" @click="lisaaVuosiluokkakokonaisuus" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
           {{ $t('uusi-vuosiluokkakokonaisuus')}}
         </EpButton>
       </div>
@@ -35,7 +35,6 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteStore } from '@/stores/PerusteStore';

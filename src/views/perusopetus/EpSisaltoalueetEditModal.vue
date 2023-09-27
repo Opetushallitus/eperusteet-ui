@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ep-button icon="kyna" @click="avaa" variant="link" v-if="isEditing" class="muokkaa mb-3">
+    <ep-button v-if="isEditing" icon="edit" @click="avaa" variant="link" class="muokkaa mb-3">
       {{$t('muokkaa-sisaltoalueita')}}
     </ep-button>
 
@@ -35,7 +35,7 @@
         <div v-for="(sisaltoalue, index) in model.sisaltoalueet" :key="'sisaltoalue' + index" class="mt-4">
           <div class="d-flex" >
             <div class="order-handle mr-3">
-              <fas icon="grip-vertical"></fas>
+              <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <h4>{{ $t('sisaltoalueen-nimi') }}</h4>
           </div>
@@ -47,19 +47,19 @@
           </div>
 
           <div class="d-flex justify-content-between mt-1 ml-3">
-            <ep-button variant="outline-primary" icon="plussa" v-if="model.sisaltoalueet && index+1 === model.sisaltoalueet.length" @click="lisaaSisaltoalue()">
+            <ep-button variant="outline-primary" icon="add" v-if="model.sisaltoalueet && index+1 === model.sisaltoalueet.length" @click="lisaaSisaltoalue()">
               {{ $t('lisaa-sisaltoalue') }}
             </ep-button>
             <div v-else/>
 
-            <ep-button variant="link" icon="roskalaatikko" @click="poistaSisaltoalue(sisaltoalue)">
+            <ep-button variant="link" icon="delete" @click="poistaSisaltoalue(sisaltoalue)">
               {{ $t('poista-sisaltoalue') }}
             </ep-button>
           </div>
         </div>
       </draggable>
 
-      <ep-button variant="outline-primary" icon="plussa" v-if="model.sisaltoalueet && model.sisaltoalueet.length === 0" @click="lisaaSisaltoalue()" class="mt-3">
+      <ep-button variant="outline-primary" icon="add" v-if="model.sisaltoalueet && model.sisaltoalueet.length === 0" @click="lisaaSisaltoalue()" class="mt-3">
         {{ $t('lisaa-sisaltoalue') }}
       </ep-button>
 
@@ -84,6 +84,7 @@ import { Kielet } from '@shared/stores/kieli';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import { OppiaineenVuosiluokkaKokonaisuusDto } from '@shared/api/eperusteet';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -92,6 +93,7 @@ import { OppiaineenVuosiluokkaKokonaisuusDto } from '@shared/api/eperusteet';
     EpButton,
     EpContent,
     EpKielivalinta,
+    EpMaterialIcon,
   },
 })
 export default class EpSisaltoalueetEditModal extends Vue {

@@ -14,16 +14,16 @@
           {{yhteyshenkilo}}
         </ep-perustieto-data>
 
-        <ep-perustieto-data icon="kielet" :topic="$t('julkaisukielet')">
+        <ep-perustieto-data icon="translate" :topic="$t('julkaisukielet')">
           {{julkaisukielet}}
         </ep-perustieto-data>
 
-        <ep-perustieto-data icon="kalenteri" :topic="$t('luotu')">
+        <ep-perustieto-data icon="calendar_today" :topic="$t('luotu')">
           {{$sdt(peruste.luotu)}}
         </ep-perustieto-data>
       </div>
 
-      <ep-perustieto-data icon="tyoryhma" :topic="$t('tyoryhma')" class="w-60" v-if="virkailijat">
+      <ep-perustieto-data icon="groups" :topic="$t('tyoryhma')" class="w-60" v-if="virkailijat">
         <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
           {{ virkailija.esitysnimi }}
         </p>
@@ -39,13 +39,12 @@
 <script lang="ts">
 import _ from 'lodash';
 import { Vue, Component, Prop } from 'vue-property-decorator';
-
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpPerustietoData from './EpPerustietoData.vue';
 import { Kielet } from '@shared/stores/kieli';
-import { PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
+import { PerusteprojektiDto, PerusteDto } from '@shared/api/eperusteet';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { parsiEsitysnimi } from '../../../eperusteet-frontend-utils/vue/src/utils/kayttaja';
 

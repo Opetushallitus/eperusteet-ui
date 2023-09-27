@@ -6,8 +6,8 @@
           {{ $kaanna(inner.nimi) }}
         </div>
         <div class="flex-shrink-1">
-          <fas v-if="isOpen" icon="chevron-up" />
-          <fas v-else icon="chevron-down" />
+          <EpMaterialIcon v-if="isOpen">expand_less</EpMaterialIcon>
+          <EpMaterialIcon v-else>expand_more</EpMaterialIcon>
         </div>
       </div>
     </div>
@@ -81,6 +81,7 @@ import { GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import * as _ from 'lodash';
 import { KayttajaStore } from '@/stores/kayttaja';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -89,6 +90,7 @@ import { KayttajaStore } from '@/stores/kayttaja';
     EpInput,
     EpMainView,
     EpSpinner,
+    EpMaterialIcon,
   },
 })
 export default class GeneerinenArviointi extends Vue {

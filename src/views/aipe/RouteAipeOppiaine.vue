@@ -17,7 +17,7 @@
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
                     disabled></b-form-input>
                   <b-input-group-append>
-                    <b-button @click="open" icon="plus" variant="primary">
+                    <b-button @click="open" variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -47,17 +47,13 @@
                 tag="div"
                 v-model="data.oppimaarat">
                   <div class="listaus p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                    <div class="order-handle mr-2" v-if="isEditing">
-                      <fas icon="grip-vertical" v-if="isEditing"></fas>
-                    </div>
-                    <div>
-                      <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                    </div>
+                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
+                    <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
                   </div>
               </draggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="plussa" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button variant="outline-primary" icon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>
@@ -69,17 +65,13 @@
                 tag="div"
                 v-model="data.kurssit">
                   <div class="listaus p-3 d-flex" v-for="kurssi in data.kurssit" :key="'kurssi'+kurssi.id">
-                    <div class="order-handle mr-2" v-if="isEditing">
-                      <fas icon="grip-vertical" v-if="isEditing"></fas>
-                    </div>
-                    <div>
-                      <router-link :to="{ name: 'aipekurssi', params: { kurssiId: kurssi.id } }">{{ $kaanna(kurssi.nimi) || $t('nimeton-kurssi') }}</router-link>
-                    </div>
+                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
+                    <router-link :to="{ name: 'aipekurssi', params: { kurssiId: kurssi.id } }">{{ $kaanna(kurssi.nimi) || $t('nimeton-kurssi') }}</router-link>
                   </div>
               </draggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="plussa" @click="lisaaKurssi" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button variant="outline-primary" icon="add" @click="lisaaKurssi" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
               {{ $t('lisaa-kurssi') }}
             </ep-button>
           </template>
@@ -98,9 +90,7 @@
                   :usePadding="false">
 
                   <div slot="header" class="d-flex">
-                    <div class="order-handle mr-3" v-if="isEditing">
-                      <fas icon="grip-vertical" v-if="isEditing"></fas>
-                    </div>
+                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-3">drag_indicator</EpMaterialIcon>
                     <h4 class="mb-0">{{$kaanna(tavoite.tavoite)}}</h4>
                   </div>
 
@@ -109,7 +99,7 @@
                 </EpCollapse>
             </draggable>
 
-            <ep-button @click="lisaaTavoite" variant="outline" icon="plus" v-if="isEditing">
+            <ep-button @click="lisaaTavoite" variant="outline" icon="add" v-if="isEditing">
               {{ $t('lisaa-tavoite') }}
             </ep-button>
           </b-form-group>
@@ -141,6 +131,7 @@ import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue'
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpOppiaineenTavoite from '@/views/aipe/yleiset/EpOppiaineenTavoite.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -153,6 +144,7 @@ import EpOppiaineenTavoite from '@/views/aipe/yleiset/EpOppiaineenTavoite.vue';
     EpSisaltoTekstikappaleet,
     EpCollapse,
     EpOppiaineenTavoite,
+    EpMaterialIcon,
   },
 })
 export default class RouteAipeOppiaine extends Vue {

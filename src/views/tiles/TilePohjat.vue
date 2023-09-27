@@ -1,5 +1,5 @@
 <template>
-<EpHomeTile icon="luo-pdf" :route="{ name: 'pohjat' }">
+<EpHomeTile icon="article" :route="{ name: 'pohjat' }">
   <template slot="header">
     <span>{{ $t('pohjat') }}</span>
   </template>

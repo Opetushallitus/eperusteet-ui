@@ -20,7 +20,7 @@
                   {{ laskettuLaajuus }}
                 </span>
                 / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
-              <ep-button variant="link" icon="pen" @click="editMuodostuminen" v-if="isEditing"></ep-button>
+              <ep-button variant="link" icon="edit" @click="editMuodostuminen" v-if="isEditing"></ep-button>
             </h5>
             <div class="filters">
               <ep-search v-model="query" :placeholder="$t('etsi-rakenteesta')" />
@@ -32,7 +32,7 @@
                     <ep-button @click="toggleDescription" variant="link">
                       {{ $t('nayta-ryhmien-kuvaukset') }}
                     </ep-button>
-                    <ep-button @click="addRyhma" variant="outline" icon="plus" v-if="isEditing">
+                    <ep-button @click="addRyhma" variant="outline" icon="add" v-if="isEditing">
                       {{ $t('lisaa-ryhma-rakenteeseen') }}
                     </ep-button>
                     <EpRakenneModal
@@ -117,7 +117,7 @@
                       <draggable :value="tutkinnonosatPaged" v-bind="optionsTutkinnonOsat" tag="div">
                         <div v-for="tosa in tutkinnonosatPaged" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pr-3 m-1 tosa draggable tosa">
                           <div class="grip mr-2" v-if="isEditing">
-                            <fas icon="grip-vertical"/>
+                            <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                           </div>
                           <div class="flex-grow-1">
                             {{ $kaanna(tosa.nimi) }} <span v-if="tosa.tutkinnonOsa.koodiArvo">({{tosa.tutkinnonOsa.koodiArvo}})</span>
@@ -138,13 +138,13 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('osaamisalat') }}</h5>
                     <div>
-                      <ep-button @click="lisaaOsaamisala" icon="plus" variant="outline" class="mb-2">
+                      <ep-button @click="lisaaOsaamisala" icon="add" variant="outline" class="mb-2">
                         {{ $t('lisaa-osaamisala') }}
                       </ep-button>
                       <draggable :value="osaamisalatPaged" v-bind="optionsKoodit" tag="div">
                         <div v-for="(ryhma, index) in osaamisalatPaged" :key="'osaamisala' + index" class="mb-1 d-flex justify-content-center align-items-center draggable osaamisalat">
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['osaamisala'],  background: colorMap['osaamisala'] }">
-                            <fas icon="grip-vertical"/>
+                            <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                           </div>
                           <ep-koodisto-select :store="osaamisalaStore" v-if="isEditing" :value="index" @add="osaamisalaKoodiLisays" class="w-100">
                             <template #default="{ open }">
@@ -163,7 +163,7 @@
                                   :disabled="false"
                                   :change="() => osaamisalaNimiChange(ryhma, index)"/>
                                 <b-input-group-append>
-                                  <b-button @click="open" icon="plus" variant="primary">
+                                  <b-button @click="open" variant="primary">
                                     {{ $t('hae') }}
                                   </b-button>
                                 </b-input-group-append>
@@ -175,7 +175,7 @@
                                        :id="'poista-osaamisala-' + index"
                                        @click="poistaOsaamisala(index)"
                                        variant="link"
-                                       icon="roskalaatikko"
+                                       icon="delete"
                                        :disabled="ryhma.osaamisala.rakenteessa">
                             </ep-button>
                             <b-popover v-if="ryhma.osaamisala.rakenteessa"
@@ -198,14 +198,14 @@
 
                     <h5 class="mt-4 font-weight-600">{{ $t('tutkintonimikkeet') }}</h5>
                     <div>
-                      <ep-button @click="lisaaTutkintonimike" icon="plus" variant="outline" class="mb-2">
+                      <ep-button @click="lisaaTutkintonimike" icon="add" variant="outline" class="mb-2">
                         {{ $t('lisaa-tutkintonimike') }}
                       </ep-button>
 
                       <draggable :value="tutkintonimikkeetPaged" v-bind="optionsKoodit" tag="div">
                         <div v-for="(ryhma, index) in tutkintonimikkeetPaged" :key="ryhma.tutkintonimike.uri" class="mb-1 d-flex justify-content-center align-items-center draggable tutkintonimikkeet">
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }">
-                            <fas icon="grip-vertical"/>
+                            <EpMaterialIcon size="20px">drag_indicator</EpMaterialIcon>
                           </div>
                           <ep-koodisto-select :store="tutkintonimikeStore" v-if="isEditing" :value="index" @add="tutkintonimikeKoodiLisays" class="w-100">
                             <template #default="{ open }">
@@ -224,7 +224,7 @@
                                   :disabled="!ryhma.tutkintonimike.uri.startsWith('temporary')"
                                   :change="() => tutkintonimikeNimiChange(ryhma, index)"/>
                                 <b-input-group-append>
-                                  <b-button @click="open" icon="plus" variant="primary">
+                                  <b-button @click="open" variant="primary">
                                     {{ $t('hae') }}
                                   </b-button>
                                 </b-input-group-append>
@@ -235,7 +235,8 @@
                             <ep-button v-if="isEditing"
                                        :id="'poista-tutkintonimike-' + index"
                                        @click="poistaTutkintonimike(index)"
-                                       variant="link" icon="roskalaatikko"
+                                       variant="link"
+                                       icon="delete"
                                        :disabled="ryhma.tutkintonimike.rakenteessa">
                             </ep-button>
                             <b-popover v-if="ryhma.tutkintonimike.rakenteessa"
@@ -296,7 +297,6 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpJarjesta from '@shared/components/EpJarjesta/EpJarjesta.vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -316,13 +316,13 @@ import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolor } from '@/components/muodostuminen/utils';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
     EpButton,
     EpContent,
     EpEditointi,
-    EpIcon,
     EpInput,
     EpJarjesta,
     EpKoodistoSelect,
@@ -333,6 +333,7 @@ import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolo
     MuodostumisNode,
     draggable,
     EpRakenneModal,
+    EpMaterialIcon,
   },
   inject: [],
 })
@@ -940,16 +941,16 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   }
 
   .colorblock {
-    width: 20px;
+    width: 25px;
     color: $white;
     border-bottom-left-radius: 8px;
     border-top-left-radius: 8px;
-    border-right: 0px;
+    border-right: 0;
   }
 
   .paaryhma-label {
     border: 1px solid $gray-lighten-3;
-    border-left: 0px;
+    border-left: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -962,7 +963,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   }
 
   &.osaamisalat .colorblock, &.tutkintonimikkeet .colorblock{
-    padding: 0.45rem 0.3rem !important;
+    padding: 0.5rem 0.3rem 0.45rem 0 !important;
   }
 
   .koodi-input ::v-deep input{
@@ -975,9 +976,9 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 .actions {
 
   ::v-deep .ep-button .btn-link {
-    padding-left: 0px !important;
+    padding-left: 0 !important;
     .teksti{
-      padding-left: 0px !important;
+      padding-left: 0 !important;
     }
   }
 

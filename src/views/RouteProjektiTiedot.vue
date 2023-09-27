@@ -78,7 +78,7 @@
             </b-col>
             <b-col lg="6">
               <b-form-group :label="$t('perusteen-lataus')" v-if="!isEditing">
-                <ep-button variant="primary" icon="file" @click="exportPeruste">{{ $t('lataa-peruste-json') }}</ep-button>
+                <ep-button variant="primary" icon="description" @click="exportPeruste">{{ $t('lataa-peruste-json') }}</ep-button>
               </b-form-group>
             </b-col>
           </b-row>

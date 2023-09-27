@@ -50,7 +50,6 @@
                   <b-input-group-append>
                     <b-button
                       @click="open"
-                      icon="plus"
                       variant="primary">
                       {{ $t('hae-koodistosta') }}
                     </b-button>
@@ -143,21 +142,21 @@
                       :is-editing="isEditing"
                       :disabled="tavoite.uri !== undefined">
                       <div class="order-handle m-2" slot="left">
-                        <fas icon="grip-vertical"/>
+                        <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                       </div>
                     </EpInput>
                   </b-col>
                   <b-col cols="1" v-if="isEditing">
-                    <fas
-                      icon="roskalaatikko"
-                      class="default-icon clickable mt-2"
-                      @click="onRemoveListItem(tavoite, 'tavoitteet')"/>
+                    <div class="default-icon clickable mt-2"
+                         @click="onRemoveListItem(tavoite, 'tavoitteet')">
+                      <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
+                    </div>
                   </b-col>
                 </b-row>
               </draggable>
               <EpButton
                 variant="outline"
-                icon="plus"
+                icon="add"
                 @click="onAddListItem('tavoitteet')"
                 v-if="isEditing">
                 {{ $t('lisaa-tavoite') }}
@@ -246,6 +245,7 @@ import {
   KoulutuksenOsaDtoKoulutusOsanTyyppiEnum,
 } from '@shared/api/eperusteet';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
@@ -257,6 +257,7 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
     EpButton,
     draggable,
     EpAlert,
+    EpMaterialIcon,
   },
 })
 export default class RouteKoulutuksenOsa extends Vue {
