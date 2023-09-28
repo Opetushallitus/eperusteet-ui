@@ -96,6 +96,7 @@
       </b-col>
     </b-row>
 
+<<<<<<< HEAD
     <b-row
       class="mt-2 mx-1 py-2"
       v-for="(arvioinninkohde, index) in model.arvioinninkohteet"
@@ -124,6 +125,44 @@
         </div>
       </b-col>
     </b-row>
+=======
+    <template v-if="isEditing">
+      <b-row
+        class="mt-2 mx-1 py-2 border-bottom"
+        v-for="(arvioinninkohde, index) in model.arvioinninkohteet"
+        :key="'arvio'+index">
+        <b-col cols="4">
+          <ep-select v-model="arvioinninkohde.arvosana"
+                    :items="arvosanat"
+                    :is-editing="isEditing"
+                    :enable-empty-option="true"
+                    :placeholder="'valitse'"
+                    :emptyOptionDisabled="true">
+            <template slot-scope="{ item }">
+              {{$t('osaamisen-kuvaus-arvosanalle_' + item)}}
+            </template>
+          </ep-select>
+        </b-col>
+        <b-col cols="7">
+          <ep-input v-model="arvioinninkohde.osaamisenKuvaus" :is-editing="isEditing"></ep-input>
+        </b-col>
+        <b-col cols="1" class="text-center">
+          <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poistaArviointi(arvioinninkohde)"/>
+        </b-col>
+      </b-row>
+    </template>
+
+    <template v-else>
+      <b-row class="mt-2 mx-1 py-2 listaus" v-for="(arvioinninkohde, index) in arvioinninKohteetSorted" :key="'arvio'+index">
+        <b-col cols="4">
+          <div>{{ $t('osaamisen-kuvaus-arvosanalle_' + arvioinninkohde.arvosana) }}</div>
+        </b-col>
+        <b-col cols="7">
+          {{$kaanna(arvioinninkohde.osaamisenKuvaus)}}
+        </b-col>
+      </b-row>
+    </template>
+>>>>>>> 1e51dae (EP-3779-2)
 
     <ep-button class="mt-3" @click="lisaaArvosanaRivi" variant="outline" icon="add" v-if="isEditing">
       {{ $t('lisaa-rivi') }}
@@ -286,6 +325,10 @@ export default class EpOppiaineenTavoite extends Vue {
 
   poistaTavoite() {
     this.$emit('poista', this.model);
+  }
+
+  get arvioinninKohteetSorted() {
+    return _.sortBy(this.model.arvioinninkohteet, 'arvosana');
   }
 }
 </script>
