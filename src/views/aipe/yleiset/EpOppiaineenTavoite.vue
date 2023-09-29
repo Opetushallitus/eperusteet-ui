@@ -96,36 +96,6 @@
       </b-col>
     </b-row>
 
-<<<<<<< HEAD
-    <b-row
-      class="mt-2 mx-1 py-2"
-      v-for="(arvioinninkohde, index) in model.arvioinninkohteet"
-      :key="'arvio'+index"
-      :class="{'listaus': !isEditing, 'border-bottom': isEditing}">
-      <b-col cols="4">
-        <ep-select v-if="isEditing"
-                  v-model="arvioinninkohde.arvosana"
-                  :items="arvosanat"
-                  :is-editing="isEditing"
-                  :enable-empty-option="true"
-                  :placeholder="'valitse'"
-                  :emptyOptionDisabled="true">
-          <template slot-scope="{ item }">
-            {{$t('osaamisen-kuvaus-arvosanalle_' + item)}}
-          </template>
-        </ep-select>
-        <div v-else>{{ $t('osaamisen-kuvaus-arvosanalle_' + arvioinninkohde.arvosana) }}</div>
-      </b-col>
-      <b-col cols="7">
-        <ep-input v-model="arvioinninkohde.osaamisenKuvaus" :is-editing="isEditing"></ep-input>
-      </b-col>
-      <b-col cols="1" class="text-center">
-        <div v-if="isEditing" class="default-icon clickable mt-2" @click="poistaArviointi(arvioinninkohde)">
-          <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
-        </div>
-      </b-col>
-    </b-row>
-=======
     <template v-if="isEditing">
       <b-row
         class="mt-2 mx-1 py-2 border-bottom"
@@ -162,7 +132,6 @@
         </b-col>
       </b-row>
     </template>
->>>>>>> 1e51dae (EP-3779-2)
 
     <ep-button class="mt-3" @click="lisaaArvosanaRivi" variant="outline" icon="add" v-if="isEditing">
       {{ $t('lisaa-rivi') }}
