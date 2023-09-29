@@ -7,19 +7,19 @@
     <div class="d-flex flex-wrap" v-else>
       <div class="w-40">
 
-        <ep-perustieto-data icon="kielet" :topic="$t('julkaisukielet')">
+        <ep-perustieto-data icon="language" :topic="$t('julkaisukielet')">
           {{julkaisukielet}}
         </ep-perustieto-data>
 
-        <ep-perustieto-data icon="kalenteri" :topic="$t('luotu')">
+        <ep-perustieto-data icon="calendar_today" :topic="$t('luotu')">
           {{$sdt(peruste.luotu)}}
         </ep-perustieto-data>
 
-        <ep-perustieto-data icon="hallitus" :topic="$t('koulutustyyppi')" v-if="peruste.oppaanKoulutustyypit" >
+        <ep-perustieto-data icon="account_balance" :topic="$t('koulutustyyppi')" v-if="peruste.oppaanKoulutustyypit" >
           <div v-for="(koulutustyyppi, index) in peruste.oppaanKoulutustyypit" :key="'kt'+index">{{$t(koulutustyyppi)}}</div>
         </ep-perustieto-data>
 
-        <ep-perustieto-data icon="opetussuunnitelma" :topic="$t('peruste')" v-if="peruste.oppaanPerusteet">
+        <ep-perustieto-data icon="article" :topic="$t('peruste')" v-if="peruste.oppaanPerusteet">
           <div v-for="(peruste, index) in peruste.oppaanPerusteet" :key="'peruste'+index">{{$kaanna(peruste.nimi)}}</div>
         </ep-perustieto-data>
 
@@ -41,14 +41,10 @@
 </template>
 
 <script lang="ts">
-import _ from 'lodash';
-import { Vue, Component, Prop } from 'vue-property-decorator';
-
+import { Component } from 'vue-property-decorator';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpPerustietoData from './EpPerustietoData.vue';
-import { Kielet } from '@shared/stores/kieli';
-import { PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
 import EpPerustePerustiedot from './EpPerustePerustiedot.vue';
 
 @Component({
