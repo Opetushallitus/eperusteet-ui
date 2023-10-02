@@ -147,7 +147,7 @@ export default class RouteRoot extends Vue {
 .home-container {
   .header {
     color: white;
-    background-image: url('../../public/img/banners/header.svg');
+    background-image: url('~@assets/img/banners/header.svg');
     background-position: 100% 0;
     background-repeat: none;
     background-size: cover;
