@@ -261,10 +261,7 @@ export default class RouteModuuli extends Vue {
   poistaSisaltoalue(poistettavaSisaltoalue) {
     this.store?.setData({
       ...this.store.data.value,
-      sisallot: {
-        ...this.store.data.value.sisallot,
-        sisallot: _.filter(this.store.data.value.sisallot, sisalto => sisalto !== poistettavaSisaltoalue),
-      },
+      sisallot: _.without(this.store.data.value.sisallot, poistettavaSisaltoalue),
     });
   }
 
