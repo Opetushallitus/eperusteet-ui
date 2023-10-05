@@ -41,6 +41,12 @@
         </div>
       </div>
     </template>
+
+    <hr class="my-4"/>
+    <h2 class="mb-5">{{ $t('muut-toimenpiteet') }}</h2>
+
+    <EpButton @click="maarayksetperusteille()" :showSpinner="maarayksetPerusteilleLoading">{{$t('luo-maaraykset-perusteille')}}</EpButton>
+
   </ep-main-view>
 </template>
 
@@ -55,6 +61,7 @@ import { YllapitoStore } from '@/stores/YllapitoStore';
 import { YllapitoDto } from '@shared/generated/eperusteet';
 import { Validations } from 'vuelidate-property-decorators';
 import { notNull } from '@shared/validators/required';
+import { Maintenance } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -72,6 +79,7 @@ export default class RouteYllapito extends Vue {
   private isEditing = false;
 
   private yllapitoTiedot: YllapitoDto[] | null = null;
+  private maarayksetPerusteilleLoading = false;
 
   @Validations()
   validations = {
@@ -119,6 +127,18 @@ export default class RouteYllapito extends Vue {
 
   isBoolean(val) {
     return val === false || val === true || val === 'false' || val === 'true';
+  }
+
+  async maarayksetperusteille() {
+    this.maarayksetPerusteilleLoading = true;
+    try {
+      await Maintenance.maarayksetperusteille();
+      this.$success('Määräykset lisätty');
+    }
+    catch (e) {
+      this.$success(this.$t('virhe-palvelu-virhe') as string);
+    }
+    this.maarayksetPerusteilleLoading = false;
   }
 }
 </script>

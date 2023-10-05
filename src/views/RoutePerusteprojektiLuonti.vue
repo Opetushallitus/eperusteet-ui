@@ -243,7 +243,7 @@ import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
-import { PerusteAikatauluDtoTapahtumaEnum, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
+import { MaaraysDtoTilaEnum, MaaraysDtoTyyppiEnum, PerusteAikatauluDtoTapahtumaEnum, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { isLukiokoulutus, EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perusteet';
@@ -252,6 +252,7 @@ import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { notNull } from '@shared/validators/required';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
+import { MaarayksetEditStore } from '@/stores/MaarayksetEditStore';
 
 const util = require('util');
 
@@ -474,6 +475,12 @@ export default class RoutePerusteprojektiLuonti extends Vue {
       kuvaus: this.data.kuvaus,
       projektiKuvaus: this.data.projektiKuvaus,
       ...(isLukiokoulutus(this.data.koulutustyyppi) && { toteutus: 'lops2019' as any }),
+      maarays: MaarayksetEditStore.createEmptyMaarays({
+        nimi: { [Kielet.getSisaltoKieli.value]: this.data.nimi },
+        tyyppi: MaaraysDtoTyyppiEnum.PERUSTE,
+        koulutustyypit: [this.data.koulutustyyppi],
+        tila: MaaraysDtoTilaEnum.LUONNOS,
+      }),
     };
 
     if (this.data.tiedosto) {

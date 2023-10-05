@@ -42,8 +42,10 @@ import RouteTavoitesisaltoalue from '@/views/RouteTavoitesisaltoalue.vue';
 import RouteKotoKielitaitotaso from '@/views/RouteKotoKielitaitotaso.vue';
 import RouteKotoOpinto from '@/views/RouteKotoOpinto.vue';
 import RouteKotoLaajaalainenOsaaminen from '@/views/RouteKotoLaajaalainenOsaaminen.vue';
-import RouteMaaraykset from '@/views/RouteMaaraykset.vue';
 import RouteOsaamismerkit from '@/views/RouteOsaamismerkit.vue';
+import RouteMuutMaaraykset from '@/views/RouteMuutMaaraykset.vue';
+import RouteMaaraysKokoelma from '@/views/RouteMaaraysKokoelma.vue';
+import RouteMaaraysMuokkaus from '@/views/RouteMaaraysMuokkaus.vue';
 import RoutePoistetutSisallot from '@/views/RoutePoistetutSisallot.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpErrorPage from '@shared/components/EpErrorPage/EpErrorPage.vue';
@@ -149,10 +151,21 @@ const router = new VueRouter({
         props,
       }],
     }, {
-      path: 'maaraykset',
-      name: 'maaraykset',
-      component: RouteMaaraykset,
+      path: 'muutMaaraykset',
+      name: 'muutMaaraykset',
+      component: RouteMuutMaaraykset,
       props,
+    }, {
+      path: 'maarayskokoelma',
+      name: 'maarayskokoelma',
+      component: RouteMaaraysKokoelma,
+      props,
+      children: [{
+        path: ':maaraysId',
+        name: 'maaraysMuokkaus',
+        component: RouteMaaraysMuokkaus,
+        props,
+      }],
     }, {
       path: 'tilastot',
       name: 'tilastot',
@@ -609,7 +622,10 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (!_.get(to.params, 'lang')) {
+  if (_.get(to.params, 'lang') === 'maarayskokoelma') {
+    router.push({ path: '/' + await getCasKayttajaKieli() + '/maarayskokoelma' });
+  }
+  else if (!_.get(to.params, 'lang')) {
     router.push({ path: '/' + await getCasKayttajaKieli() });
   }
 

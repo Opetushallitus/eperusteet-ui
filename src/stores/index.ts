@@ -17,11 +17,12 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { TermitStore } from '@/stores/TermitStore';
 import { TilastotStore } from '@/stores/TilastotStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
-import { MaarayksetStore } from '@/stores/MaarayksetStore';
+import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 import { PoistetutStore } from './PoistetutStore';
 import { DigitaalisetOsaamisetStore } from './DigitaalisetOsaamisetStore';
 import { YllapitoStore } from '@/stores/YllapitoStore';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
+import { MaarayksetStore } from '@shared/stores/MaarayksetStore';
 
 const arviointiStore = new ArviointiStore(Kielet);
 const kayttajaStore = Kayttajat;
@@ -42,6 +43,7 @@ const tyoryhmaStore = new TyoryhmaStore();
 const termitStore = new TermitStore();
 const tilastotStore = new TilastotStore();
 const palautteetStore = new PalautteetStore();
+const muutMaarayksetStore = new MuutMaarayksetStore();
 const maarayksetStore = new MaarayksetStore();
 const poistetutStore = new PoistetutStore();
 const yllapitoStore = new YllapitoStore();
@@ -69,8 +71,9 @@ export const stores = Object.freeze({
   termitStore,
   tilastotStore,
   palautteetStore,
-  maarayksetStore,
+  muutMaarayksetStore,
   poistetutStore,
   yllapitoStore,
   osaamismerkitStore,
+  maarayksetStore,
 });

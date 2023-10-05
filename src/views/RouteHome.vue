@@ -14,11 +14,12 @@
     </Portal>
     <div class="container tile-container">
       <div class="d-flex flex-row flex-wrap justify-content-center">
-        <TilePerusteprojektit />
+        <TilePerusteprojektit v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
         <TilePohjat v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileOppaat :perusteOppaatStore="perusteOppaatStore"/>
-        <TileMaaraykset :maarayksetStore="maarayksetStore"/>
-        <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
+        <TileTiedotteet :tiedotteetStore="tiedotteetStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
+        <TileOppaat :perusteOppaatStore="perusteOppaatStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
+        <TileMaaraysKokoelma v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet_maarays'}"/>
+        <TileMuutMaaraykset :muutMaarayksetStore="muutMaarayksetStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
         <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
         <TileOsaamismerkit v-if="$hasOphCrud()" />
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
@@ -45,7 +46,8 @@ import TileTiedotteet from './tiles/TileTiedotteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import TileTilastot from './tiles/TileTilastot.vue';
 import TilePalautteet from './tiles/TilePalautteet.vue';
-import TileMaaraykset from './tiles/TileMaaraykset.vue';
+import TileMuutMaaraykset from './tiles/TileMuutMaaraykset.vue';
+import TileMaaraysKokoelma from './tiles/TileMaaraysKokoelma.vue';
 import TileYllapito from './tiles/TileYllapito.vue';
 import TileOsaamismerkit from './tiles/TileOsaamismerkit.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
@@ -54,7 +56,7 @@ import { Meta } from '@shared/utils/decorators';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
 import EpFeedbackModal from '@shared/components/EpFeedback/EpFeedbackModal.vue';
-import { MaarayksetStore } from '@/stores/MaarayksetStore';
+import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 
 @Component({
   components: {
@@ -69,9 +71,10 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
     TileArviointiasteikot,
     TileTilastot,
     TilePalautteet,
-    TileMaaraykset,
     TileDigitaalinenOsaaminen,
     TileOsaamismerkit,
+    TileMuutMaaraykset,
+    TileMaaraysKokoelma,
   },
 })
 export default class Home extends Vue {
@@ -88,7 +91,7 @@ export default class Home extends Vue {
   private palautteetStore!: PalautteetStore;
 
   @Prop({ required: true })
-  private maarayksetStore!: MaarayksetStore;
+  private muutMaarayksetStore!: MuutMaarayksetStore;
 
   @Prop({ required: true })
   private digitaalisetOsaamisetStore!: PerusteetStore;

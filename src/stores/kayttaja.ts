@@ -11,7 +11,14 @@ Vue.use(VueCompositionApi);
 // FIXME: tyypitä backendiin
 export type Oikeus = 'luku' | 'kommentointi' | 'muokkaus' | 'luonti' | 'poisto' | 'tilanvaihto' | 'hallinta';
 export type OikeusKohde = 'perusteprojekti' | 'peruste' | 'pohja';
+export type RoleAppOikeus = 'eperusteet' | 'eperusteet_maarays'
 export interface Oikeudet { [kohde: string]: Oikeus[]; }
+
+const oikeusArvoToRoleOikeus = {
+  'luku': 'READ',
+  'muokkaus': 'CRUD',
+  'poisto': 'CRUD',
+};
 
 function getOikeusArvo(oikeus: Oikeus) {
   switch (oikeus) {
@@ -95,16 +102,23 @@ export class KayttajaStore implements IOikeusProvider {
     }
   }
 
-  public hasOikeus(oikeus: Oikeus, kohde: OikeusKohde = 'perusteprojekti') {
+  public hasOikeus(oikeus: Oikeus, kohde: RoleAppOikeus | OikeusKohde = 'perusteprojekti') {
     if (!oikeus) {
       return false;
     }
     else if (oikeus === 'hallinta') {
       return this.hasHallintaoikeus(kohde);
     }
+    else if (kohde === 'eperusteet' || kohde === 'eperusteet_maarays') {
+      return this.vertaaRoleOikeus(oikeus, kohde);
+    }
     else {
       return this.vertaa(oikeus, kohde);
     }
+  }
+
+  private vertaaRoleOikeus(oikeus: Oikeus, kohde: RoleAppOikeus) {
+    return _.some(this.tiedot.value.oikeudet, kayttajaoikeus => kayttajaoikeus === 'ROLE_APP_' + kohde.toUpperCase() + '_' + oikeusArvoToRoleOikeus[oikeus]);
   }
 
   private vertaa(oikeus: Oikeus, kohde: OikeusKohde = 'perusteprojekti') {

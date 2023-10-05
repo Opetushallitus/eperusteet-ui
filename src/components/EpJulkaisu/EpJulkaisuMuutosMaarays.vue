@@ -1,0 +1,96 @@
+<template>
+  <EpSpinner v-if="!maarayksetNimella || !asiasanat" />
+  <div v-else>
+    <b-form-group :label="$t('lataa-uusi-muutosmaarays') + isRequired" class="w-40">
+        <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
+      </b-form-group>
+
+      <b-form-group :label="$t('muutosmaarays-astuu-voimaan') + isRequired" class="mt-4 d-flex">
+        <ep-datepicker v-model="model.voimassaoloAlkaa" :isEditing="isEditing" />
+      </b-form-group>
+
+      <b-form-group :label="$t('muutosmaarayksen-nimi') + isRequired" class="mt-4 w-40">
+        <ep-input v-model="model.nimi" :isEditing="isEditing"/>
+      </b-form-group>
+
+      <b-form-group :label="$t('muutosmaarayksen-diaarinumero') + isRequired" class="mt-4 w-40">
+        <ep-input v-model="model.diaarinumero" :isEditing="isEditing" type="string"/>
+      </b-form-group>
+
+      <b-form-group :label="$t('maarays-annettu') + isRequired" class="mt-4 d-flex">
+        <ep-datepicker v-model="model.maarayspvm" :isEditing="isEditing" />
+      </b-form-group>
+
+      <b-form-group :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired" class="mt-4">
+        <EpMaaraysLiittyyMuuttaaValinta v-model="model" :isEditing="isEditing" :maarayksetNimella="maarayksetNimella"/>
+      </b-form-group>
+
+      <b-form-group :label="$t('asiasana')" class="mt-4">
+        <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="asiasanat[kieli]" :isEditing="isEditing"/>
+      </b-form-group>
+  </div>
+</template>
+
+<script lang="ts">
+import * as _ from 'lodash';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
+import { Maaraykset, MaaraysDto, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
+import { Kielet } from '@shared/stores/kieli';
+import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
+import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
+import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+
+@Component({
+  components: {
+    EpToggle,
+    EpMaaraysLiittyyMuuttaaValinta,
+    EpMaaraysAsiasanat,
+    EpDatepicker,
+    EpInput,
+    EpMaaraysLiitteet,
+    EpSpinner,
+  },
+})
+export default class EpJulkaisuMuutosMaarays extends Vue {
+  private MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
+
+  @Prop({ required: true })
+  value!: MaaraysDto;
+
+  @Prop({ required: false })
+  isEditing!: boolean;
+
+  private maarayksetNimella: MaaraysKevytDto[] | null = null;
+  private asiasanat: { [key: string]: string[]; } | null = null;
+
+  async mounted() {
+    this.maarayksetNimella = (await Maaraykset.getMaarayksetNimet()).data;
+    this.asiasanat = (await Maaraykset.getAsiasanat()).data;
+  }
+
+  set model(val) {
+    this.$emit('input', val);
+  }
+
+  get model() {
+    return this.value;
+  }
+
+  get isRequired() {
+    return this.isEditing ? ' *' : '';
+  }
+
+  get kieli() {
+    return Kielet.getSisaltoKieli.value;
+  }
+}
+</script>
+
+<style scoped lang="scss">
+@import '@shared/styles/_variables.scss';
+
+</style>

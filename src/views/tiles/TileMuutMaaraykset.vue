@@ -1,8 +1,8 @@
 <template>
   <EpHomeTile icon="picture_as_pdf"
-              :route="{ name: 'maaraykset' }">
+              :route="{ name: 'muutMaaraykset' }">
     <template slot="header">
-      <span>{{ $t('tile-maaraykset') }}</span>
+      <span>{{ $t('tile-ammatilliset-maaraykset') }}</span>
     </template>
     <template slot="content">
 
@@ -28,7 +28,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
-import { MaarayksetStore } from '@/stores/MaarayksetStore';
+import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import * as _ from 'lodash';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -42,13 +42,13 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
     EpMaterialIcon,
   },
 })
-export default class TileMaaraykset extends Vue {
+export default class TileMuutMaaraykset extends Vue {
   @Prop({ required: true })
-  private maarayksetStore!: MaarayksetStore;
+  private muutMaarayksetStore!: MuutMaarayksetStore;
 
   async mounted() {
     if (!this.maaraykset) {
-      await this.maarayksetStore.fetch();
+      await this.muutMaarayksetStore.fetch();
     }
   }
 
@@ -57,7 +57,7 @@ export default class TileMaaraykset extends Vue {
   }
 
   get maaraykset() {
-    return this.maarayksetStore.maaraykset.value;
+    return this.muutMaarayksetStore.maaraykset.value;
   }
 }
 </script>
