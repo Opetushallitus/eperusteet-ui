@@ -1,13 +1,13 @@
 <template>
   <b-form-group>
     <div slot="label">
-      <div v-if="isEditing" class="mb-2">{{$t('tavoitealueen-otsikko')}}</div>
+      <div v-if="isEditing" class="mb-2">{{$t('tavoitealueen-nimi')}}</div>
       <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
     </div>
     <div class="ml-3" v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
 
       <div class="mb-2">
-        <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)">{{$t('arvioinnin-kohteen-otsikko')}}</div>
+        <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)">{{$t('arvioinnin-kohteen-nimi-vapaaehtoinen')}}</div>
         <EpInput :isEditing="isEditing" v-model="arvioinninKohde.otsikko" />
       </div>
       <div class="mb-3">
@@ -34,18 +34,26 @@
         </b-form-radio-group>
       </template>
 
-      <OsaamistasonKriteeri
-        class="mb-3 ml-0 p-1 taulukko-rivi-varitys"
-        v-for="(osaamistasonkriteeri, osaamistasoIndex) in arvioinninKohde.osaamistasonKriteerit"
-        :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso"
-        v-model="arvioinninKohde.osaamistasonKriteerit[osaamistasoIndex]"
-        :isEditing="isEditing"
-        :arviointiasteikko="arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko]"
-      />
+      <template v-else>
+        <OsaamistasonKriteeri
+          class="mb-3 ml-0 p-1 taulukko-rivi-varitys"
+          v-for="(osaamistasonkriteeri, osaamistasoIndex) in arvioinninKohde.osaamistasonKriteerit"
+          :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso"
+          v-model="arvioinninKohde.osaamistasonKriteerit[osaamistasoIndex]"
+          :isEditing="isEditing"
+          :arviointiasteikko="arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko]"
+        />
+      </template>
 
-      <EpButton class="mt-4 no-padding" v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohde(arvioinninKohde)">
-        {{$t('poista-arvioinnin-kohde')}}
-      </EpButton>
+      <div class="d-flex mb-5 mt-4" :class="{'justify-content-end' : !arvioinninKohde._arviointiAsteikko, 'justify-content-between': arvioinninKohde._arviointiAsteikko}">
+        <EpButton v-if="isEditing && arvioinninKohde._arviointiAsteikko" variant="link" icon="refresh" @click="poistaArviointiasteikko(arvioinninKohde)">
+          {{$t('vaihda-arviointiasteikko')}}
+        </EpButton>
+
+        <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohde(arvioinninKohde)">
+          {{$t('poista-arvioinnin-kohde')}}
+        </EpButton>
+      </div>
 
       <hr v-if="isEditing || arvindex < arvioinninKohdeAlue.arvioinninKohteet.length -1"/>
     </div>
@@ -64,6 +72,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import OsaamistasonKriteeri from '@/views/tutkinnonosat/OsaamistasonKriteeri.vue';
+import { Kielet } from '@shared/stores/kieli';
 
 @Component({
   components: {
@@ -90,6 +99,10 @@ export default class EpArviointi extends Vue {
     this.$emit('input', val);
   }
 
+  get kieli() {
+    return Kielet.getSisaltoKieli.value;
+  }
+
   get arviointiasteikotKeyById() {
     return _.keyBy(_.map(this.arviointiasteikot, arviointiasteikko => {
       return {
@@ -102,7 +115,10 @@ export default class EpArviointi extends Vue {
   lisaaArvionninkohde() {
     this.arvioinninKohdeAlue.arvioinninKohteet = [
       ...this.arvioinninKohdeAlue.arvioinninKohteet,
-      {},
+      {
+        selite: {
+          [this.kieli]: this.$t('opiskelija') },
+      },
     ];
   }
 
@@ -125,6 +141,10 @@ export default class EpArviointi extends Vue {
 
       return arvioinninKohde;
     });
+  }
+
+  poistaArviointiasteikko(arvioinninKohde) {
+    arvioinninKohde._arviointiAsteikko = null;
   }
 }
 </script>
