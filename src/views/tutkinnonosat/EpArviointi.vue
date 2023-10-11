@@ -1,13 +1,16 @@
 <template>
   <b-form-group>
     <div slot="label">
-      <div v-if="isEditing" class="mb-2">{{$t('tavoitealueen-nimi')}}</div>
+      <div v-if="isEditing" class="mb-2">{{$t('ammattitaitovaatimus-tekemisena')}}</div>
       <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
     </div>
     <div class="ml-3" v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
 
       <div class="mb-2">
-        <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)">{{$t('arvioinnin-kohteen-nimi-vapaaehtoinen')}}</div>
+        <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)">
+          <span v-if="isEditing">{{$t('ryhmittelyotsikko-vapaaehtoinen')}}</span>
+          <span v-if="!isEditing">{{$t('ryhmittelyotsikko')}}</span>
+        </div>
         <EpInput :isEditing="isEditing" v-model="arvioinninKohde.otsikko" />
       </div>
       <div class="mb-3">
