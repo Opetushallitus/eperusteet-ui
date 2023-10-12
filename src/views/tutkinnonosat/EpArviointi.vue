@@ -54,7 +54,7 @@
         </EpButton>
 
         <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohde(arvioinninKohde)">
-          {{$t('poista-arvioinnin-kohde')}}
+          {{$t('poista-ryhmittelyotsikko')}}
         </EpButton>
       </div>
 
@@ -62,7 +62,7 @@
     </div>
 
     <div class="d-flex justify-content-between">
-      <EpButton v-if="isEditing" variant="outline" icon="add" @click="lisaaArvionninkohde">{{$t('lisaa-arvioinnin-kohdealueen-arvioinnin-kohde')}}</EpButton>
+      <EpButton v-if="isEditing" variant="outline" icon="add" @click="lisaaArvionninkohde">{{$t('lisaa-ryhmittelyotsikko')}}</EpButton>
       <slot name="poisto" />
     </div>
 
