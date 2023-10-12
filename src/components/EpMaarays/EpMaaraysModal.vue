@@ -22,7 +22,7 @@
         </div>
       </template>
 
-      <div class="mb-5 ">
+      <div class="mb-5">
         <b-form-group :label="$t('maarayksen-nimi') + (editing ? ' *' : '')">
           <EpField v-model="muokattavaMaarays.nimi" :is-editing="editing" :validation="$v.muokattavaMaarays.nimi" :showValidValidation="false"/>
         </b-form-group>
@@ -71,7 +71,7 @@ import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue
 import { Validations } from 'vuelidate-property-decorators';
 import { requiredLokalisoituTeksti } from '@shared/validators/required';
 import { MaarayksetStore } from '@/stores/MaarayksetStore';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {

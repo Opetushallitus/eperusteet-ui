@@ -32,7 +32,7 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import * as _ from 'lodash';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {

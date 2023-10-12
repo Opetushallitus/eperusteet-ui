@@ -20,6 +20,7 @@
         <TileMaaraykset :maarayksetStore="maarayksetStore"/>
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
+        <TileOsaamismerkit v-if="$hasOphCrud()" :osaamismerkit-store="osaamismerkitStore"/>
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TilePalautteet v-if="$isAdmin()"/>
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
@@ -46,6 +47,7 @@ import TileTilastot from './tiles/TileTilastot.vue';
 import TilePalautteet from './tiles/TilePalautteet.vue';
 import TileMaaraykset from './tiles/TileMaaraykset.vue';
 import TileYllapito from './tiles/TileYllapito.vue';
+import TileOsaamismerkit from './tiles/TileOsaamismerkit.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
@@ -53,11 +55,13 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
 import EpFeedbackModal from '@shared/components/EpFeedback/EpFeedbackModal.vue';
 import { MaarayksetStore } from '@/stores/MaarayksetStore';
+import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 
 @Component({
   components: {
-    TileYllapito,
     EpSearch,
+    EpFeedbackModal,
+    TileYllapito,
     TileArkistoidut,
     TileOppaat,
     TilePerusteprojektit,
@@ -66,9 +70,9 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
     TileArviointiasteikot,
     TileTilastot,
     TilePalautteet,
-    EpFeedbackModal,
     TileMaaraykset,
     TileDigitaalinenOsaaminen,
+    TileOsaamismerkit,
   },
 })
 export default class Home extends Vue {
@@ -90,7 +94,8 @@ export default class Home extends Vue {
   @Prop({ required: true })
   private digitaalisetOsaamisetStore!: PerusteetStore;
 
-  private rajain = '';
+  @Prop({ required: true })
+  private osaamismerkitStore!: OsaamismerkitStore;
 
   @Meta
   getMetaInfo() {
