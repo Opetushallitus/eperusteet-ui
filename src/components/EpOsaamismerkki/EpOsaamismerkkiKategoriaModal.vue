@@ -13,6 +13,9 @@
           <span v-if="kategoria.id" class="mr-2">{{ $t('muokkaa-kategoriaa')}}</span>
           <span v-else class="mr-2">{{ $t('lisaa-kategoria')}}</span>
         </div>
+        <div class="close-btn clickable" @click="sulje">
+          <EpMaterialIcon aria-hidden="false" :aria-label="$t('sulje')">close</EpMaterialIcon>
+        </div>
       </div>
     </template>
 
@@ -21,15 +24,26 @@
         <EpField v-model="kategoria.nimi" :is-editing="true" :validation="$v.kategoria.nimi" :showValidValidation="false"/>
       </b-form-group>
       <b-form-group :label="$t('kuva') + ' *'">
-        <b-form-file ref="file-input" v-if="!kategoria.liite" accept="image/jpeg,image/png" :placeholder="placeholder" :drop-placeholder="dropPlaceholder" :browse-text="browseText" @input="fileChanged"></b-form-file>
-
-        <img v-if="imagePreviewUrl" :src="imagePreviewUrl" width="200" height="200">
-
-        <div v-if="kategoria.liite && kategoria.liite.nimi" class="clickable mt-2" @click="poistaKuva()">
-          <span>{{ kategoria.liite.nimi }}</span>
+        <div v-if="!liite" class="kuva-lataus tiedosto">
+          <b-form-file v-model="kategoria.liite"
+                       ref="file-input"
+                       accept="image/jpeg, image/png"
+                       :placeholder="placeholder"
+                       :drop-placeholder="dropPlaceholder"
+                       :browse-text="browseText"
+                       @input="fileChanged"></b-form-file>
+        </div>
+        <div v-if="!liite">
+          <span class="font-size-08">{{ $t('kuvan-maksimi-koko') }}</span>
+        </div>
+        <div>
+          <img v-if="newImagePreviewUrl" :src="newImagePreviewUrl">
+          <img v-if="liite && liite.binarydata && !newImagePreviewUrl" :src="savedImagePreviewUrl">
+        </div>
+        <div v-if="liite && liite.binarydata" class="clickable mt-2" @click="poistaKuva()">
+          <span>{{ liite.nimi }}</span>
           <EpMaterialIcon class="default-icon ml-2">delete</EpMaterialIcon>
         </div>
-
       </b-form-group>
     </div>
 
@@ -55,7 +69,7 @@ import * as _ from 'lodash';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { OsaamismerkkiKategoriaDto } from '@shared/generated/eperusteet';
 import { Validations } from 'vuelidate-property-decorators';
-import { requiredLokalisoituTeksti } from '@shared/validators/required';
+import { requiredLokalisoituTeksti, notNull } from '@shared/validators/required';
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import EpKuvaLataus from '@shared/components/EpKuvaLataus/EpKuvaLataus.vue';
@@ -75,15 +89,16 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
 
   private tallennetaan: boolean = false;
   private kategoria: OsaamismerkkiKategoriaDto = {};
-  private imagePreviewUrl: string | null = null;
+  private newImagePreviewUrl: string | null = null;
   private imageWidth: number = 0;
   private imageHeight: number = 0;
 
   @Validations()
   validations = {
     kategoria: {
-      nimi: {
-        ...requiredLokalisoituTeksti(),
+      nimi: requiredLokalisoituTeksti(),
+      liite: {
+        binarydata: notNull(),
       },
     },
   }
@@ -112,13 +127,14 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
         this.imageWidth = img.width;
         this.imageHeight = img.height;
         if (reader.result && this.isValidImage()) {
-          this.imagePreviewUrl = evt.target.result;
+          this.newImagePreviewUrl = evt.target.result;
           this.kategoria.liite = {
             binarydata: reader.result.toString().split(',')[1],
             nimi: file.name,
           };
         }
         else {
+          this.kategoria.liite = undefined;
           this.$fail(this.$t('kuvan-maksimi-koko') as string);
         }
       };
@@ -128,7 +144,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
 
   poistaKuva() {
     this.kategoria.liite = undefined;
-    this.imagePreviewUrl = null;
+    this.newImagePreviewUrl = null;
   }
 
   sulje() {
@@ -145,7 +161,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
 
   clear() {
     this.kategoria = {};
-    this.imagePreviewUrl = null;
+    this.newImagePreviewUrl = null;
     this.imageWidth = 0;
     this.imageHeight = 0;
   }
@@ -154,8 +170,16 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
     return this.imageWidth <= 200 && this.imageHeight <= 200;
   }
 
+  get liite() {
+    return this.kategoria.liite;
+  }
+
   get invalid() {
-    return this.$v.$invalid || !this.kategoria.liite;
+    return this.$v.$invalid;
+  }
+
+  get savedImagePreviewUrl() {
+    return this.liite ? 'data:' + this.liite.mime + ';base64,' + this.liite.binarydata : null;
   }
 
   get placeholder() {
@@ -177,5 +201,56 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
 
 .error {
   color: $invalid;
+}
+
+.kuva-lataus {
+  margin: 0;
+  width:100%;
+  border-width: 1px;
+  border-color: $gray-lighten-2;
+  border-style: dashed;
+  border-radius: 10px;
+  position: relative;
+
+  &.tiedosto {
+    height: 100px;
+    background-color: $gray-lighten-7;
+  }
+
+  .custom-file::v-deep{
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    display: flex;
+
+    input {
+      display: none;
+    }
+
+    .custom-file-label {
+      width: 100%;
+      background-image: url('~@assets/img/icons/lataus_ikoni.svg');
+      background-repeat: no-repeat;
+      background-position: left;
+      border: 0;
+      margin-left: 30px;
+      margin-top: 10px;
+      height: 50px;
+      background-color: inherit;
+      padding-top: 0;
+      padding-left: 60px;
+      position: relative;
+      border-radius: 0;
+    }
+
+    .custom-file-label::after {
+      text-decoration: underline;
+      color: blue;
+      padding: 0 0 0 0.20rem;
+      display: inline;
+      position: relative;
+      background-color: $gray-lighten-7;
+    }
+  }
 }
 </style>

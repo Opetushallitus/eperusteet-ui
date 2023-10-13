@@ -49,7 +49,7 @@
       </div>
     </div>
 
-    <div class="row align-items-end mb-4">
+    <div class="row align-items-end">
       <div class="col-4">
         <b-form-checkbox-group v-model="tila">
           <b-form-checkbox v-for="tila in osaamismerkkiTilat" :key="tila" :value="tila">
@@ -205,7 +205,7 @@ export default class RouteOsaamismerkit extends Vue {
         key: 'nimi',
         label: this.$t('nimi'),
         sortable: false,
-        thStyle: { width: '25%', borderBottom: '2px' },
+        thStyle: { width: '35%', borderBottom: '2px' },
         formatter: (value: any, key: any, item: any) => {
           return (this as any).$kaanna(value);
         },
@@ -213,7 +213,7 @@ export default class RouteOsaamismerkit extends Vue {
         key: 'kategoria',
         label: this.$t('kategoria'),
         sortable: false,
-        thStyle: { width: '25%', borderBottom: '2px' },
+        thStyle: { width: '20%', borderBottom: '2px' },
         formatter: (value: any, key: any, item: any) => {
           return (this as any).$kaanna(value.nimi);
         },
@@ -221,7 +221,7 @@ export default class RouteOsaamismerkit extends Vue {
         key: 'tila',
         label: this.$t('tila'),
         sortable: true,
-        thStyle: { width: '15%', borderBottom: '2px' },
+        thStyle: { width: '10%', borderBottom: '2px' },
         formatter: (value: any, key: string, item: OsaamismerkkiDto) => {
           return this.$t('tila-' + _.toLower(item!.tila));
         },
@@ -265,7 +265,7 @@ export default class RouteOsaamismerkit extends Vue {
   }
 
   avaaOsaamismerkkiModal(osaamismerkki: OsaamismerkkiDto) {
-    (this as any).$refs['osaamismerkkiModal'].muokkaa(osaamismerkki);
+    (this as any).$refs['osaamismerkkiModal'].avaaModal(osaamismerkki);
   }
 
   @Watch('query', { deep: true, immediate: true })

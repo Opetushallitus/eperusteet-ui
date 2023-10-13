@@ -13,10 +13,17 @@
           <span v-if="osaamismerkki.id" class="mr-2">{{ $t('muokkaa-osaamismerkkiä')}}</span>
           <span v-else class="mr-2">{{ $t('lisaa-osaamismerkki')}}</span>
         </div>
+        <div class="close-btn clickable" @click="sulje">
+          <EpMaterialIcon aria-hidden="false" :aria-label="$t('sulje')">close</EpMaterialIcon>
+        </div>
       </div>
     </template>
 
-    <div class="mb-5">
+    <div class="mb-2">
+      <b-form-group v-if="osaamismerkki.muokattu" :label="$t('tila')">
+        <span>{{ tilaText + $sdt(osaamismerkki.muokattu)}} </span>
+      </b-form-group>
+
       <b-form-group :label="$t('nimi') + ' *'">
         <EpField v-model="osaamismerkki.nimi" :is-editing="true" :validation="$v.osaamismerkki.nimi" :showValidValidation="false"/>
       </b-form-group>
@@ -41,15 +48,79 @@
       </b-form-group>
     </div>
 
+    <b-form-group :label="$t('osaamistavoitteet') + ' *'">
+      <draggable v-bind="defaultDragOptions"
+                 tag="div"
+                 v-model="osaamistavoitteet">
+        <div class="row mb-2" v-for="(tavoite, i) in osaamistavoitteet" :key="'tavoite'+i">
+          <div class="col">
+            <EpInput v-model="tavoite.osaamistavoite"
+                     :is-editing="true"
+                     class="input-wrapper">
+              <div class="order-handle m-2" slot="left">
+                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+              </div>
+            </EpInput>
+          </div>
+          <div class="col-1">
+            <EpButton @click="poistaTavoite(tavoite)"
+                       variant="link"
+                       icon="delete">
+            </EpButton>
+          </div>
+        </div>
+      </draggable>
+      <EpButton @click="lisaaTavoite"
+                 variant="outline-primary"
+                 icon="add">
+        {{ $t('lisaa-osaamistavoite') }}
+      </EpButton>
+    </b-form-group>
+
+    <b-form-group :label="$t('arviointikriteerit') + ' *'">
+      <draggable v-bind="defaultDragOptions"
+                 tag="div"
+                 v-model="arviointikriteerit">
+        <div class="row mb-2" v-for="(kriteeri, i) in arviointikriteerit" :key="'kriteeri'+i">
+          <div class="col">
+            <EpInput v-model="kriteeri.arviointikriteeri"
+                     :is-editing="true"
+                     class="input-wrapper">
+              <div class="order-handle m-2" slot="left">
+                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+              </div>
+            </EpInput>
+          </div>
+          <div class="col-1">
+            <EpButton @click="poistaKriteeri(kriteeri)"
+                      variant="link"
+                      icon="delete">
+            </EpButton>
+          </div>
+        </div>
+      </draggable>
+      <EpButton @click="lisaaKriteeri"
+                 variant="outline-primary"
+                 icon="add">
+        {{ $t('lisaa-arviointikriteeri') }}
+      </EpButton>
+    </b-form-group>
+
     <div class="float-right">
       <EpButton @click="sulje"
                 variant="link">
         {{ $t('peruuta') }}
       </EpButton>
-      <EpButton @click="tallenna"
+      <EpButton @click="tallennaLuonnos"
                 :show-spinner="tallennetaan"
                 :disabled="invalid">
-        {{ $t('tallenna') }}
+        {{ $t('tallenna-luonnoksena') }}
+      </EpButton>
+      <EpButton @click="tallennaJulkaisu"
+                class="ml-2"
+                :show-spinner="tallennetaan"
+                :disabled="invalid">
+        {{ $t('julkaise') }}
       </EpButton>
     </div>
   </b-modal>
@@ -57,6 +128,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 import EpKuvaLataus from '@shared/components/EpKuvaLataus/EpKuvaLataus.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpField from '@shared/components/forms/EpField.vue';
@@ -64,15 +136,17 @@ import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLata
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { Validations } from 'vuelidate-property-decorators';
-import { requiredLokalisoituTeksti } from '@shared/validators/required';
+import { requiredLokalisoituTeksti, notNull } from '@shared/validators/required';
 import * as _ from 'lodash';
-import { OsaamismerkkiDto } from '@shared/generated/eperusteet';
+import { OsaamismerkkiDto, OsaamismerkkiDtoTilaEnum } from '@shared/generated/eperusteet';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
 import { required } from 'vuelidate/lib/validators';
 
 @Component({
   components: {
+    draggable,
     EpDatepicker,
     EpKuvaLataus,
     EpButton,
@@ -80,6 +154,7 @@ import { required } from 'vuelidate/lib/validators';
     EpTiedostoLataus,
     EpMaterialIcon,
     EpMultiSelect,
+    EpInput,
   },
 })
 export default class EpOsaamismerkkiModal extends Vue {
@@ -92,17 +167,55 @@ export default class EpOsaamismerkkiModal extends Vue {
   @Validations()
   validations = {
     osaamismerkki: {
-      nimi: {
-        ...requiredLokalisoituTeksti(),
+      nimi: requiredLokalisoituTeksti(),
+      kategoria: notNull(),
+      voimassaoloAlkaa: notNull(),
+      osaamistavoitteet: {
+        $each: {
+          osaamistavoite: requiredLokalisoituTeksti(),
+        },
+        required,
+      },
+      arviointikriteerit: {
+        $each: {
+          arviointikriteeri: requiredLokalisoituTeksti(),
+        },
+        required,
       },
     },
   }
 
-  muokkaa(osaamismerkki) {
+  get defaultDragOptions() {
+    return {
+      animation: 300,
+      emptyInsertThreshold: 10,
+      handle: '.order-handle',
+      ghostClass: 'dragged',
+      disabled: false,
+    };
+  }
+
+  avaaModal(osaamismerkki) {
     if (osaamismerkki) {
       this.osaamismerkki = _.cloneDeep(osaamismerkki);
     }
+    else {
+      this.osaamismerkki = {
+        osaamistavoitteet: [],
+        arviointikriteerit: [],
+      };
+    }
     (this.$refs['osaamismerkkiModal'] as any).show();
+  }
+
+  tallennaJulkaisu() {
+    this.osaamismerkki.tila = OsaamismerkkiDtoTilaEnum.JULKAISTU;
+    this.tallenna();
+  }
+
+  tallennaLuonnos() {
+    this.osaamismerkki.tila = OsaamismerkkiDtoTilaEnum.LAADINTA;
+    this.tallenna();
   }
 
   async tallenna() {
@@ -120,6 +233,26 @@ export default class EpOsaamismerkkiModal extends Vue {
     }
   }
 
+  poistaTavoite(poistettavaTavoite) {
+    this.osaamismerkki.osaamistavoitteet = _.filter(this.osaamismerkki.osaamistavoitteet, (tavoite) => tavoite !== poistettavaTavoite);
+  }
+
+  lisaaTavoite() {
+    this.osaamismerkki.osaamistavoitteet?.push({
+      osaamistavoite: undefined,
+    });
+  }
+
+  poistaKriteeri(poistettavaKriteeri) {
+    this.osaamismerkki.arviointikriteerit = _.filter(this.osaamismerkki.arviointikriteerit, (kriteeri) => kriteeri !== poistettavaKriteeri);
+  }
+
+  lisaaKriteeri() {
+    this.osaamismerkki.arviointikriteerit?.push({
+      arviointikriteeri: undefined,
+    });
+  }
+
   sulje() {
     this.clear();
     (this.$refs['osaamismerkkiModal'] as any).hide();
@@ -129,22 +262,32 @@ export default class EpOsaamismerkkiModal extends Vue {
     this.osaamismerkki = {};
   }
 
+  get osaamistavoitteet() {
+    return this.osaamismerkki.osaamistavoitteet;
+  }
+
+  set osaamistavoitteet(tavoitteet) {
+    this.osaamismerkki.osaamistavoitteet = tavoitteet;
+  }
+
+  get arviointikriteerit() {
+    return this.osaamismerkki.arviointikriteerit;
+  }
+
+  set arviointikriteerit(kriteerit) {
+    this.osaamismerkki.arviointikriteerit = kriteerit;
+  }
+
   get osaamismerkkiKategoriat() {
     return this.store.kategoriat.value;
-    // return _.chain(this.store.kategoriat.value)
-    //   .map(kategoria => {
-    //     return {
-    //       text: this.$kaanna(kategoria.nimi),
-    //       value: kategoria,
-    //     };
-    //   })
-    //   .uniqWith(_.isEqual)
-    //   .filter('text')
-    //   .value();
   }
 
   get invalid() {
     return this.$v.$invalid;
+  }
+
+  get tilaText() {
+    return this.$t('tila-' + _.toLower(this.osaamismerkki.tila)) + ' - ' + this.$t('muokannut-viimeksi') + ': ' + this.osaamismerkki.muokkaaja + ' ';
   }
 };
 </script>
