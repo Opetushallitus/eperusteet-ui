@@ -2,7 +2,7 @@
   <EpMainView>
     <template slot="header">
       <div class="d-flex justify-content-between">
-        <h1>{{ $t('osaamismerkkikategorioiden-hallinta') }}</h1>
+        <h1>{{ $t('osaamismerkki-kategorioiden-hallinta') }}</h1>
         <div class="d-flex">
           <EpButton class="m-0 p-0"
                     variant="outlined"

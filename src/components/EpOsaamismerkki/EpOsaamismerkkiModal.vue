@@ -111,7 +111,12 @@
                 variant="link">
         {{ $t('peruuta') }}
       </EpButton>
+      <EpButton v-if="allowDelete" @click="poistaOsaamismerkki"
+                :show-spinner="tallennetaan">
+        {{ $t('poista') }}
+      </EpButton>
       <EpButton @click="tallennaLuonnos"
+                class="ml-2"
                 :show-spinner="tallennetaan"
                 :disabled="invalid">
         {{ $t('tallenna-luonnoksena') }}
@@ -120,7 +125,7 @@
                 class="ml-2"
                 :show-spinner="tallennetaan"
                 :disabled="invalid">
-        {{ $t('julkaise') }}
+        {{ $t('tallenna-julkisena') }}
       </EpButton>
     </div>
   </b-modal>
@@ -224,13 +229,32 @@ export default class EpOsaamismerkkiModal extends Vue {
       await this.store.updateOsaamismerkki(this.osaamismerkki);
       this.tallennetaan = false;
       this.$success(this.$t('osaamismerkin-paivitys-onnistui') as string);
-      await this.store.fetchOsaamismerkit();
+      await this.store.updateOsaamismerkkiQuery(this.store.options.value);
       this.sulje();
     }
     catch (err) {
       this.tallennetaan = false;
       this.$fail(this.$t('osaamismerkin-paivitys-epaonnistui') as string);
     }
+  }
+
+  async poistaOsaamismerkki() {
+    try {
+      await this.store.deleteOsaamismerkki(this.osaamismerkki.id);
+      this.tallennetaan = false;
+      this.$success(this.$t('osaamismerkin-poistaminen-onnistui') as string);
+      await this.store.updateOsaamismerkkiQuery(this.store.options.value);
+      this.sulje();
+    }
+    catch (err) {
+      this.tallennetaan = false;
+      this.$fail(this.$t('osaamismerkin-poistaminen-epaonnistui') as string);
+    }
+  }
+
+  sulje() {
+    this.osaamismerkki = {};
+    (this.$refs['osaamismerkkiModal'] as any).hide();
   }
 
   poistaTavoite(poistettavaTavoite) {
@@ -253,13 +277,8 @@ export default class EpOsaamismerkkiModal extends Vue {
     });
   }
 
-  sulje() {
-    this.clear();
-    (this.$refs['osaamismerkkiModal'] as any).hide();
-  }
-
-  clear() {
-    this.osaamismerkki = {};
+  get allowDelete() {
+    return this.osaamismerkki.tila === OsaamismerkkiDtoTilaEnum.LAADINTA;
   }
 
   get osaamistavoitteet() {

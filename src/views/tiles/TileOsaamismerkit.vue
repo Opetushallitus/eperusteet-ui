@@ -23,10 +23,6 @@ import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 export default class TileOsaamismerkit extends Vue {
   @Prop({ required: true })
   private osaamismerkitStore!: OsaamismerkitStore;
-
-  mounted() {
-    this.osaamismerkitStore.fetchOsaamismerkit();
-  }
 }
 </script>
 

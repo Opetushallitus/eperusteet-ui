@@ -22,14 +22,13 @@ export class OsaamismerkitStore {
   async init(query: OsaamismerkitQuery) {
     this.state.query = query;
     this.state.osaamismerkkiPage = null;
-    await this.fetchOsaamismerkit();
     await this.fetchKategoriat();
   }
 
   @Debounced(300)
-  public async fetchOsaamismerkit() {
+  public async updateOsaamismerkkiQuery(query: OsaamismerkitQuery) {
     this.state.osaamismerkkiPage = null;
-    this.state.osaamismerkkiPage = await this.fetchOsaamismerkitImpl(this.options.value);
+    this.state.osaamismerkkiPage = await this.fetchOsaamismerkitImpl(query);
   }
 
   private async fetchOsaamismerkitImpl(q: OsaamismerkitQuery) {
@@ -39,9 +38,9 @@ export class OsaamismerkitStore {
       q.nimi,
       q.tila,
       q.kategoria,
-      q.voimassaolo,
-      q.julkaistu,
-      q.laadinta
+      q.voimassa,
+      q.tuleva,
+      q.poistunut
     )).data as any;
     return res;
   }
@@ -49,6 +48,10 @@ export class OsaamismerkitStore {
   public async fetchKategoriat() {
     this.state.kategoriat = null;
     this.state.kategoriat = (await Osaamismerkit.getKategoriat()).data;
+  }
+
+  public async deleteOsaamismerkki(id) {
+    await Osaamismerkit.deleteOsaamismerkki(id);
   }
 
   public async updateOsaamismerkki(osaamismerkki: OsaamismerkkiDto) {

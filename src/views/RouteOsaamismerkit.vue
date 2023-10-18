@@ -16,14 +16,14 @@
     <div class="row align-items-end">
       <div class="col-6">
         <EpFormContent name="hae">
-          <EpSearch v-model="nimiFilter" />
+          <EpSearch v-model="query.nimi" />
         </EpFormContent>
       </div>
       <div class="col-3">
         <EpFormContent name="kategoria">
-          <EpMultiSelect :is-editing="true"
-                         :options="osaamismerkkiKategoriat"
-                         v-model="kategoria"
+          <EpMultiSelect v-model="kategoria"
+                         :is-editing="true"
+                         :options="osaamismerkkiKategoriaOptions"
                          :placeholder="$t('kaikki')"
                          track-by="value"
                          label="text">
@@ -32,12 +32,10 @@
       </div>
       <div class="col-3">
         <EpFormContent name="voimassaolo">
-          <EpMultiSelect :is-editing="false"
+          <EpMultiSelect v-model="voimassaolo"
+                         :is-editing="false"
                          :options="osaamismerkkiVoimassaolot"
-                         v-model="voimassaolo"
-                         :placeholder="$t('kaikki')"
-                         track-by="value"
-                         label="text">
+                         :placeholder="$t('kaikki')">
             <template slot="singleLabel" slot-scope="{ option }">
               {{ $t('ajoitus-' + option.toLowerCase()) }}
             </template>
@@ -68,7 +66,6 @@
                fixed
                hover
                no-local-sorting
-               @sort-changed="sortingChanged"
                :sort-by.sync="sort.sortBy"
                :sort-desc.sync="sort.sortDesc"
                :items="osaamismerkitFiltered"
@@ -98,7 +95,7 @@ import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { OsaamismerkitQuery, PerusteQuery } from '@shared/api/eperusteet';
+import { OsaamismerkitQuery } from '@shared/api/eperusteet';
 import { OsaamismerkkiDto } from '@shared/generated/eperusteet';
 import * as _ from 'lodash';
 import EpOsaamismerkkiModal from '@/components/EpOsaamismerkki/EpOsaamismerkkiModal.vue';
@@ -120,28 +117,26 @@ export default class RouteOsaamismerkit extends Vue {
 
   private sivu = 0;
   private perPage = 10;
-  private nimiFilter = ''
-  private sort = {};
-  private tila: string[] | null = null;
+  private tila: string[] | null = ['LAADINTA', 'JULKAISTU'];
   private voimassaolo: string | null = null;
   private kategoria: any | null = null;
+  private isLoading = false;
 
   private query = {
     sivu: 0,
     sivukoko: 10,
-    voimassaolo: false,
+    nimi: '',
+    tila: ['LAADINTA', 'JULKAISTU'],
+    kategoria: undefined,
+    voimassa: false,
     tuleva: false,
     poistunut: false,
-    tila: ['LAADINTA', 'JULKAISTU'],
-    nimi: '',
-    kategoria: undefined,
     jarjestysOrder: false,
     jarjestysTapa: 'nimi',
   } as OsaamismerkitQuery;
 
   async mounted() {
     await this.osaamismerkitStore.init(this.query);
-    this.tila = ['LAADINTA', 'JULKAISTU'];
   }
 
   private fetch(query) {
@@ -186,6 +181,16 @@ export default class RouteOsaamismerkit extends Vue {
       .value();
   }
 
+  get osaamismerkkiKategoriaOptions() {
+    return [
+      {
+        text: this.$t('kaikki'),
+        value: null,
+      },
+      ...this.osaamismerkkiKategoriat,
+    ];
+  }
+
   get osaamismerkkiTilat() {
     return ['LAADINTA', 'JULKAISTU'];
   }
@@ -220,7 +225,7 @@ export default class RouteOsaamismerkit extends Vue {
       }, {
         key: 'tila',
         label: this.$t('tila'),
-        sortable: true,
+        sortable: false,
         thStyle: { width: '10%', borderBottom: '2px' },
         formatter: (value: any, key: string, item: OsaamismerkkiDto) => {
           return this.$t('tila-' + _.toLower(item!.tila));
@@ -228,7 +233,7 @@ export default class RouteOsaamismerkit extends Vue {
       }, {
         key: 'muokattu',
         label: this.$t('muokattu'),
-        sortable: true,
+        sortable: false,
         thStyle: { width: '15%', borderBottom: '2px' },
         formatter: (value: any, key: any, item: any) => {
           return (this as any).$sdt(value);
@@ -236,7 +241,7 @@ export default class RouteOsaamismerkit extends Vue {
       }, {
         key: 'voimassaoloAlkaa',
         label: this.$t('voimassaolo-alkaa'),
-        sortable: true,
+        sortable: false,
         thStyle: { width: '15%', borderBottom: '2px' },
         formatter: (value: any, key: any, item: any) => {
           return (this as any).$sd(value);
@@ -244,7 +249,7 @@ export default class RouteOsaamismerkit extends Vue {
       }, {
         key: 'voimassaoloLoppuu',
         label: this.$t('voimassaolo-loppuu'),
-        sortable: true,
+        sortable: false,
         thStyle: { width: '15%', borderBottom: '2px' },
         formatter: (value: any, key: any, item: any) => {
           return (this as any).$sd(value);
@@ -253,36 +258,61 @@ export default class RouteOsaamismerkit extends Vue {
     ];
   }
 
-  sortingChanged(sort) {
-    this.sort = sort;
-    this.fetch(
-      {
-        sivu: 0,
-        jarjestys: sort.sortBy,
-        jarjestysNouseva: !sort.sortDesc,
-      }
-    );
-  }
-
   avaaOsaamismerkkiModal(osaamismerkki: OsaamismerkkiDto) {
     (this as any).$refs['osaamismerkkiModal'].avaaModal(osaamismerkki);
   }
 
   @Watch('query', { deep: true, immediate: true })
-  async onQueryChange(query: PerusteQuery) {
+  async onQueryChange(query: OsaamismerkitQuery) {
+    this.isLoading = true;
+    try {
+      await this.osaamismerkitStore.updateOsaamismerkkiQuery({
+        ...query,
+      });
+    }
+    catch (e) {
+      this.$fail(this.$t('virhe-palvelu-virhe') as string);
+    }
+    finally {
+      this.isLoading = false;
+    }
   }
 
   @Watch('tila')
-  onTilaChange(tila: string) {
-    this.query = {
-      ...this.query,
-      tila: tila ? [tila] : ['LAADINTA', 'JULKAISTU'],
-    };
+  onTilaChange(tila) {
+    this.query.tila = tila || ['LAADINTA', 'JULKAISTU'];
   }
 
   @Watch('kategoria')
   onKategoriaChange(kategoria) {
-    this.query.kategoria = kategoria.value;
+    this.query.kategoria = kategoria ? kategoria.value : null;
+  }
+
+  @Watch('voimassaolo')
+  onVoimassaoloChange(tila) {
+    const defaults = {
+      voimassa: false,
+      tuleva: false,
+      poistunut: false,
+    };
+
+    switch (tila) {
+    case 'tuleva':
+      this.query = { ...this.query, ...defaults, tuleva: true };
+      break;
+    case 'voimassaolo':
+      this.query = { ...this.query, ...defaults, voimassa: true };
+      break;
+    case 'poistunut':
+      this.query = { ...this.query, ...defaults, poistunut: true };
+      break;
+    default:
+      this.query = {
+        ...this.query,
+        ...defaults,
+      };
+      break;
+    }
   }
 };
 </script>

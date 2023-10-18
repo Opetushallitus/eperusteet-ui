@@ -34,7 +34,7 @@
                        @input="fileChanged"></b-form-file>
         </div>
         <div v-if="!liite">
-          <span class="font-size-08">{{ $t('kuvan-maksimi-koko') }}</span>
+          <span class="font-size-08">{{ imageDimensionText }}</span>
         </div>
         <div>
           <img v-if="newImagePreviewUrl" :src="newImagePreviewUrl">
@@ -92,6 +92,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   private newImagePreviewUrl: string | null = null;
   private imageWidth: number = 0;
   private imageHeight: number = 0;
+  private imageMaxDimension: string = '200x200';
 
   @Validations()
   validations = {
@@ -135,7 +136,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
         }
         else {
           this.kategoria.liite = undefined;
-          this.$fail(this.$t('kuvan-maksimi-koko') as string);
+          this.$fail(this.imageDimensionText);
         }
       };
       img.src = evt.target.result;
@@ -168,6 +169,10 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
 
   isValidImage() {
     return this.imageWidth <= 200 && this.imageHeight <= 200;
+  }
+
+  get imageDimensionText() {
+    return this.$t('kuvan-maksimimitat') + ': ' + this.imageMaxDimension as string;
   }
 
   get liite() {
