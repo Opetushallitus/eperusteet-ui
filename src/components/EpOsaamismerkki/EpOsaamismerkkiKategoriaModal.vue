@@ -30,7 +30,7 @@
         <div v-if="!liite" class="kuva-lataus tiedosto">
           <b-form-file v-model="kategoria.liite"
                        ref="file-input"
-                       accept="image/jpeg, image/png"
+                       :accept="mimeTypes"
                        :placeholder="placeholder"
                        :drop-placeholder="dropPlaceholder"
                        :browse-text="browseText"
@@ -100,6 +100,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   private imageHeight: number = 0;
   private imageMaxDimension: string = '200x200';
   private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv]
+  private mimeTypes: string = 'image/jpeg, image/png, image/svg+xml';
 
   @Validations()
   validations = {
