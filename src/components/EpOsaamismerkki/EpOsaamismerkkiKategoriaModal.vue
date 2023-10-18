@@ -13,7 +13,10 @@
           <span v-if="kategoria.id" class="mr-2">{{ $t('muokkaa-kategoriaa')}}</span>
           <span v-else class="mr-2">{{ $t('lisaa-kategoria')}}</span>
         </div>
-        <div class="close-btn clickable" @click="sulje">
+        <div>
+          <EpKielivalinta/>
+        </div>
+        <div class="close-btn clickable ml-3 pt-1" @click="sulje">
           <EpMaterialIcon aria-hidden="false" :aria-label="$t('sulje')">close</EpMaterialIcon>
         </div>
       </div>
@@ -73,6 +76,8 @@ import { requiredLokalisoituTeksti, notNull } from '@shared/validators/required'
 import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import EpKuvaLataus from '@shared/components/EpKuvaLataus/EpKuvaLataus.vue';
+import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
+import { Kieli } from '@shared/tyypit';
 
 @Component({
   components: {
@@ -81,6 +86,7 @@ import EpKuvaLataus from '@shared/components/EpKuvaLataus/EpKuvaLataus.vue';
     EpField,
     EpTiedostoLataus,
     EpMaterialIcon,
+    EpKielivalinta,
   },
 })
 export default class EpOsaamismerkkiKategoriaModal extends Vue {
@@ -93,11 +99,12 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   private imageWidth: number = 0;
   private imageHeight: number = 0;
   private imageMaxDimension: string = '200x200';
+  private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv]
 
   @Validations()
   validations = {
     kategoria: {
-      nimi: requiredLokalisoituTeksti(),
+      nimi: requiredLokalisoituTeksti(this.requiredKielet),
       liite: {
         binarydata: notNull(),
       },

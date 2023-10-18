@@ -13,7 +13,10 @@
           <span v-if="osaamismerkki.id" class="mr-2">{{ $t('muokkaa-osaamismerkkiä')}}</span>
           <span v-else class="mr-2">{{ $t('lisaa-osaamismerkki')}}</span>
         </div>
-        <div class="close-btn clickable" @click="sulje">
+        <div>
+          <EpKielivalinta/>
+        </div>
+        <div class="close-btn clickable ml-3 pt-1" @click="sulje">
           <EpMaterialIcon aria-hidden="false" :aria-label="$t('sulje')">close</EpMaterialIcon>
         </div>
       </div>
@@ -147,7 +150,9 @@ import { OsaamismerkkiDto, OsaamismerkkiDtoTilaEnum } from '@shared/generated/ep
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { required } from 'vuelidate/lib/validators';
+import { Kieli } from '@shared/tyypit';
 
 @Component({
   components: {
@@ -160,6 +165,7 @@ import { required } from 'vuelidate/lib/validators';
     EpMaterialIcon,
     EpMultiSelect,
     EpInput,
+    EpKielivalinta,
   },
 })
 export default class EpOsaamismerkkiModal extends Vue {
@@ -168,22 +174,23 @@ export default class EpOsaamismerkkiModal extends Vue {
 
   private osaamismerkki: OsaamismerkkiDto = {};
   private tallennetaan: boolean = false;
+  private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv]
 
   @Validations()
   validations = {
     osaamismerkki: {
-      nimi: requiredLokalisoituTeksti(),
+      nimi: requiredLokalisoituTeksti(this.requiredKielet),
       kategoria: notNull(),
       voimassaoloAlkaa: notNull(),
       osaamistavoitteet: {
         $each: {
-          osaamistavoite: requiredLokalisoituTeksti(),
+          osaamistavoite: requiredLokalisoituTeksti(this.requiredKielet),
         },
         required,
       },
       arviointikriteerit: {
         $each: {
-          arviointikriteeri: requiredLokalisoituTeksti(),
+          arviointikriteeri: requiredLokalisoituTeksti(this.requiredKielet),
         },
         required,
       },

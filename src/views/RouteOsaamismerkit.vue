@@ -66,8 +66,6 @@
                fixed
                hover
                no-local-sorting
-               :sort-by.sync="sort.sortBy"
-               :sort-desc.sync="sort.sortDesc"
                :items="osaamismerkitFiltered"
                :fields="tableFields"
                :per-page="perPage"
@@ -137,15 +135,6 @@ export default class RouteOsaamismerkit extends Vue {
 
   async mounted() {
     await this.osaamismerkitStore.init(this.query);
-  }
-
-  private fetch(query) {
-    this.osaamismerkitStore.init(
-      {
-        ...this.osaamismerkitStore.options.value,
-        ...query,
-      }
-    );
   }
 
   get osaamismerkitPage() {
