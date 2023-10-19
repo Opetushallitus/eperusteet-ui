@@ -37,7 +37,7 @@
                        @input="fileChanged"></b-form-file>
         </div>
         <div v-if="!liite">
-          <span class="font-size-08">{{ imageDimensionText }}</span>
+          <span class="font-size-08">{{ imageInfoText }}</span>
         </div>
         <div>
           <img v-if="newImagePreviewUrl" :src="newImagePreviewUrl">
@@ -73,18 +73,14 @@ import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { OsaamismerkkiKategoriaDto } from '@shared/generated/eperusteet';
 import { Validations } from 'vuelidate-property-decorators';
 import { requiredLokalisoituTeksti, notNull } from '@shared/validators/required';
-import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import EpKuvaLataus from '@shared/components/EpKuvaLataus/EpKuvaLataus.vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { Kieli } from '@shared/tyypit';
 
 @Component({
   components: {
-    EpKuvaLataus,
     EpButton,
     EpField,
-    EpTiedostoLataus,
     EpMaterialIcon,
     EpKielivalinta,
   },
@@ -101,6 +97,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   private imageMaxDimension: string = '200x200';
   private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv]
   private mimeTypes: string = 'image/jpeg, image/png, image/svg+xml';
+  private allowedTypes: string = '.jpeg .png .svg';
 
   @Validations()
   validations = {
@@ -144,7 +141,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
         }
         else {
           this.kategoria.liite = undefined;
-          this.$fail(this.imageDimensionText);
+          this.$fail(this.imageInfoText);
         }
       };
       img.src = evt.target.result;
@@ -161,7 +158,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
     (this.$refs['osaamismerkkiKategoriaModal'] as any).hide();
   }
 
-  muokkaa(kategoria) {
+  avaaModal(kategoria) {
     if (kategoria) {
       this.kategoria = _.cloneDeep(kategoria);
     }
@@ -179,8 +176,8 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
     return this.imageWidth <= 200 && this.imageHeight <= 200;
   }
 
-  get imageDimensionText() {
-    return this.$t('kuvan-maksimimitat') + ': ' + this.imageMaxDimension as string;
+  get imageInfoText() {
+    return this.$t('kuvan-maksimimitat') + ': ' + this.imageMaxDimension + '. ' + this.$t('sallitut-kuvaformaatit') + ': ' + this.allowedTypes;
   }
 
   get liite() {
@@ -211,10 +208,6 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
 
 <style lang="scss" scoped>
 @import "@shared/styles/_variables.scss";
-
-.error {
-  color: $invalid;
-}
 
 .kuva-lataus {
   margin: 0;

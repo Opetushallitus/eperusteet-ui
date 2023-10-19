@@ -5,9 +5,18 @@
         <h1>{{ $t('osaamismerkit') }}</h1>
         <div class="d-flex">
           <router-link :to="{ name: 'osaamismerkkiKategoria' }">
-            <EpButton class="m-0 p-0" variant="link" icon="edit">{{$t('kategorioiden-hallinta')}}</EpButton>
+            <EpButton class="m-0 p-0"
+                      variant="link"
+                      icon="edit">
+              {{$t('kategorioiden-hallinta')}}
+            </EpButton>
           </router-link>
-          <EpButton class="m-0 p-0" variant="link" icon="add" @click="avaaOsaamismerkkiModal">{{$t('lisaa-osaamismerkki')}}</EpButton>
+          <EpButton class="m-0 p-0"
+                    variant="outlined"
+                    icon="add"
+                    @click="avaaOsaamismerkkiModal">
+            {{$t('lisaa-osaamismerkki')}}
+          </EpButton>
         </div>
       </div>
       <div class="mb-1">{{$t('osaamismerkit-kuvaus')}}</div>
@@ -71,16 +80,15 @@
                :per-page="perPage"
                @row-clicked="avaaOsaamismerkkiModal"/>
 
-      <b-pagination
-        v-model="page"
-        :total-rows="totalRows"
-        :per-page="perPage"
-        aria-controls="tiedotteet"
-        align="center">
+      <b-pagination v-model="page"
+                    :total-rows="totalRows"
+                    :per-page="perPage"
+                    aria-controls="tiedotteet"
+                    align="center">
       </b-pagination>
     </div>
-    <EpOsaamismerkkiModal ref="osaamismerkkiModal" :store="osaamismerkitStore"/>
 
+    <EpOsaamismerkkiModal ref="osaamismerkkiModal" :store="osaamismerkitStore"/>
   </EpMainView>
 </template>
 
@@ -95,8 +103,8 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { OsaamismerkitQuery } from '@shared/api/eperusteet';
 import { OsaamismerkkiDto } from '@shared/generated/eperusteet';
-import * as _ from 'lodash';
 import EpOsaamismerkkiModal from '@/components/EpOsaamismerkki/EpOsaamismerkkiModal.vue';
+import * as _ from 'lodash';
 
 @Component({
   components: {

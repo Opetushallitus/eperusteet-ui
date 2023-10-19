@@ -23,8 +23,13 @@
     </template>
 
     <div class="mb-2">
-      <b-form-group v-if="osaamismerkki.muokattu" :label="$t('tila')">
-        <span>{{ tilaText + $sdt(osaamismerkki.muokattu)}} </span>
+      <b-form-group :label="$t('tila')">
+        <div class="d-flex">
+          <b-form-checkbox v-model="isJulkinen">
+            {{ $t('naytetaan-julkisena') }}
+          </b-form-checkbox>
+          <span v-if="osaamismerkki.muokattu" class="muokattu-text ml-1">{{ muokkausText + $sdt(osaamismerkki.muokattu)}}</span>
+        </div>
       </b-form-group>
 
       <b-form-group :label="$t('nimi') + ' *'">
@@ -114,21 +119,17 @@
                 variant="link">
         {{ $t('peruuta') }}
       </EpButton>
-      <EpButton v-if="allowDelete" @click="poistaOsaamismerkki"
-                :show-spinner="tallennetaan">
+      <EpButton v-if="osaamismerkki.id"
+                @click="poistaOsaamismerkki"
+                :show-spinner="tallennetaan"
+                :disabled="isJulkinen">
         {{ $t('poista') }}
       </EpButton>
-      <EpButton @click="tallennaLuonnos"
+      <EpButton @click="tallenna"
                 class="ml-2"
                 :show-spinner="tallennetaan"
                 :disabled="invalid">
-        {{ $t('tallenna-luonnoksena') }}
-      </EpButton>
-      <EpButton @click="tallennaJulkaisu"
-                class="ml-2"
-                :show-spinner="tallennetaan"
-                :disabled="invalid">
-        {{ $t('tallenna-julkisena') }}
+        {{ $t('tallenna') }}
       </EpButton>
     </div>
   </b-modal>
@@ -137,14 +138,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
-import EpKuvaLataus from '@shared/components/EpKuvaLataus/EpKuvaLataus.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpField from '@shared/components/forms/EpField.vue';
-import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { Validations } from 'vuelidate-property-decorators';
-import { requiredLokalisoituTeksti, notNull } from '@shared/validators/required';
+import { notNull, requiredLokalisoituTeksti } from '@shared/validators/required';
 import * as _ from 'lodash';
 import { OsaamismerkkiDto, OsaamismerkkiDtoTilaEnum } from '@shared/generated/eperusteet';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
@@ -158,10 +157,8 @@ import { Kieli } from '@shared/tyypit';
   components: {
     draggable,
     EpDatepicker,
-    EpKuvaLataus,
     EpButton,
     EpField,
-    EpTiedostoLataus,
     EpMaterialIcon,
     EpMultiSelect,
     EpInput,
@@ -197,6 +194,14 @@ export default class EpOsaamismerkkiModal extends Vue {
     },
   }
 
+  init() {
+    this.osaamismerkki = {
+      osaamistavoitteet: [],
+      arviointikriteerit: [],
+    };
+    this.osaamismerkki.tila = OsaamismerkkiDtoTilaEnum.LAADINTA;
+  }
+
   get defaultDragOptions() {
     return {
       animation: 300,
@@ -212,22 +217,9 @@ export default class EpOsaamismerkkiModal extends Vue {
       this.osaamismerkki = _.cloneDeep(osaamismerkki);
     }
     else {
-      this.osaamismerkki = {
-        osaamistavoitteet: [],
-        arviointikriteerit: [],
-      };
+      this.init();
     }
     (this.$refs['osaamismerkkiModal'] as any).show();
-  }
-
-  tallennaJulkaisu() {
-    this.osaamismerkki.tila = OsaamismerkkiDtoTilaEnum.JULKAISTU;
-    this.tallenna();
-  }
-
-  tallennaLuonnos() {
-    this.osaamismerkki.tila = OsaamismerkkiDtoTilaEnum.LAADINTA;
-    this.tallenna();
   }
 
   async tallenna() {
@@ -284,8 +276,12 @@ export default class EpOsaamismerkkiModal extends Vue {
     });
   }
 
-  get allowDelete() {
-    return this.osaamismerkki.tila === OsaamismerkkiDtoTilaEnum.LAADINTA;
+  get isJulkinen() {
+    return this.osaamismerkki.tila === OsaamismerkkiDtoTilaEnum.JULKAISTU;
+  }
+
+  set isJulkinen(tila) {
+    this.osaamismerkki.tila = tila ? OsaamismerkkiDtoTilaEnum.JULKAISTU : OsaamismerkkiDtoTilaEnum.LAADINTA;
   }
 
   get osaamistavoitteet() {
@@ -312,13 +308,17 @@ export default class EpOsaamismerkkiModal extends Vue {
     return this.$v.$invalid;
   }
 
-  get tilaText() {
-    return this.$t('tila-' + _.toLower(this.osaamismerkki.tila)) + ' - ' + this.$t('muokannut-viimeksi') + ': ' + this.osaamismerkki.muokkaaja + ' ';
+  get muokkausText() {
+    return ' - ' + this.$t('muokannut-viimeksi') + ': ' + this.osaamismerkki.muokkaaja + ' ';
   }
 };
 </script>
 
 <style lang="scss" scoped>
 @import "@shared/styles/_variables.scss";
+
+.muokattu-text {
+  color: $gray-lighten-12;
+}
 
 </style>
