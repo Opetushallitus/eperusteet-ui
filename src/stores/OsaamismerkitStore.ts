@@ -61,4 +61,8 @@ export class OsaamismerkitStore {
   public async updateKategoria(kategoria: OsaamismerkkiKategoriaDto) {
     await Osaamismerkit.updateKategoria(kategoria);
   }
+
+  public async deleteKategoria(id) {
+    await Osaamismerkit.deleteKategoria(id);
+  }
 }

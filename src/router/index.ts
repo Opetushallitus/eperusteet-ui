@@ -142,11 +142,12 @@ const router = new VueRouter({
       name: 'osaamismerkit',
       component: RouteOsaamismerkit,
       props,
-    }, {
-      path: 'osaamismerkit/kategoriat',
-      name: 'osaamismerkkiKategoria',
-      component: RouteOsaamismerkkiKategoriat,
-      props,
+      children: [{
+        path: 'kategoriat',
+        name: 'osaamismerkkikategoriat',
+        component: RouteOsaamismerkkiKategoriat,
+        props,
+      }],
     }, {
       path: 'maaraykset',
       name: 'maaraykset',

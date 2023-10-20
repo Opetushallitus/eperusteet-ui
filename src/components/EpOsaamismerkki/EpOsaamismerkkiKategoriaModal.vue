@@ -55,7 +55,13 @@
                 variant="link">
         {{ $t('peruuta') }}
       </EpButton>
+      <EpButton v-if="kategoria.id"
+                @click="poistaKategoria"
+                :show-spinner="tallennetaan">
+        {{ $t('poista') }}
+      </EpButton>
       <EpButton @click="tallenna"
+                class="ml-2"
                 :show-spinner="tallennetaan"
                 :disabled="invalid">
         {{ $t('tallenna') }}
@@ -121,6 +127,20 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
     catch (err) {
       this.tallennetaan = false;
       this.$fail(this.$t('kategorian-paivitys-epaonnistui') as string);
+    }
+  }
+
+  async poistaKategoria() {
+    try {
+      await this.store.deleteKategoria(this.kategoria.id);
+      this.tallennetaan = false;
+      this.$success(this.$t('kategorian-poistaminen-onnistui') as string);
+      await this.store.fetchKategoriat();
+      this.sulje();
+    }
+    catch (err) {
+      this.tallennetaan = false;
+      this.$fail(this.$t('kategorian-poistaminen-epaonnistui') as string);
     }
   }
 

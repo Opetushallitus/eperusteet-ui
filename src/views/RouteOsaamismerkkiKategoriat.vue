@@ -37,6 +37,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { OsaamismerkkiKategoriaDto } from '@shared/generated/eperusteet';
 import EpOsaamismerkkiKategoriaModal from '@/components/EpOsaamismerkki/EpOsaamismerkkiKategoriaModal.vue';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
+import { Murupolku } from '@shared/stores/murupolku';
 
 @Component({
   components: {
@@ -51,6 +52,9 @@ export default class RouteOsaamismerkkiKategoriat extends Vue {
   private osaamismerkitStore!: OsaamismerkitStore;
 
   async mounted() {
+    Murupolku.aseta('osaamismerkkikategoriat', this.$t('route-osaamismerkkikategoriat'), {
+      name: 'osaamismerkkikategoriat',
+    });
     await this.osaamismerkitStore.fetchKategoriat();
   }
 
