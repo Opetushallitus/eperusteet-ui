@@ -7,7 +7,7 @@
         :arviointiasteikot="arviointiasteikot">
 
         <div slot="poisto">
-          <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)">{{$t('poista-arvioinnin-kohdealue')}}</EpButton>
+          <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)">{{$t('poista-ammattitaitovaatimus-tekemisena')}}</EpButton>
         </div>
         </EpArviointi>
     </div>
@@ -66,7 +66,7 @@ export default class EpArvioinninKohdeAlueet extends Vue {
 
   get lisaaBtnTeksti() {
     if (_.size(this.model) > 0) {
-      return 'lisaa-arvioinnin-kohdealue';
+      return 'lisaa-ammattitaitovaatimus-tekemisena';
     }
 
     return 'lisaa-tutkinnon-osa-kohtainen-arviointi';
