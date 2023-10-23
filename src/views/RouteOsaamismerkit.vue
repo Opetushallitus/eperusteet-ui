@@ -68,8 +68,7 @@
       </div>
 
       <EpSpinner v-if="!osaamismerkitPage" />
-
-      <div v-else>
+      <div v-else-if="totalRows > 0">
         <b-table responsive
                  borderless
                  striped
@@ -87,6 +86,9 @@
                       aria-controls="tiedotteet"
                       align="center">
         </b-pagination>
+      </div>
+      <div v-else class="m-2 alert alert-info">
+        {{ $t('ei-hakutuloksia') }}
       </div>
 
       <EpOsaamismerkkiModal ref="osaamismerkkiModal" :store="osaamismerkitStore"/>

@@ -13,7 +13,7 @@
     </template>
 
     <EpSpinner v-if="!kategoriat" />
-    <div v-else>
+    <div v-else-if="kategoriat.length > 0">
       <b-table responsive
                borderless
                striped
@@ -23,6 +23,9 @@
                :items="kategoriat"
                :fields="tableFields"
                @row-clicked="avaaKategoriaModal"/>
+    </div>
+    <div v-else class="m-2 alert alert-info">
+      {{ $t('ei-hakutuloksia') }}
     </div>
 
     <EpOsaamismerkkiKategoriaModal ref="osaamismerkkiKategoriaModal" :store="osaamismerkitStore"/>
