@@ -59,8 +59,8 @@
     <b-form-group :label="$t('osaamistavoitteet') + ' *'">
       <draggable v-bind="defaultDragOptions"
                  tag="div"
-                 v-model="osaamistavoitteet">
-        <div class="row mb-2" v-for="(tavoite, i) in osaamistavoitteet" :key="'tavoite'+i">
+                 v-model="osaamismerkki.osaamistavoitteet">
+        <div class="row mb-2" v-for="(tavoite, i) in osaamismerkki.osaamistavoitteet" :key="'tavoite'+i">
           <div class="col">
             <EpInput v-model="tavoite.osaamistavoite"
                      :is-editing="true"
@@ -88,8 +88,8 @@
     <b-form-group :label="$t('arviointikriteerit') + ' *'">
       <draggable v-bind="defaultDragOptions"
                  tag="div"
-                 v-model="arviointikriteerit">
-        <div class="row mb-2" v-for="(kriteeri, i) in arviointikriteerit" :key="'kriteeri'+i">
+                 v-model="osaamismerkki.arviointikriteerit">
+        <div class="row mb-2" v-for="(kriteeri, i) in osaamismerkki.arviointikriteerit" :key="'kriteeri'+i">
           <div class="col">
             <EpInput v-model="kriteeri.arviointikriteeri"
                      :is-editing="true"
@@ -282,22 +282,6 @@ export default class EpOsaamismerkkiModal extends Vue {
 
   set isJulkinen(tila) {
     this.osaamismerkki.tila = tila ? OsaamismerkkiDtoTilaEnum.JULKAISTU : OsaamismerkkiDtoTilaEnum.LAADINTA;
-  }
-
-  get osaamistavoitteet() {
-    return this.osaamismerkki.osaamistavoitteet;
-  }
-
-  set osaamistavoitteet(tavoitteet) {
-    this.osaamismerkki.osaamistavoitteet = tavoitteet;
-  }
-
-  get arviointikriteerit() {
-    return this.osaamismerkki.arviointikriteerit;
-  }
-
-  set arviointikriteerit(kriteerit) {
-    this.osaamismerkki.arviointikriteerit = kriteerit;
   }
 
   get osaamismerkkiKategoriat() {

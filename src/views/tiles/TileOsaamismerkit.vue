@@ -11,17 +11,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
-import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
+
 @Component({
   components: {
     EpHomeTile,
   },
 })
 export default class TileOsaamismerkit extends Vue {
-  @Prop({ required: true })
-  private osaamismerkitStore!: OsaamismerkitStore;
 }
 </script>
 

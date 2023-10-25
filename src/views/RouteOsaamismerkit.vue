@@ -216,7 +216,7 @@ export default class RouteOsaamismerkit extends Vue {
         key: 'nimi',
         label: this.$t('nimi'),
         sortable: false,
-        thStyle: { width: '35%', borderBottom: '2px' },
+        thStyle: { width: '25%', borderBottom: '2px' },
         formatter: (value: any, key: any, item: any) => {
           return (this as any).$kaanna(value);
         },

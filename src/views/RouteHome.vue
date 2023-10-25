@@ -20,7 +20,7 @@
         <TileMaaraykset :maarayksetStore="maarayksetStore"/>
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
-        <TileOsaamismerkit v-if="$hasOphCrud()" :osaamismerkit-store="osaamismerkitStore"/>
+        <TileOsaamismerkit v-if="$hasOphCrud()" />
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TilePalautteet v-if="$isAdmin()"/>
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
@@ -55,7 +55,6 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
 import EpFeedbackModal from '@shared/components/EpFeedback/EpFeedbackModal.vue';
 import { MaarayksetStore } from '@/stores/MaarayksetStore';
-import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 
 @Component({
   components: {
@@ -93,9 +92,6 @@ export default class Home extends Vue {
 
   @Prop({ required: true })
   private digitaalisetOsaamisetStore!: PerusteetStore;
-
-  @Prop({ required: true })
-  private osaamismerkitStore!: OsaamismerkitStore;
 
   @Meta
   getMetaInfo() {
