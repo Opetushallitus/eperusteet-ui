@@ -20,6 +20,7 @@
         <TileMaaraykset :maarayksetStore="maarayksetStore"/>
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" />
         <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
+        <TileOsaamismerkit v-if="$hasOphCrud()" />
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TilePalautteet v-if="$isAdmin()"/>
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
@@ -46,6 +47,7 @@ import TileTilastot from './tiles/TileTilastot.vue';
 import TilePalautteet from './tiles/TilePalautteet.vue';
 import TileMaaraykset from './tiles/TileMaaraykset.vue';
 import TileYllapito from './tiles/TileYllapito.vue';
+import TileOsaamismerkit from './tiles/TileOsaamismerkit.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
@@ -56,8 +58,9 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
 
 @Component({
   components: {
-    TileYllapito,
     EpSearch,
+    EpFeedbackModal,
+    TileYllapito,
     TileArkistoidut,
     TileOppaat,
     TilePerusteprojektit,
@@ -66,9 +69,9 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
     TileArviointiasteikot,
     TileTilastot,
     TilePalautteet,
-    EpFeedbackModal,
     TileMaaraykset,
     TileDigitaalinenOsaaminen,
+    TileOsaamismerkit,
   },
 })
 export default class Home extends Vue {
@@ -89,8 +92,6 @@ export default class Home extends Vue {
 
   @Prop({ required: true })
   private digitaalisetOsaamisetStore!: PerusteetStore;
-
-  private rajain = '';
 
   @Meta
   getMetaInfo() {

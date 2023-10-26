@@ -55,7 +55,7 @@ import { MaaraysDto } from '@shared/api/eperusteet';
 import EpMaaraysModal from '@/components/EpMaarays/EpMaaraysModal.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {

@@ -43,6 +43,7 @@ import RouteKotoKielitaitotaso from '@/views/RouteKotoKielitaitotaso.vue';
 import RouteKotoOpinto from '@/views/RouteKotoOpinto.vue';
 import RouteKotoLaajaalainenOsaaminen from '@/views/RouteKotoLaajaalainenOsaaminen.vue';
 import RouteMaaraykset from '@/views/RouteMaaraykset.vue';
+import RouteOsaamismerkit from '@/views/RouteOsaamismerkit.vue';
 import RoutePoistetutSisallot from '@/views/RoutePoistetutSisallot.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpErrorPage from '@shared/components/EpErrorPage/EpErrorPage.vue';
@@ -64,7 +65,7 @@ import RoutePerusopetusOppiaineet from '@/views/perusopetus/RouteOppiaineet.vue'
 import RoutePerusopetusLaajaAlaisetOsaamiset from '@/views/perusopetus/RouteLaajaAlaisetOsaamiset.vue';
 import RoutePerusopetusLaajaAlainenOsaaminen from '@/views/perusopetus/RouteLaajaAlainenOsaaminen.vue';
 import RoutePerusopetusOppiaine from '@/views/perusopetus/RouteOppiaine.vue';
-
+import RouteOsaamismerkkiKategoriat from '@/views/RouteOsaamismerkkiKategoriat.vue';
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
 import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
@@ -136,6 +137,17 @@ const router = new VueRouter({
       name: 'tiedotteet',
       component: RouteTiedotteet,
       props,
+    }, {
+      path: 'osaamismerkit',
+      name: 'osaamismerkit',
+      component: RouteOsaamismerkit,
+      props,
+      children: [{
+        path: 'kategoriat',
+        name: 'osaamismerkkikategoriat',
+        component: RouteOsaamismerkkiKategoriat,
+        props,
+      }],
     }, {
       path: 'maaraykset',
       name: 'maaraykset',

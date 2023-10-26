@@ -78,7 +78,7 @@ import { Validations } from 'vuelidate-property-decorators';
 import { validationMixin } from 'vuelidate';
 import { notNull } from '@shared/validators/required';
 import { requiredIf } from 'vuelidate/lib/validators';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {

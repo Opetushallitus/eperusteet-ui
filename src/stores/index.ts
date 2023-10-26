@@ -21,6 +21,7 @@ import { MaarayksetStore } from '@/stores/MaarayksetStore';
 import { PoistetutStore } from './PoistetutStore';
 import { DigitaalisetOsaamisetStore } from './DigitaalisetOsaamisetStore';
 import { YllapitoStore } from '@/stores/YllapitoStore';
+import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 
 const arviointiStore = new ArviointiStore(Kielet);
 const kayttajaStore = Kayttajat;
@@ -44,6 +45,7 @@ const palautteetStore = new PalautteetStore();
 const maarayksetStore = new MaarayksetStore();
 const poistetutStore = new PoistetutStore();
 const yllapitoStore = new YllapitoStore();
+const osaamismerkitStore = new OsaamismerkitStore();
 
 export const stores = Object.freeze({
   aikatauluStore,
@@ -70,4 +72,5 @@ export const stores = Object.freeze({
   maarayksetStore,
   poistetutStore,
   yllapitoStore,
+  osaamismerkitStore,
 });

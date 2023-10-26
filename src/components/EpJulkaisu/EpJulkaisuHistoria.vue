@@ -72,7 +72,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpJulkaisuModal from './EpJulkaisuModal.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 interface Julkaisu {
   revision?: number;
