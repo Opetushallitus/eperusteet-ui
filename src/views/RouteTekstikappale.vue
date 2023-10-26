@@ -1,6 +1,10 @@
 <template>
   <div v-if="store">
-    <EpEditointi :store="store" :versionumero="versionumero" :confirmRemove="false" :postRemove="postRemove">
+    <EpEditointi :store="store"
+                 :versionumero="versionumero"
+                 :confirmRemove="true"
+                 :postRemove="postRemove"
+                 label-remove-confirm="vahvista-tekstikappaleen-poisto">
       <template v-slot:header="{ data }">
         <h2 class="m-0">{{ $kaanna(data.nimi) }}</h2>
       </template>
@@ -346,7 +350,7 @@ export default class RouteTekstikappale extends Vue {
           .roskalaatikko {
             color: $paletti-blue;
             cursor: pointer;
-            margin: 0px 10px;
+            margin: 0 10px;
           }
         }
       }
