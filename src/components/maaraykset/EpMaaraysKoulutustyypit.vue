@@ -15,7 +15,7 @@
       </ep-button>
     </template>
 
-    <div v-else class="ml-4">
+    <div v-else class="ml-2">
       <KoulutustyyppiSelect v-for="(koulutustyyppi, index) in model" :key="'koulutustyyppi' + index" :value="koulutustyyppi"/>
     </div>
 

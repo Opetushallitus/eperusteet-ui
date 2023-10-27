@@ -24,7 +24,7 @@
           <ep-search v-model="query.nimi" :placeholder="$t('etsi-maarayksia')"/>
         </b-form-group>
 
-        <b-form-group :label="$t('tyyppi')" class="col-4">
+        <b-form-group :label="$t('tyyppi')" class="col-3">
           <EpMultiSelect v-model="query.tyyppi"
                   :enable-empty-option="true"
                   placeholder="kaikki"
@@ -39,10 +39,10 @@
           </EpMultiSelect>
         </b-form-group>
 
-        <b-form-group :label="$t('koulutus-tai-tutkinto')" class="col-2">
+        <b-form-group :label="$t('koulutus-tai-tutkinto')" class="col-3">
           <koulutustyyppi-select v-model="query.koulutustyyppi"
                                 :koulutustyypit="koulutustyyppiVaihtoehdot"
-                                :isEditing="true"></koulutustyyppi-select>
+                                :isEditing="true" textWrap/>
         </b-form-group>
 
         <b-form-group :label="$t('voimassaolo')" class="col-2">
@@ -107,7 +107,7 @@
 <script lang="ts">
 import * as _ from 'lodash';
 import { Prop, Component, Vue, ProvideReactive, Watch } from 'vue-property-decorator';
-import { MaarayksetStore } from '@shared/stores/MaarayksetStore';
+import { MaarayksetStore, MaaraysQueryDto } from '@shared/stores/MaarayksetStore';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -130,6 +130,7 @@ interface MaaraysQuery {
   voimassaolo: 'KAIKKI' | 'TULEVA' | 'VOIMASSAOLO' | 'POISTUNUT' | null,
   jarjestysTapa?: string;
   jarjestys: string;
+  koulutustyyppi: string | null,
 }
 
 @Component({
@@ -159,6 +160,7 @@ export default class RouteMaaraysKokoelma extends Vue {
     voimassaolo: null,
     jarjestysTapa: 'nimi',
     jarjestys: 'ASC',
+    koulutustyyppi: null,
   }
 
   async mounted() {
@@ -224,6 +226,7 @@ export default class RouteMaaraysKokoelma extends Vue {
         tuleva: this.query.voimassaolo === 'TULEVA',
         voimassaolo: this.query.voimassaolo === 'VOIMASSAOLO',
         poistunut: this.query.voimassaolo === 'POISTUNUT',
+        koulutustyypit: this.query.koulutustyyppi ? [this.query.koulutustyyppi] : [],
       });
   }
 
