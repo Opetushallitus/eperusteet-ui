@@ -3,7 +3,7 @@
     <EpTestiymparisto />
 
     <div class="header" ref="header">
-      <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet"/>
+      <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet" :logoutHref="logoutHref"/>
       <PortalTarget ref="innerPortal" name="headerExtension" />
     </div>
     <RouterView />
@@ -16,7 +16,7 @@ import _ from 'lodash';
 import { Prop, Watch, Component, Vue } from 'vue-property-decorator';
 import Sticky from 'vue-sticky-directive';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
-import { Kayttajat, KayttajaStore } from '@/stores/kayttaja';
+import { KayttajaStore } from '@/stores/kayttaja';
 
 import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
 
@@ -25,6 +25,7 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { Meta } from '@shared/utils/decorators';
 import EpTestiymparisto from '@shared/components/EpTestiymparisto/EpTestiymparisto.vue';
+import { baseURL, KayttajatParam } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -137,6 +138,10 @@ export default class RouteRoot extends Vue {
 
   get sovellusOikeudet() {
     return this.kayttajaStore?.sovellusOikeudet.value;
+  }
+
+  get logoutHref() {
+    return baseURL + KayttajatParam.logout().url;
   }
 }
 </script>
