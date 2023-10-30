@@ -10,7 +10,7 @@
     <template slot="modal-header">
       <div class="row w-100">
         <div class="col">
-          <span v-if="osaamismerkki.id" class="mr-2">{{ $t('muokkaa-osaamismerkkiä')}}</span>
+          <span v-if="osaamismerkki.id" class="mr-2">{{ $t('muokkaa-osaamismerkkia')}}</span>
           <span v-else class="mr-2">{{ $t('lisaa-osaamismerkki')}}</span>
         </div>
         <div>
@@ -23,17 +23,28 @@
     </template>
 
     <div class="mb-2">
-      <b-form-group :label="$t('tila')">
-        <div class="d-flex">
-          <b-form-checkbox v-model="isJulkinen">
-            {{ $t('naytetaan-julkisena') }}
-          </b-form-checkbox>
-          <span v-if="osaamismerkki.muokattu" class="muokattu-text ml-1">{{ muokkausText + $sdt(osaamismerkki.muokattu)}}</span>
-        </div>
-      </b-form-group>
+      <b-row no-gutters v-if="osaamismerkki.id">
+        <b-col lg="8">
+          <b-form-group :label="$t('tila')">
+            <div class="d-flex">
+              <b-form-checkbox v-model="isJulkinen">
+                {{ $t('naytetaan-julkisena') }}
+              </b-form-checkbox>
+              <span v-if="osaamismerkki.muokattu" class="muokattu-text ml-1">{{ muokkausText + $sdt(osaamismerkki.muokattu)}}</span>
+            </div>
+            <div></div>
+          </b-form-group>
+        </b-col>
+
+        <b-col lg="4">
+          <b-form-group :label="$t('koodi')" v-if="osaamismerkki.koodiUri">
+            <span>{{ koodi }}</span>
+          </b-form-group>
+        </b-col>
+      </b-row>
 
       <b-form-group :label="$t('nimi') + ' *'">
-        <EpField v-model="osaamismerkki.nimi" :is-editing="true" :validation="$v.osaamismerkki.nimi" :showValidValidation="false"/>
+        <EpInput v-model="osaamismerkki.nimi" :is-editing="true"/>
       </b-form-group>
 
       <b-form-group :label="$t('kategoria') + ' *'">
@@ -139,7 +150,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpField from '@shared/components/forms/EpField.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { Validations } from 'vuelidate-property-decorators';
@@ -158,7 +168,6 @@ import { Kieli } from '@shared/tyypit';
     draggable,
     EpDatepicker,
     EpButton,
-    EpField,
     EpMaterialIcon,
     EpMultiSelect,
     EpInput,
@@ -294,6 +303,10 @@ export default class EpOsaamismerkkiModal extends Vue {
 
   get muokkausText() {
     return ' - ' + this.$t('muokannut-viimeksi') + ': ' + this.osaamismerkki.muokkaaja + ' ';
+  }
+
+  get koodi() {
+    return this.osaamismerkki.koodiUri ? this.osaamismerkki.koodiUri.replace('osaamismerkit_', '') : null;
   }
 };
 </script>
