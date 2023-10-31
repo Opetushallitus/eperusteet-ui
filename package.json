@@ -64,7 +64,7 @@
     "tslib": "^2.2.0",
     "typescript": "3.7.5",
     "uuid": "^7.0.2",
-    "vue": "^2.7.10",
+    "vue": "^2.7.15",
     "vue-apexcharts": "^1.5.2",
     "vue-axe": "^1.0.7",
     "vue-class-component": "^7.0.2",

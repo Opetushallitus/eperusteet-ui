@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi, MaaraysDto, Maaraykset } from '@shared/api/eperusteet';
+=======
+import Vue, { watch, reactive, computed } from 'vue';
+import VueCompositionApi from '@vue/composition-api';
+import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi } from '@shared/api/eperusteet';
+>>>>>>> d87ba97 (fixes)
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isKoulutustyyppiPdfTuettu } from '@shared/utils/perusteet';
