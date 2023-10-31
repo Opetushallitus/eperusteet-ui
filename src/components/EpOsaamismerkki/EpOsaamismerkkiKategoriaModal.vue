@@ -24,7 +24,7 @@
 
     <div class="mb-5">
       <b-form-group :label="$t('nimi') + ' *'">
-        <EpField v-model="kategoria.nimi" :is-editing="true" :validation="$v.kategoria.nimi" :showValidValidation="false"/>
+        <EpInput v-model="kategoria.nimi" :is-editing="true"/>
       </b-form-group>
       <b-form-group :label="$t('kuva') + ' *'">
         <div v-if="!liite" class="kuva-lataus tiedosto">
@@ -73,7 +73,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpField from '@shared/components/forms/EpField.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
 import * as _ from 'lodash';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { OsaamismerkkiKategoriaDto } from '@shared/generated/eperusteet';
@@ -86,7 +86,7 @@ import { Kieli } from '@shared/tyypit';
 @Component({
   components: {
     EpButton,
-    EpField,
+    EpInput,
     EpMaterialIcon,
     EpKielivalinta,
   },
