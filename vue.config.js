@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const proxy = {
   '/eperusteet-service': {
@@ -26,8 +26,12 @@ module.exports = {
     },
     plugins: [
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+      new ForkTsCheckerWebpackPlugin({
+        memoryLimit: 8192,
+      }),
     ],
   },
+
   chainWebpack: config => {
     // enabloidaan sourcemap ja nimetään "oikeat" vuen scirpti-tiedostot uudelleen, jotta löytyy selaimen devtoolsissa helpommin
     // esim. RouteRoot.vue?bf9d -> RouteRoot.vue?script
