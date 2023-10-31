@@ -306,7 +306,7 @@ export default class EpOsaamismerkkiModal extends Vue {
   }
 
   get koodi() {
-    return this.osaamismerkki.koodiUri ? this.osaamismerkki.koodiUri.replace('osaamismerkit_', '') : null;
+    return this.osaamismerkki.koodiUri ? this.osaamismerkki.koodiUri.split('_')[1] : null;
   }
 };
 </script>
