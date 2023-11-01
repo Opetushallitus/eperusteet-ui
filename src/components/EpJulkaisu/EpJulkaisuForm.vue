@@ -66,7 +66,7 @@
 
 <script lang="ts">
 import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
-import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
+import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
