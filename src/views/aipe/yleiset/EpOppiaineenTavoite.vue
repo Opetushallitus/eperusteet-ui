@@ -1,7 +1,7 @@
 <template>
   <div>
     <h4 v-if="isEditing" class="mt-4">{{$t('tavoitteen-nimi')}}</h4>
-    <ep-input v-if="isEditing" v-model="model.tavoite" :is-editing="isEditing"></ep-input>
+    <ep-input v-if="isEditing" v-model="tavoite" :is-editing="isEditing"></ep-input>
 
     <h4 class="mt-4">{{$t('tavoitteista-johdetut-oppimisen-tavoitteet')}}</h4>
     <ep-content layout="normal" v-model="model.tavoitteistaJohdetutOppimisenTavoitteet" :is-editable="isEditing"> </ep-content>
@@ -159,11 +159,12 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { Kielet } from '@shared/stores/kieli';
+import { Kielet, KieliStore } from '@shared/stores/kieli';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
+import { unescapeStringHtml } from '@shared/utils/inputs';
 
 interface OppiaineenTavoiteSupportData {
   kohdealueet: any[];
@@ -198,6 +199,30 @@ export default class EpOppiaineenTavoite extends Vue {
 
   set model(val) {
     this.$emit('input', val);
+  }
+
+  set tavoite(tavoite) {
+    this.model = {
+      ...this.model,
+      tavoite,
+    };
+  }
+
+  get tavoite() {
+    return {
+      ...this.model.tavoite,
+      [Kielet.getSisaltoKieli.value]: this.siivoaTagit(this.model.tavoite),
+    };
+  }
+
+  siivoaTagit(tavoite) {
+    if (tavoite && tavoite[Kielet.getSisaltoKieli.value]) {
+      const elem = document.createElement('div');
+      elem.innerHTML = unescapeStringHtml(tavoite[Kielet.getSisaltoKieli.value])!;
+      return elem.textContent;
+    }
+
+    return '';
   }
 
   get kohdealue() {
