@@ -7,6 +7,8 @@
     <template #modal-header>
       <h2 v-if="muokkaus">{{ $t('muokkaa-ryhmaa') }}: {{$kaanna(nimi)}}</h2>
       <h2 v-else>{{ $t('lisaa-ryhma') }}</h2>
+
+      <EpKielivalinta/>
     </template>
 
     <template #modal-footer>
@@ -147,6 +149,7 @@ import * as _ from 'lodash';
 import { Kieli } from '@shared/tyypit';
 import { Kielet } from '@shared/stores/kieli';
 import { Prop, Component, Vue, Watch, InjectReactive } from 'vue-property-decorator';
+import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 
 @Component({
   components: {
@@ -154,6 +157,7 @@ import { Prop, Component, Vue, Watch, InjectReactive } from 'vue-property-decora
     EpContent,
     EpInput,
     EpToggle,
+    EpKielivalinta,
   },
 })
 
@@ -334,7 +338,11 @@ export default class EpRakenneModal extends Vue {
 
   @Watch('nimiValinta')
   nimiValintaChange(newVal, oldVal) {
-    if (this.nimiValinta !== null) {
+    if (!newVal || !oldVal) {
+      return;
+    }
+
+    if (this.nimiValinta) {
       if (this.nimiValinta !== 'muu') {
         this.$emit('input', { ...this.innerModel, nimi: this.getNimi(this.nimiValintaTekstit[this.nimiValinta]) });
       }
@@ -346,6 +354,10 @@ export default class EpRakenneModal extends Vue {
 
   @Watch('tyyppi')
   tyyppiChange(newVal, oldVal) {
+    if (!newVal || !oldVal) {
+      return;
+    }
+
     let osaamisala = this.innerModel.osaamisala;
     if (this.tyyppi === 'osaamisala' && _.isNil(this.innerModel.osaamisala)) {
       osaamisala = {};

@@ -37,7 +37,7 @@
                     </ep-button>
                     <EpRakenneModal
                       v-model="uusi.ryhma"
-                      ref="eprakennemodal"
+                      ref="eprakennemodalUusiRyhma"
                       @save="addUusi(data.rakenne)"/>
                   </div>
                   <div class="drag-area-left mr-3">
@@ -348,7 +348,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   private queryTutkinnonOsa = '';
   private showUnusedTutkinnonOsat = false;
   private store: EditointiStore | null = null;
-  private uusi: any | null = DefaultRyhma;
+  private uusi: any | null = _.cloneDeep(DefaultRyhma);
   private naytaKuvaukset = false;
   private naytaRakenne = true;
   private nimiValinta: 'paikallinen' | 'tutkinnonosato' | 'korkeakoulu' | 'yhteinen' | 'muu' | null = null;
@@ -625,12 +625,12 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
         ...template,
         ...this.uusi.ryhma,
       }, ...root.osat];
+      this.uusi = _.cloneDeep(DefaultRyhma);
     }
   }
 
   addRyhma() {
-    this.uusi = _.cloneDeep(DefaultRyhma);
-    (this.$refs.eprakennemodal as any).show(true);
+    (this.$refs.eprakennemodalUusiRyhma as any).show(true);
   }
 
   @ProvideReactive('tutkintonimikkeet')
