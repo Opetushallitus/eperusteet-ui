@@ -226,7 +226,7 @@ export default class MuodostumisNode extends Vue {
   }
 
   pakollinen(node) {
-    return (node.rooli === 'määritelty' && node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-pakollinen')) || node.pakollinen;
+    return (node.rooli === 'määritelty' && !!node.nimi && node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-pakollinen')) || node.pakollinen;
   }
 
   async add(element) {
