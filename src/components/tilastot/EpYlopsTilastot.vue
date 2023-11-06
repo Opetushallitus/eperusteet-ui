@@ -124,8 +124,6 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
-
-import { YlopsKoulutustyypit } from '@/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
 import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKSET } from '@shared/plugins/oikeustarkastelu';
 
@@ -157,7 +155,7 @@ export default class EpYlopsTilastot extends Vue {
       return _.map(this.opetussuunnitelmat, ops => {
         return {
           ...ops,
-          url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[ops.koulutustyyppi])?.url + '/#/fi/opetussuunnitelmat/' + ops.id,
+          url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[ops.koulutustyyppi])?.url + '/#/fi/opetussuunnitelmat/' + ops.id + '/yleisnakyma',
         };
       });
     }
