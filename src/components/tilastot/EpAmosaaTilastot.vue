@@ -100,6 +100,9 @@
                 :fields="toteutussuunnitelmaFields"
                 :current-page="opsPage"
                 :per-page="perPage">
+        <template v-slot:cell(nimi)="{item, value}">
+          <a :href="item.url" rel="noopener noreferrer" target="_blank">{{ value }}</a>
+        </template>
       </b-table>
 
       <b-pagination
@@ -140,11 +143,10 @@ import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import { ryhmatKoulutustyypeilla } from '@shared/utils/perusteet';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import * as _ from 'lodash';
-import { TilastotStore } from '@/stores/TilastotStore';
 import { Kielet } from '@shared/stores/kieli';
+import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKSET } from '@shared/plugins/oikeustarkastelu';
 
 @Component({
   components: {
@@ -175,6 +177,8 @@ export default class EpAmosaaTilastot extends Vue {
         return {
           ...toteutussuunnitelma,
           voimassaolo: this.toteutussuunnitelmaVoimassaolo(toteutussuunnitelma),
+          url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[toteutussuunnitelma.koulutustyyppi])?.url
+              + '/fi/koulutustoimija/' + toteutussuunnitelma.koulutustoimija.id + '/toteutussuunnitelma/' + toteutussuunnitelma.id,
         };
       });
     }
