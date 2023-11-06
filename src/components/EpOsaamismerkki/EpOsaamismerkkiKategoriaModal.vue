@@ -27,15 +27,10 @@
         <EpInput v-model="kategoria.nimi" :is-editing="true"/>
       </b-form-group>
       <b-form-group :label="$t('kuva') + ' *'">
-        <div v-if="!liite" class="kuva-lataus tiedosto">
-          <b-form-file v-model="kategoria.liite"
-                       ref="file-input"
-                       :accept="mimeTypes"
-                       :placeholder="placeholder"
-                       :drop-placeholder="dropPlaceholder"
-                       :browse-text="browseText"
-                       @input="fileChanged"></b-form-file>
-        </div>
+        <EpTiedostoInput v-if="!liite"
+                         @input="fileChanged"
+                         :file-types="mimeTypes">
+        </EpTiedostoInput>
         <div v-if="!liite">
           <span class="font-size-08">{{ imageInfoText }}</span>
         </div>
@@ -82,6 +77,7 @@ import { requiredLokalisoituTeksti, notNull } from '@shared/validators/required'
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { Kieli } from '@shared/tyypit';
+import EpTiedostoInput from '@shared/components/EpTiedosto/EpTiedostoInput.vue';
 
 @Component({
   components: {
@@ -89,6 +85,7 @@ import { Kieli } from '@shared/tyypit';
     EpInput,
     EpMaterialIcon,
     EpKielivalinta,
+    EpTiedostoInput,
   },
 })
 export default class EpOsaamismerkkiKategoriaModal extends Vue {
@@ -102,7 +99,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   private imageHeight: number = 0;
   private imageMaxDimension: string = '200x200';
   private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv]
-  private mimeTypes: string = 'image/jpeg, image/png, image/svg+xml';
+  private mimeTypes: string[] = ['image/jpeg, image/png, image/svg+xml'];
   private allowedTypes: string = '.jpeg .png .svg';
 
   @Validations()
@@ -211,72 +208,10 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   get savedImagePreviewUrl() {
     return this.liite ? 'data:' + this.liite.mime + ';base64,' + this.liite.binarydata : null;
   }
-
-  get placeholder() {
-    return this.$t('fu-placeholder');
-  }
-
-  get dropPlaceholder() {
-    return this.$t('fu-placeholder');
-  }
-
-  get browseText() {
-    return this.$t('fu-browse-text');
-  }
 };
 </script>
 
 <style lang="scss" scoped>
 @import "@shared/styles/_variables.scss";
 
-.kuva-lataus {
-  margin: 0;
-  width:100%;
-  border-width: 1px;
-  border-color: $gray-lighten-2;
-  border-style: dashed;
-  border-radius: 10px;
-  position: relative;
-
-  &.tiedosto {
-    height: 100px;
-    background-color: $gray-lighten-7;
-  }
-
-  .custom-file::v-deep{
-    height: 100%;
-    flex-direction: column;
-    justify-content: center;
-    display: flex;
-
-    input {
-      display: none;
-    }
-
-    .custom-file-label {
-      width: 100%;
-      background-image: url('~@assets/img/icons/lataus_ikoni.svg');
-      background-repeat: no-repeat;
-      background-position: left;
-      border: 0;
-      margin-left: 30px;
-      margin-top: 10px;
-      height: 50px;
-      background-color: inherit;
-      padding-top: 0;
-      padding-left: 60px;
-      position: relative;
-      border-radius: 0;
-    }
-
-    .custom-file-label::after {
-      text-decoration: underline;
-      color: blue;
-      padding: 0 0 0 0.20rem;
-      display: inline;
-      position: relative;
-      background-color: $gray-lighten-7;
-    }
-  }
-}
 </style>

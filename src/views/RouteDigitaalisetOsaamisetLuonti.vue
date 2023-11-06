@@ -69,7 +69,6 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
-import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
 import { PerusteprojektiLuontiDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import * as _ from 'lodash';
@@ -92,7 +91,6 @@ export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
     EpSelect,
     EpSpinner,
     EpSteps,
-    EpTiedostoLataus,
     EpDatepicker,
     KoulutustyyppiSelect,
     EpToggle,
