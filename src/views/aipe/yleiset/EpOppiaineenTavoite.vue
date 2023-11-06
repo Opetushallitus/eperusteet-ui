@@ -159,11 +159,12 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { Kielet } from '@shared/stores/kieli';
+import { Kielet, KieliStore } from '@shared/stores/kieli';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
+import { unescapeStringHtml } from '@shared/utils/inputs';
 
 interface OppiaineenTavoiteSupportData {
   kohdealueet: any[];
