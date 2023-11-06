@@ -83,8 +83,8 @@
             :current-page="currentPage"
             :per-page="perPage">
 
-      <template v-slot:cell(nimi)="data">
-        {{ data.value }}
+      <template v-slot:cell(nimi)="{item, value}">
+        <a :href="item.url" rel="noopener noreferrer" target="_blank">{{ value }}</a>
       </template>
 
       <template v-slot:cell(koulutustyyppi)="data">
@@ -127,6 +127,7 @@ import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 
 import { YlopsKoulutustyypit } from '@/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
+import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKSET } from '@shared/plugins/oikeustarkastelu';
 
 @Component({
   components: {
@@ -151,8 +152,19 @@ export default class EpYlopsTilastot extends Vue {
   private valitutVoimassaolot: [] = [];
   private valitutPerusteet: [] = [];
 
+  get opetussuunnitelmatFilled() {
+    if (this.opetussuunnitelmat) {
+      return _.map(this.opetussuunnitelmat, ops => {
+        return {
+          ...ops,
+          url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[ops.koulutustyyppi])?.url + '/#/fi/opetussuunnitelmat/' + ops.id,
+        };
+      });
+    }
+  }
+
   get opetussuunnitelmatFiltered() {
-    return _.chain(this.opetussuunnitelmat)
+    return _.chain(this.opetussuunnitelmatFilled)
       .filter(ops => _.isEmpty(this.valitutTilat) || _.includes(_.map(this.valitutTilat, 'value'), ops.tila))
       .filter(ops => _.isEmpty(this.valitutKoulutustyypit) || _.includes(_.map(this.valitutKoulutustyypit, 'value'), ops.koulutustyyppi))
       .filter(ops => Kielet.search(this.query, ops.nimi))
@@ -283,12 +295,16 @@ export default class EpYlopsTilastot extends Vue {
   }
 
   get koulutustyyppiItems() {
-    return _.map(YlopsKoulutustyypit, (koulutustyyppi) => {
-      return {
-        text: this.$t(koulutustyyppi),
-        value: koulutustyyppi,
-      };
-    });
+    return _.chain(this.opetussuunnitelmat)
+      .map('koulutustyyppi')
+      .uniq()
+      .map(koulutustyyppi => {
+        return {
+          text: this.$t(koulutustyyppi),
+          value: koulutustyyppi,
+        };
+      })
+      .value();
   }
 
   get tilaItems() {
