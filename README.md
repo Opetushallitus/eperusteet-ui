@@ -50,7 +50,7 @@ yarn test
 yarn test:unit
 
 # Pitää testit käynnissä
-yarn test:unit:dev 
+yarn test:unit:dev
 
 # e2e testit
 yarn test:e2e
@@ -100,9 +100,9 @@ yarn build
 
 Testiympäristöjen swaggerit löytyvät seuraavista osoitteista
 
-- [untuva](https://virkailija.untuvaopintopolku.fi/eperusteet-app/uusi/#/fi)
-- [hahtuva](https://virkailija.hahtuvaopintopolku.fi/eperusteet-app/uusi/#/fi)
-- [QA eli pallero](https://virkailija.testiopintopolku.fi/eperusteet-app/uusi/#/fi)
+- [untuva](https://virkailija.untuvaopintopolku.fi/eperusteet-app/#/fi)
+- [hahtuva](https://virkailija.hahtuvaopintopolku.fi/eperusteet-app/#/fi)
+- [QA eli pallero](https://virkailija.testiopintopolku.fi/eperusteet-app/#/fi)
 
 ### 4.3. Lokit
 
@@ -114,7 +114,7 @@ https://github.com/Opetushallitus/eperusteet-ui/actions
 
 ### 5. Koodityyli
 
-Suositeltavia resursseja: 
+Suositeltavia resursseja:
  - [Vue style guide](https://vuejs.org/v2/style-guide)
  - [BootstrapVue](https://bootstrap-vue.org/docs)
 
