@@ -26,8 +26,12 @@
       <b-form-group :label="$t('nimi') + ' *'">
         <EpInput v-model="kategoria.nimi" :is-editing="true"/>
       </b-form-group>
+      <b-form-group :label="$t('kuvaus') + ' *'">
+        <EpInput v-model="kategoria.kuvaus" :is-editing="true"/>
+      </b-form-group>
       <b-form-group :label="$t('kuva') + ' *'">
         <EpTiedostoInput v-if="!liite"
+                         v-model="kategoria.liite"
                          @input="fileChanged"
                          :file-types="mimeTypes">
         </EpTiedostoInput>
@@ -106,6 +110,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   validations = {
     kategoria: {
       nimi: requiredLokalisoituTeksti(this.requiredKielet),
+      kuvaus: requiredLokalisoituTeksti(this.requiredKielet),
       liite: {
         binarydata: notNull(),
       },
