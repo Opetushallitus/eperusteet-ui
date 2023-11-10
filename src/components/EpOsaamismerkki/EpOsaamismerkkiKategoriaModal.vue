@@ -31,6 +31,7 @@
       </b-form-group>
       <b-form-group :label="$t('kuva') + ' *'">
         <EpTiedostoInput v-if="!liite"
+                         v-model="kategoria.liite"
                          @input="fileChanged"
                          :file-types="mimeTypes">
         </EpTiedostoInput>
