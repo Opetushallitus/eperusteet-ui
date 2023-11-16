@@ -282,7 +282,8 @@ export class PerusteStore implements IEditoitava {
   }
 
   public async fetchJulkaisemattomiaMuutoksia() {
-    this.state.julkaisemattomiaMuutoksia = !_.isEmpty((await Julkaisut.julkaisuversioMuutokset(this.state.perusteId!)).data);
+    this.state.julkaisemattomiaMuutoksia = null;
+    this.state.julkaisemattomiaMuutoksia = (await Julkaisut.julkaisemattomiaMuutoksia(this.state.perusteId!)).data;
   }
 
   async acquire() {
