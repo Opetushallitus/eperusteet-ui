@@ -69,7 +69,7 @@ export default class RouteOsaamismerkkiKategoriat extends Vue {
     return [
       {
         key: 'nimi',
-        label: this.$t('nimi'),
+        label: this.$t('kategoria-nimi'),
         sortable: false,
         thStyle: { width: '50%', borderBottom: '0px' },
         formatter: (value: any, key: any, item: any) => {
