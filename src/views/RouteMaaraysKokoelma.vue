@@ -258,7 +258,7 @@ export default class RouteMaaraysKokoelma extends Vue {
       },
     }, {
       key: 'voimassaoloAlkaa',
-      label: this.$t('voimassaolo-alkaa'),
+      label: this.$t('voimaantulo'),
       sortable: false,
       thClass: 'border-0',
       formatter: (value: any, key: any, item: any) => {
@@ -266,7 +266,7 @@ export default class RouteMaaraysKokoelma extends Vue {
       },
     }, {
       key: 'voimassaoloLoppuu',
-      label: this.$t('voimassaolo-loppuu'),
+      label: this.$t('voimassaolo-paattyy'),
       sortable: false,
       thClass: 'border-0',
       formatter: (value: any, key: any, item: any) => {

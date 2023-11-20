@@ -25,7 +25,7 @@
 <script lang="ts">
 import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
+import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
 import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';

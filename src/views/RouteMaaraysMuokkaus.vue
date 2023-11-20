@@ -1,12 +1,56 @@
 <template>
   <ep-main-view container>
-    <template slot="header">
-      <div class="d-flex justify-content-between">
-        <h1>{{ $t(header) }}</h1>
-      </div>
-    </template>
-
     <EpEditointi :store="store" :confirmRemove="false">
+      <template v-slot:customheader="{ data, isEditing, cancel, save, disabled, validation, isSaving, modify, remove, editable }">
+        <div class="d-flex justify-content-between header py-2" :class="{'editing': isEditing}">
+          <h1 class="mb-4 mr-auto">{{ $t(header) }}</h1>
+
+          <ep-button class="ml-4"
+                      v-if="isEditing"
+                      @click="cancel()"
+                      :disabled="disabled"
+                      variant="link">
+            {{ $t('peruuta') }}
+          </ep-button>
+          <ep-button class="ml-4"
+                      @click="tallenna(LUONNOS, save)"
+                      v-if="isEditing"
+                      :disabled="disabled || (validation && validation.$invalid)"
+                      variant="primary">
+            {{ $t('tallenna-luonnoksena') }}
+          </ep-button>
+          <ep-button class="ml-4"
+                      @click="tallenna(JULKAISTU, save)"
+                      v-if="isEditing"
+                      :disabled="disabled || (validation && validation.$invalid)"
+                      variant="primary">
+            {{ $t('tallenna-ja-julkaise') }}
+          </ep-button>
+          <ep-button class="ml-4"
+                      v-if="!isEditing"
+                      @click="modify()"
+                      :disabled="disabled || !editable"
+                      variant="link"
+                      icon="edit"
+                      v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
+                      >
+            {{ $t('muokkaa') }}
+          </ep-button>
+          <ep-button class="ml-4"
+                      v-if="!isEditing && data.id"
+                      @click="poista(remove)"
+                      :disabled="disabled || !editable"
+                      variant="link"
+                      icon="delete"
+                      v-oikeustarkastelu="{oikeus:'poisto', kohde: 'eperusteet_maarays'}"
+                      >
+            {{ $t('poista') }}
+          </ep-button>
+
+          <EpSpinner v-if="isSaving" />
+        </div>
+      </template>
+
       <template v-slot:default="{ data, isEditing, validation, supportData }">
 
         <div v-if="!isEditing">
@@ -14,11 +58,15 @@
             <span v-if="data.tila">{{$t(data.tila.toLowerCase())}} - {{ $t('muokannut-viimeksi')}}: </span>
             <span v-if="muokkaajaNimi">{{ muokkaajaNimi }} </span>
             <span v-else>{{ data.muokkaaja }} </span>
-            <span>{{$sdt(data.muokattu)}}</span>
+            <span v-if="data.muokattu">{{$sdt(data.muokattu)}}</span>
           </b-form-group>
         </div>
 
-        <b-form-group :label="$t('tyyppi') + isRequired" class="mt-4">
+        <b-form-group class="mt-4">
+          <div slot="label" class="d-flex">
+            <div>{{$t('tyyppi') + isRequired }}</div>
+            <EpInfoPopover class="ml-3" v-if="isEditing"><div v-html="$t('maarays-muokkaus-tyyppi-info-selite')" /></EpInfoPopover>
+          </div>
           <template v-if="isEditing">
             <b-form-radio v-for="tyyppi in tyypit" v-model="data.tyyppi" :value="tyyppi" :key="'tyyppivalinta_'+tyyppi">
               {{ $t('maarays-tyyppi-' + tyyppi.toLowerCase()) }}
@@ -42,22 +90,22 @@
         <b-form-group :label="$t('voimassaolo')" class="mt-4">
           <div class="d-flex align-items-center">
             <div>
-              <div v-if="isEditing">{{$t('alkaen')}}{{ isRequired }}</div>
+              <div v-if="isEditing">{{$t('alkaa')}}{{ isRequired }}</div>
               <ep-datepicker v-model="data.voimassaoloAlkaa" :is-editing="isEditing" />
             </div>
             <div class="ml-2 mr-2" :class="{'mt-4': isEditing}">-</div>
             <div>
-              <div v-if="isEditing">{{$t('paattyen')}}</div>
+              <div v-if="isEditing">{{$t('paattyy')}}</div>
               <ep-datepicker v-model="data.voimassaoloLoppuu" :is-editing="isEditing" v-if="data.voimassaoloLoppuu || isEditing"/>
             </div>
           </div>
         </b-form-group>
 
-        <b-form-group :label="$t('maarays-annettu') + isRequired" class="mt-4 d-flex">
+        <b-form-group :label="$t('maarayksen-paatospaivamaara') + isRequired" class="mt-4 d-flex">
           <ep-datepicker v-model="data.maarayspvm" :is-editing="isEditing" />
         </b-form-group>
 
-        <b-form-group :label="$t('maaraysdokumentti') + isRequired" class="mt-4">
+        <b-form-group :label="$t('maaraysdokumentti') + ' (pdf) ' + isRequired" class="mt-4">
           <div v-if="maarayskirje">
             <a :href="maarayskirjeUrl" target="_blank" rel="noopener noreferrer">{{ maarayskirje.nimi }}</a>
           </div>
@@ -68,8 +116,8 @@
           <EpMaaraysLiittyyMuuttaaValinta v-model="storeData" :maarayksetNimella="supportData.maarayksetNimella" :isEditing="isEditing" />
         </b-form-group>
 
-        <b-form-group :label="$t('koulutustyyppi') + isRequired" class="mt-4">
-          <EpMaaraysKoulutustyypit v-model="data.koulutustyypit" :isEditing="isEditing" />
+        <b-form-group :label="$t('koulutus-tai-tutkinto') + isRequired" class="mt-4">
+          <KoulutustyyppiSelect v-model="data.koulutustyypit" :isEditing="isEditing"/>
         </b-form-group>
 
         <b-form-group :label="$t('asiasana')" class="mt-4">
@@ -80,66 +128,9 @@
           <ep-content v-model="data.kuvaus" layout="simplified" :is-editable="isEditing"/>
         </b-form-group>
 
-        <b-form-group :label="$t('liitteet')" class="mt-4 mb-5">
+        <b-form-group :label="$t('liitteet') + ' (pdf)'" class="mt-4 mb-5">
           <EpMaaraysLiitteet v-model="data.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
         </b-form-group>
-
-      </template>
-
-      <template v-slot:footer="{ data, isEditing, cancel, save, disabled, validation, isSaving, modify, remove, editable }">
-        <div class="d-flex justify-content-end">
-          <router-link :to="{ name:'maarayskokoelma'}" class="mr-auto">
-            <ep-button v-if="!isEditing "
-                        variant="link"
-                        icon="undo">
-              {{ $t('takaisin') }}
-            </ep-button>
-          </router-link>
-          <ep-button class="ml-4"
-                      v-if="!isEditing && data.id"
-                      @click="poista(remove)"
-                      :disabled="disabled || !editable"
-                      variant="link"
-                      icon="delete"
-                      v-oikeustarkastelu="{oikeus:'poisto', kohde: 'eperusteet_maarays'}"
-                      >
-            {{ $t('poista') }}
-          </ep-button>
-          <ep-button class="ml-4"
-                      v-if="isEditing"
-                      @click="cancel()"
-                      :disabled="disabled"
-                      variant="link">
-            {{ $t('peruuta') }}
-          </ep-button>
-          <ep-button class="ml-4"
-                      @click="tallenna(LUONNOS, save)"
-                      v-if="isEditing"
-                      :disabled="disabled || (validation && validation.$invalid)"
-                      variant="primary">
-            {{ $t('tallenna-luonnoksena') }}
-          </ep-button>
-          <ep-button class="ml-4"
-                      @click="tallenna(JULKAISTU, save)"
-                      v-if="isEditing"
-                      :disabled="disabled || (validation && validation.$invalid)"
-                      variant="primary">
-            {{ $t('tallenna-ja-julkaise') }}
-          </ep-button>
-
-          <ep-button class="ml-4"
-                      v-if="!isEditing"
-                      @click="modify()"
-                      :disabled="disabled || !editable"
-                      variant="link"
-                      icon="edit"
-                      v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
-                      >
-            {{ $t('muokkaa') }}
-          </ep-button>
-
-          <EpSpinner v-if="isSaving" />
-        </div>
 
       </template>
     </EpEditointi>
@@ -161,17 +152,16 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
-import EpTiedostoLataus from '@shared/components/EpTiedostoLataus/EpTiedostoLataus.vue';
+import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
 import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { nimiSearchIdentity } from '@shared/utils/helpers';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
 import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
-import EpMaaraysKoulutustyypit from '@/components/maaraykset/EpMaaraysKoulutustyypit.vue';
-
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { Kielet } from '@shared/stores/kieli';
+import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 
 @Component({
   components: {
@@ -188,8 +178,8 @@ import { Kielet } from '@shared/stores/kieli';
     EpSpinner,
     EpMaaraysAsiasanat,
     EpMaaraysLiitteet,
-    EpMaaraysKoulutustyypit,
     EpMaaraysLiittyyMuuttaaValinta,
+    EpInfoPopover,
   },
 })
 export default class RouteMaaraysMuokkaus extends Vue {
@@ -293,7 +283,7 @@ export default class RouteMaaraysMuokkaus extends Vue {
 
   get liittyykoToiseenMaaraykseenOtsikko() {
     if (this.store?.isEditing.value) {
-      return this.$t('liittyyko-maarays-toiseen-maaraykseen') + this.isRequired;
+      return this.$t('maarayksen-liittyminen-aiempaan-maaraykseen') + this.isRequired;
     }
 
     if (this.store?.data.value.liittyyTyyppi === this.EILIITY) {
@@ -347,6 +337,14 @@ export default class RouteMaaraysMuokkaus extends Vue {
 
   ::v-deep .editointikontrolli .sisalto {
     padding: 0;
+  }
+
+  .header {
+    background: $white;
+
+    &.editing {
+      border-bottom: 1px solid #E7E7E7;
+    }
   }
 
 </style>
