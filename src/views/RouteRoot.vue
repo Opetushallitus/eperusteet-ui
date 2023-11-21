@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import _ from 'lodash';
-import { Prop, Watch, Component, Vue } from 'vue-property-decorator';
+import { Prop, Watch, Component, Vue, ProvideReactive } from 'vue-property-decorator';
 import Sticky from 'vue-sticky-directive';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
 import { KayttajaStore } from '@/stores/kayttaja';
@@ -142,6 +142,11 @@ export default class RouteRoot extends Vue {
 
   get logoutHref() {
     return baseURL + LogoutParam.logoutGet().url;
+  }
+
+  @ProvideReactive('dull')
+  get dullInject() {
+    return {};
   }
 }
 </script>

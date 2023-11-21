@@ -1,56 +1,58 @@
 <template>
   <div>
-    <b-form-group :label="$t('lataa-uusi-muutosmaaraus') + asterisk">
-      <ep-tiedosto-lataus ref="tiedostoLataus" :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!file" />
-      <div v-if="julkaisuLiitteet && julkaisuLiitteet.length > 0">
-        <table class="table">
-          <thead>
-          <tr>
-            <th class="w-40">{{ $t('nimi') }}*</th>
-            <th class="w-20">{{ $t('kieli') }}*</th>
-            <th class="w-30">{{ $t('tiedosto') }}</th>
-            <th class="w-10">{{ $t('poista') }}</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="(liiteData, index) in julkaisuLiitteet" :key="'liite'+index">
-            <td>
-              <ep-input v-model="liiteData.nimi" :is-editing="true"></ep-input>
-            </td>
-            <td>
-              <ep-multi-select v-model="liiteData.kieli"
-                               :options="julkaisukielet"
-                               :searchable="false"
-                               :clear-on-select="false"
-                               :allowEmpty="false">
-                <template v-slot:singleLabel="{ option }">{{ $t(option) }}</template>
-                <template v-slot:option="{ option }">{{ $t(option) }}</template>
-                <template v-slot:tag="{ option }">{{ $t(option) }}</template>
-              </ep-multi-select>
-            </td>
-            <td class="file-name">
-              <span>{{ liiteData.liite.nimi }}</span>
-            </td>
-            <td>
-              <ep-button variant="link" icon="delete" @click="poistaLiite(index)"></ep-button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </b-form-group>
+    <div class="mb-5" v-if="muutosmaarays">
+      <b-form-group :label="$t('lataa-uusi-muutosmaaraus') + asterisk">
+        <ep-tiedosto-lataus ref="tiedostoLataus" :fileTypes="['application/pdf']" v-model="file" :as-binary="true" v-if="!file" />
+        <div v-if="julkaisuLiitteet && julkaisuLiitteet.length > 0">
+          <table class="table">
+            <thead>
+            <tr>
+              <th class="w-40">{{ $t('nimi') }}*</th>
+              <th class="w-20">{{ $t('kieli') }}*</th>
+              <th class="w-30">{{ $t('tiedosto') }}</th>
+              <th class="w-10">{{ $t('poista') }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(liiteData, index) in julkaisuLiitteet" :key="'liite'+index">
+              <td>
+                <ep-input v-model="liiteData.nimi" :is-editing="true"></ep-input>
+              </td>
+              <td>
+                <ep-multi-select v-model="liiteData.kieli"
+                                  :options="julkaisukielet"
+                                  :searchable="false"
+                                  :clear-on-select="false"
+                                  :allowEmpty="false">
+                  <template v-slot:singleLabel="{ option }">{{ $t(option) }}</template>
+                  <template v-slot:option="{ option }">{{ $t(option) }}</template>
+                  <template v-slot:tag="{ option }">{{ $t(option) }}</template>
+                </ep-multi-select>
+              </td>
+              <td class="file-name">
+                <span>{{ liiteData.liite.nimi }}</span>
+              </td>
+              <td>
+                <ep-button variant="link" icon="delete" @click="poistaLiite(index)"></ep-button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </b-form-group>
 
-    <b-form-group :label="$t('muutosmaarays-astuu-voimaan') + asterisk" class="mt-4 col-lg-3">
-      <ep-datepicker v-model="julkaisu.muutosmaaraysVoimaan"
-                     :is-editing="true"/>
-    </b-form-group>
+      <b-form-group :label="$t('muutosmaarays-astuu-voimaan') + asterisk" class="mt-4 col-lg-3">
+        <ep-datepicker v-model="julkaisu.muutosmaaraysVoimaan"
+                        :is-editing="true"/>
+      </b-form-group>
+    </div>
 
-    <b-form-group :label="$t('tiedote-hallintanakymaan')" class="mt-4">
+    <b-form-group :label="$t('tiedote-hallintanakymaan')">
       <div class="mb-3">{{ $t('tiedote-naytetaan-taman-sivun-julkaisuhistoriassa') }}</div>
       <ep-content v-model="julkaisu.tiedote"
                   layout="simplified"
                   :is-editable="true" />
-      <ep-toggle v-model="julkaisu.julkinen" :isSWitch="false" class="mt-4" :is-editing="isEditing">
+      <ep-toggle v-model="julkaisu.julkinen" :isSWitch="false" class="mt-4" :is-editing="!isLatest">
         {{$t('julkaisu-naytetaan-julkisen-sivuston-julkaisuhistoriassa')}}
       </ep-toggle>
     </b-form-group>
@@ -100,7 +102,10 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
   private julkaisu: any;
 
   @Prop({ default: false, type: Boolean })
-  private isEditing!: boolean;
+  private isLatest!: boolean;
+
+  @Prop({ default: false, type: Boolean })
+  private muutosmaarays!: boolean;
 
   private file: any | null = null;
 

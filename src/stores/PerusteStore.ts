@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
-import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi } from '@shared/api/eperusteet';
+import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi, MaaraysDto, Maaraykset } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isKoulutustyyppiPdfTuettu } from '@shared/utils/perusteet';
@@ -152,6 +152,10 @@ export class PerusteStore implements IEditoitava {
     finally {
       this.state.initializing = false;
     }
+  }
+
+  async updateMaarays() {
+    return (await Maaraykset.getMaaraysPerusteella(Number((this.state.projekti as any)._peruste))).data;
   }
 
   async updateCurrent() {

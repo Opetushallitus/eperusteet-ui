@@ -70,8 +70,8 @@ import { success, fail } from '@shared/utils/notifications';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { Validations } from 'vuelidate-property-decorators';
 import { requiredLokalisoituTeksti } from '@shared/validators/required';
-import { MaarayksetStore } from '@/stores/MaarayksetStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 
 @Component({
   components: {
@@ -84,7 +84,7 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
 })
 export default class EpMaaraysModal extends Vue {
   @Prop({ required: true })
-  private maarayksetStore!: MaarayksetStore
+  private maarayksetStore!: MuutMaarayksetStore
 
   private editing: boolean = false;
   private muokattavaMaarays: MaaraysDto | {} = {};

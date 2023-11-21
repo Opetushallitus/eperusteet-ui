@@ -14,11 +14,15 @@
         </div>
       </div>
     </template>
-    <EpJulkaisuForm :is-editing="!isLatest"
-                    :store="store"
-                    :julkaisu="muokattavaJulkaisu"
-                    @setInvalid="hasRequiredData">
-    </EpJulkaisuForm>
+
+    <EpJulkaisuMuutosMaarays class="mb-4" v-if="muokattavaJulkaisu && muokattavaJulkaisu.muutosmaarays" v-model="muokattavaJulkaisu.muutosmaarays" :isEditing="true"/>
+
+    <EpJulkaisuForm
+      :isLatest="isLatest"
+      :store="store"
+      :julkaisu="muokattavaJulkaisu"
+      @setInvalid="hasRequiredData" />
+
     <div class="float-right">
       <EpButton @click="sulje"
                 variant="link">
@@ -39,11 +43,13 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpJulkaisuMuutosMaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosMaarays.vue';
 
 @Component({
   components: {
     EpJulkaisuForm,
     EpButton,
+    EpJulkaisuMuutosMaarays,
   },
 })
 export default class EpJulkaisuModal extends Vue {

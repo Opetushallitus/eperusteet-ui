@@ -5,7 +5,7 @@
         <h2 class="m-0">{{ $t('perusteen-tiedot') }}</h2>
       </template>
 
-      <template v-slot:default="{ data, isEditing, validation }">
+      <template v-slot:default="{ data, isEditing, validation, supportData }">
         <h3>{{ $t('perustiedot') }}</h3>
         <b-container fluid="lg" class="ml-0 pl-0">
           <b-row no-gutters >
@@ -258,6 +258,22 @@
             </b-col>
           </b-row>
 
+          <b-row no-gutters v-if="isEditing || data.maarays.asiasanat[kieli].asiasana.length > 0">
+            <b-col class="mb-4">
+              <b-form-group :label="$t('maarayskirjeen-asiasana')">
+                <EpMaaraysAsiasanat v-model="data.maarays.asiasanat[kieli].asiasana" :asiasanat="supportData.asiasanat[kieli]" :isEditing="isEditing"/>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row no-gutters v-if="isEditing || !!data.maarays.kuvaus">
+            <b-col class="mb-4">
+              <b-form-group :label="$t('maarayskirjeen-kuvaus')">
+                <ep-content v-model="data.maarays.kuvaus" layout="simplified" :is-editable="isEditing"/>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
           <b-row no-gutters>
             <b-col class="mb-4">
               <b-form-group :label="$t('muutosmaaraykset')">
@@ -448,8 +464,9 @@ import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSel
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import { UiKielet } from '@shared/stores/kieli';
+import { UiKielet, Kielet } from '@shared/stores/kieli';
 import _ from 'lodash';
+import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
@@ -492,6 +509,7 @@ const koulutustyyppiTietoFilters = [
     EpToggle,
     PerustetyoryhmaSelect,
     EpMaterialIcon,
+    EpMaaraysAsiasanat,
   },
 })
 export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
@@ -885,6 +903,10 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       ...this.store?.data.value,
       koulutukset: _.filter(this.store?.data.value.koulutukset, koulutus => koulutus.koulutuskoodiUri !== item.koulutuskoodiUri),
     });
+  }
+
+  get kieli() {
+    return Kielet.getSisaltoKieli.value;
   }
 }
 

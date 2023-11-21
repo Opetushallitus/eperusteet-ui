@@ -2,10 +2,10 @@
   <ep-main-view :tutoriaaliStore="tutoriaaliStore">
     <template slot="header">
       <div class="d-flex justify-content-between">
-        <h1>{{ $t('maaraykset') }}</h1>
+        <h1>{{ $t('ammatilliset-maaraykset') }}</h1>
         <EpMaaraysModal
           ref="epmaaraysmodal"
-          :maarayksetStore="maarayksetStore"
+          :maarayksetStore="muutMaarayksetStore"
           :oikeustarkastelu="{oikeus:'hallinta'}" />
       </div>
     </template>
@@ -45,7 +45,7 @@
 <script lang="ts">
 import * as _ from 'lodash';
 import { Prop, Component, Vue } from 'vue-property-decorator';
-import { MaarayksetStore } from '@/stores/MaarayksetStore';
+import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -68,9 +68,9 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
     EpMaterialIcon,
   },
 })
-export default class RouteMaaraykset extends Vue {
+export default class RouteMuutMaaraykset extends Vue {
   @Prop({ required: true })
-  private maarayksetStore!: MaarayksetStore;
+  private muutMaarayksetStore!: MuutMaarayksetStore;
 
   @Prop({ required: true })
   private tutoriaaliStore!: TutoriaaliStore;
@@ -79,15 +79,15 @@ export default class RouteMaaraykset extends Vue {
   private nimiFilter = ''
 
   async mounted() {
-    await this.maarayksetStore.fetch();
+    await this.muutMaarayksetStore.fetch();
   }
 
   get maaraykset() {
-    return this.maarayksetStore.maaraykset.value;
+    return this.muutMaarayksetStore.maaraykset.value;
   }
 
   get maarayksetFiltered() {
-    return _.filter(this.maarayksetStore.maaraykset.value, maarays => Kielet.search(this.nimiFilter, maarays.nimi));
+    return _.filter(this.muutMaarayksetStore.maaraykset.value, maarays => Kielet.search(this.nimiFilter, maarays.nimi));
   }
 
   avaaMaarays(maarays: MaaraysDto) {

@@ -1,38 +1,38 @@
 import Vue from 'vue';
 import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-import { MaaraysDto, Maaraykset } from '@shared/api/eperusteet';
+import { MuuMaaraysDto, MuutMaaraykset } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
 Vue.use(VueCompositionApi);
 
-export class MaarayksetStore {
+export class MuutMaarayksetStore {
   private state = reactive({
-    maaraykset: null as MaaraysDto[] | null,
+    maaraykset: null as MuuMaaraysDto[] | null,
 
   })
 
   public readonly maaraykset = computed(() => this.state.maaraykset);
 
   async fetch() {
-    this.state.maaraykset = (await Maaraykset.getMaaraykset()).data;
+    this.state.maaraykset = (await MuutMaaraykset.getMuutMaaraykset()).data;
   }
 
-  async tallenna(tallennettava: MaaraysDto) {
+  async tallenna(tallennettava: MuuMaaraysDto) {
     if (tallennettava.id) {
-      const tallennettu = (await Maaraykset.updateMaarays(tallennettava.id, tallennettava)).data;
+      const tallennettu = (await MuutMaaraykset.updateMuuMaarays(tallennettava.id, tallennettava)).data;
       this.state.maaraykset = _.map(this.state.maaraykset, maarays => maarays.id === tallennettu.id ? tallennettu : maarays);
     }
     else {
-      const tallennettu = (await Maaraykset.addMaarays(tallennettava)).data;
+      const tallennettu = (await MuutMaaraykset.addMuuMaarays(tallennettava)).data;
       this.state.maaraykset = [
-        ...this.state.maaraykset as MaaraysDto[],
+        ...this.state.maaraykset as MuuMaaraysDto[],
         tallennettu,
       ];
     }
   }
 
-  async poista(poistettava: MaaraysDto) {
-    await Maaraykset.deleteMaarays(poistettava.id!);
+  async poista(poistettava: MuuMaaraysDto) {
+    await MuutMaaraykset.deleteMuuMaarays(poistettava.id!);
     this.state.maaraykset = _.filter(this.state.maaraykset, maarays => maarays.id !== poistettava.id);
   }
 }

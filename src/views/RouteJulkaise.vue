@@ -126,16 +126,24 @@
       <div v-if="julkaisuMahdollinen">
         <hr class="mt-4 mb-4">
         <h3 class="mb-4">{{ $t('uusi-julkaisu') }}</h3>
-        <EpJulkaisuForm :is-editing="false"
-                        :store="perusteStore"
-                        :julkaisu="julkaisu"
-                        @setInvalid="hasRequiredData">
-        </EpJulkaisuForm>
+
+        <ep-toggle v-model="liittyyMuutosmaarays" :isSWitch="false">
+          {{$t('julkaisuun-liittyy-muutosmaarays')}}
+        </ep-toggle>
+
+        <EpJulkaisuMuutosMaarays class="mt-4 " v-if="liittyyMuutosmaarays" v-model="julkaisu.muutosmaarays" :isEditing="true"/>
+
+        <EpJulkaisuForm
+          class="mt-4"
+          is-latest
+          :store="perusteStore"
+          :julkaisu="julkaisu" />
+
         <b-form-group>
           <EpJulkaisuButton :julkaise="julkaise"
                             v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
                             :julkaisuKesken="julkaisuKesken"
-                            :disabled="invalid"/>
+                            :disabled="!valid"/>
         </b-form-group>
       </div>
 
@@ -166,7 +174,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import { PerusteDtoTilaEnum, NavigationNodeDto, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut, Maintenance } from '@shared/api/eperusteet';
+import { PerusteDtoTilaEnum, NavigationNodeDto, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut, Maintenance, MaaraysDtoTyyppiEnum, MaaraysDtoTilaEnum, MaaraysDtoLiittyyTyyppiEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
@@ -182,10 +190,15 @@ import { buildKatseluUrl } from '@shared/utils/esikatselu';
 import { koulutustyyppiTheme } from '@shared/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
+import EpJulkaisuMuutosMaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosMaarays.vue';
 import { nodeToRoute } from '@/utils/routing';
 import { Location } from 'vue-router';
 import EpJulkaisuValidointi from '@shared/components/EpJulkaisuValidointi/EpJulkaisuValidointi.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { MaarayksetEditStore, requireOneLiite } from '@/stores/MaarayksetEditStore';
+import { Validations } from 'vuelidate-property-decorators';
+import { notNull, requiredOneLang } from '@shared/validators/required';
+import { minLength, required, requiredIf } from 'vuelidate/lib/validators';
 
 @Component({
   components: {
@@ -208,6 +221,7 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
     EpJulkaisuForm,
     EpJulkaisuValidointi,
     EpMaterialIcon,
+    EpJulkaisuMuutosMaarays,
   },
 })
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
@@ -223,13 +237,33 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     julkinen: true,
     muutosmaaraysVoimaan: null,
     liitteet: [],
+    muutosmaarays: null,
   };
 
+  private liittyyMuutosmaarays: boolean | null = false;
   private hallintaLoading: boolean = false;
-  private invalid: boolean = false;
 
-  mounted() {
+  async mounted() {
     this.validoi();
+    await this.initMaarays();
+  }
+
+  async initMaarays() {
+    const perusteenMaarays = await this.perusteStore.updateMaarays();
+    this.liittyyMuutosmaarays = false;
+    this.julkaisu.muutosmaarays = MaarayksetEditStore.createEmptyMaarays({
+      tyyppi: MaaraysDtoTyyppiEnum.PERUSTE,
+      koulutustyypit: [this.perusteStore.peruste.value?.koulutustyyppi as any],
+      tila: MaaraysDtoTilaEnum.JULKAISTU,
+      peruste: {
+        id: this.perusteStore.peruste.value?.id,
+      },
+      asiasanat: perusteenMaarays.asiasanat,
+      diaarinumero: perusteenMaarays.diaarinumero,
+      kuvaus: perusteenMaarays.kuvaus,
+      muutettavatMaaraykset: [perusteenMaarays],
+      liittyyTyyppi: MaaraysDtoLiittyyTyyppiEnum.MUUTTAA,
+    }) as any;
   }
 
   get julkaisuMahdollinen() {
@@ -280,6 +314,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
         julkinen: this.julkaisu.julkinen,
         muutosmaaraysVoimaan: this.julkaisu.muutosmaaraysVoimaan,
         liitteet: this.julkaisu.liitteet,
+        muutosmaarays: this.liittyyMuutosmaarays ? this.julkaisu.muutosmaarays : null,
       });
 
       this.julkaisu.tiedote = {};
@@ -287,13 +322,11 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       this.julkaisu.julkinen = true;
       this.julkaisu.muutosmaaraysVoimaan = null;
       this.julkaisu.liitteet = [];
+      this.initMaarays();
       this.$success(this.$t('julkaisu-kaynnistetty') as string);
     }
     catch (err) {
       this.$fail(this.$t('julkaisu-epaonnistui') as string);
-    }
-    finally {
-      this.invalid = false;
     }
   }
 
@@ -307,8 +340,8 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     }
   }
 
-  hasRequiredData(value) {
-    this.invalid = value;
+  get valid() {
+    return !this.liittyyMuutosmaarays || !this.$v.$invalid;
   }
 
   get julkaisuKesken() {
@@ -468,8 +501,24 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     }
     return '';
   }
-}
 
+  @Validations()
+  validations = {
+    julkaisu: {
+      muutosmaarays: {
+        nimi: requiredOneLang(),
+        diaarinumero: { required },
+        voimassaoloAlkaa: { required },
+        maarayspvm: { required },
+        koulutustyypit: {
+          required,
+          'min-length': minLength(1),
+        },
+        liitteet: requireOneLiite(),
+      },
+    },
+  }
+}
 </script>
 
 <style lang="scss" scoped>
