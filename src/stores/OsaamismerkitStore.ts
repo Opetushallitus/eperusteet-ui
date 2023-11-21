@@ -40,7 +40,8 @@ export class OsaamismerkitStore {
       q.kategoria,
       q.voimassa,
       q.tuleva,
-      q.poistunut
+      q.poistunut,
+      q.kieli,
     )).data as any;
     return res;
   }

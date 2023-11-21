@@ -111,6 +111,7 @@ import { OsaamismerkkiDto } from '@shared/generated/eperusteet';
 import EpOsaamismerkkiModal from '@/components/EpOsaamismerkki/EpOsaamismerkkiModal.vue';
 import * as _ from 'lodash';
 import { Murupolku } from '@shared/stores/murupolku';
+import { Kielet } from '@shared/stores/kieli';
 
 @Component({
   components: {
@@ -143,8 +144,7 @@ export default class RouteOsaamismerkit extends Vue {
     voimassa: false,
     tuleva: false,
     poistunut: false,
-    jarjestysOrder: false,
-    jarjestysTapa: 'nimi',
+    kieli: this.kieli,
   } as OsaamismerkitQuery;
 
   async mounted() {
@@ -214,7 +214,7 @@ export default class RouteOsaamismerkit extends Vue {
     return [
       {
         key: 'nimi',
-        label: this.$t('nimi'),
+        label: this.$t('osaamismerkki-nimi'),
         sortable: false,
         thStyle: { width: '25%', borderBottom: '2px' },
         formatter: (value: any, key: any, item: any) => {
@@ -266,6 +266,15 @@ export default class RouteOsaamismerkit extends Vue {
 
   avaaOsaamismerkkiModal(osaamismerkki: OsaamismerkkiDto) {
     (this as any).$refs['osaamismerkkiModal'].avaaModal(osaamismerkki);
+  }
+
+  @Watch('kieli')
+  private kieliChanged() {
+    this.query.kieli = this.kieli;
+  }
+
+  get kieli() {
+    return Kielet.getSisaltoKieli.value;
   }
 
   @Watch('query', { deep: true, immediate: true })
