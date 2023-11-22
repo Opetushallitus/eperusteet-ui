@@ -2,18 +2,37 @@
   <div>
 
     <template v-if="isEditing">
-      <div v-for="(asiasana, index) in model" :key="'asiasana' + index" class="d-flex align-items-center mb-2">
-        <b-form-input v-model="model[index]" :list="'asiasanat'+index" class="w-40"/>
-        <b-form-datalist :id="'asiasanat'+index" :options="asiasanat"/>
+      <EpMultiSelect v-model="model"
+                 :placeholder="$t('maarays-asiasanat-placeholder')"
+                 :tagPlaceholder="$t('maarays-asiasanat-lisays-placeholder')"
+                 :search-identity="identity"
+                 :options="valittavatAsiasanat"
+                 :maxHeight="500"
+                 :multiple="true"
+                 :closeOnSelect="false"
+                 :taggable="true"
+                 @tag="lisaaAsiasana">
 
-        <div class="default-icon clickable ml-2" @click="poistaAsiasana(asiasana)">
-          <EpMaterialIcon>delete</EpMaterialIcon>
-        </div>
+        <template slot="option" slot-scope="{ option }">
+          <span v-if="option.label">{{ option.label }}</span>
+          <span v-else>{{ option }}</span>
+        </template>
 
-      </div>
-      <ep-button @click="lisaaAsiasana()" variant="outline" icon="add">
-        {{ $t('lisaa-asiasana') }}
-      </ep-button>
+        <template v-slot:checkbox="{ option }"><span/></template>
+
+        <template slot="selection" slot-scope="{ values }">
+          <div class="d-flex align-items-center" :class="{'mb-2': values.length > 0}">
+            <span class="multiselect__tag" v-for="value in values" :key="'value' + value">
+              <span class="nimi">{{ value }}</span>
+              <span class="multiselect__tag-icon clickable" @click.prevent @mousedown.prevent.stop="poista(value)"/>
+            </span>
+
+            <span v-if="values.length > 0" class="ml-auto clickable border-right pr-2 remove-all" @click.prevent @mousedown.prevent.stop="poistaKaikki()">
+              <ep-material-icon>close</ep-material-icon>
+            </span>
+          </div>
+        </template>
+      </EpMultiSelect>
     </template>
 
     <ul v-else>
@@ -57,15 +76,30 @@ export default class EpMaaraysAsiasanat extends Vue {
     return this.value;
   }
 
-  poistaAsiasana(asiasana) {
+  get valittavatAsiasanat() {
+    return _.uniq([
+      ...this.asiasanat,
+      ...this.model,
+    ]);
+  }
+
+  identity(asiasana) {
+    return asiasana;
+  }
+
+  lisaaAsiasana(uusiAsiasana) {
+    this.model = [
+      ...this.model,
+      uusiAsiasana,
+    ];
+  }
+
+  poista(asiasana) {
     this.model = _.without(this.model, asiasana);
   }
 
-  lisaaAsiasana() {
-    this.model = [
-      ...this.model,
-      '',
-    ];
+  poistaKaikki() {
+    this.model = [];
   }
 }
 </script>
@@ -73,26 +107,13 @@ export default class EpMaaraysAsiasanat extends Vue {
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
 
-::v-deep datalist {
-  position: absolute;
-  max-height: 20em;
-  border: 0 none;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-::v-deep datalist option {
-  display: block;
-  font-size: 0.8em;
-  padding: 0.3em 1em;
-  background-color: #ccc;
-  cursor: pointer;
-}
-
-::v-deep datalist option:hover, ::v-deep datalist option:focus {
-  color: #fff;
-  background-color: #036;
-  outline: 0 none;
+::v-deep .multiselect__tags {
+  .multiselect__tag {
+    .nimi {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
 }
 
 </style>
