@@ -124,10 +124,6 @@ export class MaarayksetEditStore implements IEditoitava {
       diaarinumero: { required },
       voimassaoloAlkaa: { required },
       maarayspvm: { required },
-      koulutustyypit: {
-        required,
-        'min-length': minLength(1),
-      },
       kuvaus: requiredOneLang(),
       liitteet: requireOneLiite(),
     };

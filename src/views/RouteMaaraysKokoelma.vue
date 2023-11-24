@@ -40,9 +40,7 @@
         </b-form-group>
 
         <b-form-group :label="$t('koulutus-tai-tutkinto')" class="col-3">
-          <koulutustyyppi-select v-model="query.koulutustyyppi"
-                                :koulutustyypit="koulutustyyppiVaihtoehdot"
-                                :isEditing="true" textWrap/>
+          <EpMaarayskokoelmaKoulutustyyppiSelect v-model="query.koulutustyyppi" :isEditing="true"/>
         </b-form-group>
 
         <b-form-group :label="$t('voimassaolo')" class="col-2">
@@ -117,12 +115,11 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 import { Murupolku } from '@shared/stores/murupolku';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import { EperusteetKoulutustyypit } from '@shared/utils/perusteet';
-import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 import { Debounced } from '@shared/utils/delay';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { Kielet } from '@shared/stores/kieli';
+import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
 
 interface MaaraysQuery {
   nimi: string,
@@ -142,7 +139,7 @@ interface MaaraysQuery {
     EpButton,
     EpMaterialIcon,
     EpMultiSelect,
-    KoulutustyyppiSelect,
+    EpMaarayskokoelmaKoulutustyyppiSelect,
     EpPagination,
     EpToggle,
   },
@@ -190,10 +187,6 @@ export default class RouteMaaraysKokoelma extends Vue {
       MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
       MaaraysDtoTyyppiEnum.PERUSTE,
     ];
-  }
-
-  get koulutustyyppiVaihtoehdot() {
-    return EperusteetKoulutustyypit;
   }
 
   get voimassaVaihtoehdot() {
