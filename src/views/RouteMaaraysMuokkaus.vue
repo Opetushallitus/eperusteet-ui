@@ -116,12 +116,12 @@
           <EpMaaraysLiittyyMuuttaaValinta v-model="storeData" :maarayksetNimella="supportData.maarayksetNimella" :isEditing="isEditing" />
         </b-form-group>
 
-        <b-form-group :label="$t('koulutus-tai-tutkinto') + isRequired" class="mt-4">
-          <KoulutustyyppiSelect v-model="data.koulutustyypit" :isEditing="isEditing"/>
+        <b-form-group :label="$t('koulutus-tai-tutkinto')" class="mt-4">
+          <EpMaarayskokoelmaKoulutustyyppiSelect v-model="data.koulutustyypit" :isEditing="isEditing"/>
         </b-form-group>
 
         <b-form-group :label="$t('asiasana')" class="mt-4">
-          <EpMaaraysAsiasanat v-model="data.asiasanat[kieli].asiasana" :asiasanat="supportData.asiasanat[kieli]" :isEditing="isEditing"/>
+          <EpMaaraysAsiasanat v-model="data.asiasanat[kieli].asiasana" :asiasanat="asiasanat" :isEditing="isEditing"/>
         </b-form-group>
 
         <b-form-group :label="$t('kuvaus') + isRequired" class="mt-4">
@@ -150,7 +150,6 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
-import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
 import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
@@ -162,6 +161,7 @@ import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
 
 @Component({
   components: {
@@ -171,7 +171,6 @@ import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
     EpContent,
     EpInput,
     EpDatepicker,
-    KoulutustyyppiSelect,
     EpTiedostoLataus,
     EpMaterialIcon,
     EpMultiSelect,
@@ -180,6 +179,7 @@ import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
     EpMaaraysLiitteet,
     EpMaaraysLiittyyMuuttaaValinta,
     EpInfoPopover,
+    EpMaarayskokoelmaKoulutustyyppiSelect,
   },
 })
 export default class RouteMaaraysMuokkaus extends Vue {
@@ -324,6 +324,14 @@ export default class RouteMaaraysMuokkaus extends Vue {
     else {
       return null;
     }
+  }
+
+  get asiasanat() {
+    if (_.isEmpty(this.store?.supportData.value.asiasanat[this.kieli])) {
+      return [];
+    }
+
+    return this.store?.supportData.value.asiasanat[this.kieli];
   }
 
   get peruste() {
