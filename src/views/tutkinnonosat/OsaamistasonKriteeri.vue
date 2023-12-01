@@ -1,6 +1,6 @@
 <template>
   <b-row>
-    <b-col cols="3" >{{$kaanna(arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko)}}</b-col>
+    <b-col cols="4">{{$kaanna(arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko)}}</b-col>
     <b-col class="d-flex flex-column">
       <template v-if="!isEditing">
         <ul>
@@ -11,12 +11,20 @@
       </template>
 
       <template v-else>
-        <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
-          <div class="d-flex">
-            <EpInput class="w-100" :isEditing="isEditing" v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]" />
-            <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaKriteeri(kriteeri)"/>
+        <draggable v-bind="defaultDragOptions"
+                   tag="div"
+                   v-model="osaamistasonkriteeri.kriteerit">
+          <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
+            <div class="d-flex">
+              <EpInput class="w-100" :isEditing="isEditing" v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]">
+                <div class="order-handle m-2" slot="left">
+                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                </div>
+              </EpInput>
+              <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaKriteeri(kriteeri)"/>
+            </div>
           </div>
-        </div>
+        </draggable>
         <EpButton :paddingx="false" v-if="isEditing" class="mb-3" variant="link" icon="add" @click="lisaaKriteeri()">
           {{ $t('lisaa-kriteeri') }}
         </EpButton>
@@ -27,12 +35,16 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
+import draggable from 'vuedraggable';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
+    EpMaterialIcon,
+    draggable,
     EpInput,
     EpButton,
   },
@@ -64,6 +76,16 @@ export default class OsaamistasonKriteeri extends Vue {
 
   async poistaKriteeri(poistettavaKriteeri) {
     this.osaamistasonkriteeri.kriteerit = _.filter(this.osaamistasonkriteeri.kriteerit, kriteeri => kriteeri !== poistettavaKriteeri);
+  }
+
+  get defaultDragOptions() {
+    return {
+      animation: 300,
+      emptyInsertThreshold: 10,
+      handle: '.order-handle',
+      ghostClass: 'dragged',
+      disabled: false,
+    };
   }
 }
 </script>
