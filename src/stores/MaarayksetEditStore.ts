@@ -76,33 +76,6 @@ export class MaarayksetEditStore implements IEditoitava {
     }
   }
 
-  public static async tallennaLiitteet(maarayksenLiitteet) {
-    return kielilistaObjektiksi(await Promise.all(_.map(_.keys(maarayksenLiitteet), async kieli => {
-      return {
-        [kieli]: {
-          ...maarayksenLiitteet[kieli],
-          liitteet: await Promise.all(_.map(maarayksenLiitteet[kieli].liitteet, async liite => {
-            if (!liite.id) {
-              const id = (await Maaraykset.uploadMaaraysLiite({
-                fileB64: window.btoa(liite.file.binary),
-                nimi: liite.nimi || { [Kielet.getSisaltoKieli.value]: liite.tiedostonimi },
-                tiedostonimi: liite.tiedostonimi,
-                tyyppi: liite.tyyppi,
-              })).data;
-
-              return {
-                ...liite,
-                id,
-              };
-            }
-
-            return liite;
-          })),
-        },
-      };
-    })));
-  }
-
   public async remove() {
     if (this.maaraysId !== 'uusi') {
       await Maaraykset.deleteMaarays(this.maaraysId);
