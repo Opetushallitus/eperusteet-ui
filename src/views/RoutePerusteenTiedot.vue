@@ -261,7 +261,7 @@
           <b-row no-gutters v-if="isEditing || data.maarays.asiasanat[kieli].asiasana.length > 0">
             <b-col class="mb-4">
               <b-form-group :label="$t('maarayskirjeen-asiasana')">
-                <EpMaaraysAsiasanat v-model="data.maarays.asiasanat[kieli].asiasana" :asiasanat="supportData.asiasanat[kieli]" :isEditing="isEditing"/>
+                <EpMaaraysAsiasanat v-model="data.maarays.asiasanat[kieli].asiasana" :asiasanat="asiasanat" :isEditing="isEditing"/>
               </b-form-group>
             </b-col>
           </b-row>
@@ -907,6 +907,14 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 
   get kieli() {
     return Kielet.getSisaltoKieli.value;
+  }
+
+  get asiasanat() {
+    if (_.isEmpty(this.store?.supportData.value.asiasanat[this.kieli])) {
+      return [];
+    }
+
+    return this.store?.supportData.value.asiasanat[this.kieli];
   }
 }
 

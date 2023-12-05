@@ -71,6 +71,7 @@ export default class EpJulkaisuModal extends Vue {
         julkinen: this.muokattavaJulkaisu.julkinen,
         muutosmaaraysVoimaan: this.muokattavaJulkaisu.muutosmaaraysVoimaan,
         liitteet: this.muokattavaJulkaisu.liitteet,
+        muutosmaarays: this.muokattavaJulkaisu.muutosmaarays,
       });
       this.tallennetaan = false;
       this.$success(this.$t('julkaisun-paivitys-onnistui') as string);
