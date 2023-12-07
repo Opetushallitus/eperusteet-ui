@@ -22,7 +22,11 @@
       </b-form-group>
 
       <b-form-group :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired" class="mt-4">
-        <EpMaaraysLiittyyMuuttaaValinta v-model="model" :isEditing="isEditing" :maarayksetNimella="maarayksetNimella"/>
+        <EpMaaraysLiittyyMuuttaaValinta
+          v-model="model"
+          :isEditing="isEditing"
+          :maarayksetNimella="maarayksetNimella"
+          :disabloidutValinnat="disabloidutMuuttaaValinnat"/>
       </b-form-group>
 
       <b-form-group :label="$t('asiasana')" class="mt-4">
@@ -35,7 +39,7 @@
 import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
-import { Maaraykset, MaaraysDto, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import { Maaraykset, MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
@@ -86,6 +90,10 @@ export default class EpJulkaisuMuutosMaarays extends Vue {
 
   get kieli() {
     return Kielet.getSisaltoKieli.value;
+  }
+
+  get disabloidutMuuttaaValinnat() {
+    return [MaaraysDtoLiittyyTyyppiEnum.EILIITY];
   }
 }
 </script>
