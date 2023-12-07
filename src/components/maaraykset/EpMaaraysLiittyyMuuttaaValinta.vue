@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="isEditing">
-      <b-form-radio v-model="model.liittyyTyyppi" :value="EILIITY">
+      <b-form-radio v-model="model.liittyyTyyppi" :value="EILIITY" :disabled="disabloidutValinnat.includes(EILIITY)">
         {{ $t('ei-liity-toiseen-maaraykseen') }}
       </b-form-radio>
       <b-form-radio v-model="model.liittyyTyyppi" :value="MUUTTAA">
@@ -49,15 +49,18 @@ import EpMaaraysLiittyyMaaraykseen from '@/components/maaraykset/EpMaaraysLiitty
   },
 })
 export default class EpMaaraysLiittyyMuuttaaValinta extends Vue {
-  private EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY
-  private MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA
-  private KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA
+  private EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
+  private MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
+  private KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
 
   @Prop({ required: false })
   isEditing!: boolean;
 
   @Prop({ required: false, default: [] })
   maarayksetNimella!: MaaraysKevytDto[];
+
+  @Prop({ required: false, default: [] })
+  disabloidutValinnat!: MaaraysDtoLiittyyTyyppiEnum[];
 
   @Prop({ required: true })
   value!: MaaraysDto;

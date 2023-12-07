@@ -249,7 +249,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   async initMaarays() {
-    const perusteenMaarays = await this.perusteStore.updateMaarays();
+    const perusteenMaarays = await this.perusteStore.fetchMaarays();
     this.liittyyMuutosmaarays = false;
     this.julkaisu.muutosmaarays = MaarayksetEditStore.createEmptyMaarays({
       tyyppi: MaaraysDtoTyyppiEnum.PERUSTE,

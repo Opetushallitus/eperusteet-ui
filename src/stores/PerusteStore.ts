@@ -154,7 +154,7 @@ export class PerusteStore implements IEditoitava {
     }
   }
 
-  async updateMaarays() {
+  async fetchMaarays() {
     return (await Maaraykset.getMaaraysPerusteella(Number((this.state.projekti as any)._peruste))).data;
   }
 
