@@ -258,11 +258,12 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       peruste: {
         id: this.perusteStore.peruste.value?.id,
       },
-      asiasanat: perusteenMaarays.asiasanat,
-      diaarinumero: perusteenMaarays.diaarinumero,
-      kuvaus: perusteenMaarays.kuvaus,
-      muutettavatMaaraykset: [perusteenMaarays],
       liittyyTyyppi: MaaraysDtoLiittyyTyyppiEnum.MUUTTAA,
+      ...(perusteenMaarays && { asiasanat: perusteenMaarays.asiasanat,
+        diaarinumero: perusteenMaarays.diaarinumero,
+        kuvaus: perusteenMaarays.kuvaus,
+        muutettavatMaaraykset: [perusteenMaarays],
+      }),
     }) as any;
   }
 
