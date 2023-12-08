@@ -77,10 +77,14 @@ export default class EpMaaraysAsiasanat extends Vue {
   }
 
   get valittavatAsiasanat() {
-    return _.uniq([
-      ...this.asiasanat,
-      ...this.model,
-    ]);
+    if (this.asiasanat && this.model) {
+      return _.uniq([
+        ...this.asiasanat,
+        ...this.model,
+      ]);
+    }
+
+    return [];
   }
 
   identity(asiasana) {

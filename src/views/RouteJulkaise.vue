@@ -127,7 +127,7 @@
         <hr class="mt-4 mb-4">
         <h3 class="mb-4">{{ $t('uusi-julkaisu') }}</h3>
 
-        <ep-toggle v-model="liittyyMuutosmaarays" :isSWitch="false">
+        <ep-toggle v-if="isNormaali" v-model="liittyyMuutosmaarays" :isSWitch="false">
           {{$t('julkaisuun-liittyy-muutosmaarays')}}
         </ep-toggle>
 
