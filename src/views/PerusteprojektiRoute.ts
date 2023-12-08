@@ -76,6 +76,12 @@ export class PerusteprojektiRoute extends Vue {
     }
   }
 
+  protected get isNormaali() {
+    if (this.peruste) {
+      return this.peruste.tyyppi === _.toLower(PerusteDtoTyyppiEnum.NORMAALI);
+    }
+  }
+
   protected async onProjektiChange(projektiId: number, perusteId: number) {
   }
 

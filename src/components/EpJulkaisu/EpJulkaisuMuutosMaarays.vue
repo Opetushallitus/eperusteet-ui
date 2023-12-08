@@ -30,7 +30,7 @@
       </b-form-group>
 
       <b-form-group :label="$t('asiasana')" class="mt-4">
-        <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="asiasanat[kieli]" :isEditing="isEditing"/>
+        <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="kielenAsiasanat[kieli]" :isEditing="isEditing"/>
       </b-form-group>
   </div>
 </template>
@@ -94,6 +94,14 @@ export default class EpJulkaisuMuutosMaarays extends Vue {
 
   get disabloidutMuuttaaValinnat() {
     return [MaaraysDtoLiittyyTyyppiEnum.EILIITY];
+  }
+
+  get kielenAsiasanat() {
+    if (!this.asiasanat || _.isEmpty(this.asiasanat[this.kieli])) {
+      return [];
+    }
+
+    return this.asiasanat[this.kieli];
   }
 }
 </script>
