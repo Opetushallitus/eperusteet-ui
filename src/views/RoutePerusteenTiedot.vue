@@ -258,21 +258,23 @@
             </b-col>
           </b-row>
 
-          <b-row no-gutters v-if="isEditing || data.maarays.asiasanat[kieli].asiasana.length > 0">
-            <b-col class="mb-4">
-              <b-form-group :label="$t('maarayskirjeen-asiasana')">
-                <EpMaaraysAsiasanat v-model="data.maarays.asiasanat[kieli].asiasana" :asiasanat="asiasanat" :isEditing="isEditing"/>
-              </b-form-group>
-            </b-col>
-          </b-row>
+          <template v-if="data.maarays">
+            <b-row no-gutters v-if="isEditing || data.maarays.asiasanat[kieli].asiasana.length > 0">
+              <b-col class="mb-4">
+                <b-form-group :label="$t('maarayskirjeen-asiasana')">
+                  <EpMaaraysAsiasanat v-model="data.maarays.asiasanat[kieli].asiasana" :asiasanat="asiasanat" :isEditing="isEditing"/>
+                </b-form-group>
+              </b-col>
+            </b-row>
 
-          <b-row no-gutters v-if="isEditing || !!data.maarays.kuvaus">
-            <b-col class="mb-4">
-              <b-form-group :label="$t('maarayskirjeen-kuvaus')">
-                <ep-content v-model="data.maarays.kuvaus" layout="simplified" :is-editable="isEditing"/>
-              </b-form-group>
-            </b-col>
-          </b-row>
+            <b-row no-gutters v-if="isEditing || !!data.maarays.kuvaus">
+              <b-col class="mb-4">
+                <b-form-group :label="$t('maarayskirjeen-kuvaus')">
+                  <ep-content v-model="data.maarays.kuvaus" layout="simplified" :is-editable="isEditing"/>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </template>
 
           <b-row no-gutters>
             <b-col class="mb-4">

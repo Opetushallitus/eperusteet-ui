@@ -28,17 +28,7 @@ export class PerusteEditStore implements IEditoitava {
     supportDataProvider({ asiasanat });
 
     const peruste = (await Perusteet.getPerusteenTiedot(this.perusteId)).data;
-    let maarays = (await Maaraykset.getMaaraysPerusteella(this.perusteId)).data;
-    if (!maarays) {
-      maarays = MaarayksetEditStore.createEmptyMaarays({
-        tyyppi: MaaraysDtoTyyppiEnum.PERUSTE,
-        koulutustyypit: [peruste.koulutustyyppi as any],
-        tila: MaaraysDtoTilaEnum.LUONNOS,
-        peruste: {
-          id: this.perusteId,
-        },
-      });
-    }
+    const maarays = (await Maaraykset.getMaaraysPerusteella(this.perusteId)).data;
 
     return {
       ...peruste,
@@ -47,14 +37,8 @@ export class PerusteEditStore implements IEditoitava {
   }
 
   async save(data: any) {
-    if (data.maarays.id) {
+    if (data.maarays?.id) {
       await Maaraykset.updateMaarays(data.maarays.id, data.maarays);
-    }
-    else {
-      await Maaraykset.addMaarays({
-        ...data.maarays,
-        nimi: data.nimi,
-      });
     }
 
     await Perusteet.updatePeruste(this.perusteId, _.omit(data, 'maarays'));
