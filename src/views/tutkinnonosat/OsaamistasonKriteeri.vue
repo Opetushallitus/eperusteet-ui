@@ -40,6 +40,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 
 @Component({
   components: {
@@ -80,11 +81,7 @@ export default class OsaamistasonKriteeri extends Vue {
 
   get defaultDragOptions() {
     return {
-      animation: 300,
-      emptyInsertThreshold: 10,
-      handle: '.order-handle',
-      ghostClass: 'dragged',
-      disabled: false,
+      ...DEFAULT_DRAGGABLE_PROPERTIES,
     };
   }
 }
