@@ -121,7 +121,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
 
         TutkinnonOsaEditStore.config!.perusteStore!.updateNavigationEntry({
           id: data.id!,
-          label: data.tutkinnonOsa!.nimi as any,
+          label: (data.tutkinnonOsa as any).nimi as any,
         });
 
         return res.data;
