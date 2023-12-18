@@ -85,6 +85,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import OsaamistasonKriteeri from '@/views/tutkinnonosat/OsaamistasonKriteeri.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 
 @Component({
   components: {
@@ -163,11 +164,7 @@ export default class EpArviointi extends Vue {
 
   get defaultDragOptions() {
     return {
-      animation: 300,
-      emptyInsertThreshold: 10,
-      handle: '.order-handle',
-      ghostClass: 'dragged',
-      disabled: false,
+      ...DEFAULT_DRAGGABLE_PROPERTIES,
     };
   }
 }
