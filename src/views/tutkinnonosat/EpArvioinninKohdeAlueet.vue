@@ -1,16 +1,24 @@
 <template>
   <div>
-    <div v-for="(arvioinninKohdeAlue, index) in model" :key="'arvioinninKohdeAlue' + index" class="arviointi">
-      <EpArviointi
-        v-model="model[index]"
-        :isEditing="isEditing"
-        :arviointiasteikot="arviointiasteikot">
-
-        <div slot="poisto">
-          <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)">{{$t('poista-ammattitaitovaatimus-tekemisena')}}</EpButton>
+    <draggable v-bind="defaultDragOptions"
+               tag="div"
+               v-model="model">
+      <div v-for="(arvioinninKohdeAlue, index) in model" :key="'arvioinninKohdeAlue' + index" class="arviointi">
+        <div v-if="isEditing" class="order-handle">
+          <EpMaterialIcon>drag_indicator</EpMaterialIcon>
         </div>
+        <EpArviointi class="w-100"
+                     v-model="model[index]"
+                     :isEditing="isEditing"
+                     :arviointiasteikot="arviointiasteikot">
+
+          <div slot="poisto">
+            <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)">{{$t('poista-ammattitaitovaatimus-tekemisena')}}</EpButton>
+          </div>
         </EpArviointi>
-    </div>
+      </div>
+    </draggable>
+
     <EpButton v-if="isEditing"
               class="mt-3"
               variant="outline"
@@ -23,12 +31,17 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
+import draggable from 'vuedraggable';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpArviointi from '@/views/tutkinnonosat/EpArviointi.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
   components: {
+    EpMaterialIcon,
+    draggable,
     EpArviointi,
     EpButton,
   },
@@ -71,6 +84,12 @@ export default class EpArvioinninKohdeAlueet extends Vue {
 
     return 'lisaa-tutkinnon-osa-kohtainen-arviointi';
   }
+
+  get defaultDragOptions() {
+    return {
+      ...DEFAULT_DRAGGABLE_PROPERTIES,
+    };
+  }
 }
 </script>
 
@@ -80,10 +99,11 @@ export default class EpArvioinninKohdeAlueet extends Vue {
 @import '@shared/styles/_mixins.scss';
 
 .arviointi {
-    @include tile-background-shadow;
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
-  }
+  @include tile-background-shadow;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  display: flex;
+}
 
 </style>
