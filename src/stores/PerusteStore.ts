@@ -9,6 +9,7 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
 import { fail } from '@shared/utils/notifications';
+import { MaarayksetEditStore } from './MaarayksetEditStore';
 
 Vue.use(VueCompositionApi);
 
@@ -27,6 +28,7 @@ export class PerusteStore implements IEditoitava {
     julkaisemattomiaMuutoksia: null as boolean | null,
     viimeisinJulkaisuTila: null as string | null,
     tilaPolling: null as any | null,
+    muutosmaaraykset: null as MaaraysDto[] | null,
   });
 
   public readonly projekti = computed(() => this.state.projekti);
@@ -41,12 +43,14 @@ export class PerusteStore implements IEditoitava {
   public readonly isVapaasivistystyo = computed(() => isVapaasivistystyoKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly julkaisut = computed(() => this.state.julkaisut);
   public readonly isPohja = computed(() => this.state.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA));
+  public readonly isNormaali = computed(() => this.state.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.NORMAALI));
   public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.peruste.value?.koulutustyyppi));
   public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.peruste.value?.koulutustyyppi));
   public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
   public readonly isJulkaistu = computed(() => (_.size(this.julkaisut.value) > 0 || this.peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
   public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
   public readonly arkistointiReroute = computed(() => this.peruste.value?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
+  public readonly muutosmaaraykset = computed(() => this.state.muutosmaaraykset ? _.reverse(_.sortBy(this.state.muutosmaaraykset, 'voimassaoloAlkaa')) : null);
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {
@@ -288,6 +292,32 @@ export class PerusteStore implements IEditoitava {
   public async fetchJulkaisemattomiaMuutoksia() {
     this.state.julkaisemattomiaMuutoksia = null;
     this.state.julkaisemattomiaMuutoksia = (await Julkaisut.julkaisemattomiaMuutoksia(this.state.perusteId!)).data;
+  }
+
+  public async fetchMuutosmaaraykset() {
+    this.state.muutosmaaraykset = null;
+    this.state.muutosmaaraykset = (await Maaraykset.getPerusteenMuutosmaaraykset(this.state.perusteId!)).data;
+  }
+
+  public async tallennaMuutosmaarays(muutosmaarays) {
+    if (muutosmaarays.id) {
+      const tallennettu = (await Maaraykset.updateMaarays(muutosmaarays.id, muutosmaarays)).data;
+      this.state.muutosmaaraykset = _.map(this.state.muutosmaaraykset, nykyinen => {
+        return nykyinen.id === tallennettu.id ? tallennettu : nykyinen;
+      });
+    }
+    else {
+      const tallennettu = (await Maaraykset.addMaarays(muutosmaarays)).data;
+      this.state.muutosmaaraykset = [
+        ...(this.state.muutosmaaraykset || []),
+        tallennettu,
+      ];
+    }
+  }
+
+  public async poistaMuutosmaarays(poistettavaMuutosmaarays) {
+    await Maaraykset.deleteMaarays(poistettavaMuutosmaarays.id, poistettavaMuutosmaarays);
+    this.state.muutosmaaraykset = _.reject(this.state.muutosmaaraykset, muutosmaarays => muutosmaarays.id === poistettavaMuutosmaarays.id);
   }
 
   async acquire() {

@@ -125,7 +125,7 @@
         </b-form-group>
 
         <b-form-group :label="$t('kuvaus') + isRequired" class="mt-4">
-          <ep-content v-model="data.kuvaus" layout="simplified" :is-editable="isEditing"/>
+          <ep-content v-model="data.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
         </b-form-group>
 
         <b-form-group :label="$t('liitteet') + ' (pdf)'" class="mt-4 mb-5">

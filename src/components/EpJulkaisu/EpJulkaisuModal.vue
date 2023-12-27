@@ -8,18 +8,21 @@
            size="xl"
            :hide-footer="true">
     <template slot="modal-header">
-      <div class="row w-100">
-        <div class="col">
-          <span class="mr-2">{{ $t('muokkaa')}}</span>
-        </div>
+      <div class="d-flex justify-content-between w-100">
+        <div class="mt-1">{{ $t('muokkaa')}}</div>
+        <EpKielivalinta/>
       </div>
     </template>
 
-    <EpJulkaisuMuutosMaarays class="mb-4" v-if="muokattavaJulkaisu && muokattavaJulkaisu.muutosmaarays" v-model="muokattavaJulkaisu.muutosmaarays" :isEditing="true"/>
+    <EpJulkaisuMuutosmaarays
+      v-if="isNormaali"
+      v-model="muokattavaJulkaisu"
+      :muutosmaaraykset="muutosmaaraykset"/>
 
     <EpJulkaisuForm
+      class="mt-4"
       :isLatest="isLatest"
-      :store="store"
+      :store="perusteStore"
       :julkaisu="muokattavaJulkaisu"
       @setInvalid="hasRequiredData" />
 
@@ -43,18 +46,20 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpJulkaisuMuutosMaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosMaarays.vue';
+import EpJulkaisuMuutosmaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosmaarays.vue';
+import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 
 @Component({
   components: {
     EpJulkaisuForm,
     EpButton,
-    EpJulkaisuMuutosMaarays,
+    EpJulkaisuMuutosmaarays,
+    EpKielivalinta,
   },
 })
 export default class EpJulkaisuModal extends Vue {
   @Prop({ required: true })
-  private store!: PerusteStore;
+  private perusteStore!: PerusteStore;
 
   private muokattavaJulkaisu: any | null = null;
   private invalid: boolean = false;
@@ -64,7 +69,7 @@ export default class EpJulkaisuModal extends Vue {
   async tallenna() {
     this.tallennetaan = true;
     try {
-      await this.store.updateJulkaisu({
+      await this.perusteStore.updateJulkaisu({
         revision: this.muokattavaJulkaisu.revision,
         tiedote: this.muokattavaJulkaisu.tiedote || {},
         julkinenTiedote: this.muokattavaJulkaisu.julkinenTiedote || {},
@@ -89,12 +94,23 @@ export default class EpJulkaisuModal extends Vue {
 
   muokkaa(julkaisu, isLatest) {
     this.isLatest = isLatest;
-    this.muokattavaJulkaisu = _.cloneDeep(julkaisu);
+    this.muokattavaJulkaisu = {
+      ..._.cloneDeep(julkaisu),
+      liittyyMuutosmaarays: !!julkaisu.muutosmaarays,
+    };
     (this.$refs['julkaisuModal'] as any).show();
   }
 
   hasRequiredData(value) {
     this.invalid = value;
+  }
+
+  get muutosmaaraykset() {
+    return this.perusteStore.muutosmaaraykset.value;
+  }
+
+  get isNormaali() {
+    return this.perusteStore.isNormaali.value;
   }
 };
 </script>

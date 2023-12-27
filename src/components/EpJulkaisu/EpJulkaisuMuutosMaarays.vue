@@ -1,112 +1,72 @@
 <template>
-  <EpSpinner v-if="!maarayksetNimella || !asiasanat" />
-  <div v-else>
-    <b-form-group :label="$t('lataa-uusi-muutosmaarays') + isRequired" class="w-40">
-        <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
-      </b-form-group>
+  <div>
+    <EpToggle v-model="liittyyMuutosmaarays" :isSWitch="false">
+      {{$t('julkaisuun-liittyy-muutosmaarays')}}
+    </EpToggle>
 
-      <b-form-group :label="$t('muutosmaarays-astuu-voimaan') + isRequired" class="mt-4 d-flex">
-        <ep-datepicker v-model="model.voimassaoloAlkaa" :isEditing="isEditing" />
-      </b-form-group>
+    <b-form-group class="mt-4" :label="$t('muutosmaarays')" v-if="liittyyMuutosmaarays">
+      <div class="ei-muutosmaarayksia p-3" v-if="muutosmaaraykset && muutosmaaraykset.length === 0">
+        <EpMaterialIcon>info</EpMaterialIcon>
+        {{$t('muutosmaarayksia-ei-loytynyt')}} {{$t('voit-lisata-muutosmaarayksia')}}
+        <router-link :to="{name: 'perusteenTiedot'}">{{$t('perusteen-tiedoista')}}</router-link>
+      </div>
 
-      <b-form-group :label="$t('muutosmaarayksen-nimi') + isRequired" class="mt-4 w-40">
-        <ep-input v-model="model.nimi" :isEditing="isEditing"/>
-      </b-form-group>
-
-      <b-form-group :label="$t('muutosmaarayksen-diaarinumero') + isRequired" class="mt-4 w-40">
-        <ep-input v-model="model.diaarinumero" :isEditing="isEditing" type="string"/>
-      </b-form-group>
-
-      <b-form-group :label="$t('maarays-annettu') + isRequired" class="mt-4 d-flex">
-        <ep-datepicker v-model="model.maarayspvm" :isEditing="isEditing" />
-      </b-form-group>
-
-      <b-form-group :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired" class="mt-4">
-        <EpMaaraysLiittyyMuuttaaValinta
-          v-model="model"
-          :isEditing="isEditing"
-          :maarayksetNimella="maarayksetNimella"
-          :disabloidutValinnat="disabloidutMuuttaaValinnat"/>
-      </b-form-group>
-
-      <b-form-group :label="$t('asiasana')" class="mt-4">
-        <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="kielenAsiasanat[kieli]" :isEditing="isEditing"/>
-      </b-form-group>
+      <ep-multi-select
+        v-if="muutosmaaraykset && muutosmaaraykset.length > 0"
+        class="w-50" v-model="julkaisu.muutosmaarays" :options="muutosmaaraykset" track-by="id">
+        <template v-slot:singleLabel="{ option }">{{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )</template>
+        <template v-slot:option="{ option }">{{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )</template>
+        <template v-slot:tag="{ option }">{{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )</template>
+      </ep-multi-select>
+    </b-form-group>
   </div>
 </template>
 
 <script lang="ts">
 import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
-import { Maaraykset, MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
-import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
-import { Kielet } from '@shared/stores/kieli';
-import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
-import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
-import EpInput from '@shared/components/forms/EpInput.vue';
-import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import { MaaraysDto } from '@shared/api/eperusteet';
 
 @Component({
   components: {
-    EpToggle,
-    EpMaaraysLiittyyMuuttaaValinta,
-    EpMaaraysAsiasanat,
-    EpDatepicker,
-    EpInput,
-    EpMaaraysLiitteet,
-    EpSpinner,
+    EpMultiSelect,
   },
 })
-export default class EpJulkaisuMuutosMaarays extends Vue {
-  private MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
+export default class EpJulkaisuMuutosmaarays extends Vue {
+  @Prop({ required: true })
+  private value!: any;
 
   @Prop({ required: true })
-  value!: MaaraysDto;
+  private muutosmaaraykset!: MaaraysDto[];
 
-  @Prop({ required: false })
-  isEditing!: boolean;
-
-  private maarayksetNimella: MaaraysKevytDto[] | null = null;
-  private asiasanat: { [key: string]: string[]; } | null = null;
-
-  async mounted() {
-    this.maarayksetNimella = (await Maaraykset.getMaarayksetNimet()).data;
-    this.asiasanat = (await Maaraykset.getAsiasanat()).data;
-  }
-
-  set model(val) {
+  set julkaisu(val) {
     this.$emit('input', val);
   }
 
-  get model() {
+  get julkaisu() {
     return this.value;
   }
 
-  get isRequired() {
-    return this.isEditing ? ' *' : '';
-  }
+  set liittyyMuutosmaarays(val) {
+    this.julkaisu.liittyyMuutosmaarays = val;
 
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
-
-  get disabloidutMuuttaaValinnat() {
-    return [MaaraysDtoLiittyyTyyppiEnum.EILIITY];
-  }
-
-  get kielenAsiasanat() {
-    if (!this.asiasanat || _.isEmpty(this.asiasanat[this.kieli])) {
-      return [];
+    if (!val) {
+      this.julkaisu.muutosmaarays = null;
     }
+  }
 
-    return this.asiasanat[this.kieli];
+  get liittyyMuutosmaarays() {
+    return this.julkaisu.liittyyMuutosmaarays;
   }
 }
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
+
+.ei-muutosmaarayksia {
+  background-color: $blue-lighten-4;
+}
 
 </style>
