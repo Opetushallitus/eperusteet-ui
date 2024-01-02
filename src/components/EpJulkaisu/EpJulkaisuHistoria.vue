@@ -49,6 +49,10 @@
             </div>
             <span>- {{ $sd(julkaisu.muutosmaaraysVoimaan) }} {{ $t('alkaen') }}</span>
           </div>
+          <div v-if="julkaisu.muutosmaarays" class="d-flex">
+            <EpPdfLink :url="julkaisu.muutosmaarays.url">{{ $kaanna(julkaisu.muutosmaarays.nimi) }}</EpPdfLink>
+            <span class="pl-2"> - {{$t('voimassaolo-alkaa')}} {{$sd(julkaisu.muutosmaarays.voimassaoloAlkaa)}}</span>
+          </div>
           <div  v-if="julkaisu.tiedote" class="mt-2">
             <span class="font-bold pr-1">{{ $t('tiedote') }}:</span>
             <div v-html="$kaanna(julkaisu.tiedote)" />
@@ -60,7 +64,7 @@
         </div>
       </div>
     </template>
-    <EpJulkaisuModal ref="julkaisuModal" :store="store"/>
+    <EpJulkaisuModal ref="julkaisuModal" :perusteStore="store"/>
   </div>
 </template>
 
@@ -73,6 +77,8 @@ import EpJulkaisuModal from './EpJulkaisuModal.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { parsiEsitysnimi } from '@/stores/kayttaja';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { MaaraysLiiteDtoTyyppiEnum } from '@shared/generated/eperusteet';
+import { MaarayksetParams, baseURL } from '@shared/api/eperusteet';
 
 interface Julkaisu {
   revision?: number;
@@ -122,6 +128,12 @@ export default class EpJulkaisuHistoria extends Vue {
           tila: julkaisu.tila || 'JULKAISTU',
           palautuksessa: this.palautuksessa === julkaisu.revision,
           liitteet: this.muutosmaaraysLiite(julkaisu),
+          ...(!!julkaisu.muutosmaarays && {
+            muutosmaarays: {
+              ...julkaisu.muutosmaarays,
+              url: this.muutosmaaraysUrl(julkaisu.muutosmaarays),
+            },
+          }),
         };
       })
       .sortBy('revision')
@@ -159,6 +171,14 @@ export default class EpJulkaisuHistoria extends Vue {
     else {
       return [];
     }
+  }
+
+  muutosmaaraysUrl(muutosmaarays) {
+    if (!_.find(muutosmaarays.liitteet![this.$slang.value].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI)) {
+      return null;
+    }
+
+    return baseURL + MaarayksetParams.getMaaraysLiite(_.toString(_.get(_.find(muutosmaarays.liitteet![this.$slang.value].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI), 'id'))).url;
   }
 
   avaaMuokkausModal(julkaisu) {

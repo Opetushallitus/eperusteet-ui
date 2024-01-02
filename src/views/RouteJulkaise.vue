@@ -49,7 +49,7 @@
           <div>{{ $t('validointi-kaynnissa') }}</div>
         </div>
         <div v-else>
-          <div v-if="isValid" class="d-flex">
+          <div v-if="isPerusteValid" class="d-flex">
             <EpMaterialIcon class="no-errors">check_circle</EpMaterialIcon>
             <div class="ml-2">{{$t('ei-julkaisua-estavia-virheita')}}</div>
           </div>
@@ -124,14 +124,14 @@
 
     <template v-if="!isPohja">
       <div v-if="julkaisuMahdollinen">
-        <hr class="mt-4 mb-4">
-        <h3 class="mb-4">{{ $t('uusi-julkaisu') }}</h3>
+        <hr class="mt-4">
+        <h3 class="mt-4">{{ $t('uusi-julkaisu') }}</h3>
 
-        <ep-toggle v-if="isNormaali" v-model="liittyyMuutosmaarays" :isSWitch="false">
-          {{$t('julkaisuun-liittyy-muutosmaarays')}}
-        </ep-toggle>
-
-        <EpJulkaisuMuutosMaarays class="mt-4 " v-if="liittyyMuutosmaarays" v-model="julkaisu.muutosmaarays" :isEditing="true"/>
+        <EpJulkaisuMuutosmaarays
+          v-if="isNormaali"
+          class="mt-4"
+          v-model="julkaisu"
+          :muutosmaaraykset="muutosmaaraykset"/>
 
         <EpJulkaisuForm
           class="mt-4"
@@ -143,7 +143,7 @@
           <EpJulkaisuButton :julkaise="julkaise"
                             v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
                             :julkaisuKesken="julkaisuKesken"
-                            :disabled="!valid"/>
+                            :disabled="!julkaisuValid"/>
         </b-form-group>
       </div>
 
@@ -190,15 +190,13 @@ import { buildKatseluUrl } from '@shared/utils/esikatselu';
 import { koulutustyyppiTheme } from '@shared/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
-import EpJulkaisuMuutosMaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosMaarays.vue';
+import EpJulkaisuMuutosmaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosmaarays.vue';
 import { nodeToRoute } from '@/utils/routing';
 import { Location } from 'vue-router';
 import EpJulkaisuValidointi from '@shared/components/EpJulkaisuValidointi/EpJulkaisuValidointi.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { MaarayksetEditStore, requireOneLiite } from '@/stores/MaarayksetEditStore';
 import { Validations } from 'vuelidate-property-decorators';
-import { notNull, requiredOneLang } from '@shared/validators/required';
-import { minLength, required, requiredIf } from 'vuelidate/lib/validators';
+import { requiredIf } from 'vuelidate/lib/validators';
 
 @Component({
   components: {
@@ -221,7 +219,7 @@ import { minLength, required, requiredIf } from 'vuelidate/lib/validators';
     EpJulkaisuForm,
     EpJulkaisuValidointi,
     EpMaterialIcon,
-    EpJulkaisuMuutosMaarays,
+    EpJulkaisuMuutosmaarays,
   },
 })
 export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
@@ -238,37 +236,29 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     muutosmaaraysVoimaan: null,
     liitteet: [],
     muutosmaarays: null,
+    liittyyMuutosmaarays: false,
   };
 
-  private liittyyMuutosmaarays: boolean | null = false;
   private hallintaLoading: boolean = false;
 
   async mounted() {
     this.validoi();
     await this.initMaarays();
+    await this.perusteStore.fetchMuutosmaaraykset();
   }
 
   async initMaarays() {
     const perusteenMaarays = await this.perusteStore.fetchMaarays();
-    this.liittyyMuutosmaarays = false;
-    this.julkaisu.muutosmaarays = MaarayksetEditStore.createEmptyMaarays({
-      tyyppi: MaaraysDtoTyyppiEnum.PERUSTE,
-      koulutustyypit: [this.perusteStore.peruste.value?.koulutustyyppi as any],
-      tila: MaaraysDtoTilaEnum.JULKAISTU,
-      peruste: {
-        id: this.perusteStore.peruste.value?.id,
-      },
-      liittyyTyyppi: MaaraysDtoLiittyyTyyppiEnum.MUUTTAA,
-      ...(perusteenMaarays && { asiasanat: perusteenMaarays.asiasanat,
-        diaarinumero: perusteenMaarays.diaarinumero,
-        kuvaus: perusteenMaarays.kuvaus,
-        muutettavatMaaraykset: [perusteenMaarays],
-      }),
-    }) as any;
+  }
+
+  get muutosmaaraykset() {
+    if (this.perusteStore.muutosmaaraykset.value) {
+      return this.perusteStore.muutosmaaraykset.value;
+    }
   }
 
   get julkaisuMahdollinen() {
-    return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.isValid;
+    return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.isPerusteValid;
   }
 
   get valmiiksiMahdollinen() {
@@ -296,8 +286,10 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     return _.map(list, item => ({ ...item, route: this.nodeToRoute(item.navigationNode) }));
   }
 
-  get isValid() {
-    return _.every(this.validoinnit, validointi => _.isEmpty(validointi.virheet));
+  get isPerusteValid() {
+    if (this.validoinnit) {
+      return _.every(this.validoinnit, validointi => _.isEmpty(validointi.virheet));
+    }
   }
 
   protected async onProjektiChange() {
@@ -315,7 +307,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
         julkinen: this.julkaisu.julkinen,
         muutosmaaraysVoimaan: this.julkaisu.muutosmaaraysVoimaan,
         liitteet: this.julkaisu.liitteet,
-        muutosmaarays: this.liittyyMuutosmaarays ? this.julkaisu.muutosmaarays : null,
+        muutosmaarays: this.julkaisu.liittyyMuutosmaarays ? this.julkaisu.muutosmaarays : null,
       });
 
       this.julkaisu.tiedote = {};
@@ -341,8 +333,8 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     }
   }
 
-  get valid() {
-    return !this.liittyyMuutosmaarays || !this.$v.$invalid;
+  get julkaisuValid() {
+    return !this.$v.$invalid;
   }
 
   get julkaisuKesken() {
@@ -507,15 +499,9 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   validations = {
     julkaisu: {
       muutosmaarays: {
-        nimi: requiredOneLang(),
-        diaarinumero: { required },
-        voimassaoloAlkaa: { required },
-        maarayspvm: { required },
-        koulutustyypit: {
-          required,
-          'min-length': minLength(1),
-        },
-        liitteet: requireOneLiite(),
+        required: requiredIf((value) => {
+          return value && value.liittyyMuutosmaarays;
+        }),
       },
     },
   }

@@ -5,6 +5,7 @@ import '@shared/config/bootstrap';
 import '@shared/config/styles';
 import 'animate.css/animate.min.css';
 import 'material-icons/iconfont/material-icons.css';
+import '@shared/config/defaultcomponents';
 
 import VueI18n from 'vue-i18n';
 import VueCompositionApi from '@vue/composition-api';
@@ -39,12 +40,12 @@ import { registerIconColorSchemeChange } from '@shared/utils/icon';
 import router from './router';
 
 import { stores } from '@/stores';
-import { getKaannokset } from '@shared/api/eperusteet';
 import { TavoitesisaltoalueStore } from './stores/TavoitesisaltoalueStore';
 import { LaajaalainenOsaaminenStore } from './stores/LaajaalainenOsaaminenStore';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 import { OsaamiskokonaisuusStore } from './stores/OsaamiskokonaisuusStore';
 import { OsaamiskokonaisuusPaaAlueStore } from './stores/OsaamiskokonaisuusPaaAlueStore';
+
 Vue.config.productionTip = false;
 
 Vue.use(VueI18n);

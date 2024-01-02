@@ -1,5 +1,5 @@
 <template>
-  <EpSpinner v-if="!maarayksetNimella || !asiasanat" />
+  <EpSpinner v-if="!asiasanat" />
   <div v-else>
     <b-form-group :label="$t('lataa-uusi-muutosmaarays') + isRequired" class="w-40">
         <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
@@ -21,23 +21,19 @@
         <ep-datepicker v-model="model.maarayspvm" :isEditing="isEditing" />
       </b-form-group>
 
-      <b-form-group :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired" class="mt-4">
-        <EpMaaraysLiittyyMuuttaaValinta
-          v-model="model"
-          :isEditing="isEditing"
-          :maarayksetNimella="maarayksetNimella"
-          :disabloidutValinnat="disabloidutMuuttaaValinnat"/>
+      <b-form-group :label="$t('asiasana')" class="mt-4">
+        <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="kielenAsiasanat" :isEditing="isEditing"/>
       </b-form-group>
 
-      <b-form-group :label="$t('asiasana')" class="mt-4">
-        <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="kielenAsiasanat[kieli]" :isEditing="isEditing"/>
+      <b-form-group :label="$t('kuvaus')" class="mt-4">
+        <ep-content v-model="model.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
       </b-form-group>
   </div>
 </template>
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, ProvideReactive, Vue } from 'vue-property-decorator';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { Maaraykset, MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
@@ -47,6 +43,7 @@ import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpContent from '@shared/components/EpContent/EpContent.vue';
 
 @Component({
   components: {
@@ -57,9 +54,10 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
     EpInput,
     EpMaaraysLiitteet,
     EpSpinner,
+    EpContent,
   },
 })
-export default class EpJulkaisuMuutosMaarays extends Vue {
+export default class EpMuutosmaarays extends Vue {
   private MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
 
   @Prop({ required: true })
@@ -68,13 +66,8 @@ export default class EpJulkaisuMuutosMaarays extends Vue {
   @Prop({ required: false })
   isEditing!: boolean;
 
-  private maarayksetNimella: MaaraysKevytDto[] | null = null;
-  private asiasanat: { [key: string]: string[]; } | null = null;
-
-  async mounted() {
-    this.maarayksetNimella = (await Maaraykset.getMaarayksetNimet()).data;
-    this.asiasanat = (await Maaraykset.getAsiasanat()).data;
-  }
+  @Prop({ required: true })
+  asiasanat!: { [key: string]: string[]; };
 
   set model(val) {
     this.$emit('input', val);
@@ -90,10 +83,6 @@ export default class EpJulkaisuMuutosMaarays extends Vue {
 
   get kieli() {
     return Kielet.getSisaltoKieli.value;
-  }
-
-  get disabloidutMuuttaaValinnat() {
-    return [MaaraysDtoLiittyyTyyppiEnum.EILIITY];
   }
 
   get kielenAsiasanat() {
