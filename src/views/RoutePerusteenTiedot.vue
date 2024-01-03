@@ -248,7 +248,8 @@
 
               <b-row no-gutters>
                 <b-col>
-                  <b-form-group :label="$t('muutosmaaraykset')">
+                  <b-form-group>
+                    <h3 slot="label">{{$t('muutosmaaraykset')}}</h3>
                     <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
                                         :is-editing="isEditing"
                                         :liitteet="liitteetFiltered"
@@ -366,6 +367,7 @@
               <b-row no-gutters>
                 <b-col class="mb-4">
                   <b-form-group>
+                    <h3 slot="label">{{$t('osaamisalat')}}</h3>
                     <div class="text-muted font-size-small">
                       {{ $t('lisaa-tai-poista-osaamisala') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
                     </div>
