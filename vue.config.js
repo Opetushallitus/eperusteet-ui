@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const path = require('path');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const proxy = {
   '/eperusteet-service': {
@@ -26,9 +25,6 @@ module.exports = {
     },
     plugins: [
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new ForkTsCheckerWebpackPlugin({
-        memoryLimit: 8192,
-      }),
     ],
   },
 

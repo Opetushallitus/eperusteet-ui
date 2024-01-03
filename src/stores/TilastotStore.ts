@@ -33,7 +33,7 @@ export class TilastotStore {
     }
 
     try {
-      this.state.perusteet = _.get((await Perusteet.getAllPerusteetInternal(
+      const perusteet  = _.get((await Perusteet.getAllPerusteetInternal(
         undefined,
         1000,
         undefined,
@@ -44,6 +44,10 @@ export class TilastotStore {
         undefined,
         yleissivistavatKoulutustyypit,
       )).data, 'data');
+
+      if (perusteet) {
+        this.state.perusteet = perusteet;
+      }
     }
     catch (e) {
       this.state.perusteet = [];

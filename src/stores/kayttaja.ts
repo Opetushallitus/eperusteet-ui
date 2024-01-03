@@ -75,7 +75,7 @@ export class KayttajaStore implements IOikeusProvider {
       this.state.tiedot = (await KayttajatApi.getKirjautunutKayttajat()).data;
       logger.info('Käyttäjän tiedot', this.tiedot.value);
     }
-    catch (err) {
+    catch (err: any) {
       logger.error('Käyttäjän tietojen lataus epäonnistui', err.message);
     }
   }
@@ -85,7 +85,7 @@ export class KayttajaStore implements IOikeusProvider {
       this.state.projektiId = null;
       this.state.oikeudet = {};
     }
-    catch (err) {
+    catch (err: any) {
       logger.error('Ei oikeuksia', err.message);
     }
   }
@@ -96,7 +96,7 @@ export class KayttajaStore implements IOikeusProvider {
       this.state.projektiId = perusteprojektiId;
       this.state.oikeudet = res.data as any;
     }
-    catch (err) {
+    catch (err: any) {
       logger.error('Ei oikeuksia', err.message);
       throw err;
     }

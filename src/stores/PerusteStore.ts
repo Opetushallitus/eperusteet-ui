@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 import Vue from 'vue';
 import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi, MaaraysDto, Maaraykset } from '@shared/api/eperusteet';
-=======
-import Vue, { watch, reactive, computed } from 'vue';
-import VueCompositionApi from '@vue/composition-api';
-import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi } from '@shared/api/eperusteet';
->>>>>>> d87ba97 (fixes)
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
 import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isKoulutustyyppiPdfTuettu } from '@shared/utils/perusteet';
@@ -15,7 +9,6 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
 import { fail } from '@shared/utils/notifications';
-import { MaarayksetEditStore } from './MaarayksetEditStore';
 
 Vue.use(VueCompositionApi);
 
@@ -216,27 +209,28 @@ export class PerusteStore implements IEditoitava {
     return node;
   }
 
-  public async blockUntilInitialized() {
-    return new Promise(resolve => {
-      if (this.state.isInitialized) {
-        resolve();
-      }
-      else {
-        this.blocklist.push(resolve);
-      }
-    });
+  public async blockUntilInitialized(): Promise<void> {
+    // return new Promise<void>(resolve => {
+    //   if (this.state.isInitialized) {
+    //     resolve();
+    //   }
+    //   else {
+    //     this.blocklist.push(resolve);
+    //   }
+    // });
+    return new Promise<void>(resolve => resolve());
   }
 
-  private readonly blockResolver = watch(() => {
-    if (this.state.isInitialized) {
-      while (this.blocklist.length > 0) {
-        const fn = this.blocklist.shift();
-        if (fn) {
-          fn();
-        }
-      }
-    }
-  });
+  // private readonly blockResolver = watch(() => {
+  //   if (this.state.isInitialized) {
+  //     while (this.blocklist.length > 0) {
+  //       const fn = this.blocklist.shift();
+  //       if (fn) {
+  //         fn();
+  //       }
+  //     }
+  //   }
+  // });
 
   async julkaise(tiedot: any) {
     const projektiId = this.state.projekti?.id;
