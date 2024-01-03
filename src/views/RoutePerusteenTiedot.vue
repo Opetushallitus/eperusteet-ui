@@ -102,12 +102,15 @@
                 <b-col class="mb-4">
                   <b-form-group :label="$t('tyotehtavat-joissa-voi-toimia')">
                     <ep-content
+                      v-if="data.kvliite.tyotehtavatJoissaVoiToimia || isEditing"
                       v-model="data.kvliite.tyotehtavatJoissaVoiToimia"
                       layout="normal"
                       :is-editable="isEditing"></ep-content>
                   </b-form-group>
                 </b-col>
               </b-row>
+
+              <hr/>
 
               <b-row no-gutters>
                 <b-col class="mb-4">
@@ -233,7 +236,7 @@
                 </b-row>
 
                 <b-row no-gutters v-if="isEditing || !!data.maarays.kuvaus">
-                  <b-col class="mb-4">
+                  <b-col>
                     <b-form-group :label="$t('maarayskirjeen-kuvaus')">
                       <ep-content v-model="data.maarays.kuvaus" layout="normal" :is-editable="isEditing"/>
                     </b-form-group>
@@ -241,9 +244,10 @@
                 </b-row>
               </template>
 
+              <hr/>
+
               <b-row no-gutters>
-                <b-col class="mb-4">
-                  <hr/>
+                <b-col>
                   <b-form-group :label="$t('muutosmaaraykset')">
                     <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
                                         :is-editing="isEditing"
@@ -253,9 +257,10 @@
                 </b-col>
               </b-row>
 
+              <hr/>
+
               <b-row>
                 <b-col class="mb-4">
-                  <hr/>
                   <b-form-group>
                     <h3 slot="label">{{$t('saamen-kielelle-kaannetyt-perusteet')}}</h3>
                     <ep-spinner v-if="!liitteet" />
@@ -286,12 +291,12 @@
                     </b-table>
                   </b-form-group>
                 </b-col>
-
               </b-row>
+
+              <hr/>
 
               <b-row v-if="isAmmatillinen">
                 <b-col class="mb-4">
-                  <hr/>
                   <b-form-group>
                     <h3 slot="label">{{$t('koulutusviennin-ohje')}}</h3>
                     <ep-spinner v-if="!liitteet" />
@@ -351,7 +356,6 @@
                     </b-form-group>
 
                   </b-form-group>
-                  <hr/>
                 </b-col>
               </b-row>
 
@@ -915,6 +919,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 </script>
 
 <style lang="scss" scoped>
+@import '@shared/styles/_variables';
 .valiviiva {
   display: block;
   height: 1px;
@@ -941,6 +946,11 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 
 .table-no-edit {
   margin-top: -25px;
+}
+
+hr {
+  border-top-color: $gray;
+  margin-bottom: 3rem;
 }
 
 </style>
