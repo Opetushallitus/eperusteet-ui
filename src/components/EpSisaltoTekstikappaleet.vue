@@ -29,26 +29,42 @@
       </div>
     </ep-collapse>
 
-    <ep-collapse class="collapsable" v-for="(teksti, index) in model.vapaatTekstit" :key="'teksti' +index" :collapsable="!isEditing" :border-bottom="isEditing" :class="{'mb-4': !isEditing}">
+    <ep-collapse class="collapsable"
+                 :collapsable="!isEditing"
+                 :border-bottom="isEditing"
+                 :class="{'mb-4': !isEditing}"
+                 v-for="(vt, index) in model.vapaatTekstit" :key="'vt' + index">
       <template #header>
-        <h4 v-if="!isEditing">{{ $kaanna(teksti.nimi)}}</h4>
+        <h4 v-if="!isEditing">{{ $kaanna(vt.nimi)}}</h4>
       </template>
-      <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-otsikko')}}</h4>
-      <ep-input v-if="isEditing" v-model="teksti.nimi" :is-editing="isEditing"></ep-input>
 
-      <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
-      <ep-content layout="normal" v-model="teksti.teksti" :is-editable="isEditing"> </ep-content>
+      <draggable v-bind="defaultDragOptions"
+                 tag="div"
+                 v-model="model.vapaatTekstit">
+        <div v-for="(teksti, index) in model.vapaatTekstit" :key="'teksti' + index">
+          <div v-if="isEditing" class="d-flex">
+            <div class="order-handle">
+              <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+            </div>
+            <h4 class="otsikko">{{$t('tekstikappaleen-otsikko')}}</h4>
+          </div>
+          <ep-input v-if="isEditing" v-model="teksti.nimi" :is-editing="isEditing"></ep-input>
 
-      <div class="d-flex justify-content-between mt-1" v-if="isEditing">
-        <ep-button variant="outline-primary" icon="add" v-if="index+1 === vapaatTekstit.length" @click="lisaaTekstikappale()">
-          {{ $t('lisaa-tekstikappale') }}
-        </ep-button>
-        <div v-else/>
+          <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
+          <ep-content layout="normal" v-model="teksti.teksti" :is-editable="isEditing"> </ep-content>
 
-        <ep-button variant="link" icon="delete" @click="poistaTeksti(teksti)">
-          {{ $t('poista-tekstikappale') }}
-        </ep-button>
-      </div>
+          <div class="d-flex justify-content-between mt-1" v-if="isEditing">
+            <ep-button variant="outline-primary" icon="add" v-if="index+1 === vapaatTekstit.length" @click="lisaaTekstikappale()">
+              {{ $t('lisaa-tekstikappale') }}
+            </ep-button>
+            <div v-else/>
+
+            <ep-button variant="link" icon="delete" @click="poistaTeksti(teksti)">
+              {{ $t('poista-tekstikappale') }}
+            </ep-button>
+          </div>
+        </div>
+      </draggable>
     </ep-collapse>
 
     <ep-button variant="outline-primary" icon="add" v-if="isEditing && sisaltoTekstiAvaimet.length === 0 && vapaatTekstit.length === 0" @click="lisaaTekstikappale()">
@@ -65,13 +81,18 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
+import draggable from 'vuedraggable';
 
 @Component({
   components: {
+    draggable,
     EpCollapse,
     EpInput,
     EpButton,
     EpContent,
+    EpMaterialIcon,
   },
 })
 export default class EpSisaltoTekstikappaleet extends Vue {
@@ -130,6 +151,12 @@ export default class EpSisaltoTekstikappaleet extends Vue {
   get borderBottom() {
     return (!this.isEditing && (this.sisaltoTekstiAvaimet.length > 0 || this.model.vapaatTekstit?.length > 0)) || (this.isEditing && (this.sisaltoTekstiAvaimet.length === 0 && this.model.vapaatTekstit?.length === 0));
   }
+
+  get defaultDragOptions() {
+    return {
+      ...DEFAULT_DRAGGABLE_PROPERTIES,
+    };
+  }
 }
 </script>
 
@@ -137,6 +164,10 @@ export default class EpSisaltoTekstikappaleet extends Vue {
 @import '@shared/styles/_variables.scss';
   .collapsable ::v-deep .ep-collapse {
     padding: 0 !important;
+  }
+
+  .otsikko {
+    line-height: 1.5;
   }
 
 </style>
