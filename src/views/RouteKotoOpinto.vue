@@ -110,6 +110,7 @@ export default class RouteKotoOpinto extends Vue {
   }
 
   async fetch() {
+    await this.perusteStore.blockUntilInitialized();
     const tkstore = new KotoOpintoStore(this.perusteId!, Number(this.kotoOpintoId), this.versionumero);
     this.store = new EditointiStore(tkstore);
   }

@@ -12,7 +12,8 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 
 const browserStore = new BrowserStore();
 
-export abstract class PerusteprojektiRoute extends Vue {
+@Component
+export class PerusteprojektiRoute extends Vue {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
 
@@ -33,6 +34,12 @@ export abstract class PerusteprojektiRoute extends Vue {
 
   protected get showNavigation() {
     return browserStore.navigationVisible.value;
+  }
+
+  private isInitingProjekti = false;
+
+  protected get isInitializing() {
+    return this.isInitingProjekti;
   }
 
   protected get projektiId() {
@@ -75,36 +82,33 @@ export abstract class PerusteprojektiRoute extends Vue {
     }
   }
 
-  protected abstract onProjektiChange(projektiId?: number, perusteId?: number): Promise<any>;
-
-  async mounted() {
-    console.log('mounted');
-    if (!this.perusteStore.peruste.value) {
-      await this.fetch();
-    }
+  protected async onProjektiChange(projektiId?: number, perusteId?: number) {
   }
 
-  @Watch('projektiId')
+  @Watch('projektiId', { immediate: true })
   async onProjektiChangeImpl(newValue: string, oldValue: string) {
-
-    console.log(newValue, oldValue);
-
-    if (newValue && newValue !== oldValue) {
-      await this.fetch();
+    if (newValue && newValue !== oldValue && !this.isInitingProjekti) {
+      const projektiId = _.parseInt(newValue);
+      this.isInitingProjekti = true;
+      window.scrollTo(0, 0);
+      try {
+        this.kayttajaStore.clear();
+        this.muokkaustietoStore.clear();
+        this.aikatauluStore.clear();
+        this.tiedotteetStore.clear();
+        this.tyoryhmaStore.clear();
+        await this.kayttajaStore.setPerusteprojekti(projektiId);
+        await this.perusteStore.init(projektiId);
+        await this.perusteStore.blockUntilInitialized();
+        await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
+      }
+      catch (err) {
+        console.error(err);
+        throw err;
+      }
+      finally {
+        this.isInitingProjekti = false;
+      }
     }
-  }
-
-  async fetch() {
-    window.scrollTo(0, 0);
-    this.kayttajaStore.clear();
-    this.muokkaustietoStore.clear();
-    this.aikatauluStore.clear();
-    this.tiedotteetStore.clear();
-    this.tyoryhmaStore.clear();
-    const projektiId = _.parseInt(this.projektiId);
-    await this.kayttajaStore.setPerusteprojekti(projektiId);
-    await this.perusteStore.init(projektiId);
-    await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
-    console.log('fetch end');
   }
 }

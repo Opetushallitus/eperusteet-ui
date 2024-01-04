@@ -79,9 +79,6 @@ export default class RoutePoistetutSisallot extends PerusteprojektiRoute {
       fail('virhe-palvelu-virhe');
     }
   }
-
-  async onProjektiChange() {
-  }
 }
 </script>
 

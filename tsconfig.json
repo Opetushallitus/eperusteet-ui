@@ -14,7 +14,6 @@
     "strict": true,
     "skipLibCheck": true,
     "strictPropertyInitialization": true,
-    // "suppressImplicitAnyIndexErrors": true,
     "target": "es2020",
     "types": [
       "webpack-env",

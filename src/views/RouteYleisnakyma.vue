@@ -70,7 +70,6 @@ export default class RouteYleisnakyma extends PerusteprojektiRoute {
   private tyyppi!: 'opas' | 'peruste';
 
   async onProjektiChange() {
-    console.log('RouteYleisnakyma onprojectchange' );
     if (this.peruste && this.peruste.id) {
       await Promise.all([
         this.muokkaustietoStore.init(this.peruste.id),

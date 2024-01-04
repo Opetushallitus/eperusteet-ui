@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
+import VueCompositionApi, { watch, reactive, computed, ref } from '@vue/composition-api';
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi, MaaraysDto, Maaraykset } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
@@ -20,7 +20,9 @@ export class PerusteStore implements IEditoitava {
     peruste: null as PerusteDto | null,
     navigation: null as NavigationNodeDto | null,
     perusteId: null as number | null,
+    isInitialized: false,
     julkaisut: null as JulkaisuBaseDto[] | null,
+    initializing: false,
     validoinnit: null as Array<Validointi> | null,
     julkaisemattomiaMuutoksia: null as boolean | null,
     viimeisinJulkaisuTila: null as string | null,
@@ -48,6 +50,7 @@ export class PerusteStore implements IEditoitava {
   public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
   public readonly arkistointiReroute = computed(() => this.peruste.value?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
   public readonly muutosmaaraykset = computed(() => this.state.muutosmaaraykset ? _.reverse(_.sortBy(this.state.muutosmaaraykset, 'voimassaoloAlkaa')) : null);
+  public readonly isInitialized = computed(() => this.state.isInitialized);
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {
@@ -118,29 +121,41 @@ export class PerusteStore implements IEditoitava {
   }
 
   async init(projektiId: number) {
-    if (projektiId === this.projektiId.value) {
+    if (this.state.initializing || (this.state.isInitialized && projektiId === this.projektiId.value)) {
       return;
     }
 
-    this.state.peruste = null;
-    this.state.projekti = null;
-    this.state.validoinnit = null;
-    this.state.julkaisut = null;
-    Murupolku.tyhjenna();
-    this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
-    const perusteId = Number((this.state.projekti as any)._peruste);
-    this.state.perusteId = perusteId;
+    try {
+      this.state.initializing = true;
+      this.state.isInitialized = false;
+      this.state.peruste = null;
+      this.state.projekti = null;
+      this.state.validoinnit = null;
+      this.state.julkaisut = null;
+      Murupolku.tyhjenna();
+      this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
+      const perusteId = Number((this.state.projekti as any)._peruste);
+      this.state.perusteId = perusteId;
 
-    [
-      this.state.peruste,
-      this.state.navigation,
-    ] = _.map(await Promise.all([
-      Perusteet.getPerusteenTiedot(perusteId),
-      Perusteet.getNavigation(perusteId),
-    ]), 'data');
+      [
+        this.state.peruste,
+        this.state.navigation,
+      ] = _.map(await Promise.all([
+        Perusteet.getPerusteenTiedot(perusteId),
+        Perusteet.getNavigation(perusteId),
+      ]), 'data');
 
-    await this.updateValidointi();
-    await this.fetchJulkaisut();
+      await this.updateValidointi();
+      await this.fetchJulkaisut();
+
+      this.state.isInitialized = true;
+    }
+    catch (err) {
+      console.error(err);
+    }
+    finally {
+      this.state.initializing = false;
+    }
   }
 
   async fetchMaarays() {
@@ -194,6 +209,28 @@ export class PerusteStore implements IEditoitava {
       .value();
     return node;
   }
+
+  public async blockUntilInitialized(): Promise<void> {
+    return new Promise(resolve => {
+      if (this.state.isInitialized) {
+        resolve();
+      }
+      else {
+        this.blocklist.push(resolve);
+      }
+    });
+  }
+
+  private readonly blockResolver = watch(this.isInitialized, () => {
+    if (this.state.isInitialized) {
+      while (this.blocklist.length > 0) {
+        const fn = this.blocklist.shift();
+        if (fn) {
+          fn();
+        }
+      }
+    }
+  });
 
   async julkaise(tiedot: any) {
     const projektiId = this.state.projekti?.id;
