@@ -12,8 +12,7 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 
 const browserStore = new BrowserStore();
 
-@Component
-export class PerusteprojektiRoute extends Vue {
+export abstract class PerusteprojektiRoute extends Vue {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
 
@@ -76,10 +75,26 @@ export class PerusteprojektiRoute extends Vue {
     }
   }
 
-  protected async onProjektiChange(projektiId: number, perusteId: number) {
-  }
+  protected abstract onProjektiChange(projektiId?: number, perusteId?: number): Promise<any>;
 
   async mounted() {
+    console.log('mounted');
+    if (!this.perusteStore.peruste.value) {
+      await this.fetch();
+    }
+  }
+
+  @Watch('projektiId')
+  async onProjektiChangeImpl(newValue: string, oldValue: string) {
+
+    console.log(newValue, oldValue);
+
+    if (newValue && newValue !== oldValue) {
+      await this.fetch();
+    }
+  }
+
+  async fetch() {
     window.scrollTo(0, 0);
     this.kayttajaStore.clear();
     this.muokkaustietoStore.clear();
@@ -90,6 +105,6 @@ export class PerusteprojektiRoute extends Vue {
     await this.kayttajaStore.setPerusteprojekti(projektiId);
     await this.perusteStore.init(projektiId);
     await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
+    console.log('fetch end');
   }
-
 }

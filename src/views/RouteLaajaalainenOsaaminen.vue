@@ -92,7 +92,6 @@ export default class RouteLaajaalainenOsaaminen extends Vue {
   }
 
   public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
     const tkstore = new LaajaalainenOsaaminenStore(this.perusteId!, Number(this.laajaalainenosaaminenId), this.versionumero);
     this.store = new EditointiStore(tkstore);
   }

@@ -123,7 +123,6 @@ export default class RouteOsaamiskokonaisuus extends Vue {
   }
 
   async fetch() {
-    await this.perusteStore.blockUntilInitialized();
     const store = new OsaamiskokonaisuusStore(this.perusteId!, Number(this.osaamiskokonaisuusId), this.versionumero);
     this.editointiStore = new EditointiStore(store);
   }

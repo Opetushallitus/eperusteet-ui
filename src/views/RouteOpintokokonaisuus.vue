@@ -201,7 +201,6 @@ export default class RouteOpintokokonaisuus extends Vue {
   }
 
   public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
     const tkstore = new OpintokokonaisuusStore(this.perusteId!, Number(this.opintokokonaisuusId), this.versionumero);
     this.store = new EditointiStore(tkstore);
   }

@@ -293,7 +293,6 @@ export default class RouteKoulutuksenOsa extends Vue {
   }
 
   public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
     const tkstore = new KoulutuksenOsaStore(this.perusteId!, Number(this.koulutuksenosaId), this.versionumero);
     this.store = new EditointiStore(tkstore);
     this.tempNimiValue = null;

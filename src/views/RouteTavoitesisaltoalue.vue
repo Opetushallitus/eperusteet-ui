@@ -103,7 +103,6 @@ export default class RouteTavoitesisaltoalue extends Vue {
   }
 
   public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
     const tkstore = new TavoitesisaltoalueStore(this.perusteId!, Number(this.tavoitesisaltoalueId), this.versionumero);
     this.store = new EditointiStore(tkstore);
   }

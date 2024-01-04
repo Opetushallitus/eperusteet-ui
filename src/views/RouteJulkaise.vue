@@ -222,11 +222,11 @@ import { requiredIf } from 'vuelidate/lib/validators';
     EpJulkaisuMuutosmaarays,
   },
 })
-export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
+export default class RouteJulkaise extends PerusteprojektiRoute {
   @Prop({ required: true })
   protected perusteStore!: PerusteStore;
 
-  @Prop({ required: true })
+  @Prop()
   protected tiedotSivu!: Location;
 
   private julkaisu = {
@@ -292,7 +292,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
     }
   }
 
-  protected async onProjektiChange() {
+  async onProjektiChange() {
   }
 
   async validoi() {

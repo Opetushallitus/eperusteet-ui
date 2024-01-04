@@ -195,29 +195,6 @@ export class PerusteStore implements IEditoitava {
     return node;
   }
 
-  public async blockUntilInitialized(): Promise<void> {
-    // return new Promise<void>(resolve => {
-    //   if (this.state.isInitialized) {
-    //     resolve();
-    //   }
-    //   else {
-    //     this.blocklist.push(resolve);
-    //   }
-    // });
-    return new Promise<void>(resolve => resolve());
-  }
-
-  // private readonly blockResolver = watch(() => {
-  //   if (this.state.isInitialized) {
-  //     while (this.blocklist.length > 0) {
-  //       const fn = this.blocklist.shift();
-  //       if (fn) {
-  //         fn();
-  //       }
-  //     }
-  //   }
-  // });
-
   async julkaise(tiedot: any) {
     const projektiId = this.state.projekti?.id;
     if (projektiId) {

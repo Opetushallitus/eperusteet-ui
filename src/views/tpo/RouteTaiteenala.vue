@@ -97,7 +97,6 @@ export default class RouteTaiteenala extends Vue {
   }
 
   public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
     const store = new TaiteenalaStore(this.perusteId!, this.taiteenalaId, this.versionumero, !!this.uusi);
     this.store = new EditointiStore(store);
   }

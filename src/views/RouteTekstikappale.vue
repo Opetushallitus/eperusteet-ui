@@ -174,7 +174,6 @@ export default class RouteTekstikappale extends Vue {
   }
 
   async fetch() {
-    await this.perusteStore.blockUntilInitialized();
     const tkstore = new TekstikappaleStore(this.perusteId!, Number(this.tekstikappaleId), this.versionumero);
     this.store = new EditointiStore(tkstore);
   }
