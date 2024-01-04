@@ -36,12 +36,6 @@ export class PerusteprojektiRoute extends Vue {
     return browserStore.navigationVisible.value;
   }
 
-  private isInitingProjekti = false;
-
-  protected get isInitializing() {
-    return this.isInitingProjekti;
-  }
-
   protected get projektiId() {
     return this.$route.params.projektiId;
   }
@@ -85,30 +79,17 @@ export class PerusteprojektiRoute extends Vue {
   protected async onProjektiChange(projektiId: number, perusteId: number) {
   }
 
-  @Watch('projektiId', { immediate: true })
-  async onProjektiChangeImpl(newValue: string, oldValue: string) {
-    if (newValue && newValue !== oldValue && !this.isInitingProjekti) {
-      const projektiId = _.parseInt(newValue);
-      this.isInitingProjekti = true;
-      window.scrollTo(0, 0);
-      try {
-        this.kayttajaStore.clear();
-        this.muokkaustietoStore.clear();
-        this.aikatauluStore.clear();
-        this.tiedotteetStore.clear();
-        this.tyoryhmaStore.clear();
-        await this.kayttajaStore.setPerusteprojekti(projektiId);
-        await this.perusteStore.init(projektiId);
-        await this.perusteStore.blockUntilInitialized();
-        await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
-      }
-      catch (err) {
-        console.error(err);
-        throw err;
-      }
-      finally {
-        this.isInitingProjekti = false;
-      }
-    }
+  async mounted() {
+    window.scrollTo(0, 0);
+    this.kayttajaStore.clear();
+    this.muokkaustietoStore.clear();
+    this.aikatauluStore.clear();
+    this.tiedotteetStore.clear();
+    this.tyoryhmaStore.clear();
+    const projektiId = _.parseInt(this.projektiId);
+    await this.kayttajaStore.setPerusteprojekti(projektiId);
+    await this.perusteStore.init(projektiId);
+    await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
   }
+
 }

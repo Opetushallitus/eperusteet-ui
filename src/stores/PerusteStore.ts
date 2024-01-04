@@ -20,9 +20,7 @@ export class PerusteStore implements IEditoitava {
     peruste: null as PerusteDto | null,
     navigation: null as NavigationNodeDto | null,
     perusteId: null as number | null,
-    isInitialized: false,
     julkaisut: null as JulkaisuBaseDto[] | null,
-    initializing: false,
     validoinnit: null as Array<Validointi> | null,
     julkaisemattomiaMuutoksia: null as boolean | null,
     viimeisinJulkaisuTila: null as string | null,
@@ -120,41 +118,29 @@ export class PerusteStore implements IEditoitava {
   }
 
   async init(projektiId: number) {
-    if (this.state.initializing || (this.state.isInitialized && projektiId === this.projektiId.value)) {
+    if (projektiId === this.projektiId.value) {
       return;
     }
 
-    try {
-      this.state.initializing = true;
-      this.state.isInitialized = false;
-      this.state.peruste = null;
-      this.state.projekti = null;
-      this.state.validoinnit = null;
-      this.state.julkaisut = null;
-      Murupolku.tyhjenna();
-      this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
-      const perusteId = Number((this.state.projekti as any)._peruste);
-      this.state.perusteId = perusteId;
+    this.state.peruste = null;
+    this.state.projekti = null;
+    this.state.validoinnit = null;
+    this.state.julkaisut = null;
+    Murupolku.tyhjenna();
+    this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
+    const perusteId = Number((this.state.projekti as any)._peruste);
+    this.state.perusteId = perusteId;
 
-      [
-        this.state.peruste,
-        this.state.navigation,
-      ] = _.map(await Promise.all([
-        Perusteet.getPerusteenTiedot(perusteId),
-        Perusteet.getNavigation(perusteId),
-      ]), 'data');
+    [
+      this.state.peruste,
+      this.state.navigation,
+    ] = _.map(await Promise.all([
+      Perusteet.getPerusteenTiedot(perusteId),
+      Perusteet.getNavigation(perusteId),
+    ]), 'data');
 
-      await this.updateValidointi();
-      await this.fetchJulkaisut();
-
-      this.state.isInitialized = true;
-    }
-    catch (err) {
-      console.error(err);
-    }
-    finally {
-      this.state.initializing = false;
-    }
+    await this.updateValidointi();
+    await this.fetchJulkaisut();
   }
 
   async fetchMaarays() {
