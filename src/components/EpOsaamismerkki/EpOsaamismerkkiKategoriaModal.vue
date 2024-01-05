@@ -102,7 +102,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   private imageWidth: number = 0;
   private imageHeight: number = 0;
   private imageMaxDimension: string = '200x200';
-  private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv]
+  private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv];
   private mimeTypes: string[] = ['image/jpeg, image/png, image/svg+xml'];
   private allowedTypes: string = '.jpeg .png .svg';
 
@@ -114,7 +114,7 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
         binarydata: notNull(),
       },
     },
-  }
+  };
 
   async tallenna() {
     this.tallennetaan = true;

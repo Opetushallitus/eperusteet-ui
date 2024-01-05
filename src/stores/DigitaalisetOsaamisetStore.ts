@@ -10,7 +10,7 @@ Vue.use(VueCompositionApi);
 
 export class DigitaalisetOsaamisetStore implements IProjektiProvider {
   constructor(
-    private overrides = {} as PerusteQuery & any
+    private overrides = {} as PerusteQuery & any,
   ) {
   }
 
@@ -18,7 +18,7 @@ export class DigitaalisetOsaamisetStore implements IProjektiProvider {
     ownProjects: null as PerusteprojektiListausDto[] | null,
     projects: null as Page<PerusteprojektiKevytDto> | null,
     perusteQuery: {} as PerusteQuery,
-  })
+  });
 
   public readonly ownProjects = computed(() => this.state.ownProjects);
   public readonly projects = computed(() => this.state.projects);
@@ -28,7 +28,7 @@ export class DigitaalisetOsaamisetStore implements IProjektiProvider {
       [
         this.findPerusteet({ tila: ['LAADINTA'] }),
         this.findPerusteet({ tila: ['JULKAISTU'] }),
-      ]
+      ],
     ), 'data') as any;
     this.state.ownProjects = _.uniqBy([...res[0], ...res[1]], projekti => projekti.id);
   }

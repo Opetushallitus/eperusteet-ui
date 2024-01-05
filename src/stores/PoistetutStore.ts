@@ -8,7 +8,7 @@ Vue.use(VueCompositionApi);
 export class PoistetutStore {
   public state = reactive({
     poistetut: null as PoistettuSisaltoDto[] | null,
-  })
+  });
 
   public readonly poistetut = computed(() => this.state.poistetut);
 

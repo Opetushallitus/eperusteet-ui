@@ -9,7 +9,7 @@ export class MuutMaarayksetStore {
   private state = reactive({
     maaraykset: null as MuuMaaraysDto[] | null,
 
-  })
+  });
 
   public readonly maaraykset = computed(() => this.state.maaraykset);
 

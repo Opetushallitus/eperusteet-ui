@@ -10,7 +10,7 @@ export class OppaatStore {
   private state = reactive({
     oppaat: null as PerusteHakuDto[] | null,
 
-  })
+  });
 
   public readonly oppaat = computed(() => this.state.oppaat);
 

@@ -51,7 +51,7 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async save(data) {
-    let rakenne = data.rakenne;
+    const rakenne = data.rakenne;
     if (rakenne?.muodostumisSaanto?.laajuus) {
       rakenne.muodostumisSaanto.laajuus.maksimi = rakenne.muodostumisSaanto.laajuus.minimi;
     }

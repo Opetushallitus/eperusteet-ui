@@ -26,12 +26,13 @@ export class JarjestysStore implements IEditoitava {
 
   public async load() {
     if (!_.isEmpty(this.stores)) {
-
       const datas = await Promise.all(_.map(this.stores, async (v, k) => ({
         [k]: await v.load(() => {}),
-      })) as any)
+      })) as any);
 
-      return  _.reduce(datas, function(memo, current) { return _.assign(memo, current) },  {})
+      return _.reduce(datas, function(memo, current) {
+        return _.assign(memo, current);
+      }, {});
     }
     return {};
   }

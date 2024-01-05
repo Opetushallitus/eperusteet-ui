@@ -14,7 +14,7 @@ interface Breadcrumb {
 export class BreadcrumbStore {
   private state = reactive({
     crumbs: [] as Breadcrumb[],
-  })
+  });
 
   public readonly breacrumbs = computed(() => this.state.crumbs);
 

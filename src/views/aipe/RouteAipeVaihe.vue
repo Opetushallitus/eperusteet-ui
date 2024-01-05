@@ -155,7 +155,7 @@ export default class RouteAipeVaihe extends Vue {
           ...this.store.data.value.opetuksenKohdealueet,
           {},
         ],
-      }
+      },
     );
   }
 
@@ -164,7 +164,7 @@ export default class RouteAipeVaihe extends Vue {
       {
         ...this.store.data.value,
         opetuksenKohdealueet: _.filter(this.store.data.value.opetuksenKohdealueet, kohdealue => kohdealue !== poistettavaKohdealue),
-      }
+      },
     );
   }
 

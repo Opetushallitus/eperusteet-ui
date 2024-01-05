@@ -188,9 +188,9 @@ export default class RouteMaaraysMuokkaus extends Vue {
   private JULKAISTU = MaaraysDtoTilaEnum.JULKAISTU;
   private LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
   private MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
-  private EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY
-  private MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA
-  private KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA
+  private EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
+  private MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
+  private KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
 
   private maaraysliittyy: 'eiliity' | 'muuttaa' | 'korvaa' = 'eiliity';
   private nimiSearchIdentity = nimiSearchIdentity;

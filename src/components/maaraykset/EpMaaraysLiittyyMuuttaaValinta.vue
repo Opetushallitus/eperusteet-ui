@@ -72,7 +72,7 @@ export default class EpMaaraysLiittyyMuuttaaValinta extends Vue {
   get model() {
     return this.value;
   }
-s
+s;
 get isRequired() {
   return this.isEditing ? ' *' : '';
 }

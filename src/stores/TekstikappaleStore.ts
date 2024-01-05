@@ -174,7 +174,7 @@ export class TekstikappaleStore implements IEditoitava {
                 nimi: otsikko,
                 osanTyyppi: 'tekstikappale',
               } as any,
-            }
+            },
           ));
           return tallennettu.data;
         }

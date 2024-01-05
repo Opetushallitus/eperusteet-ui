@@ -99,7 +99,7 @@ export default class RouteTiedotteet extends Vue {
 
   private sivu = 0;
   private perPage = 10;
-  private nimiFilter = ''
+  private nimiFilter = '';
   private sort = {};
   private valitutJulkaisupaikat: [] = [];
   private perusteet: PerusteKevytDto[] | null = null;
@@ -109,7 +109,7 @@ export default class RouteTiedotteet extends Vue {
       {
         sivu: this.sivu,
         sivukoko: 10,
-      }
+      },
     );
     this.perusteet = (await Perusteet.getJulkaistutPerusteet()).data;
   }
@@ -120,7 +120,7 @@ export default class RouteTiedotteet extends Vue {
       {
         sivu: 0,
         nimi: this.nimiFilter,
-      }
+      },
     );
   }
 
@@ -130,7 +130,7 @@ export default class RouteTiedotteet extends Vue {
       {
         sivu: 0,
         tiedoteJulkaisuPaikka: _.map(this.valitutJulkaisupaikat, 'value'),
-      }
+      },
     );
   }
 
@@ -139,7 +139,7 @@ export default class RouteTiedotteet extends Vue {
     this.fetch(
       {
         sivu: this.sivu,
-      }
+      },
     );
   }
 
@@ -150,7 +150,7 @@ export default class RouteTiedotteet extends Vue {
         sivu: 0,
         jarjestys: sort.sortBy,
         jarjestysNouseva: !sort.sortDesc,
-      }
+      },
     );
   }
 
@@ -159,7 +159,7 @@ export default class RouteTiedotteet extends Vue {
       {
         ...this.tiedotteetStore.options.value,
         ...query,
-      }
+      },
     );
   }
 
@@ -245,7 +245,7 @@ export default class RouteTiedotteet extends Vue {
               .value(),
             ..._.map(item.koulutustyypit, kt => this.$t(kt)),
           ],
-          ', '
+          ', ',
         );
       },
     }];

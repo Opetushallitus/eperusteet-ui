@@ -123,7 +123,7 @@ export default class EpJulkaisuForm extends Mixins(validationMixin) {
         required: requiredIf(() => this.julkaisu.liitteet.length > 0),
       },
     },
-  }
+  };
 
   lisaaLiite() {
     this.julkaisuLiitteet.push({

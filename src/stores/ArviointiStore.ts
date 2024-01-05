@@ -12,7 +12,7 @@ Vue.use(VueCompositionApi);
 
 export class ArviointiStore {
   constructor(
-    private kieliStore: KieliStore
+    private kieliStore: KieliStore,
   ) {
   }
 
@@ -21,7 +21,7 @@ export class ArviointiStore {
     geneeriset: null as GeneerinenArviointiasteikkoDto[] | null,
     closed: {} as { [id: number]: boolean },
     filterStr: '',
-  })
+  });
 
   public readonly arviointiasteikot = computed(() => this.state.arviointiasteikot);
   public readonly geneeriset = computed(() => this.state.geneeriset);

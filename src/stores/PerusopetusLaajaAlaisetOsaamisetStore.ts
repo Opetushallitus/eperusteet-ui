@@ -13,7 +13,7 @@ export class PerusopetusLaajaAlaisetOsaamisetStore {
 
   public state = reactive({
     laajaAlaisetOsaamiset: null as LaajaalainenOsaaminenDto[] | null,
-  })
+  });
 
   public readonly laajaAlaisetOsaamiset = computed(() => this.state.laajaAlaisetOsaamiset);
 

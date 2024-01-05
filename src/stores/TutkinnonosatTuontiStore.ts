@@ -12,7 +12,7 @@ export class TutkinnonosatTuontiStore {
   public state = reactive({
     perusteet: null as Page<PerusteHakuInternalDto> | null,
     tutkinnonosat: null as Page<TutkinnonOsaViiteKontekstiDto> | null,
-  })
+  });
 
   constructor(
     private readonly peruste: PerusteDto) {

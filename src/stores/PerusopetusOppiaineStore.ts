@@ -101,7 +101,7 @@ export class PerusopetusOppiaineStore implements IEditoitava {
   public static async create(perusteId, parentId?) {
     let tallennettavaParentId = parentId;
     if (parentId) {
-      let parentOppiaine = (await PerusopetuksenPerusteenSisalto.getPerusopetusOppiaine(perusteId, parentId)).data;
+      const parentOppiaine = (await PerusopetuksenPerusteenSisalto.getPerusopetusOppiaine(perusteId, parentId)).data;
       if (_.get(parentOppiaine, '_oppiaine')) {
         tallennettavaParentId = _.get(parentOppiaine, '_oppiaine');
       }
@@ -117,7 +117,7 @@ export class PerusopetusOppiaineStore implements IEditoitava {
         kohdealueet: [],
         vuosiluokkakokonaisuudet: [],
         ...(tallennettavaParentId && { _oppiaine: _.toNumber(tallennettavaParentId) }),
-      }
+      },
     )).data;
   }
 
@@ -149,7 +149,7 @@ export class PerusopetusOppiaineStore implements IEditoitava {
   }
 
   public static async setOppiaineKoosteinen(perusteId, oppiaineId) {
-    let oppiaine = (await PerusopetuksenPerusteenSisalto.getPerusopetusOppiaine(perusteId, oppiaineId)).data;
+    const oppiaine = (await PerusopetuksenPerusteenSisalto.getPerusopetusOppiaine(perusteId, oppiaineId)).data;
     oppiaine.koosteinen = true;
     await PerusopetusOppiaineLukko.lockPerusopetusOppiaine(perusteId, oppiaineId);
     await PerusopetuksenPerusteenSisalto.updatePerusopetusOppiaine(perusteId, oppiaineId, oppiaine);

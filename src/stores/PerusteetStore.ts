@@ -10,7 +10,7 @@ Vue.use(VueCompositionApi);
 
 export class PerusteetStore implements IProjektiProvider {
   constructor(
-    private overrides = {} as PerusteQuery & any
+    private overrides = {} as PerusteQuery & any,
   ) {
   }
 
@@ -18,7 +18,7 @@ export class PerusteetStore implements IProjektiProvider {
     ownProjects: null as PerusteprojektiListausDto[] | null,
     projects: null as Page<PerusteprojektiKevytDto> | null,
     perusteQuery: {} as PerusteQuery,
-  })
+  });
 
   public readonly ownProjects = computed(() => {
     if (this.state.ownProjects) {

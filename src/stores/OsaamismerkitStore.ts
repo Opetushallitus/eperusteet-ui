@@ -11,7 +11,7 @@ export class OsaamismerkitStore {
     isLoading: false,
     kokonaismaara: 0,
     kategoriat: [] as OsaamismerkkiKategoriaDto[] | null,
-  })
+  });
 
   public readonly osaamismerkkiPage = computed(() => this.state.osaamismerkkiPage);
   public readonly osaamismerkit = computed(() => this.state.osaamismerkkiPage?.data || null);

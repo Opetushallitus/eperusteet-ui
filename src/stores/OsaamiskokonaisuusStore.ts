@@ -42,7 +42,7 @@ export class OsaamiskokonaisuusStore extends AbstractPerusteenOsaViiteStore {
       const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
         OsaamiskokonaisuusStore.config.perusteStore.perusteId.value!,
         OsaamiskokonaisuusStore.config?.perusteStore.perusteSuoritustapa.value!,
-        perusteenOsa
+        perusteenOsa,
       ));
       return tallennettu.data;
     }
@@ -51,7 +51,7 @@ export class OsaamiskokonaisuusStore extends AbstractPerusteenOsaViiteStore {
         OsaamiskokonaisuusStore.config.perusteStore.perusteId.value!,
         OsaamiskokonaisuusStore.config?.perusteStore.perusteSuoritustapa.value!,
         tekstikappaleIsa.id,
-        perusteenOsa
+        perusteenOsa,
       ));
 
       return tallennettu.data;

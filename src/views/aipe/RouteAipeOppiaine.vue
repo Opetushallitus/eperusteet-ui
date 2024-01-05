@@ -255,7 +255,7 @@ export default class RouteAipeOppiaine extends Vue {
             arvioinninkohteet: [],
           },
         ],
-      }
+      },
     );
   }
 
@@ -264,7 +264,7 @@ export default class RouteAipeOppiaine extends Vue {
       {
         ...this.store.data.value,
         tavoitteet: _.reject(this.store.data.value.tavoitteet, poistettavaTavoite),
-      }
+      },
     );
   }
 }

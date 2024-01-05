@@ -76,7 +76,7 @@ export default class RouteMuutMaaraykset extends Vue {
   private tutoriaaliStore!: TutoriaaliStore;
 
   private perPage = 10;
-  private nimiFilter = ''
+  private nimiFilter = '';
 
   async mounted() {
     await this.muutMaarayksetStore.fetch();

@@ -10,7 +10,7 @@ export class AikatauluStore {
   private state = reactive({
     aikataulutapahtumat: null as Tapahtuma[] | null,
     peruste: null as PerusteDto | null,
-  })
+  });
 
   public readonly aikataulutapahtumat = computed(() => this.state.peruste?.perusteenAikataulut);
   public readonly peruste = computed(() => this.state.peruste);

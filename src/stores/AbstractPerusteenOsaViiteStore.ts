@@ -95,7 +95,7 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
       const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
         AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value!,
         AbstractPerusteenOsaViiteStore.config?.perusteStore.perusteSuoritustapa.value!,
-        perusteenOsa
+        perusteenOsa,
       ));
       return tallennettu.data;
     }
@@ -104,7 +104,7 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
         AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value!,
         AbstractPerusteenOsaViiteStore.config?.perusteStore.perusteSuoritustapa.value!,
         tekstikappaleIsa.id,
-        perusteenOsa
+        perusteenOsa,
       ));
       return tallennettu.data;
     }
