@@ -13,7 +13,7 @@
       </div>
     </template>
 
-    <EpMuutosmaarays class="mb-4" v-model="muutosmaarays" :isEditing="true" :asiasanat="asiasanat"/>
+    <EpMuutosmaarays class="mb-4" v-model="muutosmaarays" :isEditing="true" :asiasanat="asiasanat" :maarayksetNimella="maarayksetNimella"/>
 
     <div class="d-flex ">
       <div class="mr-auto">
@@ -54,7 +54,7 @@ import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue
 import { Validations } from 'vuelidate-property-decorators';
 import { requiredOneLang } from '@shared/validators/required';
 import { required } from 'vuelidate/lib/validators';
-import { Maaraykset } from '@shared/api/eperusteet';
+import { Maaraykset, MaaraysKevytDto } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -72,6 +72,7 @@ export default class EpMuutosmaaraysModal extends Vue {
   private tallennetaan: boolean = false;
   private poistetaan: boolean = false;
   private asiasanat: { [key: string]: string[]; } | null = null;
+  private maarayksetNimella: MaaraysKevytDto[] | null = null;
 
   async tallenna() {
     this.tallennetaan = true;
@@ -116,6 +117,7 @@ export default class EpMuutosmaaraysModal extends Vue {
     }
     (this.$refs['muutosmaaraysModal'] as any).show();
     this.asiasanat = (await Maaraykset.getAsiasanat()).data;
+    this.maarayksetNimella = (await Maaraykset.getMaarayksetNimet()).data;
   }
 
   async poista() {

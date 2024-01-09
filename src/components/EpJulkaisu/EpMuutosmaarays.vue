@@ -1,5 +1,5 @@
 <template>
-  <EpSpinner v-if="!asiasanat" />
+  <EpSpinner v-if="!asiasanat || !maarayksetNimella" />
   <div v-else>
     <b-form-group :label="$t('lataa-uusi-muutosmaarays') + isRequired" class="w-40">
         <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
@@ -19,6 +19,14 @@
 
       <b-form-group :label="$t('maarays-annettu') + isRequired" class="mt-4 d-flex">
         <ep-datepicker v-model="model.maarayspvm" :isEditing="isEditing" />
+      </b-form-group>
+
+      <b-form-group :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired" class="mt-4">
+        <EpMaaraysLiittyyMuuttaaValinta
+          v-model="model"
+          :isEditing="isEditing"
+          :maarayksetNimella="maarayksetNimella"
+          :disabloidutValinnat="disabloidutMuuttaaValinnat"/>
       </b-form-group>
 
       <b-form-group :label="$t('asiasana')" class="mt-4">
@@ -69,6 +77,9 @@ export default class EpMuutosmaarays extends Vue {
   @Prop({ required: true })
   asiasanat!: { [key: string]: string[]; };
 
+  @Prop({ required: true })
+  maarayksetNimella!: MaaraysKevytDto[];
+
   set model(val) {
     this.$emit('input', val);
   }
@@ -91,6 +102,10 @@ export default class EpMuutosmaarays extends Vue {
     }
 
     return this.asiasanat[this.kieli];
+  }
+
+  get disabloidutMuuttaaValinnat() {
+    return [MaaraysDtoLiittyyTyyppiEnum.EILIITY];
   }
 }
 </script>
