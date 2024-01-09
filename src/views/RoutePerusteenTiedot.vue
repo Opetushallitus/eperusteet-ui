@@ -33,10 +33,14 @@
                 </b-col>
                 <b-col lg="6" v-if="filtersContain('diaarinumero')" class="mb-4">
                   <b-form-group :label="$t('diaarinumero')">
-                    <ep-input v-model="data.diaarinumero"
-                              type="string"
-                              :is-editing="isEditing"
-                              :validation="validation.diaarinumero"></ep-input>
+                    <div class="d-flex">
+                      <ep-input v-model="data.diaarinumero"
+                                type="string"
+                                :is-editing="isEditing"
+                                :validation="validation.diaarinumero"
+                                class="w-80"></ep-input>
+                      <EpInfoPopover v-if="isEditing" class="info ml-2">{{ $t('diaarinumeron-muoto') }}</EpInfoPopover>
+                    </div>
                   </b-form-group>
                 </b-col>
                 <b-col lg="6" v-if="filtersContain('paatospaivamaara')" class="mb-4">
@@ -446,6 +450,7 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import { UiKielet, Kielet } from '@shared/stores/kieli';
 import _ from 'lodash';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
+import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
@@ -473,6 +478,7 @@ const koulutustyyppiTietoFilters = [
 
 @Component({
   components: {
+    EpInfoPopover,
     EpButton,
     EpCollapse,
     EpContent,
@@ -953,6 +959,10 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 hr {
   border-top-color: $gray;
   margin-bottom: 3rem;
+}
+
+.info {
+  align-self: center;
 }
 
 </style>
