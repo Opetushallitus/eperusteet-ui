@@ -29,43 +29,30 @@
       </div>
     </ep-collapse>
 
-    <ep-collapse class="collapsable"
-                 :collapsable="!isEditing"
-                 :border-bottom="isEditing"
-                 :class="{'mb-4': !isEditing}"
-                 v-for="(vt, index) in model.vapaatTekstit" :key="'vt' + index">
-      <template #header>
-        <h4 v-if="!isEditing">{{ $kaanna(vt.nimi)}}</h4>
+    <EpDraggableCollapse v-model="model.vapaatTekstit" :isEditing="isEditing">
+      <template #header="{data}" v-if="!isEditing">
+        <h4 v-if="!isEditing">{{ $kaanna(data.nimi)}}</h4>
       </template>
 
-      <draggable v-bind="defaultDragOptions"
-                 tag="div"
-                 v-model="model.vapaatTekstit">
-        <div v-for="(teksti, index) in model.vapaatTekstit" :key="'teksti' + index">
-          <div v-if="isEditing" class="d-flex">
-            <div class="order-handle">
-              <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-            </div>
-            <h4 class="otsikko">{{$t('tekstikappaleen-otsikko')}}</h4>
-          </div>
-          <ep-input v-if="isEditing" v-model="teksti.nimi" :is-editing="isEditing"></ep-input>
+      <template #default="{data}">
+        <h4 v-if="isEditing" class="otsikko">{{$t('tekstikappaleen-otsikko')}}</h4>
+        <ep-input v-if="isEditing" v-model="data.nimi" :is-editing="isEditing"></ep-input>
 
-          <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
-          <ep-content layout="normal" v-model="teksti.teksti" :is-editable="isEditing"> </ep-content>
+        <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
+        <ep-content layout="normal" v-model="data.teksti" :is-editable="isEditing"> </ep-content>
 
-          <div class="d-flex justify-content-between mt-1" v-if="isEditing">
-            <ep-button variant="outline-primary" icon="add" v-if="index+1 === vapaatTekstit.length" @click="lisaaTekstikappale()">
-              {{ $t('lisaa-tekstikappale') }}
-            </ep-button>
-            <div v-else/>
+        <div class="d-flex justify-content-between mt-1" v-if="isEditing">
+          <ep-button variant="outline-primary" icon="add" @click="lisaaTekstikappale()">
+            {{ $t('lisaa-tekstikappale') }}
+          </ep-button>
 
-            <ep-button variant="link" icon="delete" @click="poistaTeksti(teksti)">
-              {{ $t('poista-tekstikappale') }}
-            </ep-button>
-          </div>
+          <ep-button variant="link" icon="delete" @click="poistaTeksti(data)">
+            {{ $t('poista-tekstikappale') }}
+          </ep-button>
         </div>
-      </draggable>
-    </ep-collapse>
+
+      </template>
+    </EpDraggableCollapse>
 
     <ep-button variant="outline-primary" icon="add" v-if="isEditing && sisaltoTekstiAvaimet.length === 0 && vapaatTekstit.length === 0" @click="lisaaTekstikappale()">
       {{ $t('lisaa-tekstikappale') }}
@@ -81,18 +68,18 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpDraggableCollapse from '@shared/components/EpDraggableCollapse/EpDraggableCollapse.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 
 @Component({
   components: {
+    EpDraggableCollapse,
     draggable,
     EpCollapse,
     EpInput,
     EpButton,
     EpContent,
-    EpMaterialIcon,
   },
 })
 export default class EpSisaltoTekstikappaleet extends Vue {
