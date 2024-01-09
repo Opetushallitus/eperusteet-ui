@@ -315,6 +315,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       this.julkaisu.julkinen = true;
       this.julkaisu.muutosmaaraysVoimaan = null;
       this.julkaisu.liitteet = [];
+      this.julkaisu.liittyyMuutosmaarays = false;
       this.initMaarays();
       this.$success(this.$t('julkaisu-kaynnistetty') as string);
     }
