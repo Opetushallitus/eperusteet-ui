@@ -86,7 +86,11 @@
             <ep-input v-model="data.nimi" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')" :validation="$v.data.nimi"/>
           </b-form-group>
 
-          <b-form-group :label="$t('projektin-diaarinumero')">
+          <b-form-group>
+            <div class="d-flex">
+              <h4 slot="label">{{$t('projektin-diaarinumero')}}</h4>
+              <EpInfoPopover class="ml-2">{{ $t('diaarinumeron-muoto') }}</EpInfoPopover>
+            </div>
             <ep-input v-model="data.diaarinumero" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-diaarinumero')" :validation="$v.data.diaarinumero"/>
           </b-form-group>
 
