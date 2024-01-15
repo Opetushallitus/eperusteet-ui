@@ -3,6 +3,37 @@
     <h4 v-if="isEditing" class="mt-4">{{$t('tavoitteen-nimi')}}</h4>
     <ep-input v-if="isEditing" v-model="model.tavoite" :is-editing="isEditing"></ep-input>
 
+    <b-form-group class="mt-4" :label="$t('opetuksen-tavoitteet')">
+      <draggable v-bind="defaultDragOptions"
+                 tag="div"
+                 v-model="model.oppiaineenTavoitteenOpetuksenTavoitteet">
+        <div class="row mb-2" v-for="(tavoite, i) in model.oppiaineenTavoitteenOpetuksenTavoitteet" :key="'tavoite'+i">
+          <div class="col">
+            <EpInput v-model="tavoite.tavoite"
+                     :is-editing="isEditing"
+                     class="input-wrapper">
+              <div class="order-handle m-2" slot="left">
+                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+              </div>
+            </EpInput>
+          </div>
+          <div class="col-1">
+            <EpButton v-if="isEditing"
+                      @click="poistaOsaamisenTavoite(tavoite)"
+                      variant="link"
+                      icon="delete">
+            </EpButton>
+          </div>
+        </div>
+      </draggable>
+      <EpButton v-if="isEditing"
+                @click="lisaaOsaamisenTavoite"
+                variant="outline-primary"
+                icon="add">
+        {{ $t('lisaa-osaamistavoite') }}
+      </EpButton>
+    </b-form-group>
+
     <h4 class="mt-4">{{$t('tavoitteista-johdetut-oppimisen-tavoitteet')}}</h4>
     <ep-content layout="normal" v-model="model.tavoitteistaJohdetutOppimisenTavoitteet" :is-editable="isEditing"> </ep-content>
 
@@ -117,7 +148,9 @@
           <ep-input v-model="arvioinninkohde.osaamisenKuvaus" :is-editing="isEditing"></ep-input>
         </b-col>
         <b-col cols="1" class="text-center">
-          <fas icon="roskalaatikko" class="default-icon clickable mt-2" @click="poistaArviointi(arvioinninkohde)"/>
+          <div class="default-icon clickable mt-2" @click="poistaArviointi(arvioinninkohde)">
+            <EpMaterialIcon icon-shape="outlined" :color="'inherit'">delete</EpMaterialIcon>
+          </div>
         </b-col>
       </b-row>
     </template>
@@ -159,12 +192,11 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { Kielet, KieliStore } from '@shared/stores/kieli';
+import { Kielet } from '@shared/stores/kieli';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
-import { unescapeStringHtml } from '@shared/utils/inputs';
 
 interface OppiaineenTavoiteSupportData {
   kohdealueet: any[];
@@ -299,6 +331,23 @@ export default class EpOppiaineenTavoite extends Vue {
 
   get arvioinninKohteetSorted() {
     return _.sortBy(this.model.arvioinninkohteet, 'arvosana');
+  }
+
+  poistaOsaamisenTavoite(poistettavaTavoite) {
+    this.model.oppiaineenTavoitteenOpetuksenTavoitteet = _.filter(this.model.oppiaineenTavoitteenOpetuksenTavoitteet, (tavoite) => tavoite !== poistettavaTavoite);
+  }
+
+  lisaaOsaamisenTavoite() {
+    if (!this.model.oppiaineenTavoitteenOpetuksenTavoitteet) {
+      this.model.oppiaineenTavoitteenOpetuksenTavoitteet = [];
+    }
+    this.model.oppiaineenTavoitteenOpetuksenTavoitteet?.push({ tavoite: undefined });
+  }
+
+  get defaultDragOptions() {
+    return {
+      ...DEFAULT_DRAGGABLE_PROPERTIES,
+    };
   }
 }
 </script>
