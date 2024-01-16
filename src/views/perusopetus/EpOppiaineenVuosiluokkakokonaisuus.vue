@@ -119,6 +119,7 @@ export default class EpOppiaineenVuosiluokkakokonaisuus extends Vue {
         laajattavoitteet: [],
         arvioinninkohteet: [],
         sisaltoalueet: [],
+        oppiaineenTavoitteenOpetuksenTavoitteet: [],
       },
     ];
   }

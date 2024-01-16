@@ -315,16 +315,6 @@ export default class EpOppiaineenTavoite extends Vue {
     this.model.arvioinninkohteet = _.filter(this.model.arvioinninkohteet, arvioinninkohde => arvioinninkohde !== arviointi);
   }
 
-  get arvioinnitDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'arvioinnit',
-      },
-    };
-  }
-
   poistaTavoite() {
     this.$emit('poista', this.model);
   }
@@ -338,9 +328,6 @@ export default class EpOppiaineenTavoite extends Vue {
   }
 
   lisaaOsaamisenTavoite() {
-    if (!this.model.oppiaineenTavoitteenOpetuksenTavoitteet) {
-      this.model.oppiaineenTavoitteenOpetuksenTavoitteet = [];
-    }
     this.model.oppiaineenTavoitteenOpetuksenTavoitteet?.push({ tavoite: undefined });
   }
 
