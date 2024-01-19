@@ -256,7 +256,6 @@
                     <h3 slot="label">{{$t('muutosmaaraykset')}}</h3>
                     <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
                                         :is-editing="isEditing"
-                                        :liitteet="liitteetFiltered"
                                         :perusteStore="perusteStore" />
                   </b-form-group>
                 </b-col>
@@ -524,10 +523,6 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       lisatieto: liite.lisatieto || '',
       url: baseURL + LiitetiedostotParam.getLiite(this.perusteId!, liite.id!).url,
     }));
-  }
-
-  get liitteetFiltered() {
-    return _.reject(this.liitteet, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KOULUTUSVIENNINOHJE) || liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KAANNOS));
   }
 
   get koulutusvienninOhjeet() {
