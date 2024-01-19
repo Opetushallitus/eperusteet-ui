@@ -91,9 +91,6 @@ export default class EpMuutosmaaraykset extends Vue {
   @Prop({ required: true })
   private value!: any[];
 
-  @Prop({ required: true })
-  private liitteet!: LiiteDto[];
-
   @Prop({ default: false })
   private isEditing!: boolean;
 
