@@ -2,12 +2,12 @@
   <EpMainView>
     <template slot="header">
       <div class="d-flex justify-content-between">
-        <h1>{{ $t('osaamismerkki-kategorioiden-hallinta') }}</h1>
+        <h1>{{ $t('osaamismerkki-teemojen-hallinta') }}</h1>
         <div class="d-flex">
           <EpButton class="m-0 p-0"
                     variant="outlined"
                     icon="add"
-                    @click="avaaKategoriaModal">{{$t('lisaa-kategoria')}}</EpButton>
+                    @click="avaaKategoriaModal">{{$t('lisaa-teema')}}</EpButton>
         </div>
       </div>
     </template>
@@ -55,7 +55,7 @@ export default class RouteOsaamismerkkiKategoriat extends Vue {
   private osaamismerkitStore!: OsaamismerkitStore;
 
   async mounted() {
-    Murupolku.aseta('osaamismerkkikategoriat', this.$t('route-osaamismerkkikategoriat'), {
+    Murupolku.aseta('osaamismerkkikategoriat', this.$t('route-osaamismerkkiteemat'), {
       name: 'osaamismerkkikategoriat',
     });
     await this.osaamismerkitStore.fetchKategoriat();
@@ -69,7 +69,7 @@ export default class RouteOsaamismerkkiKategoriat extends Vue {
     return [
       {
         key: 'nimi',
-        label: this.$t('kategoria-nimi'),
+        label: this.$t('teeman-nimi'),
         sortable: false,
         thStyle: { width: '50%', borderBottom: '0px' },
         formatter: (value: any, key: any, item: any) => {

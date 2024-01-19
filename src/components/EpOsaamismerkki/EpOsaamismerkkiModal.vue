@@ -47,11 +47,11 @@
         <EpInput v-model="osaamismerkki.nimi" :is-editing="true"/>
       </b-form-group>
 
-      <b-form-group :label="$t('kuvaus') + ' *'">
+      <b-form-group :label="$t('kuvaus')">
         <EpInput v-model="osaamismerkki.kuvaus" :is-editing="true"/>
       </b-form-group>
 
-      <b-form-group :label="$t('kategoria') + ' *'">
+      <b-form-group :label="$t('teema') + ' *'">
         <EpMultiSelect :is-editing="true"
                        :options="osaamismerkkiKategoriat"
                        v-model="osaamismerkki.kategoria"
@@ -190,7 +190,6 @@ export default class EpOsaamismerkkiModal extends Vue {
   validations = {
     osaamismerkki: {
       nimi: requiredLokalisoituTeksti(this.requiredKielet),
-      kuvaus: requiredLokalisoituTeksti(this.requiredKielet),
       kategoria: notNull(),
       voimassaoloAlkaa: notNull(),
       osaamistavoitteet: {

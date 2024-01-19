@@ -9,7 +9,7 @@
               <EpButton class="m-0 p-0"
                         variant="link"
                         icon="edit">
-                {{$t('kategorioiden-hallinta')}}
+                {{$t('teemojen-hallinta')}}
               </EpButton>
             </router-link>
             <EpButton class="m-0 p-0"
@@ -30,7 +30,7 @@
           </EpFormContent>
         </div>
         <div class="col-3">
-          <EpFormContent name="kategoria">
+          <EpFormContent name="teema">
             <EpMultiSelect v-model="kategoria"
                            :is-editing="true"
                            :options="osaamismerkkiKategoriaOptions"
@@ -222,7 +222,7 @@ export default class RouteOsaamismerkit extends Vue {
         },
       }, {
         key: 'kategoria',
-        label: this.$t('kategoria'),
+        label: this.$t('teema'),
         sortable: false,
         thStyle: { width: '20%', borderBottom: '2px' },
         formatter: (value: any, key: any, item: any) => {
