@@ -50,7 +50,7 @@ export class OsaamiskokonaisuusPaaAlueStore extends AbstractPerusteenOsaViiteSto
         OsaamiskokonaisuusPaaAlueStore.config.perusteStore.perusteId.value!,
         OsaamiskokonaisuusPaaAlueStore.config?.perusteStore.perusteSuoritustapa.value!,
         osaamiskokonaisuusId,
-        perusteenOsa
+        perusteenOsa,
     ));
 
     return tallennettu.data;

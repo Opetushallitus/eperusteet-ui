@@ -13,7 +13,7 @@ export class PerusopetusVuosiluokkakokonaisuudetStore {
 
   public state = reactive({
     vuosiluokkakokonaisuudet: null as VuosiluokkaKokonaisuusDto[] | null,
-  })
+  });
 
   public readonly vuosiluokkakokonaisuudet = computed(() => this.state.vuosiluokkakokonaisuudet);
 

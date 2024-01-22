@@ -158,7 +158,7 @@ export default class RouteMaaraysKokoelma extends Vue {
     jarjestysTapa: 'nimi',
     jarjestys: 'ASC',
     koulutustyyppi: null,
-  }
+  };
 
   async mounted() {
     Murupolku.aseta('maarayskokoelma', this.$t('route-maaraykset'), {
@@ -198,7 +198,7 @@ export default class RouteMaaraysKokoelma extends Vue {
     ];
   }
 
-  @Watch('sivu',)
+  @Watch('sivu')
   async sivuChange() {
     await this.fetch();
   }

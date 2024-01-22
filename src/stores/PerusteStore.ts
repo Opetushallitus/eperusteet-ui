@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
+import VueCompositionApi, { watch, reactive, computed, ref } from '@vue/composition-api';
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi, MaaraysDto, Maaraykset } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
@@ -9,7 +9,6 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
 import { fail } from '@shared/utils/notifications';
-import { MaarayksetEditStore } from './MaarayksetEditStore';
 
 Vue.use(VueCompositionApi);
 
@@ -51,6 +50,7 @@ export class PerusteStore implements IEditoitava {
   public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
   public readonly arkistointiReroute = computed(() => this.peruste.value?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
   public readonly muutosmaaraykset = computed(() => this.state.muutosmaaraykset ? _.reverse(_.sortBy(this.state.muutosmaaraykset, 'voimassaoloAlkaa')) : null);
+  public readonly isInitialized = computed(() => this.state.isInitialized);
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {
@@ -210,7 +210,7 @@ export class PerusteStore implements IEditoitava {
     return node;
   }
 
-  public async blockUntilInitialized() {
+  public async blockUntilInitialized(): Promise<void> {
     return new Promise(resolve => {
       if (this.state.isInitialized) {
         resolve();
@@ -221,7 +221,7 @@ export class PerusteStore implements IEditoitava {
     });
   }
 
-  private readonly blockResolver = watch(() => {
+  private readonly blockResolver = watch(this.isInitialized, () => {
     if (this.state.isInitialized) {
       while (this.blocklist.length > 0) {
         const fn = this.blocklist.shift();

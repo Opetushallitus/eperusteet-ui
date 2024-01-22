@@ -506,7 +506,7 @@ export default class EpPerusteprojektiListaus extends Vue {
         confirm: 'palauta-peruste-vahvistus',
         tila: 'laadinta',
         projektiId: item.id,
-      }
+      },
     );
     await this.onQueryChange(this.query);
     await this.provider.updateOwnProjects();

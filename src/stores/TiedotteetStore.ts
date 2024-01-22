@@ -15,7 +15,7 @@ export class TiedotteetStore implements ITiedotteetProvider {
     query: {} as TiedoteQuery,
     isLoading: false,
     kokonaismaara: 0,
-  })
+  });
 
   public readonly tiedotteet = computed(() => this.state.tiedotteetPage?.data || null);
   public readonly tiedotteetPage = computed(() => this.state.tiedotteetPage);

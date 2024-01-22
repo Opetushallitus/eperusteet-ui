@@ -7,8 +7,8 @@ export class MaintenanceStore {
 
   async exportPeruste() {
     const ladattuPeruste = (await Maintenance.viePeruste(this.perusteId!)) as any;
-    var fileURL = window.URL.createObjectURL(new Blob([ladattuPeruste]));
-    var fileLink = document.createElement('a');
+    const fileURL = window.URL.createObjectURL(new Blob([ladattuPeruste]));
+    const fileLink = document.createElement('a');
     fileLink.href = fileURL;
     fileLink.setAttribute('download', 'peruste.json');
     document.body.appendChild(fileLink);

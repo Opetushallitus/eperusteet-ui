@@ -152,7 +152,7 @@ export default class EpMuutosmaaraysModal extends Vue {
         maarayspvm: { required },
         liitteet: requireOneLiite(),
       },
-    }
+    };
 };
 </script>
 

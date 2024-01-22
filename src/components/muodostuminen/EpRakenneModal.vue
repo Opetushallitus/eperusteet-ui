@@ -188,7 +188,7 @@ export default class EpRakenneModal extends Vue {
     'rakenne-moduuli-ammatilliset': 'määritelty',
     'rakenne-moduuli-yhteiset': 'vieras',
     'rakenne-moduuli-paikalliset': 'määrittelemätön',
-  }
+  };
 
   set innerModel(innerModel) {
     this.$emit('input', innerModel);

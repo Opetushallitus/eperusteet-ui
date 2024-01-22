@@ -84,7 +84,7 @@ import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 })
 export default class EpMaaraysModal extends Vue {
   @Prop({ required: true })
-  private maarayksetStore!: MuutMaarayksetStore
+  private maarayksetStore!: MuutMaarayksetStore;
 
   private editing: boolean = false;
   private muokattavaMaarays: MaaraysDto | {} = {};
@@ -150,7 +150,7 @@ export default class EpMaaraysModal extends Vue {
           ...requiredLokalisoituTeksti(),
         },
       },
-    }
+    };
 }
 </script>
 

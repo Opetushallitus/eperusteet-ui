@@ -100,7 +100,7 @@ export default class RouteDigitaalisetOsaamiset extends Vue {
         confirm: 'palauta-peruste-vahvistus',
         tila: 'laadinta',
         projektiId: perusteprojekti.id,
-      }
+      },
     );
     await this.haePoistetut();
     await this.digitaalisetOsaamisetStore.updateOwnProjects();

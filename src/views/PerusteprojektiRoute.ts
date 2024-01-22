@@ -82,7 +82,7 @@ export class PerusteprojektiRoute extends Vue {
     }
   }
 
-  protected async onProjektiChange(projektiId: number, perusteId: number) {
+  protected async onProjektiChange(projektiId?: number, perusteId?: number) {
   }
 
   @Watch('projektiId', { immediate: true })

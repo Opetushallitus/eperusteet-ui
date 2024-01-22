@@ -161,7 +161,7 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
 </script>
 
 <style lang="scss" scoped>
-/deep/ .form-group {
+::v-deep .form-group {
   padding-right: 30px !important;
 }
 

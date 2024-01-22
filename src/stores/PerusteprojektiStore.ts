@@ -13,7 +13,7 @@ export class PerusteprojektiStore {
   public state = reactive({
     pohjat: null as PerusteKevytDto[] | null,
     perusteet: null as PerusteKevytDto[] | null,
-  })
+  });
 
   public readonly perusteet = computed(() => this.state.perusteet);
   public readonly pohjat = computed(() => this.state.pohjat);

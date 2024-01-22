@@ -48,7 +48,7 @@ import { Kielet } from '@shared/stores/kieli';
 })
 export default class EpTutkinnonOsaKaytossaModal extends Vue {
   @Prop({ required: true })
-  projektit!: PerusteprojektinPerusteenosaDto[]
+  projektit!: PerusteprojektinPerusteenosaDto[];
 
   @Prop({ required: false })
   alkuperainenPeruste!: PerusteInfoDto;

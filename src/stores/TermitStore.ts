@@ -50,7 +50,7 @@ export class TermitStore implements ITermiStore {
   }
 
   private makeKey(item) {
-    var termi = _.first(_.compact(_.values(item.termi))) || '';
+    const termi = _.first(_.compact(_.values(item.termi))) || '';
     return termi.replace(/[^a-zA-Z0-9]/g, '') + new Date().getTime();
   }
 

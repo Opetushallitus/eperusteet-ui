@@ -505,7 +505,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
         }),
       },
     },
-  }
+  };
 }
 </script>
 

@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
 
 const proxy = {
   '/eperusteet-service': {
@@ -28,6 +27,7 @@ module.exports = {
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     ],
   },
+
   chainWebpack: config => {
     // enabloidaan sourcemap ja nimetään "oikeat" vuen scirpti-tiedostot uudelleen, jotta löytyy selaimen devtoolsissa helpommin
     // esim. RouteRoot.vue?bf9d -> RouteRoot.vue?script

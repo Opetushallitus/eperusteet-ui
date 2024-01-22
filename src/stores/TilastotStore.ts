@@ -11,7 +11,7 @@ export class TilastotStore {
     opetussuunnitelmat: null as any[] | null,
     toteutussuunnitelmat: null as any[] | null,
     perusteet: null as any[] | null,
-  })
+  });
 
   public readonly opetussuunnitelmat = computed(() => this.state.opetussuunnitelmat);
   public readonly toteutussuunnitelmat = computed(() => this.state.toteutussuunnitelmat);
@@ -33,7 +33,7 @@ export class TilastotStore {
     }
 
     try {
-      this.state.perusteet = _.get((await Perusteet.getAllPerusteetInternal(
+      const perusteet = _.get((await Perusteet.getAllPerusteetInternal(
         undefined,
         1000,
         undefined,
@@ -44,6 +44,10 @@ export class TilastotStore {
         undefined,
         yleissivistavatKoulutustyypit,
       )).data, 'data');
+
+      if (perusteet) {
+        this.state.perusteet = perusteet;
+      }
     }
     catch (e) {
       this.state.perusteet = [];
