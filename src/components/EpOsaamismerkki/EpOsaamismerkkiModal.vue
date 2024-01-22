@@ -47,11 +47,11 @@
         <EpInput v-model="osaamismerkki.nimi" :is-editing="true"/>
       </b-form-group>
 
-      <b-form-group :label="$t('kuvaus') + ' *'">
+      <b-form-group :label="$t('kuvaus')">
         <EpInput v-model="osaamismerkki.kuvaus" :is-editing="true"/>
       </b-form-group>
 
-      <b-form-group :label="$t('kategoria') + ' *'">
+      <b-form-group :label="$t('teema') + ' *'">
         <EpMultiSelect :is-editing="true"
                        :options="osaamismerkkiKategoriat"
                        v-model="osaamismerkki.kategoria"
@@ -184,29 +184,9 @@ export default class EpOsaamismerkkiModal extends Vue {
 
   private osaamismerkki: OsaamismerkkiDto = {};
   private tallennetaan: boolean = false;
-  private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv]
 
   @Validations()
-  validations = {
-    osaamismerkki: {
-      nimi: requiredLokalisoituTeksti(this.requiredKielet),
-      kuvaus: requiredLokalisoituTeksti(this.requiredKielet),
-      kategoria: notNull(),
-      voimassaoloAlkaa: notNull(),
-      osaamistavoitteet: {
-        $each: {
-          osaamistavoite: requiredLokalisoituTeksti(this.requiredKielet),
-        },
-        required,
-      },
-      arviointikriteerit: {
-        $each: {
-          arviointikriteeri: requiredLokalisoituTeksti(this.requiredKielet),
-        },
-        required,
-      },
-    },
-  }
+  validations = this.createValidationStructure(OsaamismerkkiDtoTilaEnum.LAADINTA);
 
   init() {
     this.osaamismerkki = {
@@ -229,6 +209,7 @@ export default class EpOsaamismerkkiModal extends Vue {
   avaaModal(osaamismerkki) {
     if (osaamismerkki) {
       this.osaamismerkki = _.cloneDeep(osaamismerkki);
+      this.validations = this.createValidationStructure(this.osaamismerkki.tila);
     }
     else {
       this.init();
@@ -296,6 +277,7 @@ export default class EpOsaamismerkkiModal extends Vue {
 
   set isJulkinen(tila) {
     this.osaamismerkki.tila = tila ? OsaamismerkkiDtoTilaEnum.JULKAISTU : OsaamismerkkiDtoTilaEnum.LAADINTA;
+    this.validations = this.createValidationStructure(this.osaamismerkki.tila);
   }
 
   get osaamismerkkiKategoriat() {
@@ -312,6 +294,29 @@ export default class EpOsaamismerkkiModal extends Vue {
 
   get koodi() {
     return this.osaamismerkki.koodiUri ? this.osaamismerkki.koodiUri.split('_')[1] : null;
+  }
+
+  createValidationStructure(tila) {
+    let kielet = tila === OsaamismerkkiDtoTilaEnum.JULKAISTU ? [Kieli.fi, Kieli.sv] : [Kieli.fi];
+    return {
+      osaamismerkki: {
+        nimi: requiredLokalisoituTeksti(kielet),
+        kategoria: notNull(),
+        voimassaoloAlkaa: notNull(),
+        osaamistavoitteet: {
+          $each: {
+            osaamistavoite: requiredLokalisoituTeksti(kielet),
+          },
+          required,
+        },
+        arviointikriteerit: {
+          $each: {
+            arviointikriteeri: requiredLokalisoituTeksti(kielet),
+          },
+          required,
+        },
+      },
+    };
   }
 };
 </script>

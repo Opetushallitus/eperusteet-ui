@@ -10,8 +10,8 @@
     <template slot="modal-header">
       <div class="row w-100">
         <div class="col">
-          <span v-if="kategoria.id" class="mr-2">{{ $t('muokkaa-kategoriaa')}}</span>
-          <span v-else class="mr-2">{{ $t('lisaa-kategoria')}}</span>
+          <span v-if="kategoria.id" class="mr-2">{{ $t('muokkaa-teemaa')}}</span>
+          <span v-else class="mr-2">{{ $t('lisaa-teema')}}</span>
         </div>
         <div>
           <EpKielivalinta/>
@@ -26,7 +26,7 @@
       <b-form-group :label="$t('nimi') + ' *'">
         <EpInput v-model="kategoria.nimi" :is-editing="true"/>
       </b-form-group>
-      <b-form-group :label="$t('kuvaus') + ' *'">
+      <b-form-group :label="$t('teema')">
         <EpInput v-model="kategoria.kuvaus" :is-editing="true"/>
       </b-form-group>
       <b-form-group :label="$t('kuva') + ' *'">
@@ -110,7 +110,6 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
   validations = {
     kategoria: {
       nimi: requiredLokalisoituTeksti(this.requiredKielet),
-      kuvaus: requiredLokalisoituTeksti(this.requiredKielet),
       liite: {
         binarydata: notNull(),
       },
@@ -122,13 +121,13 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
     try {
       await this.store.updateKategoria(this.kategoria);
       this.tallennetaan = false;
-      this.$success(this.$t('kategorian-paivitys-onnistui') as string);
+      this.$success(this.$t('teeman-paivitys-onnistui') as string);
       await this.store.fetchKategoriat();
       this.sulje();
     }
     catch (err) {
       this.tallennetaan = false;
-      this.$fail(this.$t('kategorian-paivitys-epaonnistui') as string);
+      this.$fail(this.$t('teeman-paivitys-epaonnistui') as string);
     }
   }
 
@@ -136,13 +135,13 @@ export default class EpOsaamismerkkiKategoriaModal extends Vue {
     try {
       await this.store.deleteKategoria(this.kategoria.id);
       this.tallennetaan = false;
-      this.$success(this.$t('kategorian-poistaminen-onnistui') as string);
+      this.$success(this.$t('teeman-poistaminen-onnistui') as string);
       await this.store.fetchKategoriat();
       this.sulje();
     }
     catch (err) {
       this.tallennetaan = false;
-      this.$fail(this.$t('kategorian-poistaminen-epaonnistui') as string);
+      this.$fail(this.$t('teeman-poistaminen-epaonnistui') as string);
     }
   }
 
