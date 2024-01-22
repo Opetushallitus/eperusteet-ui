@@ -734,7 +734,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       data.set('tyyppi', 'maarayskirje');
       const maarayskirjeUuid = _.get(await Api.request({
         method: 'POST',
-        url: `perusteet/${this.perusteId!}/liitteet/b64`,
+        url: `api/perusteet/${this.perusteId!}/liitteet/b64`,
         data,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -856,7 +856,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       data.set('tyyppi', 'koulutusvienninohje');
       await Api.request({
         method: 'POST',
-        url: `perusteet/${this.perusteId!}/liitteet/b64`,
+        url: `api/perusteet/${this.perusteId!}/liitteet/b64`,
         data,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -877,7 +877,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       data.set('tyyppi', 'kaannos');
       await Api.request({
         method: 'POST',
-        url: `perusteet/${this.perusteId!}/liitteet/b64`,
+        url: `api/perusteet/${this.perusteId!}/liitteet/b64`,
         data,
         headers: {
           'Content-Type': 'multipart/form-data',
