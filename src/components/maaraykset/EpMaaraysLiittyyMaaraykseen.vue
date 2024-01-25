@@ -15,7 +15,7 @@
             {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{option.diaarinumero}})</span>
           </template>
           <template slot="option" slot-scope="{ option }">
-            {{ $kaanna(option.nimi) }} ({{option.diaarinumero}})
+            {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{option.diaarinumero}})</span>
           </template>
         </EpMultiSelect>
 

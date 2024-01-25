@@ -28,6 +28,7 @@ export class PerusteStore implements IEditoitava {
     viimeisinJulkaisuTila: null as string | null,
     tilaPolling: null as any | null,
     muutosmaaraykset: null as MaaraysDto[] | null,
+    maarays: null as MaaraysDto | null,
   });
 
   public readonly projekti = computed(() => this.state.projekti);
@@ -51,24 +52,25 @@ export class PerusteStore implements IEditoitava {
   public readonly arkistointiReroute = computed(() => this.peruste.value?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
   public readonly muutosmaaraykset = computed(() => this.state.muutosmaaraykset ? _.reverse(_.sortBy(this.state.muutosmaaraykset, 'voimassaoloAlkaa')) : null);
   public readonly isInitialized = computed(() => this.state.isInitialized);
+  public readonly maarays = computed(() => this.state.maarays);
 
   public readonly isOpas = computed(() => {
     if (this.state.peruste) {
       return _.lowerCase((this.state.peruste as PerusteDto).tyyppi) === _.lowerCase(PerusteDtoTyyppiEnum.OPAS);
     }
+
+    return false;
   });
 
   public readonly perusteSuoritustapa = computed(() => {
-    if (this.state.peruste) {
-      if (this.isOpas.value) {
-        return 'OPAS';
-      }
-      else if (perusteenSuoritustapa(this.peruste.value)) {
-        return perusteenSuoritustapa(this.peruste.value);
-      }
-      else {
-        return 'REFORMI';
-      }
+    if (this.isOpas.value) {
+      return 'OPAS';
+    }
+    else if (perusteenSuoritustapa(this.peruste.value)) {
+      return perusteenSuoritustapa(this.peruste.value);
+    }
+    else {
+      return 'REFORMI';
     }
   });
 
@@ -156,10 +158,6 @@ export class PerusteStore implements IEditoitava {
     finally {
       this.state.initializing = false;
     }
-  }
-
-  async fetchMaarays() {
-    return (await Maaraykset.getMaaraysPerusteella(Number((this.state.projekti as any)._peruste))).data;
   }
 
   async updateCurrent() {
@@ -294,9 +292,11 @@ export class PerusteStore implements IEditoitava {
     this.state.julkaisemattomiaMuutoksia = (await Julkaisut.julkaisemattomiaMuutoksia(this.state.perusteId!)).data;
   }
 
-  public async fetchMuutosmaaraykset() {
+  public async fetchMaaraykset() {
     this.state.muutosmaaraykset = null;
+    this.state.maarays = null;
     this.state.muutosmaaraykset = (await Maaraykset.getPerusteenMuutosmaaraykset(this.state.perusteId!)).data;
+    this.state.maarays = (await Maaraykset.getMaaraysPerusteella(Number((this.state.projekti as any)._peruste))).data;
   }
 
   public async tallennaMuutosmaarays(muutosmaarays) {

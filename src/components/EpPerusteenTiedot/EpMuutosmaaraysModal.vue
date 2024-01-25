@@ -101,6 +101,9 @@ export default class EpMuutosmaaraysModal extends Vue {
   }
 
   async muokkaa(muutosmaarays?) {
+    this.asiasanat = (await Maaraykset.getAsiasanat()).data;
+    this.maarayksetNimella = (await Maaraykset.getMaarayksetNimet()).data;
+
     if (muutosmaarays) {
       this.muutosmaarays = _.cloneDeep(muutosmaarays);
     }
@@ -113,11 +116,10 @@ export default class EpMuutosmaaraysModal extends Vue {
           id: this.perusteStore.peruste.value?.id,
         },
         liittyyTyyppi: MaaraysDtoLiittyyTyyppiEnum.MUUTTAA,
+        muutettavatMaaraykset: this.perusteStore.maarays.value ? _.filter(this.maarayksetNimella, maarays => maarays.id === this.perusteStore.maarays.value?.id) : [],
       }) as any;
     }
     (this.$refs['muutosmaaraysModal'] as any).show();
-    this.asiasanat = (await Maaraykset.getAsiasanat()).data;
-    this.maarayksetNimella = (await Maaraykset.getMaarayksetNimet()).data;
   }
 
   async poista() {

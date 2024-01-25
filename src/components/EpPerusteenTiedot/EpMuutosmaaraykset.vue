@@ -70,11 +70,11 @@ import { Prop, Component, Vue } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import { LiiteDto, MaarayksetParams, MaaraysLiiteDtoTyyppiEnum, baseURL } from '@shared/api/eperusteet';
+import { MaarayksetParams, MaaraysLiiteDtoTyyppiEnum, baseURL } from '@shared/api/eperusteet';
 import EpMuutosmaaraysModal from '@/components/EpPerusteenTiedot/EpMuutosmaaraysModal.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import { Kielet, KieliStore } from '@shared/stores/kieli';
+import { Kielet } from '@shared/stores/kieli';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
 @Component({
