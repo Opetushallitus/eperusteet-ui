@@ -243,12 +243,7 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 
   async mounted() {
     this.validoi();
-    await this.initMaarays();
-    await this.perusteStore.fetchMuutosmaaraykset();
-  }
-
-  async initMaarays() {
-    const perusteenMaarays = await this.perusteStore.fetchMaarays();
+    await this.perusteStore.fetchMaaraykset();
   }
 
   get muutosmaaraykset() {
@@ -316,7 +311,6 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
       this.julkaisu.muutosmaaraysVoimaan = null;
       this.julkaisu.liitteet = [];
       this.julkaisu.liittyyMuutosmaarays = false;
-      this.initMaarays();
       this.$success(this.$t('julkaisu-kaynnistetty') as string);
     }
     catch (err) {

@@ -513,7 +513,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   async onProjektiChange(projektiId: number, perusteId: number) {
     this.store = new EditointiStore(new PerusteEditStore(projektiId, perusteId, this.perusteStore, this.tallennaKoulutusvienninOhjeDiaari));
     await this.fetchLiitteet();
-    await this.perusteStore.fetchMuutosmaaraykset();
+    await this.perusteStore.fetchMaaraykset();
   }
 
   async fetchLiitteet() {

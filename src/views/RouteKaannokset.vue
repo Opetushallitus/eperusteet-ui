@@ -45,7 +45,7 @@ import { saveAs } from 'file-saver';
 
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
 import _ from 'lodash';
 
 @Component({
