@@ -26,7 +26,7 @@
       <b-form-group :label="$t('nimi') + ' *'">
         <EpInput v-model="kategoria.nimi" :is-editing="true"/>
       </b-form-group>
-      <b-form-group :label="$t('teema')">
+      <b-form-group :label="$t('kuvaus')">
         <EpInput v-model="kategoria.kuvaus" :is-editing="true"/>
       </b-form-group>
       <b-form-group :label="$t('kuva') + ' *'">
