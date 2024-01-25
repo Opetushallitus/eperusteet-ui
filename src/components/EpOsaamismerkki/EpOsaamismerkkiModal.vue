@@ -75,6 +75,9 @@
       <draggable v-bind="defaultDragOptions"
                  tag="div"
                  v-model="osaamismerkki.osaamistavoitteet">
+        <div v-if="osaamismerkki.osaamistavoitteet?.length > 0" class="mb-1 font-italic">
+          <span>{{ $t('osaamismerkin-suorittaja') }}...</span>
+        </div>
         <div class="row mb-2" v-for="(tavoite, i) in osaamismerkki.osaamistavoitteet" :key="'tavoite'+i">
           <div class="col">
             <EpInput v-model="tavoite.osaamistavoite"
@@ -104,6 +107,9 @@
       <draggable v-bind="defaultDragOptions"
                  tag="div"
                  v-model="osaamismerkki.arviointikriteerit">
+        <div v-if="osaamismerkki.arviointikriteerit?.length > 0" class="mb-1 font-italic">
+          <span>{{ $t('osaamismerkin-suorittaja') }}...</span>
+        </div>
         <div class="row mb-2" v-for="(kriteeri, i) in osaamismerkki.arviointikriteerit" :key="'kriteeri'+i">
           <div class="col">
             <EpInput v-model="kriteeri.arviointikriteeri"
