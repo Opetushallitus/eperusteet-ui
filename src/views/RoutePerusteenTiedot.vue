@@ -39,7 +39,7 @@
                                 :is-editing="isEditing"
                                 :validation="validation.diaarinumero"
                                 class="w-80"></ep-input>
-                      <EpInfoPopover v-if="isEditing" class="info ml-2">{{ $t('diaarinumeron-muoto') }}</EpInfoPopover>
+                      <EpInfoPopover v-if="isEditing" class="info ml-2" unique-id="1">{{ $t('diaarinumeron-muoto') }}</EpInfoPopover>
                     </div>
                   </b-form-group>
                 </b-col>
@@ -93,7 +93,11 @@
 
               <b-row no-gutters v-if="data.kvliite">
                 <b-col class="mb-4">
-                  <b-form-group :label="$t('tutkinnon-suorittaneen-osaaminen')">
+                  <b-form-group>
+                    <div class="d-flex mb-2">
+                      <span class="font-weight-600">{{$t('tutkinnon-suorittaneen-osaaminen')}}</span>
+                      <EpInfoPopover v-if="isEditing" class="ml-2" unique-id="2">{{ $t('kentat-tulostetaan-kv-liitteelle') }}</EpInfoPopover>
+                    </div>
                     <ep-content
                       v-model="data.kvliite.suorittaneenOsaaminen"
                       layout="normal"
@@ -104,7 +108,11 @@
 
               <b-row no-gutters v-if="data.kvliite">
                 <b-col class="mb-4">
-                  <b-form-group :label="$t('tyotehtavat-joissa-voi-toimia')">
+                  <b-form-group>
+                    <div class="d-flex mb-2">
+                      <span class="font-weight-600">{{$t('tyotehtavat-joissa-voi-toimia')}}</span>
+                      <EpInfoPopover v-if="isEditing" class="ml-2" unique-id="3">{{ $t('kentat-tulostetaan-kv-liitteelle') }}</EpInfoPopover>
+                    </div>
                     <ep-content
                       v-if="data.kvliite.tyotehtavatJoissaVoiToimia || isEditing"
                       v-model="data.kvliite.tyotehtavatJoissaVoiToimia"
