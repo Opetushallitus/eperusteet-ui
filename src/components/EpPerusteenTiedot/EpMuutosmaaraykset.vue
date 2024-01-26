@@ -5,27 +5,18 @@
         <tr>
           <th>{{ $t('nimi') }}</th>
           <th>{{ $t('tiedosto') }}</th>
+          <th v-if="isEditing"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(muutos, idx) in value" :key="'muutos' + idx">
           <td>
-            <ep-input v-model="muutos.nimi"
-                      :is-editing="isEditing"></ep-input>
+            <ep-input v-model="muutos.nimi" :is-editing="isEditing" :placeholder="(muutos.liitteet && muutos.liitteet[$slang.value].nimi) ? muutos.liitteet[$slang.value].nimi : ''"/>
           </td>
           <td>
-            <ep-multi-select class="w-100"
-                             v-if="isEditing"
-                             :value="muutos.liitteet ? muutos.liitteet[$slang.value] : null"
-                             @input="updateLiite(idx, $event)"
-                             :options="liitteet">
-              <template v-slot:singleLabel="{ option }">{{ option.nimi }}</template>
-              <template v-slot:option="{ option }">{{ option.nimi }}</template>
-              <template v-slot:tag="{ option }">{{ option.nimi }}</template>
-            </ep-multi-select>
-            <div v-else>
-              {{ (muutos.liitteet && muutos.liitteet[$slang.value].nimi) ? muutos.liitteet[$slang.value].nimi : null }}
-            </div>
+            <span v-if="!!muutos.liitteet && muutos.liitteet[$slang.value]">
+              {{muutos.liitteet[$slang.value].nimi}}
+            </span>
           </td>
           <td v-if="isEditing">
             <div class="text-center">
