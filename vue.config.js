@@ -13,7 +13,7 @@ const proxy = {
 
 module.exports = {
   lintOnSave: false,
-  publicPath: process.env.NODE_ENV === 'production' ? '/eperusteet-app/' : '/',
+  publicPath: process.env.NODE_ENV === 'production' ? '/eperusteet-service/ui' : '/',
   configureWebpack: {
     resolve: {
       alias: {

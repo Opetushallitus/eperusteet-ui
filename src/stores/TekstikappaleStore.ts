@@ -66,7 +66,7 @@ export class TekstikappaleStore implements IEditoitava {
     await this.fetch();
     return {
       ...this.tekstikappale.value,
-      originalNimi: this.tekstikappale.value?.nimi,
+      originalNimi: (this.tekstikappale.value as any).nimi,
     };
   }
 
