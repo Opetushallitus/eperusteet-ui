@@ -293,6 +293,11 @@ export default class RouteOsaamismerkit extends Vue {
     }
   }
 
+  @Watch('sivu')
+  async onPageChange() {
+    this.query.sivu = this.sivu;
+  }
+
   @Watch('tila')
   onTilaChange(tila) {
     this.query.tila = tila || ['LAADINTA', 'JULKAISTU'];
