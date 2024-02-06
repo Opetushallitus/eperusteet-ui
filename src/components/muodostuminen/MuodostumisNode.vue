@@ -255,7 +255,7 @@ export default class MuodostumisNode extends Vue {
       return true;
     }
 
-    return node.rooli === 'määritelty' || node.pakollinen;
+    return null;
   }
 }
 </script>
