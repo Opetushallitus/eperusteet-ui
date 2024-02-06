@@ -74,14 +74,13 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import _ from 'lodash';
-import { Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
 import { DefaultRyhma, ryhmaTemplate } from './utils';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { ColorMap, rakenneNodecolor } from '@shared/utils/perusterakenne';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { Kielet } from '@shared/stores/kieli';
 
 @Component({
   name: 'MuodostumisItem',
@@ -114,6 +113,11 @@ export default class MuodostumisItem extends Vue {
 
   private showDescription = false;
   private uusi: any | null = DefaultRyhma;
+
+  @Watch('pakollinen', { immediate: true })
+  onPakollinenChange() {
+    this.innerModel = { ...this.innerModel, pakollinen: this.pakollinen };
+  }
 
   set innerModel(innerModel) {
     this.$emit('input', innerModel);
