@@ -15,7 +15,7 @@
                         :tutkinnonOsatMap="tutkinnonOsatMap"
                         @remove="remove(idx)"
                         @copy="copy(idx)"
-                        :parentMandatory="parentMandatory"
+                        :pakollinen="isPakollinen(node)"
                         ref="muodostumisItem">
         </MuodostumisItem>
         <div class="children"
@@ -28,7 +28,7 @@
             :depth="depth + 1"
             v-model="node.osat"
             :is-editing="isEditing"
-            :parentMandatory="pakollinen(node)"
+            :parentMandatory="isPakollinen(node)"
             :copyToClipBoard="copyToClipBoard">
           </MuodostumisNode>
         </div>
@@ -112,8 +112,8 @@ export default class MuodostumisNode extends Vue {
   @Prop({ required: true })
   private tutkinnonOsatMap!: any;
 
-  @Prop({ default: false, type: Boolean })
-  private parentMandatory!: boolean;
+  @Prop({ default: null, type: Boolean })
+  private parentMandatory!: boolean | null;
 
   @Prop({ default: false })
   private copyToClipBoard!: Function;
@@ -225,10 +225,6 @@ export default class MuodostumisNode extends Vue {
     _.forEach(this.$refs['childNode'], item => (item as any).toggleDescription(toggle));
   }
 
-  pakollinen(node) {
-    return this.parentMandatory || (node.rooli === 'määritelty' && !!node.nimi && node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-pakollinen')) || node.pakollinen;
-  }
-
   async add(element) {
     if (_.includes(element.from.classList, 'paaryhmat') && this.model[element.newIndex] && this.model[element.newIndex].rooli === 'määrittelemätön') {
       const uuid = _.get(this.model[element.newIndex], 'uuid');
@@ -244,6 +240,22 @@ export default class MuodostumisNode extends Vue {
     if (this.copyToClipBoard) {
       this.copyToClipBoard(getIndex(this.model, idx));
     }
+  }
+
+  isPakollinen(node) {
+    if (this.parentMandatory !== null) {
+      return this.parentMandatory;
+    }
+
+    if (node.nimi && node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-valinnainen')) {
+      return false;
+    }
+
+    if (node.nimi && node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-pakollinen')) {
+      return true;
+    }
+
+    return node.rooli === 'määritelty' || node.pakollinen;
   }
 }
 </script>
