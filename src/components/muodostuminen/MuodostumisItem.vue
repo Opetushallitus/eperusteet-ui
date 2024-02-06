@@ -8,7 +8,7 @@
         </b-button>
       </div>
       <div class="flex-grow-1 h-100 p-2 nimi">
-        <EpColorIndicator :size="10" :backgroundColor="color" class="ml-2 mr-2" v-if="tosa"/>
+        <EpColorIndicator :size="10" :backgroundColor="tutkinnonOsaColor" class="ml-2 mr-2" v-if="tosa"/>
         {{ $kaanna(nimi) }} <span v-if="koodiArvo">({{koodiArvo}})</span>
       </div>
       <div style="width: 100px;" class="text-center">
@@ -79,8 +79,9 @@ import { DefaultRyhma, ryhmaTemplate } from './utils';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
-import { rakenneNodecolor } from '@shared/utils/perusterakenne';
+import { ColorMap, rakenneNodecolor } from '@shared/utils/perusterakenne';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { Kielet } from '@shared/stores/kieli';
 
 @Component({
   name: 'MuodostumisItem',
@@ -109,7 +110,7 @@ export default class MuodostumisItem extends Vue {
   private tutkinnonOsatMap!: any;
 
   @Prop({ default: false, type: Boolean })
-  private parentMandatory!: boolean;
+  private pakollinen!: boolean;
 
   private showDescription = false;
   private uusi: any | null = DefaultRyhma;
@@ -272,7 +273,15 @@ export default class MuodostumisItem extends Vue {
   }
 
   get color() {
-    return rakenneNodecolor(this.value, this.parentMandatory, this);
+    return rakenneNodecolor(this.value, this.pakollinen, this);
+  }
+
+  get tutkinnonOsaColor() {
+    if (this.pakollinen) {
+      return ColorMap['pakollinen'];
+    }
+
+    return ColorMap['valinnainen'];
   }
 
   get isRyhma() {
