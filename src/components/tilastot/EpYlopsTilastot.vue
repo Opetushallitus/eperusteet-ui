@@ -48,6 +48,8 @@
         </ep-form-content>
       </div>
 
+      <TilastoAikavaliVertailu class="col-12" v-model="aikavali"/>
+
       <div class="col-xl-9 col-md-9 col-sm-12">
         <ep-form-content name="peruste">
           <ep-multi-select :multiple="true"
@@ -126,6 +128,7 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import { Kielet } from '@shared/stores/kieli';
 import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKSET } from '@shared/plugins/oikeustarkastelu';
+import TilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilastot/TilastoAikavaliVertailu.vue';
 
 @Component({
   components: {
@@ -133,6 +136,7 @@ import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKS
     EpSpinner,
     EpMultiSelect,
     EpFormContent,
+    TilastoAikavaliVertailu,
   },
 })
 export default class EpYlopsTilastot extends Vue {
@@ -149,6 +153,7 @@ export default class EpYlopsTilastot extends Vue {
   private valitutKoulutustyypit: [] = [];
   private valitutVoimassaolot: [] = [];
   private valitutPerusteet: [] = [];
+  private aikavali: AikavaliVertailu = {};
 
   get opetussuunnitelmatFilled() {
     if (this.opetussuunnitelmat) {
@@ -168,8 +173,33 @@ export default class EpYlopsTilastot extends Vue {
       .filter(ops => Kielet.search(this.query, ops.nimi))
       .filter(ops => _.isEmpty(this.valitutVoimassaolot) || _.includes(_.map(this.valitutVoimassaolot, 'value'), this.opetussuunnitelmaVoimassaolo(ops)))
       .filter(ops => _.isEmpty(this.valitutPerusteet) || _.includes(_.map(this.valitutPerusteet, 'value'), ops.perusteenId))
+      .filter(ops => this.aikavertailu(ops))
       .sortBy(ops => Kielet.kaanna(ops.nimi))
       .value();
+  }
+
+  get aikavaliValue() {
+    return _.get(this.aikavali, 'tyyppi.value');
+  }
+
+  aikavertailu(ops) {
+    if (!this.aikavaliValue) {
+      return true;
+    }
+
+    if (_.get(ops, this.aikavaliValue) === null) {
+      return false;
+    }
+
+    return ops[this.aikavaliValue] >= this.aikavaliAlkuVrt && ops[this.aikavaliValue] <= this.aikavaliLoppuVrt;
+  }
+
+  get aikavaliAlkuVrt() {
+    return this.aikavali?.aikavaliAlku ? this.aikavali.aikavaliAlku : new Date(0);
+  }
+
+  get aikavaliLoppuVrt() {
+    return this.aikavali?.aikavaliLoppu ? this.aikavali.aikavaliLoppu : new Date(8640000000000000);
   }
 
   opetussuunnitelmaVoimassaolo(ops) {
@@ -236,17 +266,33 @@ export default class EpYlopsTilastot extends Vue {
       key: 'tila',
       label: this.$t('tila'),
       sortable: true,
-      thStyle: { width: '20%' },
+      thStyle: { width: '10%' },
     }, {
       key: 'perusteenVoimassaoloAlkaa',
       label: this.$t('voimassaolo-alkaa'),
       sortable: true,
-      thStyle: { width: '15%' },
+      thStyle: { width: '10%' },
     }, {
       key: 'perusteenVoimassaoloLoppuu',
       label: this.$t('voimassaolo-paattyy'),
       sortable: true,
-      thStyle: { width: '15%' },
+      thStyle: { width: '10%' },
+    }, {
+      key: 'ensijulkaisu',
+      label: this.$t('ensijulkaisu'),
+      sortable: true,
+      thStyle: { width: '12%', paddingTop: '0px' },
+      formatter: (value, key, item) => {
+        return value ? (this as any).$sd(value) : '';
+      },
+    }, {
+      key: 'luotu',
+      label: this.$t('luotu'),
+      sortable: true,
+      thStyle: { width: '8%', paddingTop: '0px' },
+      formatter: (value, key, item) => {
+        return value ? (this as any).$sd(value) : '';
+      },
     }];
   }
 
