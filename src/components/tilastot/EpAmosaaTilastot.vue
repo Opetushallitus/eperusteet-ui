@@ -51,6 +51,8 @@
           </ep-form-content>
         </div>
 
+        <TilastoAikavaliVertailu class="col-12" v-model="aikavali"/>
+
         <div class="col-xl-6 col-md-6 col-sm-12">
           <ep-form-content name="peruste">
             <ep-multi-select :multiple="true"
@@ -147,6 +149,7 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKSET } from '@shared/plugins/oikeustarkastelu';
+import TilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilastot/TilastoAikavaliVertailu.vue';
 
 @Component({
   components: {
@@ -155,6 +158,7 @@ import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKS
     EpFormContent,
     EpMultiSelect,
     EpSearch,
+    TilastoAikavaliVertailu,
   },
 })
 export default class EpAmosaaTilastot extends Vue {
@@ -170,6 +174,7 @@ export default class EpAmosaaTilastot extends Vue {
   private valitutVoimassaolot: [] = [];
   private valitutPerusteet: [] = [];
   private valitutKoulutustoimijat: [] = [];
+  private aikavali: AikavaliVertailu = {};
 
   get toteutussuunnitelmatFilled() {
     if (this.toteutussuunnitelmat) {
@@ -192,8 +197,33 @@ export default class EpAmosaaTilastot extends Vue {
       .filter(toteutussuunnitelma => _.isEmpty(this.valitutVoimassaolot) || _.includes(_.map(this.valitutVoimassaolot, 'value'), toteutussuunnitelma.voimassaolo))
       .filter(toteutussuunnitelma => _.isEmpty(this.valitutPerusteet) || _.includes(_.map(this.valitutPerusteet, 'value'), toteutussuunnitelma.perusteId))
       .filter(toteutussuunnitelma => _.isEmpty(this.valitutKoulutustoimijat) || _.includes(_.map(this.valitutKoulutustoimijat, 'value'), toteutussuunnitelma.koulutustoimija!.id))
+      .filter(toteutussuunnitelma => this.aikavertailu(toteutussuunnitelma))
       .sortBy(toteutussuunnitelma => Kielet.kaanna(toteutussuunnitelma.nimi))
       .value();
+  }
+
+  get aikavaliValue() {
+    return _.get(this.aikavali, 'tyyppi.value');
+  }
+
+  aikavertailu(toteutussuunnitelma) {
+    if (!this.aikavaliValue) {
+      return true;
+    }
+
+    if (_.get(toteutussuunnitelma, this.aikavaliValue) === null) {
+      return false;
+    }
+
+    return toteutussuunnitelma[this.aikavaliValue] >= this.aikavaliAlkuVrt && toteutussuunnitelma[this.aikavaliValue] <= this.aikavaliLoppuVrt;
+  }
+
+  get aikavaliAlkuVrt() {
+    return this.aikavali?.aikavaliAlku ? this.aikavali.aikavaliAlku : new Date(0);
+  }
+
+  get aikavaliLoppuVrt() {
+    return this.aikavali?.aikavaliLoppu ? this.aikavali.aikavaliLoppu : new Date(8640000000000000);
   }
 
   toteutussuunnitelmaVoimassaolo(toteutussuunnitelma) {
@@ -387,7 +417,7 @@ export default class EpAmosaaTilastot extends Vue {
       key: 'tila',
       label: this.$t('tila'),
       sortable: true,
-      thStyle: { width: '20%' },
+      thStyle: { width: '10%' },
       sortByFormatted: true,
       formatter: (value, key, item) => {
         return (this as any).$t(value);
@@ -396,15 +426,31 @@ export default class EpAmosaaTilastot extends Vue {
       key: 'voimaantulo',
       label: this.$t('voimassaolo-alkaa'),
       sortable: true,
-      thStyle: { width: '15%', paddingTop: '0px' },
+      thStyle: { width: '10%', paddingTop: '0px' },
       formatter: (value, key, item) => {
         return value ? (this as any).$sd(value) : '';
       },
     }, {
       key: 'paatospaivamaara',
-      label: this.$t('paatospaivamaara'),
+      label: this.$t('paatospaivamaara-lyhyt'),
       sortable: true,
-      thStyle: { width: '15%', paddingTop: '0px' },
+      thStyle: { width: '10%', paddingTop: '0px' },
+      formatter: (value, key, item) => {
+        return value ? (this as any).$sd(value) : '';
+      },
+    }, {
+      key: 'ensijulkaisu',
+      label: this.$t('ensijulkaisu'),
+      sortable: true,
+      thStyle: { width: '12%', paddingTop: '0px' },
+      formatter: (value, key, item) => {
+        return value ? (this as any).$sd(value) : '';
+      },
+    }, {
+      key: 'luotu',
+      label: this.$t('luotu'),
+      sortable: true,
+      thStyle: { width: '8%', paddingTop: '0px' },
       formatter: (value, key, item) => {
         return value ? (this as any).$sd(value) : '';
       },
