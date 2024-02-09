@@ -40,7 +40,7 @@ export interface AikavaliVertailu {
 }
 
 @Component
-export default class TilastoAikavaliVertailu extends Vue {
+export default class EpTilastoAikavaliVertailu extends Vue {
   @Prop({ required: true })
   value!: AikavaliVertailu;
 
