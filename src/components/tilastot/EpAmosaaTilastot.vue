@@ -51,7 +51,7 @@
           </ep-form-content>
         </div>
 
-        <TilastoAikavaliVertailu class="col-12" v-model="aikavali"/>
+        <EpTilastoAikavaliVertailu class="col-12" v-model="aikavali"/>
 
         <div class="col-xl-6 col-md-6 col-sm-12">
           <ep-form-content name="peruste">
@@ -149,7 +149,7 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKSET } from '@shared/plugins/oikeustarkastelu';
-import TilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilastot/TilastoAikavaliVertailu.vue';
+import EpTilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilastot/EpTilastoAikavaliVertailu.vue';
 
 @Component({
   components: {
@@ -158,7 +158,7 @@ import TilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilastot
     EpFormContent,
     EpMultiSelect,
     EpSearch,
-    TilastoAikavaliVertailu,
+    EpTilastoAikavaliVertailu,
   },
 })
 export default class EpAmosaaTilastot extends Vue {
