@@ -16,9 +16,9 @@
 
     <div class="col-xl-9 col-md-9 col-sm-12">
       <ep-form-content name="aikavali">
-        <div class="d-flex" :class="{'disabled-events' : !model.tyyppi}">
+        <div class="d-flex align-items-center" :class="{'disabled-events' : !model.tyyppi}">
           <ep-datepicker v-model="model.aikavaliAlku" :is-editing="true" />
-          <span class="mx-2"></span>
+          <span class="mx-2">-</span>
           <ep-datepicker v-model="model.aikavaliLoppu" :is-editing="true" endOfDay/>
         </div>
       </ep-form-content>
@@ -27,7 +27,6 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 export interface AikavaliVertailu {
