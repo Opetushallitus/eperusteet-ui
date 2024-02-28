@@ -25,7 +25,7 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { Meta } from '@shared/utils/decorators';
 import EpTestiymparisto from '@shared/components/EpTestiymparisto/EpTestiymparisto.vue';
-import { baseURL, LogoutParam } from '@shared/api/eperusteet';
+import { baseURL } from '@shared/api/eperusteet';
 
 @Component({
   components: {
@@ -141,7 +141,7 @@ export default class RouteRoot extends Vue {
   }
 
   get logoutHref() {
-    return baseURL + LogoutParam.logoutGet().url;
+    return baseURL + '/api/logout';
   }
 
   @ProvideReactive('dull')
