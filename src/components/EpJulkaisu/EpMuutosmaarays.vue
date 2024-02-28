@@ -36,6 +36,10 @@
       <b-form-group :label="$t('kuvaus')" class="mt-4">
         <ep-content v-model="model.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
       </b-form-group>
+
+      <b-form-group :label="$t('liitteet') + ' (pdf)'" class="mt-4 mb-5">
+          <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
+        </b-form-group>
   </div>
 </template>
 
@@ -67,6 +71,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 })
 export default class EpMuutosmaarays extends Vue {
   private MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
+  private LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
 
   @Prop({ required: true })
   value!: MaaraysDto;
