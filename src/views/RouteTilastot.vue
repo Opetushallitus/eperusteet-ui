@@ -64,4 +64,8 @@ export default class RouteTilastot extends Vue {
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
 
+::v-deep .container{
+  max-width: 1500px;
+}
+
 </style>

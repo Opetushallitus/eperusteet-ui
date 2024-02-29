@@ -271,17 +271,25 @@ export default class EpYlopsTilastot extends Vue {
       key: 'perusteenVoimassaoloAlkaa',
       label: this.$t('voimassaolo-alkaa'),
       sortable: true,
-      thStyle: { width: '10%' },
+      thStyle: { width: '130px' },
     }, {
       key: 'perusteenVoimassaoloLoppuu',
       label: this.$t('voimassaolo-paattyy'),
       sortable: true,
-      thStyle: { width: '10%' },
+      thStyle: { width: '130px' },
+    }, {
+      key: 'julkaistu',
+      label: this.$t('julkaistu'),
+      sortable: true,
+      thStyle: { width: '130px', paddingTop: '0px' },
+      formatter: (value, key, item) => {
+        return value ? (this as any).$sd(value) : '';
+      },
     }, {
       key: 'ensijulkaisu',
       label: this.$t('ensijulkaisu'),
       sortable: true,
-      thStyle: { width: '12%', paddingTop: '0px' },
+      thStyle: { width: '130px', paddingTop: '0px' },
       formatter: (value, key, item) => {
         return value ? (this as any).$sd(value) : '';
       },
@@ -289,7 +297,7 @@ export default class EpYlopsTilastot extends Vue {
       key: 'luotu',
       label: this.$t('luotu'),
       sortable: true,
-      thStyle: { width: '8%', paddingTop: '0px' },
+      thStyle: { width: '130px', paddingTop: '0px' },
       formatter: (value, key, item) => {
         return value ? (this as any).$sd(value) : '';
       },

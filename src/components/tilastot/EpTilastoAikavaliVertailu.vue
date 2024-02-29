@@ -54,6 +54,10 @@ export default class EpTilastoAikavaliVertailu extends Vue {
   get aikavaliItems() {
     return [
       {
+        text: this.$t('julkaistu'),
+        value: 'julkaistu',
+      },
+      {
         text: this.$t('ensijulkaisu'),
         value: 'ensijulkaisu',
       },

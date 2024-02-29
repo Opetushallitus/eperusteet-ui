@@ -426,7 +426,7 @@ export default class EpAmosaaTilastot extends Vue {
       key: 'voimaantulo',
       label: this.$t('voimassaolo-alkaa'),
       sortable: true,
-      thStyle: { width: '10%', paddingTop: '0px' },
+      thStyle: { width: '130px', paddingTop: '0px' },
       formatter: (value, key, item) => {
         return value ? (this as any).$sd(value) : '';
       },
@@ -434,15 +434,24 @@ export default class EpAmosaaTilastot extends Vue {
       key: 'paatospaivamaara',
       label: this.$t('paatospaivamaara-lyhyt'),
       sortable: true,
-      thStyle: { width: '10%', paddingTop: '0px' },
+      thStyle: { width: '130px', paddingTop: '0px' },
       formatter: (value, key, item) => {
         return value ? (this as any).$sd(value) : '';
       },
     }, {
+      key: 'julkaistu',
+      label: this.$t('julkaistu'),
+      sortable: true,
+      thStyle: { width: '130px', paddingTop: '0px' },
+      formatter: (value, key, item) => {
+        return value ? (this as any).$sd(value) : '';
+      },
+    }, {
+    }, {
       key: 'ensijulkaisu',
       label: this.$t('ensijulkaisu'),
       sortable: true,
-      thStyle: { width: '12%', paddingTop: '0px' },
+      thStyle: { width: '130px', paddingTop: '0px' },
       formatter: (value, key, item) => {
         return value ? (this as any).$sd(value) : '';
       },
@@ -450,7 +459,7 @@ export default class EpAmosaaTilastot extends Vue {
       key: 'luotu',
       label: this.$t('luotu'),
       sortable: true,
-      thStyle: { width: '8%', paddingTop: '0px' },
+      thStyle: { width: '130px', paddingTop: '0px' },
       formatter: (value, key, item) => {
         return value ? (this as any).$sd(value) : '';
       },
