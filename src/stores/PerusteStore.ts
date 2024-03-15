@@ -316,7 +316,7 @@ export class PerusteStore implements IEditoitava {
   }
 
   public async poistaMuutosmaarays(poistettavaMuutosmaarays) {
-    await Maaraykset.deleteMaarays(poistettavaMuutosmaarays.id, poistettavaMuutosmaarays);
+    await Maaraykset.deleteMaarays(poistettavaMuutosmaarays.id, this.perusteId.value!);
     this.state.muutosmaaraykset = _.reject(this.state.muutosmaaraykset, muutosmaarays => muutosmaarays.id === poistettavaMuutosmaarays.id);
   }
 
