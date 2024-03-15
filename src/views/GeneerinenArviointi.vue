@@ -26,7 +26,13 @@
         <div v-else>{{ $t('' + inner.oletusvalinta) }}</div>
       </div>
       <div class="mt-4">
+
+        <div v-if="!isEditing && kriteeriton" class="mb-3">
+          <div> {{ $kaanna(osaamistaso) }} </div>
+        </div>
+
         <b-table
+            v-else
             striped
             hover
             responsive
@@ -237,6 +243,19 @@ export default class GeneerinenArviointi extends Vue {
 
   get kayttajaIsAdmin() {
     return this.kayttajaStore.isAdmin.value;
+  }
+
+  get kriteeriton() {
+    return this.osaamistasot?.length === 1
+      && _.chain(this.osaamistasot)
+        .map('kriteerit')
+        .flatten()
+        .isEmpty()
+        .value();
+  }
+
+  get osaamistaso() {
+    return _.get(_.first(this.osaamistasot), 'otsikko');
   }
 }
 </script>

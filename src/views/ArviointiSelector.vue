@@ -12,10 +12,10 @@
       <b-form-group :label="$t('arviointiasteikko')">
         <b-form-radio-group v-model="model" @change="onInput" stacked>
           <b-form-radio :value="asteikko.id" v-for="asteikko in asteikot" :key="asteikko.id">
-            <span class="text-nowrap">
+            <span class="text-wrap">
               <span v-for="(taso, idx) in asteikko.osaamistasot" :key="'taso-' + taso.id">
                 <span v-if="idx !== 0" class="text-muted">/</span>
-                {{ $kaanna(taso.otsikko) }}
+                <EpExpandText :text="$kaanna(taso.otsikko)" />
               </span>
             </span>
           </b-form-radio>
@@ -35,6 +35,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpExpandText from '@shared/components/EpExpandText/EpExpandText.vue';
 
 @Component({
   components: {
@@ -42,6 +43,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
     EpInput,
     EpMainView,
     EpSpinner,
+    EpExpandText,
   },
 })
 export default class GeneerinenArviointi extends Vue {

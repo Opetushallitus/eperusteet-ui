@@ -64,7 +64,7 @@
               <div
                 v-for="(taso, index) in asteikko.osaamistasot"
                 :key="taso.id"
-                class="taso py-2"
+                class="taso py-2 text-wrap"
                 :class="{ 'pl-3': !isEditing, 'is-editing': isEditing }">
                 <template v-if="!isEditing">
                   {{ $kaanna(taso.otsikko) }}
