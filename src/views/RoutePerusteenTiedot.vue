@@ -315,7 +315,7 @@
 
                     <div v-if="isEditing">
                       <div class="mb-4">
-                        <b-form-radio-group stacked v-model="data.poikkeamismaaraysTyyppi" class="mb-3">
+                        <b-form-radio-group stacked v-model="data.poikkeamismaaraysTyyppi" class="mb-2">
                           <b-form-radio value="ei_tarvita_ohjetta"
                                         name="poikkeamismaaraysTyyppi">{{ $t('voi-kayttaa-tutkintoviennissa') }}</b-form-radio>
                           <b-form-radio value="ei_voi_poiketa"
@@ -323,7 +323,10 @@
                           <b-form-radio value="koulutusvientiliite"
                                         name="poikkeamismaaraysTyyppi">{{ $t('maarays-tutkinnon-perusteista-poikkeamiseen-tutkintoviennissa') }}</b-form-radio>
                         </b-form-radio-group>
+
+                        <EpButton variant="link" class="no-padding" v-if="data.poikkeamismaaraysTyyppi" @click="data.poikkeamismaaraysTyyppi = null">{{$t('tyhjenna-valinta')}}</EpButton>
                       </div>
+
                     </div>
                     <div v-else>
                       <span>{{ poikkeamismaaraysTyyppiText }}</span>
