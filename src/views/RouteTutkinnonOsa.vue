@@ -138,7 +138,12 @@
                   <div class="font-weight-bold">{{ $t('arvioinnin-kohde') }}</div>
                   <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
                 </div>
-                <table class="table table-striped">
+
+                <div v-if="kriteeritonGeneerinenValittu">
+                  {{ $kaanna(valittuGeneerinen.osaamistasot[0].otsikko)}}
+                </div>
+
+                <table v-else class="table table-striped">
                   <thead>
                     <tr>
                       <th width="20%">{{ $t('osaamistaso') }}</th>
@@ -562,6 +567,15 @@ export default class RouteTutkinnonosa extends Vue {
     });
 
     this.arvioinninTyyppi = null;
+  }
+
+  get kriteeritonGeneerinenValittu() {
+    return this.valittuGeneerinen?.osaamistasot?.length === 1
+      && _.chain(this.valittuGeneerinen.osaamistasot)
+        .map('kriteerit')
+        .flatten()
+        .isEmpty()
+        .value();
   }
 }
 </script>
