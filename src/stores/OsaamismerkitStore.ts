@@ -37,6 +37,7 @@ export class OsaamismerkitStore {
       q.sivukoko,
       q.nimi,
       q.tila,
+      q.koodit,
       q.kategoria,
       q.voimassa,
       q.tuleva,
