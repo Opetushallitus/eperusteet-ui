@@ -25,7 +25,27 @@
             </b-col>
           </b-row>
 
-          <b-row no-gutters>
+          <b-row no-gutters class="mt-4" v-if="oppaanTyyppiTietoaPalvelusta || isEditing">
+            <b-col lg="6">
+              <b-form-group :label="$t('sisallonhallinta')">
+                <b-form-checkbox-group v-if="isEditing" v-model="oppaanTyyppi" stacked>
+                  <b-form-checkbox v-for="tyyppi in oppaanTyypit" :key="tyyppi" :value="tyyppi">
+                    {{ $t('oppaan-tyyppi-' + tyyppi) }}
+                  </b-form-checkbox>
+                </b-form-checkbox-group>
+                <div v-if="oppaanTyyppiTietoaPalvelusta && !isEditing">
+                  {{ $t('oppaan-tyyppi-' + oppaanTyyppi[0]) }}
+                </div>
+              </b-form-group>
+            </b-col>
+            <b-col lg="6" v-if="oppaanTyyppiTietoaPalvelusta">
+              <b-form-group :label="$t('tietoa-palvelusta-etusivu-teksti')">
+                <ep-content v-model="data.peruste.tietoapalvelustaKuvaus" layout="simplified" :is-editable="isEditing"/>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row no-gutters class="mt-4">
              <b-col lg="6">
               <b-form-group :label="$t('koulutustyyppi')" class="pr-5">
                 <EpMultiListSelect v-model="data.peruste.oppaanKoulutustyypit"
@@ -67,7 +87,7 @@
              </b-col>
           </b-row>
 
-          <b-row no-gutters>
+          <b-row no-gutters class="mt-4">
             <b-col lg="6">
               <b-form-group :label="$t('oppaan-kielet')">
                 <b-form-checkbox-group v-if="isEditing" v-model="data.peruste.kielet" stacked>
@@ -84,7 +104,7 @@
               </b-form-group>
             </b-col>
 
-            <b-col lg="6">
+            <b-col lg="6" v-if="!oppaanTyyppiTietoaPalvelusta">
               <b-form-group :label="$t('voimassaolo')">
               <div class="asettamatta" v-if="!data.peruste.voimassaoloAlkaa && !data.peruste.voimassaoloLoppuu && !isEditing">
                 {{$t('ei-asetettu')}}
@@ -250,7 +270,7 @@ import { UiKielet } from '@shared/stores/kieli';
 import { MaintenanceStore } from '@/stores/MaintenanceStore';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 import EpKoodistoSelectTable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectTable.vue';
-import { Koodisto } from '@shared/api/eperusteet';
+import { Koodisto, PerusteBaseDtoOpasTyyppiEnum } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 
 @Component({
@@ -507,6 +527,36 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
         },
       },
     );
+  }
+
+  get oppaanTyypit() {
+    return [
+      _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA),
+    ];
+  }
+
+  get oppaanTyyppi() {
+    if (!this.store?.data.value.peruste.opasTyyppi || this.store?.data.value.peruste.opasTyyppi === _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI)) {
+      return [];
+    }
+
+    return [this.store?.data.value.peruste.opasTyyppi];
+  }
+
+  set oppaanTyyppi(tyyppi) {
+    this.store!.setData(
+      {
+        ...this.store?.data.value,
+        peruste: {
+          ...this.store?.data.value.peruste,
+          opasTyyppi: tyyppi[0] || _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI),
+        },
+      },
+    );
+  };
+
+  get oppaanTyyppiTietoaPalvelusta() {
+    return _.includes(this.oppaanTyyppi, _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA));
   }
 }
 </script>
