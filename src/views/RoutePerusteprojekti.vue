@@ -12,7 +12,8 @@
             @asetaValmiiksi="asetaValmiiksi"
             @palauta="palauta"
             @validoi="validoi"
-            tyyppi="peruste"/>
+            tyyppi="peruste"
+            :julkaisuRoute="julkaisuRoute"/>
         </div>
         <div class="flex-grow-1 align-self-center">
           <div class="mb-5 p-2" v-if="peruste && projekti">
@@ -418,6 +419,7 @@ import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTe
 import { Koulutustyyppi } from '@shared/tyypit';
 import {
   NavigationNodeDtoTypeEnum,
+  PerusteBaseDtoOpasTyyppiEnum,
   PerusteDtoTilaEnum,
   PerusteDtoToteutusEnum,
 } from '@shared/api/eperusteet';
@@ -679,6 +681,8 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       this,
       this.palautusMeta,
     );
+
+    await this.perusteStore.updateCurrent();
   }
 
   async asetaValmiiksi() {
@@ -688,6 +692,8 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       confirm: 'pohja-valmis-varmistus',
       okTitle: 'aseta-valmiiksi',
     });
+
+    await this.perusteStore.updateCurrent();
   }
 
   async validoi() {
