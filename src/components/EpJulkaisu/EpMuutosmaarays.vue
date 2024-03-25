@@ -1,61 +1,76 @@
 <template>
   <EpSpinner v-if="!asiasanat || !maarayksetNimella" />
   <div v-else>
-    <b-form-group :label="$t('lataa-uusi-muutosmaarays') + isRequired" class="w-40">
-        <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
-      </b-form-group>
 
-      <b-form-group :label="$t('muutosmaarays-astuu-voimaan') + isRequired" class="mt-4 d-flex">
-        <ep-datepicker v-model="model.voimassaoloAlkaa" :isEditing="isEditing" />
-      </b-form-group>
+    <EpInfoBanner class="mb-3">
+      {{$t('lisaa-muutosmaarayksen-kieliversiot-samaan-muutosmaaraykseen')}}
+    </EpInfoBanner>
 
-      <b-form-group :label="$t('muutosmaarayksen-nimi') + isRequired" class="mt-4 w-40">
-        <ep-input v-model="model.nimi" :isEditing="isEditing"/>
-      </b-form-group>
+    <b-tabs class="mb-3" v-model="tabindex">
+      <b-tab v-for="kieli in kielet" :key='"kieli"+kieli' :title="$t('translatiivi-' + kieli)"/>
+    </b-tabs>
 
-      <b-form-group :label="$t('muutosmaarayksen-diaarinumero') + isRequired" class="mt-4 w-40">
-        <ep-input v-model="model.diaarinumero" :isEditing="isEditing" type="string"/>
-      </b-form-group>
+    <b-form-group :label="$t('lataa-uusi-muutosmaarays') + isRequired" >
+      <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
+    </b-form-group>
 
-      <b-form-group :label="$t('maarays-annettu') + isRequired" class="mt-4 d-flex">
-        <ep-datepicker v-model="model.maarayspvm" :isEditing="isEditing" />
-      </b-form-group>
+    <b-form-group :label="$t('muutosmaarayksen-nimi') + isRequired" class="mt-4 w-40">
+      <ep-input v-model="model.nimi" :isEditing="isEditing"/>
+    </b-form-group>
 
-      <b-form-group :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired" class="mt-4">
-        <EpMaaraysLiittyyMuuttaaValinta
-          v-model="model"
-          :isEditing="isEditing"
-          :maarayksetNimella="maarayksetNimella"
-          :disabloidutValinnat="disabloidutMuuttaaValinnat"/>
-      </b-form-group>
+    <b-form-group :label="$t('asiasana')" class="mt-4">
+      <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="kielenAsiasanat" :isEditing="isEditing"/>
+    </b-form-group>
 
-      <b-form-group :label="$t('asiasana')" class="mt-4">
-        <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="kielenAsiasanat" :isEditing="isEditing"/>
-      </b-form-group>
+    <b-form-group :label="$t('kuvaus')" class="mt-4">
+      <ep-content v-model="model.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
+    </b-form-group>
 
-      <b-form-group :label="$t('kuvaus')" class="mt-4">
-        <ep-content v-model="model.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
-      </b-form-group>
+    <b-form-group :label="$t('liitteet') + ' (pdf)'" class="mt-4">
+      <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
+    </b-form-group>
 
-      <b-form-group :label="$t('liitteet') + ' (pdf)'" class="mt-4 mb-5">
-          <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
-        </b-form-group>
+    <hr class="my-4"/>
+
+    <h3>{{$t('muutosmaarayksen-kieliversioiden-yhteiset-tiedot')}}</h3>
+
+    <b-form-group :label="$t('muutosmaarays-astuu-voimaan') + isRequired" class="mt-4 d-flex">
+      <ep-datepicker v-model="model.voimassaoloAlkaa" :isEditing="isEditing" />
+    </b-form-group>
+
+    <b-form-group :label="$t('muutosmaarayksen-diaarinumero') + isRequired" class="mt-4 w-40">
+      <ep-input v-model="model.diaarinumero" :isEditing="isEditing" type="string"/>
+    </b-form-group>
+
+    <b-form-group :label="$t('maarays-annettu') + isRequired" class="mt-4 d-flex">
+      <ep-datepicker v-model="model.maarayspvm" :isEditing="isEditing" />
+    </b-form-group>
+
+    <b-form-group :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired" class="mt-4">
+      <EpMaaraysLiittyyMuuttaaValinta
+      v-model="model"
+      :isEditing="isEditing"
+      :maarayksetNimella="maarayksetNimella"
+      :disabloidutValinnat="disabloidutMuuttaaValinnat"/>
+    </b-form-group>
+
   </div>
 </template>
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, ProvideReactive, Vue } from 'vue-property-decorator';
+import { Component, Prop, ProvideReactive, Vue, Watch } from 'vue-property-decorator';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { Maaraykset, MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
-import { Kielet } from '@shared/stores/kieli';
+import { Kielet, UiKielet } from '@shared/stores/kieli';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
+import { Kieli } from '@shared/tyypit';
 
 @Component({
   components: {
@@ -85,6 +100,8 @@ export default class EpMuutosmaarays extends Vue {
   @Prop({ required: true })
   maarayksetNimella!: MaaraysKevytDto[];
 
+  private tabindex = 0;
+
   set model(val) {
     this.$emit('input', val);
   }
@@ -111,6 +128,15 @@ export default class EpMuutosmaarays extends Vue {
 
   get disabloidutMuuttaaValinnat() {
     return [MaaraysDtoLiittyyTyyppiEnum.EILIITY];
+  }
+
+  get kielet() {
+    return UiKielet;
+  }
+
+  @Watch('tabindex')
+  kielivaihtui(index) {
+    Kielet.setSisaltoKieli(Kieli[this.kielet[index]]);
   }
 }
 </script>

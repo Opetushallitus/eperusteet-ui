@@ -7,10 +7,7 @@
            size="xl"
            :hide-footer="true">
     <template slot="modal-header">
-      <div class="d-flex justify-content-between w-100">
-        <div class="mt-1">{{ otsikko }}</div>
-        <EpKielivalinta/>
-      </div>
+      <div class="mt-1">{{ otsikko }}</div>
     </template>
 
     <EpMuutosmaarays class="mb-4" v-model="muutosmaarays" :isEditing="true" :asiasanat="asiasanat" :maarayksetNimella="maarayksetNimella"/>
@@ -50,7 +47,6 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMuutosmaarays from '@/components/EpJulkaisu/EpMuutosmaarays.vue';
 import { MaarayksetEditStore, requireOneLiite } from '@/stores/MaarayksetEditStore';
 import { MaaraysDtoLiittyyTyyppiEnum, MaaraysDtoTilaEnum, MaaraysDtoTyyppiEnum } from '@shared/generated/eperusteet';
-import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { Validations } from 'vuelidate-property-decorators';
 import { requiredOneLang } from '@shared/validators/required';
 import { required } from 'vuelidate/lib/validators';
@@ -61,7 +57,6 @@ import { Maaraykset, MaaraysKevytDto } from '@shared/api/eperusteet';
     EpJulkaisuForm,
     EpButton,
     EpMuutosmaarays,
-    EpKielivalinta,
   },
 })
 export default class EpMuutosmaaraysModal extends Vue {
