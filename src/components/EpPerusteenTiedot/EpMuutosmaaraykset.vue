@@ -11,7 +11,7 @@
       <tbody>
         <tr v-for="(muutos, idx) in value" :key="'muutos' + idx">
           <td>
-            <ep-input v-model="muutos.nimi" :is-editing="isEditing" :placeholder="(muutos.liitteet && muutos.liitteet[$slang.value].nimi) ? muutos.liitteet[$slang.value].nimi : ''"/>
+            <ep-input v-model="muutos.nimi" :is-editing="isEditing" :placeholder="(muutos.liitteet && muutos.liitteet[$slang.value]) ? muutos.liitteet[$slang.value].nimi : ''"/>
           </td>
           <td>
             <span v-if="!!muutos.liitteet && muutos.liitteet[$slang.value]">
