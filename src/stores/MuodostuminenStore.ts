@@ -78,7 +78,7 @@ export class MuodostuminenStore implements IEditoitava {
 
   public async lock() {
     try {
-      const res = await Api.get(`/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`);
+      const res = await Api.get(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`);
       return res.data;
     }
     catch (err) {
@@ -87,7 +87,7 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async acquire() {
-    const res = await Api.post(`/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`, {
+    const res = await Api.post(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`, {
       osanId: this.perusteId,
       suoritustapa: MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!,
     });
@@ -95,7 +95,7 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async release() {
-    await Api.delete(`/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`);
+    await Api.delete(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`);
   }
 
   public async preview() {
