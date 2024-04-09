@@ -45,7 +45,7 @@
     <hr class="my-4"/>
     <h2 class="mb-5">{{ $t('muut-toimenpiteet') }}</h2>
 
-    <EpButton @click="maarayksetperusteille()" :showSpinner="maarayksetPerusteilleLoading">{{$t('luo-maaraykset-perusteille')}}</EpButton>
+    <EpButton @click="amosaaKoulutustoimijaPaivitys()" :showSpinner="amosaaKtPaivitysLoading">{{$t('paivita-amosaa-koulutustoimijat')}}</EpButton>
 
   </ep-main-view>
 </template>
@@ -79,7 +79,7 @@ export default class RouteYllapito extends Vue {
   private isEditing = false;
 
   private yllapitoTiedot: YllapitoDto[] | null = null;
-  private maarayksetPerusteilleLoading = false;
+  private amosaaKtPaivitysLoading = false;
 
   @Validations()
   validations = {
@@ -129,16 +129,16 @@ export default class RouteYllapito extends Vue {
     return val === false || val === true || val === 'false' || val === 'true';
   }
 
-  async maarayksetperusteille() {
-    this.maarayksetPerusteilleLoading = true;
+  async amosaaKoulutustoimijaPaivitys() {
+    this.amosaaKtPaivitysLoading = true;
     try {
-      await Maintenance.maarayksetperusteille();
-      this.$success('Määräykset lisätty');
+      await Maintenance.paivitaAmosaaKoulutustoimijat();
+      this.$success('Päivitys käynnistetty');
     }
     catch (e) {
       this.$success(this.$t('virhe-palvelu-virhe') as string);
     }
-    this.maarayksetPerusteilleLoading = false;
+    this.amosaaKtPaivitysLoading = false;
   }
 }
 </script>
