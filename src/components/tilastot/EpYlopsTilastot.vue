@@ -50,12 +50,25 @@
 
       <EpTilastoAikavaliVertailu class="col-12" v-model="aikavali"/>
 
-      <div class="col-xl-9 col-md-9 col-sm-12">
+      <div class="col-xl-6 col-md-6 col-sm-12">
         <ep-form-content name="peruste">
           <ep-multi-select :multiple="true"
             :is-editing="true"
             :options="perusteItems"
             v-model="valitutPerusteet"
+            :placeholder="$t('kaikki')"
+            track-by="value"
+            label="text">
+          </ep-multi-select>
+        </ep-form-content>
+      </div>
+
+      <div class="col-xl-6 col-md-6 col-sm-12">
+        <ep-form-content name="koulutuksenjarjestaja">
+          <ep-multi-select :multiple="true"
+            :is-editing="true"
+            :options="koulutuksenjarjestajaItems"
+            v-model="valitutKoulutuksenjarjestajat"
             :placeholder="$t('kaikki')"
             track-by="value"
             label="text">
@@ -115,6 +128,26 @@
       align="center">
     </b-pagination>
 
+    <h2 class="mt-5">{{$t('koulutuksenjarjestajat')}} {{koulutuksenjarjestajaFiltered.length}} {{$t('kpl')}}</h2>
+
+      <b-table responsive
+                borderless
+                striped
+                fixed
+                :items="koulutuksenjarjestajaFiltered"
+                :fields="koulutuksenjarjestajaFields"
+                :current-page="koulutuksenjarjestajaPage"
+                :per-page="perPage">
+      </b-table>
+
+      <b-pagination
+        v-model="koulutuksenjarjestajaPage"
+        :total-rows="koulutuksenjarjestajaFiltered.length"
+        :per-page="perPage"
+        aria-controls="opetussuunnitelmat"
+        align="center">
+      </b-pagination>
+
   </div>
 </template>
 
@@ -148,12 +181,14 @@ export default class EpYlopsTilastot extends Vue {
 
   private currentPage = 1;
   private perPage = 10;
+  private koulutuksenjarjestajaPage = 1;
   private query = '';
   private valitutTilat: [] = [];
   private valitutKoulutustyypit: [] = [];
   private valitutVoimassaolot: [] = [];
   private valitutPerusteet: [] = [];
   private aikavali: AikavaliVertailu = {};
+  private valitutKoulutuksenjarjestajat: [] = [];
 
   get opetussuunnitelmatFilled() {
     if (this.opetussuunnitelmat) {
@@ -173,9 +208,30 @@ export default class EpYlopsTilastot extends Vue {
       .filter(ops => Kielet.search(this.query, ops.nimi))
       .filter(ops => _.isEmpty(this.valitutVoimassaolot) || _.includes(_.map(this.valitutVoimassaolot, 'value'), this.opetussuunnitelmaVoimassaolo(ops)))
       .filter(ops => _.isEmpty(this.valitutPerusteet) || _.includes(_.map(this.valitutPerusteet, 'value'), ops.perusteenId))
+      .filter(ops => _.isEmpty(this.valitutKoulutuksenjarjestajat) || _.includes(_.map(this.valitutKoulutuksenjarjestajat, 'value'), ops.koulutuksenjarjestaja!.oid))
       .filter(ops => this.aikavertailu(ops))
       .sortBy(ops => Kielet.kaanna(ops.nimi))
       .value();
+  }
+
+  get koulutuksenjarjestajaFiltered() {
+    return _.chain(this.opetussuunnitelmatFiltered)
+      .filter(ops => !!ops.koulutuksenjarjestaja)
+      .map('koulutuksenjarjestaja')
+      .uniqWith(_.isEqual)
+      .map(koulutuksenjarjestaja => {
+        return {
+          koulutuksenjarjestaja,
+          luonnos: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['luonnos']),
+          valmis: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['valmis']),
+          julkaistu: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['julkaistu']),
+        };
+      })
+      .value();
+  }
+
+  get koulutuksenjarjestajaByOid() {
+    return _.groupBy(this.opetussuunnitelmatFiltered, 'koulutuksenjarjestaja.oid');
   }
 
   get aikavaliValue() {
@@ -403,6 +459,46 @@ export default class EpYlopsTilastot extends Vue {
 
   get tyhjaGraafiData() {
     return [1];
+  }
+
+  get koulutuksenjarjestajaFields() {
+    return [{
+      key: 'koulutuksenjarjestaja',
+      label: this.$t('koulutuksenjarjestaja'),
+      sortable: true,
+      sortByFormatted: true,
+      formatter: (value, key, item) => {
+        return (this as any).$kaanna(value.nimi);
+      },
+    }, {
+      key: 'luonnos',
+      label: this.$t('luonnokset'),
+      sortable: true,
+      thStyle: { width: '15%' },
+    }, {
+      key: 'valmis',
+      label: this.$t('valmiit'),
+      sortable: true,
+      thStyle: { width: '15%' },
+    }, {
+      key: 'julkaistu',
+      label: this.$t('julkaistut'),
+      sortable: true,
+      thStyle: { width: '15%' },
+    }];
+  }
+
+  get koulutuksenjarjestajaItems() {
+    return _.chain(this.opetussuunnitelmatFilled)
+      .filter(opetussuunnitelma => !!opetussuunnitelma.koulutuksenjarjestaja)
+      .map(opetussuunnitelma => {
+        return {
+          value: opetussuunnitelma.koulutuksenjarjestaja.oid,
+          text: (this as any).$kaanna(opetussuunnitelma.koulutuksenjarjestaja!.nimi),
+        };
+      })
+      .uniqWith(_.isEqual)
+      .value();
   }
 }
 </script>
