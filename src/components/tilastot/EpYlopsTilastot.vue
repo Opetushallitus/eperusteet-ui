@@ -87,7 +87,7 @@
       </div>
     </div>
 
-    <h2 class="mt-5">{{$t('opetussuunnitelmat')}}</h2>
+    <h2 class="mt-5">{{$t('opetussuunnitelmat')}} {{opetussuunnitelmatFiltered.length}} {{$t('kpl')}}</h2>
 
     <b-table responsive
             borderless
