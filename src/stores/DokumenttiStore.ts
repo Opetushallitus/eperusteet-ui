@@ -46,20 +46,27 @@ export class DokumenttiStore {
     }
 
     if (!this.state.dokumentti.julkaisuDokumentti && !this.state.dokumenttiJulkaisu && this.version === 'uusi') {
-      this.state.dokumenttiJulkaisu = (await Dokumentit.getJulkaistuDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value)).data;
-      if (this.state.dokumenttiJulkaisu.id) {
-        this.state.dokumenttiJulkaisuHref = baseURL + DokumentitParams.getDokumentti(_.toString(this.state.dokumenttiJulkaisu.id)).url;
-      }
+      await this.getJulkaistuDokumentti();
     }
 
     if (_.kebabCase(this.state.dokumentti.tila) === _.kebabCase(DokumenttiDtoTilaEnum.EPAONNISTUI)
         || _.kebabCase(this.state.dokumentti.tila) === _.kebabCase(DokumenttiDtoTilaEnum.VALMIS)) {
       this.state.polling = false;
-      this.setHref();
+      await this.setHref();
+      await this.getJulkaistuDokumentti();
     }
     else if (_.kebabCase(this.state.dokumentti.tila) !== _.kebabCase(DokumenttiDtoTilaEnum.EIOLE)) {
       this.state.polling = true;
       await this.getDokumenttiTila();
+    }
+  }
+
+  async getJulkaistuDokumentti() {
+    if (!this.state.dokumenttiJulkaisu || _.kebabCase(this.state.dokumenttiJulkaisu?.tila) === _.kebabCase(DokumenttiDtoTilaEnum.EPAONNISTUI)) {
+      this.state.dokumenttiJulkaisu = (await Dokumentit.getJulkaistuDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value)).data;
+      if (this.state.dokumenttiJulkaisu?.id) {
+        this.state.dokumenttiJulkaisuHref = baseURL + DokumentitParams.getDokumentti(_.toString(this.state.dokumenttiJulkaisu.id)).url;
+      }
     }
   }
 
