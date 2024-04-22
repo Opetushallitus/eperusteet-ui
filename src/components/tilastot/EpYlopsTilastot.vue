@@ -222,6 +222,7 @@ export default class EpYlopsTilastot extends Vue {
       .map(koulutuksenjarjestaja => {
         return {
           koulutuksenjarjestaja,
+          arkistoitu: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['poistettu']),
           luonnos: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['luonnos']),
           valmis: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['valmis']),
           julkaistu: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['julkaistu']),
@@ -470,6 +471,11 @@ export default class EpYlopsTilastot extends Vue {
       formatter: (value, key, item) => {
         return (this as any).$kaanna(value.nimi);
       },
+    }, {
+      key: 'arkistoitu',
+      label: this.$t('arkistoidut'),
+      sortable: true,
+      thStyle: { width: '15%' },
     }, {
       key: 'luonnos',
       label: this.$t('luonnokset'),
