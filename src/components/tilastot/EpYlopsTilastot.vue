@@ -75,6 +75,19 @@
           </ep-multi-select>
         </ep-form-content>
       </div>
+
+      <div class="col-xl-3 col-md-3 col-sm-12">
+        <ep-form-content name="koulutuksenjarjestajan-tyyppi">
+          <ep-multi-select :multiple="true"
+            :is-editing="true"
+            :options="koulutuksenjarjestajaTyyppiItems"
+            v-model="valitutKoulutuksenjarjestajaTyypit"
+            :placeholder="$t('kaikki')"
+            track-by="value"
+            label="text">
+          </ep-multi-select>
+        </ep-form-content>
+      </div>
     </div>
 
     <h2 class="mt-5">{{$t('opetussuunnitelmien-lukumaarat')}}</h2>
@@ -189,6 +202,7 @@ export default class EpYlopsTilastot extends Vue {
   private valitutPerusteet: [] = [];
   private aikavali: AikavaliVertailu = {};
   private valitutKoulutuksenjarjestajat: [] = [];
+  private valitutKoulutuksenjarjestajaTyypit: [] = [];
 
   get opetussuunnitelmatFilled() {
     if (this.opetussuunnitelmat) {
@@ -196,6 +210,7 @@ export default class EpYlopsTilastot extends Vue {
         return {
           ...ops,
           url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[ops.koulutustyyppi])?.url + '/#/fi/opetussuunnitelmat/' + ops.id + '/yleisnakyma',
+
         };
       });
     }
@@ -209,6 +224,7 @@ export default class EpYlopsTilastot extends Vue {
       .filter(ops => _.isEmpty(this.valitutVoimassaolot) || _.includes(_.map(this.valitutVoimassaolot, 'value'), this.opetussuunnitelmaVoimassaolo(ops)))
       .filter(ops => _.isEmpty(this.valitutPerusteet) || _.includes(_.map(this.valitutPerusteet, 'value'), ops.perusteenId))
       .filter(ops => _.isEmpty(this.valitutKoulutuksenjarjestajat) || _.includes(_.map(this.valitutKoulutuksenjarjestajat, 'value'), ops.koulutuksenjarjestaja!.oid))
+      .filter(ops => _.isEmpty(this.valitutKoulutuksenjarjestajaTyypit) || _.some(_.map(this.valitutKoulutuksenjarjestajaTyypit, 'value'), tyyppi => _.includes(ops.koulutuksenjarjestaja!.tyypit, tyyppi)))
       .filter(ops => this.aikavertailu(ops))
       .sortBy(ops => Kielet.kaanna(ops.nimi))
       .value();
@@ -440,6 +456,13 @@ export default class EpYlopsTilastot extends Vue {
         text: (this as any).$kaanna(peruste.nimi),
       };
     });
+  }
+
+  get koulutuksenjarjestajaTyyppiItems() {
+    return [
+      { text: this.$t('kunta'), value: 'Kunta' },
+      { text: this.$t('oppilaitos'), value: 'Oppilaitos' },
+    ];
   }
 
   get tyhjaGraafiOptions() {
