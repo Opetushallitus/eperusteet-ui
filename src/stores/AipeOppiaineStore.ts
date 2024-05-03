@@ -31,7 +31,6 @@ export class AipeOppiaineStore implements IEditoitava {
     if (this.oppiaineId) {
       const oppiaine = (await Aipeopetuksensisalto.getAipeOppiaine(this.perusteId, this.vaiheId, this.oppiaineId)).data;
       const oppimaarat = (await Aipeopetuksensisalto.getAipeOppimaarat(this.perusteId, this.vaiheId, this.oppiaineId)).data;
-      const kurssit = (await Aipeopetuksensisalto.getAipeKurssit(this.perusteId, this.vaiheId, this.oppiaineId)).data;
 
       return {
         ...oppiaine,
@@ -42,7 +41,6 @@ export class AipeOppiaineStore implements IEditoitava {
           };
         }),
         oppimaarat,
-        kurssit,
       };
     }
 
