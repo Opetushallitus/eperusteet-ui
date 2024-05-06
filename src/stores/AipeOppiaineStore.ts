@@ -2,6 +2,7 @@ import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/Edit
 import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
+import { Revision } from '@shared/tyypit';
 
 export class AipeOppiaineStore implements IEditoitava {
   constructor(
@@ -11,6 +12,7 @@ export class AipeOppiaineStore implements IEditoitava {
     private parentId: number | null,
     private perusteStore: PerusteStore,
     private el: any,
+    public versionumero?: number,
   ) {
   }
 
@@ -29,8 +31,15 @@ export class AipeOppiaineStore implements IEditoitava {
     });
 
     if (this.oppiaineId) {
-      const oppiaine = (await Aipeopetuksensisalto.getAipeOppiaine(this.perusteId, this.vaiheId, this.oppiaineId)).data;
-      const oppimaarat = (await Aipeopetuksensisalto.getAipeOppimaarat(this.perusteId, this.vaiheId, this.oppiaineId)).data;
+      let oppiaine;
+      if (this.versionumero) {
+        const revisions = (await Aipeopetuksensisalto.getAipeOppiaineVersiot(this.perusteId, this.vaiheId!, this.oppiaineId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        oppiaine = (await Aipeopetuksensisalto.getAipeOppiaine(this.perusteId, this.vaiheId, this.oppiaineId, rev.numero)).data;
+      }
+      else {
+        oppiaine = (await Aipeopetuksensisalto.getAipeOppiaine(this.perusteId, this.vaiheId, this.oppiaineId)).data;
+      }
 
       return {
         ...oppiaine,
@@ -40,7 +49,6 @@ export class AipeOppiaineStore implements IEditoitava {
             arvioinninkohteet: _.sortBy(tavoite.arvioinninkohteet, 'arvosana'),
           };
         }),
-        oppimaarat,
       };
     }
 
@@ -84,5 +92,18 @@ export class AipeOppiaineStore implements IEditoitava {
       await this.perusteStore.updateNavigation();
       this.el.$router.push({ name: 'aipevaihe', params: { vaiheId: this.vaiheId } });
     }
+  }
+
+  public async revisions() {
+    if (this.oppiaineId) {
+      const res = await Aipeopetuksensisalto.getAipeOppiaineVersiot(this.perusteId, this.vaiheId!, this.oppiaineId!);
+      return res.data as Revision[];
+    }
+
+    return [];
+  }
+
+  public async restore(rev: number) {
+    await Aipeopetuksensisalto.revertAipeOppiaine(this.perusteId, this.vaiheId!, this.oppiaineId!, rev);
   }
 }

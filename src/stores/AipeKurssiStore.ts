@@ -2,6 +2,7 @@ import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/Edit
 import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
+import { Revision } from '@shared/tyypit';
 
 export class AipeKurssiStore implements IEditoitava {
   constructor(
@@ -11,6 +12,7 @@ export class AipeKurssiStore implements IEditoitava {
     private kurssiId: number | null,
     private perusteStore: PerusteStore,
     private el: any,
+    public versionumero?: number,
   ) {
   }
 
@@ -27,7 +29,14 @@ export class AipeKurssiStore implements IEditoitava {
     supportDataProvider({ tavoitteet: oppiaine.tavoitteet });
 
     if (this.kurssiId) {
-      return (await Aipeopetuksensisalto.getAipeKurssi(this.perusteId, this.vaiheId, this.oppiaineId, this.kurssiId)).data;
+      if (this.versionumero) {
+        const revisions = (await Aipeopetuksensisalto.getKurssiVersiot(this.perusteId, this.vaiheId!, this.oppiaineId, this.kurssiId)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        return (await Aipeopetuksensisalto.getAipeKurssi(this.perusteId, this.vaiheId, this.oppiaineId, this.kurssiId, rev.numero)).data;
+      }
+      else {
+        return (await Aipeopetuksensisalto.getAipeKurssi(this.perusteId, this.vaiheId, this.oppiaineId, this.kurssiId)).data;
+      }
     }
 
     return {};
@@ -55,5 +64,18 @@ export class AipeKurssiStore implements IEditoitava {
       await this.perusteStore.updateNavigation();
       this.el.$router.push({ name: 'aipeoppiaine', params: { oppiaineID: this.oppiaineId } });
     }
+  }
+
+  public async revisions() {
+    if (this.kurssiId) {
+      const res = await Aipeopetuksensisalto.getKurssiVersiot(this.perusteId, this.vaiheId!, this.oppiaineId!, this.kurssiId);
+      return res.data as Revision[];
+    }
+
+    return [];
+  }
+
+  public async restore(rev: number) {
+    await Aipeopetuksensisalto.revertKurssi(this.perusteId, this.vaiheId!, this.oppiaineId!, this.kurssiId!, rev);
   }
 }
