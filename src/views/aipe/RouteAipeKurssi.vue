@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="store">
+  <EpEditointi :store="store" :versionumero="versionumero">
     <template #header="{ data }">
       <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
       <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
@@ -110,8 +110,17 @@ export default class RouteAipeKurssi extends Vue {
 
   @Watch('kurssiId', { immediate: true })
   async kurssiChange() {
-    const store = new AipeKurssiStore(this.perusteId!, this.vaiheId, this.oppiaineId, this.kurssiId, this.perusteStore, this);
+    const store = new AipeKurssiStore(this.perusteId!, this.vaiheId, this.oppiaineId, this.kurssiId, this.perusteStore, this, this.versionumero);
     this.store = new EditointiStore(store);
+  }
+
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.kurssiChange();
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
   }
 
   get perusteId() {

@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="store">
+  <EpEditointi :store="store" :versionumero="versionumero">
     <template #header="{ data }">
       <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
       <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
@@ -119,8 +119,17 @@ export default class RouteAipeVaihe extends Vue {
 
   @Watch('vaiheId', { immediate: true })
   async vaiheChange() {
-    const store = new AipeVaiheStore(this.perusteId!, this.vaiheId, this.perusteStore, this);
+    const store = new AipeVaiheStore(this.perusteId!, this.vaiheId, this.perusteStore, this, this.versionumero);
     this.store = new EditointiStore(store);
+  }
+
+  @Watch('versionumero', { immediate: true })
+  async versionumeroChange() {
+    await this.vaiheChange();
+  }
+
+  get versionumero() {
+    return _.toNumber(this.$route.query.versionumero);
   }
 
   get sisaltoTekstiAvaimet() {

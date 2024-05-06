@@ -2,6 +2,7 @@ import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/Edit
 import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
+import { Revision } from '@shared/tyypit';
 
 export class AipeVaiheStore implements IEditoitava {
   constructor(
@@ -9,6 +10,7 @@ export class AipeVaiheStore implements IEditoitava {
     private vaiheId: number | null,
     private perusteStore: PerusteStore,
     private el: any,
+    public versionumero?: number,
   ) {
   }
 
@@ -22,7 +24,14 @@ export class AipeVaiheStore implements IEditoitava {
 
   async load() {
     if (this.vaiheId) {
-      return (await Aipeopetuksensisalto.getVaihe(this.perusteId, this.vaiheId)).data;
+      if (this.versionumero) {
+        const revisions = (await Aipeopetuksensisalto.getVaiheVersiot(this.perusteId, this.vaiheId!)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        return (await Aipeopetuksensisalto.getVaihe(this.perusteId, this.vaiheId, rev.numero)).data;
+      }
+      else {
+        return (await Aipeopetuksensisalto.getVaihe(this.perusteId, this.vaiheId)).data;
+      }
     }
 
     return {
@@ -54,5 +63,14 @@ export class AipeVaiheStore implements IEditoitava {
       await this.perusteStore.updateNavigation();
       this.el.$router.push({ name: 'perusteprojekti' });
     }
+  }
+
+  public async revisions() {
+    const res = await Aipeopetuksensisalto.getVaiheVersiot(this.perusteId, this.vaiheId!);
+    return res.data as Revision[];
+  }
+
+  public async restore(rev: number) {
+    await Aipeopetuksensisalto.revertVaihe(this.perusteId, this.vaiheId!, rev);
   }
 }
