@@ -175,9 +175,14 @@ export default class EpMuutosmaaraykset extends Vue {
 
     if (poista) {
       this.poistossa.push(muutosmaarays.id);
-      this.perusteStore.poistaMuutosmaarays(muutosmaarays);
-      this.poistossa = _.reject(this.poistossa, poisto => poisto === muutosmaarays.id);
-      this.$success(this.$t('muutosmaarays-poistettu') as string);
+      try {
+        await this.perusteStore.poistaMuutosmaarays(muutosmaarays);
+        this.poistossa = _.without(this.poistossa, muutosmaarays.id);
+        this.$success(this.$t('muutosmaarays-poistettu') as string);
+      }
+      catch (err) {
+        this.poistossa = _.without(this.poistossa, muutosmaarays.id);
+      }
     }
   }
 }

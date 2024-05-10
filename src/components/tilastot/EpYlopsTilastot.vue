@@ -224,7 +224,8 @@ export default class EpYlopsTilastot extends Vue {
       .filter(ops => _.isEmpty(this.valitutVoimassaolot) || _.includes(_.map(this.valitutVoimassaolot, 'value'), this.opetussuunnitelmaVoimassaolo(ops)))
       .filter(ops => _.isEmpty(this.valitutPerusteet) || _.includes(_.map(this.valitutPerusteet, 'value'), ops.perusteenId))
       .filter(ops => _.isEmpty(this.valitutKoulutuksenjarjestajat) || _.includes(_.map(this.valitutKoulutuksenjarjestajat, 'value'), ops.koulutuksenjarjestaja!.oid))
-      .filter(ops => _.isEmpty(this.valitutKoulutuksenjarjestajaTyypit) || _.some(_.map(this.valitutKoulutuksenjarjestajaTyypit, 'value'), tyyppi => _.includes(ops.koulutuksenjarjestaja?.tyypit, tyyppi)))
+      .filter(ops => _.isEmpty(this.valitutKoulutuksenjarjestajaTyypit)
+        || _.some(_.map(this.valitutKoulutuksenjarjestajaTyypit, 'value'), tyyppi => _.includes(ops.koulutuksenjarjestaja?.tyypit, tyyppi) || (tyyppi === 'maarittelematon' && _.isEmpty(ops.koulutuksenjarjestaja?.tyypit))))
       .filter(ops => this.aikavertailu(ops))
       .sortBy(ops => Kielet.kaanna(ops.nimi))
       .value();
@@ -460,6 +461,7 @@ export default class EpYlopsTilastot extends Vue {
 
   get koulutuksenjarjestajaTyyppiItems() {
     return [
+      { text: this.$t('maarittelematon'), value: 'maarittelematon' },
       { text: this.$t('kunta'), value: 'Kunta' },
       { text: this.$t('oppilaitos'), value: 'Oppilaitos' },
     ];
