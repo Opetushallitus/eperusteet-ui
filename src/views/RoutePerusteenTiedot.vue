@@ -350,9 +350,15 @@
                               hover>
 
                         <template v-slot:cell(diaarinumero)="{index}">
-                          <EpInput type="string" :isEditing="isEditing" :placeholder="$t('kirjoita-diaarinumero')" v-model="koulutusvienninOhjeet[index].lisatieto"/>
+                          <div class="d-flex">
+                            <EpInput type="string" :isEditing="isEditing" :placeholder="$t('kirjoita-diaarinumero')" v-model="koulutusvienninOhjeet[index].lisatieto"/>
+                            <ep-button v-if="isEditing"
+                                       variant="link"
+                                       icon="save"
+                                       @click="tallennaDiaari(koulutusvienninOhjeet[index])"
+                                       :help="$t('tallenna-liitteen-diaarinumero')"></ep-button>
+                          </div>
                         </template>
-
                         <template v-slot:cell(toiminnot)="data">
                           <div class="text-center" v-if="isEditing">
                             <ep-button variant="link" icon="delete" @click="poistaLiite(data.item)">
@@ -656,15 +662,20 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     return [{
       key: 'nimi',
       label: this.$t('nimi'),
-      thStyle: { width: '40%' },
+      thStyle: { width: '50%' },
+      tdClass: ['liite-nimi', 'align-middle'],
       sortable: false,
     }, {
       key: 'diaarinumero',
       label: this.$t('diaarinumero'),
+      thStyle: { width: '25%' },
+      tdClass: 'align-middle',
       sortable: false,
     }, {
       key: 'luotu',
       label: this.$t('julkaistu'),
+      thStyle: { width: '15%' },
+      tdClass: 'align-middle',
       sortable: false,
       formatter: (value: any, key: any, item: any) => {
         return (this as any).$sdt(value);
@@ -892,6 +903,19 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     }
   }
 
+  async tallennaDiaari(liiteData) {
+    if (liiteData && liiteData.lisatieto) {
+      try {
+        await Liitetiedostot.paivitaLisatieto(this.perusteId!, liiteData.id, liiteData.lisatieto);
+        this.$success(this.$t('diaarinumero-tallennettu') as string);
+      }
+      catch (err) {
+        this.$fail(this.$t('diaarinumeron-tallennus-epaonnistui') as string);
+        console.log(err);
+      }
+    }
+  }
+
   async tallennaKoulutusvienninOhjeDiaari() {
     if (!_.isEmpty(this.koulutusvienninOhjeet)) {
       await Promise.all(_.map(this.koulutusvienninOhjeet, liite =>
@@ -971,4 +995,7 @@ hr {
   align-self: center;
 }
 
+::v-deep .liite-nimi {
+  overflow-x: auto;
+}
 </style>
