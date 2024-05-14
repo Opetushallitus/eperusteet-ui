@@ -1,9 +1,8 @@
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { computed } from '@vue/composition-api';
-import { Maaraykset, MaaraysDtoTilaEnum, MaaraysDtoTyyppiEnum, PerusteDtoTilaEnum, Perusteet } from '@shared/api/eperusteet';
+import { Liitetiedostot, Maaraykset, Perusteet } from '@shared/api/eperusteet';
 import { required } from 'vuelidate/lib/validators';
 import { PerusteStore } from './PerusteStore';
-import { MaarayksetEditStore } from './MaarayksetEditStore';
 import _ from 'lodash';
 
 export class PerusteEditStore implements IEditoitava {
@@ -39,6 +38,9 @@ export class PerusteEditStore implements IEditoitava {
   async save(data: any) {
     if (data.maarays?.id) {
       await Maaraykset.updateMaarays(data.maarays.id, data.maarays);
+    }
+    if (data.koulutusvienninOhjeLiitteet && data.koulutusvienninOhjeLiitteet.length > 0) {
+      await Promise.all(_.map(data.koulutusvienninOhjeLiitteet, liite => Liitetiedostot.paivitaLisatieto(this.perusteId!, liite.id, liite.lisatieto)));
     }
 
     await Perusteet.updatePeruste(this.perusteId, _.omit(data, 'maarays'));

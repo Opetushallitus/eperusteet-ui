@@ -352,11 +352,6 @@
                         <template v-slot:cell(diaarinumero)="{index}">
                           <div class="d-flex">
                             <EpInput type="string" :isEditing="isEditing" :placeholder="$t('kirjoita-diaarinumero')" v-model="koulutusvienninOhjeet[index].lisatieto"/>
-                            <ep-button v-if="isEditing"
-                                       variant="link"
-                                       icon="save"
-                                       @click="tallennaDiaari(koulutusvienninOhjeet[index])"
-                                       :help="$t('tallenna-liitteen-diaarinumero')"></ep-button>
                           </div>
                         </template>
                         <template v-slot:cell(toiminnot)="data">
@@ -572,6 +567,14 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
 
   get korvattavatDiaarinumerot() {
     return this.store?.data?.value?.korvattavatDiaarinumerot || null;
+  }
+
+  @Watch('koulutusvienninOhjeet', { deep: true })
+  async onKoulutusvienninOhjeetChanged() {
+    this.store!.setData({
+      ...this.store!.data.value,
+      koulutusvienninOhjeLiitteet: this.koulutusvienninOhjeet,
+    });
   }
 
   @Watch('korvattavatDiaarinumerot')
@@ -900,26 +903,6 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
       this.$success(this.$t('kaannos-tallennettu') as string);
       this.fetchLiitteet();
       this.kaannosFile = null;
-    }
-  }
-
-  async tallennaDiaari(liiteData) {
-    if (liiteData && liiteData.lisatieto) {
-      try {
-        await Liitetiedostot.paivitaLisatieto(this.perusteId!, liiteData.id, liiteData.lisatieto);
-        this.$success(this.$t('diaarinumero-tallennettu') as string);
-      }
-      catch (err) {
-        this.$fail(this.$t('diaarinumeron-tallennus-epaonnistui') as string);
-        console.log(err);
-      }
-    }
-  }
-
-  async tallennaKoulutusvienninOhjeDiaari() {
-    if (!_.isEmpty(this.koulutusvienninOhjeet)) {
-      await Promise.all(_.map(this.koulutusvienninOhjeet, liite =>
-        Liitetiedostot.paivitaLisatieto(this.perusteId!, liite.id, liite.lisatieto)));
     }
   }
 
