@@ -5,7 +5,7 @@
     </template>
 
     <EpSpinner v-if="!yllapitoTiedot" />
-    <template v-else>
+    <template v-else-if="yllapitoTiedot && yllapitoTiedot.length > 0">
       <div class="mt-4">
         <b-table
           striped
@@ -31,7 +31,6 @@
 
         </b-table>
       </div>
-
       <div v-if="!isEditing">
         <ep-button variant="primary ml-2" @click="onEdit()">{{ $t('muokkaa') }}</ep-button>
       </div>
@@ -40,9 +39,9 @@
           <ep-button class="ml-2" variant="primary" @click="onSave()" :disabled="$v.$invalid">{{ $t('tallenna') }}</ep-button>
         </div>
       </div>
+      <hr class="my-4"/>
     </template>
 
-    <hr class="my-4"/>
     <h2 class="mb-5">{{ $t('muut-toimenpiteet') }}</h2>
 
     <EpButton @click="amosaaKoulutustoimijaPaivitys()" :showSpinner="amosaaKtPaivitysLoading">{{$t('paivita-amosaa-koulutustoimijat')}}</EpButton>
