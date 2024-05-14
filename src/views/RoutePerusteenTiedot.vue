@@ -906,6 +906,13 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     }
   }
 
+  async tallennaKoulutusvienninOhjeDiaari() {
+    if (!_.isEmpty(this.koulutusvienninOhjeet)) {
+      await Promise.all(_.map(this.koulutusvienninOhjeet, liite =>
+        Liitetiedostot.paivitaLisatieto(this.perusteId!, liite.id, liite.lisatieto)));
+    }
+  }
+
   get tyypinVaihtoSallittu() {
     return this.isAmmatillinen && this.$isAdmin() && _.includes(_.map(this.perusteenTyypit, 'value'), this.peruste.tyyppi);
   }
