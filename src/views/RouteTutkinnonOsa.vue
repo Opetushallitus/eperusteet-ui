@@ -186,7 +186,7 @@
           </ep-collapse>
 
           <ep-collapse tyyppi="ammattitaidon-osoittamistavat" :border-bottom="false" :border-top="true">
-            <h3 slot="header">{{ $t('ammattitaidonOsoittamistavat') }}</h3>
+            <h3 slot="header">{{ $t('ammattitaidon-osoittamistavat') }}</h3>
             <b-form-group>
               <ep-content v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
                           :validation="validation.tutkinnonOsa.ammattitaidonOsoittamistavat"
