@@ -10,7 +10,11 @@
       <b-tab v-for="kieli in kielet" :key='"kieli"+kieli' :title="$t('translatiivi-' + kieli)"/>
     </b-tabs>
 
-    <b-form-group :label="$t('lataa-uusi-muutosmaarays') + isRequired" >
+    <b-form-group>
+      <div slot="label" class="d-flex">
+        <span>{{$t('lataa-uusi-muutosmaarays') + isRequired}}</span>
+        <EpInfoPopover class="ml-2" unique-id="11">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+      </div>
       <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
     </b-form-group>
 
@@ -26,7 +30,11 @@
       <ep-content v-model="model.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
     </b-form-group>
 
-    <b-form-group :label="$t('liitteet') + ' (pdf)'" class="mt-4">
+    <b-form-group class="mt-4">
+      <div slot="label" class="d-flex">
+        <span>{{$t('liitteet') + ' (pdf)'}}</span>
+        <EpInfoPopover class="ml-2" unique-id="12">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+      </div>
       <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
     </b-form-group>
 
@@ -59,9 +67,9 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, ProvideReactive, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
-import { Maaraykset, MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import { MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
 import { Kielet, UiKielet } from '@shared/stores/kieli';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
@@ -71,9 +79,11 @@ import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import { Kieli } from '@shared/tyypit';
+import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 
 @Component({
   components: {
+    EpInfoPopover,
     EpToggle,
     EpMaaraysLiittyyMuuttaaValinta,
     EpMaaraysAsiasanat,
@@ -100,6 +110,7 @@ export default class EpMuutosmaarays extends Vue {
   @Prop({ required: true })
   maarayksetNimella!: MaaraysKevytDto[];
 
+  private fileMaxSize = 10;
   private tabindex = 0;
 
   set model(val) {
