@@ -210,7 +210,10 @@
           <b-tab :title="$t('liitteet-ja-maaraykset')">
             <b-container fluid="xl" class="perustiedot-container">
 
-              <h3>{{$t('maarayskirje')}}</h3>
+              <div class="d-flex">
+                <h3>{{$t('maarayskirje')}}</h3>
+                <EpInfoPopover v-if="isEditing" class="ml-2" unique-id="4">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+              </div>
 
               <b-row no-gutters>
                 <b-col class="mb-4">
@@ -277,7 +280,10 @@
                     <h3 slot="label">{{$t('saamen-kielelle-kaannetyt-perusteet')}}</h3>
                     <ep-spinner v-if="!liitteet" />
                     <div v-if="isEditing" class="mb-4">
-                      <div class="lataaliite mb-3">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                      <div class="d-flex">
+                        <div class="lataaliite mb-3">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                        <EpInfoPopover v-if="isEditing" class="ml-2" unique-id="5">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+                      </div>
                       <ep-tiedosto-lataus :fileTypes="['application/pdf']" v-model="kaannosFile" :as-binary="true" />
                     </div>
                     <b-table v-if="kaannokset.length > 0"
@@ -334,7 +340,10 @@
 
                     <div v-if="data.poikkeamismaaraysTyyppi === 'koulutusvientiliite'">
                       <div v-if="isEditing">
-                        <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                        <div class="d-flex">
+                          <div class="lataaliite">{{ $t('lataa-uusi-liitetiedosto') }}</div>
+                          <EpInfoPopover v-if="isEditing" class="ml-2" unique-id="6">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+                        </div>
                         <div class="liiteohje" v-html="$t('koulutusviennin-lataus-ohje')"></div>
                         <ep-tiedosto-lataus :fileTypes="['application/pdf']"
                                             v-model="koulutusvienninOhjeFile"
@@ -521,6 +530,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
   private korvattavatPerusteet: { [diaari: string]: any } = {};
   private korvattavaDiaarinumero = '';
   private poikkeamismaaraysTyyppi: 'ei_tarvita_ohjetta' | 'ei_voi_poiketa' | 'koulutusvientiliite' | null = null;
+  private fileMaxSize = 10;
 
   async onProjektiChange(projektiId: number, perusteId: number) {
     this.store = new EditointiStore(new PerusteEditStore(projektiId, perusteId, this.perusteStore, this.tallennaKoulutusvienninOhjeDiaari));
