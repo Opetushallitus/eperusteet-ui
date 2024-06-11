@@ -5,47 +5,16 @@ jobs:
   build-and-test-eperusteet-ui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Node 16
-        uses: actions/setup-node@v3
+      - name: Set up Node 21
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
-
-      - name: Cache Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-cache-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Print yarn cache directory path
-        id: yarn-cache-dir-path
-        run: |
-          yarn cache dir
-          echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Cache yarn
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Print npm cache directory
-        id: npm-cache-dir
-        run: |
-          npm config get cache
-          echo "::set-output name=dir::$(npm config get cache)"
-
-      - name: Cache npm
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-        
+          node-version: '21.7.3'
+      
+      - name: Enable corepack for nodejs
+        run: corepack enable
+      
       - name: Get backend branch file http status
         id: spec_file_http_status
         run: |
@@ -59,15 +28,14 @@ jobs:
           
       - name: Build eperusteet-ui
         run: |
-          echo spec file: ${{ env.EPERUSTEET_SPECFILE }}
-          git clone --depth=1 https://github.com/Opetushallitus/eperusteet
           git submodule update --recursive --init
-          
           cd eperusteet-frontend-utils/vue
           yarn install --silent
           yarn gen:api
           rm -rf node_modules
           cd ../..
+          
           yarn install --silent
+          yarn lint
           yarn test:unit
           yarn build
