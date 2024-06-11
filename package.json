@@ -8,8 +8,7 @@
     "serve": "vue-cli-service serve",
     "serve-dev": "set USE_SOURCEMAP=true && vue-cli-service serve",
     "build": "vue-cli-service build",
-    "test:unit": "TZ=Europe/Helsinki vue-cli-service test:unit --ci --coverage --no-cache",
-    "test:unit:notz": "vue-cli-service test:unit --ci --coverage --no-cache",
+    "test:unit": "vue-cli-service test:unit --ci --coverage --no-cache",
     "test:unit:inspect": "node --inspect-brk ./node_modules/@vue/cli-service/bin/vue-cli-service.js test:unit",
     "test:e2e": "vue-cli-service test:e2e --headless",
     "lint": "vue-cli-service lint --no-fix",
@@ -91,12 +90,13 @@
     "xlsx": "^0.17.0"
   },
   "engines": {
-    "node": "^16"
+    "node": "^21"
   },
   "resolutions": {
     "prosemirror-model": "1.8.2",
     "prosemirror-state": "1.3.2",
     "prosemirror-transform": "1.2.2",
     "prosemirror-view": "1.13.4"
-  }
+  },
+  "packageManager": "yarn@4.3.1"
 }

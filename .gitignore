@@ -3,6 +3,7 @@ node_modules
 coverage
 /dist
 package-lock.json
+.yarn/*
 
 /tests/e2e/videos/
 /tests/e2e/screenshots/
