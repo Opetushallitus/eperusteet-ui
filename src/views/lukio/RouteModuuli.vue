@@ -6,7 +6,7 @@
       <h2 v-else class="font-italic" >{{ $t('nimeton-moduuli') }}</h2>
     </template>
 
-    <template #default="{ data, isEditing, supportData }">
+    <template #default="{ data, isEditing }">
       <b-row>
         <b-col cols="8" v-if="isEditing" class="mb-3">
           <b-form-group :label="$t('moduulin-nimi')">

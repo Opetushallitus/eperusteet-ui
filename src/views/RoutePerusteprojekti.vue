@@ -329,7 +329,7 @@
                 </div>
               </template>
 
-              <template v-slot:perusopetuslaajaalaisetosaamiset="{ item }">
+              <template v-slot:perusopetuslaajaalaisetosaamiset>
                 <div class="menu-item">
                   <router-link :to="{ name: 'perusopetusLaajaAlaisetOsaamiset' }">
                     {{ $t('laaja-alaiset-osaamiset') }}
@@ -345,7 +345,7 @@
                 </div>
               </template>
 
-              <template v-slot:vuosiluokkakokonaisuudet="{ item }">
+              <template v-slot:vuosiluokkakokonaisuudet>
                 <div class="menu-item">
                   <router-link :to="{ name: 'perusopetusVuosiluokkakokonaisuudet' }">
                     {{ $t('vuosiluokkakokonaisuudet') }}
@@ -361,7 +361,7 @@
                 </div>
               </template>
 
-              <template v-slot:perusopetusoppiaineet="{ item }">
+              <template v-slot:perusopetusoppiaineet>
                 <div class="menu-item">
                   <router-link :to="{ name: 'perusopetusOppiaineet' }">
                     {{ $t('oppiaineet') }}

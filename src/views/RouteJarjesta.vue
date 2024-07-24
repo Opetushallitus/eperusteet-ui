@@ -1,7 +1,7 @@
 <template>
   <ep-spinner v-if="!store" />
   <EpEditointi v-else :store="store">
-    <template #header="{ data }">
+    <template #header>
       <h2>{{ $t('muokkaa-jarjestysta') }}</h2>
     </template>
     <template #default="{ data, isEditing }">

@@ -18,7 +18,7 @@
           <span v-else>{{ option }}</span>
         </template>
 
-        <template v-slot:checkbox="{ option }"><span/></template>
+        <template v-slot:checkbox><span/></template>
 
         <template slot="selection" slot-scope="{ values }">
           <div class="d-flex align-items-center" :class="{'mb-2': values.length > 0}">

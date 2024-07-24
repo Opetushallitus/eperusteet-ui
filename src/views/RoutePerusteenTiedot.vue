@@ -5,7 +5,7 @@
         <h2 class="m-0">{{ $t('perusteen-tiedot') }}</h2>
       </template>
 
-      <template v-slot:default="{ data, isEditing, validation, supportData }">
+      <template v-slot:default="{ data, isEditing, validation }">
 
         <b-tabs>
           <b-tab :title="$t('perustiedot')">

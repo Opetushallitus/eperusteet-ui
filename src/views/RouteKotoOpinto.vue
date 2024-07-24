@@ -4,7 +4,7 @@
       <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
       <h2 class="m-0" v-else >{{ $t('nimeton-opinto') }}</h2>
     </template>
-    <template v-slot:default="{ data, isEditing, validation }">
+    <template v-slot:default="{ data, isEditing }">
 
       <b-row v-if="isEditing" class="mb-4">
         <b-col lg="8">

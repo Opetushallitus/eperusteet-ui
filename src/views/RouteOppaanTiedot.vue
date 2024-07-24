@@ -1,7 +1,7 @@
 <template>
   <div v-if="!isInitializing && store">
     <EpEditointi :store="store">
-      <template v-slot:header="{ data }">
+      <template v-slot:header>
         <h2 class="m-0">{{ $t('oppaan-tiedot') }}</h2>
       </template>
       <template v-slot:default="{ data, isEditing, validation }">
