@@ -6,7 +6,7 @@
       <h2 v-else class="font-italic" >{{ $t('nimeton-oppiaine') }}</h2>
     </template>
 
-    <template #default="{ data, isEditing, supportData }">
+    <template #default="{ data, isEditing }">
       <b-row>
         <b-col cols="8" v-if="isEditing">
           <b-form-group :label="$t('oppiaineen-nimi')">

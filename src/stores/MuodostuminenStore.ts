@@ -30,8 +30,8 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async load() {
-    let data;
-    let peruste;
+    let data = {} as any;
+    let peruste = {} as any;
     [peruste, data] = _.map(await (Promise.all([
       Perusteet.getPerusteenTiedot(this.perusteId),
       TutkinnonRakenne.getRakenne(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!),

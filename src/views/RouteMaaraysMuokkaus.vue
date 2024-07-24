@@ -51,7 +51,7 @@
         </div>
       </template>
 
-      <template v-slot:default="{ data, isEditing, validation, supportData }">
+      <template v-slot:default="{ data, isEditing, supportData }">
 
         <div v-if="!isEditing">
           <b-form-group :label="$t('tila')">

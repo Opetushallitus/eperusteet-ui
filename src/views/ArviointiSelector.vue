@@ -4,7 +4,7 @@
       <template slot="modal-header">
         {{$t('luo-uusi-arviointi')}}
       </template>
-      <template v-slot:modal-footer="{ ok, cancel }">
+      <template v-slot:modal-footer>
         <ep-button variant="secondary" @click="onClose">{{ $t('peruuta') }}</ep-button>
         <ep-button variant="primary" :disabled="!model" @click="onOk">{{ $t('luo-uusi-arviointi') }}</ep-button>
       </template>

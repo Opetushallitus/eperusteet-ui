@@ -9,7 +9,7 @@
       </h2>
       </template>
 
-    <template #default="{ data, isEditing, supportData }">
+    <template #default="{ data, isEditing }">
       <b-row>
         <b-col cols="8" v-if="isEditing">
           <b-form-group :label="!isOppimaara ? $t('oppiaineen-nimi') : $t('oppimaaran-nimi')">
