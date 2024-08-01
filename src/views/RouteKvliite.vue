@@ -6,6 +6,11 @@
         <h2 class="m-0">{{ $t('kvliite') }}</h2>
       </template>
       <template v-slot:default="{ data, isEditing }">
+        <EpInfoBanner class="mb-4" v-if="data.kvliite.periytynyt">
+          {{ $t('perusteen-kvliite-periytynyt') }}
+          <router-link :to="{name: 'kvliite', params: { projektiId: data.kvliite.pohjaProjekti.id }}">{{$kaanna(data.kvliite.pohjaProjekti.peruste.nimi)}}</router-link>
+        </EpInfoBanner>
+
         <h3>{{ $t('tutkinnon-suorittaneen-ammatillinen-osaaminen') }}</h3>
         <b-form-group :label="$t('tutkinnon-muodostuminen')">
           <ep-content v-model="tutkinnonMuodostuminen"
@@ -17,13 +22,13 @@
         <b-form-group :label="$t('tutkintotodistuksen-antaja')">
           <ep-content v-model="data.kvliite.tutkintotodistuksenAntaja"
                       layout="simplified"
-                      :is-editable="isEditing"></ep-content>
+                      :is-editable="isEditing && !data.kvliite.periytynyt"></ep-content>
         </b-form-group>
 
         <b-form-group :label="$t('tutkinnosta-paattava-viranomainen')">
           <ep-content v-model="data.kvliite.tutkinnostaPaattavaViranomainen"
                       layout="simplified"
-                      :is-editable="isEditing"></ep-content>
+                      :is-editable="isEditing && !data.kvliite.periytynyt"></ep-content>
         </b-form-group>
 
         <b-form-group :label="$t('tutkinnon-taso')">

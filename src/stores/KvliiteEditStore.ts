@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { computed } from '@vue/composition-api';
 import { Perusteet, Arviointiasteikot } from '@shared/api/eperusteet';
 
@@ -77,4 +77,14 @@ export class KvliiteEditStore implements IEditoitava {
   public readonly validator = computed(() => {
     return {};
   });
+
+  public features(data: any) {
+    return computed(() => {
+      return {
+        editable: !data.kvliite.periytynyt,
+        removable: false,
+        recoverable: false,
+      } as EditoitavaFeatures;
+    });
+  }
 }
