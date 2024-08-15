@@ -1,10 +1,17 @@
 <template>
   <ep-main-view :container="true">
-    <template slot="header">
-      <h1>{{ $t('tilastot') }}</h1>
+    <template #header>
+      <div class="d-flex">
+        <h1>{{ $t('tilastot') }}</h1>
+        <EpSpinner v-if="!toteutussuunnitelmat || !opetussuunnitelmat" />
+      </div>
     </template>
 
     <b-tabs>
+      <b-tab :title="$t('suunnitelmien-lukumaarat')" class="mt-5">
+        <EpLukumaaraTilastot :tilastotStore="tilastotStore" />
+      </b-tab>
+
       <b-tab :title="$t('amosaa-tyokalu')" class="mt-5">
         <EpAmosaaTilastot :toteutussuunnitelmat="toteutussuunnitelmat" />
       </b-tab>
@@ -23,15 +30,16 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import * as _ from 'lodash';
 import { TilastotStore } from '@/stores/TilastotStore';
-import { Kielet } from '@shared/stores/kieli';
 import EpAmosaaTilastot from '@/components/tilastot/EpAmosaaTilastot.vue';
 import EpYlopsTilastot from '@/components/tilastot/EpYlopsTilastot.vue';
+import EpLukumaaraTilastot from '@/components/tilastot/EpLukumaaraTilastot.vue';
 
 @Component({
   components: {
     EpMainView,
     EpAmosaaTilastot,
     EpYlopsTilastot,
+    EpLukumaaraTilastot,
   },
 })
 export default class RouteTilastot extends Vue {
