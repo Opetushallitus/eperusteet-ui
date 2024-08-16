@@ -1,23 +1,27 @@
 <template>
   <div>
-    <ep-form-content name="aikavali">
-      <div class="d-flex align-items-center">
-        <ep-datepicker v-model="alkupvm" :is-editing="true" />
-        <span class="mx-2">-</span>
-        <ep-datepicker v-model="loppupvm" :is-editing="true" endOfDay/>
-      </div>
-    </ep-form-content>
+    <EpSpinner v-if="!toteutussuunnitelmat || !opetussuunnitelmat" />
 
-    <div>{{$t('suunnitelmien-lukumaarat-selite')}}</div>
+    <template v-else>
+      <ep-form-content name="aikavali">
+        <div class="d-flex align-items-center">
+          <ep-datepicker v-model="alkupvm" :is-editing="true" />
+          <span class="mx-2">-</span>
+          <ep-datepicker v-model="loppupvm" :is-editing="true" endOfDay/>
+        </div>
+      </ep-form-content>
 
-    <b-table
-      responsive
-      borderless
-      fixed
-      :items="lukumaarat"
-      :fields="fields"
-      :tbody-tr-class="rowClass">
-    </b-table>
+      <div>{{$t('suunnitelmien-lukumaarat-selite')}}</div>
+
+      <b-table
+        responsive
+        borderless
+        fixed
+        :items="lukumaarat"
+        :fields="fields"
+        :tbody-tr-class="rowClass">
+      </b-table>
+    </template>
   </div>
 </template>
 
@@ -64,6 +68,11 @@ export default class EpLukumaaraTilastot extends Vue {
       .sortBy((rivi: any) => koulutustyyppiRyhmaSort[rivi.ryhma] ?? 99)
       .value();
 
+    lukumaarat = [
+      ...lukumaarat,
+      this.kaikkiYhteensa,
+    ];
+
     let evenrow = false;
     lukumaarat = _.map(lukumaarat, (rivi, index) => {
       if (index > 0) {
@@ -78,21 +87,20 @@ export default class EpLukumaaraTilastot extends Vue {
       };
     });
 
-    lukumaarat = [
-      ...lukumaarat,
-      {
-        koulutustyyppi: 'kaikki-yhteensa',
-        ryhma: 'kaikki-yhteensa',
-        tyyppi: 'kaikki-yhteensa',
-        julkaistut: _.sumBy(lukumaarat, 'julkaistut'),
-        luonnokset: _.sumBy(lukumaarat, 'luonnokset'),
-        arkistoidut: _.sumBy(lukumaarat, 'arkistoidut'),
-        yhteensa: _.sumBy(lukumaarat, 'yhteensa'),
-        uusia: _.sumBy(lukumaarat, 'uusia'),
-      },
-    ];
-
     return lukumaarat;
+  }
+
+  get kaikkiYhteensa() {
+    return {
+      koulutustyyppi: 'kaikki-yhteensa',
+      ryhma: 'kaikki-yhteensa',
+      tyyppi: 'kaikki-yhteensa',
+      julkaistut: _.sumBy(this.suunnitelmaLukumaarat, 'julkaistut'),
+      luonnokset: _.sumBy(this.suunnitelmaLukumaarat, 'luonnokset'),
+      arkistoidut: _.sumBy(this.suunnitelmaLukumaarat, 'arkistoidut'),
+      yhteensa: _.sumBy(this.suunnitelmaLukumaarat, 'yhteensa'),
+      uusia: _.sumBy(this.suunnitelmaLukumaarat, 'uusia'),
+    };
   }
 
   get suunnitelmaLukumaarat() {
@@ -100,13 +108,17 @@ export default class EpLukumaaraTilastot extends Vue {
       .reduce((tulos, suunnitelma) => {
         let koulutustyyppi = suunnitelma.koulutustyyppi; ;
         if (suunnitelma.jotpatyyppi) {
-          koulutustyyppi = 'jotpa-rahoitteisia';
+          koulutustyyppi = 'koulutustyyppi_muu';
+        }
+
+        if (!suunnitelma.koulutustyyppi) {
+          koulutustyyppi = 'maarittelematon';
         }
 
         if (!tulos[koulutustyyppi]) {
           tulos[koulutustyyppi] = {
             koulutustyyppi: koulutustyyppi,
-            ryhma: themes[koulutustyyppi] ?? 'muu',
+            ryhma: themes[koulutustyyppi] ?? 'maarittelematon',
             julkaistut: 0,
             luonnokset: 0,
             arkistoidut: 0,
@@ -157,12 +169,18 @@ export default class EpLukumaaraTilastot extends Vue {
       .value();
   }
 
+  get koulutustyyppiKiellelinenMuutos() {
+    return {
+      'koulutustyyppi_muu': 'jotpa-rahoitteisia',
+    };
+  }
+
   get fields() {
     return [
       {
         key: 'koulutustyyppi',
         label: this.$t('koulutustyyppi'),
-        formatter: (value: string) => this.$t(value),
+        formatter: (value: string) => this.$t(this.koulutustyyppiKiellelinenMuutos[value] ?? value),
       },
       {
         key: 'julkaistut',

@@ -1,10 +1,7 @@
 <template>
   <ep-main-view :container="true">
     <template #header>
-      <div class="d-flex">
-        <h1>{{ $t('tilastot') }}</h1>
-        <EpSpinner v-if="!toteutussuunnitelmat || !opetussuunnitelmat" />
-      </div>
+      <h1>{{ $t('tilastot') }}</h1>
     </template>
 
     <b-tabs>
