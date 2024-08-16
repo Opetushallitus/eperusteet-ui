@@ -18,20 +18,28 @@ export class TilastotStore {
   public readonly perusteet = computed(() => this.state.perusteet);
 
   public async fetch() {
+    await Promise.all([this.fetchAmosaaTilastot(), this.fetchYlopsTilastot(), this.fetchPerusteet()]);
+  }
+
+  async fetchAmosaaTilastot() {
     try {
       this.state.toteutussuunnitelmat = (await Tilastot.getAmosaaTilastot()).data;
     }
     catch (e) {
       this.state.toteutussuunnitelmat = [];
     }
+  }
 
+  async fetchYlopsTilastot() {
     try {
       this.state.opetussuunnitelmat = (await Tilastot.getYlopsTilastot()).data as any;
     }
     catch (e) {
       this.state.opetussuunnitelmat = [];
     }
+  }
 
+  async fetchPerusteet() {
     try {
       const perusteet = _.get((await Perusteet.getAllPerusteetInternal(
         undefined,
