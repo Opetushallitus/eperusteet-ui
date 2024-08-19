@@ -128,13 +128,13 @@ export default class EpLukumaaraTilastot extends Vue {
           };
         }
 
-        if (suunnitelma.tila === 'luonnos') {
+        if (suunnitelma.tila === 'luonnos' && suunnitelma.luotu <= this.loppupvm!) {
           tulos[koulutustyyppi].luonnokset++;
         }
-        else if (suunnitelma.tila === 'julkaistu') {
+        else if (suunnitelma.tila === 'julkaistu' && suunnitelma.ensijulkaisu <= this.loppupvm!) {
           tulos[koulutustyyppi].julkaistut++;
         }
-        else if (suunnitelma.tila === 'poistettu') {
+        else if (suunnitelma.tila === 'poistettu' && suunnitelma.viimeisinTilaMuutosAika <= this.loppupvm!) {
           tulos[koulutustyyppi].arkistoidut++;
         }
 
