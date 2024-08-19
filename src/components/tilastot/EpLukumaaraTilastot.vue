@@ -30,6 +30,7 @@ import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { TilastotStore } from '@/stores/TilastotStore';
 import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
+import { suunnitelmatTilastoksi } from './tilastot';
 
 @Component
 export default class EpLukumaaraTilastot extends Vue {
@@ -104,50 +105,7 @@ export default class EpLukumaaraTilastot extends Vue {
   }
 
   get suunnitelmaLukumaarat() {
-    return _.chain(this.suunnitelmat)
-      .reduce((tulos, suunnitelma) => {
-        let koulutustyyppi = suunnitelma.koulutustyyppi; ;
-        if (suunnitelma.jotpatyyppi) {
-          koulutustyyppi = 'koulutustyyppi_muu';
-        }
-
-        if (!suunnitelma.koulutustyyppi) {
-          koulutustyyppi = 'maarittelematon';
-        }
-
-        if (!tulos[koulutustyyppi]) {
-          tulos[koulutustyyppi] = {
-            koulutustyyppi: koulutustyyppi,
-            ryhma: themes[koulutustyyppi] ?? 'maarittelematon',
-            julkaistut: 0,
-            luonnokset: 0,
-            arkistoidut: 0,
-            yhteensa: 0,
-            uusia: 0,
-            tyyppi: 'suunnitelma',
-          };
-        }
-
-        if (suunnitelma.tila === 'luonnos' && suunnitelma.luotu <= this.loppupvm!) {
-          tulos[koulutustyyppi].luonnokset++;
-        }
-        else if (suunnitelma.tila === 'julkaistu' && suunnitelma.ensijulkaisu <= this.loppupvm!) {
-          tulos[koulutustyyppi].julkaistut++;
-        }
-        else if (suunnitelma.tila === 'poistettu' && suunnitelma.viimeisinTilaMuutosAika <= this.loppupvm!) {
-          tulos[koulutustyyppi].arkistoidut++;
-        }
-
-        if (suunnitelma.luotu >= this.alkupvm! && suunnitelma.luotu <= this.loppupvm!) {
-          tulos[koulutustyyppi].uusia++;
-        }
-
-        tulos[koulutustyyppi].yhteensa = tulos[koulutustyyppi].julkaistut + tulos[koulutustyyppi].luonnokset + tulos[koulutustyyppi].arkistoidut;
-
-        return tulos;
-      }, {})
-      .toArray()
-      .value();
+    return suunnitelmatTilastoksi(this.suunnitelmat, this.alkupvm!, this.loppupvm!);
   }
 
   get ryhmaLukumaarat() {
