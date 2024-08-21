@@ -192,7 +192,7 @@ export default class EpLukumaaraGraafit extends Vue {
         animations: {
           enabled: false,
         },
-      }
+      },
     };
   }
 
