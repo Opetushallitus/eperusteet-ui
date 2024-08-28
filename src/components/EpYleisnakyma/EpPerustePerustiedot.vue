@@ -74,7 +74,7 @@ import { Kielet } from '@shared/stores/kieli';
 import { PerusteprojektiDto, PerusteDto } from '@shared/api/eperusteet';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
-import { buildPerusteEsikatseluUrl } from '@shared/utils/esikatselu';
+import { buildPerusteEsikatseluUrl } from '@/utils/esikatselu';
 
 @Component({
   components: {
