@@ -1,5 +1,5 @@
 import { Koulutustyyppi } from '@shared/tyypit';
-import { AmmatillisetKoulutustyypit, koulutustyyppiRyhmaSort, themes, VapaasivistystyoKoulutustyypit } from '@shared/utils/perusteet';
+import { AmmatillisetKoulutustyypit, koulutustyyppiRyhmaSort, koulutustyyppiSort, themes, VapaasivistystyoKoulutustyypit } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
 
 export function suunnitelmatTilastoksi(suunnitelmat, alkupvm, loppupvm) {
@@ -72,4 +72,11 @@ const tilastoRyhmat = {
   vapaatavoitteiset_ei_jotpa: 'vapaasivistystyo',
   kops: 'vapaasivistystyo',
   osaamisen_arvioinnin_toteutussuunnitelma: 'ammatillinen',
+};
+
+export const koulutustyyppiTilastoSort = {
+  ...koulutustyyppiSort,
+  osaamisen_arvioinnin_toteutussuunnitelma: 66,
+  kops: 74,
+  vapaatavoitteiset_ei_jotpa: 75,
 };
