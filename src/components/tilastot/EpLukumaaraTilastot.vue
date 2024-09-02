@@ -14,9 +14,7 @@
       <div>{{$t('suunnitelmien-lukumaarat-selite')}}</div>
 
       <b-table
-        responsive
         borderless
-        fixed
         :items="lukumaarat"
         :fields="fields"
         :tbody-tr-class="rowClass">
@@ -29,7 +27,7 @@
 import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { TilastotStore } from '@/stores/TilastotStore';
-import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
+import { koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
 import { suunnitelmatTilastoksi } from './tilastot';
 
 @Component
@@ -186,6 +184,10 @@ export default class EpLukumaaraTilastot extends Vue {
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
+
+::v-deep .table {
+  border-collapse: collapse !important;
+}
 
 ::v-deep .table .ryhma, ::v-deep .table .kaikki-yhteensa {
   font-weight: bold;

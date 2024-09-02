@@ -1,22 +1,16 @@
-import { themes } from '@shared/utils/perusteet';
+import { Koulutustyyppi } from '@shared/tyypit';
+import { AmmatillisetKoulutustyypit, koulutustyyppiRyhmaSort, themes, VapaasivistystyoKoulutustyypit } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
 
 export function suunnitelmatTilastoksi(suunnitelmat, alkupvm, loppupvm) {
   return _.chain(suunnitelmat)
     .reduce((tulos, suunnitelma) => {
-      let koulutustyyppi = suunnitelma.koulutustyyppi; ;
-      if (suunnitelma.jotpatyyppi) {
-        koulutustyyppi = 'koulutustyyppi_muu';
-      }
-
-      if (!suunnitelma.koulutustyyppi) {
-        koulutustyyppi = 'maarittelematon';
-      }
+      const koulutustyyppi = maaritteleKoulutustyyppi(suunnitelma);
 
       if (!tulos[koulutustyyppi]) {
         tulos[koulutustyyppi] = {
           koulutustyyppi: koulutustyyppi,
-          ryhma: themes[koulutustyyppi] ?? 'maarittelematon',
+          ryhma: tilastoRyhmat[koulutustyyppi] ?? 'maarittelematon',
           julkaistut: 0,
           luonnokset: 0,
           arkistoidut: 0,
@@ -47,3 +41,35 @@ export function suunnitelmatTilastoksi(suunnitelmat, alkupvm, loppupvm) {
     .toArray()
     .value();
 }
+
+function maaritteleKoulutustyyppi(suunnitelma) {
+  if (suunnitelma.jotpatyyppi) {
+    return 'koulutustyyppi_muu';
+  }
+
+  if (_.includes(VapaasivistystyoKoulutustyypit, suunnitelma.koulutustyyppi)) {
+    if (!suunnitelma.perusteId) {
+      return 'vapaatavoitteiset_ei_jotpa';
+    }
+    else {
+      return 'kops';
+    }
+  }
+
+  if (!suunnitelma.koulutustyyppi) {
+    return 'maarittelematon';
+  }
+
+  if (_.includes(AmmatillisetKoulutustyypit, suunnitelma.koulutustyyppi) && suunnitelma.tyyppi === 'yhteinen') {
+    return 'osaamisen_arvioinnin_toteutussuunnitelma';
+  }
+
+  return suunnitelma.koulutustyyppi;
+}
+
+const tilastoRyhmat = {
+  ...themes,
+  vapaatavoitteiset_ei_jotpa: 'vapaasivistystyo',
+  kops: 'vapaasivistystyo',
+  osaamisen_arvioinnin_toteutussuunnitelma: 'ammatillinen',
+};
