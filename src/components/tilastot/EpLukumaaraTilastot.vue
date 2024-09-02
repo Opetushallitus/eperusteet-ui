@@ -28,7 +28,7 @@ import * as _ from 'lodash';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { TilastotStore } from '@/stores/TilastotStore';
 import { koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
-import { suunnitelmatTilastoksi } from './tilastot';
+import { suunnitelmatTilastoksi, koulutustyyppiTilastoSort } from './tilastot';
 
 @Component
 export default class EpLukumaaraTilastot extends Vue {
@@ -63,6 +63,7 @@ export default class EpLukumaaraTilastot extends Vue {
       ...this.suunnitelmaLukumaarat,
       ...this.ryhmaLukumaarat,
     ])
+      .sortBy((rivi: any) => koulutustyyppiTilastoSort[rivi.koulutustyyppi] ?? 99)
       .sortBy((rivi: any) => rivi.tyyppi === 'ryhma' ? 0 : 1)
       .sortBy((rivi: any) => koulutustyyppiRyhmaSort[rivi.ryhma] ?? 99)
       .value();
