@@ -118,20 +118,13 @@
             </b-col>
           </b-row>
 
-        </b-container>
-
-        <h3 class="mt-4">{{ $t('esikatselu-ja-lataus') }}</h3>
-        <b-container fluid>
-          <b-row no-gutters>
-            <b-col lg="6">
-              <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing" v-if="isEditing || !data.esikatseltavissa">
-                {{$t('salli-oppaan-esikatselu')}}
-              </ep-toggle>
-              <ep-external-link :url="data.esikatseluUrl" v-if="!isEditing && data.esikatseltavissa">
-                {{$t('esikatsele-opasta')}}
-              </ep-external-link>
+          <b-row>
+            <b-col>
+              <EpEsikatselu opas v-model="storeData" :is-editing="isEditing" />
             </b-col>
-            <b-col lg="6" v-if="!isEditing">
+          </b-row>
+          <b-row>
+            <b-col v-if="!isEditing">
               <b-form-group :label="$t('oppaan-lataus')">
                 <ep-button variant="primary" @click="lataa">{{ $t('lataa-opas-json') }}</ep-button>
               </b-form-group>
@@ -272,6 +265,7 @@ import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue
 import EpKoodistoSelectTable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectTable.vue';
 import { Koodisto, PerusteBaseDtoOpasTyyppiEnum } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 
 @Component({
   components: {
@@ -289,6 +283,7 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
     EpColorIndicator,
     EpExternalLink,
     EpKoodistoSelectTable,
+    EpEsikatselu,
   },
 })
 export default class RouteOppaanTiedot extends PerusteprojektiRoute {
@@ -557,6 +552,14 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
 
   get oppaanTyyppiTietoaPalvelusta() {
     return _.includes(this.oppaanTyyppi, _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA));
+  }
+
+  get storeData() {
+    return this.store?.data.value;
+  }
+
+  set storeData(data) {
+    this.store?.setData(data);
   }
 }
 </script>

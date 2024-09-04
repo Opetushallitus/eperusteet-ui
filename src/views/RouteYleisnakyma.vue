@@ -44,12 +44,8 @@ import EpPerusteTutkinnonOsat from '@/components/EpYleisnakyma/EpPerusteTutkinno
 import EpPerusteTiedotteet from '@/components/EpYleisnakyma/EpPerusteTiedotteet.vue';
 import EpPerusteRakenne from '@/components/EpYleisnakyma/EpPerusteRakenne.vue';
 import EpViimeaikainenToiminta from '@shared/components/EpViimeaikainenToiminta/EpViimeaikainenToiminta.vue';
-import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
-import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
-import { AikatauluStore } from '@/stores/AikatauluStore';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
-import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 
 @Component({
   components: {
