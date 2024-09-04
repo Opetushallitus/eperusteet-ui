@@ -53,7 +53,7 @@
       <div class="col-7">
         <EpPerustietoData icon="visibility">
           <template #header>{{ $t('esikatsele-perustetta')}}</template>
-          <template v-if="!projekti.esikatseltavissa">{{ $t('esikatselua-ei-ole-sallittu') }}</template>
+          <template v-if="!projekti.esikatseltavissa">{{ $t('et-ole-sallinut-esikatselua') }}</template>
           <template v-else>
             <ep-external-link :url="esikatseluUrl"></ep-external-link>
           </template>
@@ -74,7 +74,7 @@ import { Kielet } from '@shared/stores/kieli';
 import { PerusteprojektiDto, PerusteDto } from '@shared/api/eperusteet';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
-import { buildPerusteEsikatseluUrl } from '@/utils/esikatselu';
+import { buildPerusteEsikatseluUrl } from '@shared/utils/esikatselu';
 
 @Component({
   components: {

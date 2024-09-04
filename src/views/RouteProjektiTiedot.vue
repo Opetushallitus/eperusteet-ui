@@ -64,17 +64,9 @@
               </b-form-group>
             </b-col>
           </b-row>
-        </b-container>
-        <h3>{{ $t('esikatselu-ja-lataus') }}</h3>
-        <b-container fluid>
           <b-row no-gutters>
-            <b-col lg="6" :class="{'disabled-events': data.tila === 'poistettu'}">
-              <ep-toggle v-model="data.esikatseltavissa" :is-editing="isEditing" v-if="isEditing || !data.esikatseltavissa">
-                {{$t('salli-perusteen-esikatselu')}}
-              </ep-toggle>
-              <ep-external-link :url="data.esikatseluUrl" v-if="!isEditing && data.esikatseltavissa">
-                {{$t('esikatsele-perustetta')}}
-              </ep-external-link>
+            <b-col lg="6">
+              <EpEsikatselu peruste v-model="storeData" :is-editing="isEditing" />
             </b-col>
             <b-col lg="6">
               <b-form-group :label="$t('perusteen-lataus')" v-if="!isEditing">
@@ -109,6 +101,7 @@ import { KuvaStore } from '@/stores/KuvaStore';
 import { TermitStore } from '@/stores/TermitStore';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 import { Maintenance, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
+import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 
 @Component({
   components: {
@@ -121,6 +114,7 @@ import { Maintenance, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperus
     EpToggle,
     PerustetyoryhmaSelect,
     EpExternalLink,
+    EpEsikatselu,
   },
 })
 export default class RouteProjektiTiedot extends PerusteprojektiRoute {
@@ -146,6 +140,14 @@ export default class RouteProjektiTiedot extends PerusteprojektiRoute {
       uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
       korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
     };
+  }
+
+  get storeData() {
+    return this.store?.data.value;
+  }
+
+  set storeData(data) {
+    this.store?.setData(data);
   }
 
   async exportPeruste() {
