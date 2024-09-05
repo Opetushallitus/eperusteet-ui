@@ -11,14 +11,13 @@
         <ep-pdf-luonti :store="perusteDokumenttiStore" :pdfnimi="perusteNimi"/>
 
         <h4 v-if="kvliite" class="mt-5">{{$t('kvliite')}}</h4>
-        <ep-pdf-luonti v-if="kvliite" :store="kvliiteStore" pdfnimi="kvliite"/>
+        <ep-pdf-luonti v-if="kvliite" :store="kvliiteStore" pdfnimi="kvliite" :nayta-julkaistu="false"/>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import _ from 'lodash';
 import { Component, Watch, Prop } from 'vue-property-decorator';
 import { Kielet } from '@shared/stores/kieli';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
