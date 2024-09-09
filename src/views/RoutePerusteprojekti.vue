@@ -733,6 +733,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   color: #fff;
 }
 
+::v-deep .btn:focus {
+  box-shadow: unset;
+}
+
 .portal-menu {
   height: 140px;
 
