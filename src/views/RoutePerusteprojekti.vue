@@ -19,13 +19,20 @@
           <div class="mb-5 p-2" v-if="peruste && projekti">
             <h1>
               <span>{{nimi}}</span>
-              <b-dropdown class="asetukset" size="lg" variant="link" toggle-class="text-decoration-none" no-caret>
+            </h1>
+            <div class="diaarinumero mt-2" v-if="showNavigation">
+              <span>{{ $t(peruste.koulutustyyppi) }}</span>
+              <span class="ml-2 mr-2">|</span>
+              <span>{{ peruste.diaarinumero }}</span>
+              <span v-if="peruste.koulutustyyppi && peruste.diaarinumero" class="ml-2 mr-2">|</span>
+
+              <b-dropdown class="asetukset" size="sm" no-caret variant="transparent">
                 <template v-slot:button-content>
-                  <EpMaterialIcon icon-shape="outlined" class="hallinta">settings</EpMaterialIcon>
+                  <span>{{$t('lisatoiminnot')}}</span>
+                  <EpMaterialIcon icon-shape="outlined" class="hallinta" size="22px">expand_more</EpMaterialIcon>
                 </template>
 
                 <div v-for="(ratasvalinta, index) in ratasvalintaFiltered" :key="'ratasvalinta'+index">
-
                   <hr v-if="ratasvalinta.separator && index !== (ratasvalintaFiltered.length - 1)" class="mt-2 mb-2" />
 
                   <b-dropdown-item v-if="ratasvalinta.route" :to="{ name: ratasvalinta.route }" :disabled="ratasvalinta.disabled">
@@ -43,9 +50,7 @@
                   </b-dropdown-item>
                 </div>
               </b-dropdown>
-            </h1>
-            <div class="diaarinumero" v-if="showNavigation">
-              {{ $t(peruste.koulutustyyppi) }} <span v-if="peruste.koulutustyyppi && peruste.diaarinumero">|</span> {{ peruste.diaarinumero }}
+
             </div>
           </div>
         </div>
@@ -719,6 +724,13 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
 .order-icon {
   vertical-align: middle;
+}
+
+::v-deep .btn-sm {
+  padding: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
 }
 
 .portal-menu {
