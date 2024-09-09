@@ -730,7 +730,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   padding: 0 0 4px 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #fff;
+  color: inherit;
 }
 
 ::v-deep .btn:focus {
