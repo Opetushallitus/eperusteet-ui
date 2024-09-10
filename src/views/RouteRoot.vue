@@ -2,12 +2,18 @@
   <div class="home-container minfull">
     <EpTestiymparisto />
 
-    <div class="header" ref="header">
-      <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet" :logoutHref="logoutHref"/>
-      <PortalTarget ref="innerPortal" name="headerExtension" />
+    <div class="view-container">
+      <div class="header" ref="header">
+        <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet" :logoutHref="logoutHref"/>
+        <PortalTarget ref="innerPortal" name="headerExtension" />
+      </div>
+      <RouterView />
     </div>
-    <RouterView />
-    <ep-footer />
+    <ep-footer>
+      <template #palaute>
+        <EpPalauteLinkki yllapito-avain="perusteiden-laadinta-palaute-url" />
+      </template>
+    </ep-footer>
   </div>
 </template>
 
@@ -17,11 +23,9 @@ import { Prop, Watch, Component, Vue, ProvideReactive } from 'vue-property-decor
 import Sticky from 'vue-sticky-directive';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
 import { KayttajaStore } from '@/stores/kayttaja';
-
 import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
-
+import EpPalauteLinkki from '@shared/components/EpPalauteLinkki/EpPalauteLinkki.vue';
 import { BrowserStore } from '@shared/stores/BrowserStore';
-
 import { PerusteStore } from '@/stores/PerusteStore';
 import { Meta } from '@shared/utils/decorators';
 import EpTestiymparisto from '@shared/components/EpTestiymparisto/EpTestiymparisto.vue';
@@ -32,6 +36,7 @@ import { baseURL } from '@shared/api/eperusteet';
     EpNavbar,
     EpFooter,
     EpTestiymparisto,
+    EpPalauteLinkki,
   },
   directives: {
     Sticky,
@@ -155,6 +160,10 @@ export default class RouteRoot extends Vue {
 @import '@/styles/_variables.scss';
 
 .home-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
   .header {
     color: white;
     background-image: url('~@assets/img/banners/header.svg');
@@ -163,12 +172,11 @@ export default class RouteRoot extends Vue {
     background-size: cover;
     @media only screen and (min-width: 2503px)  {
     }
-    /* background-size: 100%; */
   }
 }
 
-// .animate {
-//   transition: max-height 0.2s ease-in-out;
-// }
+.view-container {
+  flex:1;
+}
 
 </style>

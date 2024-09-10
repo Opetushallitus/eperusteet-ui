@@ -17,7 +17,7 @@
           :fields="fields">
 
           <template v-slot:cell(kuvaus)="data">
-            <ep-input v-model="data.item.kuvaus" :is-editing="isEditing"/>
+            <ep-input v-model="data.item.kuvaus"/>
           </template>
 
           <template v-slot:cell(key)="data">
@@ -26,7 +26,7 @@
 
           <template v-slot:cell(value)="data">
             <ep-toggle v-model="data.item.value" :is-editing="isEditing" v-if="isBoolean(data.item.value)"/>
-            <ep-input v-model="data.item.value" :is-editing="isEditing" v-else/>
+            <ep-input type="string" v-model="data.item.value" :is-editing="isEditing" v-else/>
           </template>
 
         </b-table>
