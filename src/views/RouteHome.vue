@@ -28,9 +28,6 @@
         <TileYllapito v-if="$isAdmin()"/>
       </div>
     </div>
-
-    <EpFeedbackModal :palauteProvider="palautteetStore"/>
-
   </div>
 </template>
 
@@ -55,13 +52,11 @@ import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
-import EpFeedbackModal from '@shared/components/EpFeedback/EpFeedbackModal.vue';
 import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 
 @Component({
   components: {
     EpSearch,
-    EpFeedbackModal,
     TileYllapito,
     TileArkistoidut,
     TileOppaat,
