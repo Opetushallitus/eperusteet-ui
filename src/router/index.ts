@@ -74,6 +74,7 @@ import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
 import { getCasKayttajaKieli } from '@shared/api/common';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
+import { BrowserStore } from '@shared/stores/BrowserStore';
 
 Vue.use(VueRouter);
 Vue.use(VueMeta, {
@@ -643,6 +644,10 @@ router.beforeEach(async (to, from, next) => {
     stores.perusteStore.clear();
   }
   next();
+});
+
+router.afterEach(() => {
+  BrowserStore.changeLocation(location.href);
 });
 
 export default router;
