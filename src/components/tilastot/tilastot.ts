@@ -6,7 +6,6 @@ export function suunnitelmatTilastoksi(suunnitelmat, alkupvm, loppupvm) {
   return _.chain(suunnitelmat)
     .reduce((tulos, suunnitelma) => {
       const koulutustyyppi = maaritteleKoulutustyyppi(suunnitelma);
-
       if (!tulos[koulutustyyppi]) {
         tulos[koulutustyyppi] = {
           koulutustyyppi: koulutustyyppi,
