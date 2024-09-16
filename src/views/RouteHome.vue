@@ -25,6 +25,7 @@
         <TilePalautteet v-if="$isAdmin()"/>
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
         <TileYllapito v-if="$isAdmin()"/>
+        <TileOpsAi v-if="$isAdmin()"/>
       </div>
     </div>
   </div>
@@ -45,6 +46,7 @@ import TilePalautteet from './tiles/TilePalautteet.vue';
 import TileMaaraysKokoelma from './tiles/TileMaaraysKokoelma.vue';
 import TileYllapito from './tiles/TileYllapito.vue';
 import TileOsaamismerkit from './tiles/TileOsaamismerkit.vue';
+import TileOpsAi from './tiles/TileOpsAi.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
@@ -66,6 +68,7 @@ import { PalautteetStore } from '@/stores/PalautteetStore';
     TileDigitaalinenOsaaminen,
     TileOsaamismerkit,
     TileMaaraysKokoelma,
+    TileOpsAi,
   },
 })
 export default class Home extends Vue {
