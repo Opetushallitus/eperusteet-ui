@@ -72,6 +72,7 @@ import { getCasKayttajaKieli } from '@shared/api/common';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { BrowserStore } from '@shared/stores/BrowserStore';
+import RouteOpsAiKeskustelut from '@/views/RouteOpsAiKeskustelut.vue';
 
 Vue.use(VueRouter);
 Vue.use(VueMeta, {
@@ -200,6 +201,11 @@ const router = new VueRouter({
       path: 'digitaalisetosaamiset/uusi',
       name: 'digitaalinenOsaaminenLuonti',
       component: RouteDigitaalisetOsaamisetLuonti,
+      props,
+    }, {
+      path: 'opsai',
+      name: 'opsai',
+      component: RouteOpsAiKeskustelut,
       props,
     }, {
       path: 'perusteprojekti/:projektiId',
