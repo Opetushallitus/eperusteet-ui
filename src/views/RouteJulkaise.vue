@@ -9,19 +9,34 @@
             {{$t('hallinta')}} <EpMaterialIcon icon-shape="outlined">settings</EpMaterialIcon>
           </template>
           <EpButton variant="link" :disabled="!valmiiksiMahdollinen" @click="asetaValmiiksi">
-            {{$t('aseta-peruste-valmiiksi')}}
+            <div class="d-flex">
+              {{$t('aseta-peruste-valmiiksi')}}
+              <EpInfoPopover v-if="valmiiksiMahdollinen" class="ml-2" unique-id="1">{{ $t('aseta-peruste-valmiiksi-info')}}</EpInfoPopover>
+            </div>
           </EpButton>
           <EpButton variant="link" :disabled="valmiiksiMahdollinen" @click="avaaPeruste">
-            {{$t('avaa-peruste')}}
+            <div class="d-flex">
+              {{$t('avaa-peruste')}}
+              <EpInfoPopover v-if="!valmiiksiMahdollinen" class="ml-2" unique-id="2">{{ $t('avaa-peruste-info')}}</EpInfoPopover>
+            </div>
           </EpButton>
           <EpButton variant="link" @click="kooditaPeruste">
-            {{$t('koodita-peruste')}}
+            <div class="d-flex">
+              {{$t('koodita-peruste')}}
+              <EpInfoPopover class="ml-2" unique-id="3">{{ $t('koodita-peruste-info')}}</EpInfoPopover>
+            </div>
           </EpButton>
           <EpButton variant="link" @click="nollaaJulkaisuTila">
-            {{$t('nollaa-julkaisu-tila')}}
+            <div class="d-flex">
+              {{$t('nollaa-julkaisu-tila')}}
+              <EpInfoPopover class="ml-2" unique-id="4">{{ $t('nollaa-julkaisu-tila-info')}}</EpInfoPopover>
+            </div>
           </EpButton>
           <EpButton variant="link" @click="pakotaJulkaisu">
-            {{$t('pakota-julkaisu')}}
+            <div class="d-flex">
+              {{$t('pakota-julkaisu')}}
+              <EpInfoPopover class="ml-2" unique-id="5">{{ $t('pakota-julkaisu-info')}}</EpInfoPopover>
+            </div>
           </EpButton>
         </b-dropdown>
       </div>
@@ -174,7 +189,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
-import { PerusteDtoTilaEnum, NavigationNodeDto, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut, Maintenance, MaaraysDtoTyyppiEnum, MaaraysDtoTilaEnum, MaaraysDtoLiittyyTyyppiEnum } from '@shared/api/eperusteet';
+import { PerusteDtoTilaEnum, NavigationNodeDto, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut, Maintenance } from '@shared/api/eperusteet';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
@@ -197,9 +212,11 @@ import EpJulkaisuValidointi from '@shared/components/EpJulkaisuValidointi/EpJulk
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { Validations } from 'vuelidate-property-decorators';
 import { requiredIf } from 'vuelidate/lib/validators';
+import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 
 @Component({
   components: {
+    EpInfoPopover,
     EpButton,
     EpCollapse,
     EpContent,
