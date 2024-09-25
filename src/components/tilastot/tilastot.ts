@@ -22,7 +22,7 @@ export function suunnitelmatTilastoksi(suunnitelmat, alkupvm, loppupvm) {
       if (suunnitelma.tila === 'luonnos' && suunnitelma.luotu <= loppupvm) {
         tulos[koulutustyyppi].luonnokset++;
       }
-      else if (suunnitelma.tila === 'julkaistu' && suunnitelma.viimeisinTilaMuutosAika <= loppupvm) {
+      else if (suunnitelma.tila === 'julkaistu' && (suunnitelma.ensijulkaisu && suunnitelma.ensijulkaisu <= loppupvm)) {
         tulos[koulutustyyppi].julkaistut++;
       }
       else if (suunnitelma.tila === 'poistettu' && suunnitelma.viimeisinTilaMuutosAika <= loppupvm) {
