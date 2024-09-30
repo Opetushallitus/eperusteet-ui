@@ -43,7 +43,6 @@ import RouteKotoKielitaitotaso from '@/views/RouteKotoKielitaitotaso.vue';
 import RouteKotoOpinto from '@/views/RouteKotoOpinto.vue';
 import RouteKotoLaajaalainenOsaaminen from '@/views/RouteKotoLaajaalainenOsaaminen.vue';
 import RouteOsaamismerkit from '@/views/RouteOsaamismerkit.vue';
-import RouteMuutMaaraykset from '@/views/RouteMuutMaaraykset.vue';
 import RouteMaaraysKokoelma from '@/views/RouteMaaraysKokoelma.vue';
 import RouteMaaraysMuokkaus from '@/views/RouteMaaraysMuokkaus.vue';
 import RoutePoistetutSisallot from '@/views/RoutePoistetutSisallot.vue';
@@ -151,11 +150,6 @@ const router = new VueRouter({
         component: RouteOsaamismerkkiKategoriat,
         props,
       }],
-    }, {
-      path: 'muutMaaraykset',
-      name: 'muutMaaraykset',
-      component: RouteMuutMaaraykset,
-      props,
     }, {
       path: 'maarayskokoelma',
       name: 'maarayskokoelma',

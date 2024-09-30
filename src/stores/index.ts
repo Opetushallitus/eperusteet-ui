@@ -17,7 +17,6 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { TermitStore } from '@/stores/TermitStore';
 import { TilastotStore } from '@/stores/TilastotStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
-import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 import { PoistetutStore } from './PoistetutStore';
 import { DigitaalisetOsaamisetStore } from './DigitaalisetOsaamisetStore';
 import { YllapitoStore } from '@/stores/YllapitoStore';
@@ -43,7 +42,6 @@ const tyoryhmaStore = new TyoryhmaStore();
 const termitStore = new TermitStore();
 const tilastotStore = new TilastotStore();
 const palautteetStore = new PalautteetStore();
-const muutMaarayksetStore = new MuutMaarayksetStore();
 const maarayksetStore = new MaarayksetStore();
 const poistetutStore = new PoistetutStore();
 const yllapitoStore = new YllapitoStore();
@@ -71,7 +69,6 @@ export const stores = Object.freeze({
   termitStore,
   tilastotStore,
   palautteetStore,
-  muutMaarayksetStore,
   poistetutStore,
   yllapitoStore,
   osaamismerkitStore,
