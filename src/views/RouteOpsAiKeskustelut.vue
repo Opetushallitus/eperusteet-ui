@@ -97,6 +97,7 @@ import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelec
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import { FeedbackDtoResultEnum } from '@shared/api/ai';
 import EpOpsAiMessage from '@shared/components/EpOpsAi/EpOpsAiMessage.vue';
+import EpOpsAiMessageMeta from '@shared/components/EpOpsAi/EpOpsAiMessageMeta.vue';
 import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
 @Component({
@@ -105,6 +106,7 @@ import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
     EpMainView,
     EpOpsAiMessage,
     EpPagination,
+    EpOpsAiMessageMeta,
   },
 })
 export default class RouteOpsAiKeskustelut extends Vue {
@@ -149,7 +151,6 @@ export default class RouteOpsAiKeskustelut extends Vue {
           lahdeNimi: _.first(thread.messages)?.meta?.sourceName,
           sisaltaaPositiivisen: _.some(thread.messages, message => message.feedback?.result === FeedbackDtoResultEnum.POSITIVE),
           sisaltaaNegatiivisen: _.some(thread.messages, message => message.feedback?.result === FeedbackDtoResultEnum.NEGATIVE),
-
         };
       })
       .sortBy('startDate')
