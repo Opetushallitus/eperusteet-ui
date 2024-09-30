@@ -19,7 +19,6 @@
         <TileTiedotteet :tiedotteetStore="tiedotteetStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
         <TileOppaat :perusteOppaatStore="perusteOppaatStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
         <TileMaaraysKokoelma v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet_maarays'}"/>
-        <TileMuutMaaraykset :muutMaarayksetStore="muutMaarayksetStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
         <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
         <TileOsaamismerkit v-if="$hasOphCrud()" />
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
@@ -43,7 +42,6 @@ import TileTiedotteet from './tiles/TileTiedotteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import TileTilastot from './tiles/TileTilastot.vue';
 import TilePalautteet from './tiles/TilePalautteet.vue';
-import TileMuutMaaraykset from './tiles/TileMuutMaaraykset.vue';
 import TileMaaraysKokoelma from './tiles/TileMaaraysKokoelma.vue';
 import TileYllapito from './tiles/TileYllapito.vue';
 import TileOsaamismerkit from './tiles/TileOsaamismerkit.vue';
@@ -52,7 +50,6 @@ import { KayttajaStore } from '@/stores/kayttaja';
 import { Meta } from '@shared/utils/decorators';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { PalautteetStore } from '@/stores/PalautteetStore';
-import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
 
 @Component({
   components: {
@@ -68,7 +65,6 @@ import { MuutMaarayksetStore } from '@/stores/MuutMaarayksetStore';
     TilePalautteet,
     TileDigitaalinenOsaaminen,
     TileOsaamismerkit,
-    TileMuutMaaraykset,
     TileMaaraysKokoelma,
   },
 })
@@ -84,9 +80,6 @@ export default class Home extends Vue {
 
   @Prop({ required: true })
   private palautteetStore!: PalautteetStore;
-
-  @Prop({ required: true })
-  private muutMaarayksetStore!: MuutMaarayksetStore;
 
   @Prop({ required: true })
   private digitaalisetOsaamisetStore!: PerusteetStore;
