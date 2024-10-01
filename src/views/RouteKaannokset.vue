@@ -37,11 +37,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { BvTableFieldArray } from 'bootstrap-vue';
-import { PalautteetStore } from '@/stores/PalautteetStore';
 import { getMessages } from '@shared/stores/kieli';
 import { Api } from '@shared/api/eperusteet';
-import { saveAs } from 'file-saver';
 
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
