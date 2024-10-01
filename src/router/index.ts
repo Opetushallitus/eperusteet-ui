@@ -17,7 +17,6 @@ import RouteOpintokokonaisuus from '@/views/RouteOpintokokonaisuus.vue';
 import RouteOppaanTiedot from '@/views/RouteOppaanTiedot.vue';
 import RouteOppaat from '@/views/RouteOppaat.vue';
 import RouteOppaatLuonti from '@/views/RouteOppaatLuonti.vue';
-import RoutePalautteet from '@/views/RoutePalautteet.vue';
 import RoutePdfLuonti from '@/views/RoutePdfLuonti.vue';
 import RoutePerusteenTiedot from '@/views/RoutePerusteenTiedot.vue';
 import RoutePerusteprojekti from '@/views/RoutePerusteprojekti.vue';
@@ -170,11 +169,6 @@ const router = new VueRouter({
       path: 'yllapito',
       name: 'yllapito',
       component: RouteYllapito,
-      props,
-    }, {
-      path: 'palautteet',
-      name: 'palautteet',
-      component: RoutePalautteet,
       props,
     }, {
       path: 'arviointi',
