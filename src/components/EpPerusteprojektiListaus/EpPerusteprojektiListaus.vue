@@ -206,7 +206,7 @@ import { IProjektiProvider } from './types';
 import ProjektiCard from './ProjektiCard.vue';
 import * as _ from 'lodash';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
-import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
+import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
 import { perusteTile } from '@shared/utils/bannerIcons';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
