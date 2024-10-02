@@ -9,7 +9,7 @@
             :julkaisemattomiaMuutoksia="julkaisemattomiaMuutoksia"
             :julkaistava="!isPohja"
             :is-validating="isValidating"
-            @asetaValmiiksi="asetaValmiiksi"
+            @asetaValmiiksi="asetaPohjaValmiiksi"
             @palauta="palauta"
             @validoi="validoi"
             tyyppi="peruste"
@@ -28,8 +28,11 @@
 
               <b-dropdown class="asetukset" size="sm" no-caret variant="transparent">
                 <template v-slot:button-content>
-                  <span>{{$t('lisatoiminnot')}}</span>
-                  <EpMaterialIcon icon-shape="outlined" class="hallinta" size="22px">expand_more</EpMaterialIcon>
+                  <EpSpinner v-if="hallintaLoading" color="white"/>
+                  <template v-else>
+                    <span>{{$t('lisatoiminnot')}}</span>
+                    <EpMaterialIcon icon-shape="outlined" class="hallinta" size="22px">expand_more</EpMaterialIcon>
+                  </template>
                 </template>
 
                 <div v-for="(ratasvalinta, index) in ratasvalintaFiltered" :key="'ratasvalinta'+index">
@@ -45,8 +48,11 @@
                     @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)"
                     :disabled="ratasvalinta.disabled"
                     v-oikeustarkastelu="ratasvalinta.meta.oikeus()">
-                    <EpMaterialIcon icon-shape="outlined">{{ ratasvalinta.icon }}</EpMaterialIcon>
-                    <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
+                    <div class="d-flex">
+                      <EpMaterialIcon icon-shape="outlined" v-if="ratasvalinta.icon">{{ ratasvalinta.icon }}</EpMaterialIcon>
+                      <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
+                      <EpInfoPopover v-if="ratasvalinta.infopopovertext" class="ml-2" :unique-id="'ratasinfopopover-' + index">{{ $t(ratasvalinta.infopopovertext)}}</EpInfoPopover>
+                    </div>
                   </b-dropdown-item>
                 </div>
               </b-dropdown>
@@ -424,13 +430,12 @@ import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTe
 import { Koulutustyyppi } from '@shared/tyypit';
 import {
   NavigationNodeDtoTypeEnum,
-  PerusteBaseDtoOpasTyyppiEnum,
   PerusteDtoTilaEnum,
   PerusteDtoToteutusEnum,
 } from '@shared/api/eperusteet';
 import { Meta } from '@shared/utils/decorators';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
+import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSisallonLisays from '@/components/EpSisallonLisays.vue';
 import { routeToNode, LinkkiHandler } from '@/utils/routing';
@@ -495,6 +500,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   private naviStore: EpTreeNavibarStore | null = null;
   private isValidating: boolean = false;
   private query = '';
+  private hallintaLoading: boolean = false;
 
   @Meta
   getMetaInfo() {
@@ -625,8 +631,15 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     }
   }
 
-  ratasClick(clickFn, meta) {
-    clickFn(this, meta);
+  async ratasClick(clickFn, meta) {
+    this.hallintaLoading = true;
+    await clickFn(this, meta);
+
+    if (meta.callback) {
+      await meta.callback();
+    }
+
+    this.hallintaLoading = false;
   }
 
   get isPerusteVapaasivistystyo(): boolean {
@@ -690,7 +703,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     await this.perusteStore.updateCurrent();
   }
 
-  async asetaValmiiksi() {
+  async asetaPohjaValmiiksi() {
     await vaihdaPerusteTilaConfirm(this, {
       tila: 'valmis',
       title: 'aseta-pohja-valmiiksi',
@@ -744,6 +757,8 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     margin: 0;
     padding: 0;
 
+  }
+  .diaarinumero {
     .asetukset {
       .hallinta {
         color: white;
@@ -757,6 +772,15 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
       ::v-deep .dropdown-item {
         padding-left: 1rem;
         padding-right: 2rem;
+
+        .icon {
+          padding-right: 0.75rem;
+          margin: 0;
+        }
+
+        .dropdown-text {
+          margin: 0;
+        }
       }
 
       svg:not(.hallinta) {

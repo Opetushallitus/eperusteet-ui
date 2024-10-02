@@ -45,7 +45,7 @@ import * as _ from 'lodash';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import EpArkistoidutModal from '@shared/components/EpArkistoidutModal/EpArkistoidutModal.vue';
-import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
+import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
 import { DigitaalisetOsaamisetStore } from '@/stores/DigitaalisetOsaamisetStore';
 
 @Component({

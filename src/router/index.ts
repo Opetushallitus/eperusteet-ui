@@ -68,7 +68,7 @@ import RoutePerusopetusOppiaine from '@/views/perusopetus/RouteOppiaine.vue';
 import RouteOsaamismerkkiKategoriat from '@/views/RouteOsaamismerkkiKategoriat.vue';
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
-import { vaihdaPerusteTilaConfirm } from '@/utils/arkistointi';
+import { asetaValmiiksi, avaaPeruste, kooditaPeruste, nollaaJulkaisuTila, pakotaJulkaisu, vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
 import { getCasKayttajaKieli } from '@shared/api/common';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
@@ -246,6 +246,54 @@ const router = new VueRouter({
             reroute: () => stores.perusteStore.arkistointiReroute.value,
             tila: 'poistettu',
             callback: async () => stores.perusteStore.updateCurrent(),
+          },
+        }, {
+          separator: true,
+          meta: {
+            oikeus: () => ({ oikeus: 'hallinta', kohde: 'pohja' }),
+          },
+        }, {
+          text: 'aseta-peruste-valmiiksi',
+          click: asetaValmiiksi,
+          infopopovertext: 'aseta-peruste-valmiiksi-info',
+          meta: {
+            oikeus: () => ({ oikeus: 'hallinta', kohde: 'pohja' }),
+            callback: async () => stores.perusteStore.updateCurrent(),
+          },
+        }, {
+          text: 'avaa-peruste',
+          click: avaaPeruste,
+          infopopovertext: 'avaa-peruste-info',
+          meta: {
+            oikeus: () => ({ oikeus: 'hallinta', kohde: 'pohja' }),
+            callback: async () => stores.perusteStore.updateCurrent(),
+          },
+        }, {
+          text: 'koodita-peruste',
+          click: kooditaPeruste,
+          infopopovertext: 'koodita-peruste-info',
+          meta: {
+            oikeus: () => ({ oikeus: 'hallinta', kohde: 'pohja' }),
+            callback: async () => stores.perusteStore.updateCurrent(),
+            getPerusteId: () => stores.perusteStore.peruste.value?.id,
+          },
+        }, {
+          text: 'nollaa-julkaisu-tila',
+          click: nollaaJulkaisuTila,
+          infopopovertext: 'nollaa-julkaisu-tila-info',
+          meta: {
+            oikeus: () => ({ oikeus: 'hallinta', kohde: 'pohja' }),
+            callback: async () => stores.perusteStore.fetchJulkaisut(),
+            getPerusteId: () => stores.perusteStore.peruste.value?.id,
+          },
+        }, {
+          text: 'pakota-julkaisu',
+          click: pakotaJulkaisu,
+          infopopovertext: 'pakota-julkaisu-info',
+          meta: {
+            oikeus: () => ({ oikeus: 'hallinta', kohde: 'pohja' }),
+            callback: async () => stores.perusteStore.fetchJulkaisut(),
+            getPerusteId: () => stores.perusteStore.peruste.value?.id,
           },
         }],
         palautusMeta: {
