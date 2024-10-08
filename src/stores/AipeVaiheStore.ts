@@ -66,8 +66,11 @@ export class AipeVaiheStore implements IEditoitava {
   }
 
   public async revisions() {
-    const res = await Aipeopetuksensisalto.getVaiheVersiot(this.perusteId, this.vaiheId!);
-    return res.data as Revision[];
+    if (this.vaiheId) {
+      const res = await Aipeopetuksensisalto.getVaiheVersiot(this.perusteId, this.vaiheId!);
+      return res.data as Revision[];
+    }
+    return [];
   }
 
   public async restore(rev: number) {
