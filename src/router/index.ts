@@ -210,6 +210,7 @@ const router = new VueRouter({
       path: 'perusteprojekti/:projektiId',
       component: RoutePerusteprojekti,
       name: 'perusteprojekti',
+      redirect: { name: 'peruste-yleisnakyma' },
       props: {
         ...stores,
         ratasvalinnat: [{
@@ -305,7 +306,7 @@ const router = new VueRouter({
       },
       children: [{
         path: '',
-        name: 'perusteprojekti',
+        name: 'peruste-yleisnakyma',
         component: RouteYleisnakyma,
         props,
       }, {
@@ -519,6 +520,7 @@ const router = new VueRouter({
       path: 'opas/:projektiId',
       component: RoutePerusteprojekti,
       name: 'opas',
+      redirect: { name: 'opas-yleisnakyma' },
       props: {
         ...stores,
         julkaisuRoute: { name: 'julkaiseOpas' },
@@ -563,7 +565,7 @@ const router = new VueRouter({
       },
       children: [{
         path: '',
-        name: 'opas',
+        name: 'opas-yleisnakyma',
         component: RouteYleisnakyma,
         props: {
           ...stores,
