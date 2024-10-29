@@ -3,11 +3,20 @@
     <EpTestiymparisto />
 
     <div class="view-container">
-      <div class="header" ref="header">
-        <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet" :logoutHref="logoutHref"/>
-        <PortalTarget ref="innerPortal" name="headerExtension" />
-      </div>
-      <RouterView />
+      <EpNavbar
+        class="header topbar"
+        v-sticky
+        sticky-offset="{ top: 0 }"
+        sticky-z-index="700"
+        :kayttaja="kayttaja"
+        :sovellusOikeudet="sovellusOikeudet"
+        :logoutHref="logoutHref"
+      />
+      <PortalTarget
+        ref="innerPortal"
+        name="headerExtension"
+        class="header portal"/>
+      <RouterView class="view"/>
     </div>
     <ep-footer>
       <template #palaute>
@@ -164,14 +173,30 @@ export default class RouteRoot extends Vue {
   display: flex;
   flex-direction: column;
 
-  .header {
-    color: white;
+  .topbar {
     background-image: url('~@assets/img/banners/header.svg');
     background-position: 100% 0;
     background-repeat: none;
-    background-size: cover;
+    background-size: 100% 200px;
     @media only screen and (min-width: 2503px)  {
     }
+  }
+
+  .portal {
+    background-image: url('~@assets/img/banners/header.svg');
+    background-position: top -56px right 0px;
+    background-repeat: none;
+    background-size: 100% 200px;
+    @media only screen and (min-width: 2503px)  {
+    }
+  }
+
+  .header {
+    color: white;
+  }
+
+  .view {
+    background: white;
   }
 }
 

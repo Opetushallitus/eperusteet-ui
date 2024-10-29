@@ -47,18 +47,18 @@
       </b-form-group>
     </div>
 
-    <b-form-group :label="$t('tiedote-hallintanakymaan')">
-      <div class="mb-3">{{ $t('tiedote-naytetaan-taman-sivun-julkaisuhistoriassa') }}</div>
+    <b-form-group :label="$t('lyhyt-kuvaus-muutoksesta-hallintanakymaan')">
+      <div class="mb-3">{{ $t('kuvaus-naytetaan-taman-sivun-muutoshistoriassa') }}</div>
       <ep-content v-model="julkaisu.tiedote"
                   layout="simplified"
                   :is-editable="true" />
-      <ep-toggle v-model="julkaisu.julkinen" :isSWitch="false" class="mt-4" :is-editing="!isLatest">
+      <ep-toggle v-model="julkaisu.julkinen" :isSWitch="false" class="mt-4" :is-editing="!isLatest" v-if="!isLatest">
         {{$t('julkaisu-naytetaan-julkisen-sivuston-julkaisuhistoriassa')}}
       </ep-toggle>
     </b-form-group>
 
-    <b-form-group v-if="julkaisu.julkinen" :label="$t('tiedote-julkiselle-sivustolle')" class="mt-4">
-      <div class="mb-3">{{ $t('tiedote-naytetaan-perusteen-tiedot-näkyman-julkaisuhistoriassa') }}</div>
+    <b-form-group v-if="julkaisu.julkinen" :label="$t('lyhyt-kuvaus-muutoksesta-julkisella-sivustolla')" class="mt-4">
+      <div class="mb-3">{{ $t('kuvaus-naytetaan-perusteen-tiedot-nakyman-muutoshistoriassa') }}</div>
       <ep-content v-model="julkaisu.julkinenTiedote"
                   layout="simplified"
                   :is-editable="true" />
