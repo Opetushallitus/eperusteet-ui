@@ -104,6 +104,10 @@
         <hr class="mt-4">
         <h3 class="mt-4">{{ $t('uusi-julkaisu') }}</h3>
 
+        <EpInfoBanner class="mb-3">
+          {{$t('muista-lisata-julkaisun-kuvauksesta-myos-kieliversio')}}
+        </EpInfoBanner>
+
         <EpJulkaisuMuutosmaarays
           v-if="isNormaali"
           class="mt-4"
