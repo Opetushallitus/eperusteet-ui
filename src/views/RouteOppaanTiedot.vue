@@ -266,6 +266,7 @@ import EpKoodistoSelectTable from '@shared/components/EpKoodistoSelect/EpKoodist
 import { Koodisto, PerusteBaseDtoOpasTyyppiEnum } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
+import { KoulutusTyyppi } from '@/utils/perusteet';
 
 @Component({
   components: {
@@ -314,7 +315,7 @@ export default class RouteOppaanTiedot extends PerusteprojektiRoute {
   }
 
   get koulutustyypit() {
-    return _.chain(EperusteetKoulutustyypit)
+    return _.chain([...EperusteetKoulutustyypit, KoulutusTyyppi.MUU])
       .map(koulutustyyppi => {
         return {
           value: koulutustyyppi,

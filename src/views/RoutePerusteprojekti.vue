@@ -21,10 +21,8 @@
               <span>{{nimi}}</span>
             </h1>
             <div class="diaarinumero mt-2" v-if="showNavigation">
-              <span>{{ $t(peruste.koulutustyyppi) }}</span>
-              <span class="ml-2 mr-2">|</span>
-              <span>{{ peruste.diaarinumero }}</span>
-              <span v-if="peruste.koulutustyyppi && peruste.diaarinumero" class="ml-2 mr-2">|</span>
+              <span v-if="peruste.koulutustyyppi">{{ $t(peruste.koulutustyyppi) }}<span class="mx-2">|</span></span>
+              <span v-if="peruste.diaarinumero">{{ peruste.diaarinumero }}<span class="mx-2">|</span></span>
 
               <b-dropdown class="asetukset" size="sm" no-caret variant="transparent">
                 <template v-slot:button-content>
@@ -760,6 +758,11 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
   .diaarinumero {
     .asetukset {
+
+      ::v-deep .btn {
+        padding: 0;
+      }
+
       .hallinta {
         color: white;
       }
