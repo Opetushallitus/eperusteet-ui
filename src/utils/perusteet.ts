@@ -1,7 +1,7 @@
 import { EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import _ from 'lodash';
 
-enum KoulutusTyyppi {
+export enum KoulutusTyyppi {
   AMMATILLINEN_PERUSTUTKINTO = 'koulutustyyppi_1',
   LUKIOKOULUTUS = 'koulutustyyppi_2',
   TELMA = 'koulutustyyppi_5',
