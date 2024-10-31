@@ -1,22 +1,13 @@
 <template>
-  <div class="home-container minfull">
+  <div class="home-container minfull" sticky-container>
     <EpTestiymparisto />
 
     <div class="view-container">
-      <EpNavbar
-        class="header topbar"
-        v-sticky
-        sticky-offset="{ top: 0 }"
-        sticky-z-index="700"
-        :kayttaja="kayttaja"
-        :sovellusOikeudet="sovellusOikeudet"
-        :logoutHref="logoutHref"
-      />
-      <PortalTarget
-        ref="innerPortal"
-        name="headerExtension"
-        class="header portal"/>
-      <RouterView class="view"/>
+      <div class="header" ref="header">
+        <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet" :logoutHref="logoutHref" :sticky="routeStickyNavi"/>
+        <PortalTarget ref="innerPortal" name="headerExtension" />
+      </div>
+      <RouterView />
     </div>
     <ep-footer>
       <template #palaute>
@@ -66,6 +57,10 @@ export default class RouteRoot extends Vue {
 
   get kayttaja() {
     return this.kayttajaStore?.tiedot?.value || null;
+  }
+
+  get routeStickyNavi() {
+    return this.$route.name !== 'root';
   }
 
   @Meta
@@ -173,30 +168,14 @@ export default class RouteRoot extends Vue {
   display: flex;
   flex-direction: column;
 
-  .topbar {
+  .header {
+    color: white;
     background-image: url('~@assets/img/banners/header.svg');
     background-position: 100% 0;
     background-repeat: none;
-    background-size: 100% 200px;
+    background-size: cover;
     @media only screen and (min-width: 2503px)  {
     }
-  }
-
-  .portal {
-    background-image: url('~@assets/img/banners/header.svg');
-    background-position: top -56px right 0px;
-    background-repeat: none;
-    background-size: 100% 200px;
-    @media only screen and (min-width: 2503px)  {
-    }
-  }
-
-  .header {
-    color: white;
-  }
-
-  .view {
-    background: white;
   }
 }
 
