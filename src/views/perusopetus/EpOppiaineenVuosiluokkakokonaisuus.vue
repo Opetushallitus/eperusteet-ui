@@ -2,9 +2,9 @@
   <div>
     <EpSisaltoTekstikappaleet v-model="model" :isEditing="isEditing" :sisaltoAvaimet="['tehtava', 'ohjaus', 'tyotavat', 'arviointi']" />
 
-    <b-form-group class="mt-4 pt-3" v-if="model.sisaltoalueinfo">
+    <b-form-group class="mt-4 pt-3">
       <template v-slot:label>
-        <h4 class="mb-0">
+        <h4 class="mb-0" v-if="model.sisaltoalueinfo">
           <span v-if="model.sisaltoalueinfo.otsikko">{{$kaanna(model.sisaltoalueinfo.otsikko)}}</span>
           <span v-else>{{$t('sisaltoalueet-vuosiluokilla-' + vuosiluokat)}}</span>
         </h4>
