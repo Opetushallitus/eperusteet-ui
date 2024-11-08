@@ -8,12 +8,13 @@
       <div>{{ $t('julkaisunakyma-kuvaus') }}</div>
 
       <div class="mt-4">
-        <h3>{{ $t('julkaisu-vaikutukset') }}</h3>
+        <h3>{{ $t('julkaisun-vaikutukset') }}</h3>
         <ul>
-          <li>{{ $t('julkaisusta-julkinen') }}</li>
-          <li>{{ $t('julkaisusta-luodaan-pdf') }}</li>
-          <li>{{ $t('julkaisusta-vanhat-versiot-sailyvat') }}</li>
-          <li v-if="isAmmatillinen">{{ $t('tutkinnon-muodostumisessa-lisatyt-uudet-osaamisalat-ja-tutkintonimikkeet-viedaan-koodistoon') }}</li>
+          <li>{{ $t('peruste-julkaisun-vaikutukset-1') }}</li>
+          <li>{{ $t('peruste-julkaisun-vaikutukset-2') }}</li>
+          <li>{{ $t('peruste-julkaisun-vaikutukset-3') }}</li>
+          <li>{{ $t('peruste-julkaisun-vaikutukset-4') }}</li>
+          <li v-if="isAmmatillinen">{{ $t('peruste-julkaisun-vaikutukset-ammatillinen-1') }}</li>
         </ul>
       </div>
     </template>
