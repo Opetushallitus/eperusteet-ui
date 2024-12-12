@@ -3651,18 +3651,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"adler-32@npm:~1.2.0":
-  version: 1.2.0
-  resolution: "adler-32@npm:1.2.0"
-  dependencies:
-    exit-on-epipe: "npm:~1.0.1"
-    printj: "npm:~1.1.0"
-  bin:
-    adler32: ./bin/adler32.njs
-  checksum: 10c0/1c2af9c21d2b22d0e576531f09de178950f2afd84fdfc84204e15e30bbf80d9645a896ae48b2d1389ce677c90e628ce7496d2d23da101582443ebc9fd5cd0c10
-  languageName: node
-  linkType: hard
-
 "adler-32@npm:~1.3.0":
   version: 1.3.1
   resolution: "adler-32@npm:1.3.1"
@@ -5219,7 +5207,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cfb@npm:^1.1.4":
+"cfb@npm:~1.2.1":
   version: 1.2.2
   resolution: "cfb@npm:1.2.2"
   dependencies:
@@ -5987,7 +5975,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crc-32@npm:~1.2.0":
+"crc-32@npm:~1.2.0, crc-32@npm:~1.2.1":
   version: 1.2.2
   resolution: "crc-32@npm:1.2.2"
   bin:
@@ -7226,7 +7214,7 @@ __metadata:
     vuelidate-property-decorators: "npm:^1.0.28"
     vuex: "npm:^3.1.2"
     webpack: "npm:^4.47.0"
-    xlsx: "npm:^0.17.0"
+    xlsx: "npm:^0.18.5"
   languageName: unknown
   linkType: soft
 
@@ -7917,13 +7905,6 @@ __metadata:
   version: 1.1.1
   resolution: "exit-hook@npm:1.1.1"
   checksum: 10c0/6485772b1f5fdc5c8bf0cf9e9ba430f5b1e1ced2976be0bc6474b695358be32374a59370f5a3cec452c1b786b5f181035f3a10c58f9c639d7a7218e1b49e1a3a
-  languageName: node
-  linkType: hard
-
-"exit-on-epipe@npm:~1.0.1":
-  version: 1.0.1
-  resolution: "exit-on-epipe@npm:1.0.1"
-  checksum: 10c0/f10a5fbf1abb6294b06220f99d84bb918286700e8aec3d364963767f1f0530b7e5abf29d8f0ef2672458e794f746f73254d397b1596acc745bdce81586b183c0
   languageName: node
   linkType: hard
 
@@ -14069,15 +14050,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"printj@npm:~1.1.0":
-  version: 1.1.2
-  resolution: "printj@npm:1.1.2"
-  bin:
-    printj: ./bin/printj.njs
-  checksum: 10c0/511ebf3a1eb3269d91ac709083039c32dbee05ad71918ac20fb960df03d24cf072b09ec22a3cb0897f31c48233f10312596e3f4e43dfc6269e6977b0679a68ec
-  languageName: node
-  linkType: hard
-
 "proc-log@npm:^4.1.0, proc-log@npm:^4.2.0":
   version: 4.2.0
   resolution: "proc-log@npm:4.2.0"
@@ -18568,20 +18540,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xlsx@npm:^0.17.0":
-  version: 0.17.5
-  resolution: "xlsx@npm:0.17.5"
+"xlsx@npm:^0.18.5":
+  version: 0.18.5
+  resolution: "xlsx@npm:0.18.5"
   dependencies:
-    adler-32: "npm:~1.2.0"
-    cfb: "npm:^1.1.4"
+    adler-32: "npm:~1.3.0"
+    cfb: "npm:~1.2.1"
     codepage: "npm:~1.15.0"
-    crc-32: "npm:~1.2.0"
+    crc-32: "npm:~1.2.1"
     ssf: "npm:~0.11.2"
     wmf: "npm:~1.0.1"
     word: "npm:~0.3.0"
   bin:
     xlsx: bin/xlsx.njs
-  checksum: 10c0/c7eb20361ac42f6e8146d6ed6a8bf1bdecfaeeb9a10dac3f5743e10abbd486df69ee9ec16701288cdd0095034ca6c9ae4db83a69fe40f74398a13d92df7edcdb
+  checksum: 10c0/787cfa77034a3e86fdcde21572f1011c8976f87823a5e0ee5057f13b2f6e48f17a1710732a91b8ae15d7794945c7cba8a3ca904ea7150e028260b0ab8e1158c8
   languageName: node
   linkType: hard
 

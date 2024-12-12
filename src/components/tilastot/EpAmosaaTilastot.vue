@@ -92,7 +92,11 @@
         </div>
       </div>
 
-      <h2 class="mt-5">{{$t('toteutussuunnitelmat')}} {{toteutussuunnitelmatFiltered.length}} {{$t('kpl')}}</h2>
+      <h2 class="mt-5">
+        <span>{{$t('toteutussuunnitelmat')}} {{toteutussuunnitelmatFiltered.length}} {{$t('kpl')}}</span>
+        <EpButton class="ml-5" variant="link" @click="downloadTiedosto('csv')" noPadding>Lataa csv</EpButton>
+        <EpButton variant="link" @click="downloadTiedosto('xlsx')" noPadding>Lataa xlsx</EpButton>
+      </h2>
 
       <b-table responsive
                 borderless
@@ -150,6 +154,7 @@ import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKSET } from '@shared/plugins/oikeustarkastelu';
 import EpTilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilastot/EpTilastoAikavaliVertailu.vue';
+import { csvAikaleima, dataTiedostoksi } from './tilastot';
 
 @Component({
   components: {
@@ -491,6 +496,26 @@ export default class EpAmosaaTilastot extends Vue {
       sortable: true,
       thStyle: { width: '15%' },
     }];
+  }
+
+  get tiedostoData() {
+    return _.map(this.toteutussuunnitelmatFiltered, ops => {
+      const csvOps = _.pick(ops, ['nimi', 'koulutustyyppi', 'tila', 'voimaantulo', 'paatospaivamaara', 'julkaistu', 'ensijulkaisu', 'luotu']);
+      return {
+        nimi: this.$kaanna(csvOps.nimi),
+        koulutustyyppi: this.$t(csvOps.koulutustyyppi),
+        tila: this.$t(csvOps.tila),
+        luotu: csvAikaleima(csvOps.luotu),
+        voimassaoloAlkaa: csvAikaleima(csvOps.voimaantulo),
+        paatospaivamaara: csvAikaleima(csvOps.paatospaivamaara),
+        ensijulkaisu: csvAikaleima(csvOps.ensijulkaisu),
+        julkaistu: csvAikaleima(csvOps.julkaistu),
+      };
+    });
+  }
+
+  downloadTiedosto(tyyppi) {
+    dataTiedostoksi(tyyppi, 'amosaa', this.tiedostoData);
   }
 }
 </script>

@@ -1,6 +1,8 @@
 import { Koulutustyyppi } from '@shared/tyypit';
 import { AmmatillisetKoulutustyypit, koulutustyyppiRyhmaSort, koulutustyyppiSort, themes, VapaasivistystyoKoulutustyypit } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
+import { utils, writeFile } from 'xlsx';
+import moment from 'moment';
 
 export function suunnitelmatTilastoksi(suunnitelmat, alkupvm, loppupvm) {
   return _.chain(suunnitelmat)
@@ -79,3 +81,14 @@ export const koulutustyyppiTilastoSort = {
   kops: 74,
   vapaatavoitteiset_ei_jotpa: 75,
 };
+
+export function csvAikaleima(value) {
+  return value ? moment(value).format('YYYY-MM-DD') : null;
+}
+
+export function dataTiedostoksi(tyyppi, sisaltoTyyppi, tiedostoData) {
+  const data = utils.json_to_sheet(tiedostoData);
+  const wb = utils.book_new();
+  utils.book_append_sheet(wb, data, 'Tilastot');
+  writeFile(wb, `tilastot-${sisaltoTyyppi}-${moment(new Date()).format('YYYYMMDDHHmm')}.${tyyppi}`, { bookType: tyyppi });
+}
