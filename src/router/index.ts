@@ -106,10 +106,6 @@ const router = new VueRouter({
       component: RouteHome,
       props,
     }, {
-      path: 'kaannokset',
-      name: 'kaannokset',
-      component: RouteKaannokset,
-    }, {
       path: 'virhe',
       name: 'virhe',
       component: EpErrorPage,
