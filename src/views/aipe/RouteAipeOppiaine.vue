@@ -262,6 +262,8 @@ export default class RouteAipeOppiaine extends Vue {
           {
             laajattavoitteet: [],
             arvioinninkohteet: [],
+            sisaltoalueet: [],
+            oppiaineenTavoitteenOpetuksenTavoitteet: [],
           },
         ],
       },
