@@ -424,7 +424,7 @@
                             :fields="fields"
                             :empty-text="$t('ei-kiinnitettyja-tutkintonimikkeita')">
                       <template v-slot:cell(koodi)="data">
-                        <span class="font-weight-bold">{{ data.item.arvo }}</span>
+                        <span class="font-weight-bold">{{ data.item.tutkintonimikeArvo }}</span>
                       </template>
                       <template v-slot:cell(nimi)="data">
                         {{ $kaanna(data.item.nimi) }}
@@ -607,6 +607,7 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     return [{
       key: 'nimi',
       label: this.$t('nimi'),
+      thStyle: { width: '80%' },
     }, {
       key: 'koodi',
       label: this.$t('koodi'),
