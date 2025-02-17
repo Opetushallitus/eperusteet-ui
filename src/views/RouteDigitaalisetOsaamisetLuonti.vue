@@ -75,8 +75,6 @@ import * as _ from 'lodash';
 import { notNull } from '@shared/validators/required';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 
-const util = require('util');
-
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
 @Component({

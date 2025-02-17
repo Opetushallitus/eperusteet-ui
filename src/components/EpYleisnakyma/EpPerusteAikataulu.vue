@@ -99,7 +99,7 @@ export default class EpPerusteAikataulu extends Vue {
   }
 
   hasTapahtuma(tapahtumaEnum: PerusteAikatauluDtoTapahtumaEnum) {
-    return _.head(_.filter(this.aikatauluStore.aikataulutapahtumat.value, tapahtuma => tapahtuma.tapahtuma === _.toLower(tapahtumaEnum)));
+    return _.head(_.filter(this.aikatauluStore.aikataulutapahtumat.value, tapahtuma => _.toLower(tapahtuma.tapahtuma) === _.toLower(tapahtumaEnum)));
   }
 
   createDefaultTapahtuma(tapahtuma: PerusteAikatauluDtoTapahtumaEnum, tavoite: any, tapahtumapaiva?: Date) {

@@ -258,8 +258,6 @@ import { notNull } from '@shared/validators/required';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { MaarayksetEditStore } from '@/stores/MaarayksetEditStore';
 
-const util = require('util');
-
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
 @Component({

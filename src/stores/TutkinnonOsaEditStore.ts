@@ -231,14 +231,14 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   public features(data: any) {
     return computed(() => {
       return {
-        editable: (TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) <= 1)
+        editable: (_.toLower(TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) <= 1)
           || (data.tutkinnonOsa.tyyppi !== 'normaali' && data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
         removable: true,
         hideable: false,
-        recoverable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS)
+        recoverable: _.toLower(TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.VALMIS)
           && ((!data?.tutkinnonOsa?.alkuperainenPeruste && _.size(this.projektitJoissaKaytossa) <= 1)
           || data?.tutkinnonOsa?.alkuperainenPeruste?.id === this.perusteId),
-        copyable: TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) > 1 && data.tutkinnonOsa.tyyppi === 'normaali',
+        copyable: _.toLower(TutkinnonOsaEditStore.config?.perusteStore.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.VALMIS) && _.size(this.projektitJoissaKaytossa) > 1 && data.tutkinnonOsa.tyyppi === 'normaali',
       } as EditoitavaFeatures;
     });
   }
