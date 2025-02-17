@@ -42,14 +42,14 @@ export class PerusteStore implements IEditoitava {
   public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly isVapaasivistystyo = computed(() => isVapaasivistystyoKoulutustyyppi(this.state.peruste?.koulutustyyppi));
   public readonly julkaisut = computed(() => this.state.julkaisut);
-  public readonly isPohja = computed(() => this.state.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA));
-  public readonly isNormaali = computed(() => this.state.peruste?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.NORMAALI));
+  public readonly isPohja = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.POHJA));
+  public readonly isNormaali = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.NORMAALI));
   public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.peruste.value?.koulutustyyppi));
   public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.peruste.value?.koulutustyyppi));
   public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
-  public readonly isJulkaistu = computed(() => (_.size(this.julkaisut.value) > 0 || this.peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
+  public readonly isJulkaistu = computed(() => (_.size(this.julkaisut.value) > 0 || this.peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && _.toLower(this.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
   public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
-  public readonly arkistointiReroute = computed(() => this.peruste.value?.tyyppi === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
+  public readonly arkistointiReroute = computed(() => _.toLower(this.peruste.value?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
   public readonly muutosmaaraykset = computed(() => this.state.muutosmaaraykset ? _.reverse(_.sortBy(this.state.muutosmaaraykset, 'voimassaoloAlkaa')) : null);
   public readonly isInitialized = computed(() => this.state.isInitialized);
   public readonly maarays = computed(() => this.state.maarays);
@@ -97,7 +97,7 @@ export class PerusteStore implements IEditoitava {
   public async updateValidointi() {
     if (this.state.projekti?.id) {
       this.state.validoinnit = null;
-      if (this.peruste.value?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
+      if (_.toLower(this.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
         try {
           const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
           this.state.validoinnit = res.data;

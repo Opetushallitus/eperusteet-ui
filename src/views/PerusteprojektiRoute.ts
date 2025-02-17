@@ -72,13 +72,13 @@ export class PerusteprojektiRoute extends Vue {
 
   protected get isPohja() {
     if (this.peruste) {
-      return this.peruste.tyyppi === _.toLower(PerusteDtoTyyppiEnum.POHJA);
+      return _.toLower(this.peruste.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.POHJA);
     }
   }
 
   protected get isNormaali() {
     if (this.peruste) {
-      return this.peruste.tyyppi === _.toLower(PerusteDtoTyyppiEnum.NORMAALI);
+      return _.toLower(this.peruste.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.NORMAALI);
     }
   }
 

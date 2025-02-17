@@ -65,7 +65,7 @@ export default class RoutePoistetutSisallot extends PerusteprojektiRoute {
   }
 
   get tekstikappaleet() {
-    return _.filter(this.poistetut, p => p.tyyppi === _.toLower(PoistettuSisaltoDtoTyyppiEnum.TEKSTIKAPPALE));
+    return _.filter(this.poistetut, p => _.toLower(p.tyyppi) === _.toLower(PoistettuSisaltoDtoTyyppiEnum.TEKSTIKAPPALE));
   }
 
   async palauta(poistettu: any) {

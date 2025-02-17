@@ -645,7 +645,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get isPerusteTutkintoonValmentava(): boolean {
-    return this.peruste?.toteutus === _.toLower(PerusteDtoToteutusEnum.TUTKINTOONVALMENTAVA);
+    return _.toLower(this.peruste?.toteutus) === _.toLower(PerusteDtoToteutusEnum.TUTKINTOONVALMENTAVA);
   }
 
   get julkaisut() {
@@ -681,11 +681,11 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
   }
 
   get isArkistoitu() {
-    return this.peruste?.tila === _.toLower(PerusteDtoTilaEnum.POISTETTU);
+    return _.toLower(this.peruste?.tila) === _.toLower(PerusteDtoTilaEnum.POISTETTU);
   }
 
   get isLuonnos() {
-    return this.peruste?.tila === _.toLower(PerusteDtoTilaEnum.LUONNOS);
+    return _.toLower(this.peruste?.tila) === _.toLower(PerusteDtoTilaEnum.LUONNOS);
   }
 
   get julkaisemattomiaMuutoksia() {

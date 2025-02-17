@@ -46,11 +46,11 @@ module.exports = {
     }
   },
   devServer: {
-    overlay: {
-      warnings: false,
-      errors: true,
+    client: {
+      logging: 'none',
+      overlay: true,
+      progress: true,
     },
-    clientLogLevel: 'none',
     port: 9001,
     proxy,
   },

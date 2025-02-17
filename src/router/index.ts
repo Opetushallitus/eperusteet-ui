@@ -29,7 +29,6 @@ import RoutePohjatLuonti from '@/views/RoutePohjatLuonti.vue';
 import RouteProjektiTiedot from '@/views/RouteProjektiTiedot.vue';
 import RouteRoot from '@/views/RouteRoot.vue';
 import RouteTekstikappale from '@/views/RouteTekstikappale.vue';
-import RouteTermisto from '@/views/RouteTermisto.vue';
 import RouteTiedotteet from '@/views/RouteTiedotteet.vue';
 import RouteTilastot from '@/views/RouteTilastot.vue';
 import RouteYllapito from '@/views/RouteYllapito.vue';
@@ -334,11 +333,6 @@ const router = new VueRouter({
         path: 'tekstikappale/:tekstiKappaleId',
         name: 'tekstikappale',
         component: RouteTekstikappale,
-        props,
-      }, {
-        path: 'termisto',
-        name: 'termisto',
-        component: RouteTermisto,
         props,
       }, {
         path: 'peruste',

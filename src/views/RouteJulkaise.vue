@@ -237,11 +237,11 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
   }
 
   get julkaisuMahdollinen() {
-    return this.peruste?.tila !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.isPerusteValid;
+    return _.toLower(this.peruste?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.isPerusteValid;
   }
 
   get valmiiksiMahdollinen() {
-    return this.projekti?.tila === _.toLower(PerusteprojektiDtoTilaEnum.LAADINTA);
+    return _.toLower(this.projekti?.tila) === _.toLower(PerusteprojektiDtoTilaEnum.LAADINTA);
   }
 
   get julkaisut() {
