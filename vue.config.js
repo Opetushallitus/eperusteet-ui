@@ -57,4 +57,14 @@ module.exports = {
   transpileDependencies: [
     /[\\/]node_modules[\\/]tiptap.*/,
   ],
+  pwa: {
+    iconPaths: {
+      faviconSVG: null,
+      favicon32: null,
+      favicon16: null,
+      appleTouchIcon: null,
+      maskIcon: null,
+      msTileImage: null,
+    },
+  },
 };
