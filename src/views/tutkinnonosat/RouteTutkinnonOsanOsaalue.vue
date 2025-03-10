@@ -128,7 +128,7 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import { PerusteprojektiRoute } from '../PerusteprojektiRoute';
-import { findDeep } from 'deepdash-es/standalone';
+import { findDeep } from 'deepdash/standalone';
 import _ from 'lodash';
 import { UiKielet } from '@shared/stores/kieli';
 import { Koodistot } from '@shared/utils/koodi';
