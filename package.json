@@ -19,7 +19,7 @@
     "genspec": "cd eperusteet-frontend-utils/vue && ./scripts/buildapi.sh -g -s ${0} && cd .. && cd .. && yarn run serve"
   },
   "dependencies": {
-    "@babel/core": "^7.12.16",
+    "@babel/core": "^7.26.10",
     "@types/jest": "^27.5.2",
     "@types/lodash": "4.14.202",
     "@types/qs": "^6.9.1",
