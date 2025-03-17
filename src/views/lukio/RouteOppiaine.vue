@@ -126,25 +126,25 @@
 
             <h5>{{$t('pakollisten-moduulien-kuvaus')}}</h5>
             <ep-content layout="normal" v-model="data.pakollisetModuulitKuvaus" :is-editable="isEditing" v-if="isEditing || data.pakollisetModuulitKuvaus"/>
-            <div class="d-flex mt-3" v-if="!isEditing">
+            <template v-if="!isEditing">
               <router-link
                 v-for="(moduuli, mindex) in pakollisetModuulit" :key="'pmoduuli'+mindex"
                 :to="{ name: 'moduuli', params: { moduuliId: moduuli.id } }">
-                <EpModuuli :moduuli="moduuli"/>
+                <EpModuuli :moduuli="moduuli" class="mb-2"/>
               </router-link>
-            </div>
+            </template>
 
             <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaModuuli(true)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-pakollinen-moduuli') }}</EpButton>
 
             <h5 class="mt-5">{{$t('valinnaisten-moduulien-kuvaus')}}</h5>
             <ep-content layout="normal" v-model="data.valinnaisetModuulitKuvaus" :is-editable="isEditing" v-if="isEditing || data.pakollisetModuulitKuvaus"/>
-            <div class="d-flex mt-3" v-if="!isEditing">
+            <template v-if="!isEditing">
               <router-link
                 v-for="(moduuli, mindex) in valinnaisetModuulit" :key="'vmoduuli'+mindex"
                 :to="{ name: 'moduuli', params: { moduuliId: moduuli.id } }">
-                <EpModuuli :moduuli="moduuli"/>
+                <EpModuuli :moduuli="moduuli" class="mb-2"/>
               </router-link>
-            </div>
+            </template>
             <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaModuuli(false)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-valinnainen-moduuli') }}</EpButton>
           </EpCollapse>
 
@@ -356,10 +356,7 @@ export default class RouteOppiaine extends Vue {
   }
 
   .moduuli {
-    width:160px;
-    height:160px;
     background-color: #eaf6fe;
-    border-radius: 0.5em;
 
     .opintopiste {
       font-size: 0.85rem;
