@@ -528,6 +528,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
         return {
           ...ratasvalinta,
           disabled: ratasvalinta.disabled && ratasvalinta.disabled(),
+          text: _.isFunction(ratasvalinta.text) ? ratasvalinta.text() : ratasvalinta.text,
         };
       })
       .value();

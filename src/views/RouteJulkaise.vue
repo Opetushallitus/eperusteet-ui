@@ -49,11 +49,11 @@
 
     <div v-if="peruste && julkaisuMahdollinen && !isPohja">
       <hr class="mt-4 mb-4">
-      <h3>{{ $t('perusteen-tiedot') }}</h3>
+      <h3>{{ $t(koulutustyyppiKohtaisetKaannokset.perusteentiedot) }}</h3>
       <b-container fluid>
         <b-row no-gutters>
           <b-col>
-            <b-form-group :label="$t('perusteen-nimi') + '*'">
+            <b-form-group :label="$t(koulutustyyppiKohtaisetKaannokset.perusteennimi) + '*'">
               <ep-input v-model="peruste.nimi"></ep-input>
             </b-form-group>
           </b-col>
