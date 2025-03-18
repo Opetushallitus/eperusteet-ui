@@ -72,6 +72,7 @@ import { getCasKayttajaKieli } from '@shared/api/common';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { BrowserStore } from '@shared/stores/BrowserStore';
+import { isYleissivistavaKoulutustyyppi } from '@shared/utils/perusteet';
 
 Vue.use(VueRouter);
 Vue.use(VueMeta, {
@@ -215,7 +216,7 @@ const router = new VueRouter({
         }, {
           route: 'perusteenTiedot',
           icon: 'info',
-          text: 'perusteen-tiedot',
+          text: () => isYleissivistavaKoulutustyyppi(stores.perusteStore.peruste.value?.koulutustyyppi) ? 'perusteen-tiedot-yleissivistava' : 'perusteen-tiedot',
         }, {
           route: 'perusteenPdfLuonti',
           icon: 'picture_as_pdf',

@@ -5,10 +5,10 @@ import _ from 'lodash';
 import { PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
-import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
+import { isYleissivistavaKoulutustyyppi } from '@shared/utils/perusteet';
 
 const browserStore = new BrowserStore();
 
@@ -110,5 +110,16 @@ export class PerusteprojektiRoute extends Vue {
         this.isInitingProjekti = false;
       }
     }
+  }
+
+  protected get koulutustyyppiKohtaisetKaannokset() {
+    return {
+      perusteentiedot: isYleissivistavaKoulutustyyppi(this.perusteStore.peruste.value?.koulutustyyppi)
+        ? 'perusteen-tiedot-yleissivistava'
+        : 'perusteen-tiedot',
+      perusteennimi: isYleissivistavaKoulutustyyppi(this.perusteStore.peruste.value?.koulutustyyppi)
+        ? 'perusteen-nimi-yleissivistava'
+        : 'perusteen-nimi',
+    };
   }
 }
