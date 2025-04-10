@@ -42,10 +42,27 @@
       <hr class="my-4"/>
     </template>
 
+    <h2 class="mt-5">{{ $t('julkisivun-perusteiden-jarjestys') }}</h2>
+    <EpButton @click="muokkaaPerusteidenJarjestysta" v-if="!isEditingPerusteJarjestys">{{ $t('muokkaa')}}</EpButton>
+    <EpButton @click="peruuta" v-if="isEditingPerusteJarjestys" link>{{ $t('peruuta')}}</EpButton>
+    <EpButton @click="tallenna" v-if="isEditingPerusteJarjestys">{{ $t('tallenna')}}</EpButton>
+    <EpSpinner v-if="!julkisivunPerusteetRyhmiteltyna"/>
+    <div v-for="perusteRyhma in julkisivunPerusteetRyhmiteltyna" :key="perusteRyhma.ryhma">
+      <h3 class="mt-4">{{ $t(perusteRyhma.ryhma) }}</h3>
+      <EpBalloonList v-model="perusteRyhma.perusteet" :isEditing="isEditingPerusteJarjestys" sortable>
+        <template v-slot:default="{ item }">
+          <div class="d-flex w-100 justify-content-between">
+            <div>{{ $kaanna(item.nimi) }}</div>
+            <EpToggle v-model="item.piilotaJulkisivulta" :isEditing="isEditingPerusteJarjestys"> {{ $t('piilota-julkisivulta') }}</EpToggle>
+          </div>
+        </template>
+      </EpBalloonList>
+    </div>
+
+    <hr/>
+
     <h2 class="mb-5">{{ $t('muut-toimenpiteet') }}</h2>
-
     <EpButton @click="amosaaKoulutustoimijaPaivitys()" :showSpinner="amosaaKtPaivitysLoading">{{$t('paivita-amosaa-koulutustoimijat')}}</EpButton>
-
   </ep-main-view>
 </template>
 
@@ -61,6 +78,9 @@ import { YllapitoDto } from '@shared/generated/eperusteet';
 import { Validations } from 'vuelidate-property-decorators';
 import { notNull } from '@shared/validators/required';
 import { Maintenance } from '@shared/api/eperusteet';
+import _ from 'lodash';
+import { EperusteetKoulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
+import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
 
 @Component({
   components: {
@@ -69,6 +89,7 @@ import { Maintenance } from '@shared/api/eperusteet';
     EpInput,
     EpSpinner,
     EpToggle,
+    EpBalloonList,
   },
 })
 export default class RouteYllapito extends Vue {
@@ -76,9 +97,10 @@ export default class RouteYllapito extends Vue {
   private yllapitoStore!: YllapitoStore;
 
   private isEditing = false;
-
+  private isEditingPerusteJarjestys = false;
   private yllapitoTiedot: YllapitoDto[] | null = null;
   private amosaaKtPaivitysLoading = false;
+  private julkisivunPerusteetRyhmiteltyna: any[] | null = null;
 
   @Validations()
   validations = {
@@ -93,6 +115,37 @@ export default class RouteYllapito extends Vue {
 
   async mounted() {
     this.yllapitoTiedot = await this.yllapitoStore.fetch();
+    await this.fetchJulkisivunPerusteet();
+  }
+
+  async fetchJulkisivunPerusteet() {
+    this.julkisivunPerusteetRyhmiteltyna = null;
+    await this.yllapitoStore.fetchJulkisivunPerusteet();
+    this.julkisivunPerusteetRyhmiteltyna = this.ryhmittelePerusteet();
+  }
+
+  get julkisivunPerusteet() {
+    return this.yllapitoStore.julkisivunPerusteet.value;
+  }
+
+  ryhmittelePerusteet() {
+    const ryhmitetty = _.map(this.julkisivunPerusteet, (peruste) => {
+      return {
+        ...peruste,
+        ryhma: themes[peruste.koulutustyyppi!],
+      };
+    });
+
+    return _.chain(ryhmitetty)
+      .groupBy('ryhma')
+      .map((perusteet, ryhma) => {
+        return {
+          ryhma,
+          perusteet: _.orderBy(perusteet, ['julkisivuJarjestysNro'], ['asc']),
+        };
+      })
+      .orderBy(perusteRyhma => EperusteetKoulutustyyppiRyhmaSort[perusteRyhma.ryhma])
+      .value();
   }
 
   async onSave() {
@@ -138,6 +191,32 @@ export default class RouteYllapito extends Vue {
       this.$success(this.$t('virhe-palvelu-virhe') as string);
     }
     this.amosaaKtPaivitysLoading = false;
+  }
+
+  muokkaaPerusteidenJarjestysta() {
+    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
+  }
+
+  async peruuta() {
+    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
+    await this.fetchJulkisivunPerusteet();
+  }
+
+  async tallenna() {
+    const perusteet = _.chain(this.julkisivunPerusteetRyhmiteltyna)
+      .reduce((acc, ryhma) => {
+        return acc.concat(ryhma.perusteet);
+      }, [])
+      .map((peruste, index) => ({
+        ...peruste as any,
+        julkisivuJarjestysNro: index,
+      }))
+      .value();
+
+    await this.yllapitoStore.tallennaJulkisivunPerusteet(perusteet);
+    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
+    this.$success(this.$t('tallennus-onnistui') as string);
+    await this.fetchJulkisivunPerusteet();
   }
 }
 </script>
