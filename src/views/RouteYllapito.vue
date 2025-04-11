@@ -79,7 +79,7 @@ import { Validations } from 'vuelidate-property-decorators';
 import { notNull } from '@shared/validators/required';
 import { Maintenance } from '@shared/api/eperusteet';
 import _ from 'lodash';
-import { EperusteetKoulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
+import { EperusteetKoulutustyyppiRyhmaSort, julkisivuPerusteKoosteJarjestys, themes } from '@shared/utils/perusteet';
 import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
 
 @Component({
@@ -141,7 +141,15 @@ export default class RouteYllapito extends Vue {
       .map((perusteet, ryhma) => {
         return {
           ryhma,
-          perusteet: _.orderBy(perusteet, ['julkisivuJarjestysNro'], ['asc']),
+          perusteet: _.chain(perusteet)
+            .map(peruste => {
+              return {
+                ...peruste,
+                kaannettyNimi: this.$kaanna(peruste.nimi!),
+              };
+            })
+            .orderBy(julkisivuPerusteKoosteJarjestys.keys, julkisivuPerusteKoosteJarjestys.sortby)
+            .value(),
         };
       })
       .orderBy(perusteRyhma => EperusteetKoulutustyyppiRyhmaSort[perusteRyhma.ryhma])
