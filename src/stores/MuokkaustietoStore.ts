@@ -28,6 +28,11 @@ export class MuokkaustietoStore implements IMuokkaustietoProvider {
   public readonly viimeinenHaku = computed(() => this.state.viimeinenHaku);
   public readonly hakuLukumaara = computed(() => this.state.hakuLukumaara);
 
+  public async fetch() {
+    this.state.muokkaustiedot = null;
+    await this.update();
+  }
+
   public async update() {
     if (this.state.perusteId) {
       if (this.state.muokkaustiedot && !_.isEmpty(this.state.muokkaustiedot)) {

@@ -289,7 +289,10 @@ const router = new VueRouter({
           infopopovertext: 'pakota-julkaisu-info',
           meta: {
             oikeus: () => ({ oikeus: 'hallinta', kohde: 'pohja' }),
-            callback: async () => stores.perusteStore.fetchJulkaisut(),
+            callback: async () => {
+              await stores.muokkaustietoStore.fetch();
+              await stores.perusteStore.fetchJulkaisut();
+            },
             getPerusteId: () => stores.perusteStore.peruste.value?.id,
           },
         }],
