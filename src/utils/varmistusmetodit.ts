@@ -112,7 +112,20 @@ export async function nollaaJulkaisuTila(el, meta) {
 }
 
 export async function pakotaJulkaisu(el, meta) {
-  const pakota = await el.$bvModal.msgBoxConfirm(el.$t('pakota-julkaisu-varmistus') as any, {
+  const vahvistusSisalto = el.$createElement('div', {},
+    [
+      el.$createElement('div', el.$t('pakota-julkaisu-varmistus') as string),
+      ...(meta.validointiVirheet?.length > 0
+        ? [
+          el.$createElement('br', ''),
+          el.$createElement('div', el.$t('julkaisun-estavat-virheet') as string),
+          _.map(meta.validointiVirheet, (virhe) => {
+            return el.$createElement('div', ' - ' + el.$t(virhe.kuvaus) as string);
+          })] : []),
+    ],
+  ).children;
+
+  const pakota = await el.$bvModal.msgBoxConfirm(vahvistusSisalto as any, {
     title: el.$t('pakota-julkaisu') as any,
     okVariant: 'primary',
     okTitle: el.$t('ok') as any,
