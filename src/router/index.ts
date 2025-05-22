@@ -294,6 +294,7 @@ const router = new VueRouter({
               await stores.perusteStore.fetchJulkaisut();
             },
             getPerusteId: () => stores.perusteStore.peruste.value?.id,
+            validointi: true,
           },
         }],
         palautusMeta: {

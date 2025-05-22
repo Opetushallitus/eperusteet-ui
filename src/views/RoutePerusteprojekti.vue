@@ -46,15 +46,16 @@
                     @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)"
                     :disabled="ratasvalinta.disabled"
                     v-oikeustarkastelu="ratasvalinta.meta.oikeus()">
-                    <div class="d-flex">
+                    <div class="d-flex" :class="{'validointi-virhe': ratasvalinta.meta.validointi && validointiVirheet.length > 0}">
                       <EpMaterialIcon icon-shape="outlined" v-if="ratasvalinta.icon">{{ ratasvalinta.icon }}</EpMaterialIcon>
                       <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
-                      <EpInfoPopover v-if="ratasvalinta.infopopovertext" class="ml-2" :unique-id="'ratasinfopopover-' + index">{{ $t(ratasvalinta.infopopovertext)}}</EpInfoPopover>
+                      <EpInfoPopover v-if="ratasvalinta.infopopovertext" class="ml-2" :unique-id="'ratasinfopopover-' + index">
+                        {{ $t(ratasvalinta.infopopovertext)}}
+                      </EpInfoPopover>
                     </div>
                   </b-dropdown-item>
                 </div>
               </b-dropdown>
-
             </div>
           </div>
         </div>
@@ -630,9 +631,19 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     }
   }
 
+  get validointiVirheet() {
+    return _.chain(this.perusteStore.validoinnit.value)
+      .map('virheet')
+      .flatMap()
+      .value();
+  }
+
   async ratasClick(clickFn, meta) {
     this.hallintaLoading = true;
-    await clickFn(this, meta);
+    await clickFn(this, {
+      ...meta,
+      ...(meta.validointi && { validointiVirheet: this.validointiVirheet.slice(0, 3) }),
+    });
 
     if (meta.callback) {
       await meta.callback();
@@ -789,6 +800,10 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
 
       svg:not(.hallinta) {
         width: 25px;
+      }
+
+      .validointi-virhe {
+        color: $red;
       }
     }
   }
