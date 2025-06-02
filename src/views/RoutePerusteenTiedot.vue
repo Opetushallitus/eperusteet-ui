@@ -65,8 +65,8 @@
                 <b-col lg="6" v-if="filtersContain('koulutustyyppi')" class="mb-4">
                   <b-form-group :label="$t('koulutustyyppi')">
                     <ep-koulutustyyppi-select v-model="data.koulutustyyppi"
-                                              :koulutustyypit="siirtymat[data.koulutustyyppi]"
-                                              :is-editing="isEditing && !!siirtymat[data.koulutustyyppi]" />
+                                              :koulutustyypit="valittavatKoulutustyypit"
+                                              :is-editing="isEditing && (!data.koulutustyyppi || valittavatKoulutustyypit.includes(data.koulutustyyppi))" />
                   </b-form-group>
                 </b-col>
                 <b-col lg="6" v-if="filtersContain('perusteenkieli')" class="mb-4">
@@ -458,7 +458,7 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpPerusteenTiedot/EpMuutosmaaraykset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { Api, Liitetiedostot, Koodisto, LiiteDtoTyyppiEnum, LiitetiedostotParam, baseURL } from '@shared/api/eperusteet';
-import { SallitutKoulutustyyppisiirtymat, Koulutustyyppi } from '@shared/tyypit';
+import { AmmatillisetKoulutustyypit, Koulutustyyppi } from '@shared/tyypit';
 import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteEditStore } from '@/stores/PerusteEditStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
@@ -555,8 +555,8 @@ export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
     return _.filter(this.liitteet, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KAANNOS));
   }
 
-  get siirtymat() {
-    return SallitutKoulutustyyppisiirtymat;
+  get valittavatKoulutustyypit() {
+    return AmmatillisetKoulutustyypit;
   }
 
   get kielet() {
