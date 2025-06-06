@@ -1,0 +1,36 @@
+---
+description: pinia migration
+globs:
+alwaysApply: false
+---
+Do not convert store if it implements IEditoitava.
+
+Change VueCompositionApi to vue 3 methods.
+
+Convert store to pinia store setup style.
+Remove state const if exists and remove old computed state getters.
+If @debounced is present, convert it to lodash debounce.
+Do not retain compatibility.
+Do not change function names, try to retain old function names.
+If store constructor contains stores as parameters, delete these contructor parameters and use parameter store as pinia store.
+Only retain constructor parameters which are not stores
+
+If store extends another classs, try to retain functionalities from extended class.
+
+No need to convert these stores:
+BrowserStore
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

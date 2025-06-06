@@ -22,55 +22,42 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
-import EpSelect from '@shared/components/forms/EpSelect.vue';
+<script setup lang="ts">
+import { computed, onMounted } from 'vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import * as _ from 'lodash';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpColorIndicator,
-    EpInput,
-    EpMultiSelect,
-    EpSelect,
-    EpSpinner,
+const props = defineProps<{
+  modelValue: string;
+  ulkopuolisetStore: UlkopuolisetStore;
+  isEditing?: boolean;
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const inner = computed({
+  get() {
+    return _.find(tyoryhmat.value, { oid: props.modelValue });
   },
-})
-export default class PerustetyoryhmaSelect extends Vue {
-  @Prop({ required: true })
-  value!: string;
+  set(value: any) {
+    emit('update:modelValue', value ? value.oid : null);
+  },
+});
 
-  @Prop({ required: true })
-  ulkopuolisetStore!: UlkopuolisetStore;
+onMounted(async () => {
+  props.ulkopuolisetStore.fetchTyoryhmat();
+});
 
-  @Prop({ default: false })
-  isEditing!: boolean;
+const tyoryhmaSearchIdentity = (tr: any) => {
+  return _.toLower($kaanna(tr.nimi));
+};
 
-  get inner() {
-    return _.find(this.tyoryhmat, { oid: this.value });
-  }
-
-  set inner(value: any) {
-    this.$emit('input', value ? value.oid : null);
-  }
-
-  async mounted() {
-    this.ulkopuolisetStore.fetchTyoryhmat();
-  }
-
-  tyoryhmaSearchIdentity(tr: any) {
-    return _.toLower(this.$kaanna(tr.nimi));
-  }
-
-  get tyoryhmat() {
-    return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.tyoryhmaSearchIdentity);
-  }
-}
+const tyoryhmat = computed(() => {
+  return _.sortBy(props.ulkopuolisetStore.tyoryhmat.value, tyoryhmaSearchIdentity);
+});
 </script>
 
 <style lang="scss" scoped>

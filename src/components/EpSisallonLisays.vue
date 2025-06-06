@@ -104,8 +104,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import * as _ from 'lodash';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { Koulutustyyppi } from '@shared/tyypit';
@@ -127,430 +128,422 @@ import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
-@Component({
-  components: {
-    EpTekstikappaleLisays,
-    EpButton,
-    EpMaterialIcon,
-  },
-})
-export default class EpSisallonLisays extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  naviStore: EpTreeNavibarStore;
+}>();
 
-  @Prop({ required: true })
-  naviStore!: EpTreeNavibarStore;
+const router = useRouter();
+const route = useRoute();
 
-  loading: boolean = false;
+const loading = ref(false);
 
-  get projekti() {
-    return this.perusteStore.projekti.value;
+const projekti = computed(() => {
+  return props.perusteStore.projekti.value;
+});
+
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value;
+});
+
+const tekstikappaleet = computed(() => {
+  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Viite);
+});
+
+const opintokokonaisuudet = computed(() => {
+  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Opintokokonaisuus);
+});
+
+const koulutuksenosat = computed(() => {
+  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Koulutuksenosa);
+});
+
+const laajaalaisetosaamiset = computed(() => {
+  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Laajaalainenosaaminen);
+});
+
+const tavoitesisaltoalueet = computed(() => {
+  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Tavoitesisaltoalue);
+});
+
+const kotoKielitaitotasot = computed(() => {
+  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.KotoKielitaitotaso);
+});
+
+const kotoOpinnot = computed(() => {
+  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.KotoOpinto);
+});
+
+const perusteenOsat = computed(() => {
+  return _.sortBy([
+    ...tekstikappaleet.value,
+    ...opintokokonaisuudet.value,
+    ...koulutuksenosat.value,
+    ...laajaalaisetosaamiset.value,
+    ...tavoitesisaltoalueet.value,
+    ...kotoKielitaitotasot.value,
+    ...kotoOpinnot.value,
+  ], osa => chapterStringSort(osa.chapter));
+});
+
+const tekstikappaleRoute = computed(() => {
+  if (peruste.value && (peruste.value.tyyppi as any) === 'opas') {
+    return 'oppaanTekstikappale';
   }
 
-  get peruste() {
-    return this.perusteStore.peruste.value;
+  return 'tekstikappale';
+});
+
+const oppiaineId = computed(() => {
+  return route.params?.oppiaineId;
+});
+
+const currentLukioOppimaara = computed(() => {
+  if (oppiaineId.value) {
+    return _.get(_.find(props.naviStore.connected.value, node => node.id === _.toNumber(oppiaineId.value)), 'depth') === 3;
   }
 
-  get tekstikappaleet() {
-    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Viite);
-  }
+  return undefined;
+});
 
-  get opintokokonaisuudet() {
-    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Opintokokonaisuus);
-  }
-
-  get koulutuksenosat() {
-    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Koulutuksenosa);
-  }
-
-  get laajaalaisetosaamiset() {
-    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Laajaalainenosaaminen);
-  }
-
-  get tavoitesisaltoalueet() {
-    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Tavoitesisaltoalue);
-  }
-
-  get kotoKielitaitotasot() {
-    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.KotoKielitaitotaso);
-  }
-
-  get kotoOpinnot() {
-    return _.filter(this.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.KotoOpinto);
-  }
-
-  get perusteenOsat() {
-    return _.sortBy([
-      ...this.tekstikappaleet,
-      ...this.opintokokonaisuudet,
-      ...this.koulutuksenosat,
-      ...this.laajaalaisetosaamiset,
-      ...this.tavoitesisaltoalueet,
-      ...this.kotoKielitaitotasot,
-      ...this.kotoOpinnot,
-    ], osa => chapterStringSort(osa.chapter));
-  }
-
-  get tekstikappaleRoute() {
-    if (this.peruste && (this.peruste.tyyppi as any) === 'opas') {
-      return 'oppaanTekstikappale';
-    }
-
-    return 'tekstikappale';
-  }
-
-  async makeCall(call) {
-    this.loading = true;
-    try {
-      await call();
-    }
-    finally {
-      this.loading = false;
-    }
-  }
-
-  async tallennaUusiTekstikappale(otsikko, tekstikappaleIsa) {
-    const tkstore = new TekstikappaleStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: this.tekstikappaleRoute,
-      params: {
-        tekstiKappaleId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaUusiOpintokokonaisuus(otsikko, tekstikappaleIsa) {
-    const tkstore = new OpintokokonaisuusStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'opintokokonaisuus',
-      params: {
-        opintokokonaisuusId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaUusiTavoitesisaltoalue(otsikko, tekstikappaleIsa) {
-    const tkstore = new TavoitesisaltoalueStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'tavoitesisaltoalue',
-      params: {
-        tavoitesisaltoalueId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaUusiKoulutuksenOsa(otsikko, tekstikappaleIsa) {
-    const tkstore = new KoulutuksenOsaStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'koulutuksenosa',
-      params: {
-        koulutuksenosaId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaUusiLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
-    const tkstore = new LaajaalainenOsaaminenStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'laajaalainenosaaminen',
-      params: {
-        laajaalainenosaaminenId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaKotoKielitaito(otsikko, tekstikappaleIsa) {
-    const tkstore = new KotoKielitaitotasoStore();
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'koto_kielitaitotaso',
-      params: {
-        kotokielitaitotasoId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaKotoOpinto(otsikko, tekstikappaleIsa) {
-    const tallennettu = await new KotoOpintoStore().create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'koto_opinto',
-      params: {
-        kotoOpintoId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaUusiKotoLaajaAlainenOsaaminen(otsikko, tekstikappaleIsa) {
-    const kotoStore = new KotoLaajaalainenOsaaminenStore(this.peruste!.id!, 0);
-    const tallennettu = await kotoStore.create(otsikko, tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'koto_laajaalainenosaaminen',
-      params: {
-        kotoLaajaalainenOsaaminenId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async tallennaUusiOsaamiskokonaisuus(otsikko, tekstikappaleIsa) {
-    const osaamiskokonaisuusStore = new OsaamiskokonaisuusStore(this.peruste!.id!, 0);
-    const tallennettu = await osaamiskokonaisuusStore.create(tekstikappaleIsa);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'osaamiskokonaisuus',
-      params: {
-        osaamiskokonaisuusId: '' + tallennettu!.id,
-      },
-    });
-  }
-
-  async uusiVaihe() {
-    this.$router.push({ name: 'aipevaihe' });
-  }
-
-  async uusiLukioOppiaine(oppiaineId?) {
-    this.$router.push({
-      name: 'lukio_oppiaine',
-      ...(oppiaineId && { params: { parentId: oppiaineId } }),
-    });
-  }
-
-  async uusiLukioModuuli(oppiaineId) {
-    this.$router.push({
-      name: 'moduuli',
-      params: {
-        oppiaineId,
-      },
-    });
-  }
-
-  async uusiTaiteenala() {
-    const taiteenalaStore = new TaiteenalaStore(this.peruste!.id!, 0);
-    const tallennettu = await taiteenalaStore.create();
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'taiteenala',
-      params: {
-        taiteenalaId: '' + tallennettu!.id,
-        uusi: 'uusi',
-      },
-    });
-  }
-
-  async uusiPerusopetusoppiaine() {
-    const newOppiaine = await PerusopetusOppiaineStore.create(this.peruste!.id!, this.$route.params?.oppiaineId);
-    await this.perusteStore.updateNavigation();
-    this.$router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
-  }
-
-  get isLisasisaltoLisays() {
-    return !!this.peruste && (!!this.koulutustyypinLisasisaltoLisays[this.peruste.koulutustyyppi!] || !!this.perusteTyyppiSisaltoLisays[this.peruste.tyyppi!]);
-  }
-
-  get lisasisaltoLisays() {
-    return this.koulutustyypinLisasisaltoLisays[this.peruste!.koulutustyyppi!] || this.perusteTyyppiSisaltoLisays[this.peruste!.tyyppi!] || [];
-  }
-
-  get oppiaineId() {
-    return this.$route.params?.oppiaineId;
-  }
-
-  get lukioSisaltoLisays() {
-    return [
-      ...(this.oppiaineId && !this.currentLukioOppimaara ? [
-        {
-          call: () => this.uusiLukioOppiaine(this.oppiaineId),
-          label: {
-            'uusi': 'uusi-oppimaara',
-          },
-        },
-      ] : []),
-      ...(this.oppiaineId ? [
-        {
-          call: () => this.uusiLukioModuuli(this.oppiaineId),
-          label: {
-            'uusi': 'uusi-moduuli',
-          },
-        },
-      ] : []),
+const lukioSisaltoLisays = computed(() => {
+  return [
+    ...(oppiaineId.value && !currentLukioOppimaara.value ? [
       {
-        call: this.uusiLukioOppiaine,
+        call: () => uusiLukioOppiaine(oppiaineId.value),
         label: {
-          'uusi': 'uusi-oppiaine',
+          'uusi': 'uusi-oppimaara',
         },
       },
-    ];
-  }
+    ] : []),
+    ...(oppiaineId.value ? [
+      {
+        call: () => uusiLukioModuuli(oppiaineId.value),
+        label: {
+          'uusi': 'uusi-moduuli',
+        },
+      },
+    ] : []),
+    {
+      call: uusiLukioOppiaine,
+      label: {
+        'uusi': 'uusi-oppiaine',
+      },
+    },
+  ];
+});
 
-  get currentLukioOppimaara() {
-    if (this.oppiaineId) {
-      return _.get(_.find(this.naviStore.connected.value, node => node.id === _.toNumber(this.oppiaineId)), 'depth') === 3;
-    }
-  }
-
-  get koulutustyypinLisasisaltoLisays() {
-    return {
-      [Koulutustyyppi.aikuistenperusopetus]: [
-        {
-          groupedSisalto: [],
-          call: this.uusiVaihe,
-          label: {
-            'uusi': 'uusi-vaihe',
-          },
+const koulutustyypinLisasisaltoLisays = computed(() => {
+  return {
+    [Koulutustyyppi.aikuistenperusopetus]: [
+      {
+        groupedSisalto: [],
+        call: uusiVaihe,
+        label: {
+          'uusi': 'uusi-vaihe',
         },
-      ],
-      [Koulutustyyppi.tpo]: [
-        {
-          groupedSisalto: [],
-          call: this.uusiTaiteenala,
-          label: {
-            'uusi': 'uusi-taiteenala',
-          },
+      },
+    ],
+    [Koulutustyyppi.tpo]: [
+      {
+        groupedSisalto: [],
+        call: uusiTaiteenala,
+        label: {
+          'uusi': 'uusi-taiteenala',
         },
-      ],
-      [Koulutustyyppi.perusopetus]: [
-        {
-          groupedSisalto: [],
-          call: this.uusiPerusopetusoppiaine,
-          label: {
-            'uusi': this.$route.params?.oppiaineId ? 'uusi-oppimaara' : 'uusi-oppiaine',
-          },
+      },
+    ],
+    [Koulutustyyppi.perusopetus]: [
+      {
+        groupedSisalto: [],
+        call: uusiPerusopetusoppiaine,
+        label: {
+          'uusi': route.params?.oppiaineId ? 'uusi-oppimaara' : 'uusi-oppiaine',
         },
-      ],
-      [Koulutustyyppi.lukiokoulutus]: [
-        ...this.lukioSisaltoLisays,
-      ],
-      [Koulutustyyppi.aikuistenlukiokoulutus]: [
-        ...this.lukioSisaltoLisays,
-      ],
-      [Koulutustyyppi.vapaasivistystyo]: [
-        {
-          groupedSisalto: [],
-          save: this.tallennaUusiOpintokokonaisuus,
-          label: {
-            'uusi': 'uusi-opintokokonaisuus',
-            'lisaa': 'lisaa-opintokokonaisuus',
-            'sijainti': 'opintokokonaisuuden-sijainti',
-          },
-        }],
-      [Koulutustyyppi.vapaasivistystyolukutaito]: [
-        {
-          groupedSisalto: [],
-          save: this.tallennaUusiTavoitesisaltoalue,
-          label: {
-            'uusi': 'tavoitteet-ja-sisaltoalueet',
-            'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
-            'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
-          },
-        }],
-      [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus]: [
-        {
-          groupedLinkkiteksti: 'tavoitteet-ja-keskeiset-sisallot',
-          groupedSisalto: [
-            {
-              save: this.tallennaKotoKielitaito,
-              label: {
-                'uusi': 'kielitaitotasot',
-                'lisaa': 'lisaa-kielitaitotaso',
-                'sijainti': 'kielitaitotasot-sijainti',
-              },
+      },
+    ],
+    [Koulutustyyppi.lukiokoulutus]: [
+      ...lukioSisaltoLisays.value,
+    ],
+    [Koulutustyyppi.aikuistenlukiokoulutus]: [
+      ...lukioSisaltoLisays.value,
+    ],
+    [Koulutustyyppi.vapaasivistystyo]: [
+      {
+        groupedSisalto: [],
+        save: tallennaUusiOpintokokonaisuus,
+        label: {
+          'uusi': 'uusi-opintokokonaisuus',
+          'lisaa': 'lisaa-opintokokonaisuus',
+          'sijainti': 'opintokokonaisuuden-sijainti',
+        },
+      }],
+    [Koulutustyyppi.vapaasivistystyolukutaito]: [
+      {
+        groupedSisalto: [],
+        save: tallennaUusiTavoitesisaltoalue,
+        label: {
+          'uusi': 'tavoitteet-ja-sisaltoalueet',
+          'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
+          'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
+        },
+      }],
+    [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus]: [
+      {
+        groupedLinkkiteksti: 'tavoitteet-ja-keskeiset-sisallot',
+        groupedSisalto: [
+          {
+            save: tallennaKotoKielitaito,
+            label: {
+              'uusi': 'kielitaitotasot',
+              'lisaa': 'lisaa-kielitaitotaso',
+              'sijainti': 'kielitaitotasot-sijainti',
             },
-            {
-              save: this.tallennaKotoOpinto,
-              label: {
-                'uusi': 'tyoelama-ja-yhteiskuntataitojen-opinnot',
-                'lisaa': 'lisaa-tyoelama-ja-yhteiskuntataitojen-opinto',
-                'sijainti': 'tyoelama-ja-yhteiskuntataitojen-opinnot-sijainti',
-              },
+          },
+          {
+            save: tallennaKotoOpinto,
+            label: {
+              'uusi': 'tyoelama-ja-yhteiskuntataitojen-opinnot',
+              'lisaa': 'lisaa-tyoelama-ja-yhteiskuntataitojen-opinto',
+              'sijainti': 'tyoelama-ja-yhteiskuntataitojen-opinnot-sijainti',
             },
-          ],
-        },
-        {
-          groupedSisalto: [],
-          save: this.tallennaUusiKotoLaajaAlainenOsaaminen,
-          label: {
-            'uusi': 'uusi-laaja-alainen-osaaminen',
-            'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
-            'sijainti': 'laaja-alaisen-osaamisen-sijainti',
           },
+        ],
+      },
+      {
+        groupedSisalto: [],
+        save: tallennaUusiKotoLaajaAlainenOsaaminen,
+        label: {
+          'uusi': 'uusi-laaja-alainen-osaaminen',
+          'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
+          'sijainti': 'laaja-alaisen-osaamisen-sijainti',
         },
-      ],
-      [Koulutustyyppi.tutkintoonvalmentava]: [
-        {
-          groupedSisalto: [],
-          save: this.tallennaUusiKoulutuksenOsa,
-          label: {
-            'uusi': 'uusi-koulutuksenosa',
-            'lisaa': 'lisaa-koulutuksenosa',
-            'sijainti': 'koulutuksen-osan-sijainti',
-          },
+      },
+    ],
+    [Koulutustyyppi.tutkintoonvalmentava]: [
+      {
+        groupedSisalto: [],
+        save: tallennaUusiKoulutuksenOsa,
+        label: {
+          'uusi': 'uusi-koulutuksenosa',
+          'lisaa': 'lisaa-koulutuksenosa',
+          'sijainti': 'koulutuksen-osan-sijainti',
         },
-        {
-          groupedSisalto: [],
-          save: this.tallennaUusiLaajaAlainenOsaaminen,
-          label: {
-            'uusi': 'uusi-laaja-alainen-osaaminen',
-            'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
-            'sijainti': 'laaja-alaisen-osaamisen-sijainti',
-          },
+      },
+      {
+        groupedSisalto: [],
+        save: tallennaUusiLaajaAlainenOsaaminen,
+        label: {
+          'uusi': 'uusi-laaja-alainen-osaaminen',
+          'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
+          'sijainti': 'laaja-alaisen-osaamisen-sijainti',
         },
-      ],
-    };
-  }
+      },
+    ],
+  };
+});
 
-  get perusteTyyppiSisaltoLisays() {
-    return {
-      [_.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN)]: [
-        {
-          groupedSisalto: [],
-          save: this.tallennaUusiOsaamiskokonaisuus,
-          label: {
-            'uusi': 'uusi-osaamiskokonaisuus',
-            'lisaa': 'lisaa-osaamiskokonaisuus',
-            'sijainti': 'osaamiskokonaisuuden-sijainti',
-          },
-        }],
-    };
+const perusteTyyppiSisaltoLisays = computed(() => {
+  return {
+    [_.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN)]: [
+      {
+        groupedSisalto: [],
+        save: tallennaUusiOsaamiskokonaisuus,
+        label: {
+          'uusi': 'uusi-osaamiskokonaisuus',
+          'lisaa': 'lisaa-osaamiskokonaisuus',
+          'sijainti': 'osaamiskokonaisuuden-sijainti',
+        },
+      }],
+  };
+});
+
+const isLisasisaltoLisays = computed(() => {
+  return !!peruste.value && (!!koulutustyypinLisasisaltoLisays.value[peruste.value.koulutustyyppi!] || !!perusteTyyppiSisaltoLisays.value[peruste.value.tyyppi!]);
+});
+
+const lisasisaltoLisays = computed(() => {
+  return koulutustyypinLisasisaltoLisays.value[peruste.value!.koulutustyyppi!] || perusteTyyppiSisaltoLisays.value[peruste.value!.tyyppi!] || [];
+});
+
+const makeCall = async (call) => {
+  loading.value = true;
+  try {
+    await call();
   }
-}
+  finally {
+    loading.value = false;
+  }
+};
+
+const tallennaUusiTekstikappale = async (otsikko, tekstikappaleIsa) => {
+  const tkstore = new TekstikappaleStore(peruste.value!.id!, 0);
+  const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: tekstikappaleRoute.value,
+    params: {
+      tekstiKappaleId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaUusiOpintokokonaisuus = async (otsikko, tekstikappaleIsa) => {
+  const tkstore = new OpintokokonaisuusStore(peruste.value!.id!, 0);
+  const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'opintokokonaisuus',
+    params: {
+      opintokokonaisuusId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaUusiTavoitesisaltoalue = async (otsikko, tekstikappaleIsa) => {
+  const tkstore = new TavoitesisaltoalueStore(peruste.value!.id!, 0);
+  const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'tavoitesisaltoalue',
+    params: {
+      tavoitesisaltoalueId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaUusiKoulutuksenOsa = async (otsikko, tekstikappaleIsa) => {
+  const tkstore = new KoulutuksenOsaStore(peruste.value!.id!, 0);
+  const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'koulutuksenosa',
+    params: {
+      koulutuksenosaId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaUusiLaajaAlainenOsaaminen = async (otsikko, tekstikappaleIsa) => {
+  const tkstore = new LaajaalainenOsaaminenStore(peruste.value!.id!, 0);
+  const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'laajaalainenosaaminen',
+    params: {
+      laajaalainenosaaminenId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaKotoKielitaito = async (otsikko, tekstikappaleIsa) => {
+  const tkstore = new KotoKielitaitotasoStore();
+  const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'koto_kielitaitotaso',
+    params: {
+      kotokielitaitotasoId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaKotoOpinto = async (otsikko, tekstikappaleIsa) => {
+  const tallennettu = await new KotoOpintoStore().create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'koto_opinto',
+    params: {
+      kotoOpintoId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaUusiKotoLaajaAlainenOsaaminen = async (otsikko, tekstikappaleIsa) => {
+  const kotoStore = new KotoLaajaalainenOsaaminenStore(peruste.value!.id!, 0);
+  const tallennettu = await kotoStore.create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'koto_laajaalainenosaaminen',
+    params: {
+      kotoLaajaalainenOsaaminenId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaUusiOsaamiskokonaisuus = async (otsikko, tekstikappaleIsa) => {
+  const osaamiskokonaisuusStore = new OsaamiskokonaisuusStore(peruste.value!.id!, 0);
+  const tallennettu = await osaamiskokonaisuusStore.create(tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'osaamiskokonaisuus',
+    params: {
+      osaamiskokonaisuusId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const uusiVaihe = async () => {
+  router.push({ name: 'aipevaihe' });
+};
+
+const uusiLukioOppiaine = async (oppiaineId?) => {
+  router.push({
+    name: 'lukio_oppiaine',
+    ...(oppiaineId && { params: { parentId: oppiaineId } }),
+  });
+};
+
+const uusiLukioModuuli = async (oppiaineId) => {
+  router.push({
+    name: 'moduuli',
+    params: {
+      oppiaineId,
+    },
+  });
+};
+
+const uusiTaiteenala = async () => {
+  const taiteenalaStore = new TaiteenalaStore(peruste.value!.id!, 0);
+  const tallennettu = await taiteenalaStore.create();
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'taiteenala',
+    params: {
+      taiteenalaId: '' + tallennettu!.id,
+      uusi: 'uusi',
+    },
+  });
+};
+
+const uusiPerusopetusoppiaine = async () => {
+  const newOppiaine = await PerusopetusOppiaineStore.create(peruste.value!.id!, route.params?.oppiaineId);
+  await props.perusteStore.updateNavigation();
+  router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
+};
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/_variables';
 
-.lisasisalto-dropdown ::v-deep ep-button,
-.navigation ::v-deep .ep-button .btn {
+.lisasisalto-dropdown :deep(ep-button),
+.navigation :deep(.ep-button .btn) {
   font-size: 14px;
 }
 
-.lisasisalto-dropdown ::v-deep {
-  .btn {
-    &.dropdown-toggle {
-      padding: 0;
-      border: 0;
+.lisasisalto-dropdown :deep(.btn) {
+  &.dropdown-toggle {
+    padding: 0;
+    border: 0;
 
-      .btn {
-        padding-top: 0px;
-      }
+    .btn {
+      padding-top: 0px;
     }
   }
 }
 
-.lisasisalto-dropdown ::v-deep .dropdown-menu .ep-button .btn {
+.lisasisalto-dropdown :deep(.dropdown-menu .ep-button .btn) {
   color: $black;
   padding: 0;
 }
-
 </style>

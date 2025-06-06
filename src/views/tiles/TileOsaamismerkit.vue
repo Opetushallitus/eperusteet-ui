@@ -10,17 +10,8 @@
   </EpHomeTile>
 </template>
 
-<script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+<script setup lang="ts">
 import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
-
-@Component({
-  components: {
-    EpHomeTile,
-  },
-})
-export default class TileOsaamismerkit extends Vue {
-}
 </script>
 
 <style scoped>

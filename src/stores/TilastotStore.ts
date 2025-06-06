@@ -1,47 +1,41 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-import { Tilastot, getAllPerusteet, Perusteet } from '@shared/api/eperusteet';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { Tilastot, Perusteet } from '@shared/api/eperusteet';
 import { yleissivistavatKoulutustyypit } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
 
-Vue.use(VueCompositionApi);
+export const useTilastotStore = defineStore('tilastot', () => {
+  // State
+  const opetussuunnitelmat = ref<any[] | null>(null);
+  const toteutussuunnitelmat = ref<any[] | null>(null);
+  const perusteet = ref<any[] | null>(null);
 
-export class TilastotStore {
-  public state = reactive({
-    opetussuunnitelmat: null as any[] | null,
-    toteutussuunnitelmat: null as any[] | null,
-    perusteet: null as any[] | null,
-  });
-
-  public readonly opetussuunnitelmat = computed(() => this.state.opetussuunnitelmat);
-  public readonly toteutussuunnitelmat = computed(() => this.state.toteutussuunnitelmat);
-  public readonly perusteet = computed(() => this.state.perusteet);
-
-  public async fetch() {
-    await Promise.all([this.fetchAmosaaTilastot(), this.fetchYlopsTilastot(), this.fetchPerusteet()]);
+  // Actions
+  async function fetch() {
+    await Promise.all([fetchAmosaaTilastot(), fetchYlopsTilastot(), fetchPerusteet()]);
   }
 
-  async fetchAmosaaTilastot() {
+  async function fetchAmosaaTilastot() {
     try {
-      this.state.toteutussuunnitelmat = (await Tilastot.getAmosaaTilastot()).data;
+      toteutussuunnitelmat.value = (await Tilastot.getAmosaaTilastot()).data;
     }
     catch (e) {
-      this.state.toteutussuunnitelmat = [];
+      toteutussuunnitelmat.value = [];
     }
   }
 
-  async fetchYlopsTilastot() {
+  async function fetchYlopsTilastot() {
     try {
-      this.state.opetussuunnitelmat = (await Tilastot.getYlopsTilastot()).data as any;
+      opetussuunnitelmat.value = (await Tilastot.getYlopsTilastot()).data as any;
     }
     catch (e) {
-      this.state.opetussuunnitelmat = [];
+      opetussuunnitelmat.value = [];
     }
   }
 
-  async fetchPerusteet() {
+  async function fetchPerusteet() {
     try {
-      const perusteet = _.get((await Perusteet.getAllPerusteetInternal(
+      const perusteData = _.get((await Perusteet.getAllPerusteetInternal(
         undefined,
         1000,
         undefined,
@@ -53,12 +47,25 @@ export class TilastotStore {
         yleissivistavatKoulutustyypit,
       )).data, 'data');
 
-      if (perusteet) {
-        this.state.perusteet = perusteet;
+      if (perusteData) {
+        perusteet.value = perusteData;
       }
     }
     catch (e) {
-      this.state.perusteet = [];
+      perusteet.value = [];
     }
   }
-}
+
+  return {
+    // State
+    opetussuunnitelmat,
+    toteutussuunnitelmat,
+    perusteet,
+
+    // Actions
+    fetch,
+    fetchAmosaaTilastot,
+    fetchYlopsTilastot,
+    fetchPerusteet,
+  };
+});

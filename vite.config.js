@@ -1,0 +1,62 @@
+import { defineConfig, loadEnv } from 'vite';
+import createVuePlugin  from '@vitejs/plugin-vue';
+import commonjs from 'vite-plugin-commonjs';
+import { fileURLToPath, URL } from 'node:url';
+import { configDefaults } from 'vitest/config';
+
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => {
+
+  const env = loadEnv(mode, process.cwd(), '');
+
+  return {
+    base: env.NODE_ENV === 'production' ? '/eperusteet-service/ui' : '/',
+    plugins: [
+      createVuePlugin({
+        template: {
+          compilerOptions: {
+            compatConfig: {
+              MODE: 2,
+            },
+          },
+        },
+      }),
+      commonjs(),
+    ],
+    define: {
+      'process.env.BUILD': JSON.stringify(env.BUILD), // Define the BUILD environment variable
+    },
+    resolve: {
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@shared': fileURLToPath(new URL('./eperusteet-frontend-utils/vue/src', import.meta.url)),
+        '@assets': fileURLToPath(new URL('./eperusteet-frontend-utils/vue/public', import.meta.url)),
+        '&': fileURLToPath(new URL('./tests', import.meta.url)),
+        '~': fileURLToPath(new URL('./node_modules', import.meta.url)),
+        vue: '@vue/compat',
+      },
+    },
+    server: {
+      port: 9001,
+      proxy: {
+        '/eperusteet-service': {
+          target: 'http://localhost:8080',
+          secure: false,
+          changeOrigin: true,
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq) => {
+              proxyReq.setHeader('Caller-Id', '1.2.246.562.10.00000000001.eperusteet');
+            });
+          },
+        },
+      },
+    },
+    test: {
+      globals: true, // Jest-like global functions (describe, it, expect)
+      environment: 'jsdom', // Simulates browser environment
+      exclude: [...configDefaults.exclude, 'e2e/*'],
+      setupFiles: './test/setup.ts',
+    },
+  };
+});

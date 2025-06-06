@@ -1,32 +1,36 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import { Oppaat, OpasLuontiDto, PerusteHakuDto } from '@shared/api/eperusteet';
-import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
+import debounce from 'lodash/debounce';
 
-Vue.use(VueCompositionApi);
+export const useOppaatStore = defineStore('oppaat', () => {
+  // State
+  const oppaat = ref<PerusteHakuDto[] | null>(null);
 
-export class OppaatStore {
-  private state = reactive({
-    oppaat: null as PerusteHakuDto[] | null,
-
-  });
-
-  public readonly oppaat = computed(() => this.state.oppaat);
-
-  public async saveOpas(opas: OpasLuontiDto) {
+  // Actions
+  async function saveOpas(opas: OpasLuontiDto) {
     const res = await Oppaat.addOpas(opas);
-    this.state.oppaat = [
+    oppaat.value = [
       (res.data as any),
-      ...this.state.oppaat || [],
+      ...(oppaat.value || []),
     ];
 
     return res.data;
   }
 
-  @Debounced(300)
-  public async updateQuery() {
+  const updateQuery = debounce(async () => {
     const res = (await Oppaat.getAllOppaatKevyt(1000)).data;
-    this.state.oppaat = (res as any).data as any;
-  }
-}
+    oppaat.value = (res as any).data as any;
+  }, 300);
+
+  return {
+    // State
+    oppaat,
+
+    // Actions
+    saveOpas,
+    updateQuery,
+  };
+});
+

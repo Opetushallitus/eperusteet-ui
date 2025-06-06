@@ -26,8 +26,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from 'vue';
+import { $t } from '@shared/utils/globals';
 
 export interface AikavaliVertailu {
   tyyppi?: {
@@ -38,36 +39,37 @@ export interface AikavaliVertailu {
   aikavaliLoppu?: string;
 }
 
-@Component
-export default class EpTilastoAikavaliVertailu extends Vue {
-  @Prop({ required: true })
-  value!: AikavaliVertailu;
+const props = defineProps<{
+  modelValue: AikavaliVertailu;
+}>();
 
-  get model() {
-    return this.value;
-  }
+const emit = defineEmits(['update:modelValue']);
 
-  set model(val) {
-    this.$emit('input', val);
-  }
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  get aikavaliItems() {
-    return [
-      {
-        text: this.$t('julkaistu'),
-        value: 'julkaistu',
-      },
-      {
-        text: this.$t('ensijulkaisu'),
-        value: 'ensijulkaisu',
-      },
-      {
-        text: this.$t('luotu'),
-        value: 'luotu',
-      },
-    ];
-  }
-}
+const aikavaliItems = computed(() => {
+  return [
+    {
+      text: $t('julkaistu'),
+      value: 'julkaistu',
+    },
+    {
+      text: $t('ensijulkaisu'),
+      value: 'ensijulkaisu',
+    },
+    {
+      text: $t('luotu'),
+      value: 'luotu',
+    },
+  ];
+});
 </script>
 
 <style scoped lang="scss">

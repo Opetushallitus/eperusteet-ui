@@ -16,22 +16,23 @@
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { getCurrentInstance, computed } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import { PerusteetStore } from '@/stores/PerusteetStore';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpPerusteprojektiListaus,
-  },
-})
-export default class RoutePohjat extends Vue {
-  @Prop({ required: true })
-  pohjatStore!: PerusteetStore;
-}
+const props = defineProps<{
+  pohjatStore: PerusteetStore;
+}>();
+
+const instance = getCurrentInstance();
+const $isAdmin = (instance?.proxy?.$root as any)?.$isAdmin;
+
+const pohjatStore = computed(() => {
+  return props.pohjatStore;
+});
 </script>
 
 <style lang="scss">

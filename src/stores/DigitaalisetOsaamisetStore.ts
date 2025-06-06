@@ -1,62 +1,57 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Ulkopuoliset, getPerusteprojektit, PerusteHakuDto, getAllPerusteet, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
+import { Ulkopuoliset, getPerusteprojektit, PerusteHakuDto, getAllPerusteet, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto, PerusteprojektiQuery } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
-import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
-import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
 
-Vue.use(VueCompositionApi);
+export const useDigitaalisetOsaamisetStore = defineStore('digitaalisetOsaamiset', () => {
+  // Parameters that would have been passed to constructor
+  const overrides = ref<PerusteQuery & any>({});
 
-export class DigitaalisetOsaamisetStore implements IProjektiProvider {
-  constructor(
-    private overrides = {} as PerusteQuery & any,
-  ) {
+  // State
+  const ownProjects = ref<PerusteprojektiListausDto[] | null>(null);
+  const projects = ref<Page<PerusteprojektiKevytDto> | null>(null);
+  const perusteQuery = ref<PerusteQuery>({});
+
+  // Initialize with parameters (replacing constructor functionality)
+  function initialize(params: PerusteQuery & any) {
+    overrides.value = params;
   }
 
-  public state = reactive({
-    ownProjects: null as PerusteprojektiListausDto[] | null,
-    projects: null as Page<PerusteprojektiKevytDto> | null,
-    perusteQuery: {} as PerusteQuery,
-  });
-
-  public readonly ownProjects = computed(() => this.state.ownProjects);
-  public readonly projects = computed(() => this.state.projects);
-
-  public async updateOwnProjects() {
+  // Actions
+  async function updateOwnProjects() {
     const res = _.map(await Promise.all(
       [
-        this.findPerusteet({ tila: ['LAADINTA'] }),
-        this.findPerusteet({ tila: ['JULKAISTU'] }),
+        findPerusteet({ tila: ['LAADINTA'] }),
+        findPerusteet({ tila: ['JULKAISTU'] }),
       ],
     ), 'data') as any;
-    this.state.ownProjects = _.uniqBy([...res[0], ...res[1]], projekti => projekti.id);
+    ownProjects.value = _.uniqBy([...res[0], ...res[1]], projekti => projekti.id);
   }
 
-  public clear() {
-    this.state.ownProjects = null;
-    this.state.projects = null;
+  function clear() {
+    ownProjects.value = null;
+    projects.value = null;
   }
 
-  @Debounced(300)
-  public async updateQuery(query: PerusteQuery) {
-    this.state.projects = (await this.findPerusteet({ tila: ['POISTETTU'] }));
+  const updateQuery = _.debounce(async (query: PerusteQuery) => {
+    projects.value = (await findPerusteet({ tila: ['POISTETTU'] }));
 
-    if (_.size(this.state.projects.data) > 0) {
-      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(_.map(this.state.projects.data, 'id') as number[])).data;
+    if (_.size(projects.value.data) > 0) {
+      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(_.map(projects.value.data, 'id') as number[])).data;
       const resWithRights = {
-        ...this.state.projects,
-        data: (this.state.projects).data.map(proj => ({
+        ...projects.value,
+        data: (projects.value).data.map(proj => ({
           ...proj,
           oikeudet: rights[proj.id!],
         })),
       };
 
-      this.state.projects = resWithRights;
+      projects.value = resWithRights;
     }
-  }
+  }, 300);
 
-  public async findPerusteet(query) {
+  async function findPerusteet(query) {
     const res = await getPerusteprojektit({
       sivu: 0,
       sivukoko: 100,
@@ -70,7 +65,22 @@ export class DigitaalisetOsaamisetStore implements IProjektiProvider {
       jarjestysTapa: 'nimi',
       perusteet: [],
       ...query,
-    });
+    } as PerusteprojektiQuery);
     return res.data as Page<PerusteprojektiKevytDto>;
   }
-}
+
+  return {
+    // State
+    ownProjects,
+    projects,
+    perusteQuery,
+    overrides,
+
+    // Actions
+    initialize,
+    updateOwnProjects,
+    clear,
+    updateQuery,
+    findPerusteet,
+  };
+});

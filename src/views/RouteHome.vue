@@ -29,8 +29,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, getCurrentInstance } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useHead } from '@unhead/vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import TileArkistoidut from './tiles/TileArkistoidut.vue';
 import TileOppaat from './tiles/TileOppaat.vue';
@@ -45,50 +47,30 @@ import TileYllapito from './tiles/TileYllapito.vue';
 import TileOsaamismerkit from './tiles/TileOsaamismerkit.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
-import { Meta } from '@shared/utils/decorators';
 import { PerusteetStore } from '@/stores/PerusteetStore';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSearch,
-    TileYllapito,
-    TileArkistoidut,
-    TileOppaat,
-    TilePerusteprojektit,
-    TilePohjat,
-    TileTiedotteet,
-    TileArviointiasteikot,
-    TileTilastot,
-    TileDigitaalinenOsaaminen,
-    TileOsaamismerkit,
-    TileMaaraysKokoelma,
-  },
-})
-export default class Home extends Vue {
-  @Prop({ required: true })
-  private tiedotteetStore!: TiedotteetStore;
+const props = defineProps<{
+  tiedotteetStore: TiedotteetStore;
+  kayttajaStore: KayttajaStore;
+  perusteOppaatStore: PerusteetStore;
+  digitaalisetOsaamisetStore: PerusteetStore;
+}>();
 
-  @Prop({ required: true })
-  private kayttajaStore!: KayttajaStore;
 
-  @Prop({ required: true })
-  private perusteOppaatStore!: PerusteetStore;
+// Get global functions from instance proxy
+const instance = getCurrentInstance();
+const $hasOphCrud = () => (instance?.proxy?.$root as any)?.$hasOphCrud?.();
+const $isAdmin = () => (instance?.proxy?.$root as any)?.$isAdmin?.();
 
-  @Prop({ required: true })
-  private digitaalisetOsaamisetStore!: PerusteetStore;
+const nimi = computed(() => {
+  return props.kayttajaStore?.nimi?.value || null;
+});
 
-  @Meta
-  getMetaInfo() {
-    return {
-      title: this.$t('eperusteet'),
-      titleTemplate: null,
-    };
-  }
-
-  get nimi() {
-    return this.kayttajaStore?.nimi?.value || null;
-  }
-}
+useHead({
+  title: $t('eperusteet'),
+  titleTemplate: null,
+});
 </script>
 
 <style lang="scss" scoped>

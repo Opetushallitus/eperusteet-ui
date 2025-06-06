@@ -17,25 +17,23 @@
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { EiTuetutKoulutustyypit } from '@/utils/perusteet';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpPerusteprojektiListaus,
-  },
-})
-export default class RoutePerusteprojektit extends Vue {
-  @Prop({ required: true })
-  perusteetStore!: PerusteetStore;
+const props = defineProps<{
+  perusteetStore: PerusteetStore;
+}>();
 
-  get eiTuetutKoulutustyypit() {
-    return EiTuetutKoulutustyypit;
-  }
-}
+const eiTuetutKoulutustyypit = computed(() => {
+  return EiTuetutKoulutustyypit;
+});
+
+const perusteetStore = computed(() => {
+  return props.perusteetStore;
+});
 </script>

@@ -1,25 +1,30 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-import { Oppaat, OpasLuontiDto, PerusteHakuDto } from '@shared/api/eperusteet';
-import { Debounced } from '@shared/utils/delay';
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
 import _ from 'lodash';
-
-Vue.use(VueCompositionApi);
 
 interface Breadcrumb {
   label: string;
   route: Location;
 }
 
-export class BreadcrumbStore {
-  private state = reactive({
-    crumbs: [] as Breadcrumb[],
-  });
+export const useBreadcrumbStore = defineStore('breadcrumb', () => {
+  // State
+  const crumbs = ref<Breadcrumb[]>([]);
 
-  public readonly breacrumbs = computed(() => this.state.crumbs);
+  // Getters
+  const breadcrumbs = computed(() => crumbs.value);
 
-  @Debounced(10)
-  public async update(value: Breadcrumb[]) {
-    this.state.crumbs = value;
-  }
-}
+  // Actions
+  const update = _.debounce(async (value: Breadcrumb[]) => {
+    crumbs.value = value;
+  }, 10);
+
+  return {
+    // State
+    crumbs,
+    // Getters
+    breadcrumbs,
+    // Actions
+    update,
+  };
+});
