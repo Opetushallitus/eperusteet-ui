@@ -96,7 +96,9 @@
 
         <div v-if="data.tutkinnonOsa.tyyppi === 'normaali'">
           <ep-collapse tyyppi="ammattitaitovaatimukset" :border-bottom="false" :border-top="isEditing">
-            <h3 slot="header">{{ $t('ammattitaitovaatimukset') }}</h3>
+            <template #header>
+              <h3>{{ $t('ammattitaitovaatimukset') }}</h3>
+            </template>
             <b-form-group>
               <ep-content v-if="data.tutkinnonOsa.ammattitaitovaatimukset"
                           v-model="data.tutkinnonOsa.ammattitaitovaatimukset"
@@ -111,7 +113,9 @@
           </ep-collapse>
 
           <ep-collapse tyyppi="osaamisen-arviointi" :border-bottom="false" :border-top="true">
-            <h3 slot="header">{{ $t('osaamisen-arviointi') }}</h3>
+            <template #header>
+              <h3>{{ $t('osaamisen-arviointi') }}</h3>
+            </template>
 
             <EpButton v-if="isEditing && !valittuArviointiTyyppi"
                       variant="outline"
@@ -186,7 +190,9 @@
           </ep-collapse>
 
           <ep-collapse tyyppi="ammattitaidon-osoittamistavat" :border-bottom="false" :border-top="true">
-            <h3 slot="header">{{ $t('ammattitaidon-osoittamistavat') }}</h3>
+            <template #header>
+              <h3>{{ $t('ammattitaidon-osoittamistavat') }}</h3>
+            </template>
             <b-form-group>
               <ep-content v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
                           :validation="validation.tutkinnonOsa.ammattitaidonOsoittamistavat"
@@ -196,7 +202,9 @@
           </ep-collapse>
 
           <ep-collapse :border-bottom="false" :border-top="true" v-if="data.tutkinnonOsa.tavoitteet">
-            <h3 slot="header">{{ $t('tavoitteet') }}</h3>
+            <template #header>
+              <h3>{{ $t('tavoitteet') }}</h3>
+            </template>
             <b-form-group>
               <ep-content v-model="data.tutkinnonOsa.tavoitteet"
                           layout="normal"
@@ -205,7 +213,9 @@
           </ep-collapse>
 
           <ep-collapse :border-bottom="false" :border-top="true" v-if="data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.lisatiedot">
-            <h3 slot="header">{{ $t('arviointi') }}</h3>
+            <template #header>
+              <h3>{{ $t('arviointi') }}</h3>
+            </template>
             <b-form-group>
               <ep-content v-model="data.tutkinnonOsa.arviointi.lisatiedot"
                           layout="normal"
@@ -216,7 +226,9 @@
         </div>
         <div v-else>
           <ep-collapse tyyppi="osa-alueet" :border-bottom="false" :border-top="true">
-            <h3 slot="header">{{ $t('osa-alueet') }}</h3>
+            <template #header>
+              <h3>{{ $t('osa-alueet') }}</h3>
+            </template>
             <div>
               <EpBalloonList v-if="data.tutkinnonOsa.osaAlueet" v-model="data.tutkinnonOsa.osaAlueet" :isEditing="isEditing" sortable>
                 <template v-slot:default="{ item }">

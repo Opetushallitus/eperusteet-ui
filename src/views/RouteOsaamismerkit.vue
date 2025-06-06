@@ -1,7 +1,7 @@
 <template>
   <div v-if="$route.name === 'osaamismerkit'">
     <EpMainView>
-      <template slot="header">
+      <template #header>
         <div class="d-flex justify-content-between">
           <h1>{{ $t('osaamismerkit') }}</h1>
           <div class="d-flex">
@@ -46,10 +46,10 @@
                            :is-editing="false"
                            :options="osaamismerkkiVoimassaolot"
                            :placeholder="$t('kaikki')">
-              <template slot="singleLabel" slot-scope="{ option }">
+              <template #singleLabel="{ option }">
                 {{ $t('ajoitus-' + option.toLowerCase()) }}
               </template>
-              <template slot="option" slot-scope="{ option }">
+              <template #option="{ option }">
                 {{ $t('ajoitus-' + option.toLowerCase()) }}
               </template>
             </EpMultiSelect>

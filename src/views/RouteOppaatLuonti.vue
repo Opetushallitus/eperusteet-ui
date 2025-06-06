@@ -17,10 +17,10 @@
                     :placeholder="$t('valitse-opas')"
                     :is-editing="true"
                     :options="oppaat">
-                    <template slot="singleLabel" slot-scope="{ option }">
+                    <template #singleLabel="{ option }">
                       {{ option.nimi }}
                     </template>
-                    <template slot="option" slot-scope="{ option }">
+                    <template #option="{ option }">
                       {{ option.nimi }}
                     </template>
                   </EpMultiSelect>
@@ -48,10 +48,10 @@
                            :search-identity="tyoryhmaSearchIdentity"
                            :is-editing="true"
                            :options="tyoryhmat">
-              <template slot="singleLabel" slot-scope="{ option }">
+              <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
-              <template slot="option" slot-scope="{ option }">
+              <template #option="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
             </EpMultiSelect>
@@ -84,7 +84,7 @@
                            :is-editing="true"
                            :items="perusteet"
                            :required="true">
-              <template slot="lisaaTeksti">
+              <template #lisaaTeksti>
                 {{$t('lisaa-peruste')}}
               </template>
             </EpMultiListSelect>
@@ -92,7 +92,7 @@
 
         </template>
 
-        <template slot="luo">
+        <template #luo>
           {{$t('luo-opas')}}
         </template>
       </EpSteps>

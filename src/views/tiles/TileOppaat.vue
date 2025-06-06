@@ -1,9 +1,9 @@
 <template>
 <EpHomeTile icon="menu_book" :route="{ name: 'oppaat' }">
-  <template slot="header">
+  <template #header>
     <span>{{ $t('oppaat') }}</span>
   </template>
-  <template slot="content">
+  <template #content>
     <template v-if="$hasOphCrud()">
       <ep-spinner v-if="!oppaat"></ep-spinner>
       <div v-else>

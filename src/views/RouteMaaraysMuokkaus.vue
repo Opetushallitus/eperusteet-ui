@@ -63,10 +63,12 @@
         </div>
 
         <b-form-group class="mt-4">
-          <div slot="label" class="d-flex">
-            <div>{{$t('tyyppi') + isRequired }}</div>
-            <EpInfoPopover class="ml-3" v-if="isEditing"><div v-html="$t('maarays-muokkaus-tyyppi-info-selite')" /></EpInfoPopover>
-          </div>
+          <template #label>
+            <div class="d-flex">
+              <div>{{$t('tyyppi') + isRequired }}</div>
+              <EpInfoPopover class="ml-3" v-if="isEditing"><div v-html="$t('maarays-muokkaus-tyyppi-info-selite')" /></EpInfoPopover>
+            </div>
+          </template>
           <template v-if="isEditing">
             <b-form-radio v-for="tyyppi in tyypit" v-model="data.tyyppi" :value="tyyppi" :key="'tyyppivalinta_'+tyyppi">
               {{ $t('maarays-tyyppi-' + tyyppi.toLowerCase()) }}

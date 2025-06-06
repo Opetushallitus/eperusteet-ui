@@ -39,7 +39,9 @@
           <div v-for="(validointi, idx) in validoinnit" :key="'validointi'+idx">
             <ep-collapse v-if="validointi.virheet.length > 0 || validointi.huomautukset.length > 0"
                         :borderBottom="false">
-              <h3 slot="header">{{ $t('validointi-kategoria-' + validointi.kategoria) }}</h3>
+              <template #header>
+                <h3>{{ $t('validointi-kategoria-' + validointi.kategoria) }}</h3>
+              </template>
               <EpJulkaisuValidointi :validointi="validointi" />
             </ep-collapse>
           </div>
@@ -133,12 +135,14 @@
 
       <EpJulkaisuHistoria :store="perusteStore"
                           :palauta="palautaJulkaisu">
-        <template slot="katsele" slot-scope="{ julkaisu }">
+        <template #katsele="{ julkaisu }">
           <ep-external-link v-if="julkaisu" :url="opintopolkuKatseluUrl(julkaisu)">
             {{$t('katsele')}}
           </ep-external-link>
         </template>
-        <div slot="empty">{{ $t('perusteella-ei-julkaisuja') }}</div>
+        <template #empty>
+          <div>{{ $t('perusteella-ei-julkaisuja') }}</div>
+        </template>
       </EpJulkaisuHistoria>
     </template>
 

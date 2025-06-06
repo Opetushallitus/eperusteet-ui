@@ -33,12 +33,12 @@
 
     <b-modal class="backdrop" id="kasitteenPoistoModal" ref="kasitteenPoistoModal" @ok="poistaKasite" :lazy="true" size="lg">
       <span class="mr-2">{{ $t('haluatko-poistaa-kasitteen') }}</span>
-      <template slot="modal-cancel">{{ $t('peruuta') }}</template>
-      <template slot="modal-ok">{{ $t('poista') }}</template>
+      <template #modal-cancel>{{ $t('peruuta') }}</template>
+      <template #modal-ok>{{ $t('poista') }}</template>
     </b-modal>
 
     <b-modal class="backdrop" id="kasitteenLuontiModal" ref="kasitteenLuontiModal" @ok="tallennaKasite" :no-close-on-backdrop="true" :no-enforce-focus="true" :lazy="true" :ok-disabled="validation.$invalid" size="lg">
-      <template slot="modal-header">
+      <template #modal-header>
         <div class="row w-100">
           <div class="col">
             <span class="mr-2">{{ kasite.id ? $t('muokkaa-kasitetta') : $t('lisaa-uusi-kasite') }}</span>
@@ -60,8 +60,8 @@
         <ep-toggle v-model="kasite.alaviite">{{ $t('nayta-alaviitteessa') }}</ep-toggle>
       </ep-form-content>
 
-      <template slot="modal-cancel">{{ $t('peruuta') }}</template>
-      <template slot="modal-ok">{{ kasite.id ? $t('tallenna') : $t('lisaa-kasite') }}</template>
+      <template #modal-cancel>{{ $t('peruuta') }}</template>
+      <template #modal-ok>{{ kasite.id ? $t('tallenna') : $t('lisaa-kasite') }}</template>
     </b-modal>
   </ep-sub-view>
 </template>

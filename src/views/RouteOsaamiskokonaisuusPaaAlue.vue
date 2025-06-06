@@ -18,9 +18,11 @@
       <b-row>
         <b-col md="8">
           <b-form-group>
-            <div slot="label" v-if="isEditing">
-              {{$t('paa-alueen-kuvaus')}}
-            </div>
+            <template #label>
+              <div v-if="isEditing">
+                {{$t('paa-alueen-kuvaus')}}
+              </div>
+            </template>
             <ep-content v-model="data.kuvaus"
                         layout="normal"
                         :is-editable="isEditing"
@@ -46,12 +48,14 @@
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
                 <EpOsaAlue v-model="data.osaAlueet[index]" :isEditing="isEditing" class="w-100">
-                  <div slot="poisto">
-                    <b-button variant="link" @click.stop="poistaOsaAlue(osaAlue)">
-                      <EpMaterialIcon>delete</EpMaterialIcon>
-                      {{ $t('poista-osa-alue') }}
-                  </b-button>
-                  </div>
+                  <template #poisto>
+                    <div>
+                      <b-button variant="link" @click.stop="poistaOsaAlue(osaAlue)">
+                        <EpMaterialIcon>delete</EpMaterialIcon>
+                        {{ $t('poista-osa-alue') }}
+                    </b-button>
+                    </div>
+                  </template>
                 </EpOsaAlue>
               </div>
             </b-col>

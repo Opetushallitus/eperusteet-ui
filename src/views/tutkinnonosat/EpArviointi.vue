@@ -1,9 +1,11 @@
 <template>
   <b-form-group>
-    <div slot="label">
-      <div v-if="isEditing" class="mb-2">{{$t('ammattitaitovaatimus-tekemisena')}}</div>
-      <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
-    </div>
+    <template #label>
+      <div>
+        <div v-if="isEditing" class="mb-2">{{$t('ammattitaitovaatimus-tekemisena')}}</div>
+        <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
+      </div>
+    </template>
     <draggable v-bind="defaultDragOptions"
                tag="div"
                v-model="arvioinninKohdeAlue.arvioinninKohteet">

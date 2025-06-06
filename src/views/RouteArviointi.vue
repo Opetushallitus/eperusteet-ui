@@ -1,6 +1,6 @@
 <template>
   <EpMainView>
-    <template slot="icon">
+    <template #icon>
       <EpIcon class="float-right" icon="groups" background-color="#82D4FF" />
     </template>
 

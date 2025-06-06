@@ -1,9 +1,9 @@
 <template>
 <EpHomeTile icon="bar_chart" :route="{ name: 'geneerinen' }">
-  <template slot="header">
+  <template #header>
     <span>{{ $t('arviointi') }}</span>
   </template>
-  <template slot="content">
+  <template #content>
     <p>{{ $t('tile-arviointiasteikot-kuvaus') }}</p>
   </template>
 </EpHomeTile>

@@ -18,7 +18,9 @@
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <div v-if="isEditing" slot="label">{{$t('kappaleen-teksti')}}</div>
+            <template v-if="isEditing" #label>
+              <div>{{$t('kappaleen-teksti')}}</div>
+            </template>
             <ep-content v-model="data.yleiskuvaus"
                         layout="normal"
                         :is-editable="isEditing"
@@ -32,7 +34,7 @@
         <b-col lg="8">
           <div v-for="(osaamisalue, index) in data.osaamisAlueet"
                :key="index+'kotoLaajaAlainenOsaaminen'">
-            <div slot="header" class="mt-4">
+            <div class="mt-4">
                 <span>
                   <h3 class="d-inline">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
                   <b-button variant="link"

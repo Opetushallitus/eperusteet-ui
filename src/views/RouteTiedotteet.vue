@@ -1,10 +1,10 @@
 <template>
   <ep-main-view :tutoriaaliStore="tutoriaaliStore">
-    <template slot="icon">
+    <template #icon>
       <ep-icon class="float-right" icon="add">
       </ep-icon>
     </template>
-    <template slot="header">
+    <template #header>
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tiedotteet') }}</h1>
         <ep-tiedote-modal

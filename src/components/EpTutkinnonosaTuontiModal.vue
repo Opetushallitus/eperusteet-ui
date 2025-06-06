@@ -18,10 +18,12 @@
         </b-form-group>
 
         <b-form-group class="ml-auto w-50">
-          <div slot="label" class="d-flex">
-            <div>{{$t('tutkinto')}}</div>
-            <ep-spinner v-if="perusteetLoading" />
-          </div>
+          <template #label>
+            <div class="d-flex">
+              <div>{{$t('tutkinto')}}</div>
+              <ep-spinner v-if="perusteetLoading" />
+            </div>
+          </template>
           <EpMultiSelect
             class="flex-grow-1"
             v-model="tutkinnonosaQuery.peruste"
@@ -31,15 +33,15 @@
             @search="perusteSearch"
             :internalSearch="false"
             :clearOnSelect="false">
-            <template slot="noResult"><div v-if="perusteet && perusteet.length === 0">{{ $t('ei-hakutuloksia') }}</div><div v-else/></template>
-            <template slot="noOptions"><div></div></template>
-            <template slot="singleLabel" slot-scope="{ option }">
+            <template #noResult><div v-if="perusteet && perusteet.length === 0">{{ $t('ei-hakutuloksia') }}</div><div v-else/></template>
+            <template #noOptions><div></div></template>
+            <template #singleLabel="{ option }">
               {{ $kaanna(option.nimi) }}
               <span v-if="option.voimassaoloAlkaa">
                 ({{$t('voimassa')}} {{$sd(option.voimassaoloAlkaa)}} - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
               </span>
             </template>
-            <template slot="option" slot-scope="{ option }">
+            <template #option="{ option }">
               {{ $kaanna(option.nimi) }}
               <span v-if="option.voimassaoloAlkaa">
                 ({{$t('voimassa')}} {{$sd(option.voimassaoloAlkaa)}} - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
@@ -108,10 +110,12 @@
         </b-table>
       </div>
 
-      <div slot="modal-footer">
-        <ep-button @click="close" variant="link">{{ $t('peruuta')}}</ep-button>
-        <ep-button @click="save">{{ $t('tuo-valitut-tutkinnon-osat')}}</ep-button>
-      </div>
+      <template #modal-footer>
+        <div>
+          <ep-button @click="close" variant="link">{{ $t('peruuta')}}</ep-button>
+          <ep-button @click="save">{{ $t('tuo-valitut-tutkinnon-osat')}}</ep-button>
+        </div>
+      </template>
     </b-modal>
   </div>
 </template>

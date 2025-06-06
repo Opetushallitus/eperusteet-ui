@@ -89,10 +89,12 @@
                   :borderBottom="false"
                   :usePadding="false">
 
-                  <div slot="header" class="d-flex">
-                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-3">drag_indicator</EpMaterialIcon>
-                    <h4 class="mb-0">{{$kaanna(tavoite.tavoite)}}</h4>
-                  </div>
+                  <template #header>
+                    <div class="d-flex">
+                      <EpMaterialIcon v-if="isEditing" class="order-handle mr-3">drag_indicator</EpMaterialIcon>
+                      <h4 class="mb-0">{{$kaanna(tavoite.tavoite)}}</h4>
+                    </div>
+                  </template>
 
                   <EpOppiaineenTavoite v-model="data.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="supportData" @poista="poistaTavoite(tavoite)"/>
 

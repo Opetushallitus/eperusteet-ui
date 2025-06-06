@@ -4,9 +4,15 @@
                               :edit-route="'perusteprojekti'"
                               :new-route="{ name: 'perusteprojektiLuonti' }"
                               :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
-      <h2 slot="upperheader">{{ $t('perusteprojektisi') }}</h2>
-      <h2 slot="published-header">{{ $t('julkaistut-perusteet') }}</h2>
-      <h2 slot="lowerheader">{{ $t('kaikki-perusteprojektit') }}</h2>
+      <template #upperheader>
+        <h2>{{ $t('perusteprojektisi') }}</h2>
+      </template>
+      <template #published-header>
+        <h2>{{ $t('julkaistut-perusteet') }}</h2>
+      </template>
+      <template #lowerheader>
+        <h2>{{ $t('kaikki-perusteprojektit') }}</h2>
+      </template>
     </EpPerusteprojektiListaus>
   </EpMainView>
 </template>

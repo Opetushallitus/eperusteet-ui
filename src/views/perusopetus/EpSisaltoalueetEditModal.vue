@@ -14,7 +14,7 @@
       ref="EpSisaltoalueetEditModal"
       size="xl">
 
-      <template slot="modal-header">
+      <template #modal-header>
         <div class="d-flex justify-content-between w-100">
           <div>{{ title }}</div>
           <ep-kielivalinta />
@@ -63,10 +63,12 @@
         {{ $t('lisaa-sisaltoalue') }}
       </ep-button>
 
-      <div slot="modal-footer">
-        <ep-button @click="peruuta" variant="link">{{ $t('peruuta')}}</ep-button>
-        <ep-button :showSpinner="tallennetaan" @click="tallenna">{{ $t('tallenna')}}</ep-button>
-      </div>
+      <template #modal-footer>
+        <div>
+          <ep-button @click="peruuta" variant="link">{{ $t('peruuta')}}</ep-button>
+          <ep-button :showSpinner="tallennetaan" @click="tallenna">{{ $t('tallenna')}}</ep-button>
+        </div>
+      </template>
 
     </b-modal>
   </div>

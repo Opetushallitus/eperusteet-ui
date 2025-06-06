@@ -5,33 +5,42 @@
                               :new-route="{ name: 'digitaalinenOsaaminenLuonti' }"
                               :showCards="true"
                               :vain-kortit="true">
-      <div slot="upperheader">
-        <div class="d-flex justify-content-between">
-          <h2>{{ $t('digitaalinen-osaaminen') }}</h2>
-          <div>
-            <EpArkistoidutModal v-if="arkistoidut && arkistoidut.length > 0"
-              :arkistoidut="arkistoidut"
-              @restore="onRestore">
-              <span slot="title">{{ $t('arkistoidut-projektit') }}</span>
-              <template v-slot:palauta="{ data }">
-                <EpButton
-                  slot="palauta"
-                  variant="link"
-                  icon="keyboard_return"
-                  @click="onRestore(data.item)"
-                  v-if="palautusoikeus(data.item)">
-                  {{ $t('palauta') }}
-                </EpButton>
-              </template>
-            </EpArkistoidutModal>
+      <template #upperheader>
+        <div>
+          <div class="d-flex justify-content-between">
+            <h2>{{ $t('digitaalinen-osaaminen') }}</h2>
+            <div>
+              <EpArkistoidutModal v-if="arkistoidut && arkistoidut.length > 0"
+                :arkistoidut="arkistoidut"
+                @restore="onRestore">
+                <template #title>
+                  <span>{{ $t('arkistoidut-projektit') }}</span>
+                </template>
+                <template v-slot:palauta="{ data }">
+                  <EpButton
+                    variant="link"
+                    icon="keyboard_return"
+                    @click="onRestore(data.item)"
+                    v-if="palautusoikeus(data.item)">
+                    {{ $t('palauta') }}
+                  </EpButton>
+                </template>
+              </EpArkistoidutModal>
 
+            </div>
           </div>
+          <div>{{$t('digitaalinen-osaaminen-listaus-selite')}}</div>
         </div>
-        <div>{{$t('digitaalinen-osaaminen-listaus-selite')}}</div>
-      </div>
-      <h2 slot="unpublished-header">{{ $t('keskeneraiset-projektit') }}</h2>
-      <h2 slot="published-header">{{ $t('julkaistut-projektit') }}</h2>
-      <div slot="cardsEmpty" />
+      </template>
+      <template #unpublished-header>
+        <h2>{{ $t('keskeneraiset-projektit') }}</h2>
+      </template>
+      <template #published-header>
+        <h2>{{ $t('julkaistut-projektit') }}</h2>
+      </template>
+      <template #cardsEmpty>
+        <div />
+      </template>
     </EpPerusteprojektiListaus>
   </EpMainView>
 </template>

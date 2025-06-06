@@ -1,9 +1,9 @@
 <template>
 <EpHomeTile icon="description" :route="{ name: 'tiedotteet' }" :count="uudetTiedotteetCount">
-  <template slot="header">
+  <template #header>
     <span>{{ $t('tiedotteet') }}</span>
   </template>
-  <template slot="content">
+  <template #content>
     <div v-if="tiedotteet">
       <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
         <div class="col-2">{{$sd(tiedote.muokattu)}}</div>

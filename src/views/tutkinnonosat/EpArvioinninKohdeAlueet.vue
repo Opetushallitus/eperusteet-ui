@@ -12,9 +12,11 @@
                      :isEditing="isEditing"
                      :arviointiasteikot="arviointiasteikot">
 
-          <div slot="poisto">
-            <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)">{{$t('poista-ammattitaitovaatimus-tekemisena')}}</EpButton>
-          </div>
+          <template #poisto>
+            <div>
+              <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)">{{$t('poista-ammattitaitovaatimus-tekemisena')}}</EpButton>
+            </div>
+          </template>
         </EpArviointi>
       </div>
     </draggable>

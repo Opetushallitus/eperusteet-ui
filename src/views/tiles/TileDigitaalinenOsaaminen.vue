@@ -1,9 +1,9 @@
 <template>
 <EpHomeTile icon="play_lesson" :route="{ name: 'digitaalisetosaamiset' }">
-  <template slot="header">
+  <template #header>
     <span>{{ $t('digitaalinen-osaaminen') }}</span>
   </template>
-  <template slot="content">
+  <template #content>
     <p>{{ $t('tile-digitaalinen-osaaminen-kuvaus') }}</p>
   </template>
 </EpHomeTile>

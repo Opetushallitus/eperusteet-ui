@@ -27,12 +27,14 @@
             :borderBottom="false"
             :usePadding="false">
 
-            <div slot="header" class="d-flex">
-              <div class="order-handle mr-3" v-if="isEditing">
-                <EpMaterialIcon v-if="isEditing">drag_indicator</EpMaterialIcon>
+            <template #header>
+              <div class="d-flex">
+                <div class="order-handle mr-3" v-if="isEditing">
+                  <EpMaterialIcon v-if="isEditing">drag_indicator</EpMaterialIcon>
+                </div>
+                <h4 class="mb-0" v-html="$kaanna(tavoite.tavoite)"></h4>
               </div>
-              <h4 class="mb-0" v-html="$kaanna(tavoite.tavoite)"></h4>
-            </div>
+            </template>
 
             <EpOppiaineenTavoite v-model="model.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="vlkSupportData" @poista="poistaTavoite(tavoite)"/>
 

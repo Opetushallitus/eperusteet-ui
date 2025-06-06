@@ -7,7 +7,7 @@
            :lazy="true"
            size="xl"
            :hide-footer="true">
-    <template slot="modal-header">
+    <template #modal-header>
       <div class="d-flex justify-content-between w-100">
         <div class="mt-1">{{ $t('muokkaa')}}</div>
         <EpKielivalinta/>

@@ -1,6 +1,6 @@
 <template>
   <EpMainView>
-    <template slot="header">
+    <template #header>
       <div class="d-flex justify-content-between">
         <h1>{{ $t('osaamismerkki-teemojen-hallinta') }}</h1>
         <div class="d-flex">

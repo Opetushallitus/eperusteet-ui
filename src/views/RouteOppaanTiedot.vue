@@ -52,19 +52,19 @@
                            :is-editing="isEditing"
                            :items="koulutustyypit"
                            :required="false">
-                  <template slot="singleLabel" slot-scope="{ option }">
+                  <template #singleLabel="{ option }">
                     <span class="text-nowrap">
                       <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
                       <span class="ml-2">{{ option.text }}</span>
                     </span>
                   </template>
-                  <template slot="option" slot-scope="{ option }">
+                  <template #option="{ option }">
                     <span class="text-nowrap">
                       <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
                       <span class="ml-2">{{ option.text }}</span>
                     </span>
                   </template>
-                  <template slot="lisaaTeksti">
+                  <template #lisaaTeksti>
                     {{$t('lisaa-koulutus-tutkintotyyppi')}}
                   </template>
                 </EpMultiListSelect>
@@ -78,7 +78,7 @@
                            :is-editing="isEditing"
                            :items="perusteet"
                            :required="false">
-                  <template slot="lisaaTeksti">
+                  <template #lisaaTeksti>
                     {{$t('lisaa-peruste')}}
                   </template>
                 </EpMultiListSelect>
@@ -154,8 +154,12 @@
                       :isEditing="isEditing"
                       v-model="tutkinnonosaKoodit"
                       @remove="removeOppaanKoodi">
-                      <h4 slot="header">{{$t('tutkinnonosat')}}</h4>
-                      <span slot="button-text">{{$t('lisaa-tutkinnon-osa')}}</span>
+                      <template #header>
+                        <h4>{{$t('tutkinnonosat')}}</h4>
+                      </template>
+                      <template #button-text>
+                        <span>{{$t('lisaa-tutkinnon-osa')}}</span>
+                      </template>
                     </EpKoodistoSelectTable>
                     <EpKoodistoSelectTable
                       v-if="isEditing || osaamisalaKoodit.length > 0"
@@ -163,8 +167,12 @@
                       :isEditing="isEditing"
                       v-model="osaamisalaKoodit"
                       @remove="removeOppaanKoodi">
-                      <h4 slot="header">{{$t('osaamisalat')}}</h4>
-                      <span slot="button-text">{{$t('lisaa-osaamisala')}}</span>
+                      <template #header>
+                        <h4>{{$t('osaamisalat')}}</h4>
+                      </template>
+                      <template #button-text>
+                        <span>{{$t('lisaa-osaamisala')}}</span>
+                      </template>
                     </EpKoodistoSelectTable>
                   </div>
                 </b-col>
@@ -183,8 +191,12 @@
                   v-model="oppiaineKoodit"
                   @remove="removeOppaanKoodi"
                   :showKoodiArvo="false">
-                  <h4 slot="header">{{$t('oppiaineet')}}</h4>
-                  <span slot="button-text">{{$t('lisaa-oppiaine')}}</span>
+                  <template #header>
+                    <h4>{{$t('oppiaineet')}}</h4>
+                  </template>
+                  <template #button-text>
+                    <span>{{$t('lisaa-oppiaine')}}</span>
+                  </template>
                 </EpKoodistoSelectTable>
                 </div>
               </b-col>
@@ -203,8 +215,12 @@
                   v-model="opintokokonaisuusKoodit"
                   @remove="removeOppaanKoodi"
                   :showKoodiArvo="false">
-                  <h4 slot="header">{{$t('opintokokonaisuudet')}}</h4>
-                  <span slot="button-text">{{$t('lisaa-opintokokonaisuus')}}</span>
+                  <template #header>
+                    <h4>{{$t('opintokokonaisuudet')}}</h4>
+                  </template>
+                  <template #button-text>
+                    <span>{{$t('lisaa-opintokokonaisuus')}}</span>
+                  </template>
                 </EpKoodistoSelectTable>
                 </div>
               </b-col>
@@ -223,8 +239,12 @@
                     v-model="koulutuksenosaKoodit"
                     @remove="removeOppaanKoodi"
                     :showKoodiArvo="false">
-                    <h4 slot="header">{{$t('koulutuksenosat')}}</h4>
-                    <span slot="button-text">{{$t('lisaa-koulutuksenosa')}}</span>
+                    <template #header>
+                      <h4>{{$t('koulutuksenosat')}}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{$t('lisaa-koulutuksenosa')}}</span>
+                    </template>
                   </EpKoodistoSelectTable>
                 </div>
               </b-col>

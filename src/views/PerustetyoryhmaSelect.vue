@@ -7,10 +7,10 @@
                      :search-identity="tyoryhmaSearchIdentity"
                      :options="tyoryhmat"
                      :clear-on-select="true">
-        <template slot="singleLabel" slot-scope="{ option }">
+        <template #singleLabel="{ option }">
           {{ $kaanna(option.nimi) }}
         </template>
-        <template slot="option" slot-scope="{ option }">
+        <template #option="{ option }">
           {{ $kaanna(option.nimi) }}
         </template>
       </EpMultiSelect>

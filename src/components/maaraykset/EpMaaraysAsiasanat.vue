@@ -13,14 +13,14 @@
                  :taggable="true"
                  @tag="lisaaAsiasana">
 
-        <template slot="option" slot-scope="{ option }">
+        <template #option="{ option }">
           <span v-if="option.label">{{ option.label }}</span>
           <span v-else>{{ option }}</span>
         </template>
 
         <template v-slot:checkbox><span/></template>
 
-        <template slot="selection" slot-scope="{ values }">
+        <template #selection="{ values }">
           <div class="d-flex align-items-center" :class="{'mb-2': values.length > 0}">
             <span class="multiselect__tag" v-for="value in values" :key="'value' + value">
               <span class="nimi">{{ value }}</span>
