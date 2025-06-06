@@ -1,9 +1,9 @@
 <template>
 <EpHomeTile icon="archive" :route="{ name: 'arkistoidut' }">
-  <template slot="header">
+  <template #header>
     <span>{{ $t('arkistoidut') }}</span>
   </template>
-  <template slot="content">
+  <template #content>
     <p>{{ $t('tile-arkistoidut-kuvaus') }}</p>
   </template>
 </EpHomeTile>

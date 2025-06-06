@@ -2,7 +2,7 @@
   <router-view v-if="maaraysId"/>
 
   <ep-main-view container v-else>
-    <template slot="header">
+    <template #header>
       <div class="d-flex justify-content-between">
         <h1>{{ $t('maarayskokoelma-otsikko') }}</h1>
         <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: 'uusi' } }">
@@ -30,10 +30,10 @@
                   placeholder="kaikki"
                   :is-editing="true"
                   :options="tyyppiVaihtoehdot">
-            <template slot="singleLabel" slot-scope="{ option }">
+            <template #singleLabel="{ option }">
               {{ $t('maarays-tyyppi-' + option.toLowerCase()) }}
             </template>
-            <template slot="option" slot-scope="{ option }">
+            <template #option="{ option }">
               {{ $t('maarays-tyyppi-' + option.toLowerCase()) }}
             </template>
           </EpMultiSelect>
@@ -49,10 +49,10 @@
                     placeholder="kaikki"
                     :is-editing="true"
                     :options="voimassaVaihtoehdot">
-            <template slot="singleLabel" slot-scope="{ option }">
+            <template #singleLabel="{ option }">
               {{ $t('ajoitus-' + option.toLowerCase()) }}
             </template>
-            <template slot="option" slot-scope="{ option }">
+            <template #option="{ option }">
               {{ $t('ajoitus-' + option.toLowerCase()) }}
             </template>
           </EpMultiSelect>

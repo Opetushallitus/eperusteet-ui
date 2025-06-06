@@ -51,7 +51,7 @@
 
           <template v-slot:cell(kriteerit)="data">
             <EpBulletEditor kohde="" v-model="data.item.kriteerit" :is-editable="isEditing" :allowStructureChange="!inner.julkaistu">
-              <template slot="add">{{ $t('lisaa-kriteeri') }}</template>
+              <template #add>{{ $t('lisaa-kriteeri') }}</template>
             </EpBulletEditor>
           </template>
         </b-table>

@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4">
-    <h3 class="mb-2" slot="header">{{ $t('muutoshistoria') }}</h3>
+    <h3 class="mb-2">{{ $t('muutoshistoria') }}</h3>
     <EpSpinner v-if="!julkaisut"/>
     <template v-else>
       <div class="alert alert-info" v-if="julkaisut.length === 0">

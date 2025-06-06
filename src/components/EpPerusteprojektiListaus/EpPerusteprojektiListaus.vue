@@ -33,9 +33,11 @@
                               :koulutustyyppi="project.peruste.koulutustyyppi"
                               :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"
                               :tileImage="project.tileImage">
-                  <div slot="lower" class="small-text">
-                    {{ $t('tila-' + project.tila) }}
-                  </div>
+                  <template #lower>
+                    <div class="small-text">
+                      {{ $t('tila-' + project.tila) }}
+                    </div>
+                  </template>
                   <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
                     {{ project.nimi }}
                   </div>
@@ -59,9 +61,11 @@
                             :koulutustyyppi="project.peruste.koulutustyyppi"
                             :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"
                             :tileImage="project.tileImage">
-                <div slot="lower" class="small-text">
-                  {{ $t('tila-' + project.tila) }}
-                </div>
+                <template #lower>
+                  <div class="small-text">
+                    {{ $t('tila-' + project.tila) }}
+                  </div>
+                </template>
                 <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
                   {{ project.nimi }}
                 </div>
@@ -98,10 +102,10 @@
                       placeholder="kaikki"
                       :is-editing="true"
                       :options="perusteet">
-              <template slot="singleLabel" slot-scope="{ option }">
+              <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
-              <template slot="option" slot-scope="{ option }">
+              <template #option="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
             </EpMultiSelect>
@@ -113,10 +117,10 @@
                       placeholder="kaikki"
                       :is-editing="true"
                       :options="vaihtoehdotVoimassaolo">
-              <template slot="singleLabel" slot-scope="{ option }">
+              <template #singleLabel="{ option }">
                 {{ $t('ajoitus-' + option.toLowerCase()) }}
               </template>
-              <template slot="option" slot-scope="{ option }">
+              <template #option="{ option }">
                 {{ $t('ajoitus-' + option.toLowerCase()) }}
               </template>
             </EpMultiSelect>

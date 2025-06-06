@@ -1,6 +1,6 @@
 <template>
   <ep-main-view :container="true">
-    <template slot="header">
+    <template #header>
       <h1>{{ $t('yllapito') }}</h1>
     </template>
 

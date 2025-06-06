@@ -127,7 +127,9 @@
               <b-row no-gutters>
                 <b-col class="mb-4">
                   <b-form-group>
-                    <h3 slot="label">{{$t('peruste-koulutukset')}}</h3>
+                    <template #label>
+                      <h3>{{$t('peruste-koulutukset')}}</h3>
+                    </template>
                     <b-table striped
                       show-empty
                             :items="data.koulutukset"
@@ -164,7 +166,9 @@
               <b-row no-gutters>
                 <b-col class="mb-4">
                   <b-form-group>
-                    <h3 slot="label">{{$t('korvattavat-perusteet')}}</h3>
+                    <template #label>
+                      <h3>{{$t('korvattavat-perusteet')}}</h3>
+                    </template>
                     <b-table v-if="korvattavatDiaarinumerot && korvattavatDiaarinumerot.length > 0"
                             :items="korvattavatDiaarinumerot"
                             :fields="korvattavatFields"
@@ -264,7 +268,9 @@
               <b-row no-gutters>
                 <b-col>
                   <b-form-group>
-                    <h3 slot="label">{{$t('muutosmaaraykset')}}</h3>
+                    <template #label>
+                      <h3>{{$t('muutosmaaraykset')}}</h3>
+                    </template>
                     <EpMuutosmaaraykset v-model="data.muutosmaaraykset"
                                         :is-editing="isEditing"
                                         :perusteStore="perusteStore" />
@@ -277,7 +283,9 @@
               <b-row>
                 <b-col class="mb-4">
                   <b-form-group>
-                    <h3 slot="label">{{$t('saamen-kielelle-kaannetyt-perusteet')}}</h3>
+                    <template #label>
+                      <h3>{{$t('saamen-kielelle-kaannetyt-perusteet')}}</h3>
+                    </template>
                     <ep-spinner v-if="!liitteet" />
                     <div v-if="isEditing" class="mb-4">
                       <div class="d-flex">
@@ -316,7 +324,9 @@
               <b-row v-if="isAmmatillinen">
                 <b-col class="mb-4">
                   <b-form-group>
-                    <h3 slot="label">{{$t('koulutusviennin-ohje')}}</h3>
+                    <template #label>
+                      <h3>{{$t('koulutusviennin-ohje')}}</h3>
+                    </template>
                     <ep-spinner v-if="!liitteet" />
 
                     <div v-if="isEditing">
@@ -391,7 +401,9 @@
               <b-row no-gutters>
                 <b-col class="mb-4">
                   <b-form-group>
-                    <h3 slot="label">{{$t('osaamisalat')}}</h3>
+                    <template #label>
+                      <h3>{{$t('osaamisalat')}}</h3>
+                    </template>
                     <div class="text-muted font-size-small">
                       {{ $t('lisaa-tai-poista-osaamisala') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
                     </div>
@@ -414,7 +426,9 @@
               <b-row no-gutters>
                 <b-col class="mb-4">
                   <b-form-group>
-                    <h3 slot="label">{{$t('tutkintonimikkeet')}}</h3>
+                    <template #label>
+                      <h3>{{$t('tutkintonimikkeet')}}</h3>
+                    </template>
                     <div class="text-muted font-size-small">
                       {{ $t('lisaa-tai-poista-tutkintonimike') }} <router-link :to="{ name: 'muodostuminen' }">{{ $t('tutkinnon-muodostumisessa') }}</router-link>
                     </div>

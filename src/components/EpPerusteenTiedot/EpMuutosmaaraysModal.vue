@@ -6,7 +6,7 @@
            :lazy="true"
            size="xl"
            :hide-footer="true">
-    <template slot="modal-header">
+    <template #modal-header>
       <div class="mt-1">{{ otsikko }}</div>
     </template>
 

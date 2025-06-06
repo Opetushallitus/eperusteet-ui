@@ -1,10 +1,10 @@
 <template>
   <EpHomeTile icon="picture_as_pdf"
               :route="{ name: 'maarayskokoelma' }">
-    <template slot="header">
+    <template #header>
       <span>{{ $t('tile-maarayskokoelma') }}</span>
     </template>
-    <template slot="content">
+    <template #content>
       <p>{{ $t('tile-maarayskokoelma-kuvaus') }}</p>
     </template>
   </EpHomeTile>

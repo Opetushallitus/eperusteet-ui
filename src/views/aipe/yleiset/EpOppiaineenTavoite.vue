@@ -12,9 +12,11 @@
             <EpInput v-model="tavoite.tavoite"
                      :is-editing="isEditing"
                      class="input-wrapper">
-              <div class="order-handle m-2" slot="left">
-                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-              </div>
+              <template #left>
+                <div class="order-handle m-2">
+                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                </div>
+              </template>
             </EpInput>
           </div>
           <div class="col-1">
@@ -47,7 +49,7 @@
                   :enable-empty-option="true"
                   :placeholder="'valitse'"
                   :emptyOptionDisabled="true">
-          <template slot-scope="{ item }">
+          <template #default="{ item }">
             {{$kaanna(item.nimi)}}
           </template>
         </ep-select>
@@ -139,7 +141,7 @@
                     :enable-empty-option="true"
                     :placeholder="'valitse'"
                     :emptyOptionDisabled="true">
-            <template slot-scope="{ item }">
+            <template #default="{ item }">
               {{$t('osaamisen-kuvaus-arvosanalle_' + item)}}
             </template>
           </ep-select>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal ref="modal" size="lg">
-      <template slot="modal-header">
+      <template #modal-header>
         {{$t('luo-uusi-arviointi')}}
       </template>
       <template v-slot:modal-footer>

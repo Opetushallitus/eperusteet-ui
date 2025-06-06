@@ -6,8 +6,12 @@
                               :is-pohja="true"
                               :luontioikeus="{ 'oikeus': 'hallinta', 'kohde': 'pohja' }"
                               :showCards="$isAdmin()">
-      <h2 slot="upperheader">{{ $t('pohjasi') }}</h2>
-      <h2 slot="lowerheader">{{ $t('kaikki-pohjat') }}</h2>
+      <template #upperheader>
+        <h2>{{ $t('pohjasi') }}</h2>
+      </template>
+      <template #lowerheader>
+        <h2>{{ $t('kaikki-pohjat') }}</h2>
+      </template>
     </EpPerusteprojektiListaus>
   </EpMainView>
 </template>

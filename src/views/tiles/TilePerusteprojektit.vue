@@ -1,9 +1,9 @@
 <template>
 <EpHomeTile icon="article" :route="{ name: 'perusteprojektit' }">
-  <template slot="header">
+  <template #header>
     <span>{{ $t('perusteprojektit') }}</span>
   </template>
-  <template slot="content">
+  <template #content>
     <p>{{ $t('tile-perusteprojektit-kuvaus') }}</p>
   </template>
 </EpHomeTile>

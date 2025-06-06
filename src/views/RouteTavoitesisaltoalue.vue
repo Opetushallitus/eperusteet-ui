@@ -29,7 +29,9 @@
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <div v-if="isEditing" slot="label">{{$t('kappaleen-teksti')}}</div>
+            <template v-if="isEditing" #label>
+              <div>{{$t('kappaleen-teksti')}}</div>
+            </template>
             <ep-content v-model="data.teksti"
                         layout="normal"
                         :is-editable="isEditing"

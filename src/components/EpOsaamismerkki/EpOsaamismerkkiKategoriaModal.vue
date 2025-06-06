@@ -7,7 +7,7 @@
            :lazy="true"
            size="xl"
            :hide-footer="true">
-    <template slot="modal-header">
+    <template #modal-header>
       <div class="row w-100">
         <div class="col">
           <span v-if="kategoria.id" class="mr-2">{{ $t('muokkaa-teemaa')}}</span>

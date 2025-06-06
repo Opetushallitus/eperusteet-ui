@@ -86,9 +86,11 @@
                               v-model="tavoitealue.tavoitteet[tavoiteIndex]"
                               :is-editing="true"
                               class="input-wrapper">
-                              <div class="order-handle m-2" slot="left">
-                                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                              </div>
+                              <template #left>
+                                <div class="order-handle m-2">
+                                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                                </div>
+                              </template>
                             </EpInput>
                         </template>
                         <template #footer>

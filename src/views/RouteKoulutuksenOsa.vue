@@ -28,38 +28,40 @@
       <b-row class="mb-4">
         <b-col md="6">
           <b-form-group :label="$t('koulutuksen-osan-nimi') + (isEditing ? ' *' : '')" required>
-            <EpKoodistoSelect
-              :store="koodisto"
-              v-model="data.nimiKoodi"
-              :is-editing="isEditing"
-              :naytaArvo="false"
-              @add="onNimiKoodiAdd()">
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    v-if="data.nimi && !data.nimiKoodi"
-                    class="font-italic"
-                    :value="$kaanna(data.nimi)"
-                    disabled>
-                  </b-form-input>
-                  <b-form-input
-                    v-else
-                    :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled>
-                  </b-form-input>
-                  <b-input-group-append>
-                    <b-button
-                      @click="open"
-                      variant="primary">
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-              <div slot="empty" v-if="data.nimi">
-                {{$kaanna(data.nimi)}}
-              </div>
-            </EpKoodistoSelect>
+                          <EpKoodistoSelect
+                :store="koodisto"
+                v-model="data.nimiKoodi"
+                :is-editing="isEditing"
+                :naytaArvo="false"
+                @add="onNimiKoodiAdd()">
+                <template #default="{ open }">
+                  <b-input-group>
+                    <b-form-input
+                      v-if="data.nimi && !data.nimiKoodi"
+                      class="font-italic"
+                      :value="$kaanna(data.nimi)"
+                      disabled>
+                    </b-form-input>
+                    <b-form-input
+                      v-else
+                      :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
+                      disabled>
+                    </b-form-input>
+                    <b-input-group-append>
+                      <b-button
+                        @click="open"
+                        variant="primary">
+                        {{ $t('hae-koodistosta') }}
+                      </b-button>
+                    </b-input-group-append>
+                  </b-input-group>
+                </template>
+                <template #empty>
+                  <div v-if="data.nimi">
+                    {{$kaanna(data.nimi)}}
+                  </div>
+                </template>
+              </EpKoodistoSelect>
             <EpInput
               class="sr-only"
               aria-hidden="true"
@@ -141,9 +143,11 @@
                       v-model="data.tavoitteet[i]"
                       :is-editing="isEditing"
                       :disabled="tavoite.uri !== undefined">
-                      <div class="order-handle m-2" slot="left">
-                        <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                      </div>
+                      <template #left>
+                        <div class="order-handle m-2">
+                          <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                        </div>
+                      </template>
                     </EpInput>
                   </b-col>
                   <b-col cols="1" v-if="isEditing">
@@ -177,7 +181,9 @@
       <b-row>
       <b-col md="10">
         <b-form-group>
-          <h3 slot="label">{{ $t('laaja-alainen-osaaminen') }}</h3>
+          <template #label>
+            <h3>{{ $t('laaja-alainen-osaaminen') }}</h3>
+          </template>
           <EpContent
             v-if="isEditing || !isEditing && data.laajaAlaisenOsaamisenKuvaus"
             v-model="data.laajaAlaisenOsaamisenKuvaus"
@@ -191,9 +197,11 @@
       <hr/>
       <b-row>
         <b-col md="10">
-          <b-form-group>
-            <h3 slot="label">{{ $t('keskeinen-sisalto') }}</h3>
-            <EpContent
+                  <b-form-group>
+          <template #label>
+            <h3>{{ $t('keskeinen-sisalto') }}</h3>
+          </template>
+          <EpContent
               v-if="isEditing || !isEditing && data.keskeinenSisalto"
               v-model="data.keskeinenSisalto"
               layout="normal"
@@ -206,9 +214,11 @@
       <hr/>
       <b-row>
         <b-col md="10">
-          <b-form-group>
-            <h3 slot="label">{{ $t('arviointi') }}</h3>
-            <EpContent
+                  <b-form-group>
+          <template #label>
+            <h3>{{ $t('arviointi') }}</h3>
+          </template>
+          <EpContent
               v-if="isEditing || !isEditing && data.arvioinninKuvaus"
               v-model="data.arvioinninKuvaus"
               layout="normal"

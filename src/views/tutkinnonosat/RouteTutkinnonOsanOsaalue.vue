@@ -66,7 +66,9 @@
         </div>
 
         <ep-collapse tyyppi="pakolliset-osaamistavoitteet" :border-bottom="false" :border-top="true">
-          <h3 slot="header">{{ $t('pakolliset-osaamistavoitteet') }}</h3>
+          <template #header>
+            <h3>{{ $t('pakolliset-osaamistavoitteet') }}</h3>
+          </template>
           <Osaamistavoite v-model="data.pakollisetOsaamistavoitteet"
                           :is-valinnainen="false"
                           :is-editing="isEditing">
@@ -74,7 +76,9 @@
         </ep-collapse>
 
         <ep-collapse tyyppi="valinnaiset-osaamistavoitteet" :border-bottom="false" :border-top="true" v-if="isEditing || data.valinnaisetOsaamistavoitteet">
-          <h3 slot="header">{{ $t('valinnaiset-osaamistavoitteet') }}</h3>
+          <template #header>
+            <h3>{{ $t('valinnaiset-osaamistavoitteet') }}</h3>
+          </template>
 
           <div v-if="isEditing" class="mb-3">
             <ep-button v-if="data.valinnaisetOsaamistavoitteet" @click="poistaValinnaisetOsaamistavoitteet()" variant="link" icon="delete">
@@ -94,7 +98,9 @@
         </ep-collapse>
 
         <ep-collapse tyyppi="arviointi" :border-bottom="false" :border-top="true">
-          <h3 slot="header">{{ $t('arviointi') + (isEditing ? ' *' : '')}} </h3>
+          <template #header>
+            <h3>{{ $t('arviointi') + (isEditing ? ' *' : '')}} </h3>
+          </template>
           <EpGeneerinenAsteikko v-model="arviointi"
                                 :arviointi-store="arviointiStore"
                                 :is-editing="isEditing" />

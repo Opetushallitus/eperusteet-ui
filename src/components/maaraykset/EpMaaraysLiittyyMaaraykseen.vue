@@ -11,10 +11,10 @@
           :is-editing="true"
           :search-identity="nimiSearchIdentity"
           :options="maarayksetNimella">
-          <template slot="singleLabel" slot-scope="{ option }">
+          <template #singleLabel="{ option }">
             {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{option.diaarinumero}})</span>
           </template>
-          <template slot="option" slot-scope="{ option }">
+          <template #option="{ option }">
             {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{option.diaarinumero}})</span>
           </template>
         </EpMultiSelect>

@@ -47,9 +47,11 @@
               <b-row v-for="(kohdealue, index) in data.opetuksenKohdealueet" :key="'tavoite'+index" class="pb-2">
                 <b-col cols="11">
                   <ep-input v-model="kohdealue.nimi" :is-editing="isEditing">
-                    <div class="order-handle m-2" slot="left">
-                      <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                    </div>
+                    <template #left>
+                      <div class="order-handle m-2">
+                        <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                      </div>
+                    </template>
                   </ep-input>
                 </b-col>
                 <b-col cols="1" v-if="isEditing">

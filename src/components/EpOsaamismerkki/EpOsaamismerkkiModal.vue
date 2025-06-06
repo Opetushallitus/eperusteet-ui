@@ -7,7 +7,7 @@
            :lazy="true"
            size="xl"
            :hide-footer="true">
-    <template slot="modal-header">
+    <template #modal-header>
       <div class="row w-100">
         <div class="col">
           <span v-if="osaamismerkki.id" class="mr-2">{{ $t('muokkaa-osaamismerkkia')}}</span>
@@ -83,9 +83,11 @@
             <EpInput v-model="tavoite.osaamistavoite"
                      :is-editing="true"
                      class="input-wrapper">
-              <div class="order-handle m-2" slot="left">
-                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-              </div>
+              <template #left>
+                <div class="order-handle m-2">
+                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                </div>
+              </template>
             </EpInput>
           </div>
           <div class="col-1">
@@ -115,9 +117,11 @@
             <EpInput v-model="kriteeri.arviointikriteeri"
                      :is-editing="true"
                      class="input-wrapper">
-              <div class="order-handle m-2" slot="left">
-                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-              </div>
+              <template #left>
+                <div class="order-handle m-2">
+                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                </div>
+              </template>
             </EpInput>
           </div>
           <div class="col-1">

@@ -2,10 +2,12 @@
   <div>
     <div v-if="isEditing">
       <b-form-group >
-        <div slot="label" class="d-flex justify-content-between">
-          <div>{{$t('osa-alueen-nimi')}}</div>
-          <slot name="poisto"></slot>
-        </div>
+        <template #label>
+          <div class="d-flex justify-content-between">
+            <div>{{$t('osa-alueen-nimi')}}</div>
+            <slot name="poisto"></slot>
+          </div>
+        </template>
         <ep-input v-model="osaAlue.nimi" :is-editing="isEditing"/>
       </b-form-group>
 
@@ -20,9 +22,11 @@
             <b-row v-for="(kuvaus, kuvausIndex) in tasokuvaus.kuvaukset" :key="'kuvaus'+kuvausIndex" class="pb-2">
               <b-col cols="11">
                 <ep-input v-model="kuvaus[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
-                  <div class="order-handle m-2" slot="left">
-                    <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                  </div>
+                  <template #left>
+                    <div class="order-handle m-2">
+                      <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                    </div>
+                  </template>
                 </ep-input>
               </b-col>
               <b-col cols="1">
@@ -48,9 +52,11 @@
               <b-row v-for="(kuvaus, kuvausIndex) in tasokuvaus.edistynytOsaaminenKuvaukset" :key="'kuvaus'+kuvausIndex" class="pb-2">
                 <b-col cols="11">
                   <ep-input v-model="kuvaus[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
-                    <div class="order-handle m-2" slot="left">
-                      <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                    </div>
+                    <template #left>
+                      <div class="order-handle m-2">
+                        <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                      </div>
+                    </template>
                   </ep-input>
                 </b-col>
                 <b-col cols="1">

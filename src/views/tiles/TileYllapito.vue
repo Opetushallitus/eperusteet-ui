@@ -1,10 +1,10 @@
 <template>
   <EpHomeTile icon="settings"
               :route="{ name: 'yllapito' }">
-    <template slot="header">
+    <template #header>
       <span>{{ $t('tile-yllapito') }}</span>
     </template>
-    <template slot="content">
+    <template #content>
       <p>{{ $t('eperusteet-yllapito') }}</p>
     </template>
   </EpHomeTile>

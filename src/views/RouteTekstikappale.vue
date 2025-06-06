@@ -35,10 +35,10 @@
                               size="20px">info</EpMaterialIcon>
             </div>
             <EpMultiSelect v-model="data.osaamisala" :is-editing="true" :options="osaamisalat" :multiple="false" trackBy="uri" class="multiselect">
-              <template slot="singleLabel" slot-scope="{ option }">
+              <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
-              <template slot="option" slot-scope="{ option }">
+              <template #option="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
             </EpMultiSelect>
@@ -53,10 +53,10 @@
                               size="20px">info</EpMaterialIcon>
             </div>
             <EpMultiSelect v-model="data.tutkintonimike" :is-editing="true" :options="tutkintonimikkeet" :multiple="false" trackBy="uri" class="multiselect">
-              <template slot="singleLabel" slot-scope="{ option }">
+              <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
-              <template slot="option" slot-scope="{ option }">
+              <template #option="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
             </EpMultiSelect>

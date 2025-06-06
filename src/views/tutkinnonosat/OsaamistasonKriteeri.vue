@@ -17,9 +17,11 @@
           <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
             <div class="d-flex">
               <EpInput class="w-100" :isEditing="isEditing" v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]">
-                <div class="order-handle m-2" slot="left">
-                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                </div>
+                <template #left>
+                  <div class="order-handle m-2">
+                    <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                  </div>
+                </template>
               </EpInput>
               <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaKriteeri(kriteeri)"/>
             </div>

@@ -6,9 +6,15 @@
                               :fieldKeys="['nimi','koulutustyyppi','tila','luotu', 'globalVersion.aikaleima']"
                               :filters="['koulutustyyppi', 'peruste', 'tila']"
                               :showCards="!$isAdmin() && !$hasOphCrud()">
-      <h2 slot="upperheader">{{ $t('Oppaasi') }}</h2>
-      <h2 slot="published-header">{{ $t('julkaistut-oppaat') }}</h2>
-      <h3 slot="cardsEmpty">{{ $t('ei-oppaita')}}</h3>
+      <template #upperheader>
+        <h2>{{ $t('Oppaasi') }}</h2>
+      </template>
+      <template #published-header>
+        <h2>{{ $t('julkaistut-oppaat') }}</h2>
+      </template>
+      <template #cardsEmpty>
+        <h3>{{ $t('ei-oppaita')}}</h3>
+      </template>
       <template v-slot:lowerheader>
         <div class="d-flex">
           <h2 class="pt-2 flex-grow-1">{{ $t('oppaat') }}</h2>
@@ -17,10 +23,10 @@
           </router-link>
         </div>
       </template>
-      <template slot="nimiotsikko">
+      <template #nimiotsikko>
         {{$t('oppaan-nimi')}}
       </template>
-      <template slot="koulutustyyppisarake" slot-scope="{ perusteProjekti }">
+      <template #koulutustyyppisarake="{ perusteProjekti }">
         <span class="text-nowrap koulutustyypit" v-if="ensimmainenKoulutustyyppi(perusteProjekti)">
           <EpColorIndicator :size="10" :kind="ensimmainenKoulutustyyppi(perusteProjekti)" />
           <span class="ml-1">
@@ -34,7 +40,7 @@
               placement="bottomright">
               <h3>{{$t('koulutustyypit')}}</h3>
               <ep-julki-lista :tiedot="koulutustyypit(perusteProjekti)" listausTyyppi="sivutus" tietoMaara="5">
-                <template slot="otsikko" slot-scope="{ item }">
+                <template #otsikko="{ item }">
                   <EpColorIndicator :size="10" :kind="item.otsikko" />
                   <span class="ml-1">
                     {{ $t(item.otsikko) }}

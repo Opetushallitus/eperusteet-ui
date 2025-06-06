@@ -11,10 +11,12 @@
     </b-tabs>
 
     <b-form-group>
-      <div slot="label" class="d-flex">
-        <span>{{$t('lataa-uusi-muutosmaarays') + isRequired}}</span>
-        <EpInfoPopover class="ml-2" unique-id="11">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
-      </div>
+      <template #label>
+        <div class="d-flex">
+          <span>{{$t('lataa-uusi-muutosmaarays') + isRequired}}</span>
+          <EpInfoPopover class="ml-2" unique-id="11">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+        </div>
+      </template>
       <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
     </b-form-group>
 
@@ -31,10 +33,12 @@
     </b-form-group>
 
     <b-form-group class="mt-4">
-      <div slot="label" class="d-flex">
-        <span>{{$t('liitteet') + ' (pdf)'}}</span>
-        <EpInfoPopover class="ml-2" unique-id="12">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
-      </div>
+      <template #label>
+        <div class="d-flex">
+          <span>{{$t('liitteet') + ' (pdf)'}}</span>
+          <EpInfoPopover class="ml-2" unique-id="12">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+        </div>
+      </template>
       <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
     </b-form-group>
 

@@ -21,13 +21,13 @@
                     :search-identity="nimiSearchIdentity"
                     :options="perusteet"
                     class="perustevalinta mb-2 mt-2">
-                    <template slot="singleLabel" slot-scope="{ option }">
+                    <template #singleLabel="{ option }">
                       {{ $kaanna(option.nimi) }}
                       <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
                         (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span>-<span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
                       </span>
                     </template>
-                    <template slot="option" slot-scope="{ option }">
+                    <template #option="{ option }">
                       {{ $kaanna(option.nimi) }}
                       <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
                         (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span> - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)

@@ -46,9 +46,11 @@
       <b-row>
         <b-col md="8">
           <b-form-group>
-            <div slot="label">
-              <h3>{{$t('keskeinen-kasitteisto')}}</h3>
-            </div>
+            <template #label>
+              <div>
+                <h3>{{$t('keskeinen-kasitteisto')}}</h3>
+              </div>
+            </template>
             <ep-content v-model="data.keskeinenKasitteisto"
                         layout="normal"
                         :is-editable="isEditing"

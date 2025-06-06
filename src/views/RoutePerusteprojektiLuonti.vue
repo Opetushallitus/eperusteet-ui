@@ -24,10 +24,10 @@
                     :is-editing="true"
                     :search-identity="nimiSearchIdentity"
                     :options="pohjat">
-                    <template slot="singleLabel" slot-scope="{ option }">
+                    <template #singleLabel="{ option }">
                       {{ $kaanna(option.nimi) }}
                     </template>
-                    <template slot="option" slot-scope="{ option }">
+                    <template #option="{ option }">
                       {{ $kaanna(option.nimi) }}
                     </template>
                   </EpMultiSelect>
@@ -52,13 +52,13 @@
                     :search-identity="nimiSearchIdentity"
                     :options="perusteet"
                     class="perustevalinta">
-                    <template slot="singleLabel" slot-scope="{ option }">
+                    <template #singleLabel="{ option }">
                       {{ $kaanna(option.nimi) }}
                       <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
                         (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span>-<span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
                       </span>
                     </template>
-                    <template slot="option" slot-scope="{ option }">
+                    <template #option="{ option }">
                       {{ $kaanna(option.nimi) }}
                       <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
                         (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span> - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
@@ -87,10 +87,12 @@
           </b-form-group>
 
           <b-form-group>
-            <div class="d-flex">
-              <h4 slot="label">{{$t('projektin-diaarinumero')}}</h4>
-              <EpInfoPopover class="ml-2">{{ $t('diaarinumeron-muoto') }}</EpInfoPopover>
-            </div>
+            <template #label>
+              <div class="d-flex">
+                <h4>{{$t('projektin-diaarinumero')}}</h4>
+                <EpInfoPopover class="ml-2">{{ $t('diaarinumeron-muoto') }}</EpInfoPopover>
+              </div>
+            </template>
             <ep-input v-model="data.diaarinumero" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-diaarinumero')" :validation="$v.data.diaarinumero"/>
           </b-form-group>
 
@@ -110,10 +112,10 @@
                            :search-identity="nimiSearchIdentity"
                            :is-editing="true"
                            :options="tyoryhmat">
-              <template slot="singleLabel" slot-scope="{ option }">
+              <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
-              <template slot="option" slot-scope="{ option }">
+              <template #option="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
             </EpMultiSelect>
@@ -127,8 +129,12 @@
 
         <template v-slot:aikataulu>
           <EpAikataulu :aikataulut="tapahtumat">
-            <span slot="luomispaiva-topic" v-html="$t('projektin-luomispaiva')"></span>
-            <span slot="julkaisupaiva-topic" v-html="$t('peruste-astuu-voimaan')"></span>
+            <template #luomispaiva-topic>
+              <span v-html="$t('projektin-luomispaiva')"></span>
+            </template>
+            <template #julkaisupaiva-topic>
+              <span v-html="$t('peruste-astuu-voimaan')"></span>
+            </template>
           </EpAikataulu>
 
           <b-form-group
@@ -215,8 +221,12 @@
                 {{ $t('aikataulu') }}
               </div>
               <EpAikataulu :aikataulut="tapahtumat">
-                <span slot="luomispaiva-topic" v-html="$t('projektin-luomispaiva')"></span>
-                <span slot="julkaisupaiva-topic" v-html="$t('peruste-astuu-voimaan')"></span>
+                <template #luomispaiva-topic>
+                  <span v-html="$t('projektin-luomispaiva')"></span>
+                </template>
+                <template #julkaisupaiva-topic>
+                  <span v-html="$t('peruste-astuu-voimaan')"></span>
+                </template>
               </EpAikataulu>
             </div>
           </div>

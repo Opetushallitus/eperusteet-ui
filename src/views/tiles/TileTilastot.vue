@@ -1,10 +1,10 @@
 <template>
   <EpHomeTile icon="show_chart"
               :route="{ name: 'tilastot' }">
-    <template slot="header">
+    <template #header>
       <span>{{ $t('tile-tilastot') }}</span>
     </template>
-    <template slot="content">
+    <template #content>
       <p>{{ $t('eperusteet-tilastot') }}</p>
     </template>
   </EpHomeTile>
