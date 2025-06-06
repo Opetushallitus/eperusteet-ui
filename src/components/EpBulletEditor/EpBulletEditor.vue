@@ -20,57 +20,49 @@
   </div>
   <div v-else>
     <ul>
-      <li v-for="(bullet, idx) in value" :key="idx">
+      <li v-for="(bullet, idx) in modelValue" :key="idx">
         {{ $kaanna(bullet) }}
       </li>
     </ul>
   </div>
 </template>
 
-<script lang="ts">
-import { Watch, Vue, Component, Prop } from 'vue-property-decorator';
+<script lang="ts" setup>
+import { ref, watch } from 'vue';
 import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    draggable,
-    EpButton,
-    EpInput,
-    EpMaterialIcon,
-  },
-})
-export default class EpPrefixList extends Vue {
-  @Prop({ required: true })
-  private value!: { [lang: string]: string }[];
+const props = defineProps<{
+  modelValue: { [lang: string]: string }[];
+  isEditable?: boolean;
+  allowStructureChange?: boolean;
+}>();
 
-  @Prop({ default: false })
-  private isEditable!: boolean;
+const emit = defineEmits(['update:modelValue']);
 
-  private state!: { [lang: string]: string }[];
+const state = ref<{ [lang: string]: string }[]>([]);
 
-  @Prop({ default: true, type: Boolean })
-  private allowStructureChange!: boolean;
+watch(() => props.modelValue, (value) => {
+  state.value = value || [];
+}, { immediate: true });
 
-  @Watch('value', { immediate: true })
-  onValueChange(value: any) {
-    this.state = value;
-  }
+const add = () => {
+  state.value.push({});
+  emit('update:modelValue', [...state.value]);
+};
 
-  add() {
-    this.state.push({});
-  }
+const remove = (idx: number) => {
+  state.value.splice(idx, 1);
+  emit('update:modelValue', [...state.value]);
+};
 
-  remove(idx: number) {
-    Vue.delete(this.state, idx);
-  }
-
-  onInput(value: any, idx: number) {
-    Vue.set(this.state, idx, value);
-  }
-}
+const onInput = (value: any, idx: number) => {
+  state.value[idx] = value;
+  emit('update:modelValue', [...state.value]);
+};
 </script>
 
 <style lang="scss" scoped>

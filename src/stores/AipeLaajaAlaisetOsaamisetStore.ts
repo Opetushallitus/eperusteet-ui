@@ -1,29 +1,57 @@
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
-import { PerusteStore } from './PerusteStore';
+import { usePerusteStore } from './PerusteStore';
 
-export class AipeLaajaAlaisetOsaamisetStore implements IEditoitava {
-  constructor(
-    private perusteId: number,
-    private perusteStore: PerusteStore,
-  ) {
+export const useAipeLaajaAlaisetOsaamisetStore = defineStore('aipeLaajaAlaisetOsaamiset', () => {
+  // State
+  const perusteId = ref<number | null>(null);
+
+  // Actions
+  function initialize(perusteIdParam: number) {
+    perusteId.value = perusteIdParam;
   }
 
-  async acquire() {
+  async function acquire() {
     return null;
   }
 
-  async editAfterLoad() {
+  async function editAfterLoad() {
     return false;
   }
 
-  async load() {
-    return { laajaAlaisetOsaamiset: (await Aipeopetuksensisalto.getAipeOsaamiset(this.perusteId)).data };
+  async function load() {
+    return { laajaAlaisetOsaamiset: (await Aipeopetuksensisalto.getAipeOsaamiset(perusteId.value!)).data };
   }
 
-  async save(data: any) {
-    await Aipeopetuksensisalto.updateLaajaalaisetJarjestys(this.perusteId, data.laajaAlaisetOsaamiset);
-    await this.perusteStore.updateNavigation();
+  async function save(data: any) {
+    const perusteStore = usePerusteStore();
+    await Aipeopetuksensisalto.updateLaajaalaisetJarjestys(perusteId.value!, data.laajaAlaisetOsaamiset);
+    await perusteStore.updateNavigation();
   }
-}
+
+  // Create an IEditoitava instance
+  const editoitava: IEditoitava = {
+    acquire,
+    editAfterLoad,
+    load,
+    save,
+  };
+
+  return {
+    // State
+    perusteId,
+
+    // Actions
+    initialize,
+    acquire,
+    editAfterLoad,
+    load,
+    save,
+
+    // IEditoitava interface implementation
+    editoitava,
+  };
+});

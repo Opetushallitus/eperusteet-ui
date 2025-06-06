@@ -35,61 +35,50 @@
   </b-row>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
+import { $kaanna } from '@shared/utils/globals';
 import * as _ from 'lodash';
 import draggable from 'vuedraggable';
-import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMaterialIcon,
-    draggable,
-    EpInput,
-    EpButton,
-  },
-})
-export default class OsaamistasonKriteeri extends Vue {
-  @Prop({ required: true })
-  private value!: any;
 
-  @Prop({ required: true })
-  private isEditing!: boolean;
+const props = defineProps<{
+  modelValue: any;
+  isEditing: boolean;
+  arviointiasteikko: any;
+}>();
 
-  @Prop({ required: true })
-  private arviointiasteikko!: any;
+const emit = defineEmits(['update:modelValue']);
 
-  get osaamistasonkriteeri() {
-    return this.value;
-  }
 
-  set osaamistasonkriteeri(val) {
-    this.$emit('input', val);
-  }
+const osaamistasonkriteeri = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val),
+});
 
-  async lisaaKriteeri() {
-    this.osaamistasonkriteeri.kriteerit = [
-      ...this.osaamistasonkriteeri.kriteerit,
-      {},
-    ];
-  }
+const lisaaKriteeri = async () => {
+  osaamistasonkriteeri.value.kriteerit = [
+    ...osaamistasonkriteeri.value.kriteerit,
+    {},
+  ];
+};
 
-  async poistaKriteeri(poistettavaKriteeri) {
-    this.osaamistasonkriteeri.kriteerit = _.filter(this.osaamistasonkriteeri.kriteerit, kriteeri => kriteeri !== poistettavaKriteeri);
-  }
+const poistaKriteeri = async (poistettavaKriteeri) => {
+  osaamistasonkriteeri.value.kriteerit = _.filter(osaamistasonkriteeri.value.kriteerit, kriteeri => kriteeri !== poistettavaKriteeri);
+};
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
-}
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+  };
+});
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

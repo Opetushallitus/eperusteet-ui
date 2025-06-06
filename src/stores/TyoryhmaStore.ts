@@ -1,40 +1,47 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
-import { Page } from '@shared/tyypit';
-import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
-import { Debounced } from '@shared/utils/delay';
-import _ from 'lodash';
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import { Ulkopuoliset } from '@shared/api/eperusteet';
 
-Vue.use(VueCompositionApi);
+export const useTyoryhmaStore = defineStore('tyoryhma', () => {
+  // State
+  const perusteenTyoryhma = ref<any[] | null>(null);
+  const tyoryhmanVirkailiijat = ref<any[] | null>(null);
 
-export class TyoryhmaStore {
-  private state = reactive({
-    perusteenTyoryhma: null as any[] | null,
-    tyoryhmanVirkailiijat: null as any[] | null,
-  });
+  // Getters
+  const getPerusteenTyoryhma = computed(() => perusteenTyoryhma.value);
+  const getTyoryhmanVirkailiijat = computed(() => tyoryhmanVirkailiijat.value);
 
-  public readonly perusteenTyoryhma = computed(() => this.state.perusteenTyoryhma);
-  public readonly tyoryhmanVirkailiijat = computed(() => this.state.tyoryhmanVirkailiijat);
-
-  clear() {
-    this.state.perusteenTyoryhma = null;
-    this.state.tyoryhmanVirkailiijat = null;
+  // Actions
+  function clear() {
+    perusteenTyoryhma.value = null;
+    tyoryhmanVirkailiijat.value = null;
   }
 
-  async init(oid) {
+  async function init(oid: string) {
     try {
-      this.state.perusteenTyoryhma = (await Ulkopuoliset.getOrganisaatioRyhmatByOid(oid)).data as any;
+      perusteenTyoryhma.value = (await Ulkopuoliset.getOrganisaatioRyhmatByOid(oid)).data as any;
     }
     catch (e) {
-      this.state.perusteenTyoryhma = [];
+      perusteenTyoryhma.value = [];
     }
 
     try {
-      this.state.tyoryhmanVirkailiijat = (await Ulkopuoliset.getOrganisaatioVirkailijat(oid)).data as any;
+      tyoryhmanVirkailiijat.value = (await Ulkopuoliset.getOrganisaatioVirkailijat(oid)).data as any;
     }
     catch (e) {
-      this.state.tyoryhmanVirkailiijat = [];
+      tyoryhmanVirkailiijat.value = [];
     }
   }
-}
+
+  return {
+    // State
+    perusteenTyoryhma,
+    tyoryhmanVirkailiijat,
+    // Getters
+    getPerusteenTyoryhma,
+    getTyoryhmanVirkailiijat,
+    // Actions
+    clear,
+    init,
+  };
+});

@@ -61,95 +61,75 @@
   </ep-collapse>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed } from 'vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpDraggableCollapse from '@shared/components/EpDraggableCollapse/EpDraggableCollapse.vue';
-import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
-import draggable from 'vuedraggable';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpDraggableCollapse,
-    draggable,
-    EpCollapse,
-    EpInput,
-    EpButton,
-    EpContent,
+const props = defineProps<{
+  modelValue: any;
+  sisaltoTekstiOtsikkoField?: string;
+  isEditing?: boolean;
+  sisaltoAvaimet: string[];
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const model = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpSisaltoTekstikappaleet extends Vue {
-  @Prop({ required: true })
-  value!: any;
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: false, default: 'otsikko' })
-  sisaltoTekstiOtsikkoField!: any;
+const sisaltoTekstiAvaimet = computed(() => {
+  return _.filter(props.sisaltoAvaimet, avain => !!_.get(model.value, avain));
+});
 
-  @Prop({ required: false, default: false })
-  isEditing!: boolean;
+const poistaSisaltoteksti = (avain: string) => {
+  model.value = {
+    ...model.value,
+    [avain]: null,
+  };
+};
 
-  @Prop({ required: true })
-  sisaltoAvaimet!: string[];
+const poistaTeksti = (poistettavaTeksti: any) => {
+  model.value = {
+    ...model.value,
+    vapaatTekstit: _.filter(model.value.vapaatTekstit, teksti => teksti !== poistettavaTeksti),
+  };
+};
 
-  get model() {
-    return this.value;
-  }
+const lisaaTekstikappale = () => {
+  model.value = {
+    ...model.value,
+    vapaatTekstit: [
+      ...model.value.vapaatTekstit,
+      {},
+    ],
+  };
+};
 
-  set model(val) {
-    this.$emit('input', val);
-  }
+const vapaatTekstit = computed(() => {
+  return model.value.vapaatTekstit || [];
+});
 
-  get sisaltoTekstiAvaimet() {
-    return _.filter(this.sisaltoAvaimet, avain => !!_.get(this.model, avain));
-  }
+const borderBottom = computed(() => {
+  return (!props.isEditing && (sisaltoTekstiAvaimet.value.length > 0 || model.value.vapaatTekstit?.length > 0)) || (props.isEditing && (sisaltoTekstiAvaimet.value.length === 0 && model.value.vapaatTekstit?.length === 0));
+});
 
-  poistaSisaltoteksti(avain) {
-    this.model = {
-      ...this.model,
-      [avain]: null,
-    };
-  }
-
-  poistaTeksti(poistettavaTeksti) {
-    this.model = {
-      ...this.model,
-      vapaatTekstit: _.filter(this.model.vapaatTekstit, teksti => teksti !== poistettavaTeksti),
-    };
-  }
-
-  lisaaTekstikappale() {
-    this.model = {
-      ...this.model,
-      vapaatTekstit: [
-        ...this.model.vapaatTekstit,
-        {},
-      ],
-    };
-  }
-
-  get vapaatTekstit() {
-    return this.model.vapaatTekstit || [];
-  }
-
-  get borderBottom() {
-    return (!this.isEditing && (this.sisaltoTekstiAvaimet.length > 0 || this.model.vapaatTekstit?.length > 0)) || (this.isEditing && (this.sisaltoTekstiAvaimet.length === 0 && this.model.vapaatTekstit?.length === 0));
-  }
-
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
-}
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-  .collapsable ::v-deep .ep-collapse {
+  .collapsable :deep(.ep-collapse) {
     padding: 0 !important;
   }
 

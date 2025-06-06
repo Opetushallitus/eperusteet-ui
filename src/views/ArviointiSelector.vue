@@ -28,61 +28,50 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+<script setup lang="ts">
+import { ref, computed, watch, useTemplateRef } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import EpInput from '@shared/components/forms/EpInput.vue';
 import EpExpandText from '@shared/components/EpExpandText/EpExpandText.vue';
 
-@Component({
-  components: {
-    EpButton,
-    EpInput,
-    EpMainView,
-    EpSpinner,
-    EpExpandText,
-  },
-})
-export default class GeneerinenArviointi extends Vue {
-  @Prop({ default: null })
-  value!: number | null;
+const props = defineProps<{
+  modelValue: number | null;
+  arviointiStore: ArviointiStore;
+}>();
 
-  @Prop({ required: true })
-  arviointiStore!: ArviointiStore;
+const emit = defineEmits<{
+  'update:modelValue': [value: number | null];
+}>();
 
-  private model: number | null = null;
+const modal = useTemplateRef('modal');
+const model = ref<number | null>(null);
 
-  @Watch('value', { immediate: true })
-  onValueChange(value: number | null) {
-    this.model = value;
-  }
+watch(() => props.modelValue, (value: number | null) => {
+  model.value = value;
+}, { immediate: true });
 
-  get asteikot() {
-    return this.arviointiStore.arviointiasteikot.value;
-  }
+const asteikot = computed(() => {
+  return props.arviointiStore.arviointiasteikot.value;
+});
 
-  onInput(value: number | null) {
-    this.model = value;
-  }
+const onInput = (value: number | null) => {
+  model.value = value;
+};
 
-  onOk() {
-    this.$emit('input', this.model);
-    this.model = null;
-    (this.$refs.modal as any).hide();
-  }
+const onOk = () => {
+  emit('update:modelValue', model.value);
+  model.value = null;
+  (modal.value as any)?.hide();
+};
 
-  onClose() {
-    this.model = null;
-    (this.$refs.modal as any).hide();
-  }
+const onClose = () => {
+  model.value = null;
+  (modal.value as any)?.hide();
+};
 
-  onOpen() {
-    (this.$refs.modal as any).show();
-  }
-}
+const onOpen = () => {
+  (modal.value as any)?.show();
+};
 </script>
 
 <style lang="scss" scoped>

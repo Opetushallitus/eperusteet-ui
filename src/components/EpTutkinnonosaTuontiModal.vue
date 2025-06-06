@@ -120,9 +120,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import _ from 'lodash';
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+import { ref, computed, watch, useTemplateRef, getCurrentInstance } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -132,209 +132,206 @@ import { TutkinnonosatTuontiStore } from '@/stores/TutkinnonosatTuontiStore';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { PerusteDto, TutkinnonOsaViiteKontekstiDto } from '@shared/generated/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna, $sd, $success, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpSpinner,
-    EpSearch,
-    EpMultiSelect,
-    EpToggle,
-    EpMaterialIcon,
+const props = defineProps<{
+  peruste: PerusteDto;
+}>();
+
+const emit = defineEmits(['refresh']);
+
+const instance = getCurrentInstance();
+const $bvModal = (instance?.proxy?.$root as any)?.$bvModal;
+
+const tutkinnonosaTuontiModal = useTemplateRef('tutkinnonosaTuontiModal');
+
+const tutkinnonosatTuontiStore = ref<TutkinnonosatTuontiStore | null>(null);
+const perusteQuery = ref('');
+const tutkinnonosaQuery = ref({} as any);
+const sivu = ref(-1);
+const sisaltoSivuKoko = ref(10);
+const selectedTutkinnonosat = ref<TutkinnonOsaViiteKontekstiDto[]>([]);
+const valitutMuokattavaksiTutkinnonosat = ref<TutkinnonOsaViiteKontekstiDto[]>([]);
+
+const defaults = () => {
+  tutkinnonosatTuontiStore.value = new TutkinnonosatTuontiStore(props.peruste);
+  tutkinnonosaQuery.value = {
+    sivukoko: sisaltoSivuKoko.value,
+    nimi: '',
+    peruste: null,
+    vanhentuneet: false,
+  } as any;
+
+  page.value = 1;
+  selectedTutkinnonosat.value = [];
+  valitutMuokattavaksiTutkinnonosat.value = [];
+};
+
+const perusteet = computed(() => {
+  return tutkinnonosatTuontiStore.value?.perusteet.value?.data || null;
+});
+
+const perusteetLoading = computed(() => {
+  return !perusteet.value;
+});
+
+const tutkinnonosat = computed(() => {
+  return tutkinnonosatTuontiStore.value?.tutkinnonosat?.value?.data || null;
+});
+
+const tutkinnonosatWithSelected = computed(() => {
+  return _.map(tutkinnonosat.value, tutkinnonosa => {
+    return {
+      ...tutkinnonosa,
+      selected: _.includes(_.map(selectedTutkinnonosat.value, 'id'), _.get(tutkinnonosa, 'id')),
+    };
+  });
+});
+
+const tutkinnonosatWithSalliMuokattavaksi = computed(() => {
+  return _.map(selectedTutkinnonosat.value, tutkinnonosa => {
+    return {
+      ...tutkinnonosa,
+      kopioiMuokattavaksi: _.includes(_.map(valitutMuokattavaksiTutkinnonosat.value, 'id'), _.get(tutkinnonosa, 'id')),
+      alkuperainenPeruste: tutkinnonosa.peruste,
+    };
+  });
+});
+
+const tutkinnonosatPage = computed(() => {
+  return tutkinnonosatTuontiStore.value?.tutkinnonosat.value || null;
+});
+
+const totalRows = computed(() => {
+  return tutkinnonosatPage.value!.kokonaismäärä;
+});
+
+const page = computed({
+  get() {
+    return tutkinnonosatPage.value!.sivu + 1;
   },
-})
-export default class EpTutkinnonosaTuontiModal extends Vue {
-  @Prop({ required: true })
-  protected peruste!: PerusteDto;
+  set(value: number) {
+    sivu.value = value - 1;
+  },
+});
 
-  private tutkinnonosatTuontiStore: TutkinnonosatTuontiStore | null = null;
-  private perusteQuery = '';
-  private tutkinnonosaQuery = {} as any;
-  private sivu = -1;
-  private sisaltoSivuKoko = 10;
-  private selectedTutkinnonosat: TutkinnonOsaViiteKontekstiDto[] = [];
-  private valitutMuokattavaksiTutkinnonosat: TutkinnonOsaViiteKontekstiDto[] = [];
+const tutkinnonosatFields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+    sortable: false,
+    thStyle: { width: '40%' },
+  }, {
+    key: 'voimaantulo',
+    label: $t('voimaantulo'),
+    sortable: false,
+    formatter: (value: any, key: string, item: any) => {
+      return item.peruste.voimassaoloAlkaa ? $sd(item.peruste.voimassaoloAlkaa) : '';
+    },
+  }, {
+    key: 'laajuus',
+    label: $t('laajuus'),
+    sortable: false,
+  }, {
+    key: 'peruste',
+    label: $t('kaytossa'),
+    sortable: false,
+    formatter: (value: any, key: string, item: any) => {
+      return $kaanna(item.peruste.nimi);
+    },
+  }];
+});
 
-  defaults() {
-    this.tutkinnonosatTuontiStore = new TutkinnonosatTuontiStore(this.peruste);
-    this.tutkinnonosaQuery = {
-      sivukoko: this.sisaltoSivuKoko,
-      nimi: '',
-      peruste: null,
-      vanhentuneet: false,
-    } as any;
+const valittuFields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+    sortable: false,
+    formatter: (value: any, key: string, item: any) => {
+      return $kaanna(value);
+    },
+  }, {
+    key: 'salli-muokkaus',
+    label: $t('salli-muokkaus') + '?',
+    sortable: false,
+    thStyle: { width: '30%' },
+  }];
+});
 
-    this.page = 1;
-    this.selectedTutkinnonosat = [];
-    this.valitutMuokattavaksiTutkinnonosat = [];
+const show = async () => {
+  (tutkinnonosaTuontiModal.value as any).show();
+  defaults();
+};
+
+const queryFetch = async () => {
+  await tutkinnonosatTuontiStore.value!.fetchTutkinnonosat({ ...tutkinnonosaQuery.value, sivu: sivu.value, kieli: Kielet.getSisaltoKieli.value });
+};
+
+const save = async () => {
+  try {
+    await tutkinnonosatTuontiStore.value!.tuoSisaltoa(
+      _.map(tutkinnonosatWithSalliMuokattavaksi.value, tutkinnonosa =>
+        _.pick(tutkinnonosa, ['laajuus', 'nimi', 'suoritustapakoodi', 'tyyppi', '_tutkinnonOsa', 'kopioiMuokattavaksi', 'alkuperainenPeruste']) as any));
+
+    $success($t('tutkinnon-osat-tuotu-onnistuneesti') as string);
+    close();
+    emit('refresh');
   }
-
-  get perusteet() {
-    return this.tutkinnonosatTuontiStore?.perusteet.value?.data || null;
+  catch (e) {
+    $fail($t('tutkinnon-osien-tuonti-epaonnistui') as string);
   }
+};
 
-  get perusteetLoading() {
-    return !this.perusteet;
+const close = () => {
+  $bvModal.hide('tuotutkinnonosa');
+};
+
+const selectRow = (item: any) => {
+  if (_.includes(_.map(selectedTutkinnonosat.value, 'id'), item.id)) {
+    selectedTutkinnonosat.value = _.filter(selectedTutkinnonosat.value, tutkinnonosa => tutkinnonosa.id !== item.id);
   }
-
-  get tutkinnonosat() {
-    return this.tutkinnonosatTuontiStore?.tutkinnonosat?.value?.data || null;
+  else {
+    selectedTutkinnonosat.value = [
+      ...selectedTutkinnonosat.value,
+      item,
+    ];
   }
+};
 
-  get tutkinnonosatWithSelected() {
-    return _.map(this.tutkinnonosat, tutkinnonosa => {
-      return {
-        ...tutkinnonosa,
-        selected: _.includes(_.map(this.selectedTutkinnonosat, 'id'), _.get(tutkinnonosa, 'id')),
-      };
-    });
+const selectSalliMuokkausRow = (item: any) => {
+  if (_.includes(_.map(valitutMuokattavaksiTutkinnonosat.value, 'id'), item.id)) {
+    valitutMuokattavaksiTutkinnonosat.value = _.filter(valitutMuokattavaksiTutkinnonosat.value, tutkinnonosa => tutkinnonosa.id !== item.id);
   }
-
-  get tutkinnonosatWithSalliMuokattavaksi() {
-    return _.map(this.selectedTutkinnonosat, tutkinnonosa => {
-      return {
-        ...tutkinnonosa,
-        kopioiMuokattavaksi: _.includes(_.map(this.valitutMuokattavaksiTutkinnonosat, 'id'), _.get(tutkinnonosa, 'id')),
-        alkuperainenPeruste: tutkinnonosa.peruste,
-      };
-    });
+  else {
+    valitutMuokattavaksiTutkinnonosat.value = [
+      ...valitutMuokattavaksiTutkinnonosat.value,
+      item,
+    ];
   }
+};
 
-  get tutkinnonosatPage() {
-    return this.tutkinnonosatTuontiStore?.tutkinnonosat.value || null;
+const perusteSearch = async (search: string) => {
+  if (_.size(search) > 2) {
+    await tutkinnonosatTuontiStore.value!.fetchPerusteet(search);
   }
+};
 
-  async show() {
-    (this.$refs.tutkinnonosaTuontiModal as any).show();
-    this.defaults();
-  }
+watch(tutkinnonosaQuery, async () => {
+  sivu.value = 0;
+  await queryFetch();
+}, { deep: true });
 
-  @Watch('tutkinnonosaQuery', { deep: true })
-  async onQueryChange() {
-    this.sivu = 0;
-    await this.queryFetch();
-  }
+watch(sivu, async () => {
+  await queryFetch();
+});
 
-  @Watch('sivu')
-  async onPageChange() {
-    await this.queryFetch();
-  }
-
-  async queryFetch() {
-    await this.tutkinnonosatTuontiStore!.fetchTutkinnonosat({ ...this.tutkinnonosaQuery, sivu: this.sivu, kieli: Kielet.getSisaltoKieli.value });
-  }
-
-  get totalRows() {
-    return this.tutkinnonosatPage!.kokonaismäärä;
-  }
-
-  get page() {
-    return this.tutkinnonosatPage!.sivu + 1;
-  }
-
-  set page(value: number) {
-    this.sivu = value - 1;
-  }
-
-  async save() {
-    try {
-      await this.tutkinnonosatTuontiStore!.tuoSisaltoa(
-        _.map(this.tutkinnonosatWithSalliMuokattavaksi, tutkinnonosa =>
-          _.pick(tutkinnonosa, ['laajuus', 'nimi', 'suoritustapakoodi', 'tyyppi', '_tutkinnonOsa', 'kopioiMuokattavaksi', 'alkuperainenPeruste']) as any));
-
-      this.$success(this.$t('tutkinnon-osat-tuotu-onnistuneesti') as string);
-      this.close();
-      this.$emit('refresh');
-    }
-    catch (e) {
-      this.$fail(this.$t('tutkinnon-osien-tuonti-epaonnistui') as string);
-    }
-  }
-
-  close() {
-    (this as any).$bvModal.hide('tuotutkinnonosa');
-  }
-
-  selectRow(item) {
-    if (_.includes(_.map(this.selectedTutkinnonosat, 'id'), item.id)) {
-      this.selectedTutkinnonosat = _.filter(this.selectedTutkinnonosat, tutkinnonosa => tutkinnonosa.id !== item.id);
-    }
-    else {
-      this.selectedTutkinnonosat = [
-        ...this.selectedTutkinnonosat,
-        item,
-      ];
-    }
-  }
-
-  selectSalliMuokkausRow(item) {
-    if (_.includes(_.map(this.valitutMuokattavaksiTutkinnonosat, 'id'), item.id)) {
-      this.valitutMuokattavaksiTutkinnonosat = _.filter(this.valitutMuokattavaksiTutkinnonosat, tutkinnonosa => tutkinnonosa.id !== item.id);
-    }
-    else {
-      this.valitutMuokattavaksiTutkinnonosat = [
-        ...this.valitutMuokattavaksiTutkinnonosat,
-        item,
-      ];
-    }
-  }
-
-  get tutkinnonosatFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-      sortable: false,
-      thStyle: { width: '40%' },
-    }, {
-      key: 'voimaantulo',
-      label: this.$t('voimaantulo'),
-      sortable: false,
-      formatter: (value: any, key: string, item: any) => {
-        return item.peruste.voimassaoloAlkaa ? this.$sd(item.peruste.voimassaoloAlkaa) : '';
-      },
-    }, {
-      key: 'laajuus',
-      label: this.$t('laajuus'),
-      sortable: false,
-    }, {
-      key: 'peruste',
-      label: this.$t('kaytossa'),
-      sortable: false,
-      formatter: (value: any, key: string, item: any) => {
-        return this.$kaanna(item.peruste.nimi);
-      },
-    }];
-  }
-
-  get valittuFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-      sortable: false,
-      formatter: (value: any, key: string, item: any) => {
-        return this.$kaanna(value);
-      },
-    }, {
-      key: 'salli-muokkaus',
-      label: this.$t('salli-muokkaus') + '?',
-      sortable: false,
-      thStyle: { width: '30%' },
-    }];
-  }
-
-  async perusteSearch(search) {
-    if (_.size(search) > 2) {
-      await this.tutkinnonosatTuontiStore!.fetchPerusteet(search);
-    }
-  }
-}
-
+defineExpose({ show });
 </script>
 
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
 
-  ::v-deep .filter {
+  :deep(.filter) {
     max-width: 100%;
   }
 

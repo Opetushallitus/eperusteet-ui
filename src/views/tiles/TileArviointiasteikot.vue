@@ -9,17 +9,6 @@
 </EpHomeTile>
 </template>
 
-<script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+<script setup lang="ts">
 import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-
-@Component({
-  components: {
-    EpHomeTile,
-    EpSpinner,
-  },
-})
-export default class TileArviointiasteikot extends Vue {
-}
 </script>

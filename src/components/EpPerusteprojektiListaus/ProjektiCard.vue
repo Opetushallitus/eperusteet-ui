@@ -8,56 +8,49 @@
     <div class="flex-grow-1 mainslot h-100">
       <slot />
     </div>
-    <div class="flex-shrink-1 lower d-flex align-items-center justify-content-center text-center" v-if="$slots.lower">
+    <div class="flex-shrink-1 lower d-flex align-items-center justify-content-center text-center" v-if="hasLowerSlot">
       <slot name="lower"></slot>
     </div>
   </router-link>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, useSlots } from 'vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import * as _ from 'lodash';
+import { hasSlotContent } from '@shared/utils/vue-utils';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
-@Component({
-  components: {
-    EpColorIndicator,
-  },
-})
-export default class ProjektiCard extends Vue {
-  @Prop({ default: false })
-  fullBackground!: boolean;
+const props = defineProps<{
+  fullBackground?: boolean;
+  koulutustyyppi?: string;
+  link?: any;
+  tileImage?: any;
+  eiTuetutKoulutustyypit?: string[];
+}>();
 
-  @Prop()
-  koulutustyyppi!: string;
+const slots = useSlots();
 
-  @Prop()
-  link!: any;
+const style = computed(() => {
+  return {
+    'background-repeat': 'no-repeat',
+    ...props.tileImage,
+  };
+});
 
-  @Prop({ required: false })
-  tileImage!: any;
+const hasLowerSlot = computed(() => {
+  return hasSlotContent(slots.lower);
+});
 
-  @Prop({ required: false, default: () => [] })
-  eiTuetutKoulutustyypit!: string[];
-
-  get style() {
-    return {
-      'background-repeat': 'no-repeat',
-      ...this.tileImage,
-    };
+const classes = computed(() => {
+  if (props.fullBackground) {
+    return 'project-card full-color h-100';
   }
-
-  get classes() {
-    if (this.fullBackground) {
-      return 'project-card full-color h-100';
-    }
-    else {
-      return 'project-card d-flex flex-column h-100 ' + (_.includes(this.eiTuetutKoulutustyypit, (this.koulutustyyppi)) ? 'not-supported' : '');
-    }
+  else {
+    return 'project-card d-flex flex-column h-100 ' + (_.includes(props.eiTuetutKoulutustyypit, (props.koulutustyyppi)) ? 'not-supported' : '');
   }
-}
+});
 </script>
 
 <style lang="scss" scoped>

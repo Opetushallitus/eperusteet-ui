@@ -1,23 +1,23 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
-import { Page } from '@shared/tyypit';
-import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
-import { Debounced } from '@shared/utils/delay';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { Ulkopuoliset } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
-Vue.use(VueCompositionApi);
+export const useUlkopuolisetStore = defineStore('ulkopuoliset', () => {
+  // State
+  const tyoryhmat = ref<any[] | null>(null);
 
-export class UlkopuolisetStore {
-  public state = reactive({
-    tyoryhmat: null as any[] | null,
-  });
-
-  public readonly tyoryhmat = computed(() => this.state.tyoryhmat);
-
-  @Debounced(100)
-  public async fetchTyoryhmat() {
+  // Actions
+  const fetchTyoryhmat = _.debounce(async () => {
     const res = await Ulkopuoliset.getOrganisaatioRyhmat();
-    this.state.tyoryhmat = res.data as any;
-  }
-}
+    tyoryhmat.value = res.data as any;
+  }, 100);
+
+  return {
+    // State
+    tyoryhmat,
+
+    // Actions
+    fetchTyoryhmat,
+  };
+});

@@ -1,32 +1,43 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-import { Maintenance, PerusteDto, Perusteet, PerusteKevytDto, YllapitoDto } from '@shared/api/eperusteet';
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import { Maintenance, PerusteKevytDto, Perusteet, YllapitoDto } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
-Vue.use(VueCompositionApi);
+export const useYllapitoStore = defineStore('yllapis', () => {
+  // State
+  const julkisivunPerusteet = ref<PerusteKevytDto[] | null>(null);
 
-export class YllapitoStore {
-  private state = reactive({
-    julkisivunPerusteet: null as PerusteKevytDto[] | null,
-  });
+  // Getters
+  const getJulkisivunPerusteet = computed(() => julkisivunPerusteet.value);
 
-  public readonly julkisivunPerusteet = computed(() => this.state.julkisivunPerusteet);
-
-  public async fetchJulkisivunPerusteet() {
-    this.state.julkisivunPerusteet = null;
-    this.state.julkisivunPerusteet = (await Perusteet.getJulkaistutKoostePerusteet()).data;
+  // Actions
+  async function fetchJulkisivunPerusteet() {
+    julkisivunPerusteet.value = null;
+    julkisivunPerusteet.value = (await Perusteet.getJulkaistutKoostePerusteet()).data;
   }
 
-  public async tallennaJulkisivunPerusteet(perusteet: PerusteKevytDto[]) {
+  async function tallennaJulkisivunPerusteet(perusteet: PerusteKevytDto[]) {
     await Perusteet.updateJulkaistutKoostePerusteet(perusteet);
-    this.state.julkisivunPerusteet = perusteet;
+    julkisivunPerusteet.value = perusteet;
   }
 
-  public async fetch() {
+  async function fetch() {
     return _.sortBy((await Maintenance.getYllapidot()).data, 'key');
   }
 
-  public async save(data: YllapitoDto[]) {
+  async function save(data: YllapitoDto[]) {
     await Maintenance.updateYllapito(data);
   }
-}
+
+  return {
+    // State
+    julkisivunPerusteet,
+    // Getters
+    getJulkisivunPerusteet,
+    // Actions
+    fetchJulkisivunPerusteet,
+    tallennaJulkisivunPerusteet,
+    fetch,
+    save,
+  };
+});

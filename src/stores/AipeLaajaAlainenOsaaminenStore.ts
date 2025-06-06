@@ -1,52 +1,88 @@
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
-import { PerusteStore } from './PerusteStore';
+import { usePerusteStore } from './PerusteStore';
+import { useRouter } from 'vue-router';
 
-export class AipeLaajaAlainenOsaaminenStore implements IEditoitava {
-  constructor(
-    private perusteId: number,
-    private laoId: number | null,
-    private perusteStore: PerusteStore,
-    private el: any,
-  ) {
+export const useAipeLaajaAlainenOsaaminenStore = defineStore('aipeLaajaAlainenOsaaminen', () => {
+  // State
+  const perusteId = ref<number | null>(null);
+  const laoId = ref<number | null>(null);
+  const router = useRouter();
+
+  // Actions
+  function initialize(perusteIdParam: number, laoIdParam: number | null) {
+    perusteId.value = perusteIdParam;
+    laoId.value = laoIdParam;
   }
 
-  async acquire() {
+  async function acquire() {
     return null;
   }
 
-  async editAfterLoad() {
-    return !this.laoId;
+  async function editAfterLoad() {
+    return !laoId.value;
   }
 
-  async load() {
-    if (this.laoId) {
-      return (await Aipeopetuksensisalto.getAipeOsaaminen(this.perusteId, this.laoId)).data;
+  async function load() {
+    if (laoId.value) {
+      return (await Aipeopetuksensisalto.getAipeOsaaminen(perusteId.value!, laoId.value)).data;
     }
 
     return {};
   }
 
-  async save(data: any) {
-    if (this.laoId) {
-      await Aipeopetuksensisalto.updateAipeOsaaminen(this.perusteId, this.laoId, data);
-      await this.perusteStore.updateNavigation();
+  async function save(data: any) {
+    const perusteStore = usePerusteStore();
+
+    if (laoId.value) {
+      await Aipeopetuksensisalto.updateAipeOsaaminen(perusteId.value!, laoId.value, data);
+      await perusteStore.updateNavigation();
     }
     else {
-      const lao = (await Aipeopetuksensisalto.addAipeOsaaminen(this.perusteId, data)).data;
-      this.laoId = lao.id!;
-      await this.perusteStore.updateNavigation();
+      const lao = (await Aipeopetuksensisalto.addAipeOsaaminen(perusteId.value!, data)).data;
+      laoId.value = lao.id!;
+      await perusteStore.updateNavigation();
       await EditointiStore.cancelAll();
-      this.el.$router.push({ name: 'aipelaajaAlainenOsaaminen', params: { laoId: lao.id } });
+      router.push({ name: 'aipelaajaAlainenOsaaminen', params: { laoId: lao.id } });
     }
   }
 
-  public async remove() {
-    if (this.laoId) {
-      await Aipeopetuksensisalto.deleteAipeOsaaminen(this.perusteId, this.laoId);
-      await this.perusteStore.updateNavigation();
-      this.el.$router.push({ name: 'aipeLaajaAlaisetOsaamiset' });
+  async function remove() {
+    const perusteStore = usePerusteStore();
+
+    if (laoId.value) {
+      await Aipeopetuksensisalto.deleteAipeOsaaminen(perusteId.value!, laoId.value);
+      await perusteStore.updateNavigation();
+      router.push({ name: 'aipeLaajaAlaisetOsaamiset' });
     }
   }
-}
+
+  // Create an IEditoitava instance
+  const editoitava: IEditoitava = {
+    acquire,
+    editAfterLoad,
+    load,
+    save,
+    remove,
+  };
+
+  return {
+    // State
+    perusteId,
+    laoId,
+
+    // Actions
+    initialize,
+    acquire,
+    editAfterLoad,
+    load,
+    save,
+    remove,
+
+    // IEditoitava interface implementation
+    editoitava,
+  };
+});

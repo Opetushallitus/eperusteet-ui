@@ -5,32 +5,29 @@
 </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, onMounted, getCurrentInstance } from 'vue';
 import { Kayttajat } from '@/stores/kayttaja';
 import { delay } from '@shared/utils/delay';
 import EpNotification from '@shared/components/EpNotification/EpNotification.vue';
 import { Kielet } from '@shared/stores/kieli';
 import { getKaannokset } from '@shared/api/eperusteet';
 
-@Component({
-  components: {
-    EpNotification,
-  },
-})
-export default class App extends Vue {
-  private isInitializing = true;
-  public async mounted() {
-    const loader = (this as any).$loading.show({
-      color: '#2E5FD1',
-    });
-    await Kayttajat.init();
-    Kielet.load(await getKaannokset('eperusteet'));
-    await delay(500);
-    this.isInitializing = false;
-    loader.hide();
-  }
-}
+const isInitializing = ref(true);
+
+//fix loader
+//fix käännökset
+onMounted(async () => {
+  const instance = getCurrentInstance();
+  const loader = (instance?.proxy?.$root as any)?.$loading.show({
+    color: '#2E5FD1',
+  });
+  await Kayttajat.init();
+  Kielet.load(await getKaannokset('eperusteet'));
+  await delay(500);
+  isInitializing.value = false;
+  loader?.hide();
+});
 </script>
 
 <style lang="scss">

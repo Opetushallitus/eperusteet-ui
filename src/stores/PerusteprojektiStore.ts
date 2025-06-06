@@ -1,57 +1,63 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
-import { getAllPerusteetInternal, PerusteHakuInternalDto, PerusteprojektiLuontiDto, Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteet, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto, Maintenance, PerusteKevytDto } from '@shared/api/eperusteet';
-import { Page } from '@shared/tyypit';
-import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
-import { Debounced } from '@shared/utils/delay';
-import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import _ from 'lodash';
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
+import { Perusteet, Perusteprojektit, PerusteprojektiLuontiDto, PerusteKevytDto, Maintenance } from '@shared/api/eperusteet';
 
-Vue.use(VueCompositionApi);
+export const usePerusteprojektiStore = defineStore('perusteprojekti', () => {
+  // State
+  const pohjat = ref<PerusteKevytDto[] | null>(null);
+  const perusteet = ref<PerusteKevytDto[] | null>(null);
 
-export class PerusteprojektiStore {
-  public state = reactive({
-    pohjat: null as PerusteKevytDto[] | null,
-    perusteet: null as PerusteKevytDto[] | null,
-  });
-
-  public readonly perusteet = computed(() => this.state.perusteet);
-  public readonly pohjat = computed(() => this.state.pohjat);
-
-  public async fetchPohjat() {
-    this.state.pohjat = (await Perusteet.getPohjaperusteet('pohja')).data;
+  // Actions
+  async function fetchPohjat() {
+    pohjat.value = (await Perusteet.getPohjaperusteet('pohja')).data;
   }
 
-  public async fetchPohjaProjektit() {
-    this.state.perusteet = (await Perusteet.getPohjaperusteet('normaali')).data;
+  async function fetchPohjaProjektit() {
+    perusteet.value = (await Perusteet.getPohjaperusteet('normaali')).data;
   }
 
-  public async fetchPohjaDigitaalisetOsaamiset() {
-    this.state.perusteet = (await Perusteet.getPohjaperusteet('digitaalinen_osaaminen')).data;
+  async function fetchPohjaDigitaalisetOsaamiset() {
+    perusteet.value = (await Perusteet.getPohjaperusteet('digitaalinen_osaaminen')).data;
   }
 
-  public async addPerusteprojekti(luontiDto: PerusteprojektiLuontiDto) {
+  async function addPerusteprojekti(luontiDto: PerusteprojektiLuontiDto) {
     const res = await Perusteprojektit.addPerusteprojekti(luontiDto);
     return res.data;
   }
 
-  public async addPerusteprojektiPohja(luontiDto: PerusteprojektiLuontiDto) {
+  async function addPerusteprojektiPohja(luontiDto: PerusteprojektiLuontiDto) {
     const res = await Perusteprojektit.addPerusteprojektiPohja(luontiDto);
     return res.data;
   }
 
-  public async importPerusteprojekti(importDto: any) {
+  async function importPerusteprojekti(importDto: any) {
     const res = await Maintenance.tuoPeruste(importDto);
     return res.data;
   }
 
-  public async getPerusteprojekti(perusteProjektiId: number) {
+  async function getPerusteprojekti(perusteProjektiId: number) {
     const res = await Perusteprojektit.getPerusteprojekti(perusteProjektiId);
     return res.data;
   }
 
-  public async getPerusteprojektiTyoryhma(perusteProjektiId: number) {
+  async function getPerusteprojektiTyoryhma(perusteProjektiId: number) {
     const res = await Perusteprojektit.getPerusteprojektiTyoryhmat(perusteProjektiId);
     return res.data;
   }
-}
+
+  return {
+    // State
+    pohjat,
+    perusteet,
+
+    // Actions
+    fetchPohjat,
+    fetchPohjaProjektit,
+    fetchPohjaDigitaalisetOsaamiset,
+    addPerusteprojekti,
+    addPerusteprojektiPohja,
+    importPerusteprojekti,
+    getPerusteprojekti,
+    getPerusteprojektiTyoryhma,
+  };
+});

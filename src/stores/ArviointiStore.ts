@@ -1,90 +1,82 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
 import _ from 'lodash';
 
 import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
-import { KieliStore } from '@shared/stores/kieli';
-import { Debounced } from '@shared/utils/delay';
-import { fail, success } from '@shared/utils/notifications';
+import { Kielet } from '@shared/stores/kieli';
+import { $t, $success, $fail } from '@shared/utils/globals';
 
-Vue.use(VueCompositionApi);
 
-export class ArviointiStore {
-  constructor(
-    private kieliStore: KieliStore,
-  ) {
-  }
+export const useArviointiStore = defineStore('arviointi', () => {
+  // State
+  const arviointiasteikot = ref<ArviointiAsteikkoDto[] | null>(null);
+  const geneeriset = ref<GeneerinenArviointiasteikkoDto[] | null>(null);
+  const closed = ref<{ [id: number]: boolean }>({});
+  const filterStr = ref('');
 
-  public state = reactive({
-    arviointiasteikot: null as ArviointiAsteikkoDto[] | null,
-    geneeriset: null as GeneerinenArviointiasteikkoDto[] | null,
-    closed: {} as { [id: number]: boolean },
-    filterStr: '',
-  });
+  // Getters
+  const getArviointiasteikot = computed(() => arviointiasteikot.value);
+  const getGeneeriset = computed(() => geneeriset.value);
+  const getFilterStr = computed(() => filterStr.value);
+  const getClosed = computed(() => closed.value);
 
-  public readonly arviointiasteikot = computed(() => this.state.arviointiasteikot);
-  public readonly geneeriset = computed(() => this.state.geneeriset);
-  public readonly filterStr = computed(() => this.state.filterStr);
-  public readonly closed = computed(() => this.state.closed);
+  const allClosed = computed(() =>
+    _.size(geneeriset.value) === _.size(closed.value) && _.every(closed.value));
 
-  public readonly allClosed = computed(() =>
-    _.size(this.state.geneeriset) === _.size(this.state.closed) && _.every(this.state.closed));
+  const geneerisetSorted = computed(() =>
+    _.reverse(_.sortBy(geneeriset.value, 'id')));
 
-  public readonly geneerisetSorted = computed(() =>
-    _.reverse(_.sortBy(this.state.geneeriset, 'id')));
-
-  public readonly geneerisetFiltered = computed(() => {
-    if (this.state.filterStr) {
-      return _.filter(this.geneerisetSorted.value, this.kieliStore.filterBy('nimi', this.state.filterStr));
+  const geneerisetFiltered = computed(() => {
+    if (filterStr.value) {
+      return _.filter(geneerisetSorted.value, Kielet.filterBy('nimi', filterStr.value));
     }
     else {
-      return this.geneerisetSorted.value;
+      return geneerisetSorted.value;
     }
   });
 
-  public async fetchArviointiasteikot() {
-    this.state.arviointiasteikot = null;
+  // Actions
+  async function fetchArviointiasteikot() {
+    arviointiasteikot.value = null;
     const res = await Arviointiasteikot.getAll();
-    this.state.arviointiasteikot = res.data;
+    arviointiasteikot.value = res.data;
   }
 
-  public async updateArviointiasteikot(data: ArviointiAsteikkoDto[]) {
+  async function updateArviointiasteikot(data: ArviointiAsteikkoDto[]) {
     await Arviointiasteikot.updateArviointiasteikot(data);
   }
 
-  public async fetchGeneeriset() {
-    this.state.geneeriset = null;
+  async function fetchGeneeriset() {
+    geneeriset.value = null;
     const res = await GeneerinenArviointiasteikko.getAllGeneerisetArviointiasteikot();
-    this.state.geneeriset = res.data;
+    geneeriset.value = res.data;
   }
 
-  public async toggleAll() {
-    const val = !this.allClosed.value;
-    _.forEach(this.geneeriset.value, value => {
-      Vue.set(this.state.closed, value.id!, val);
+  async function toggleAll() {
+    const val = !allClosed.value;
+    _.forEach(geneeriset.value, value => {
+      closed.value[value.id!] = val;
     });
   }
 
-  @Debounced(300)
-  public async filterGeneeriset(value: string) {
-    this.state.filterStr = value;
-  }
+  const filterGeneeriset = _.debounce(async (value: string) => {
+    filterStr.value = value;
+  }, 300);
 
-  public async toggleOpen(value: GeneerinenArviointiasteikkoDto, state?: boolean) {
+  async function toggleOpen(value: GeneerinenArviointiasteikkoDto, state?: boolean) {
     if (!value.id) {
       return;
     }
 
     if (state !== undefined) {
-      Vue.set(this.state.closed, value.id, !!state);
+      closed.value[value.id] = !!state;
     }
     else {
-      Vue.set(this.state.closed, value.id, !this.state.closed[value.id]);
+      closed.value[value.id] = !closed.value[value.id];
     }
   }
 
-  public async add(value: GeneerinenArviointiasteikkoDto) {
+  async function add(value: GeneerinenArviointiasteikkoDto) {
     try {
       const res = await GeneerinenArviointiasteikko.addGeneerinenArviointiasteikko(value);
       res.data.osaamistasonKriteerit = _.map(res.data.osaamistasonKriteerit, osaamiskriteeri => {
@@ -93,51 +85,84 @@ export class ArviointiStore {
           kriteerit: [{}],
         };
       });
-      this.state.geneeriset = [...(this.state.geneeriset || []), res.data];
-      success('tallennettu');
+      geneeriset.value = [...(geneeriset.value || []), res.data];
+      $success('tallennettu');
       return res.data;
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail('virhe-palvelu-virhe');
     }
   }
 
-  public async save(value: GeneerinenArviointiasteikkoDto) {
+  async function save(value: GeneerinenArviointiasteikkoDto) {
     try {
       const res = await GeneerinenArviointiasteikko.updateGeneerinenArviontiasteikko(value.id!, value);
-      const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      Vue.set(this.state.geneeriset!, idx, res.data);
-      success('tallennettu');
+      const idx = _.findIndex(geneeriset.value, g => g.id === value.id);
+      if (geneeriset.value && idx !== -1) {
+        geneeriset.value[idx] = res.data;
+      }
+      $success('tallennettu');
     }
     catch (err) {
-      fail('tallennus-epaonnistui');
+      $fail('tallennus-epaonnistui');
     }
   }
 
-  public async publish(value: GeneerinenArviointiasteikkoDto, julkaistu: boolean) {
+  async function publish(value: GeneerinenArviointiasteikkoDto, julkaistu: boolean) {
     try {
       const res = await GeneerinenArviointiasteikko.updateGeneerinenArviontiasteikko(value.id!, {
         ...value,
         julkaistu,
       });
-      const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      Vue.set(this.state.geneeriset!, idx, res.data);
-      success('geneerinen-arviointi-julkaistu');
+      const idx = _.findIndex(geneeriset.value, g => g.id === value.id);
+      if (geneeriset.value && idx !== -1) {
+        geneeriset.value[idx] = res.data;
+      }
+      $success('geneerinen-arviointi-julkaistu');
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail('virhe-palvelu-virhe');
     }
   }
 
-  public async remove(value: GeneerinenArviointiasteikkoDto) {
+  async function remove(value: GeneerinenArviointiasteikkoDto) {
     try {
       await GeneerinenArviointiasteikko.removeGeneerinenArviontiasteikko(value.id!);
-      const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      Vue.delete(this.state.geneeriset!, idx);
-      success('geneerinen-arviointi-poistettu');
+      const idx = _.findIndex(geneeriset.value, g => g.id === value.id);
+      if (geneeriset.value && idx !== -1) {
+        geneeriset.value.splice(idx, 1);
+      }
+      $success('geneerinen-arviointi-poistettu');
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail('virhe-palvelu-virhe');
     }
   }
-}
+
+  return {
+    // State
+    arviointiasteikot,
+    geneeriset,
+    closed,
+    filterStr,
+    // Getters
+    getArviointiasteikot,
+    getGeneeriset,
+    getFilterStr,
+    getClosed,
+    allClosed,
+    geneerisetSorted,
+    geneerisetFiltered,
+    // Actions
+    fetchArviointiasteikot,
+    updateArviointiasteikot,
+    fetchGeneeriset,
+    toggleAll,
+    filterGeneeriset,
+    toggleOpen,
+    add,
+    save,
+    publish,
+    remove,
+  };
+});

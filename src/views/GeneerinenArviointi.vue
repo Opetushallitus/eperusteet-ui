@@ -76,9 +76,8 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
+<script setup lang="ts">
+import { ref, computed, watch, getCurrentInstance } from 'vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpBulletEditor from '@/components/EpBulletEditor/EpBulletEditor.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -89,175 +88,159 @@ import * as _ from 'lodash';
 import { KayttajaStore } from '@/stores/kayttaja';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
-@Component({
-  components: {
-    EpBulletEditor,
-    EpButton,
-    EpInput,
-    EpMainView,
-    EpSpinner,
-    EpMaterialIcon,
-  },
-})
-export default class GeneerinenArviointi extends Vue {
-  @Prop({ required: true })
-  private value!: GeneerinenArviointiasteikkoDto;
+const props = defineProps<{
+  value: GeneerinenArviointiasteikkoDto;
+  arviointiStore: ArviointiStore;
+  kayttajaStore: KayttajaStore;
+  editing?: boolean;
+}>();
 
-  @Prop({ required: true })
-  private arviointiStore!: ArviointiStore;
+const instance = getCurrentInstance();
+const $bvModal = (instance?.proxy?.$root as any)?.$bvModal;
 
-  @Prop({ required: true })
-  private kayttajaStore!: KayttajaStore;
+const isEditing = ref(false);
+const inner = ref<GeneerinenArviointiasteikkoDto | null>(null);
+const isLoading = ref(false);
 
-  @Prop({ required: false, default: false })
-  private editing!: boolean;
+watch(() => props.editing, (value) => {
+  isEditing.value = value ?? false;
+}, { immediate: true });
 
-  private isEditing = false;
-  private inner: GeneerinenArviointiasteikkoDto | null = null;
-  private isLoading = false;
+watch(() => props.value, (value) => {
+  inner.value = value;
+}, { immediate: true });
 
-  @Watch('editing', { immediate: true })
-  onEditingChange(value) {
-    this.isEditing = value;
-  }
+const asteikot = computed(() => {
+  return props.arviointiStore.arviointiasteikot.value;
+});
 
-  @Watch('value', { immediate: true })
-  onValueChange(value) {
-    this.inner = value;
-  }
-
-  get asteikot() {
-    return this.arviointiStore.arviointiasteikot.value;
-  }
-
-  get osaamistasot() {
-    if (!this.asteikot) {
-      return null;
-    }
-    const asteikko = _.find(this.asteikot, asteikko => asteikko.id === _.parseInt((this.value as any)._arviointiAsteikko));
-    if (asteikko) {
-      return _.map(asteikko.osaamistasot, ot => ({
-        ...ot,
-        kriteerit: _.find(this.value.osaamistasonKriteerit,
-          k => '' + (k as any)._osaamistaso === '' + ot.id)?.kriteerit || [],
-      }));
-    }
+const osaamistasot = computed(() => {
+  if (!asteikot.value) {
     return null;
   }
-
-  get fields() {
-    return [{
-      key: 'osaamistaso',
-      label: this.$t('osaamistaso') as string,
-      sortable: false,
-    }, {
-      key: 'kriteerit',
-      label: this.$t('kriteerit') as string,
-      sortable: false,
-    }];
+  const asteikko = _.find(asteikot.value, asteikko => asteikko.id === _.parseInt((props.value as any)._arviointiAsteikko));
+  if (asteikko) {
+    return _.map(asteikko.osaamistasot, ot => ({
+      ...ot,
+      kriteerit: _.find(props.value.osaamistasonKriteerit,
+        k => '' + (k as any)._osaamistaso === '' + ot.id)?.kriteerit || [],
+    }));
   }
+  return null;
+});
 
-  get isOpen() {
-    return !this.value.id || this.arviointiStore.closed.value[this.value.id] !== true;
-  }
+const fields = computed(() => {
+  return [{
+    key: 'osaamistaso',
+    label: instance?.proxy?.$t('osaamistaso') as string,
+    sortable: false,
+  }, {
+    key: 'kriteerit',
+    label: instance?.proxy?.$t('kriteerit') as string,
+    sortable: false,
+  }];
+});
 
-  toggleOpen() {
-    this.arviointiStore.toggleOpen(this.value);
-  }
+const isOpen = computed(() => {
+  return !props.value.id || props.arviointiStore.closed.value[props.value.id] !== true;
+});
 
-  onEdit() {
-    this.isEditing = true;
-  }
+const kayttajaIsAdmin = computed(() => {
+  return props.kayttajaStore.isAdmin.value;
+});
 
-  async onSave() {
-    try {
-      this.inner!.osaamistasonKriteerit = _.map(this.inner!.osaamistasonKriteerit, osaamiskriteeri => {
-        return {
-          ...osaamiskriteeri,
-          kriteerit: _.reject(osaamiskriteeri.kriteerit, _.isEmpty),
-        };
-      });
+const kriteeriton = computed(() => {
+  return osaamistasot.value?.length === 1
+    && _.chain(osaamistasot.value)
+      .map('kriteerit')
+      .flatten()
+      .isEmpty()
+      .value();
+});
 
-      this.isLoading = true;
-      await this.arviointiStore.save(this.inner!);
-    }
-    finally {
-      await this.arviointiStore.fetchGeneeriset();
-      this.isEditing = false;
-      this.isLoading = false;
-    }
-  }
+const osaamistaso = computed(() => {
+  return _.get(_.first(osaamistasot.value), 'otsikko');
+});
 
-  async onPublish() {
-    await this.$bvModal.msgBoxConfirm(
-      this.$t('julkaistaanko-geneerinen-arviointi-kuvaus') as any, {
-        title: this.$t('julkaistaanko-geneerinen-arviointi') as any,
-        okTitle: this.$t('julkaise') as any,
-        cancelTitle: this.$t('peruuta') as any,
-        size: 'lg',
-      });
-    this.isEditing = false;
-    await this.arviointiStore.publish(this.inner!, true);
-  }
+const toggleOpen = () => {
+  props.arviointiStore.toggleOpen(props.value);
+};
 
-  async onUnPublish() {
-    await this.$bvModal.msgBoxConfirm(
-      ' ' as any, {
-        title: this.$t('palautetaanko-geneerinen-arviointi-keskeneraiseksi') as any,
-        okTitle: this.$t('palauta') as any,
-        cancelTitle: this.$t('peruuta') as any,
-        size: 'lg',
-      });
-    this.isEditing = false;
-    await this.arviointiStore.publish(this.inner!, false);
-  }
+const onEdit = () => {
+  isEditing.value = true;
+};
 
-  async onRemove() {
-    const poisto = await this.$bvModal.msgBoxConfirm(
-      this.$t('poistetaanko-geneerinen-arviointi-kuvaus') as any, {
-        title: this.$t('vahvista-poisto') as any,
-        okTitle: this.$t('poista') as any,
-        cancelTitle: this.$t('peruuta') as any,
-        size: 'md',
-      });
-
-    if (poisto) {
-      await this.arviointiStore.remove(this.inner!);
-    }
-  }
-
-  async onCopy() {
-    await this.$bvModal.msgBoxConfirm(
-      this.$t('kopioi-geneerinen-arviointi-kuvaus') as any, {
-        title: this.$t('kopioi-geneerinen-arviointi') as any,
-        okTitle: this.$t('kopioi') as any,
-        cancelTitle: this.$t('peruuta') as any,
-        size: 'lg',
-      });
-    await this.arviointiStore.add({
-      ...this.inner!,
-      julkaistu: false,
-      id: undefined,
+const onSave = async () => {
+  try {
+    inner.value!.osaamistasonKriteerit = _.map(inner.value!.osaamistasonKriteerit, osaamiskriteeri => {
+      return {
+        ...osaamiskriteeri,
+        kriteerit: _.reject(osaamiskriteeri.kriteerit, _.isEmpty),
+      };
     });
-  }
 
-  get kayttajaIsAdmin() {
-    return this.kayttajaStore.isAdmin.value;
+    isLoading.value = true;
+    await props.arviointiStore.save(inner.value!);
   }
+  finally {
+    await props.arviointiStore.fetchGeneeriset();
+    isEditing.value = false;
+    isLoading.value = false;
+  }
+};
 
-  get kriteeriton() {
-    return this.osaamistasot?.length === 1
-      && _.chain(this.osaamistasot)
-        .map('kriteerit')
-        .flatten()
-        .isEmpty()
-        .value();
-  }
+const onPublish = async () => {
+  await $bvModal?.msgBoxConfirm(
+    instance?.proxy?.$t('julkaistaanko-geneerinen-arviointi-kuvaus') as any, {
+      title: instance?.proxy?.$t('julkaistaanko-geneerinen-arviointi') as any,
+      okTitle: instance?.proxy?.$t('julkaise') as any,
+      cancelTitle: instance?.proxy?.$t('peruuta') as any,
+      size: 'lg',
+    });
+  isEditing.value = false;
+  await props.arviointiStore.publish(inner.value!, true);
+};
 
-  get osaamistaso() {
-    return _.get(_.first(this.osaamistasot), 'otsikko');
+const onUnPublish = async () => {
+  await $bvModal?.msgBoxConfirm(
+    ' ' as any, {
+      title: instance?.proxy?.$t('palautetaanko-geneerinen-arviointi-keskeneraiseksi') as any,
+      okTitle: instance?.proxy?.$t('palauta') as any,
+      cancelTitle: instance?.proxy?.$t('peruuta') as any,
+      size: 'lg',
+    });
+  isEditing.value = false;
+  await props.arviointiStore.publish(inner.value!, false);
+};
+
+const onRemove = async () => {
+  const poisto = await $bvModal?.msgBoxConfirm(
+    instance?.proxy?.$t('poistetaanko-geneerinen-arviointi-kuvaus') as any, {
+      title: instance?.proxy?.$t('vahvista-poisto') as any,
+      okTitle: instance?.proxy?.$t('poista') as any,
+      cancelTitle: instance?.proxy?.$t('peruuta') as any,
+      size: 'md',
+    });
+
+  if (poisto) {
+    await props.arviointiStore.remove(inner.value!);
   }
-}
+};
+
+const onCopy = async () => {
+  await $bvModal?.msgBoxConfirm(
+    instance?.proxy?.$t('kopioi-geneerinen-arviointi-kuvaus') as any, {
+      title: instance?.proxy?.$t('kopioi-geneerinen-arviointi') as any,
+      okTitle: instance?.proxy?.$t('kopioi') as any,
+      cancelTitle: instance?.proxy?.$t('peruuta') as any,
+      size: 'lg',
+    });
+  await props.arviointiStore.add({
+    ...inner.value!,
+    julkaistu: false,
+    id: undefined,
+  });
+};
 </script>
 
 <style lang="scss" scoped>

@@ -1,34 +1,36 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
 import { Termit, TermiDto } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { ITermiStore, ITermi } from '@shared/components/EpContent/KasiteHandler';
 
-Vue.use(VueCompositionApi);
+export const useTermitStore = defineStore('termit', () => {
+  // State
+  const termit = ref<TermiDto[] | null>(null);
+  const perusteId = ref<number | null>(null);
 
-export class TermitStore implements ITermiStore {
-  public state = reactive({
-    termit: null as TermiDto[] | null,
-  });
+  // Getters
+  const getTermit = computed(() => termit.value);
 
-  constructor(private readonly perusteId?: number) {
+  // Actions
+  function initialize(perusteIdParam?: number) {
+    perusteId.value = perusteIdParam || null;
   }
 
-  public readonly termit = computed(() => this.state.termit);
-
-  public async init(perusteId: number) {
-    this.state.termit = null;
-    this.state.termit = (await Termit.getAllTermit(perusteId)).data;
+  async function init(perusteIdParam: number) {
+    perusteId.value = perusteIdParam || null;
+    termit.value = null;
+    termit.value = (await Termit.getAllTermit(perusteIdParam)).data;
   }
 
-  public async save(perusteId: number, muokattuTermi: TermiDto) {
+  async function save(perusteIdParam: number, muokattuTermi: TermiDto) {
     if (!muokattuTermi.avain) {
-      muokattuTermi.avain = this.makeKey(muokattuTermi);
+      muokattuTermi.avain = makeKey(muokattuTermi);
     }
 
     if (muokattuTermi.id) {
-      muokattuTermi = (await Termit.updateTermi(perusteId, muokattuTermi.id, muokattuTermi)).data;
-      this.state.termit = _.map(this.state.termit, termi => {
+      muokattuTermi = (await Termit.updateTermi(perusteIdParam, muokattuTermi.id, muokattuTermi)).data;
+      termit.value = _.map(termit.value, termi => {
         if (termi.id === muokattuTermi.id) {
           return muokattuTermi;
         }
@@ -36,40 +38,84 @@ export class TermitStore implements ITermiStore {
       });
     }
     else {
-      muokattuTermi = (await Termit.addTermi(perusteId, muokattuTermi)).data;
-      this.state.termit = [
+      muokattuTermi = (await Termit.addTermi(perusteIdParam, muokattuTermi)).data;
+      termit.value = [
         muokattuTermi,
-        ...this.state.termit || [],
+        ...termit.value || [],
       ];
     }
   }
 
-  public async delete(perusteId: number, poistettavaTermi: TermiDto) {
-    await Termit.deleteTermi(perusteId, poistettavaTermi.id!);
-    this.state.termit = _.filter(this.state.termit, termi => termi.id !== poistettavaTermi.id);
+  async function deleteAction(perusteIdParam: number, poistettavaTermi: TermiDto) {
+    await Termit.deleteTermi(perusteIdParam, poistettavaTermi.id!);
+    termit.value = _.filter(termit.value, termi => termi.id !== poistettavaTermi.id);
   }
 
-  private makeKey(item) {
+  function makeKey(item: any) {
     const termi = _.first(_.compact(_.values(item.termi))) || '';
     return termi.replace(/[^a-zA-Z0-9]/g, '') + new Date().getTime();
   }
 
-  getTermi(avain: string) {
-    return Termit.getTermi(this.perusteId!, avain);
+  function getTermi(avain: string) {
+    if (!perusteId.value) {
+      throw new Error('perusteId not set');
+    }
+    return Termit.getTermi(perusteId.value, avain);
   }
 
-  getAllTermit() {
-    return Termit.getAllTermit(this.perusteId!);
+  function getAllTermit() {
+    if (!perusteId.value) {
+      throw new Error('perusteId not set');
+    }
+    return Termit.getAllTermit(perusteId.value);
   }
 
-  updateTermi(termiId: number, termi: ITermi) {
-    return Termit.updateTermi(this.perusteId!, termiId, termi);
+  function updateTermi(termiId: number, termi: ITermi) {
+    if (!perusteId.value) {
+      throw new Error('perusteId not set');
+    }
+    return Termit.updateTermi(perusteId.value, termiId, termi);
   }
 
-  addTermi(termi: ITermi) {
-    return Termit.addTermi(this.perusteId!, {
+  function addTermi(termi: ITermi) {
+    if (!perusteId.value) {
+      throw new Error('perusteId not set');
+    }
+    return Termit.addTermi(perusteId.value, {
       ...termi,
-      avain: this.makeKey(termi),
+      avain: makeKey(termi),
     });
   }
-}
+
+  // Create store instance that implements ITermiStore
+  const storeInstance: ITermiStore = {
+    termit: getTermit,
+    init,
+    save,
+    delete: deleteAction,
+    getTermi,
+    getAllTermit,
+    updateTermi,
+    addTermi,
+  };
+
+  return {
+    // State
+    termit,
+    perusteId,
+    // Getters
+    getTermit,
+    // Actions
+    initialize,
+    init,
+    save,
+    delete: deleteAction,
+    makeKey,
+    getTermi,
+    getAllTermit,
+    updateTermi,
+    addTermi,
+    // Store instance for interface compatibility
+    storeInstance,
+  };
+});

@@ -1,22 +1,57 @@
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import { IKuvaStore } from '@shared/components/EpContent/KuvaHandler';
 import { Api, Liitetiedostot } from '@shared/api/eperusteet';
 
-export class KuvaStore implements IKuvaStore {
-  constructor(private readonly perusteId: number) {
+export const useKuvaStore = defineStore('kuva', () => {
+  // State
+  const perusteId = ref<number | null>(null);
+
+  // Actions
+  function initialize(perusteIdParam: number) {
+    perusteId.value = perusteIdParam;
   }
 
-  getEndpoint() {
-    return `/api/perusteet/${this.perusteId}/kuvat`;
-  }
-  getAllKuvat() {
-    return Liitetiedostot.getAllKuvat(this.perusteId);
-  }
-
-  getBaseUrl() {
-    return Api.defaults.baseURL + this.getEndpoint();
+  function getEndpoint() {
+    if (!perusteId.value) {
+      throw new Error('perusteId not set');
+    }
+    return `/api/perusteet/${perusteId.value}/kuvat`;
   }
 
-  getApi() {
+  function getAllKuvat() {
+    if (!perusteId.value) {
+      throw new Error('perusteId not set');
+    }
+    return Liitetiedostot.getAllKuvat(perusteId.value);
+  }
+
+  function getBaseUrl() {
+    return Api.defaults.baseURL + getEndpoint();
+  }
+
+  function getApi() {
     return Api;
   }
-}
+
+  // Create a store instance that implements IKuvaStore
+  const storeInstance: IKuvaStore = {
+    getEndpoint,
+    getAllKuvat,
+    getBaseUrl,
+    getApi,
+  };
+
+  return {
+    // State
+    perusteId,
+    // Actions
+    initialize,
+    getEndpoint,
+    getAllKuvat,
+    getBaseUrl,
+    getApi,
+    // Store instance for interface compatibility
+    storeInstance,
+  };
+});
