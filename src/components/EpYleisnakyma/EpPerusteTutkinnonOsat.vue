@@ -12,41 +12,38 @@
   </div>
 </template>
 
-<script lang="ts">
-
-import { Vue, Component, Prop, Mixins, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
 import _ from 'lodash';
+import { computed } from 'vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { PerusteDto } from '@shared/api/eperusteet';
 import EpSmallDataBox from '@/components/EpYleisnakyma/EpSmallDataBox.vue';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSpinner,
-    EpSmallDataBox,
+const props = defineProps({
+  tutkinnonOsaStore: {
+    type: Object as () => TutkinnonOsaStore,
+    required: true,
   },
-})
-export default class EpPerusteTutkinnonOsat extends Vue {
-  @Prop({ required: true })
-  private tutkinnonOsaStore!: TutkinnonOsaStore;
+  peruste: {
+    type: Object as () => PerusteDto,
+    required: true,
+  },
+});
 
-  @Prop({ required: true })
-  private peruste!: PerusteDto;
+const tutkinnonOsat = computed(() => {
+  return props.tutkinnonOsaStore.tutkinnonOsat.value;
+});
 
-  get tutkinnonOsat() {
-    return this.tutkinnonOsaStore.tutkinnonOsat.value;
-  }
+const tutkinnonOsiaLuotu = computed(() => {
+  return _.size(_.filter(props.tutkinnonOsaStore.tutkinnonOsat.value,
+    tutkinnonosaViite => !tutkinnonosaViite.tutkinnonOsa?.alkuperainenPeruste || tutkinnonosaViite.tutkinnonOsa.alkuperainenPeruste.id === props.peruste.id));
+});
 
-  get tutkinnonOsiaLuotu() {
-    return _.size(_.filter(this.tutkinnonOsaStore.tutkinnonOsat.value,
-      tutkinnonosaViite => !tutkinnonosaViite.tutkinnonOsa?.alkuperainenPeruste || tutkinnonosaViite.tutkinnonOsa.alkuperainenPeruste.id === this.peruste.id));
-  }
-
-  get tutkinnonOsiaTuotu() {
-    return _.size(this.tutkinnonOsaStore.tutkinnonOsat.value) - this.tutkinnonOsiaLuotu;
-  }
-}
+const tutkinnonOsiaTuotu = computed(() => {
+  return _.size(props.tutkinnonOsaStore.tutkinnonOsat.value) - tutkinnonOsiaLuotu.value;
+});
 </script>
 
 <style scoped lang="scss">

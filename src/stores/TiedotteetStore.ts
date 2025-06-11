@@ -1,37 +1,37 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { reactive, computed, ref, watch } from 'vue';
 import { TiedoteDto, Tiedotteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { ITiedotteetProvider } from '@shared/stores/types';
 import { TiedoteQuery } from '@shared/api/types';
+import { Debounced } from '@shared/utils/delay';
 import { Page } from '@shared/tyypit';
 
-export const useTiedotteetStore = defineStore('tiedotteet', () => {
-  // State
-  const tiedotteetPage = ref<Page<TiedoteDto> | null>(null);
-  const query = ref<TiedoteQuery>({} as TiedoteQuery);
-  const isLoading = ref(false);
+export class TiedotteetStore implements ITiedotteetProvider {
+  private state = reactive({
+    tiedotteetPage: null as Page<TiedoteDto> | null,
+    query: {} as TiedoteQuery,
+    isLoading: false,
+    kokonaismaara: 0,
+  });
 
-  // Getters
-  const tiedotteet = computed(() => tiedotteetPage.value?.data || null);
-  const getTiedotteetPage = computed(() => tiedotteetPage.value);
-  const perusteId = computed(() => query.value.perusteId);
-  const kokonaismaara = computed(() => tiedotteetPage.value?.kokonaismäärä);
-  const getIsLoading = computed(() => isLoading.value);
-  const options = computed(() => query.value);
+  public readonly tiedotteet = computed(() => this.state.tiedotteetPage?.data || null);
+  public readonly tiedotteetPage = computed(() => this.state.tiedotteetPage);
+  public readonly perusteId = computed(() => this.state.query.perusteId);
+  public readonly kokonaismaara = computed(() => this.state.tiedotteetPage?.kokonaismäärä);
+  public readonly isLoading = computed(() => this.state.isLoading);
+  public readonly options = computed(() => this.state.query);
 
-  // Actions
-  function clear() {
-    tiedotteetPage.value = null;
+  clear() {
+    this.state.tiedotteetPage = null;
   }
 
-  async function init(queryParam: TiedoteQuery) {
-    query.value = queryParam;
-    tiedotteetPage.value = null;
-    await fetch();
+  async init(query: TiedoteQuery) {
+    this.state.query = query;
+    this.state.tiedotteetPage = null;
+    await this.fetch();
   }
 
-  async function fetchImpl(q: TiedoteQuery) {
+  private async fetchImpl(q: TiedoteQuery) {
     const res = (await Tiedotteet.findTiedotteetBy(
       q.sivu,
       q.sivukoko,
@@ -50,64 +50,28 @@ export const useTiedotteetStore = defineStore('tiedotteet', () => {
     return res;
   }
 
-  const fetch = _.debounce(async () => {
-    tiedotteetPage.value = null;
-    tiedotteetPage.value = await fetchImpl(options.value);
-  }, 300);
+  @Debounced(300)
+  public async fetch() {
+    this.state.tiedotteetPage = null;
+    this.state.tiedotteetPage = await this.fetchImpl(this.options.value);
+  }
 
-  async function save(tiedote: TiedoteDto) {
+  public async save(tiedote: TiedoteDto) {
     if (_.isNil(tiedote.id)) {
       const tallennettu = (await Tiedotteet.addTiedote(tiedote) as any).data;
-      tiedotteetPage.value!.data = [tallennettu, ...tiedotteetPage.value!.data || []];
+      this.state.tiedotteetPage!.data = [tallennettu, ...this.state.tiedotteetPage!.data || []];
     }
     else {
       await Tiedotteet.updateTiedote((tiedote as any).id, tiedote);
       const tallennettu = (await Tiedotteet.getTiedote((tiedote as any).id, tiedote) as any).data;
-      tiedotteetPage.value!.data = _.map(tiedotteetPage.value!.data, (listaTiedote) => listaTiedote.id === tallennettu.id ? tallennettu : listaTiedote);
+      this.state.tiedotteetPage!.data = _.map(this.state.tiedotteetPage!.data, (listaTiedote) => listaTiedote.id === tallennettu.id ? tallennettu : listaTiedote);
     }
   }
 
-  async function deleteAction(tiedote: TiedoteDto) {
+  public async delete(tiedote: TiedoteDto) {
     if (tiedote.id) {
       await Tiedotteet.deleteTiedote(tiedote.id);
-      tiedotteetPage.value!.data = _.filter(tiedotteetPage.value!.data, (listaTiedote) => listaTiedote.id !== tiedote.id);
+      this.state.tiedotteetPage!.data = _.filter(this.state.tiedotteetPage!.data, (listaTiedote) => listaTiedote.id !== tiedote.id);
     }
   }
-
-  // Create store instance that implements ITiedotteetProvider
-  const storeInstance: ITiedotteetProvider = {
-    tiedotteet,
-    tiedotteetPage: getTiedotteetPage,
-    perusteId,
-    kokonaismaara,
-    isLoading: getIsLoading,
-    options,
-    clear,
-    init,
-    fetch,
-    save,
-    delete: deleteAction,
-  };
-
-  return {
-    // State
-    tiedotteetPage,
-    query,
-    isLoading,
-    // Getters
-    tiedotteet,
-    getTiedotteetPage,
-    perusteId,
-    kokonaismaara,
-    getIsLoading,
-    options,
-    // Actions
-    clear,
-    init,
-    fetch,
-    save,
-    delete: deleteAction,
-    // Store instance for interface compatibility
-    storeInstance,
-  };
-});
+}

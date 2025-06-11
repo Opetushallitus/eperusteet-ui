@@ -1,11 +1,8 @@
-import Vue from 'vue';
-import VueCompositionApi, { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { koodistoKoodiValidator, requiredOneLang } from '@shared/validators/required';
 import { AbstractPerusteenOsaViiteStore } from '@/stores/AbstractPerusteenOsaViiteStore';
-
-Vue.use(VueCompositionApi);
 
 export class TavoitesisaltoalueStore extends AbstractPerusteenOsaViiteStore implements IEditoitava {
   constructor(

@@ -19,76 +19,79 @@
       </div>
     </div>
   </div>
-
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed, useTemplateRef } from 'vue';
 import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpTiedostoLataus,
-    EpMaterialIcon,
-    EpInput,
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: true,
   },
-})
-export default class EpMaaraysLiitteet extends Vue {
-  @Prop({ required: true })
-  value!: any[];
+  isEditing: {
+    type: Boolean,
+    required: false,
+  },
+  tyyppi: {
+    type: String as () => MaaraysLiiteDtoTyyppiEnum,
+    required: true,
+  },
+  yksittainen: {
+    type: Boolean,
+    default: false,
+  },
+  nimisyote: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-  @Prop({ required: false })
-  isEditing!: boolean;
+const emit = defineEmits(['update:modelValue']);
 
-  @Prop({ required: true })
-  tyyppi!: MaaraysLiiteDtoTyyppiEnum;
+const liiteLataus = useTemplateRef('liiteLataus');
 
-  @Prop({ default: false, type: Boolean })
-  private yksittainen!: Boolean;
+const LIITE_MAX_KOKO = 99 * 1024 * 1024;
 
-  @Prop({ default: false, type: Boolean })
-  private nimisyote!: Boolean;
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  private LIITE_MAX_KOKO = 99 * 1024 * 1024;
+const liitteet = computed(() => {
+  return _.filter(model.value, liite => liite.tyyppi === props.tyyppi);
+});
 
-  set model(val) {
-    this.$emit('input', val);
-  }
+const poistaLiite = (liite) => {
+  model.value = _.without(model.value, liite);
+};
 
-  get model() {
-    return this.value;
-  }
+const lisaaLiite = (liite) => {
+  model.value = [
+    ...model.value,
+    {
+      tiedostonimi: liite?.file?.name,
+      tyyppi: props.tyyppi,
+      fileB64: window.btoa(liite.binary),
+      nimi: { [Kielet.getSisaltoKieli.value]: props.nimisyote ? '' : liite?.file?.name },
+    },
+  ];
 
-  get liitteet() {
-    return _.filter(this.model, liite => liite.tyyppi === this.tyyppi);
-  }
-
-  poistaLiite(liite) {
-    this.model = _.without(this.model, liite);
-  }
-
-  lisaaLiite(liite) {
-    this.model = [
-      ...this.model,
-      {
-        tiedostonimi: liite?.file?.name,
-        tyyppi: this.tyyppi,
-        fileB64: window.btoa(liite.binary),
-        nimi: { [Kielet.getSisaltoKieli.value]: this.nimisyote ? '' : liite?.file?.name },
-      },
-    ];
-
-    (this.$refs['liiteLataus'] as any).resetFile();
-  }
-}
+  (liiteLataus.value as any).resetFile();
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

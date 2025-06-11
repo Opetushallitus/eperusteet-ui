@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import { Perusteet, Arviointiasteikot } from '@shared/api/eperusteet';
 
 export class KvliiteEditStore implements IEditoitava {

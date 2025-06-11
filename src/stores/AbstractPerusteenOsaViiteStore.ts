@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
+import { computed, reactive } from 'vue';
 import { Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
@@ -7,11 +7,9 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import VueRouter from 'vue-router';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 
-Vue.use(VueCompositionApi);
-
 interface AbstractPerusteenOsaViiteStoreStoreConfig {
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: any;
 }
 
 export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {

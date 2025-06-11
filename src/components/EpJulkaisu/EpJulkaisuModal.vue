@@ -40,79 +40,77 @@
   </b-modal>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { ref, computed, useTemplateRef } from 'vue';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpJulkaisuMuutosmaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosmaarays.vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
+import { $t, $success, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpJulkaisuForm,
-    EpButton,
-    EpJulkaisuMuutosmaarays,
-    EpKielivalinta,
-  },
-})
-export default class EpJulkaisuModal extends Vue {
-  @Prop({ required: true })
-  private perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
 
-  private muokattavaJulkaisu: any | null = null;
-  private invalid: boolean = false;
-  private tallennetaan: boolean = false;
-  private isLatest: boolean = false;
+const muokattavaJulkaisu = ref<any | null>(null);
+const invalid = ref(false);
+const tallennetaan = ref(false);
+const isLatest = ref(false);
 
-  async tallenna() {
-    this.tallennetaan = true;
-    try {
-      await this.perusteStore.updateJulkaisu({
-        revision: this.muokattavaJulkaisu.revision,
-        tiedote: this.muokattavaJulkaisu.tiedote || {},
-        julkinenTiedote: this.muokattavaJulkaisu.julkinenTiedote || {},
-        julkinen: this.muokattavaJulkaisu.julkinen,
-        muutosmaaraysVoimaan: this.muokattavaJulkaisu.muutosmaaraysVoimaan,
-        liitteet: this.muokattavaJulkaisu.liitteet,
-        muutosmaarays: this.muokattavaJulkaisu.muutosmaarays,
-      });
-      this.tallennetaan = false;
-      this.$success(this.$t('julkaisun-paivitys-onnistui') as string);
-      this.sulje();
-    }
-    catch (err) {
-      this.tallennetaan = false;
-      this.$fail(this.$t('julkaisun-paivitys-epaonnistui') as string);
-    }
+const julkaisuModal = useTemplateRef('julkaisuModal');
+
+const tallenna = async () => {
+  tallennetaan.value = true;
+  try {
+    await props.perusteStore.updateJulkaisu({
+      revision: muokattavaJulkaisu.value.revision,
+      tiedote: muokattavaJulkaisu.value.tiedote || {},
+      julkinenTiedote: muokattavaJulkaisu.value.julkinenTiedote || {},
+      julkinen: muokattavaJulkaisu.value.julkinen,
+      muutosmaaraysVoimaan: muokattavaJulkaisu.value.muutosmaaraysVoimaan,
+      liitteet: muokattavaJulkaisu.value.liitteet,
+      muutosmaarays: muokattavaJulkaisu.value.muutosmaarays,
+    });
+    tallennetaan.value = false;
+    $success($t('julkaisun-paivitys-onnistui') as string);
+    sulje();
   }
-
-  sulje() {
-    (this.$refs['julkaisuModal'] as any).hide();
-  }
-
-  muokkaa(julkaisu, isLatest) {
-    this.isLatest = isLatest;
-    this.muokattavaJulkaisu = {
-      ..._.cloneDeep(julkaisu),
-      liittyyMuutosmaarays: !!julkaisu.muutosmaarays,
-    };
-    (this.$refs['julkaisuModal'] as any).show();
-  }
-
-  hasRequiredData(value) {
-    this.invalid = value;
-  }
-
-  get muutosmaaraykset() {
-    return this.perusteStore.muutosmaaraykset.value;
-  }
-
-  get isNormaali() {
-    return this.perusteStore.isNormaali.value;
+  catch (err) {
+    tallennetaan.value = false;
+    $fail($t('julkaisun-paivitys-epaonnistui') as string);
   }
 };
+
+const sulje = () => {
+  (julkaisuModal.value as any).hide();
+};
+
+const muokkaa = (julkaisu, isLatestValue) => {
+  isLatest.value = isLatestValue;
+  muokattavaJulkaisu.value = {
+    ..._.cloneDeep(julkaisu),
+    liittyyMuutosmaarays: !!julkaisu.muutosmaarays,
+  };
+  (julkaisuModal.value as any).show();
+};
+
+const hasRequiredData = (value) => {
+  invalid.value = value;
+};
+
+const muutosmaaraykset = computed(() => {
+  return props.perusteStore.muutosmaaraykset.value;
+});
+
+const isNormaali = computed(() => {
+  return props.perusteStore.isNormaali.value;
+});
+
+defineExpose({
+  muokkaa,
+});
 </script>
 
 <style lang="scss" scoped>

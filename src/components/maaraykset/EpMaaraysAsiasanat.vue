@@ -42,76 +42,76 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import { computed } from 'vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMaterialIcon,
-    EpMultiSelect,
-    EpButton,
-    EpInput,
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: true,
   },
-})
-export default class EpMaaraysAsiasanat extends Vue {
-  @Prop({ required: true })
-  value!: any[];
+  asiasanat: {
+    type: Array,
+    required: true,
+  },
+  isEditing: {
+    type: Boolean,
+    required: false,
+  },
+});
 
-  @Prop({ required: true })
-  asiasanat!: any[];
+const emit = defineEmits(['update:modelValue']);
 
-  @Prop({ required: false })
-  isEditing!: boolean;
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  set model(val) {
-    this.$emit('input', val);
+const valittavatAsiasanat = computed(() => {
+  if (props.asiasanat && model.value) {
+    return _.uniq([
+      ...props.asiasanat,
+      ...model.value,
+    ]);
   }
 
-  get model() {
-    return this.value;
-  }
+  return [];
+});
 
-  get valittavatAsiasanat() {
-    if (this.asiasanat && this.model) {
-      return _.uniq([
-        ...this.asiasanat,
-        ...this.model,
-      ]);
-    }
+const identity = (asiasana) => {
+  return asiasana;
+};
 
-    return [];
-  }
+const lisaaAsiasana = (uusiAsiasana) => {
+  model.value = [
+    ...model.value,
+    uusiAsiasana,
+  ];
+};
 
-  identity(asiasana) {
-    return asiasana;
-  }
+const poista = (asiasana) => {
+  model.value = _.without(model.value, asiasana);
+};
 
-  lisaaAsiasana(uusiAsiasana) {
-    this.model = [
-      ...this.model,
-      uusiAsiasana,
-    ];
-  }
-
-  poista(asiasana) {
-    this.model = _.without(this.model, asiasana);
-  }
-
-  poistaKaikki() {
-    this.model = [];
-  }
-}
+const poistaKaikki = () => {
+  model.value = [];
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
 
-::v-deep .multiselect__tags {
+:deep(.multiselect__tags) {
   .multiselect__tag {
     .nimi {
       margin-left: 5px;
@@ -119,5 +119,4 @@ export default class EpMaaraysAsiasanat extends Vue {
     }
   }
 }
-
 </style>

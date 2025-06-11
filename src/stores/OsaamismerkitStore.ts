@@ -1,36 +1,37 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { computed, reactive } from 'vue';
 import { Page } from '@shared/tyypit';
 import { Osaamismerkit, OsaamismerkitQuery, OsaamismerkkiDto } from '@shared/api/eperusteet';
+import { Debounced } from '@shared/utils/delay';
 import { OsaamismerkkiKategoriaDto } from '@shared/generated/eperusteet';
-import debounce from 'lodash/debounce';
 
-export const useOsaamismerkitStore = defineStore('osaamismerkit', () => {
-  // State
-  const osaamismerkkiPage = ref<Page<OsaamismerkkiDto> | null>(null);
-  const query = ref<OsaamismerkitQuery>({} as OsaamismerkitQuery);
-  const isLoading = ref(false);
-  const kokonaismaara = ref(0);
-  const kategoriat = ref<OsaamismerkkiKategoriaDto[] | null>([]);
+export class OsaamismerkitStore {
+  private state = reactive({
+    osaamismerkkiPage: null as Page<OsaamismerkkiDto> | null,
+    query: {} as OsaamismerkitQuery,
+    isLoading: false,
+    kokonaismaara: 0,
+    kategoriat: [] as OsaamismerkkiKategoriaDto[] | null,
+  });
 
-  // Computed
-  const osaamismerkit = computed(() => osaamismerkkiPage.value?.data || null);
-  const kokonaismaaraComputed = computed(() => osaamismerkkiPage.value?.kokonaismäärä);
-  const options = computed(() => query.value);
+  public readonly osaamismerkkiPage = computed(() => this.state.osaamismerkkiPage);
+  public readonly osaamismerkit = computed(() => this.state.osaamismerkkiPage?.data || null);
+  public readonly kokonaismaara = computed(() => this.state.osaamismerkkiPage?.kokonaismäärä);
+  public readonly options = computed(() => this.state.query);
+  public readonly kategoriat = computed(() => this.state.kategoriat);
 
-  // Actions
-  async function init(newQuery: OsaamismerkitQuery) {
-    query.value = newQuery;
-    osaamismerkkiPage.value = null;
-    await fetchKategoriat();
+  async init(query: OsaamismerkitQuery) {
+    this.state.query = query;
+    this.state.osaamismerkkiPage = null;
+    await this.fetchKategoriat();
   }
 
-  const updateOsaamismerkkiQuery = debounce(async (newQuery: OsaamismerkitQuery) => {
-    osaamismerkkiPage.value = null;
-    osaamismerkkiPage.value = await fetchOsaamismerkitImpl(newQuery);
-  }, 300);
+  @Debounced(300)
+  public async updateOsaamismerkkiQuery(query: OsaamismerkitQuery) {
+    this.state.osaamismerkkiPage = null;
+    this.state.osaamismerkkiPage = await this.fetchOsaamismerkitImpl(query);
+  }
 
-  async function fetchOsaamismerkitImpl(q: OsaamismerkitQuery) {
+  private async fetchOsaamismerkitImpl(q: OsaamismerkitQuery) {
     const res = (await Osaamismerkit.findOsaamismerkitBy(
       q.sivu,
       q.sivukoko,
@@ -46,47 +47,24 @@ export const useOsaamismerkitStore = defineStore('osaamismerkit', () => {
     return res;
   }
 
-  async function fetchKategoriat() {
-    kategoriat.value = null;
-    kategoriat.value = (await Osaamismerkit.getKategoriat()).data;
+  public async fetchKategoriat() {
+    this.state.kategoriat = null;
+    this.state.kategoriat = (await Osaamismerkit.getKategoriat()).data;
   }
 
-  async function deleteOsaamismerkki(id: any) {
+  public async deleteOsaamismerkki(id) {
     await Osaamismerkit.deleteOsaamismerkki(id);
   }
 
-  async function updateOsaamismerkki(osaamismerkki: OsaamismerkkiDto) {
+  public async updateOsaamismerkki(osaamismerkki: OsaamismerkkiDto) {
     await Osaamismerkit.updateOsaamismerkki(osaamismerkki);
   }
 
-  async function updateKategoria(kategoria: OsaamismerkkiKategoriaDto) {
+  public async updateKategoria(kategoria: OsaamismerkkiKategoriaDto) {
     await Osaamismerkit.updateKategoria(kategoria);
   }
 
-  async function deleteKategoria(id: any) {
+  public async deleteKategoria(id) {
     await Osaamismerkit.deleteKategoria(id);
   }
-
-  return {
-    // State
-    osaamismerkkiPage,
-    query,
-    isLoading,
-    kokonaismaara,
-    kategoriat,
-
-    // Computed
-    osaamismerkit,
-    kokonaismaaraComputed,
-    options,
-
-    // Actions
-    init,
-    updateOsaamismerkkiQuery,
-    fetchKategoriat,
-    deleteOsaamismerkki,
-    updateOsaamismerkki,
-    updateKategoria,
-    deleteKategoria,
-  };
-});
+}

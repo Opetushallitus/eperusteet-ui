@@ -1,14 +1,12 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
+import { watch, reactive, computed } from 'vue';
 import { TutkinnonOsaViiteDto, OsaAlueet, TutkinnonRakenne } from '@shared/api/eperusteet';
 import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
 import { required } from 'vuelidate/lib/validators';
 import { translated, requiredOneLang } from '@shared/validators/required';
-
-Vue.use(VueCompositionApi);
 
 interface OsaalueStoreConfig {
   perusteStore: PerusteStore;
@@ -19,7 +17,7 @@ export class OsaalueStore implements IEditoitava {
     private readonly perusteId: number,
     private tovId: number,
     private osaalueId: number | string,
-    private router: VueRouter,
+    private router: any,
   ) { }
 
   private static config: OsaalueStoreConfig;

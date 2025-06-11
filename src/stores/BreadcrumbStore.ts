@@ -1,5 +1,6 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { reactive, computed } from 'vue';
+import { Oppaat, OpasLuontiDto, PerusteHakuDto } from '@shared/api/eperusteet';
+import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
 
 interface Breadcrumb {
@@ -7,24 +8,15 @@ interface Breadcrumb {
   route: Location;
 }
 
-export const useBreadcrumbStore = defineStore('breadcrumb', () => {
-  // State
-  const crumbs = ref<Breadcrumb[]>([]);
+export class BreadcrumbStore {
+  private state = reactive({
+    crumbs: [] as Breadcrumb[],
+  });
 
-  // Getters
-  const breadcrumbs = computed(() => crumbs.value);
+  public readonly breacrumbs = computed(() => this.state.crumbs);
 
-  // Actions
-  const update = _.debounce(async (value: Breadcrumb[]) => {
-    crumbs.value = value;
-  }, 10);
-
-  return {
-    // State
-    crumbs,
-    // Getters
-    breadcrumbs,
-    // Actions
-    update,
-  };
-});
+  @Debounced(10)
+  public async update(value: Breadcrumb[]) {
+    this.state.crumbs = value;
+  }
+}

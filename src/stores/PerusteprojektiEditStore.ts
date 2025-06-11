@@ -1,5 +1,5 @@
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import { Perusteprojektit } from '@shared/api/eperusteet';
 import { required } from 'vuelidate/lib/validators';
 import { PerusteStore } from './PerusteStore';

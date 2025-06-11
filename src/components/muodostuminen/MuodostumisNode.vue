@@ -36,14 +36,15 @@
   </draggable>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { Prop, Component, Vue } from 'vue-property-decorator';
+import { ref, computed } from 'vue';
 import draggable from 'vuedraggable';
 import _ from 'lodash';
 import { RooliToTheme, ColorMap } from '@/components/muodostuminen/utils';
 import MuodostumisItem from './MuodostumisItem.vue';
 import { Kielet } from '@shared/stores/kieli';
+import { $t } from '@shared/utils/globals';
 
 function disassoc<T>(array: T[], idx: number): T[] {
   if (!_.isNumber(idx)) {
@@ -91,173 +92,182 @@ function swapped<T>(array: T[], a: number, b: number): T[] {
   return result;
 }
 
-@Component({
-  name: 'MuodostumisNode',
-  components: {
-    EpButton,
-    MuodostumisItem,
-    draggable,
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: true,
   },
-})
-export default class MuodostumisNode extends Vue {
-  @Prop({ required: true })
-  private value!: any[];
+  isEditing: {
+    type: Boolean,
+    default: false,
+  },
+  depth: {
+    type: Number,
+    default: 0,
+  },
+  tutkinnonOsatMap: {
+    type: Object,
+    required: true,
+  },
+  parentMandatory: {
+    type: Boolean,
+    default: null,
+  },
+  copyToClipBoard: {
+    type: Function,
+    default: false,
+  },
+});
 
-  @Prop({ default: false })
-  private isEditing!: boolean;
+const emit = defineEmits(['update:modelValue']);
 
-  @Prop({ default: 0 })
-  private depth!: number;
+const muodostumisItem = ref<any[]>([]);
+const childNode = ref<any[]>([]);
+const tempValue = ref<any[] | null>(null);
 
-  @Prop({ required: true })
-  private tutkinnonOsatMap!: any;
-
-  @Prop({ default: null, type: Boolean })
-  private parentMandatory!: boolean | null;
-
-  @Prop({ default: false })
-  private copyToClipBoard!: Function;
-
-  private tempValue: any[] | null = null;
-
-  get classes() {
-    if (this.depth === 0) {
-      return '';
-    }
-    else if (this.depth === 1) {
-      return 'rakenne-moduuli-root';
-    }
-    else {
-      return 'rakenne-moduuli';
-    }
+const classes = computed(() => {
+  if (props.depth === 0) {
+    return '';
   }
+  else if (props.depth === 1) {
+    return 'rakenne-moduuli-root';
+  }
+  else {
+    return 'rakenne-moduuli';
+  }
+});
 
-  nodeColor(node: any) {
-    if (node.rooli) {
-      const mapped = RooliToTheme[node.rooli];
-      if (mapped) {
-        return ColorMap[mapped];
-      }
-      if (node.rooli === 'määritelty') {
-        if (node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-pakollinen')) {
-          return ColorMap.pakollinen;
-        }
-        else if (node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-ammatilliset')) {
-          return ColorMap.ammatilliset;
-        }
-      }
-      return ColorMap.valinnainen;
+const nodeColor = (node: any) => {
+  if (node.rooli) {
+    const mapped = RooliToTheme[node.rooli];
+    if (mapped) {
+      return ColorMap[mapped];
     }
-    else {
-      if (node.pakollinen) {
+    if (node.rooli === 'määritelty') {
+      if (node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-pakollinen')) {
         return ColorMap.pakollinen;
       }
-    }
-    return '#fff';
-  }
-
-  get model() {
-    return this.value;
-  }
-
-  set model(value) {
-    this.$emit('input', value);
-  }
-
-  get options() {
-    return {
-      animation: 300,
-      emptyInsertThreshold: 10,
-      group: {
-        name: 'rakennepuu',
-        pull: true,
-      },
-      disabled: !this.isEditing,
-      ghostClass: 'rakenne-placeholder',
-      scrollSensitivity: 50,
-      forceFallback: true,
-      move: (element) => {
-        return !_.includes(element.to.classList, 'leikelauta') || !!element.draggedContext.element.rooli;
-      },
-    };
-  }
-
-  onDragStart(evt) {
-    this.tempValue = _.cloneDeep(this.model);
-  }
-
-  onDragEnd(evt) {
-    if (this.tempValue && _.includes(evt.to.classList, 'leikelauta')) {
-      this.model = this.tempValue;
-      this.tempValue = null;
-    }
-  }
-
-  public move(uuid: string, dir: 'up' | 'down' | 'left' | 'right') {
-    if (!this.isEditing) {
-      return;
-    }
-
-    const idx = _.findIndex(this.value, n => n.uuid === uuid);
-    const nodes = _.map(this.value, 'node');
-    if (idx >= 0) {
-      switch (dir) {
-      case 'up':
-        this.$emit('input', swapped(nodes, idx, idx - 1));
-        break;
-      case 'down':
-        break;
-      case 'left':
-        break;
-      case 'right':
-        break;
-      default: break;
+      else if (node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-ammatilliset')) {
+        return ColorMap.ammatilliset;
       }
     }
+    return ColorMap.valinnainen;
   }
-
-  remove(idx: number) {
-    this.$emit('input', disassoc(this.model, idx));
-  }
-
-  toggleDescription(toggle?) {
-    _.forEach(this.$refs['muodostumisItem'], item => (item as any).toggleDescription(toggle));
-    _.forEach(this.$refs['childNode'], item => (item as any).toggleDescription(toggle));
-  }
-
-  async add(element) {
-    if (_.includes(element.from.classList, 'paaryhmat') && this.model[element.newIndex] && this.model[element.newIndex].rooli === 'määrittelemätön') {
-      const uuid = _.get(this.model[element.newIndex], 'uuid');
-      const muodostumisItem = _.find(this.$refs['muodostumisItem'], item => _.get(item, 'innerModel.uuid') === uuid);
-
-      if (muodostumisItem) {
-        (muodostumisItem as any).edit();
-      }
+  else {
+    if (node.pakollinen) {
+      return ColorMap.pakollinen;
     }
   }
+  return '#fff';
+};
 
-  copy(idx: number) {
-    if (this.copyToClipBoard) {
-      this.copyToClipBoard(getIndex(this.model, idx));
-    }
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit('update:modelValue', value);
+  },
+});
+
+const options = computed(() => {
+  return {
+    animation: 300,
+    emptyInsertThreshold: 10,
+    group: {
+      name: 'rakennepuu',
+      pull: true,
+    },
+    disabled: !props.isEditing,
+    ghostClass: 'rakenne-placeholder',
+    scrollSensitivity: 50,
+    forceFallback: true,
+    move: (element) => {
+      return !_.includes(element.to.classList, 'leikelauta') || !!element.draggedContext.element.rooli;
+    },
+  };
+});
+
+const onDragStart = (evt) => {
+  tempValue.value = _.cloneDeep(model.value);
+};
+
+const onDragEnd = (evt) => {
+  if (tempValue.value && _.includes(evt.to.classList, 'leikelauta')) {
+    model.value = tempValue.value;
+    tempValue.value = null;
+  }
+};
+
+const move = (uuid: string, dir: 'up' | 'down' | 'left' | 'right') => {
+  if (!props.isEditing) {
+    return;
   }
 
-  isPakollinen(node) {
-    if (this.parentMandatory !== null) {
-      return this.parentMandatory;
+  const idx = _.findIndex(props.modelValue, n => n.uuid === uuid);
+  const nodes = _.map(props.modelValue, 'node');
+  if (idx >= 0) {
+    switch (dir) {
+    case 'up':
+      emit('update:modelValue', swapped(nodes, idx, idx - 1));
+      break;
+    case 'down':
+      break;
+    case 'left':
+      break;
+    case 'right':
+      break;
+    default: break;
     }
-
-    if (node.nimi && node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-valinnainen')) {
-      return false;
-    }
-
-    if (node.nimi && node.nimi[Kielet.getUiKieli.value] === this.$t('rakenne-moduuli-pakollinen')) {
-      return true;
-    }
-
-    return null;
   }
-}
+};
+
+const remove = (idx: number) => {
+  emit('update:modelValue', disassoc(model.value, idx));
+};
+
+const toggleDescription = (toggle?) => {
+  _.forEach(muodostumisItem.value, item => (item as any).toggleDescription(toggle));
+  _.forEach(childNode.value, item => (item as any).toggleDescription(toggle));
+};
+
+const add = async (element) => {
+  if (_.includes(element.from.classList, 'paaryhmat') && model.value[element.newIndex] && model.value[element.newIndex].rooli === 'määrittelemätön') {
+    const uuid = _.get(model.value[element.newIndex], 'uuid');
+    const item = _.find(muodostumisItem.value, item => _.get(item, 'innerModel.uuid') === uuid);
+
+    if (item) {
+      (item as any).edit();
+    }
+  }
+};
+
+const copy = (idx: number) => {
+  if (props.copyToClipBoard) {
+    props.copyToClipBoard(getIndex(model.value, idx));
+  }
+};
+
+const isPakollinen = (node) => {
+  if (props.parentMandatory !== null) {
+    return props.parentMandatory;
+  }
+
+  if (node.nimi && node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-valinnainen')) {
+    return false;
+  }
+
+  if (node.nimi && node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-pakollinen')) {
+    return true;
+  }
+
+  return null;
+};
+
+defineExpose({
+  move,
+  toggleDescription,
+});
 </script>
 
 <style scoped lang="scss">
@@ -277,7 +287,6 @@ $linecolor: #ccc;
 }
 
 .muodostumisnode {
-
   &.draggable {
     cursor: grab;
   }
@@ -289,5 +298,4 @@ $linecolor: #ccc;
   width: 8px;
   display: block;
 }
-
 </style>

@@ -1,6 +1,6 @@
 import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import * as _ from 'lodash';
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import { minLength, required, requiredIf } from 'vuelidate/lib/validators';
 import { Api, Maaraykset, MaarayksetParams, MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysDtoTyyppiEnum, MaaraysLiiteDtoTyyppiEnum, Perusteet, baseURL } from '@shared/api/eperusteet';
 import { Kielet, UiKielet } from '@shared/stores/kieli';

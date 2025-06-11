@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table class="table" v-if="value && value.length > 0">
+    <table class="table" v-if="modelValue && modelValue.length > 0">
       <thead>
         <tr>
           <th>{{ $t('nimi') }}</th>
@@ -9,9 +9,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(muutos, idx) in value" :key="'muutos' + idx">
+        <tr v-for="(muutos, idx) in modelValue" :key="'muutos' + idx">
           <td>
-            <ep-input v-model="muutos.nimi" :is-editing="isEditing" :placeholder="(muutos.liitteet && muutos.liitteet[$slang.value]) ? muutos.liitteet[$slang.value].nimi : ''"/>
+            <ep-input v-model="muutos.nimi" :is-editing="isEditing" :placeholder="(muutos.liitteet && muutos.liitteet[$slang()]) ? muutos.liitteet[$slang()].nimi : ''"/>
           </td>
           <td>
             <span v-if="!!muutos.liitteet && muutos.liitteet[$slang.value]">
@@ -55,9 +55,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Prop, Component, Vue } from 'vue-property-decorator';
+import { ref, computed, useTemplateRef, getCurrentInstance } from 'vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
@@ -67,125 +67,123 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $success, $bvModal, $slang, $sd } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpInput,
-    EpMultiSelect,
-    EpMuutosmaaraysModal,
-    EpSpinner,
-    EpMaterialIcon,
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: true,
   },
-})
-export default class EpMuutosmaaraykset extends Vue {
-  @Prop({ required: true })
-  private value!: any[];
+  isEditing: {
+    type: Boolean,
+    default: false,
+  },
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
+  },
+});
 
-  @Prop({ default: false })
-  private isEditing!: boolean;
+const emit = defineEmits(['update:modelValue']);
+const muutosmaaraysModal = useTemplateRef('muutosmaaraysModal');
+const poistossa = ref<number[]>([]);
 
-  @Prop({ required: true })
-  private perusteStore!: PerusteStore;
+const poista = (idx) => {
+  const temp = [...props.modelValue];
+  temp.splice(idx, 1);
+  emit('update:modelValue', temp);
+};
 
-  poistossa: number[] = [];
+const updateLiite = (idx, liite) => {
+  const temp = props.modelValue;
+  temp[idx].liitteet[$slang()] = { ...liite };
+  emit('update:modelValue', temp);
+};
 
-  poista(idx) {
-    const temp = [...this.value];
-    Vue.delete(temp, idx);
-    this.$emit('input', temp);
-  }
-
-  updateLiite(idx, liite) {
-    const temp = this.value;
-    Vue.set(temp[idx].liitteet, this.$slang.value, { ...liite });
-    this.$emit('input', temp);
-  }
-
-  get muutosmaaraykset() {
-    if (this.perusteStore.muutosmaaraykset.value) {
-      return _.map(this.perusteStore.muutosmaaraykset.value, muutosmaarays => {
-        return {
-          ...muutosmaarays,
-          url: this.muutosmaaraysUrl(muutosmaarays),
-          poistossa: _.includes(this.poistossa, muutosmaarays.id),
-        };
-      });
-    }
-  }
-
-  get muutosmaaryksetSorted() {
-    return this.muutosmaaraykset;
-  }
-
-  muutosmaaraysUrl(muutosmaarays) {
-    if (!_.find(muutosmaarays.liitteet![this.kieli].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI)) {
-      return null;
-    }
-
-    return baseURL + MaarayksetParams.getMaaraysLiite(_.toString(_.get(_.find(muutosmaarays.liitteet![this.kieli].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI), 'id'))).url;
-  }
-
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
-
-  get muutosmaarayksetFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-      thStyle: { width: '60%' },
-      thClass: 'border-bottom-1',
-      tdClass: 'align-middle',
-      sortable: false,
-    }, {
-      key: 'voimassaoloAlkaa',
-      label: this.$t('voimassaolo-alkaa'),
-      thClass: 'border-bottom-1',
-      tdClass: 'align-middle',
-      sortable: false,
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sd(value);
-      },
-    }, {
-      key: 'toiminnot',
-      label: '',
-      thStyle: { width: '10%', borderBottom: '0px' },
-      sortable: false,
-    }];
-  }
-
-  lisaaMuutosmaarays() {
-    (this.$refs['muutosmaaraysModal'] as any).muokkaa();
-  }
-
-  async muokkaaMuutosmaarausta(muutosmaarays) {
-    (this.$refs['muutosmaaraysModal'] as any).muokkaa(muutosmaarays);
-  }
-
-  async poistaMuutosmaarays(muutosmaarays) {
-    const poista = await this.$bvModal.msgBoxConfirm(this.$t('poista-muutosmaarays-varmistus') as any, {
-      title: this.$t('poista-muutosmaarays') as any,
-      okVariant: 'primary',
-      okTitle: this.$t('poista') as any,
-      cancelVariant: 'link',
-      cancelTitle: this.$t('peruuta') as any,
-      centered: true,
+const muutosmaaraykset = computed(() => {
+  if (props.perusteStore.muutosmaaraykset.value) {
+    return _.map(props.perusteStore.muutosmaaraykset.value, muutosmaarays => {
+      return {
+        ...muutosmaarays,
+        url: muutosmaaraysUrl(muutosmaarays),
+        poistossa: _.includes(poistossa.value, muutosmaarays.id),
+      };
     });
+  }
+  return [];
+});
 
-    if (poista) {
-      this.poistossa.push(muutosmaarays.id);
-      try {
-        await this.perusteStore.poistaMuutosmaarays(muutosmaarays);
-        this.poistossa = _.without(this.poistossa, muutosmaarays.id);
-        this.$success(this.$t('muutosmaarays-poistettu') as string);
-      }
-      catch (err) {
-        this.poistossa = _.without(this.poistossa, muutosmaarays.id);
-      }
+const muutosmaaryksetSorted = computed(() => {
+  return muutosmaaraykset.value;
+});
+
+const muutosmaaraysUrl = (muutosmaarays) => {
+  if (!_.find(muutosmaarays.liitteet![kieli.value].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI)) {
+    return null;
+  }
+
+  return baseURL + MaarayksetParams.getMaaraysLiite(_.toString(_.get(_.find(muutosmaarays.liitteet![kieli.value].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI), 'id'))).url;
+};
+
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
+
+const muutosmaarayksetFields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+    thStyle: { width: '60%' },
+    thClass: 'border-bottom-1',
+    tdClass: 'align-middle',
+    sortable: false,
+  }, {
+    key: 'voimassaoloAlkaa',
+    label: $t('voimassaolo-alkaa'),
+    thClass: 'border-bottom-1',
+    tdClass: 'align-middle',
+    sortable: false,
+    formatter: (value: any, key: any, item: any) => {
+      return $sd(value);
+    },
+  }, {
+    key: 'toiminnot',
+    label: '',
+    thStyle: { width: '10%', borderBottom: '0px' },
+    sortable: false,
+  }];
+});
+
+const lisaaMuutosmaarays = () => {
+  muutosmaaraysModal.value.muokkaa();
+};
+
+const muokkaaMuutosmaarausta = async (muutosmaarays) => {
+  muutosmaaraysModal.value.muokkaa(muutosmaarays);
+};
+
+const poistaMuutosmaarays = async (muutosmaarays) => {
+  const poista = await $bvModal.msgBoxConfirm($t('poista-muutosmaarays-varmistus'), {
+    title: $t('poista-muutosmaarays'),
+    okVariant: 'primary',
+    okTitle: $t('poista'),
+    cancelVariant: 'link',
+    cancelTitle: $t('peruuta'),
+    centered: true,
+  });
+
+  if (poista) {
+    poistossa.value.push(muutosmaarays.id);
+    try {
+      await props.perusteStore.poistaMuutosmaarays(muutosmaarays);
+      poistossa.value = _.without(poistossa.value, muutosmaarays.id);
+      $success($t('muutosmaarays-poistettu'));
+    }
+    catch (err) {
+      poistossa.value = _.without(poistossa.value, muutosmaarays.id);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

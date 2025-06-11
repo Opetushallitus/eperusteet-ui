@@ -69,153 +69,150 @@
   </b-modal>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, useTemplateRef } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import * as _ from 'lodash';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { OsaamismerkkiKategoriaDto } from '@shared/generated/eperusteet';
-import { Validations } from 'vuelidate-property-decorators';
+import { useVuelidate } from '@vuelidate/core';
 import { requiredLokalisoituTeksti, notNull } from '@shared/validators/required';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { Kieli } from '@shared/tyypit';
 import EpTiedostoInput from '@shared/components/EpTiedosto/EpTiedostoInput.vue';
+import { $t, $success, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpInput,
-    EpMaterialIcon,
-    EpKielivalinta,
-    EpTiedostoInput,
-  },
-})
-export default class EpOsaamismerkkiKategoriaModal extends Vue {
-  @Prop({ required: true })
-  private store!: OsaamismerkitStore;
+const props = defineProps<{
+  store: OsaamismerkitStore;
+}>();
 
-  private tallennetaan: boolean = false;
-  private kategoria: OsaamismerkkiKategoriaDto = {};
-  private newImagePreviewUrl: string | null = null;
-  private imageWidth: number = 0;
-  private imageHeight: number = 0;
-  private imageMaxDimension: string = '200x200';
-  private requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv];
-  private mimeTypes: string[] = ['image/jpeg, image/png, image/svg+xml'];
-  private allowedTypes: string = '.jpeg .png .svg';
+const osaamismerkkiKategoriaModal = useTemplateRef('osaamismerkkiKategoriaModal');
 
-  @Validations()
-  validations = {
-    kategoria: {
-      nimi: requiredLokalisoituTeksti(this.requiredKielet),
-      liite: {
-        binarydata: notNull(),
-      },
+const tallennetaan = ref(false);
+const kategoria = ref<OsaamismerkkiKategoriaDto>({});
+const newImagePreviewUrl = ref<string | null>(null);
+const imageWidth = ref(0);
+const imageHeight = ref(0);
+const imageMaxDimension = '200x200';
+const requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv];
+const mimeTypes: string[] = ['image/jpeg, image/png, image/svg+xml'];
+const allowedTypes = '.jpeg .png .svg';
+
+const rules = {
+  kategoria: {
+    nimi: requiredLokalisoituTeksti(requiredKielet),
+    liite: {
+      binarydata: notNull(),
     },
-  };
+  },
+};
 
-  async tallenna() {
-    this.tallennetaan = true;
-    try {
-      await this.store.updateKategoria(this.kategoria);
-      this.tallennetaan = false;
-      this.$success(this.$t('teeman-paivitys-onnistui') as string);
-      await this.store.fetchKategoriat();
-      this.sulje();
-    }
-    catch (err) {
-      this.tallennetaan = false;
-      this.$fail(this.$t('teeman-paivitys-epaonnistui') as string);
-    }
+const v$ = useVuelidate(rules, { kategoria });
+
+const tallenna = async () => {
+  tallennetaan.value = true;
+  try {
+    await props.store.updateKategoria(kategoria.value);
+    tallennetaan.value = false;
+    $success($t('teeman-paivitys-onnistui') as string);
+    await props.store.fetchKategoriat();
+    sulje();
   }
-
-  async poistaKategoria() {
-    try {
-      await this.store.deleteKategoria(this.kategoria.id);
-      this.tallennetaan = false;
-      this.$success(this.$t('teeman-poistaminen-onnistui') as string);
-      await this.store.fetchKategoriat();
-      this.sulje();
-    }
-    catch (err) {
-      this.tallennetaan = false;
-      this.$fail(this.$t('teeman-poistaminen-epaonnistui') as string);
-    }
-  }
-
-  async fileChanged(file: File) {
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (evt: any) => {
-      let img = new Image();
-      img.onload = () => {
-        this.imageWidth = img.width;
-        this.imageHeight = img.height;
-        if (reader.result && this.isValidImage()) {
-          this.newImagePreviewUrl = evt.target.result;
-          this.kategoria.liite = {
-            binarydata: reader.result.toString().split(',')[1],
-            nimi: file.name,
-          };
-        }
-        else {
-          this.kategoria.liite = undefined;
-          this.$fail(this.imageInfoText);
-        }
-      };
-      img.src = evt.target.result;
-    };
-  }
-
-  poistaKuva() {
-    this.kategoria.liite = undefined;
-    this.newImagePreviewUrl = null;
-  }
-
-  sulje() {
-    this.clear();
-    (this.$refs['osaamismerkkiKategoriaModal'] as any).hide();
-  }
-
-  avaaModal(kategoria) {
-    if (kategoria) {
-      this.kategoria = _.cloneDeep(kategoria);
-    }
-    (this.$refs['osaamismerkkiKategoriaModal'] as any).show();
-  }
-
-  clear() {
-    this.kategoria = {};
-    this.newImagePreviewUrl = null;
-    this.imageWidth = 0;
-    this.imageHeight = 0;
-  }
-
-  isValidImage() {
-    return this.imageWidth <= 200 && this.imageHeight <= 200;
-  }
-
-  get imageInfoText() {
-    return this.$t('kuvan-maksimimitat') + ': ' + this.imageMaxDimension + '. ' + this.$t('sallitut-kuvaformaatit') + ': ' + this.allowedTypes;
-  }
-
-  get liite() {
-    return this.kategoria.liite;
-  }
-
-  get invalid() {
-    return this.$v.$invalid;
-  }
-
-  get savedImagePreviewUrl() {
-    return this.liite ? 'data:' + this.liite.mime + ';base64,' + this.liite.binarydata : null;
+  catch (err) {
+    tallennetaan.value = false;
+    $fail($t('teeman-paivitys-epaonnistui') as string);
   }
 };
+
+const poistaKategoria = async () => {
+  try {
+    await props.store.deleteKategoria(kategoria.value.id);
+    tallennetaan.value = false;
+    $success($t('teeman-poistaminen-onnistui') as string);
+    await props.store.fetchKategoriat();
+    sulje();
+  }
+  catch (err) {
+    tallennetaan.value = false;
+    $fail($t('teeman-poistaminen-epaonnistui') as string);
+  }
+};
+
+const fileChanged = async (file: File) => {
+  let reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = (evt: any) => {
+    let img = new Image();
+    img.onload = () => {
+      imageWidth.value = img.width;
+      imageHeight.value = img.height;
+      if (reader.result && isValidImage()) {
+        newImagePreviewUrl.value = evt.target.result;
+        kategoria.value.liite = {
+          binarydata: reader.result.toString().split(',')[1],
+          nimi: file.name,
+        };
+      }
+      else {
+        kategoria.value.liite = undefined;
+        $fail(imageInfoText.value);
+      }
+    };
+    img.src = evt.target.result;
+  };
+};
+
+const poistaKuva = () => {
+  kategoria.value.liite = undefined;
+  newImagePreviewUrl.value = null;
+};
+
+const sulje = () => {
+  clear();
+  (osaamismerkkiKategoriaModal.value as any).hide();
+};
+
+const avaaModal = (item) => {
+  if (item) {
+    kategoria.value = _.cloneDeep(item);
+  }
+  (osaamismerkkiKategoriaModal.value as any).show();
+};
+
+const clear = () => {
+  kategoria.value = {};
+  newImagePreviewUrl.value = null;
+  imageWidth.value = 0;
+  imageHeight.value = 0;
+};
+
+const isValidImage = () => {
+  return imageWidth.value <= 200 && imageHeight.value <= 200;
+};
+
+const imageInfoText = computed(() => {
+  return $t('kuvan-maksimimitat') + ': ' + imageMaxDimension + '. ' + $t('sallitut-kuvaformaatit') + ': ' + allowedTypes;
+});
+
+const liite = computed(() => {
+  return kategoria.value.liite;
+});
+
+const invalid = computed(() => {
+  return v$.value.$invalid;
+});
+
+const savedImagePreviewUrl = computed(() => {
+  return liite.value ? 'data:' + liite.value.mime + ';base64,' + liite.value.binarydata : null;
+});
+
+defineExpose({
+  avaaModal,
+});
 </script>
 
 <style lang="scss" scoped>
 @import "@shared/styles/_variables.scss";
-
 </style>

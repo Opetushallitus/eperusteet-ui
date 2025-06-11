@@ -69,27 +69,59 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component } from 'vue-property-decorator';
+<script setup lang="ts">
+import _ from 'lodash';
+import { ref, computed } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpPerustietoData from '@shared/components/EpPerustietoData/EpPerustietoData.vue';
-import EpPerustePerustiedot from './EpPerustePerustiedot.vue';
 import { buildEsikatseluUrl } from '@shared/utils/esikatselu';
 import { Kielet } from '@shared/stores/kieli';
+import { PerusteprojektiDto, PerusteDto } from '@shared/api/eperusteet';
+import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
+import { parsiEsitysnimi } from '@shared/utils/kayttaja';
+import { $t, $kaanna, $sdt } from '@shared/utils/globals';
+import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 
-@Component({
-  components: {
-    EpSpinner,
-    EpButton,
-    EpPerustietoData,
-  },
-})
-export default class EpOpasPerustiedot extends EpPerustePerustiedot {
-  get esikatseluUrl() {
-    return buildEsikatseluUrl(Kielet.getSisaltoKieli.value, `/opas/${this.peruste.id}`);
+const props = defineProps<{
+  projekti: PerusteprojektiDto;
+  peruste: PerusteDto;
+  tyoryhmaStore: TyoryhmaStore;
+}>();
+
+const tyoryhmaAlkuMaara = 5;
+const naytaLisaaTyoryhmaa = ref(false);
+
+const julkaisukielet = computed(() => {
+  if (props.peruste) {
+    return _.map(props.peruste.kielet, (kieli) => Kielet.kaannaOlioTaiTeksti(kieli)).join(', ');
   }
-}
+  return '';
+});
+
+const tyoryhma = computed(() => {
+  return props.tyoryhmaStore.perusteenTyoryhma.value;
+});
+
+const virkailijat = computed(() => {
+  if (props.tyoryhmaStore.tyoryhmanVirkailiijat.value) {
+    return _.chain(props.tyoryhmaStore.tyoryhmanVirkailiijat.value)
+      .map(virkailija => {
+        return {
+          ...virkailija,
+          esitysnimi: parsiEsitysnimi(virkailija),
+        };
+      })
+      .value();
+  }
+  else {
+    return null;
+  }
+});
+
+const esikatseluUrl = computed(() => {
+  return buildEsikatseluUrl(Kielet.getSisaltoKieli.value, `/opas/${props.peruste.id}`);
+});
 </script>
 
 <style scoped lang="scss">

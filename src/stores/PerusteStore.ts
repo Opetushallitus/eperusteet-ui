@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
-import { watch, ref, computed } from 'vue';
+import Vue from 'vue';
+import { watch, reactive, computed, ref } from 'vue';
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi, MaaraysDto, Maaraykset } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
@@ -10,76 +10,78 @@ import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/e
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
 import { fail } from '@shared/utils/notifications';
 
-export const usePerusteStore = defineStore('peruste', () => {
-  // State
-  const blocklist = ref<Array<() => void>>([]);
-  const projekti = ref<PerusteprojektiDto | null>(null);
-  const peruste = ref<PerusteDto | null>(null);
-  const navigation = ref<NavigationNodeDto | null>(null);
-  const perusteId = ref<number | null>(null);
-  const isInitialized = ref(false);
-  const julkaisut = ref<JulkaisuBaseDto[] | null>(null);
-  const initializing = ref(false);
-  const validoinnit = ref<Array<Validointi> | null>(null);
-  const julkaisemattomiaMuutoksia = ref<boolean | null>(null);
-  const viimeisinJulkaisuTila = ref<string | null>(null);
-  const tilaPolling = ref<any | null>(null);
-  const muutosmaaraykset = ref<MaaraysDto[] | null>(null);
-  const maarays = ref<MaaraysDto | null>(null);
+export class PerusteStore implements IEditoitava {
+  private blocklist = [] as (() => void)[];
 
-  // Getters
-  const getProjekti = computed(() => projekti.value);
-  const getPeruste = computed(() => peruste.value);
-  const suoritustavat = computed(() => _.map(peruste.value?.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)) as string[]);
-  const getPerusteId = computed(() => perusteId.value);
-  const projektiId = computed(() => projekti.value?.id);
-  const tutkinnonOsat = computed(() => perusteId.value);
-  const julkaisukielet = computed(() => (peruste.value?.kielet || []) as unknown as Kieli[]);
-  const getValidoinnit = computed(() => validoinnit.value);
-  const isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(peruste.value?.koulutustyyppi));
-  const isVapaasivistystyo = computed(() => isVapaasivistystyoKoulutustyyppi(peruste.value?.koulutustyyppi));
-  const getJulkaisut = computed(() => julkaisut.value);
-  const isPohja = computed(() => _.toLower(peruste.value?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.POHJA));
-  const isNormaali = computed(() => _.toLower(peruste.value?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.NORMAALI));
-  const pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(peruste.value?.koulutustyyppi));
-  const koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(peruste.value?.koulutustyyppi));
-  const getJulkaisemattomiaMuutoksia = computed(() => julkaisemattomiaMuutoksia.value);
-  const isJulkaistu = computed(() => (_.size(julkaisut.value) > 0 || peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && _.toLower(peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
-  const getViimeisinJulkaisuTila = computed(() => viimeisinJulkaisuTila.value);
-  const arkistointiReroute = computed(() => _.toLower(peruste.value?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : isPohja.value ? 'pohjat' : 'perusteprojektit');
-  const getMuutosmaaraykset = computed(() => muutosmaaraykset.value ? _.reverse(_.sortBy(muutosmaaraykset.value, 'voimassaoloAlkaa')) : null);
-  const getIsInitialized = computed(() => isInitialized.value);
-  const getMaarays = computed(() => maarays.value);
+  private state = reactive({
+    projekti: null as PerusteprojektiDto | null,
+    peruste: null as PerusteDto | null,
+    navigation: null as NavigationNodeDto | null,
+    perusteId: null as number | null,
+    isInitialized: false,
+    julkaisut: null as JulkaisuBaseDto[] | null,
+    initializing: false,
+    validoinnit: null as Array<Validointi> | null,
+    julkaisemattomiaMuutoksia: null as boolean | null,
+    viimeisinJulkaisuTila: null as string | null,
+    tilaPolling: null as any | null,
+    muutosmaaraykset: null as MaaraysDto[] | null,
+    maarays: null as MaaraysDto | null,
+  });
 
-  const isOpas = computed(() => {
-    if (peruste.value) {
-      return _.lowerCase((peruste.value as PerusteDto).tyyppi) === _.lowerCase(PerusteDtoTyyppiEnum.OPAS);
+  public readonly projekti = computed(() => this.state.projekti);
+  public readonly peruste = computed(() => this.state.peruste);
+  public readonly suoritustavat = computed(() => _.map(this.state.peruste?.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)) as string[]);
+  public readonly perusteId = computed(() => this.state.perusteId);
+  public readonly projektiId = computed(() => this.state.projekti?.id);
+  public readonly tutkinnonOsat = computed(() => this.state.perusteId);
+  public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
+  public readonly validoinnit = computed(() => this.state.validoinnit);
+  public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
+  public readonly isVapaasivistystyo = computed(() => isVapaasivistystyoKoulutustyyppi(this.state.peruste?.koulutustyyppi));
+  public readonly julkaisut = computed(() => this.state.julkaisut);
+  public readonly isPohja = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.POHJA));
+  public readonly isNormaali = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.NORMAALI));
+  public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.peruste.value?.koulutustyyppi));
+  public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.peruste.value?.koulutustyyppi));
+  public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
+  public readonly isJulkaistu = computed(() => (_.size(this.julkaisut.value) > 0 || this.peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && _.toLower(this.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
+  public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
+  public readonly arkistointiReroute = computed(() => _.toLower(this.peruste.value?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
+  public readonly muutosmaaraykset = computed(() => this.state.muutosmaaraykset ? _.reverse(_.sortBy(this.state.muutosmaaraykset, 'voimassaoloAlkaa')) : null);
+  public readonly isInitialized = computed(() => this.state.isInitialized);
+  public readonly maarays = computed(() => this.state.maarays);
+
+  public readonly isOpas = computed(() => {
+    if (this.state.peruste) {
+      return _.lowerCase((this.state.peruste as PerusteDto).tyyppi) === _.lowerCase(PerusteDtoTyyppiEnum.OPAS);
     }
+
     return false;
   });
 
-  const perusteSuoritustapa = computed(() => {
-    if (isOpas.value) {
+  public readonly perusteSuoritustapa = computed(() => {
+    if (this.isOpas.value) {
       return 'OPAS';
     }
-    else if (perusteenSuoritustapa(peruste.value)) {
-      return perusteenSuoritustapa(peruste.value);
+    else if (perusteenSuoritustapa(this.peruste.value)) {
+      return perusteenSuoritustapa(this.peruste.value);
     }
     else {
       return 'REFORMI';
     }
   });
 
-  const getNavigation = computed(() => {
-    if (!peruste.value || !navigation.value) {
+  public readonly navigation = computed(() => {
+    if (!this.state.peruste || !this.state.navigation) {
       return null;
     }
 
-    if (isAmmatillinenKoulutustyyppi(peruste.value?.koulutustyyppi) && !isOpas.value) {
+    if (isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi) && !this.isOpas.value) {
       return {
-        ...navigation.value,
+        ...this.state.navigation,
         children: [
-          ...(navigation.value.children || []), {
+          ...(this.state.navigation.children || []), {
             type: 'kvliite',
             children: [],
           },
@@ -87,112 +89,111 @@ export const usePerusteStore = defineStore('peruste', () => {
       };
     }
 
-    return navigation.value;
+    return this.state.navigation;
   });
 
-  // Actions
-  async function updateValidointi() {
-    if (projekti.value?.id) {
-      validoinnit.value = null;
-      if (_.toLower(peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
+  public async updateValidointi() {
+    if (this.state.projekti?.id) {
+      this.state.validoinnit = null;
+      if (_.toLower(this.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
         try {
-          const res = await Perusteprojektit.getPerusteprojektiValidointi(projekti.value!.id!);
-          validoinnit.value = res.data;
+          const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
+          this.state.validoinnit = res.data;
         }
         catch (e) {
-          validoinnit.value = [];
+          this.state.validoinnit = [];
           fail('validointi-epaonnistui');
         }
       }
       else {
-        validoinnit.value = [];
+        this.state.validoinnit = [];
       }
     }
 
-    await fetchJulkaisemattomiaMuutoksia();
+    await this.fetchJulkaisemattomiaMuutoksia();
   }
 
-  function clear() {
-    peruste.value = null;
-    projekti.value = null;
-    validoinnit.value = null;
-    julkaisut.value = null;
+  clear() {
+    this.state.peruste = null;
+    this.state.projekti = null;
+    this.state.validoinnit = null;
+    this.state.julkaisut = null;
   }
 
-  async function init(projektiIdParam: number) {
-    if (initializing.value || (isInitialized.value && projektiIdParam === projektiId.value)) {
+  async init(projektiId: number) {
+    if (this.state.initializing || (this.state.isInitialized && projektiId === this.projektiId.value)) {
       return;
     }
 
     try {
-      initializing.value = true;
-      isInitialized.value = false;
-      peruste.value = null;
-      projekti.value = null;
-      validoinnit.value = null;
-      julkaisut.value = null;
+      this.state.initializing = true;
+      this.state.isInitialized = false;
+      this.state.peruste = null;
+      this.state.projekti = null;
+      this.state.validoinnit = null;
+      this.state.julkaisut = null;
       Murupolku.tyhjenna();
-      projekti.value = (await Perusteprojektit.getPerusteprojekti(projektiIdParam)).data;
-      const perusteIdValue = Number((projekti.value as any)._peruste);
-      perusteId.value = perusteIdValue;
+      this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
+      const perusteId = Number((this.state.projekti as any)._peruste);
+      this.state.perusteId = perusteId;
 
       [
-        peruste.value,
-        navigation.value,
+        this.state.peruste,
+        this.state.navigation,
       ] = _.map(await Promise.all([
-        Perusteet.getPerusteenTiedot(perusteIdValue),
-        Perusteet.getNavigation(perusteIdValue),
+        Perusteet.getPerusteenTiedot(perusteId),
+        Perusteet.getNavigation(perusteId),
       ]), 'data');
 
-      await updateValidointi();
-      await fetchJulkaisut();
+      await this.updateValidointi();
+      await this.fetchJulkaisut();
 
-      isInitialized.value = true;
+      this.state.isInitialized = true;
     }
     catch (err) {
       console.error(err);
     }
     finally {
-      initializing.value = false;
+      this.state.initializing = false;
     }
   }
 
-  async function updateCurrent() {
-    projekti.value = (await Perusteprojektit.getPerusteprojekti(projekti.value!.id!)).data;
-    peruste.value = (await Perusteet.getPerusteenTiedot(peruste.value!.id!)).data;
+  async updateCurrent() {
+    this.state.projekti = (await Perusteprojektit.getPerusteprojekti(this.projekti.value!.id!)).data;
+    this.state.peruste = (await Perusteet.getPerusteenTiedot(this.peruste.value!.id!)).data;
 
-    await updateValidointi();
+    await this.updateValidointi();
   }
 
-  async function updateNavigation() {
-    if (!perusteId.value) {
+  public async updateNavigation() {
+    if (!this.state.perusteId) {
       return;
     }
-    const res = await Perusteet.getNavigation(perusteId.value);
-    navigation.value = res.data;
+    const res = await Perusteet.getNavigation(this.state.perusteId);
+    this.state.navigation = res.data;
   }
 
-  function removeNavigationEntry(item: { id: number }) {
-    if (navigation.value) {
-      navigation.value = removeImpl(navigation.value, item);
+  public removeNavigationEntry(item: { id: number }) {
+    if (this.state.navigation) {
+      this.state.navigation = this.removeImpl(this.state.navigation, item);
     }
   }
 
-  function removeImpl(node: NavigationNodeDto, item: { id: number }): NavigationNodeDto {
+  removeImpl(node: NavigationNodeDto, item: { id: number }): NavigationNodeDto {
     node.children = _(node.children || [])
       .reject(child => child.id === item.id)
-      .map(child => removeImpl(child, item))
+      .map(child => this.removeImpl(child, item))
       .value();
     return node;
   }
 
-  function updateNavigationEntry(item: { id: number, label: { [key: string]: string }}) {
-    if (navigation.value) {
-      navigation.value = updateImpl(navigation.value, item);
+  public updateNavigationEntry(item: { id: number, label: { [key: string]: string }}) {
+    if (this.state.navigation) {
+      this.state.navigation = this.updateImpl(this.state.navigation, item);
     }
   }
 
-  function updateImpl(node: NavigationNodeDto, item: { id: number, label: { [key: string]: string }}): NavigationNodeDto {
+  updateImpl(node: NavigationNodeDto, item: { id: number, label: { [key: string]: string }}): NavigationNodeDto {
     node.children = _(node.children || [])
       .map(child => {
         if (child.id === item.id) {
@@ -200,27 +201,26 @@ export const usePerusteStore = defineStore('peruste', () => {
         }
         return child;
       })
-      .map(child => updateImpl(child, item))
+      .map(child => this.updateImpl(child, item))
       .value();
     return node;
   }
 
-  async function blockUntilInitialized(): Promise<void> {
+  public async blockUntilInitialized(): Promise<void> {
     return new Promise(resolve => {
-      if (isInitialized.value) {
+      if (this.state.isInitialized) {
         resolve();
       }
       else {
-        blocklist.value.push(resolve);
+        this.blocklist.push(resolve);
       }
     });
   }
 
-  // Watch for initialization completion to resolve blocked promises
-  watch(getIsInitialized, () => {
-    if (isInitialized.value) {
-      while (blocklist.value.length > 0) {
-        const fn = blocklist.value.shift();
+  private readonly blockResolver = watch(this.isInitialized, () => {
+    if (this.state.isInitialized) {
+      while (this.blocklist.length > 0) {
+        const fn = this.blocklist.shift();
         if (fn) {
           fn();
         }
@@ -228,240 +228,142 @@ export const usePerusteStore = defineStore('peruste', () => {
     }
   });
 
-  async function julkaise(tiedot: any) {
-    const projektiIdValue = projekti.value?.id;
-    if (projektiIdValue) {
-      await Julkaisut.teeJulkaisu(projektiIdValue, tiedot);
-      await fetchJulkaisut();
-      if (!_.includes(_.map(julkaisut.value, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
-        await updateCurrent();
+  async julkaise(tiedot: any) {
+    const projektiId = this.state.projekti?.id;
+    if (projektiId) {
+      await Julkaisut.teeJulkaisu(projektiId, tiedot);
+      await this.fetchJulkaisut();
+      if (!_.includes(_.map(this.state.julkaisut, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
+        await this.updateCurrent();
       }
     }
   }
 
-  async function updateJulkaisu(julkaisuData: any) {
-    const perusteIdValue = peruste.value?.id;
-    if (perusteIdValue) {
-      await Julkaisut.updateJulkaisu(perusteIdValue, julkaisuData);
-      await fetchJulkaisut();
-      if (!_.includes(_.map(julkaisut.value, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
-        await updateCurrent();
+  async updateJulkaisu(julkaisuData: any) {
+    const perusteId = this.state.peruste?.id;
+    if (perusteId) {
+      await Julkaisut.updateJulkaisu(perusteId, julkaisuData);
+      await this.fetchJulkaisut();
+      if (!_.includes(_.map(this.state.julkaisut, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
+        await this.updateCurrent();
       }
     }
   }
 
-  async function fetchJulkaisut() {
-    julkaisut.value = (await Julkaisut.getJulkaisut(perusteId.value!)).data;
-    if (_.includes(_.map(julkaisut.value, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
-      await fetchViimeisinJulkaisuTila();
-      await pollTila();
+  async fetchJulkaisut() {
+    this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
+    if (_.includes(_.map(this.state.julkaisut, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
+      await this.fetchViimeisinJulkaisuTila();
+      await this.pollTila();
     }
   }
 
-  async function fetchViimeisinJulkaisuTila() {
-    viimeisinJulkaisuTila.value = (await Julkaisut.viimeisinJulkaisuTila(perusteId.value!)).data;
+  async fetchViimeisinJulkaisuTila() {
+    this.state.viimeisinJulkaisuTila = (await Julkaisut.viimeisinJulkaisuTila(this.state.perusteId!)).data;
 
-    if (viimeisinJulkaisuTila.value !== JulkaisuBaseDtoTilaEnum.KESKEN) {
-      clearInterval(tilaPolling.value);
-      tilaPolling.value = null;
-      julkaisut.value = (await Julkaisut.getJulkaisut(perusteId.value!)).data;
-      await updateCurrent();
+    if (this.state.viimeisinJulkaisuTila !== JulkaisuBaseDtoTilaEnum.KESKEN) {
+      clearInterval(this.state.tilaPolling);
+      this.state.tilaPolling = null;
+      this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
+      await this.updateCurrent();
     }
   }
 
-  async function pollTila() {
-    if (viimeisinJulkaisuTila.value === JulkaisuBaseDtoTilaEnum.KESKEN) {
-      tilaPolling.value = setInterval(() => fetchViimeisinJulkaisuTila(), 2500);
+  async pollTila() {
+    if (this.state.viimeisinJulkaisuTila === JulkaisuBaseDtoTilaEnum.KESKEN) {
+      this.state.tilaPolling = setInterval(() => this.fetchViimeisinJulkaisuTila(), 2500);
     }
   }
 
-  async function palautaJulkaisu(julkaisu: any) {
-    const projektiIdValue = projekti.value?.id;
-    if (projektiIdValue) {
-      const res = (await Julkaisut.aktivoiJulkaisu(projektiIdValue, julkaisu.revision)).data as any;
-      julkaisut.value = [...julkaisut.value!, res.data];
-      await updateCurrent();
-      await fetchJulkaisut();
+  async palautaJulkaisu(julkaisu: any) {
+    const projektiId = this.state.projekti?.id;
+    if (projektiId) {
+      const res = (await Julkaisut.aktivoiJulkaisu(projektiId, julkaisu.revision)).data as any;
+      this.state.julkaisut = [...this.state.julkaisut!, res.data];
+      await this.updateCurrent();
+      await this.fetchJulkaisut();
     }
   }
 
-  async function fetchJulkaisemattomiaMuutoksia() {
-    julkaisemattomiaMuutoksia.value = null;
-    julkaisemattomiaMuutoksia.value = (await Julkaisut.julkaisemattomiaMuutoksia(perusteId.value!)).data;
+  public async fetchJulkaisemattomiaMuutoksia() {
+    this.state.julkaisemattomiaMuutoksia = null;
+    this.state.julkaisemattomiaMuutoksia = (await Julkaisut.julkaisemattomiaMuutoksia(this.state.perusteId!)).data;
   }
 
-  async function fetchMaaraykset() {
-    muutosmaaraykset.value = null;
-    maarays.value = null;
-    muutosmaaraykset.value = (await Maaraykset.getPerusteenMuutosmaaraykset(perusteId.value!)).data;
-    maarays.value = (await Maaraykset.getMaaraysPerusteella(Number((projekti.value as any)._peruste))).data;
+  public async fetchMaaraykset() {
+    this.state.muutosmaaraykset = null;
+    this.state.maarays = null;
+    this.state.muutosmaaraykset = (await Maaraykset.getPerusteenMuutosmaaraykset(this.state.perusteId!)).data;
+    this.state.maarays = (await Maaraykset.getMaaraysPerusteella(Number((this.state.projekti as any)._peruste))).data;
   }
 
-  async function tallennaMuutosmaarays(muutosmaarays: any) {
+  public async tallennaMuutosmaarays(muutosmaarays) {
     if (muutosmaarays.id) {
       const tallennettu = (await Maaraykset.updateMaarays(muutosmaarays.id, muutosmaarays)).data;
-      muutosmaaraykset.value = _.map(muutosmaaraykset.value, nykyinen => {
+      this.state.muutosmaaraykset = _.map(this.state.muutosmaaraykset, nykyinen => {
         return nykyinen.id === tallennettu.id ? tallennettu : nykyinen;
       });
     }
     else {
       const tallennettu = (await Maaraykset.addMaarays(muutosmaarays)).data;
-      muutosmaaraykset.value = [
-        ...(muutosmaaraykset.value || []),
+      this.state.muutosmaaraykset = [
+        ...(this.state.muutosmaaraykset || []),
         tallennettu,
       ];
     }
   }
 
-  async function poistaMuutosmaarays(poistettavaMuutosmaarays: any) {
-    await Maaraykset.deleteMaarays(poistettavaMuutosmaarays.id, perusteId.value!);
-    muutosmaaraykset.value = _.reject(muutosmaaraykset.value, muutosmaarays => muutosmaarays.id === poistettavaMuutosmaarays.id);
+  public async poistaMuutosmaarays(poistettavaMuutosmaarays) {
+    await Maaraykset.deleteMaarays(poistettavaMuutosmaarays.id, this.perusteId.value!);
+    this.state.muutosmaaraykset = _.reject(this.state.muutosmaaraykset, muutosmaarays => muutosmaarays.id === poistettavaMuutosmaarays.id);
   }
 
-  // IEditoitava implementation
-  async function acquire() {
+  async acquire() {
     return null;
   }
 
-  async function cancel() {
+  async cancel() {
   }
 
-  async function editAfterLoad() {
+  async editAfterLoad() {
     return false;
   }
 
-  async function history() {
+  async history() {
   }
 
-  async function load() {
+  async load() {
   }
 
-  async function preview() {
+  async preview() {
     return null;
   }
 
-  async function release() {
+  async release() {
   }
 
-  async function lock() {
+  async lock() {
     return null;
   }
 
-  async function remove() {
+  async remove() {
   }
 
-  async function restore() {
+  async restore() {
   }
 
-  async function revisions() {
+  async revisions() {
     return [];
   }
 
-  async function save() {
+  async save() {
   }
 
-  async function start() {
+  async start() {
   }
 
-  const validator = computed(() => {
+  public readonly validator = computed(() => {
     return {
     };
   });
-
-  // Create store instance that implements IEditoitava
-  const storeInstance: IEditoitava = {
-    acquire,
-    cancel,
-    editAfterLoad,
-    history,
-    load,
-    preview,
-    release,
-    lock,
-    remove,
-    restore,
-    revisions,
-    save,
-    start,
-    validator,
-  };
-
-  return {
-    // State
-    projekti,
-    peruste,
-    navigation,
-    perusteId,
-    isInitialized,
-    julkaisut,
-    initializing,
-    validoinnit,
-    julkaisemattomiaMuutoksia,
-    viimeisinJulkaisuTila,
-    tilaPolling,
-    muutosmaaraykset,
-    maarays,
-    // Getters
-    getProjekti,
-    getPeruste,
-    suoritustavat,
-    getPerusteId,
-    projektiId,
-    tutkinnonOsat,
-    julkaisukielet,
-    getValidoinnit,
-    isAmmatillinen,
-    isVapaasivistystyo,
-    getJulkaisut,
-    isPohja,
-    isNormaali,
-    pdfEnabled,
-    koulutustyyppiSupported,
-    getJulkaisemattomiaMuutoksia,
-    isJulkaistu,
-    getViimeisinJulkaisuTila,
-    arkistointiReroute,
-    getMuutosmaaraykset,
-    getIsInitialized,
-    getMaarays,
-    isOpas,
-    perusteSuoritustapa,
-    getNavigation,
-    // Actions
-    updateValidointi,
-    clear,
-    init,
-    updateCurrent,
-    updateNavigation,
-    removeNavigationEntry,
-    updateNavigationEntry,
-    blockUntilInitialized,
-    julkaise,
-    updateJulkaisu,
-    fetchJulkaisut,
-    fetchViimeisinJulkaisuTila,
-    pollTila,
-    palautaJulkaisu,
-    fetchJulkaisemattomiaMuutoksia,
-    fetchMaaraykset,
-    tallennaMuutosmaarays,
-    poistaMuutosmaarays,
-    // IEditoitava methods
-    acquire,
-    cancel,
-    editAfterLoad,
-    history,
-    load,
-    preview,
-    release,
-    lock,
-    remove,
-    restore,
-    revisions,
-    save,
-    start,
-    validator,
-    // Store instance for interface compatibility
-    storeInstance,
-  };
-});
+}

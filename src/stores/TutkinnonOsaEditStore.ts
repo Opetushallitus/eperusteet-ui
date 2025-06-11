@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Perusteenosat, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
@@ -8,17 +8,16 @@ import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/compone
 import { PerusteStore } from '@/stores/PerusteStore';
 import { Kielet } from '@shared/stores/kieli';
 
+
 export function notNull() {
   return {
     'not-null': (value: any) => !!value,
   };
 }
 
-Vue.use(VueCompositionApi);
-
 interface TutkinnonOsaEditStoreConfig {
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: any;
 }
 
 export class TutkinnonOsaEditStore implements IEditoitava {

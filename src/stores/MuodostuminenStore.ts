@@ -1,12 +1,10 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { Api, TutkinnonRakenne, Perusteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-
-Vue.use(VueCompositionApi);
 
 interface MuodostuminenStoreConfig {
   perusteStore: PerusteStore;

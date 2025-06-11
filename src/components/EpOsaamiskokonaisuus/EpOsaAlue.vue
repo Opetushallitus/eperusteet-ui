@@ -100,68 +100,59 @@
 
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed } from 'vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { Kielet } from '@shared/stores/kieli';
 import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpInput,
-    draggable,
-    EpButton,
-    EpMaterialIcon,
-  },
-})
-export default class EpOsaAlue extends Vue {
-  @Prop({ required: true })
-  value!: any;
+const props = defineProps<{
+  modelValue: any;
+  isEditing: boolean;
+}>();
 
-  @Prop({ required: true })
-  isEditing!: boolean;
+const emit = defineEmits(['update:modelValue']);
 
-  get osaAlue() {
-    return this.value;
-  }
+const osaAlue = computed(() => {
+  return props.modelValue;
+});
 
-  get defaultDragOptions() {
-    return {
-      animation: 300,
-      emptyInsertThreshold: 10,
-      handle: '.order-handle',
-      disabled: !this.isEditing,
-      ghostClass: 'dragged',
-      group: {
-        name: 'kuvaukset',
-      },
-    };
-  }
+const defaultDragOptions = computed(() => {
+  return {
+    animation: 300,
+    emptyInsertThreshold: 10,
+    handle: '.order-handle',
+    disabled: !props.isEditing,
+    ghostClass: 'dragged',
+    group: {
+      name: 'kuvaukset',
+    },
+  };
+});
 
-  get sisaltokieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
+const sisaltokieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
 
-  poistaKuvaus(listaKentta, kuvaus, taso) {
-    this.$emit('input', {
-      ...this.osaAlue,
-      tasokuvaukset: _.map(this.osaAlue.tasokuvaukset, tasokuvaus => tasokuvaus.taso === taso ? { ...tasokuvaus, [listaKentta]: _.filter(tasokuvaus[listaKentta], tkuvaus => tkuvaus !== kuvaus) } : tasokuvaus),
-    });
-  }
+const poistaKuvaus = (listaKentta, kuvaus, taso) => {
+  emit('update:modelValue', {
+    ...osaAlue.value,
+    tasokuvaukset: _.map(osaAlue.value.tasokuvaukset, tasokuvaus => tasokuvaus.taso === taso ? { ...tasokuvaus, [listaKentta]: _.filter(tasokuvaus[listaKentta], tkuvaus => tkuvaus !== kuvaus) } : tasokuvaus),
+  });
+};
 
-  lisaaKuvaus(listaKentta, taso) {
-    this.$emit('input', {
-      ...this.osaAlue,
-      tasokuvaukset: _.map(this.osaAlue.tasokuvaukset, tasokuvaus => tasokuvaus.taso === taso ? { ...tasokuvaus, [listaKentta]: [...tasokuvaus[listaKentta], {}] } : tasokuvaus),
-    });
-  }
-}
+const lisaaKuvaus = (listaKentta, taso) => {
+  emit('update:modelValue', {
+    ...osaAlue.value,
+    tasokuvaukset: _.map(osaAlue.value.tasokuvaukset, tasokuvaus => tasokuvaus.taso === taso ? { ...tasokuvaus, [listaKentta]: [...tasokuvaus[listaKentta], {}] } : tasokuvaus),
+  });
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

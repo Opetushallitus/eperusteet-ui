@@ -40,205 +40,204 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { ref, computed, onMounted } from 'vue';
 import { TilastotStore } from '@/stores/TilastotStore';
 import { suunnitelmatTilastoksi } from './tilastot';
 import moment from 'moment';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import { $t } from '@shared/utils/globals';
 
 type Ajanjakso = 'kuukausi' | 'vuosi';
 
-@Component({
-  components: {
-    KoulutustyyppiSelect,
+const props = defineProps({
+  tilastotStore: {
+    type: Object as () => TilastotStore,
+    required: true,
   },
-})
-export default class EpLukumaaraGraafit extends Vue {
-  @Prop({ required: true })
-  private tilastotStore!: TilastotStore;
+});
 
-  koulutustyyppi: string[] | null = null;
-  tila: string[] | null = null;
-  ajanjakso: Ajanjakso = 'kuukausi';
-  vuosi: number | null = null;
+const koulutustyyppi = ref<string[] | null>([]);
+const tila = ref<string[] | null>([]);
+const ajanjakso = ref<Ajanjakso>('kuukausi');
+const vuosi = ref<number | null>(null);
 
-  mounted() {
-    this.vuosi = new Date().getFullYear();
-    this.tila = [];
-    this.koulutustyyppi = [];
-  }
+onMounted(() => {
+  vuosi.value = new Date().getFullYear();
+  tila.value = [];
+  koulutustyyppi.value = [];
+});
 
-  get toteutussuunnitelmat() {
-    return this.tilastotStore.toteutussuunnitelmat.value;
-  }
+const toteutussuunnitelmat = computed(() => {
+  return props.tilastotStore.toteutussuunnitelmat.value;
+});
 
-  get opetussuunnitelmat() {
-    return this.tilastotStore.opetussuunnitelmat.value;
-  }
+const opetussuunnitelmat = computed(() => {
+  return props.tilastotStore.opetussuunnitelmat.value;
+});
 
-  get suunnitelmat() {
-    return [
-      ...this.toteutussuunnitelmat ?? [],
-      ...this.opetussuunnitelmat ?? [],
-    ];
-  }
+const suunnitelmat = computed(() => {
+  return [
+    ...toteutussuunnitelmat.value ?? [],
+    ...opetussuunnitelmat.value ?? [],
+  ];
+});
 
-  get tilaValinnat() {
-    return [
-      'julkaistu',
-      'luonnos',
-      'poistettu',
-      'kaikki',
-    ];
-  }
+const tilaValinnat = computed(() => {
+  return [
+    'julkaistu',
+    'luonnos',
+    'poistettu',
+    'kaikki',
+  ];
+});
 
-  get koulutustyyppiValinnat() {
-    return _.uniq(_.map(this.suunnitelmat, 'koulutustyyppi'));
-  }
+const koulutustyyppiValinnat = computed(() => {
+  return _.uniq(_.map(suunnitelmat.value, 'koulutustyyppi'));
+});
 
-  get maxViimeisinTilaMuutosAikaInYears() {
-    return new Date(_.max(_.map(this.suunnitelmat, 'viimeisinTilaMuutosAika'))).getFullYear();
-  }
+const maxViimeisinTilaMuutosAikaInYears = computed(() => {
+  return new Date(_.max(_.map(suunnitelmat.value, 'viimeisinTilaMuutosAika'))).getFullYear();
+});
 
-  get minViimeisinTilaMuutosAikaInYears() {
-    return new Date(_.min(_.map(this.suunnitelmat, 'viimeisinTilaMuutosAika'))).getFullYear();
-  }
+const minViimeisinTilaMuutosAikaInYears = computed(() => {
+  return new Date(_.min(_.map(suunnitelmat.value, 'viimeisinTilaMuutosAika'))).getFullYear();
+});
 
-  get vuosivalinnat() {
-    return _.range(
-      this.minViimeisinTilaMuutosAikaInYears,
-      this.maxViimeisinTilaMuutosAikaInYears + 1);
-  }
+const vuosivalinnat = computed(() => {
+  return _.range(
+    minViimeisinTilaMuutosAikaInYears.value,
+    maxViimeisinTilaMuutosAikaInYears.value + 1);
+});
 
-  get tilastoitavatAjat() {
-    if (this.ajanjakso === 'kuukausi') {
-      return _.map(_.range(0, 12), kuukausi => {
-        return {
-          alkupvm: new Date(this.vuosi!, kuukausi, 1).getTime(),
-          loppupvm: new Date(this.vuosi!, kuukausi + 1, 0, 23, 59, 59).getTime(),
-        };
-      });
-    }
-    else {
-      return _.map(this.vuosivalinnat, vuosi => {
-        return {
-          alkupvm: new Date(vuosi, 0, 1).getTime(),
-          loppupvm: new Date(vuosi, 11, 31, 23, 59, 59).getTime(),
-        };
-      });
-    }
-  }
-
-  get suunnitelmatFiltered() {
-    return _.chain(this.suunnitelmat)
-      .filter(suunnitelma => _.size(this.koulutustyyppi) === 0 || _.includes(this.koulutustyyppi, suunnitelma.koulutustyyppi))
-      .value();
-  }
-
-  get aikaFormat() {
-    return this.ajanjakso === 'kuukausi' ? 'M/y' : 'y';
-  }
-
-  get suunnitelmaLukumaarat() {
-    return _.map(this.tilastoitavatAjat, aika => {
-      const suunnitelmat = suunnitelmatTilastoksi(this.suunnitelmatFiltered, aika.alkupvm, aika.loppupvm);
-      const aikaFormatted = moment(aika.alkupvm).format(this.aikaFormat);
-
-      if (aika.alkupvm > new Date().getTime()) {
-        return this.emptyLukumaaraObject(aikaFormatted);
-      }
-
+const tilastoitavatAjat = computed(() => {
+  if (ajanjakso.value === 'kuukausi') {
+    return _.map(_.range(0, 12), kuukausi => {
       return {
-        aika: aikaFormatted,
-        julkaistut: _.sumBy(suunnitelmat, 'julkaistut'),
-        luonnokset: _.sumBy(suunnitelmat, 'luonnokset'),
-        arkistoidut: _.sumBy(suunnitelmat, 'arkistoidut'),
-        kaikki: _.sumBy(suunnitelmat, 'yhteensa'),
+        alkupvm: new Date(vuosi.value!, kuukausi, 1).getTime(),
+        loppupvm: new Date(vuosi.value!, kuukausi + 1, 0, 23, 59, 59).getTime(),
       };
     });
   }
-
-  emptyLukumaaraObject(aika) {
-    return {
-      aika,
-      julkaistut: 0,
-      luonnokset: 0,
-      arkistoidut: 0,
-      kaikki: 0,
-    };
+  else {
+    return _.map(vuosivalinnat.value, vuosi => {
+      return {
+        alkupvm: new Date(vuosi, 0, 1).getTime(),
+        loppupvm: new Date(vuosi, 11, 31, 23, 59, 59).getTime(),
+      };
+    });
   }
+});
 
-  get chartOptions() {
+const suunnitelmatFiltered = computed(() => {
+  return _.chain(suunnitelmat.value)
+    .filter(suunnitelma => _.size(koulutustyyppi.value) === 0 || _.includes(koulutustyyppi.value, suunnitelma.koulutustyyppi))
+    .value();
+});
+
+const aikaFormat = computed(() => {
+  return ajanjakso.value === 'kuukausi' ? 'M/y' : 'y';
+});
+
+const emptyLukumaaraObject = (aika) => {
+  return {
+    aika,
+    julkaistut: 0,
+    luonnokset: 0,
+    arkistoidut: 0,
+    kaikki: 0,
+  };
+};
+
+const suunnitelmaLukumaarat = computed(() => {
+  return _.map(tilastoitavatAjat.value, aika => {
+    const suunnitelmat = suunnitelmatTilastoksi(suunnitelmatFiltered.value, aika.alkupvm, aika.loppupvm);
+    const aikaFormatted = moment(aika.alkupvm).format(aikaFormat.value);
+
+    if (aika.alkupvm > new Date().getTime()) {
+      return emptyLukumaaraObject(aikaFormatted);
+    }
+
     return {
-      type: 'bar',
-      dataLabels: {
+      aika: aikaFormatted,
+      julkaistut: _.sumBy(suunnitelmat, 'julkaistut'),
+      luonnokset: _.sumBy(suunnitelmat, 'luonnokset'),
+      arkistoidut: _.sumBy(suunnitelmat, 'arkistoidut'),
+      kaikki: _.sumBy(suunnitelmat, 'yhteensa'),
+    };
+  });
+});
+
+const tilaColors = computed(() => {
+  return {
+    'julkaistu': '#008ffbd9',
+    'luonnos': '#00e396d9',
+    'poistettu': '#feb019d9',
+    'kaikki': '#ff4560d9',
+  };
+});
+
+const selectedTilaColors = computed(() => {
+  return [
+    ...(_.size(tila.value) === 0 || _.includes(tila.value, 'julkaistu') ? [tilaColors.value['julkaistu']] : []),
+    ...(_.size(tila.value) === 0 || _.includes(tila.value, 'luonnos') ? [tilaColors.value['luonnos']] : []),
+    ...(_.size(tila.value) === 0 || _.includes(tila.value, 'poistettu') ? [tilaColors.value['poistettu']] : []),
+    ...(_.size(tila.value) === 0 || _.includes(tila.value, 'kaikki') ? [tilaColors.value['kaikki']] : []),
+  ];
+});
+
+const maxKaikki = computed(() => {
+  return _.maxBy(suunnitelmaLukumaarat.value, 'kaikki')?.kaikki ?? 0;
+});
+
+const chartOptions = computed(() => {
+  return {
+    type: 'bar',
+    dataLabels: {
+      enabled: false,
+    },
+    tooltip: {
+      enabled: true,
+      shared: true,
+      intersect: false,
+    },
+    xaxis: {
+      categories: _.map(suunnitelmaLukumaarat.value, 'aika'),
+    },
+    yaxis: {
+      stepSize: _.floor(maxKaikki.value / 10),
+    },
+    colors: selectedTilaColors.value,
+    chart: {
+      animations: {
         enabled: false,
       },
-      tooltip: {
-        enabled: true,
-        shared: true,
-        intersect: false,
-      },
-      xaxis: {
-        categories: _.map(this.suunnitelmaLukumaarat, 'aika'),
-      },
-      yaxis: {
-        stepSize: _.floor(this.maxKaikki / 10),
-      },
-      colors: this.selectedTilaColors,
-      chart: {
-        animations: {
-          enabled: false,
-        },
-      },
-    };
-  }
+    },
+  };
+});
 
-  get selectedTilaColors() {
-    return [
-      ...(_.size(this.tila) === 0 || _.includes(this.tila, 'julkaistu') ? [this.tilaColors['julkaistu']] : []),
-      ...(_.size(this.tila) === 0 || _.includes(this.tila, 'luonnos') ? [this.tilaColors['luonnos']] : []),
-      ...(_.size(this.tila) === 0 || _.includes(this.tila, 'poistettu') ? [this.tilaColors['poistettu']] : []),
-      ...(_.size(this.tila) === 0 || _.includes(this.tila, 'kaikki') ? [this.tilaColors['kaikki']] : []),
-    ];
-  }
-
-  get tilaColors() {
-    return {
-      'julkaistu': '#008ffbd9',
-      'luonnos': '#00e396d9',
-      'poistettu': '#feb019d9',
-      'kaikki': '#ff4560d9',
-    };
-  }
-
-  get maxKaikki() {
-    return _.maxBy(this.suunnitelmaLukumaarat, 'kaikki')?.kaikki ?? 0;
-  }
-
-  get chartSeries() {
-    return [
-      ...(_.size(this.tila) === 0 || _.includes(this.tila, 'julkaistu') ? [{
-        name: this.$t('julkaistut'),
-        data: _.map(this.suunnitelmaLukumaarat, 'julkaistut'),
-      }] : []),
-      ...(_.size(this.tila) === 0 || _.includes(this.tila, 'luonnos') ? [{
-        name: this.$t('luonnokset'),
-        data: _.map(this.suunnitelmaLukumaarat, 'luonnokset'),
-      }] : []),
-      ...(_.size(this.tila) === 0 || _.includes(this.tila, 'poistettu') ? [{
-        name: this.$t('arkistoidut'),
-        data: _.map(this.suunnitelmaLukumaarat, 'arkistoidut'),
-      }] : []),
-      ...(_.size(this.tila) === 0 || _.includes(this.tila, 'kaikki') ? [{
-        name: this.$t('kaikki'),
-        data: _.map(this.suunnitelmaLukumaarat, 'kaikki'),
-      }] : []),
-    ];
-  }
-}
+const chartSeries = computed(() => {
+  return [
+    ...(_.size(tila.value) === 0 || _.includes(tila.value, 'julkaistu') ? [{
+      name: $t('julkaistut'),
+      data: _.map(suunnitelmaLukumaarat.value, 'julkaistut'),
+    }] : []),
+    ...(_.size(tila.value) === 0 || _.includes(tila.value, 'luonnos') ? [{
+      name: $t('luonnokset'),
+      data: _.map(suunnitelmaLukumaarat.value, 'luonnokset'),
+    }] : []),
+    ...(_.size(tila.value) === 0 || _.includes(tila.value, 'poistettu') ? [{
+      name: $t('arkistoidut'),
+      data: _.map(suunnitelmaLukumaarat.value, 'arkistoidut'),
+    }] : []),
+    ...(_.size(tila.value) === 0 || _.includes(tila.value, 'kaikki') ? [{
+      name: $t('kaikki'),
+      data: _.map(suunnitelmaLukumaarat.value, 'kaikki'),
+    }] : []),
+  ];
+});
 </script>
 
 <style scoped lang="scss">

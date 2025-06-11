@@ -1,6 +1,7 @@
 import { Kielet } from '@shared/stores/kieli';
 import { Kieli } from '@shared/tyypit';
 import { v4 as genUuid } from 'uuid';
+import { $t } from '@shared/utils/globals';
 
 export const DefaultRyhma = {
   useRange: false,
@@ -17,15 +18,15 @@ export const DefaultRyhma = {
   tyyppi: null as string | null,
 };
 
-export function getNimi(key: string, el) {
+export function getNimi(key: string) {
   return {
-    fi: el.$t(key, Kieli.fi),
-    sv: el.$t(key, Kieli.sv),
-    en: el.$t(key, Kieli.en),
+    fi: $t(key, {}, { locale: Kieli.fi }),
+    sv: $t(key, {}, { locale: Kieli.sv }),
+    en: $t(key, {}, { locale: Kieli.en }),
   };
 }
 
-export function ryhmaTemplate(kind: string, el) {
+export function ryhmaTemplate(kind: string) {
   const result = {
     kuvaus: null,
     vieras: null,
@@ -36,7 +37,7 @@ export function ryhmaTemplate(kind: string, el) {
     osaamisala: null,
     tutkintonimike: null,
     osat: [],
-    nimi: getNimi(kind, el),
+    nimi: getNimi(kind),
     uuid: genUuid(),
   };
 
@@ -88,7 +89,7 @@ export const ColorMap = Object.freeze({
   yhteiset: '#878787',
 });
 
-export function rakenneNodecolor(node, parentMandatory, el) {
+export function rakenneNodecolor(node, parentMandatory) {
   const isRyhma = !!node.rooli;
 
   if (isRyhma) {
@@ -97,13 +98,13 @@ export function rakenneNodecolor(node, parentMandatory, el) {
       return ColorMap[mapped];
     }
     if (node.rooli === 'määritelty') {
-      if (node.nimi[Kielet.getUiKieli.value] === el.$t('rakenne-moduuli-pakollinen')) {
+      if (node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-pakollinen')) {
         return ColorMap.pakollinen;
       }
-      else if (node.nimi[Kielet.getUiKieli.value] === el.$t('rakenne-moduuli-ammatilliset')) {
+      else if (node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-ammatilliset')) {
         return ColorMap.ammatilliset;
       }
-      else if (node.nimi[Kielet.getUiKieli.value] === el.$t('rakenne-moduuli-yhteiset')) {
+      else if (node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-yhteiset')) {
         return ColorMap.yhteiset;
       }
     }

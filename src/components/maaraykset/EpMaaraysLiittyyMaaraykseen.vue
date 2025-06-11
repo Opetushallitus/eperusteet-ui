@@ -5,8 +5,8 @@
       <div class="d-flex w-100 mb-2 align-items-center">
         <EpMultiSelect
           class="w-100"
-          :value="maarays"
-          @input="asetaMaarays(index, $event)"
+          :modelValue="maarays"
+          @update:modelValue="asetaMaarays(index, $event)"
           :placeholder="$t('valitse-maarays')"
           :is-editing="true"
           :search-identity="nimiSearchIdentity"
@@ -32,60 +32,49 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed } from 'vue';
 import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { nimiSearchIdentity } from '@shared/utils/helpers';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { MaaraysKevytDto } from '@shared/api/eperusteet';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMaterialIcon,
-    EpMultiSelect,
-    EpButton,
+const props = defineProps<{
+  modelValue: MaaraysKevytDto[];
+  maarayksetNimella: MaaraysKevytDto[];
+  tyyppi?: string;
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const model = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpMaaraysLiittyyMaaraykseen extends Vue {
-  private nimiSearchIdentity = nimiSearchIdentity;
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: true })
-  value!: MaaraysKevytDto[];
+const poistaMaarays = (maarays) => {
+  model.value = _.without(model.value, maarays);
+};
 
-  @Prop({ required: true })
-  maarayksetNimella!: MaaraysKevytDto[];
+const lisaaMaarays = () => {
+  model.value = [
+    ...model.value,
+    {},
+  ];
+};
 
-  @Prop()
-  tyyppi!: string;
-
-  set model(val) {
-    this.$emit('input', val);
-  }
-
-  get model() {
-    return this.value;
-  }
-
-  poistaMaarays(maarays) {
-    this.model = _.without(this.model, maarays);
-  }
-
-  lisaaMaarays() {
-    this.model = [
-      ...this.model,
-      {},
-    ];
-  }
-
-  asetaMaarays(index, asetettavaMaarays) {
-    this.model = _.map(this.model, (maarays, ind) => ind === index ? asetettavaMaarays : maarays);
-  }
-}
+const asetaMaarays = (index, asetettavaMaarays) => {
+  model.value = _.map(model.value, (maarays, ind) => ind === index ? asetettavaMaarays : maarays);
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

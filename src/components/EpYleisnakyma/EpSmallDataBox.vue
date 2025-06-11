@@ -1,7 +1,7 @@
 <template>
   <div class="box d-inline-flex flex-column  align-items-center justify-content-center text-center">
-    <div class="count">{{props.count}}</div>
-    <div class="topic">{{props.topic}}</div>
+    <div class="count">{{count}}</div>
+    <div class="topic">{{topic}}</div>
   </div>
 </template>
 
@@ -12,6 +12,9 @@ const props = defineProps<{
   topic: string;
   count: number;
 }>();
+
+// Destructuring props into local variables for easier access in template
+const { topic, count } = props;
 </script>
 
 <style scoped lang="scss">

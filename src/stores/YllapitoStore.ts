@@ -1,43 +1,29 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import { Maintenance, PerusteKevytDto, Perusteet, YllapitoDto } from '@shared/api/eperusteet';
+import { reactive, computed } from 'vue';
+import { Maintenance, PerusteDto, Perusteet, PerusteKevytDto, YllapitoDto } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
-export const useYllapitoStore = defineStore('yllapis', () => {
-  // State
-  const julkisivunPerusteet = ref<PerusteKevytDto[] | null>(null);
+export class YllapitoStore {
+  private state = reactive({
+    julkisivunPerusteet: null as PerusteKevytDto[] | null,
+  });
 
-  // Getters
-  const getJulkisivunPerusteet = computed(() => julkisivunPerusteet.value);
+  public readonly julkisivunPerusteet = computed(() => this.state.julkisivunPerusteet);
 
-  // Actions
-  async function fetchJulkisivunPerusteet() {
-    julkisivunPerusteet.value = null;
-    julkisivunPerusteet.value = (await Perusteet.getJulkaistutKoostePerusteet()).data;
+  public async fetchJulkisivunPerusteet() {
+    this.state.julkisivunPerusteet = null;
+    this.state.julkisivunPerusteet = (await Perusteet.getJulkaistutKoostePerusteet()).data;
   }
 
-  async function tallennaJulkisivunPerusteet(perusteet: PerusteKevytDto[]) {
+  public async tallennaJulkisivunPerusteet(perusteet: PerusteKevytDto[]) {
     await Perusteet.updateJulkaistutKoostePerusteet(perusteet);
-    julkisivunPerusteet.value = perusteet;
+    this.state.julkisivunPerusteet = perusteet;
   }
 
-  async function fetch() {
+  public async fetch() {
     return _.sortBy((await Maintenance.getYllapidot()).data, 'key');
   }
 
-  async function save(data: YllapitoDto[]) {
+  public async save(data: YllapitoDto[]) {
     await Maintenance.updateYllapito(data);
   }
-
-  return {
-    // State
-    julkisivunPerusteet,
-    // Getters
-    getJulkisivunPerusteet,
-    // Actions
-    fetchJulkisivunPerusteet,
-    tallennaJulkisivunPerusteet,
-    fetch,
-    save,
-  };
-});
+}

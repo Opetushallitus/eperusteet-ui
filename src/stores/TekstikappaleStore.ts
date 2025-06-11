@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { Matala, Perusteenosat, Sisallot, PerusteDtoTyyppiEnum, Laaja } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
@@ -8,8 +8,6 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { requiredOneLang } from '@shared/validators/required';
 import { PerusteenOsaDto } from '@shared/generated/eperusteet';
-
-Vue.use(VueCompositionApi);
 
 interface TekstikappaleStoreConfig {
   // notifikaatiotStore: NotifikaatiotStore;

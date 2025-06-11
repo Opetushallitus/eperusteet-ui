@@ -62,101 +62,107 @@
   </b-modal>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
-import { Prop, Component, Vue, InjectReactive } from 'vue-property-decorator';
+import { ref, computed, useTemplateRef, inject } from 'vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpContent,
-    EpInput,
-    EpToggle,
-    EpSearch,
-    EpMaterialIcon,
+const props = defineProps({
+  tutkinnonosat: {
+    type: Array,
+    required: false,
   },
-})
+});
 
-export default class TutkinnonosatAddModal extends Vue {
-  @Prop({ required: false })
-  private tutkinnonosat!: any;
+const emit = defineEmits(['save']);
 
-  private selected: any[] = [];
-  private queryTutkinnonOsa = '';
-  private showUnusedTutkinnonOsat = false;
-  private sivu = 1;
+const selected = ref([]);
+const queryTutkinnonOsa = ref('');
+const showUnusedTutkinnonOsat = ref(false);
+const sivu = ref(1);
 
-  @InjectReactive('kayttamattomatTutkinnonOsat')
-  private kayttamattomatTutkinnonOsat!: any[];
+const tutkinnonosatModal = useTemplateRef('tutkinnonosatModal');
 
-  show() {
-    this.selected = [];
-    this.sivu = 1;
-    this.showUnusedTutkinnonOsat = false;
-    this.queryTutkinnonOsa = '';
-    (this.$refs.tutkinnonosatModal as any).show();
+const kayttamattomatTutkinnonOsat = inject('kayttamattomatTutkinnonOsat', [] as any[]);
+
+const show = () => {
+  selected.value = [];
+  sivu.value = 1;
+  showUnusedTutkinnonOsat.value = false;
+  queryTutkinnonOsa.value = '';
+  (tutkinnonosatModal.value as any).show();
+};
+
+const save = () => {
+  emit('save', selected.value);
+  (tutkinnonosatModal.value as any).hide();
+};
+
+const cancel = () => {
+  (tutkinnonosatModal.value as any).hide();
+};
+
+const items = computed(() => {
+  if (!props.tutkinnonosat) {
+    return null;
   }
 
-  save() {
-    this.$emit('save', this.selected);
-    (this.$refs.tutkinnonosatModal as any).hide();
-  }
-
-  cancel() {
-    (this.$refs.tutkinnonosatModal as any).hide();
-  }
-
-  get items() {
-    if (!this.tutkinnonosat) {
-      return null;
-    }
-
-    return _.chain(this.tutkinnonosat)
-      .filter(tosa => !this.showUnusedTutkinnonOsat || _.includes(_.map(this.kayttamattomatTutkinnonOsat, '_tutkinnonOsa'), tosa._tutkinnonOsa))
-      .filter(this.$filterBy('nimi', this.queryTutkinnonOsa))
-      .map(tutkinnonosa => {
-        return {
-          ...tutkinnonosa,
-          selected: _.includes(_.map(this.selected, '_tutkinnonOsa'), _.get(tutkinnonosa, '_tutkinnonOsa')),
-        };
-      })
-      .value();
-  }
-
-  onRowSelected(items) {
-    if (!_.isEmpty(items)) {
-      const row = items[0];
-
-      if (_.includes(_.map(this.selected, '_tutkinnonOsa'), _.get(row, '_tutkinnonOsa'))) {
-        this.selected = _.filter(this.selected, tosa => tosa._tutkinnonOsa !== row._tutkinnonOsa);
+  return _.chain(props.tutkinnonosat)
+    .filter(tosa => !showUnusedTutkinnonOsat.value || _.includes(_.map(kayttamattomatTutkinnonOsat, '_tutkinnonOsa'), tosa._tutkinnonOsa))
+    .filter((tosa) => {
+      if (!queryTutkinnonOsa.value) {
+        return true;
       }
-      else {
-        this.selected = [
-          ...this.selected,
-          row,
-        ];
-      }
+
+      const search = queryTutkinnonOsa.value.toLowerCase();
+      const nimi = $kaanna(tosa.nimi).toLowerCase();
+      return nimi.includes(search);
+    })
+    .map(tutkinnonosa => {
+      return {
+        ...tutkinnonosa,
+        selected: _.includes(_.map(selected.value, '_tutkinnonOsa'), _.get(tutkinnonosa, '_tutkinnonOsa')),
+      };
+    })
+    .value();
+});
+
+const onRowSelected = (items) => {
+  if (!_.isEmpty(items)) {
+    const row = items[0];
+
+    if (_.includes(_.map(selected.value, '_tutkinnonOsa'), _.get(row, '_tutkinnonOsa'))) {
+      selected.value = _.filter(selected.value, tosa => tosa._tutkinnonOsa !== row._tutkinnonOsa);
+    }
+    else {
+      selected.value = [
+        ...selected.value,
+        row,
+      ];
     }
   }
+};
 
-  get fields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-    }, {
-      key: 'laajuus',
-      label: this.$t('osaamispiste'),
-      thStyle: { width: '30%' },
-    }];
-  }
-}
+const fields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+  }, {
+    key: 'laajuus',
+    label: $t('osaamispiste'),
+    thStyle: { width: '30%' },
+  }];
+});
 
+defineExpose({
+  show,
+});
 </script>
 
 <style lang="scss" scoped>
@@ -166,7 +172,7 @@ export default class TutkinnonosatAddModal extends Vue {
     color: $paletti-blue;
   }
 
-  ::v-deep .filter {
+  :deep(.filter) {
     max-width: 100%;
   }
 </style>
