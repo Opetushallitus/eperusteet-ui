@@ -1,48 +1,31 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import Vue from 'vue';
+import { reactive, computed } from 'vue';
 import { Tapahtuma } from '@shared/utils/aikataulu';
+import _ from 'lodash';
 import { PerusteDto, Aikataulut } from '@shared/api/eperusteet';
 
-export const useAikatauluStore = defineStore('aikataulu', () => {
-  // State
-  const aikataulutapahtumat = ref<Tapahtuma[] | null>(null);
-  const peruste = ref<PerusteDto | null>(null);
+export class AikatauluStore {
+  private state = reactive({
+    aikataulutapahtumat: null as Tapahtuma[] | null,
+    peruste: null as PerusteDto | null,
+  });
 
-  // Getters
-  const getAikataulutapahtumat = computed(() => peruste.value?.perusteenAikataulut);
-  const getPeruste = computed(() => peruste.value);
+  public readonly aikataulutapahtumat = computed(() => this.state.peruste?.perusteenAikataulut);
+  public readonly peruste = computed(() => this.state.peruste);
 
-  // Actions
-  function clear() {
-    aikataulutapahtumat.value = null;
+  clear() {
+    this.state.aikataulutapahtumat = null;
   }
 
-  async function init(perusteParam: PerusteDto) {
-    peruste.value = perusteParam;
+  async init(peruste) {
+    this.state.peruste = peruste;
   }
 
-  async function saveAikataulut(aikataulut: any) {
-    if (!peruste.value?.id) {
-      throw new Error('Peruste not initialized');
-    }
-
-    const tallennetut = await Aikataulut.updatePerusteenAikataulut(peruste.value.id, aikataulut);
-    peruste.value = {
-      ...peruste.value,
+  async saveAikataulut(aikataulut) {
+    const tallennetut = await Aikataulut.updatePerusteenAikataulut((this.state.peruste as any).id, aikataulut);
+    this.state.peruste = {
+      ...(this.state.peruste as any),
       perusteenAikataulut: tallennetut.data,
     };
   }
-
-  return {
-    // State
-    aikataulutapahtumat,
-    peruste,
-    // Getters
-    getAikataulutapahtumat,
-    getPeruste,
-    // Actions
-    clear,
-    init,
-    saveAikataulut,
-  };
-});
+}

@@ -160,175 +160,176 @@
   </b-modal>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, useTemplateRef, reactive } from 'vue';
 import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
-import { Validations } from 'vuelidate-property-decorators';
-import { notNull, requiredLokalisoituTeksti } from '@shared/validators/required';
 import * as _ from 'lodash';
 import { OsaamismerkkiDto, OsaamismerkkiDtoTilaEnum } from '@shared/generated/eperusteet';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
-import { required } from 'vuelidate/lib/validators';
 import { Kieli } from '@shared/tyypit';
+import { useVuelidate } from '@vuelidate/core';
+import { notNull, requiredLokalisoituTeksti } from '@shared/validators/required';
+import { required } from 'vuelidate/lib/validators';
+import { $t, $kaanna, $sdt, $success, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    draggable,
-    EpDatepicker,
-    EpButton,
-    EpMaterialIcon,
-    EpMultiSelect,
-    EpInput,
-    EpKielivalinta,
+const props = defineProps({
+  store: {
+    type: Object as () => OsaamismerkitStore,
+    required: true,
   },
-})
-export default class EpOsaamismerkkiModal extends Vue {
-  @Prop({ required: true })
-  private store!: OsaamismerkitStore;
+});
 
-  private osaamismerkki: OsaamismerkkiDto = {};
-  private tallennetaan: boolean = false;
+const osaamismerkkiModal = useTemplateRef('osaamismerkkiModal');
+const osaamismerkki = ref<OsaamismerkkiDto>({
+  osaamistavoitteet: [],
+  arviointikriteerit: [],
+});
+const tallennetaan = ref(false);
 
-  @Validations()
-  validations = this.createValidationStructure(OsaamismerkkiDtoTilaEnum.LAADINTA);
+const defaultDragOptions = {
+  animation: 300,
+  emptyInsertThreshold: 10,
+  handle: '.order-handle',
+  ghostClass: 'dragged',
+  disabled: false,
+};
 
-  init() {
-    this.osaamismerkki = {
-      osaamistavoitteet: [],
-      arviointikriteerit: [],
-    };
-    this.osaamismerkki.tila = OsaamismerkkiDtoTilaEnum.LAADINTA;
-  }
-
-  get defaultDragOptions() {
-    return {
-      animation: 300,
-      emptyInsertThreshold: 10,
-      handle: '.order-handle',
-      ghostClass: 'dragged',
-      disabled: false,
-    };
-  }
-
-  avaaModal(osaamismerkki) {
-    if (osaamismerkki) {
-      this.osaamismerkki = _.cloneDeep(osaamismerkki);
-      this.validations = this.createValidationStructure(this.osaamismerkki.tila);
-    }
-    else {
-      this.init();
-    }
-    (this.$refs['osaamismerkkiModal'] as any).show();
-  }
-
-  async tallenna() {
-    this.tallennetaan = true;
-    try {
-      await this.store.updateOsaamismerkki(this.osaamismerkki);
-      this.tallennetaan = false;
-      this.$success(this.$t('osaamismerkin-paivitys-onnistui') as string);
-      await this.store.updateOsaamismerkkiQuery(this.store.options.value);
-      this.sulje();
-    }
-    catch (err) {
-      this.tallennetaan = false;
-      this.$fail(this.$t('osaamismerkin-paivitys-epaonnistui') as string);
-    }
-  }
-
-  async poistaOsaamismerkki() {
-    try {
-      await this.store.deleteOsaamismerkki(this.osaamismerkki.id);
-      this.tallennetaan = false;
-      this.$success(this.$t('osaamismerkin-poistaminen-onnistui') as string);
-      await this.store.updateOsaamismerkkiQuery(this.store.options.value);
-      this.sulje();
-    }
-    catch (err) {
-      this.tallennetaan = false;
-      this.$fail(this.$t('osaamismerkin-poistaminen-epaonnistui') as string);
-    }
-  }
-
-  sulje() {
-    this.osaamismerkki = {};
-    (this.$refs['osaamismerkkiModal'] as any).hide();
-  }
-
-  poistaTavoite(poistettavaTavoite) {
-    this.osaamismerkki.osaamistavoitteet = _.filter(this.osaamismerkki.osaamistavoitteet, (tavoite) => tavoite !== poistettavaTavoite);
-  }
-
-  lisaaTavoite() {
-    this.osaamismerkki.osaamistavoitteet?.push({
-      osaamistavoite: undefined,
-    });
-  }
-
-  poistaKriteeri(poistettavaKriteeri) {
-    this.osaamismerkki.arviointikriteerit = _.filter(this.osaamismerkki.arviointikriteerit, (kriteeri) => kriteeri !== poistettavaKriteeri);
-  }
-
-  lisaaKriteeri() {
-    this.osaamismerkki.arviointikriteerit?.push({
-      arviointikriteeri: undefined,
-    });
-  }
-
-  get isJulkinen() {
-    return this.osaamismerkki.tila === OsaamismerkkiDtoTilaEnum.JULKAISTU;
-  }
-
-  set isJulkinen(tila) {
-    this.osaamismerkki.tila = tila ? OsaamismerkkiDtoTilaEnum.JULKAISTU : OsaamismerkkiDtoTilaEnum.LAADINTA;
-    this.validations = this.createValidationStructure(this.osaamismerkki.tila);
-  }
-
-  get osaamismerkkiKategoriat() {
-    return this.store.kategoriat.value;
-  }
-
-  get invalid() {
-    return this.$v.$invalid;
-  }
-
-  get muokkausText() {
-    return ' - ' + this.$t('muokannut-viimeksi') + ': ' + this.osaamismerkki.muokkaaja + ' ';
-  }
-
-  get koodi() {
-    return this.osaamismerkki.koodiUri ? this.osaamismerkki.koodiUri.split('_')[1] : null;
-  }
-
-  createValidationStructure(tila) {
-    let kielet = tila === OsaamismerkkiDtoTilaEnum.JULKAISTU ? [Kieli.fi, Kieli.sv] : [Kieli.fi];
-    return {
-      osaamismerkki: {
-        nimi: requiredLokalisoituTeksti(kielet),
-        kategoria: notNull(),
-        voimassaoloAlkaa: notNull(),
-        osaamistavoitteet: {
-          $each: {
-            osaamistavoite: requiredLokalisoituTeksti(kielet),
-          },
-          required,
+const createValidationStructure = (tila: OsaamismerkkiDtoTilaEnum) => {
+  const kielet = tila === OsaamismerkkiDtoTilaEnum.JULKAISTU ? [Kieli.fi, Kieli.sv] : [Kieli.fi];
+  return {
+    osaamismerkki: {
+      nimi: requiredLokalisoituTeksti(kielet),
+      kategoria: notNull(),
+      voimassaoloAlkaa: notNull(),
+      osaamistavoitteet: {
+        $each: {
+          osaamistavoite: requiredLokalisoituTeksti(kielet),
         },
-        arviointikriteerit: {
-          $each: {
-            arviointikriteeri: requiredLokalisoituTeksti(kielet),
-          },
-          required,
-        },
+        required,
       },
-    };
+      arviointikriteerit: {
+        $each: {
+          arviointikriteeri: requiredLokalisoituTeksti(kielet),
+        },
+        required,
+      },
+    },
+  };
+};
+
+const state = reactive({
+  rules: createValidationStructure(OsaamismerkkiDtoTilaEnum.LAADINTA),
+});
+
+const v$ = useVuelidate(state.rules, { osaamismerkki });
+
+const init = () => {
+  osaamismerkki.value = {
+    osaamistavoitteet: [],
+    arviointikriteerit: [],
+    tila: OsaamismerkkiDtoTilaEnum.LAADINTA,
+  };
+  state.rules = createValidationStructure(OsaamismerkkiDtoTilaEnum.LAADINTA);
+};
+
+const avaaModal = (merkki) => {
+  if (merkki) {
+    osaamismerkki.value = _.cloneDeep(merkki);
+    state.rules = createValidationStructure(osaamismerkki.value.tila!);
+  }
+  else {
+    init();
+  }
+  (osaamismerkkiModal.value as any).show();
+};
+
+const tallenna = async () => {
+  tallennetaan.value = true;
+  try {
+    await props.store.updateOsaamismerkki(osaamismerkki.value);
+    tallennetaan.value = false;
+    $success($t('osaamismerkin-paivitys-onnistui') as string);
+    await props.store.updateOsaamismerkkiQuery(props.store.options.value);
+    sulje();
+  }
+  catch (err) {
+    tallennetaan.value = false;
+    $fail($t('osaamismerkin-paivitys-epaonnistui') as string);
   }
 };
+
+const poistaOsaamismerkki = async () => {
+  try {
+    await props.store.deleteOsaamismerkki(osaamismerkki.value.id);
+    tallennetaan.value = false;
+    $success($t('osaamismerkin-poistaminen-onnistui') as string);
+    await props.store.updateOsaamismerkkiQuery(props.store.options.value);
+    sulje();
+  }
+  catch (err) {
+    tallennetaan.value = false;
+    $fail($t('osaamismerkin-poistaminen-epaonnistui') as string);
+  }
+};
+
+const sulje = () => {
+  osaamismerkki.value = {};
+  (osaamismerkkiModal.value as any).hide();
+};
+
+const poistaTavoite = (poistettavaTavoite) => {
+  osaamismerkki.value.osaamistavoitteet = _.filter(osaamismerkki.value.osaamistavoitteet, (tavoite) => tavoite !== poistettavaTavoite);
+};
+
+const lisaaTavoite = () => {
+  osaamismerkki.value.osaamistavoitteet?.push({
+    osaamistavoite: undefined,
+  });
+};
+
+const poistaKriteeri = (poistettavaKriteeri) => {
+  osaamismerkki.value.arviointikriteerit = _.filter(osaamismerkki.value.arviointikriteerit, (kriteeri) => kriteeri !== poistettavaKriteeri);
+};
+
+const lisaaKriteeri = () => {
+  osaamismerkki.value.arviointikriteerit?.push({
+    arviointikriteeri: undefined,
+  });
+};
+
+const isJulkinen = computed({
+  get: () => osaamismerkki.value.tila === OsaamismerkkiDtoTilaEnum.JULKAISTU,
+  set: (tila) => {
+    osaamismerkki.value.tila = tila ? OsaamismerkkiDtoTilaEnum.JULKAISTU : OsaamismerkkiDtoTilaEnum.LAADINTA;
+    state.rules = createValidationStructure(osaamismerkki.value.tila!);
+  },
+});
+
+const osaamismerkkiKategoriat = computed(() => {
+  return props.store.kategoriat.value;
+});
+
+const invalid = computed(() => {
+  return v$.value.$invalid;
+});
+
+const muokkausText = computed(() => {
+  return ' - ' + $t('muokannut-viimeksi') + ': ' + osaamismerkki.value.muokkaaja + ' ';
+});
+
+const koodi = computed(() => {
+  return osaamismerkki.value.koodiUri ? osaamismerkki.value.koodiUri.split('_')[1] : null;
+});
+
+defineExpose({
+  avaaModal,
+});
 </script>
 
 <style lang="scss" scoped>
@@ -337,5 +338,4 @@ export default class EpOsaamismerkkiModal extends Vue {
 .muokattu-text {
   color: $gray-lighten-12;
 }
-
 </style>

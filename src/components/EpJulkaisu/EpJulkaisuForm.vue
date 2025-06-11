@@ -66,8 +66,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, useTemplateRef } from 'vue';
 import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
@@ -76,119 +76,112 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import { Validations } from 'vuelidate-property-decorators';
-import { validationMixin } from 'vuelidate';
+import { useVuelidate } from '@vuelidate/core';
 import { notNull } from '@shared/validators/required';
 import { requiredIf } from 'vuelidate/lib/validators';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpTiedostoLataus,
-    EpContent,
-    EpDatepicker,
-    EpToggle,
-    EpButton,
-    EpMultiSelect,
-    EpInput,
-    EpMaterialIcon,
+const props = defineProps({
+  store: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class EpJulkaisuForm extends Mixins(validationMixin) {
-  @Prop({ required: true })
-  private store!: PerusteStore;
+  julkaisu: {
+    type: Object,
+    required: true,
+  },
+  isLatest: {
+    type: Boolean,
+    default: false,
+  },
+  muutosmaarays: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-  @Prop({ required: true })
-  private julkaisu: any;
+const emit = defineEmits(['setInvalid']);
+const file = ref(null);
+const tiedostoLataus = useTemplateRef('tiedostoLataus');
 
-  @Prop({ default: false, type: Boolean })
-  private isLatest!: boolean;
-
-  @Prop({ default: false, type: Boolean })
-  private muutosmaarays!: boolean;
-
-  private file: any | null = null;
-
-  @Validations()
-  validations = {
-    julkaisu: {
-      liitteet: {
-        $each: {
-          nimi: notNull(),
-          kieli: notNull(),
-        },
-        required: requiredIf(() => this.julkaisu.muutosmaaraysVoimaan),
+const rules = computed(() => ({
+  julkaisu: {
+    liitteet: {
+      $each: {
+        nimi: notNull(),
+        kieli: notNull(),
       },
-      muutosmaaraysVoimaan: {
-        required: requiredIf(() => this.julkaisu.liitteet.length > 0),
-      },
+      required: requiredIf(() => props.julkaisu.muutosmaaraysVoimaan),
     },
-  };
+    muutosmaaraysVoimaan: {
+      required: requiredIf(() => props.julkaisu.liitteet.length > 0),
+    },
+  },
+}));
 
-  lisaaLiite() {
-    this.julkaisuLiitteet.push({
-      data: window.btoa(this.file.binary),
-      kieli: '',
-      nimi: this.file.file.name,
-      liite: {
-        nimi: this.file.file.name,
-        tyyppi: 'julkaisumuutosmaarays',
-      },
-    });
-    this.file = null;
-    (this.$refs['tiedostoLataus'] as any).resetFile();
-  }
+const v$ = useVuelidate(rules, { julkaisu: props.julkaisu });
 
-  async poistaLiite(index) {
-    Vue.delete(this.julkaisuLiitteet, index);
-  }
-
-  get perusteId() {
-    return this.store.perusteId.value;
-  }
-
-  get julkaisukielet() {
-    return this.store.julkaisukielet.value;
-  }
-
-  get julkaisuLiitteet() {
-    return this.julkaisu.liitteet;
-  }
-
-  get isMuutosmaaraysDataRequired() {
-    return this.julkaisuLiitteet.length > 0 || this.julkaisu.muutosmaaraysVoimaan;
-  }
-
-  get asterisk() {
-    return this.isMuutosmaaraysDataRequired ? '*' : '';
-  }
-
-  @Watch('file')
-  fileChange() {
-    if (this.file) {
-      this.lisaaLiite();
-    }
-  }
-
-  @Watch('julkaisuLiitteet', { deep: true })
-  liitteetChange() {
-    this.checkValidity();
-  }
-
-  @Watch('julkaisu.muutosmaaraysVoimaan')
-  julkaisuChange() {
-    this.checkValidity();
-  }
-
-  checkValidity() {
-    this.$emit('setInvalid', this.$v.$invalid);
-  }
+const checkValidity = () => {
+  emit('setInvalid', v$.value.$invalid);
 };
+
+const lisaaLiite = () => {
+  julkaisuLiitteet.value.push({
+    data: window.btoa(file.value.binary),
+    kieli: '',
+    nimi: file.value.file.name,
+    liite: {
+      nimi: file.value.file.name,
+      tyyppi: 'julkaisumuutosmaarays',
+    },
+  });
+  file.value = null;
+  (tiedostoLataus.value as any).resetFile();
+};
+
+const poistaLiite = async (index) => {
+  julkaisuLiitteet.value.splice(index, 1);
+};
+
+const perusteId = computed(() => {
+  return props.store.perusteId.value;
+});
+
+const julkaisukielet = computed(() => {
+  return props.store.julkaisukielet.value;
+});
+
+const julkaisuLiitteet = computed(() => {
+  return props.julkaisu.liitteet;
+});
+
+const isMuutosmaaraysDataRequired = computed(() => {
+  return julkaisuLiitteet.value.length > 0 || props.julkaisu.muutosmaaraysVoimaan;
+});
+
+const asterisk = computed(() => {
+  return isMuutosmaaraysDataRequired.value ? '*' : '';
+});
+
+watch(file, () => {
+  if (file.value) {
+    lisaaLiite();
+  }
+});
+
+watch(julkaisuLiitteet, () => {
+  checkValidity();
+}, { deep: true });
+
+watch(() => props.julkaisu.muutosmaaraysVoimaan, () => {
+  checkValidity();
+});
 </script>
 
 <style lang="scss" scoped>
 
-::v-deep table {
+:deep(table) {
   table-layout: fixed;
 }
 

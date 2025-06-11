@@ -1,12 +1,9 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, watch } from '@vue/composition-api';
+import { reactive, computed, watch } from 'vue';
 import { Debounced } from '@shared/utils/delay';
 import * as _ from 'lodash';
 import { Page } from '@shared/tyypit';
 import { getAllPerusteetInternal, PerusteDto, PerusteHakuInternalDto, Tutkinnonosat, TutkinnonOsaViiteKontekstiDto, TutkinnonRakenne, TutkinnonOsaViiteLuontiDto } from '@shared/api/eperusteet';
 import { AmmatillisetKoulutustyypit, perusteenSuoritustapa } from '@shared/utils/perusteet';
-
-Vue.use(VueCompositionApi);
 
 export class TutkinnonosatTuontiStore {
   public state = reactive({

@@ -68,9 +68,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed, ref, useTemplateRef } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpJulkaisuModal from './EpJulkaisuModal.vue';
@@ -79,6 +79,7 @@ import { parsiEsitysnimi } from '@/stores/kayttaja';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { MaaraysLiiteDtoTyyppiEnum } from '@shared/generated/eperusteet';
 import { MaarayksetParams, baseURL } from '@shared/api/eperusteet';
+import { $t, $bvModal, $kaanna, $slang } from '@shared/utils/globals';
 
 interface Julkaisu {
   revision?: number;
@@ -89,102 +90,97 @@ interface Julkaisu {
   liitteet?: any;
 }
 
-@Component({
-  components: {
-    EpButton,
-    EpSpinner,
-    EpJulkaisuModal,
-    EpMaterialIcon,
+const props = defineProps({
+  store: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class EpJulkaisuHistoria extends Vue {
-  @Prop({ required: true })
-  private store!: PerusteStore;
+  palauta: {
+    type: Function,
+    required: false,
+  },
+});
 
-  @Prop({ required: false })
-  private palauta!: Function;
+const palautuksessa = ref(null);
+const julkaisuModal = useTemplateRef('julkaisuModal');
 
-  private palautuksessa: any | null = null;
+const julkaisut = computed(() => {
+  return props.store.julkaisut.value;
+});
 
-  get julkaisut() {
-    return this.store.julkaisut.value;
+const perusteId = computed(() => {
+  return props.store.perusteId.value;
+});
+
+const julkaisukielet = computed(() => {
+  return props.store.julkaisukielet.value;
+});
+
+const julkaisutMapped = computed(() => {
+  return _.chain(julkaisut.value)
+    .filter(julkaisu => julkaisu !== undefined)
+    .map(julkaisu => {
+      return {
+        ...julkaisu,
+        ...(julkaisu.kayttajanTieto && { nimi: parsiEsitysnimi(julkaisu.kayttajanTieto) }),
+        tila: julkaisu.tila || 'JULKAISTU',
+        palautuksessa: palautuksessa.value === julkaisu.revision,
+        liitteet: muutosmaaraysLiite(julkaisu),
+        ...(!!julkaisu.muutosmaarays && {
+          muutosmaarays: {
+            ...julkaisu.muutosmaarays,
+            url: muutosmaaraysUrl(julkaisu.muutosmaarays),
+          },
+        }),
+      };
+    })
+    .sortBy('revision')
+    .reverse()
+    .value();
+});
+
+const latestJulkaisuRevision = computed(() => {
+  return _.find(julkaisutMapped.value, julkaisu => julkaisu.tila === 'JULKAISTU');
+});
+
+const palautaConfirm = async (julkaisu) => {
+  if (await $bvModal.msgBoxConfirm(($t('toiminto-kopioi-ja-palauttaa-valitsemasi-version-julkiseksi')), {
+    title: $t('palauta-versio-julkiseksi'),
+    okVariant: 'primary',
+    okTitle: $t('kylla'),
+    cancelVariant: 'link',
+    cancelTitle: $t('peruuta'),
+    centered: true,
+  })) {
+    palautuksessa.value = julkaisu.revision;
+    await props.palauta(julkaisu);
+    palautuksessa.value = null;
+  }
+};
+
+const muutosmaaraysLiite = (julkaisu) => {
+  if (julkaisu.liitteet && julkaisu.liitteet.length > 0) {
+    julkaisu.liitteet.forEach(liiteData => {
+      liiteData.url = `/eperusteet-service/api/perusteet/${julkaisu.peruste.id!}/julkaisu/liitteet/${liiteData.liite.id}`;
+    });
+    return julkaisu.liitteet;
+  }
+  else {
+    return [];
+  }
+};
+
+const muutosmaaraysUrl = (muutosmaarays) => {
+  if (!_.find(muutosmaarays.liitteet![$slang()].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI)) {
+    return null;
   }
 
-  get perusteId() {
-    return this.store.perusteId.value;
-  }
+  return baseURL + MaarayksetParams.getMaaraysLiite(_.toString(_.get(_.find(muutosmaarays.liitteet![$slang()].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI), 'id'))).url;
+};
 
-  get julkaisukielet() {
-    return this.store.julkaisukielet.value;
-  }
-
-  get julkaisutMapped() {
-    return _.chain(this.julkaisut)
-      .filter(julkaisu => julkaisu !== undefined)
-      .map(julkaisu => {
-        return {
-          ...julkaisu,
-          ...(julkaisu.kayttajanTieto && { nimi: parsiEsitysnimi(julkaisu.kayttajanTieto) }),
-          tila: julkaisu.tila || 'JULKAISTU',
-          palautuksessa: this.palautuksessa === julkaisu.revision,
-          liitteet: this.muutosmaaraysLiite(julkaisu),
-          ...(!!julkaisu.muutosmaarays && {
-            muutosmaarays: {
-              ...julkaisu.muutosmaarays,
-              url: this.muutosmaaraysUrl(julkaisu.muutosmaarays),
-            },
-          }),
-        };
-      })
-      .sortBy('revision')
-      .reverse()
-      .value();
-  }
-
-  get latestJulkaisuRevision() {
-    return _.find(this.julkaisutMapped, julkaisu => julkaisu.tila === 'JULKAISTU');
-  }
-
-  async palautaConfirm(julkaisu) {
-    if (await this.$bvModal.msgBoxConfirm((this.$t('toiminto-kopioi-ja-palauttaa-valitsemasi-version-julkiseksi') as any), {
-      title: this.$t('palauta-versio-julkiseksi'),
-      okVariant: 'primary',
-      okTitle: this.$t('kylla') as any,
-      cancelVariant: 'link',
-      cancelTitle: this.$t('peruuta') as any,
-      centered: true,
-      ...{} as any,
-    })) {
-      this.palautuksessa = julkaisu.revision;
-      await this.palauta(julkaisu);
-      this.palautuksessa = null;
-    }
-  }
-
-  muutosmaaraysLiite(julkaisu) {
-    if (julkaisu.liitteet && julkaisu.liitteet.length > 0) {
-      julkaisu.liitteet.forEach(liiteData => {
-        liiteData.url = `/eperusteet-service/api/perusteet/${julkaisu.peruste.id!}/julkaisu/liitteet/${liiteData.liite.id}`;
-      });
-      return julkaisu.liitteet;
-    }
-    else {
-      return [];
-    }
-  }
-
-  muutosmaaraysUrl(muutosmaarays) {
-    if (!_.find(muutosmaarays.liitteet![this.$slang.value].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI)) {
-      return null;
-    }
-
-    return baseURL + MaarayksetParams.getMaaraysLiite(_.toString(_.get(_.find(muutosmaarays.liitteet![this.$slang.value].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI), 'id'))).url;
-  }
-
-  avaaMuokkausModal(julkaisu) {
-    (this.$refs['julkaisuModal'] as any).muokkaa(julkaisu, this.latestJulkaisuRevision!.revision === julkaisu.revision);
-  }
-}
+const avaaMuokkausModal = (julkaisu) => {
+  julkaisuModal.value.muokkaa(julkaisu, latestJulkaisuRevision.value!.revision === julkaisu.revision);
+};
 </script>
 
 <style scoped lang="scss">
@@ -225,5 +221,4 @@ export default class EpJulkaisuHistoria extends Vue {
   display: inline;
   padding-right: 5px;
 }
-
 </style>

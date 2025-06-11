@@ -21,63 +21,60 @@
   </div>
 </template>
 
-<script lang="ts">
-
-import { Vue, Component, Prop, Mixins, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
 import _ from 'lodash';
+import { ref, computed, useTemplateRef } from 'vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { PerusteDto, TiedoteDto } from '@shared/api/eperusteet';
+import { $t, $kaanna, $sdt } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSpinner,
-    EpButton,
-    EpTiedoteModal,
+const props = defineProps({
+  tiedotteetStore: {
+    type: Object as () => TiedotteetStore,
+    required: true,
   },
-})
-export default class EpPerusteTiedotteet extends Vue {
-  @Prop({ required: true })
-  private tiedotteetStore!: TiedotteetStore;
+  peruste: {
+    type: Object as () => PerusteDto,
+    required: true,
+  },
+});
 
-  @Prop({ required: true })
-  private peruste!: PerusteDto;
+const tiedoteMaara = ref(3);
+const eptiedotemodal = useTemplateRef('eptiedotemodal');
 
-  private tiedoteMaara = 3;
+const tiedotteet = computed(() => {
+  return props.tiedotteetStore.tiedotteet.value;
+});
 
-  get tiedotteet() {
-    return this.tiedotteetStore.tiedotteet.value;
-  }
+const tiedotteetSize = computed(() => {
+  return _.size(props.tiedotteetStore.tiedotteet.value);
+});
 
-  get tiedotteetSize() {
-    return _.size(this.tiedotteetStore.tiedotteet.value);
-  }
+const onkoUusi = (aika) => {
+  const paiva = 1000 * 60 * 60 * 24;
+  const paivaSitten = Date.now() - paiva;
 
-  get tiedotteetFiltered() {
-    return _.chain(this.tiedotteetStore.tiedotteet.value)
-      .map(tiedote => {
-        return {
-          ...tiedote,
-          uusi: this.onkoUusi(tiedote.luotu),
-        };
-      })
-      .take(this.tiedoteMaara)
-      .value();
-  }
+  return aika > paivaSitten;
+};
 
-  avaaTiedote(tiedote: TiedoteDto) {
-    (this as any).$refs['eptiedotemodal'].muokkaa(tiedote);
-  }
+const tiedotteetFiltered = computed(() => {
+  return _.chain(props.tiedotteetStore.tiedotteet.value)
+    .map(tiedote => {
+      return {
+        ...tiedote,
+        uusi: onkoUusi(tiedote.luotu),
+      };
+    })
+    .take(tiedoteMaara.value)
+    .value();
+});
 
-  onkoUusi(aika) {
-    const paiva = 1000 * 60 * 60 * 24;
-    const paivaSitten = Date.now() - paiva;
-
-    return aika > paivaSitten;
-  }
-}
+const avaaTiedote = (tiedote: TiedoteDto) => {
+  eptiedotemodal.value.muokkaa(tiedote);
+};
 </script>
 
 <style scoped lang="scss">
@@ -120,7 +117,7 @@ export default class EpPerusteTiedotteet extends Vue {
       }
     }
 
-    ::v-deep .btn {
+    :deep(.btn) {
       padding: 0px;
     }
 

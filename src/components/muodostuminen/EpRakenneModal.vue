@@ -128,19 +128,19 @@
       </div>
       <div v-else>
         <b-form-group :label="$t('pakollisuus')">
-          <ep-toggle v-model="value.pakollinen" switch>
+          <ep-toggle v-model="modelValue.pakollinen" switch>
             {{ $t('tutkinnon-osa-on-pakollinen') }}
           </ep-toggle>
         </b-form-group>
       </div>
       <b-form-group :label="$t('kuvaus')">
-        <ep-content v-model="value.kuvaus" :is-editable="true" layout="normal"></ep-content>
+        <ep-content v-model="modelValue.kuvaus" :is-editable="true" layout="normal"></ep-content>
       </b-form-group>
     </template>
   </b-modal>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -148,316 +148,319 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
 import { Kieli } from '@shared/tyypit';
 import { Kielet } from '@shared/stores/kieli';
-import { Prop, Component, Vue, Watch, InjectReactive } from 'vue-property-decorator';
+import { ref, computed, watch, inject, useTemplateRef } from 'vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpContent,
-    EpInput,
-    EpToggle,
-    EpKielivalinta,
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    required: true,
   },
-})
+  tutkinnonOsatMap: {
+    type: Object,
+    required: false,
+  },
+  muokkaus: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+});
 
-export default class EpRakenneModal extends Vue {
-  @Prop({ required: true })
-  private value!: any;
+const emit = defineEmits(['update:modelValue', 'save', 'remove']);
 
-  @Prop({ required: false })
-  private tutkinnonOsatMap!: any;
+const nimiValinta = ref(null);
+const tyyppi = ref(null);
+const tempModel = ref(null);
+const oldMaksimi = ref(1);
+const rakenneModal = useTemplateRef('rakenneModal');
 
-  @InjectReactive('osaamisalat')
-  private osaamisalat!: any[];
+const osaamisalat = inject('osaamisalat', []);
+const tutkintonimikkeet = inject('tutkintonimikkeet', []);
 
-  @InjectReactive('tutkintonimikkeet')
-  private tutkintonimikkeet!: any[];
+const tyyppiRoolit = {
+  'rakenne-moduuli-pakollinen': 'määritelty',
+  'rakenne-moduuli-valinnainen': 'määritelty',
+  'rakenne-moduuli-ammatilliset': 'määritelty',
+  'rakenne-moduuli-yhteiset': 'vieras',
+  'rakenne-moduuli-paikalliset': 'määrittelemätön',
+};
 
-  @Prop({ required: false, default: false, type: Boolean })
-  private muokkaus!: boolean;
+const innerModel = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  private nimiValinta: 'paikallinen' | 'tutkinnonosato' | 'korkeakoulu' | 'yhteinen' | 'muu' | null = null;
-  private tyyppi: string | null = null;
-  private tempModel: any;
-  private oldMaksimi = 1;
+const defaultTyyppi = computed(() => {
+  if (props.modelValue.rooli === 'osaamisala') {
+    return 'osaamisala';
+  }
+  else if (props.modelValue.rooli === 'tutkintonimike') {
+    return 'tutkintonimike';
+  }
 
-  private tyyppiRoolit = {
-    'rakenne-moduuli-pakollinen': 'määritelty',
-    'rakenne-moduuli-valinnainen': 'määritelty',
-    'rakenne-moduuli-ammatilliset': 'määritelty',
-    'rakenne-moduuli-yhteiset': 'vieras',
-    'rakenne-moduuli-paikalliset': 'määrittelemätön',
+  const rakennetyypit = [
+    'osaamisala',
+    'tutkintonimike',
+    'rakenne-moduuli-valinnainen',
+    'rakenne-moduuli-ammatilliset',
+    'rakenne-moduuli-yhteiset',
+    'rakenne-moduuli-paikalliset',
+    'rakenne-moduuli-pakollinen',
+  ];
+  for (const rt of rakennetyypit) {
+    if (props.modelValue?.nimi && props.modelValue.nimi[Kielet.getUiKieli.value] === $t(rt)) {
+      return rt;
+    }
+  }
+
+  return 'rakenne-moduuli-paikalliset';
+});
+
+const nimiValintaTekstit = computed(() => {
+  return {
+    'paikallinen': 'peruste-rakenne-nimi-paikallisiin',
+    'tutkinnonosato': 'peruste-rakenne-nimi-tutkinnon-osa-toisesta',
+    'korkeakoulu': 'peruste-rakenne-nimi-korkeakouluopinnot',
+    'yhteinen': 'peruste-rakenne-nimi-yhteisten-tutkinnon-osien',
+    'muu': 'peruste-rakenne-nimi-jokin-muu',
   };
+});
 
-  set innerModel(innerModel) {
-    this.$emit('input', innerModel);
+const isRyhma = computed(() => {
+  return !props.muokkaus || !!props.modelValue.rooli;
+});
+
+const tosa = computed(() => {
+  if (!props.modelValue._tutkinnonOsaViite) {
+    return null;
+  }
+  if (props.tutkinnonOsatMap) {
+    return props.tutkinnonOsatMap[props.modelValue._tutkinnonOsaViite];
+  }
+  return null;
+});
+
+const nimi = computed(() => {
+  if (isRyhma.value) {
+    return props.modelValue.nimi;
+  }
+  else {
+    return tosa.value?.nimi;
+  }
+});
+
+const selectableOsaamisalat = computed(() => {
+  return _.map(osaamisalat, osaamisala => {
+    return {
+      nimi: osaamisala.nimi,
+      osaamisalakoodiArvo: osaamisala.osaamisala.osaamisalakoodiArvo,
+      osaamisalakoodiUri: osaamisala.osaamisala.osaamisalakoodiUri,
+    };
+  });
+});
+
+const selectableTutkintonimikkeet = computed(() => {
+  return _.map(tutkintonimikkeet, tutkintonimike => {
+    return {
+      nimi: tutkintonimike.nimi,
+      arvo: tutkintonimike.tutkintonimike.arvo,
+      uri: tutkintonimike.tutkintonimike.uri,
+    };
+  });
+});
+
+const invalid = computed(() => {
+  if (tosa.value) {
+    return false;
   }
 
-  get innerModel() {
-    return this.value;
+  if (tyyppi.value === 'osaamisala') {
+    return !innerModel.value.osaamisala?.osaamisalakoodiUri;
+  }
+  else if (tyyppi.value === 'tutkintonimike') {
+    return !innerModel.value.tutkintonimike?.uri;
   }
 
-  show(isNew?) {
-    (this.$refs.rakenneModal as any).show();
-    if (isNew) {
-      this.tyyppi = null;
-      this.innerModel.tutkintonimike = null;
-      this.innerModel.osaamisala = null;
-    }
-    else {
-      this.tyyppi = this.defaultTyyppi;
+  if (innerModel.value.nimi) {
+    return _.isEmpty(innerModel.value.nimi[Kielet.getSisaltoKieli.value]) || tyyppi.value === null;
+  }
+  return true;
+});
+
+const getNimi = (key) => {
+  return {
+    fi: $t(key, {}, { locale: Kieli.fi }),
+    sv: $t(key, {}, { locale: Kieli.sv }),
+    en: $t(key, {}, { locale: Kieli.en }),
+  };
+};
+
+const setDefaultNimi = () => {
+  if (tyyppi.value === 'rakenne-moduuli-paikalliset') {
+    for (const nimiteksti of _.keys(nimiValintaTekstit.value)) {
+      if (props.modelValue?.nimi?.fi === $t(nimiValintaTekstit.value[nimiteksti], 'fi')) {
+        nimiValinta.value = nimiteksti;
+      }
     }
 
-    if (this.tyyppi !== 'rakenne-moduuli-paikalliset') {
-      this.nimiValinta = null;
+    if (!nimiValinta.value) {
+      nimiValinta.value = 'muu';
     }
+  }
+};
 
-    this.tempModel = _.cloneDeep(this.innerModel);
-    this.setDefaultNimi();
+const show = (isNew) => {
+  (rakenneModal.value as any).show();
+  if (isNew) {
+    tyyppi.value = null;
+    innerModel.value.tutkintonimike = null;
+    innerModel.value.osaamisala = null;
+  }
+  else {
+    tyyppi.value = defaultTyyppi.value;
+  }
 
-    this.$emit('input',
-      {
-        ...this.innerModel,
-        ...(this.innerModel.tutkintonimike
-          && {
-            tutkintonimike: _.find(this.selectableTutkintonimikkeet, tutkintonimike => this.innerModel.tutkintonimike.uri === tutkintonimike.uri),
-          }),
-        ...((!this.innerModel.muodostumisSaanto || this.innerModel.muodostumisSaanto === null)
-          && {
-            muodostumisSaanto: {
-              laajuus: {
-                minimi: null,
-                maksimi: null,
-              },
+  if (tyyppi.value !== 'rakenne-moduuli-paikalliset') {
+    nimiValinta.value = null;
+  }
+
+  tempModel.value = _.cloneDeep(innerModel.value);
+  setDefaultNimi();
+
+  emit('update:modelValue',
+    {
+      ...innerModel.value,
+      ...(innerModel.value.tutkintonimike
+        && {
+          tutkintonimike: _.find(selectableTutkintonimikkeet.value, tutkintonimike => innerModel.value.tutkintonimike.uri === tutkintonimike.uri),
+        }),
+      ...((!innerModel.value.muodostumisSaanto || innerModel.value.muodostumisSaanto === null)
+        && {
+          muodostumisSaanto: {
+            laajuus: {
+              minimi: null,
+              maksimi: null,
             },
-          }),
-      });
+          },
+        }),
+    });
+};
+
+const save = () => {
+  if (tyyppi.value === 'osaamisala') {
+    innerModel.value = {
+      ...innerModel.value,
+      rooli: 'osaamisala',
+      nimi: _.get(_.find(osaamisalat, osaamisala => osaamisala.osaamisala.osaamisalakoodiUri === innerModel.value.osaamisala.osaamisalakoodiUri), 'nimi'),
+    };
   }
-
-  save() {
-    if (this.tyyppi === 'osaamisala') {
-      this.innerModel = {
-        ...this.innerModel,
-        rooli: 'osaamisala',
-        nimi: _.get(_.find(this.osaamisalat, osaamisala => osaamisala.osaamisala.osaamisalakoodiUri === this.innerModel.osaamisala.osaamisalakoodiUri), 'nimi'),
-      };
-    }
-    else if (this.tyyppi === 'tutkintonimike') {
-      this.innerModel = {
-        ...this.innerModel,
-        rooli: 'tutkintonimike',
-        nimi: _.get(_.find(this.tutkintonimikkeet, tutkintonimike => tutkintonimike.tutkintonimike.uri === this.innerModel.tutkintonimike.uri), 'nimi'),
-      };
-    }
-    else if (this.isRyhma && this.tyyppi && this.tyyppiRoolit[this.tyyppi]) {
-      this.innerModel = {
-        ...this.innerModel,
-        rooli: this.tyyppiRoolit[this.tyyppi],
-      };
-    }
-
-    this.$emit('save');
-    (this.$refs.rakenneModal as any).hide();
+  else if (tyyppi.value === 'tutkintonimike') {
+    innerModel.value = {
+      ...innerModel.value,
+      rooli: 'tutkintonimike',
+      nimi: _.get(_.find(tutkintonimikkeet, tutkintonimike => tutkintonimike.tutkintonimike.uri === innerModel.value.tutkintonimike.uri), 'nimi'),
+    };
   }
-
-  remove() {
-    this.$emit('remove');
-    (this.$refs.rakenneModal as any).hide();
-  }
-
-  cancel() {
-    this.$emit('input', this.tempModel);
-    (this.$refs.rakenneModal as any).hide();
-  }
-
-  toggleRange() {
-    this.innerModel.useRange = !this.innerModel.useRange;
-    if (this.innerModel.useRange) {
-      this.innerModel.ryhma.muodostumisSaanto.laajuus.maksimi = 0;
-    }
-    else {
-      delete this.innerModel.ryhma.muodostumisSaanto.laajuus.maksimi;
-    }
-  }
-
-  get defaultTyyppi() {
-    if (this.value.rooli === 'osaamisala') {
-      return 'osaamisala';
-    }
-    else if (this.value.rooli === 'tutkintonimike') {
-      return 'tutkintonimike';
-    }
-
-    const rakennetyypit = [
-      'osaamisala',
-      'tutkintonimike',
-      'rakenne-moduuli-valinnainen',
-      'rakenne-moduuli-ammatilliset',
-      'rakenne-moduuli-yhteiset',
-      'rakenne-moduuli-paikalliset',
-      'rakenne-moduuli-pakollinen',
-    ];
-    for (const rt of rakennetyypit) {
-      if (this.value?.nimi && this.value.nimi[Kielet.getUiKieli.value] === this.$t(rt)) {
-        return rt;
-      }
-    }
-
-    return 'rakenne-moduuli-paikalliset';
-  }
-
-  setDefaultNimi() {
-    if (this.tyyppi === 'rakenne-moduuli-paikalliset') {
-      for (const nimiteksti of _.keys(this.nimiValintaTekstit)) {
-        if (this.value?.nimi?.fi === this.$t(this.nimiValintaTekstit[nimiteksti], 'fi')) {
-          this.nimiValinta = nimiteksti as any;
-        }
-      }
-
-      if (!this.nimiValinta) {
-        this.nimiValinta = 'muu';
-      }
-    }
-  }
-
-  toggleMaksimi(toggled) {
-    if (!toggled) {
-      if (this.innerModel.muodostumisSaanto.laajuus.maksimi) {
-        this.oldMaksimi = this.innerModel.muodostumisSaanto.laajuus.maksimi;
-      }
-      this.innerModel.muodostumisSaanto.laajuus.maksimi = null;
-    }
-    else {
-      this.innerModel.muodostumisSaanto.laajuus = {
-        ...this.innerModel.muodostumisSaanto.laajuus,
-        maksimi: this.oldMaksimi,
-      };
-    }
-  }
-
-  @Watch('nimiValinta')
-  nimiValintaChange(newVal, oldVal) {
-    if (!newVal || !oldVal) {
-      return;
-    }
-
-    if (this.nimiValinta) {
-      if (this.nimiValinta !== 'muu') {
-        this.$emit('input', { ...this.innerModel, nimi: this.getNimi(this.nimiValintaTekstit[this.nimiValinta]) });
-      }
-      else {
-        this.$emit('input', { ...this.innerModel, nimi: null });
-      }
-    }
-  }
-
-  @Watch('tyyppi')
-  tyyppiChange(newVal, oldVal) {
-    if (!newVal || !oldVal) {
-      return;
-    }
-
-    let osaamisala = this.innerModel.osaamisala;
-    if (this.tyyppi === 'osaamisala' && _.isNil(this.innerModel.osaamisala)) {
-      osaamisala = {};
-    }
-    else if (this.tyyppi !== 'osaamisala') {
-      osaamisala = null;
-    }
-
-    if (this.tyyppi && this.tyyppi !== 'rakenne-moduuli-paikalliset') {
-      this.$emit('input', {
-        ...this.innerModel,
-        nimi: this.getNimi(this.tyyppi),
-        osaamisala,
-      });
-    }
-    else if (this.tyyppi && this.tyyppi === 'rakenne-moduuli-paikalliset') {
-      this.nimiValintaChange(this.nimiValinta, this.nimiValinta);
-    }
-    else if (oldVal) {
-      this.$emit('input', { ...this.innerModel, nimi: null });
-    }
-  }
-
-  get nimiValintaTekstit() {
-    return {
-      'paikallinen': 'peruste-rakenne-nimi-paikallisiin',
-      'tutkinnonosato': 'peruste-rakenne-nimi-tutkinnon-osa-toisesta',
-      'korkeakoulu': 'peruste-rakenne-nimi-korkeakouluopinnot',
-      'yhteinen': 'peruste-rakenne-nimi-yhteisten-tutkinnon-osien',
-      'muu': 'peruste-rakenne-nimi-jokin-muu',
+  else if (isRyhma.value && tyyppi.value && tyyppiRoolit[tyyppi.value]) {
+    innerModel.value = {
+      ...innerModel.value,
+      rooli: tyyppiRoolit[tyyppi.value],
     };
   }
 
-  getNimi(key: string) {
-    return {
-      fi: this.$t(key, Kieli.fi),
-      sv: this.$t(key, Kieli.sv),
-      en: this.$t(key, Kieli.en),
+  emit('save');
+  (rakenneModal.value as any).hide();
+};
+
+const remove = () => {
+  emit('remove');
+  (rakenneModal.value as any).hide();
+};
+
+const cancel = () => {
+  emit('update:modelValue', tempModel.value);
+  (rakenneModal.value as any).hide();
+};
+
+const toggleRange = () => {
+  innerModel.value.useRange = !innerModel.value.useRange;
+  if (innerModel.value.useRange) {
+    innerModel.value.ryhma.muodostumisSaanto.laajuus.maksimi = 0;
+  }
+  else {
+    delete innerModel.value.ryhma.muodostumisSaanto.laajuus.maksimi;
+  }
+};
+
+const toggleMaksimi = (toggled) => {
+  if (!toggled) {
+    if (innerModel.value.muodostumisSaanto.laajuus.maksimi) {
+      oldMaksimi.value = innerModel.value.muodostumisSaanto.laajuus.maksimi;
+    }
+    innerModel.value.muodostumisSaanto.laajuus.maksimi = null;
+  }
+  else {
+    innerModel.value.muodostumisSaanto.laajuus = {
+      ...innerModel.value.muodostumisSaanto.laajuus,
+      maksimi: oldMaksimi.value,
     };
   }
+};
 
-  get invalid() {
-    if (this.tosa) {
-      return false;
-    }
+watch(nimiValinta, (newVal, oldVal) => {
+  nimiChanged(newVal, oldVal);
+});
 
-    if (this.tyyppi === 'osaamisala') {
-      return !this.innerModel.osaamisala?.osaamisalakoodiUri;
-    }
-    else if (this.tyyppi === 'tutkintonimike') {
-      return !this.innerModel.tutkintonimike?.uri;
-    }
-
-    if (this.innerModel.nimi) {
-      return _.isEmpty(this.innerModel.nimi[Kielet.getSisaltoKieli.value]) || this.tyyppi === null;
-    }
-    return true;
+const nimiChanged = (newVal, oldVal) => {
+  if (!newVal || !oldVal) {
+    return;
   }
 
-  get isRyhma() {
-    return !this.muokkaus || !!this.value.rooli;
-  };
-
-  get tosa() {
-    if (!this.value._tutkinnonOsaViite) {
-      return null;
-    }
-    if (this.tutkinnonOsatMap) {
-      return this.tutkinnonOsatMap[this.value._tutkinnonOsaViite];
-    }
-  }
-
-  get nimi() {
-    if (this.isRyhma) {
-      return this.value.nimi;
+  if (nimiValinta.value) {
+    if (nimiValinta.value !== 'muu') {
+      emit('update:modelValue', { ...innerModel.value, nimi: getNimi(nimiValintaTekstit.value[nimiValinta.value]) });
     }
     else {
-      return this.tosa.nimi;
+      emit('update:modelValue', { ...innerModel.value, nimi: null });
     }
-  }
-
-  get selectableOsaamisalat() {
-    return _.map(this.osaamisalat, osaamisala => {
-      return {
-        nimi: osaamisala.nimi,
-        osaamisalakoodiArvo: osaamisala.osaamisala.osaamisalakoodiArvo,
-        osaamisalakoodiUri: osaamisala.osaamisala.osaamisalakoodiUri,
-      };
-    });
-  }
-
-  get selectableTutkintonimikkeet() {
-    return _.map(this.tutkintonimikkeet, tutkintonimike => {
-      return {
-        nimi: tutkintonimike.nimi,
-        arvo: tutkintonimike.tutkintonimike.arvo,
-        uri: tutkintonimike.tutkintonimike.uri,
-      };
-    });
   }
 }
 
+watch(tyyppi, (newVal, oldVal) => {
+  if (!newVal || !oldVal) {
+    return;
+  }
+
+  let osaamisala = innerModel.value.osaamisala;
+  if (tyyppi.value === 'osaamisala' && _.isNil(innerModel.value.osaamisala)) {
+    osaamisala = {};
+  }
+  else if (tyyppi.value !== 'osaamisala') {
+    osaamisala = null;
+  }
+
+  if (tyyppi.value && tyyppi.value !== 'rakenne-moduuli-paikalliset') {
+    emit('update:modelValue', {
+      ...innerModel.value,
+      nimi: getNimi(tyyppi.value),
+      osaamisala,
+    });
+  }
+  else if (tyyppi.value && tyyppi.value === 'rakenne-moduuli-paikalliset') {
+    nimiChanged(nimiValinta.value, nimiValinta.value);
+  }
+  else if (oldVal) {
+    emit('update:modelValue', { ...innerModel.value, nimi: null });
+  }
+});
+
+defineExpose({
+  show,
+});
 </script>

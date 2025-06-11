@@ -168,10 +168,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Prop, Vue, Component, Mixins } from 'vue-property-decorator';
+<script setup lang="ts">
 import * as _ from 'lodash';
-
+import { ref, computed } from 'vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
@@ -180,382 +179,398 @@ import { Kielet } from '@shared/stores/kieli';
 import { EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET, EPERUSTEET_SOVELLUKSET } from '@shared/plugins/oikeustarkastelu';
 import EpTilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilastot/EpTilastoAikavaliVertailu.vue';
 import { csvAikaleima, dataTiedostoksi } from './tilastot';
+import { $t, $kaanna, $sd } from '@shared/utils/globals';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
 
-@Component({
-  components: {
-    EpSearch,
-    EpSpinner,
-    EpMultiSelect,
-    EpFormContent,
-    EpTilastoAikavaliVertailu,
-  },
-})
-export default class EpYlopsTilastot extends Vue {
-  @Prop({ required: true })
-  private opetussuunnitelmat!: any[];
+interface Opetussuunnitelma {
+  id: string | number;
+  nimi: Record<string, string>;
+  koulutustyyppi: string;
+  tila: string;
+  perusteenVoimassaoloAlkaa: Date;
+  perusteenVoimassaoloLoppuu?: Date;
+  julkaistu?: Date;
+  ensijulkaisu?: Date;
+  luotu: Date;
+  perusteenId?: string | number;
+  julkaisukielet?: string[];
+  voimassaolo?: string;
+  url?: string;
+  koulutuksenjarjestaja?: {
+    oid: string;
+    nimi: Record<string, string>;
+  };
+  kunnat?: any[];
+  organisaatiot?: any[];
+}
 
-  @Prop({ required: true })
-  private perusteet!: any[];
+interface Peruste {
+  id: string | number;
+  nimi: Record<string, string>;
+}
 
-  private currentPage = 1;
-  private perPage = 10;
-  private koulutuksenjarjestajaPage = 1;
-  private query = '';
-  private valitutTilat: [] = [];
-  private valitutKoulutustyypit: [] = [];
-  private valitutVoimassaolot: [] = [];
-  private valitutPerusteet: [] = [];
-  private aikavali: AikavaliVertailu = {};
-  private valitutKoulutuksenjarjestajat: [] = [];
-  private valitutKoulutuksenjarjestajaTyypit: [] = [];
+const props = defineProps<{
+  opetussuunnitelmat: Opetussuunnitelma[];
+  perusteet: Peruste[];
+}>();
 
-  get opetussuunnitelmatFilled() {
-    if (this.opetussuunnitelmat) {
-      return _.map(this.opetussuunnitelmat, ops => {
-        return {
-          ...ops,
-          url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[ops.koulutustyyppi])?.url + '/#/fi/opetussuunnitelmat/' + ops.id + '/yleisnakyma',
+const currentPage = ref(1);
+const perPage = ref(10);
+const koulutuksenjarjestajaPage = ref(1);
+const query = ref('');
+const valitutTilat = ref<Array<{value: string, text: string}>>([]);
+const valitutKoulutustyypit = ref<Array<{value: string, text: string}>>([]);
+const valitutVoimassaolot = ref<Array<{value: string, text: string}>>([]);
+const valitutPerusteet = ref<Array<{value: string | number, text: string}>>([]);
+const aikavali = ref<AikavaliVertailu>({});
+const valitutKoulutuksenjarjestajat = ref<Array<{value: string, text: string}>>([]);
+const valitutKoulutuksenjarjestajaTyypit = ref<Array<{value: string, text: string}>>([]);
 
-        };
-      });
-    }
-  }
-
-  get opetussuunnitelmatFiltered() {
-    return _.chain(this.opetussuunnitelmatFilled)
-      .filter(ops => _.isEmpty(this.valitutTilat) || _.includes(_.map(this.valitutTilat, 'value'), ops.tila))
-      .filter(ops => _.isEmpty(this.valitutKoulutustyypit) || _.includes(_.map(this.valitutKoulutustyypit, 'value'), ops.koulutustyyppi))
-      .filter(ops => Kielet.search(this.query, ops.nimi))
-      .filter(ops => _.isEmpty(this.valitutVoimassaolot) || _.includes(_.map(this.valitutVoimassaolot, 'value'), this.opetussuunnitelmaVoimassaolo(ops)))
-      .filter(ops => _.isEmpty(this.valitutPerusteet) || _.includes(_.map(this.valitutPerusteet, 'value'), ops.perusteenId))
-      .filter(ops => _.isEmpty(this.valitutKoulutuksenjarjestajat) || _.includes(_.map(this.valitutKoulutuksenjarjestajat, 'value'), ops.koulutuksenjarjestaja!.oid))
-      .filter(ops => _.isEmpty(this.valitutKoulutuksenjarjestajaTyypit)
-        || _.some(_.map(this.valitutKoulutuksenjarjestajaTyypit, 'value'), tyyppi => _.includes(ops.koulutuksenjarjestaja?.tyypit, tyyppi) || (tyyppi === 'maarittelematon' && _.isEmpty(ops.koulutuksenjarjestaja?.tyypit))))
-      .filter(ops => this.aikavertailu(ops))
-      .sortBy(ops => Kielet.kaanna(ops.nimi))
-      .value();
-  }
-
-  get koulutuksenjarjestajaFiltered() {
-    return _.chain(this.opetussuunnitelmatFiltered)
-      .filter(ops => !!ops.koulutuksenjarjestaja)
-      .map('koulutuksenjarjestaja')
-      .uniqWith(_.isEqual)
-      .map(koulutuksenjarjestaja => {
-        return {
-          koulutuksenjarjestaja,
-          arkistoitu: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['poistettu']),
-          luonnos: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['luonnos']),
-          valmis: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['valmis']),
-          julkaistu: _.size(_.groupBy(this.koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['julkaistu']),
-        };
-      })
-      .value();
-  }
-
-  get koulutuksenjarjestajaByOid() {
-    return _.groupBy(this.opetussuunnitelmatFiltered, 'koulutuksenjarjestaja.oid');
-  }
-
-  get aikavaliValue() {
-    return _.get(this.aikavali, 'tyyppi.value');
-  }
-
-  aikavertailu(ops) {
-    if (!this.aikavaliValue) {
-      return true;
-    }
-
-    if (_.get(ops, this.aikavaliValue) === null) {
-      return false;
-    }
-
-    return ops[this.aikavaliValue] >= this.aikavaliAlkuVrt && ops[this.aikavaliValue] <= this.aikavaliLoppuVrt;
-  }
-
-  get aikavaliAlkuVrt() {
-    return this.aikavali?.aikavaliAlku ? this.aikavali.aikavaliAlku : new Date(0);
-  }
-
-  get aikavaliLoppuVrt() {
-    return this.aikavali?.aikavaliLoppu ? this.aikavali.aikavaliLoppu : new Date(8640000000000000);
-  }
-
-  opetussuunnitelmaVoimassaolo(ops) {
-    if (ops.perusteenVoimassaoloLoppuu && ops.perusteenVoimassaoloLoppuu < new Date()) {
-      return 'paattynyt';
-    }
-
-    if (ops.perusteenVoimassaoloAlkaa > new Date()) {
-      return 'tuleva';
-    }
-
-    return 'voimassaoleva';
-  }
-
-  get opetussuunnitelmatEmpty() {
-    return _.isEmpty(this.opetussuunnitelmatFiltered);
-  }
-
-  get statistiikkaData() {
-    return _.map(_.keys(this.statistiikka), otsikko => {
+const opetussuunnitelmatFilled = computed(() => {
+  if (props.opetussuunnitelmat) {
+    return _.map(props.opetussuunnitelmat, (opetussuunnitelma: Opetussuunnitelma) => {
       return {
-        otsikko: otsikko,
-        graafiAvaimet: this.chartOptions(otsikko),
-        graafiData: this.series(otsikko),
+        ...opetussuunnitelma,
+        url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[ops.koulutustyyppi])?.url + '/#/fi/opetussuunnitelmat/' + ops.id + '/yleisnakyma',
       };
     });
   }
+  return [];
+});
 
-  get statistiikka() {
-    return {
-      koulutustyypeittain: _.groupBy(this.opetussuunnitelmatFiltered, 'koulutustyyppi'),
-      tiloittain: _.groupBy(this.opetussuunnitelmatFiltered, 'tila'),
-      kielittain: _.omitBy({
-        fi: _.filter(this.opetussuunnitelmatFiltered, (ops) => _.includes(ops.julkaisukielet as any, 'fi')),
-        sv: _.filter(this.opetussuunnitelmatFiltered, (ops) => _.includes(ops.julkaisukielet as any, 'sv')),
-        en: _.filter(this.opetussuunnitelmatFiltered, (ops) => _.includes(ops.julkaisukielet as any, 'en')),
-        se: _.filter(this.opetussuunnitelmatFiltered, (ops) => _.includes(ops.julkaisukielet as any, 'se')),
-      }, _.isEmpty),
-      tasoittain: _.omitBy({
-        seutukunnat: _.filter(this.opetussuunnitelmatFiltered, (ops) => _.size(ops.kunnat) > 1),
-        kunnat: _.filter(this.opetussuunnitelmatFiltered, (ops) => _.size(ops.kunnat) === 1),
-        koulujoukko: _.filter(this.opetussuunnitelmatFiltered, (ops) => _.size(_.filter(ops.organisaatiot, (org) => _.size(org.tyypit) > 0 && _.head(org.tyypit) === 'Oppilaitos')) > 1),
-        koulut: _.filter(this.opetussuunnitelmatFiltered, (ops) => _.size(_.filter(ops.organisaatiot, (org) => _.size(org.tyypit) > 0 && _.head(org.tyypit) === 'Oppilaitos')) === 1),
-      }, _.isEmpty),
-      perusteittain: _.groupBy(this.opetussuunnitelmatFiltered, 'perusteenId'),
-    };
-  }
+const opetussuunnitelmatFiltered = computed(() => {
+  return _.chain(opetussuunnitelmatFilled.value)
+    .filter(ops => _.isEmpty(valitutTilat) || _.includes(_.map(valitutTilat, 'value'), ops.tila))
+    .filter(ops => _.isEmpty(valitutKoulutustyypit) || _.includes(_.map(valitutKoulutustyypit, 'value'), ops.koulutustyyppi))
+    .filter(ops => Kielet.search(query, ops.nimi))
+    .filter(ops => _.isEmpty(valitutVoimassaolot) || _.includes(_.map(valitutVoimassaolot, 'value'), opetussuunnitelmaVoimassaolo(ops)))
+    .filter(ops => _.isEmpty(valitutPerusteet) || _.includes(_.map(valitutPerusteet, 'value'), ops.perusteenId))
+    .filter(ops => _.isEmpty(valitutKoulutuksenjarjestajat) || _.includes(_.map(valitutKoulutuksenjarjestajat, 'value'), ops.koulutuksenjarjestaja!.oid))
+    .filter(ops => _.isEmpty(valitutKoulutuksenjarjestajaTyypit)
+      || _.some(_.map(valitutKoulutuksenjarjestajaTyypit, 'value'), tyyppi => _.includes(ops.koulutuksenjarjestaja?.tyypit, tyyppi) || (tyyppi === 'maarittelematon' && _.isEmpty(ops.koulutuksenjarjestaja?.tyypit))))
+    .filter(ops => aikavertailu(ops))
+    .sortBy(ops => Kielet.kaanna(ops.nimi))
+    .value();
+});
 
-  get tableFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-      sortable: true,
-      sortByFormatted: true,
-      formatter: (value, key, item) => {
-        return (this as any).$kaanna(value);
-      },
-    }, {
-      key: 'koulutustyyppi',
-      label: this.$t('koulutustyyppi'),
-      sortable: true,
-      thStyle: { width: '20%' },
-    }, {
-      key: 'tila',
-      label: this.$t('tila'),
-      sortable: true,
-      thStyle: { width: '10%' },
-    }, {
-      key: 'perusteenVoimassaoloAlkaa',
-      label: this.$t('voimassaolo-alkaa'),
-      sortable: true,
-      thStyle: { width: '130px' },
-    }, {
-      key: 'perusteenVoimassaoloLoppuu',
-      label: this.$t('voimassaolo-paattyy'),
-      sortable: true,
-      thStyle: { width: '130px' },
-    }, {
-      key: 'julkaistu',
-      label: this.$t('julkaistu'),
-      sortable: true,
-      thStyle: { width: '130px', paddingTop: '0px' },
-      formatter: (value, key, item) => {
-        return value ? (this as any).$sd(value) : '';
-      },
-    }, {
-      key: 'ensijulkaisu',
-      label: this.$t('ensijulkaisu'),
-      sortable: true,
-      thStyle: { width: '130px', paddingTop: '0px' },
-      formatter: (value, key, item) => {
-        return value ? (this as any).$sd(value) : '';
-      },
-    }, {
-      key: 'luotu',
-      label: this.$t('luotu'),
-      sortable: true,
-      thStyle: { width: '130px', paddingTop: '0px' },
-      formatter: (value, key, item) => {
-        return value ? (this as any).$sd(value) : '';
-      },
-    }];
-  }
+const koulutuksenjarjestajaFiltered = computed(() => {
+  const koulutuksenjarjestajaByOid = _.groupBy(opetussuunnitelmatFiltered.value, 'koulutuksenjarjestaja.oid');
 
-  chartLegends(otsikko) {
-    if (otsikko !== 'perusteittain') {
-      return _.map(_.keys(this.statistiikka![otsikko]), (alaotsikko) => this.$t(alaotsikko));
-    }
-    else {
-      const perusteet = _.keyBy(this.perusteet, 'id');
-      return _.map(_.keys(this.statistiikka![otsikko]), (alaotsikko) => perusteet[alaotsikko] ? (this as any).$kaanna(perusteet[alaotsikko].nimi) : this.$t('null'));
-    }
-  }
-
-  chartOptions(otsikko) {
-    return {
-      labels: this.chartLegends(otsikko),
-      dataLabels: {
-        enabled: true,
-        style: {
-          colors: ['#000'],
-          fontWeight: '400',
-        },
-        dropShadow: {
-          enabled: false,
-        },
-      },
-      legend: {
-        position: 'bottom',
-        horizontalAlign: 'center',
-        show: (otsikko !== 'perusteittain' || !_.isEmpty(this.valitutPerusteet)),
-        formatter: function(seriesName, opts) {
-          return [seriesName, ': ', opts.w.globals.series[opts.seriesIndex]];
-        },
-      },
-      tooltip: {
-        enabled: true,
-      },
-      colors: ['#82D4FF', '#9DDF72', '#FFD900', '#F166C0', '#B2B2B2', '#99B3F1', '#7CD443', '#FACCEA', '#CDEEFF', '#C126B8'],
-    };
-  }
-
-  series(avain) {
-    return _.map(this.statistiikka![avain], (value) => _.size(value));
-  }
-
-  get koulutustyyppiItems() {
-    return _.chain(this.opetussuunnitelmat)
-      .map('koulutustyyppi')
-      .uniq()
-      .map(koulutustyyppi => {
-        return {
-          text: this.$t(koulutustyyppi),
-          value: koulutustyyppi,
-        };
-      })
-      .value();
-  }
-
-  get tilaItems() {
-    return [
-      { text: this.$t('luonnos'), value: 'luonnos' },
-      { text: this.$t('valmis'), value: 'valmis' },
-      { text: this.$t('julkaistu'), value: 'julkaistu' },
-      { text: this.$t('poistettu'), value: 'poistettu' },
-    ];
-  }
-
-  get voimassaoloItems() {
-    return [
-      { text: this.$t('voimassaolevat'), value: 'voimassaoleva' },
-      { text: this.$t('tulevat'), value: 'tuleva' },
-      { text: this.$t('paattyneet'), value: 'paattynyt' },
-    ];
-  }
-
-  get perusteItems() {
-    return _.map(this.perusteet, peruste => {
+  return _.chain(opetussuunnitelmatFiltered.value)
+    .filter(ops => !!ops.koulutuksenjarjestaja)
+    .map('koulutuksenjarjestaja')
+    .uniqWith(_.isEqual)
+    .map(koulutuksenjarjestaja => {
       return {
-        value: peruste.id,
-        text: (this as any).$kaanna(peruste.nimi),
+        koulutuksenjarjestaja,
+        arkistoitu: _.size(_.groupBy(koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['poistettu']),
+        luonnos: _.size(_.groupBy(koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['luonnos']),
+        valmis: _.size(_.groupBy(koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['valmis']),
+        julkaistu: _.size(_.groupBy(koulutuksenjarjestajaByOid[koulutuksenjarjestaja.oid], 'tila')['julkaistu']),
       };
-    });
+    })
+    .value();
+});
+
+const aikavaliValue = computed(() => {
+  return _.get(aikavali.value, 'tyyppi.value');
+});
+
+function aikavertailu(ops: Opetussuunnitelma) {
+  if (!aikavaliValue.value) {
+    return true;
   }
 
-  get koulutuksenjarjestajaTyyppiItems() {
-    return [
-      { text: this.$t('maarittelematon'), value: 'maarittelematon' },
-      { text: this.$t('kunta'), value: 'Kunta' },
-      { text: this.$t('oppilaitos'), value: 'Oppilaitos' },
-    ];
+  if (_.get(ops, aikavaliValue.value) === null) {
+    return false;
   }
 
-  get tyhjaGraafiOptions() {
+  return ops[aikavaliValue.value as keyof Opetussuunnitelma] >= aikavaliAlkuVrt.value &&
+         ops[aikavaliValue.value as keyof Opetussuunnitelma] <= aikavaliLoppuVrt.value;
+}
+
+const aikavaliAlkuVrt = computed(() => {
+  return aikavali.value?.aikavaliAlku ? aikavali.value.aikavaliAlku : new Date(0);
+});
+
+const aikavaliLoppuVrt = computed(() => {
+  return aikavali.value?.aikavaliLoppu ? aikavali.value.aikavaliLoppu : new Date(8640000000000000);
+});
+
+function opetussuunnitelmaVoimassaolo(ops: Opetussuunnitelma) {
+  if (ops.perusteenVoimassaoloLoppuu && ops.perusteenVoimassaoloLoppuu < new Date()) {
+    return 'paattynyt';
+  }
+
+  if (ops.perusteenVoimassaoloAlkaa > new Date()) {
+    return 'tuleva';
+  }
+
+  return 'voimassaoleva';
+}
+
+const opetussuunnitelmatEmpty = computed(() => {
+  return _.isEmpty(opetussuunnitelmatFiltered.value);
+});
+
+const statistiikka = computed(() => {
+  return {
+    koulutustyypeittain: _.groupBy(opetussuunnitelmatFiltered.value, 'koulutustyyppi'),
+    tiloittain: _.groupBy(opetussuunnitelmatFiltered.value, 'tila'),
+    kielittain: _.omitBy({
+      fi: _.filter(opetussuunnitelmatFiltered.value, (ops) => _.includes(ops.julkaisukielet as any, 'fi')),
+      sv: _.filter(opetussuunnitelmatFiltered.value, (ops) => _.includes(ops.julkaisukielet as any, 'sv')),
+      en: _.filter(opetussuunnitelmatFiltered.value, (ops) => _.includes(ops.julkaisukielet as any, 'en')),
+      se: _.filter(opetussuunnitelmatFiltered.value, (ops) => _.includes(ops.julkaisukielet as any, 'se')),
+    }, _.isEmpty),
+    tasoittain: _.omitBy({
+      seutukunnat: _.filter(opetussuunnitelmatFiltered.value, (ops) => _.size(ops.kunnat) > 1),
+      kunnat: _.filter(opetussuunnitelmatFiltered.value, (ops) => _.size(ops.kunnat) === 1),
+      koulujoukko: _.filter(opetussuunnitelmatFiltered.value, (ops) => _.size(_.filter(ops.organisaatiot, (org) => _.size(org.tyypit) > 0 && _.head(org.tyypit) === 'Oppilaitos')) > 1),
+      koulut: _.filter(opetussuunnitelmatFiltered.value, (ops) => _.size(_.filter(ops.organisaatiot, (org) => _.size(org.tyypit) > 0 && _.head(org.tyypit) === 'Oppilaitos')) === 1),
+    }, _.isEmpty),
+    perusteittain: _.groupBy(opetussuunnitelmatFiltered.value, 'perusteenId'),
+  };
+});
+
+const statistiikkaData = computed(() => {
+  return _.map(_.keys(statistiikka.value), otsikko => {
     return {
-      labels: ['test'],
-      dataLabels: {
+      otsikko: otsikko,
+      graafiAvaimet: chartOptions(otsikko),
+      graafiData: series(otsikko),
+    };
+  });
+});
+
+const tableFields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+    sortable: true,
+    sortByFormatted: true,
+    formatter: (value: any, key: string, item: any) => {
+      return $kaanna(value);
+    },
+  }, {
+    key: 'koulutustyyppi',
+    label: $t('koulutustyyppi'),
+    sortable: true,
+    thStyle: { width: '20%' },
+  }, {
+    key: 'tila',
+    label: $t('tila'),
+    sortable: true,
+    thStyle: { width: '10%' },
+  }, {
+    key: 'perusteenVoimassaoloAlkaa',
+    label: $t('voimassaolo-alkaa'),
+    sortable: true,
+    thStyle: { width: '130px' },
+  }, {
+    key: 'perusteenVoimassaoloLoppuu',
+    label: $t('voimassaolo-paattyy'),
+    sortable: true,
+    thStyle: { width: '130px' },
+  }, {
+    key: 'julkaistu',
+    label: $t('julkaistu'),
+    sortable: true,
+    thStyle: { width: '130px', paddingTop: '0px' },
+    formatter: (value: any, key: string, item: any) => {
+      return value ? $sd(value) : '';
+    },
+  }, {
+    key: 'ensijulkaisu',
+    label: $t('ensijulkaisu'),
+    sortable: true,
+    thStyle: { width: '130px', paddingTop: '0px' },
+    formatter: (value: any, key: string, item: any) => {
+      return value ? $sd(value) : '';
+    },
+  }, {
+    key: 'luotu',
+    label: $t('luotu'),
+    sortable: true,
+    thStyle: { width: '130px', paddingTop: '0px' },
+    formatter: (value: any, key: string, item: any) => {
+      return value ? $sd(value) : '';
+    },
+  }];
+});
+
+function chartLegends(otsikko: string) {
+  if (otsikko !== 'perusteittain') {
+    return _.map(_.keys(statistiikka.value![otsikko]), (alaotsikko) => $t(alaotsikko));
+  }
+  else {
+    const perusteMap = _.keyBy(props.perusteet, 'id');
+    return _.map(_.keys(statistiikka.value![otsikko]), (alaotsikko) => perusteMap[alaotsikko] ? $kaanna(perusteMap[alaotsikko].nimi) : $t('null'));
+  }
+}
+
+function chartOptions(otsikko: string) {
+  return {
+    labels: chartLegends(otsikko),
+    dataLabels: {
+      enabled: true,
+      style: {
+        colors: ['#000'],
+        fontWeight: '400',
+      },
+      dropShadow: {
         enabled: false,
       },
-      legend: {
-        show: false,
+    },
+    legend: {
+      position: 'bottom',
+      horizontalAlign: 'center',
+      show: (otsikko !== 'perusteittain' || !_.isEmpty(valitutPerusteet.value)),
+      formatter: function(seriesName: string, opts: any) {
+        return [seriesName, ': ', opts.w.globals.series[opts.seriesIndex]];
       },
-      tooltip: {
-        enabled: false,
-      },
-      colors: ['#546E7A'],
-    };
-  }
+    },
+    tooltip: {
+      enabled: true,
+    },
+    colors: ['#82D4FF', '#9DDF72', '#FFD900', '#F166C0', '#B2B2B2', '#99B3F1', '#7CD443', '#FACCEA', '#CDEEFF', '#C126B8'],
+  };
+}
 
-  get tyhjaGraafiData() {
-    return [1];
-  }
+function series(avain: string) {
+  return _.map(statistiikka.value![avain], (value) => _.size(value));
+}
 
-  get koulutuksenjarjestajaFields() {
-    return [{
-      key: 'koulutuksenjarjestaja',
-      label: this.$t('koulutuksenjarjestaja'),
-      sortable: true,
-      sortByFormatted: true,
-      formatter: (value, key, item) => {
-        return (this as any).$kaanna(value.nimi);
-      },
-    }, {
-      key: 'arkistoitu',
-      label: this.$t('arkistoidut'),
-      sortable: true,
-      thStyle: { width: '15%' },
-    }, {
-      key: 'luonnos',
-      label: this.$t('luonnokset'),
-      sortable: true,
-      thStyle: { width: '15%' },
-    }, {
-      key: 'valmis',
-      label: this.$t('valmiit'),
-      sortable: true,
-      thStyle: { width: '15%' },
-    }, {
-      key: 'julkaistu',
-      label: this.$t('julkaistut'),
-      sortable: true,
-      thStyle: { width: '15%' },
-    }];
-  }
-
-  get koulutuksenjarjestajaItems() {
-    return _.chain(this.opetussuunnitelmatFilled)
-      .filter(opetussuunnitelma => !!opetussuunnitelma.koulutuksenjarjestaja)
-      .map(opetussuunnitelma => {
-        return {
-          value: opetussuunnitelma.koulutuksenjarjestaja.oid,
-          text: (this as any).$kaanna(opetussuunnitelma.koulutuksenjarjestaja!.nimi),
-        };
-      })
-      .uniqWith(_.isEqual)
-      .value();
-  }
-
-  get tiedostoData() {
-    return _.map(this.opetussuunnitelmatFiltered, ops => {
-      const csvOps = _.pick(ops, ['nimi', 'koulutustyyppi', 'tila', 'perusteenVoimassaoloAlkaa', 'perusteenVoimassaoloLoppuu', 'julkaistu', 'ensijulkaisu', 'luotu']);
+const koulutustyyppiItems = computed(() => {
+  return _.chain(props.opetussuunnitelmat)
+    .map('koulutustyyppi')
+    .uniq()
+    .map(koulutustyyppi => {
       return {
-        nimi: this.$kaanna(csvOps.nimi),
-        koulutustyyppi: this.$t(csvOps.koulutustyyppi),
-        tila: this.$t(csvOps.tila),
-        luotu: csvAikaleima(csvOps.luotu),
-        voimassaoloAlkaa: csvAikaleima(csvOps.perusteenVoimassaoloAlkaa),
-        voimassaoloLoppuu: csvAikaleima(csvOps.perusteenVoimassaoloLoppuu),
-        ensijulkaisu: csvAikaleima(csvOps.ensijulkaisu),
-        julkaistu: csvAikaleima(csvOps.julkaistu),
+        text: $t(koulutustyyppi),
+        value: koulutustyyppi,
       };
-    });
-  }
+    })
+    .value();
+});
 
-  downloadTiedosto(tyyppi) {
-    dataTiedostoksi(tyyppi, 'ylops', this.tiedostoData);
-  }
+const tilaItems = computed(() => {
+  return [
+    { text: $t('luonnos'), value: 'luonnos' },
+    { text: $t('valmis'), value: 'valmis' },
+    { text: $t('julkaistu'), value: 'julkaistu' },
+    { text: $t('poistettu'), value: 'poistettu' },
+  ];
+});
+
+const voimassaoloItems = computed(() => {
+  return [
+    { text: $t('voimassaolevat'), value: 'voimassaoleva' },
+    { text: $t('tulevat'), value: 'tuleva' },
+    { text: $t('paattyneet'), value: 'paattynyt' },
+  ];
+});
+
+const perusteItems = computed(() => {
+  return _.map(props.perusteet, peruste => {
+    return {
+      value: peruste.id,
+      text: $kaanna(peruste.nimi),
+    };
+  });
+});
+
+const koulutuksenjarjestajaTyyppiItems = computed(() => {
+  return [
+    { text: $t('maarittelematon'), value: 'maarittelematon' },
+    { text: $t('kunta'), value: 'Kunta' },
+    { text: $t('oppilaitos'), value: 'Oppilaitos' },
+  ];
+});
+
+const tyhjaGraafiOptions = computed(() => {
+  return {
+    labels: ['test'],
+    dataLabels: {
+      enabled: false,
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      enabled: false,
+    },
+    colors: ['#546E7A'],
+  };
+});
+
+const tyhjaGraafiData = computed(() => {
+  return [1];
+});
+
+const koulutuksenjarjestajaFields = computed(() => {
+  return [{
+    key: 'koulutuksenjarjestaja',
+    label: $t('koulutuksenjarjestaja'),
+    sortable: true,
+    sortByFormatted: true,
+    formatter: (value: any, key: string, item: any) => {
+      return $kaanna(value.nimi);
+    },
+  }, {
+    key: 'arkistoitu',
+    label: $t('arkistoidut'),
+    sortable: true,
+    thStyle: { width: '15%' },
+  }, {
+    key: 'luonnos',
+    label: $t('luonnokset'),
+    sortable: true,
+    thStyle: { width: '15%' },
+  }, {
+    key: 'valmis',
+    label: $t('valmiit'),
+    sortable: true,
+    thStyle: { width: '15%' },
+  }, {
+    key: 'julkaistu',
+    label: $t('julkaistut'),
+    sortable: true,
+    thStyle: { width: '15%' },
+  }];
+});
+
+const koulutuksenjarjestajaItems = computed(() => {
+  return _.chain(opetussuunnitelmatFilled.value)
+    .filter(opetussuunnitelma => !!opetussuunnitelma.koulutuksenjarjestaja)
+    .map(opetussuunnitelma => {
+      return {
+        value: opetussuunnitelma.koulutuksenjarjestaja!.oid,
+        text: $kaanna(opetussuunnitelma.koulutuksenjarjestaja!.nimi),
+      };
+    })
+    .uniqWith(_.isEqual)
+    .value();
+});
+
+const tiedostoData = computed(() => {
+  return _.map(opetussuunnitelmatFiltered.value, (ops: any) => {
+    const csvOps = _.pick(ops, ['nimi', 'koulutustyyppi', 'tila', 'perusteenVoimassaoloAlkaa', 'perusteenVoimassaoloLoppuu', 'julkaistu', 'ensijulkaisu', 'luotu']);
+    return {
+      nimi: $kaanna(csvOps.nimi),
+      koulutustyyppi: $t(csvOps.koulutustyyppi),
+      tila: $t(csvOps.tila),
+      luotu: csvAikaleima(csvOps.luotu),
+      voimassaoloAlkaa: csvAikaleima(csvOps.perusteenVoimassaoloAlkaa),
+      voimassaoloLoppuu: csvAikaleima(csvOps.perusteenVoimassaoloLoppuu),
+      ensijulkaisu: csvAikaleima(csvOps.ensijulkaisu),
+      julkaistu: csvAikaleima(csvOps.julkaistu),
+    };
+  });
+});
+
+function downloadTiedosto(tyyppi: string) {
+  dataTiedostoksi(tyyppi, 'ylops', tiedostoData.value);
 }
 </script>
 

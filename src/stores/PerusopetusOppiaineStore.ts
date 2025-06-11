@@ -1,6 +1,6 @@
 import { PerusopetuksenPerusteenSisalto, PerusopetusOppiaineLukko, PerusopetusOppiaineVlkLukko } from '@shared/api/eperusteet';
 import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
 import { required } from 'vuelidate/lib/validators';

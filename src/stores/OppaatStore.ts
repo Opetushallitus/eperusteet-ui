@@ -1,36 +1,29 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { reactive, computed } from 'vue';
 import { Oppaat, OpasLuontiDto, PerusteHakuDto } from '@shared/api/eperusteet';
+import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
-import debounce from 'lodash/debounce';
 
-export const useOppaatStore = defineStore('oppaat', () => {
-  // State
-  const oppaat = ref<PerusteHakuDto[] | null>(null);
+export class OppaatStore {
+  private state = reactive({
+    oppaat: null as PerusteHakuDto[] | null,
 
-  // Actions
-  async function saveOpas(opas: OpasLuontiDto) {
+  });
+
+  public readonly oppaat = computed(() => this.state.oppaat);
+
+  public async saveOpas(opas: OpasLuontiDto) {
     const res = await Oppaat.addOpas(opas);
-    oppaat.value = [
+    this.state.oppaat = [
       (res.data as any),
-      ...(oppaat.value || []),
+      ...this.state.oppaat || [],
     ];
 
     return res.data;
   }
 
-  const updateQuery = debounce(async () => {
+  @Debounced(300)
+  public async updateQuery() {
     const res = (await Oppaat.getAllOppaatKevyt(1000)).data;
-    oppaat.value = (res as any).data as any;
-  }, 300);
-
-  return {
-    // State
-    oppaat,
-
-    // Actions
-    saveOpas,
-    updateQuery,
-  };
-});
-
+    this.state.oppaat = (res as any).data as any;
+  }
+}

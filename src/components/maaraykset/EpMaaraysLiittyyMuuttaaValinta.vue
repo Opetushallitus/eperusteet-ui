@@ -37,49 +37,54 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed } from 'vue';
 import EpMaaraysLiittyyMaaraykseen from '@/components/maaraykset/EpMaaraysLiittyyMaaraykseen.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMaaraysLiittyyMaaraykseen,
+const EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
+const MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
+const KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
+
+const props = defineProps({
+  modelValue: {
+    type: Object as () => MaaraysDto,
+    required: true,
   },
-})
-export default class EpMaaraysLiittyyMuuttaaValinta extends Vue {
-  private EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
-  private MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
-  private KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
+  isEditing: {
+    type: Boolean,
+    required: false,
+  },
+  maarayksetNimella: {
+    type: Array as () => MaaraysKevytDto[],
+    required: false,
+    default: () => [],
+  },
+  disabloidutValinnat: {
+    type: Array as () => MaaraysDtoLiittyyTyyppiEnum[],
+    required: false,
+    default: () => [],
+  },
+});
 
-  @Prop({ required: false })
-  isEditing!: boolean;
+const emit = defineEmits(['update:modelValue']);
 
-  @Prop({ required: false, default: [] })
-  maarayksetNimella!: MaaraysKevytDto[];
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: false, default: [] })
-  disabloidutValinnat!: MaaraysDtoLiittyyTyyppiEnum[];
-
-  @Prop({ required: true })
-  value!: MaaraysDto;
-
-  set model(val) {
-    this.$emit('input', val);
-  }
-
-  get model() {
-    return this.value;
-  }
-s;
-get isRequired() {
-  return this.isEditing ? ' *' : '';
-}
-}
+const isRequired = computed(() => {
+  return props.isEditing ? ' *' : '';
+});
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

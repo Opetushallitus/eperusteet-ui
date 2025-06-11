@@ -43,12 +43,13 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from 'vue';
 import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
 import { LokalisoituTekstiDto } from '@shared/tyypit';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import _ from 'lodash';
+import { $t, $kaanna } from '@shared/utils/globals';
 
 export interface YhdistettyOsaamistaso {
   otsikko?: LokalisoituTekstiDto;
@@ -61,74 +62,67 @@ export interface YhdistettyGeneerinen {
   osaamistasot?: YhdistettyOsaamistaso[],
 }
 
-@Component({
-  components: {
-    EpAlert,
+const props = defineProps<{
+  arviointiStore: ArviointiStore;
+  isEditing?: boolean;
+  modelValue: number;
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const inner = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpGeneerinenAsteikko extends Vue {
-  @Prop({ required: true })
-  arviointiStore!: ArviointiStore;
+  set(value: number) {
+    emit('update:modelValue', value);
+  },
+});
 
-  @Prop({ default: false })
-  isEditing!: boolean;
+const arviointiasteikot = computed(() => {
+  return props.arviointiStore.arviointiasteikot.value;
+});
 
-  @Prop({ required: true })
-  value!: number;
+const kaikkiGeneeriset = computed(() => {
+  return props.arviointiStore.geneeriset.value;
+});
 
-  get inner() {
-    return this.value;
+const valittuGeneerinen = computed((): YhdistettyGeneerinen | null => {
+  if (!props.modelValue) {
+    return null;
   }
 
-  set inner(value: number) {
-    this.$emit('input', value);
+  const geneerinen = _.first(_.filter(kaikkiGeneeriset.value,
+    g => g.id === Number(props.modelValue)));
+
+  if (!geneerinen) {
+    return null;
   }
 
-  get arviointiasteikot() {
-    return this.arviointiStore.arviointiasteikot.value;
+  const asteikko = _.first(_.filter(arviointiasteikot.value,
+    g => g.id === Number((geneerinen as any)._arviointiAsteikko)));
+
+  if (!asteikko) {
+    return null;
   }
 
-  get kaikkiGeneeriset() {
-    return this.arviointiStore.geneeriset.value;
-  }
+  const kriteeriMap = _.keyBy(geneerinen.osaamistasonKriteerit, '_osaamistaso');
 
-  get valittuGeneerinen(): YhdistettyGeneerinen | null {
-    if (!this.value) {
-      return null;
-    }
+  return {
+    nimi: geneerinen.nimi as any,
+    kohde: geneerinen.kohde as any,
+    osaamistasot: _.map(_.reverse(asteikko?.osaamistasot || []), (ot: any) => {
+      return {
+        otsikko: ot.otsikko as any,
+        kriteerit: kriteeriMap[ot.id!]!.kriteerit!,
+      };
+    }),
+  };
+});
 
-    const geneerinen = _.first(_.filter(this.kaikkiGeneeriset,
-      g => g.id === Number(this.value)));
-
-    if (!geneerinen) {
-      return null;
-    }
-
-    const asteikko = _.first(_.filter(this.arviointiasteikot,
-      g => g.id === Number((geneerinen as any)._arviointiAsteikko)));
-
-    if (!asteikko) {
-      return null;
-    }
-
-    const kriteeriMap = _.keyBy(geneerinen.osaamistasonKriteerit, '_osaamistaso');
-
-    return {
-      nimi: geneerinen.nimi as any,
-      kohde: geneerinen.kohde as any,
-      osaamistasot: _.map(_.reverse(asteikko?.osaamistasot || []), (ot: any) => {
-        return {
-          otsikko: ot.otsikko as any,
-          kriteerit: kriteeriMap[ot.id!]!.kriteerit!,
-        };
-      }),
-    };
-  }
-
-  get geneeriset() {
-    return _.filter(this.arviointiStore.geneeriset.value, 'julkaistu');
-  }
-}
+const geneeriset = computed(() => {
+  return _.filter(props.arviointiStore.geneeriset.value, 'julkaistu');
+});
 </script>
 
 <style lang="scss" scoped>

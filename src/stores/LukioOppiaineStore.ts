@@ -2,7 +2,7 @@ import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/Edit
 import { Lops2019 } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import { required } from 'vuelidate/lib/validators';
 
 export class LukioOppiaineStore implements IEditoitava {

@@ -1,41 +1,46 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { reactive, computed } from 'vue';
 import { Tilastot, Perusteet } from '@shared/api/eperusteet';
 import { yleissivistavatKoulutustyypit } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
 
-export const useTilastotStore = defineStore('tilastot', () => {
-  // State
-  const opetussuunnitelmat = ref<any[] | null>(null);
-  const toteutussuunnitelmat = ref<any[] | null>(null);
-  const perusteet = ref<any[] | null>(null);
+// Original class-based implementation for backward compatibility
+export class TilastotStore {
+  public state = reactive({
+    opetussuunnitelmat: null as any[] | null,
+    toteutussuunnitelmat: null as any[] | null,
+    perusteet: null as any[] | null,
+  });
 
-  // Actions
-  async function fetch() {
-    await Promise.all([fetchAmosaaTilastot(), fetchYlopsTilastot(), fetchPerusteet()]);
+  public readonly opetussuunnitelmat = computed(() => this.state.opetussuunnitelmat);
+  public readonly toteutussuunnitelmat = computed(() => this.state.toteutussuunnitelmat);
+  public readonly perusteet = computed(() => this.state.perusteet);
+
+  public async fetch() {
+    await Promise.all([this.fetchAmosaaTilastot(), this.fetchYlopsTilastot(), this.fetchPerusteet()]);
   }
 
-  async function fetchAmosaaTilastot() {
+  async fetchAmosaaTilastot() {
     try {
-      toteutussuunnitelmat.value = (await Tilastot.getAmosaaTilastot()).data;
+      this.state.toteutussuunnitelmat = (await Tilastot.getAmosaaTilastot()).data;
     }
     catch (e) {
-      toteutussuunnitelmat.value = [];
+      this.state.toteutussuunnitelmat = [];
     }
   }
 
-  async function fetchYlopsTilastot() {
+  async fetchYlopsTilastot() {
     try {
-      opetussuunnitelmat.value = (await Tilastot.getYlopsTilastot()).data as any;
+      this.state.opetussuunnitelmat = (await Tilastot.getYlopsTilastot()).data as any;
     }
     catch (e) {
-      opetussuunnitelmat.value = [];
+      this.state.opetussuunnitelmat = [];
     }
   }
 
-  async function fetchPerusteet() {
+  async fetchPerusteet() {
     try {
-      const perusteData = _.get((await Perusteet.getAllPerusteetInternal(
+      const perusteet = _.get((await Perusteet.getAllPerusteetInternal(
         undefined,
         1000,
         undefined,
@@ -47,22 +52,77 @@ export const useTilastotStore = defineStore('tilastot', () => {
         yleissivistavatKoulutustyypit,
       )).data, 'data');
 
-      if (perusteData) {
-        perusteet.value = perusteData;
+      if (perusteet) {
+        this.state.perusteet = perusteet;
       }
     }
     catch (e) {
-      perusteet.value = [];
+      this.state.perusteet = [];
+    }
+  }
+}
+
+// New Pinia implementation
+export const useTilastotStore = defineStore('tilastot', () => {
+  const state = reactive({
+    opetussuunnitelmat: null as any[] | null,
+    toteutussuunnitelmat: null as any[] | null,
+    perusteet: null as any[] | null,
+  });
+
+  const opetussuunnitelmat = computed(() => state.opetussuunnitelmat);
+  const toteutussuunnitelmat = computed(() => state.toteutussuunnitelmat);
+  const perusteet = computed(() => state.perusteet);
+
+  async function fetch() {
+    await Promise.all([fetchAmosaaTilastot(), fetchYlopsTilastot(), fetchPerusteet()]);
+  }
+
+  async function fetchAmosaaTilastot() {
+    try {
+      state.toteutussuunnitelmat = (await Tilastot.getAmosaaTilastot()).data;
+    }
+    catch (e) {
+      state.toteutussuunnitelmat = [];
+    }
+  }
+
+  async function fetchYlopsTilastot() {
+    try {
+      state.opetussuunnitelmat = (await Tilastot.getYlopsTilastot()).data as any;
+    }
+    catch (e) {
+      state.opetussuunnitelmat = [];
+    }
+  }
+
+  async function fetchPerusteet() {
+    try {
+      const perusteet = _.get((await Perusteet.getAllPerusteetInternal(
+        undefined,
+        1000,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        yleissivistavatKoulutustyypit,
+      )).data, 'data');
+
+      if (perusteet) {
+        state.perusteet = perusteet;
+      }
+    }
+    catch (e) {
+      state.perusteet = [];
     }
   }
 
   return {
-    // State
     opetussuunnitelmat,
     toteutussuunnitelmat,
     perusteet,
-
-    // Actions
     fetch,
     fetchAmosaaTilastot,
     fetchYlopsTilastot,

@@ -1,16 +1,14 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { Matala, Sisallot } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 
-Vue.use(VueCompositionApi);
-
 interface TekstiRakenneStoreConfig {
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: typeof VueRouter;
 }
 
 export class TekstiRakenneStore implements IEditoitava {

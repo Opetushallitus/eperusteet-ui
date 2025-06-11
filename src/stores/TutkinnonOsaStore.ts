@@ -1,55 +1,52 @@
-import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import Vue, { computed, reactive } from 'vue';
 import { TutkinnonOsaViiteDto, TutkinnonRakenne } from '@shared/api/eperusteet';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
-import { pinia } from '.';
-import { usePerusteStore } from '@/stores/PerusteStore';
 
-export const useTutkinnonOsaStore = defineStore('tutkinnonOsa', () => {
-  // State
-  const tutkinnonOsat = ref<TutkinnonOsaViiteDto[] | null>(null);
+export class TutkinnonOsaStore implements IEditoitava {
+  constructor(
+    private perusteStore: PerusteStore,
+  ) { }
 
-  // Reference to Peruste store - will be initialized in initialize method
-  const perusteStore = usePerusteStore(pinia)
+  private state = reactive({
+    tutkinnonOsat: null as TutkinnonOsaViiteDto[] | null,
+  });
 
-  // Actions
-  async function fetch() {
-    if (!perusteStore) return;
+  public readonly tutkinnonOsat = computed(() => this.state.tutkinnonOsat);
 
-    const perusteId = perusteStore.perusteId;
-    const st = perusteStore.suoritustavat;
+  public async fetch() {
+    const perusteId = this.perusteStore.perusteId.value;
+    const st = this.perusteStore.suoritustavat.value;
     if (perusteId && st) {
-      tutkinnonOsat.value = null;
-      await init(perusteId, st);
+      this.state.tutkinnonOsat = null;
+      await this.init(perusteId, st);
     }
   }
 
-  async function init(projektiId: number, suoritustapakoodit: readonly string[]) {
+  public async init(projektiId: number, suoritustapakoodit: readonly string[]) {
     if (!_.isEmpty(suoritustapakoodit)) {
-      const tutkinnonosatData = _.chain(await Promise.all(
+      const tutkinnonosat = _.chain(await Promise.all(
         _.map(suoritustapakoodit, suoritustapakoodi => TutkinnonRakenne.getPerusteenTutkinnonOsat(projektiId, (suoritustapakoodi as any)))))
         .map('data')
         .flatMap()
         .sortBy('jarjestys')
         .value();
-      tutkinnonOsat.value = tutkinnonosatData;
+      this.state.tutkinnonOsat = tutkinnonosat;
     }
     else {
-      tutkinnonOsat.value = [];
+      this.state.tutkinnonOsat = [];
     }
   }
 
-  async function load() {
-    await fetch();
-    return tutkinnonOsat.value;
+  public async load() {
+    await this.fetch();
+    return this.tutkinnonOsat.value;
   }
 
-  async function save(data: any[]) {
-    if (!perusteStore) return null;
-
-    const perusteId = perusteStore.perusteId;
-    const st = perusteStore.suoritustavat?.[0] as any;
+  public async save(data: any[]) {
+    const perusteId = this.perusteStore.perusteId.value;
+    const st = this.perusteStore.suoritustavat.value[0] as any;
     const payload = _.map(data, (tosa, idx) => ({
       id: tosa.id,
       jarjestys: idx,
@@ -58,30 +55,17 @@ export const useTutkinnonOsaStore = defineStore('tutkinnonOsa', () => {
     return res.data;
   }
 
-  async function editAfterLoad() {
+  public async editAfterLoad() {
     return false;
   }
 
-  async function preview() {
+  public async preview() {
     return null;
   }
 
-  const features = computed(() => ({
-    editable: false,
-  }));
-
-  return {
-    // State
-    tutkinnonOsat,
-
-    // Actions
-    fetch,
-    init,
-    load,
-    save,
-    editAfterLoad,
-    preview,
-    features,
-  };
-});
-
+  public features() {
+    return computed(() => ({
+      editable: false,
+    }));
+  }
+}

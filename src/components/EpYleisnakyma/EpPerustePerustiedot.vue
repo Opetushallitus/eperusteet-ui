@@ -63,9 +63,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import _ from 'lodash';
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { ref, computed } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
@@ -75,73 +75,62 @@ import { PerusteprojektiDto, PerusteDto } from '@shared/api/eperusteet';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import { buildPerusteEsikatseluUrl } from '@shared/utils/esikatselu';
+import { $t, $kaanna, $sdt } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSpinner,
-    EpButton,
-    EpPerustietoData,
-    EpInput,
-  },
-})
-export default class EpPerustePerustiedot extends Vue {
-  private tyoryhmaAlkuMaara = 5;
-  private naytaLisaaTyoryhmaa: boolean = false;
+const props = defineProps<{
+  projekti: PerusteprojektiDto;
+  peruste: PerusteDto;
+  tyoryhmaStore: TyoryhmaStore;
+}>();
 
-  @Prop({ required: true })
-  protected projekti!: PerusteprojektiDto;
+const tyoryhmaAlkuMaara = 5;
+const naytaLisaaTyoryhmaa = ref(false);
 
-  @Prop({ required: true })
-  protected peruste!: PerusteDto;
+const projektinKuvaus = computed(() => {
+  return props.projekti.kuvaus;
+});
 
-  @Prop({ required: true })
-  private tyoryhmaStore!: TyoryhmaStore;
+const yhteyshenkilo = computed(() => {
+  return props.projekti?.yhteistyotaho || null;
+});
 
-  get projektinKuvaus() {
-    return this.projekti.kuvaus;
+const julkaisukielet = computed(() => {
+  if (props.peruste) {
+    return _.map(props.peruste.kielet, (kieli) => Kielet.kaannaOlioTaiTeksti(kieli)).join(', ');
   }
+  return '';
+});
 
-  get yhteyshenkilo() {
-    return this.projekti?.yhteistyotaho || null;
-  }
+const tyoryhma = computed(() => {
+  return props.tyoryhmaStore.perusteenTyoryhma.value;
+});
 
-  get julkaisukielet() {
-    if (this.peruste) {
-      return _.map(this.peruste.kielet, (kieli) => Kielet.kaannaOlioTaiTeksti(kieli)).join(', ');
-    }
+const virkailijat = computed(() => {
+  if (props.tyoryhmaStore.tyoryhmanVirkailiijat.value) {
+    return _.chain(props.tyoryhmaStore.tyoryhmanVirkailiijat.value)
+      .map(virkailija => {
+        return {
+          ...virkailija,
+          esitysnimi: parsiEsitysnimi(virkailija),
+        };
+      })
+      .value();
   }
+  else {
+    return null;
+  }
+});
 
-  get tyoryhma() {
-    return this.tyoryhmaStore.perusteenTyoryhma.value;
+const esikatseluUrl = computed(() => {
+  if (props.peruste) {
+    return buildPerusteEsikatseluUrl(props.peruste);
   }
-
-  get virkailijat() {
-    if (this.tyoryhmaStore.tyoryhmanVirkailiijat.value) {
-      return _.chain(this.tyoryhmaStore.tyoryhmanVirkailiijat.value)
-        .map(virkailija => {
-          return {
-            ...virkailija,
-            esitysnimi: parsiEsitysnimi(virkailija),
-          };
-        })
-        .value();
-    }
-    else {
-      return null;
-    }
-  }
-
-  get esikatseluUrl() {
-    if (this.peruste) {
-      return buildPerusteEsikatseluUrl(this.peruste);
-    }
-  }
-}
+  return '';
+});
 </script>
 
 <style scoped lang="scss">
 @import "@/styles/_variables.scss";
 @import "@/styles/_mixins.scss";
 @include perustiedot-content;
-
 </style>

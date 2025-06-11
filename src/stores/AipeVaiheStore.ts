@@ -1,43 +1,36 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
 import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
-import { usePerusteStore } from './PerusteStore';
+import { PerusteStore } from './PerusteStore';
 import { Revision } from '@shared/tyypit';
-import { useRouter } from 'vue-router';
 
-export const useAipeVaiheStore = defineStore('aipeVaihe', () => {
-  // State
-  const perusteId = ref<number | null>(null);
-  const vaiheId = ref<number | null>(null);
-  const versionumero = ref<number | undefined>(undefined);
-  const router = useRouter();
-
-  // Actions
-  function initialize(perusteIdParam: number, vaiheIdParam: number | null, versionumeroParam?: number) {
-    perusteId.value = perusteIdParam;
-    vaiheId.value = vaiheIdParam;
-    versionumero.value = versionumeroParam;
+export class AipeVaiheStore implements IEditoitava {
+  constructor(
+    private perusteId: number,
+    private vaiheId: number | null,
+    private perusteStore: PerusteStore,
+    private el: any,
+    public versionumero?: number,
+  ) {
   }
 
-  async function acquire() {
+  async acquire() {
     return null;
   }
 
-  async function editAfterLoad() {
-    return !vaiheId.value;
+  async editAfterLoad() {
+    return !this.vaiheId;
   }
 
-  async function load() {
-    if (vaiheId.value) {
-      if (versionumero.value) {
-        const revisions = (await Aipeopetuksensisalto.getVaiheVersiot(perusteId.value!, vaiheId.value!)).data as Revision[];
-        const rev = revisions[revisions.length - versionumero.value];
-        return (await Aipeopetuksensisalto.getVaihe(perusteId.value!, vaiheId.value, rev.numero)).data;
+  async load() {
+    if (this.vaiheId) {
+      if (this.versionumero) {
+        const revisions = (await Aipeopetuksensisalto.getVaiheVersiot(this.perusteId, this.vaiheId!)).data as Revision[];
+        const rev = revisions[revisions.length - this.versionumero];
+        return (await Aipeopetuksensisalto.getVaihe(this.perusteId, this.vaiheId, rev.numero)).data;
       }
       else {
-        return (await Aipeopetuksensisalto.getVaihe(perusteId.value!, vaiheId.value)).data;
+        return (await Aipeopetuksensisalto.getVaihe(this.perusteId, this.vaiheId)).data;
       }
     }
 
@@ -47,75 +40,40 @@ export const useAipeVaiheStore = defineStore('aipeVaihe', () => {
     };
   }
 
-  async function save(data: any) {
-    const perusteStore = usePerusteStore();
-
-    if (vaiheId.value) {
-      await Aipeopetuksensisalto.updateVaihe(perusteId.value!, vaiheId.value, data);
+  async save(data: any) {
+    if (this.vaiheId) {
+      await Aipeopetuksensisalto.updateVaihe(this.perusteId, this.vaiheId, data);
       if (_.size(data.oppiaineet) > 0) {
-        await Aipeopetuksensisalto.updateOppiaineetJarjestys(perusteId.value!, vaiheId.value, data.oppiaineet);
+        await Aipeopetuksensisalto.updateOppiaineetJarjestys(this.perusteId, this.vaiheId, data.oppiaineet);
       }
-      await perusteStore.updateNavigation();
+      await this.perusteStore.updateNavigation();
     }
     else {
-      const newData = (await Aipeopetuksensisalto.addVaihe(perusteId.value!, data)).data;
-      await perusteStore.updateNavigation();
+      const newData = (await Aipeopetuksensisalto.addVaihe(this.perusteId, data)).data;
+      await this.perusteStore.updateNavigation();
 
       await EditointiStore.cancelAll();
-      router.push({ name: 'aipevaihe', params: { vaiheId: newData.id } });
+      this.el.$router.push({ name: 'aipevaihe', params: { vaiheId: newData.id } });
     }
   }
 
-  async function remove() {
-    const perusteStore = usePerusteStore();
-
-    if (vaiheId.value) {
-      await Aipeopetuksensisalto.removeVaihe(perusteId.value!, vaiheId.value);
-      await perusteStore.updateNavigation();
-      router.push({ name: 'perusteprojekti' });
+  public async remove() {
+    if (this.vaiheId) {
+      await Aipeopetuksensisalto.removeVaihe(this.perusteId, this.vaiheId);
+      await this.perusteStore.updateNavigation();
+      this.el.$router.push({ name: 'perusteprojekti' });
     }
   }
 
-  async function revisions() {
-    if (vaiheId.value) {
-      const res = await Aipeopetuksensisalto.getVaiheVersiot(perusteId.value!, vaiheId.value!);
+  public async revisions() {
+    if (this.vaiheId) {
+      const res = await Aipeopetuksensisalto.getVaiheVersiot(this.perusteId, this.vaiheId!);
       return res.data as Revision[];
     }
     return [];
   }
 
-  async function restore(rev: number) {
-    await Aipeopetuksensisalto.revertVaihe(perusteId.value!, vaiheId.value!, rev);
+  public async restore(rev: number) {
+    await Aipeopetuksensisalto.revertVaihe(this.perusteId, this.vaiheId!, rev);
   }
-
-  // Create an IEditoitava instance
-  const editoitava: IEditoitava = {
-    acquire,
-    editAfterLoad,
-    load,
-    save,
-    remove,
-    revisions,
-    restore,
-  };
-
-  return {
-    // State
-    perusteId,
-    vaiheId,
-    versionumero,
-
-    // Actions
-    initialize,
-    acquire,
-    editAfterLoad,
-    load,
-    save,
-    remove,
-    revisions,
-    restore,
-
-    // IEditoitava interface implementation
-    editoitava,
-  };
-});
+}

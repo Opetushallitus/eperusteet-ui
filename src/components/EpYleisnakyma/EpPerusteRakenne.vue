@@ -10,15 +10,20 @@
   </div>
 </template>
 
-<script lang="ts">
-
-import { Vue, Component, Prop, Mixins, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
 import _ from 'lodash';
+import { computed } from 'vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
-import { PerusteDto } from '@shared/api/eperusteet';
 import EpSmallDataBox from '@/components/EpYleisnakyma/EpSmallDataBox.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
+import { $t } from '@shared/utils/globals';
+
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
+  },
+});
 
 const koulutustyyppiLisasisalto = {
   'koulutustyyppi_10': {
@@ -39,52 +44,41 @@ const koulutustyyppiLisasisalto = {
   },
 };
 
-@Component({
-  components: {
-    EpSpinner,
-    EpSmallDataBox,
-  },
-})
-export default class EpRakenne extends Vue {
-  @Prop({ required: true })
-  protected perusteStore!: PerusteStore;
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value;
+});
 
-  get peruste() {
-    return this.perusteStore.peruste.value;
-  }
+const sisaltoLapset = (sisalto) => {
+  return _.chain(sisalto.children)
+    .map(lapsi => {
+      return [
+        lapsi,
+        ...sisaltoLapset(lapsi),
+      ];
+    })
+    .flatten()
+    .value();
+};
 
-  get tekstikappaleita() {
-    return _.size(_.filter(this.sisaltoFlat, sisalto => sisalto.type === 'viite'));
-  }
+const sisaltoFlat = computed(() => {
+  return sisaltoLapset(props.perusteStore.navigation.value);
+});
 
-  get hasLisasisalto() {
-    return !!_.get(koulutustyyppiLisasisalto, this.peruste?.koulutustyyppi!);
-  }
+const tekstikappaleita = computed(() => {
+  return _.size(_.filter(sisaltoFlat.value, sisalto => sisalto.type === 'viite'));
+});
 
-  get lisasisaltoOtsikko() {
-    return koulutustyyppiLisasisalto[this.peruste?.koulutustyyppi!]['otsikko'];
-  }
+const hasLisasisalto = computed(() => {
+  return !!_.get(koulutustyyppiLisasisalto, peruste.value?.koulutustyyppi!);
+});
 
-  get lisasisaltoMaara() {
-    return _.size(_.filter(this.sisaltoFlat, sisalto => sisalto.type === koulutustyyppiLisasisalto[this.peruste?.koulutustyyppi!]['tietue']));
-  }
+const lisasisaltoOtsikko = computed(() => {
+  return koulutustyyppiLisasisalto[peruste.value?.koulutustyyppi!]['otsikko'];
+});
 
-  get sisaltoFlat() {
-    return this.sisaltoLapset(this.perusteStore.navigation.value);
-  }
-
-  sisaltoLapset(sisalto) {
-    return _.chain(sisalto.children)
-      .map(lapsi => {
-        return [
-          lapsi,
-          ...this.sisaltoLapset(lapsi),
-        ];
-      })
-      .flatten()
-      .value();
-  }
-}
+const lisasisaltoMaara = computed(() => {
+  return _.size(_.filter(sisaltoFlat.value, sisalto => sisalto.type === koulutustyyppiLisasisalto[peruste.value?.koulutustyyppi!]['tietue']));
+});
 </script>
 
 <style scoped lang="scss">

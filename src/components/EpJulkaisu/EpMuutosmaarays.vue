@@ -69,9 +69,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { computed, ref, watch } from 'vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto, MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
@@ -84,79 +84,62 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import { Kieli } from '@shared/tyypit';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import EpInfoBanner from '@shared/components/EpInfoBanner/EpInfoBanner.vue';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpInfoPopover,
-    EpToggle,
-    EpMaaraysLiittyyMuuttaaValinta,
-    EpMaaraysAsiasanat,
-    EpDatepicker,
-    EpInput,
-    EpMaaraysLiitteet,
-    EpSpinner,
-    EpContent,
+const MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
+const LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
+
+const props = defineProps<{
+  modelValue: MaaraysDto;
+  isEditing?: boolean;
+  asiasanat: { [key: string]: string[]; };
+  maarayksetNimella: MaaraysKevytDto[];
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const fileMaxSize = 10;
+const tabindex = ref(0);
+
+const model = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpMuutosmaarays extends Vue {
-  private MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
-  private LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: true })
-  value!: MaaraysDto;
+const isRequired = computed(() => {
+  return props.isEditing ? ' *' : '';
+});
 
-  @Prop({ required: false })
-  isEditing!: boolean;
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
 
-  @Prop({ required: true })
-  asiasanat!: { [key: string]: string[]; };
-
-  @Prop({ required: true })
-  maarayksetNimella!: MaaraysKevytDto[];
-
-  private fileMaxSize = 10;
-  private tabindex = 0;
-
-  set model(val) {
-    this.$emit('input', val);
+const kielenAsiasanat = computed(() => {
+  if (!props.asiasanat || _.isEmpty(props.asiasanat[kieli.value])) {
+    return [];
   }
 
-  get model() {
-    return this.value;
-  }
+  return props.asiasanat[kieli.value];
+});
 
-  get isRequired() {
-    return this.isEditing ? ' *' : '';
-  }
+const disabloidutMuuttaaValinnat = computed(() => {
+  return [MaaraysDtoLiittyyTyyppiEnum.EILIITY];
+});
 
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
+const kielet = computed(() => {
+  return UiKielet;
+});
 
-  get kielenAsiasanat() {
-    if (!this.asiasanat || _.isEmpty(this.asiasanat[this.kieli])) {
-      return [];
-    }
-
-    return this.asiasanat[this.kieli];
-  }
-
-  get disabloidutMuuttaaValinnat() {
-    return [MaaraysDtoLiittyyTyyppiEnum.EILIITY];
-  }
-
-  get kielet() {
-    return UiKielet;
-  }
-
-  @Watch('tabindex')
-  kielivaihtui(index) {
-    Kielet.setSisaltoKieli(Kieli[this.kielet[index]]);
-  }
-}
+watch(tabindex, (index) => {
+  Kielet.setSisaltoKieli(Kieli[kielet.value[index]]);
+});
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>
