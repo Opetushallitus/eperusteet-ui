@@ -51,50 +51,65 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
-import { Component } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpJarjesta from '@shared/components/EpJarjesta/EpJarjesta.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { JarjestysStore } from '@/stores/JarjestysStore';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { Koulutustyyppi } from '@shared/tyypit';
 import { AipeVaiheetStore } from '@/stores/AipeVaiheetStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpJarjesta,
-    EpMainView,
-    EpSpinner,
-    EpMaterialIcon,
-  },
-})
-export default class RouteJarjesta extends PerusteprojektiRoute {
-  private store: EditointiStore | null = null;
-  private stores: { [key: string]: IEditoitava } = {};
+const props = defineProps<{
+  perusteStore: any;
+  projektiId?: number;
+  perusteId?: number;
+}>();
 
-  async onProjektiChange(projektiId: number) {
-    if (this.perusteId) {
-      this.stores = {
-        tekstit: new TekstiRakenneStore(this.perusteId),
-      };
+const store = ref<EditointiStore | null>(null);
+const stores = ref<{ [key: string]: IEditoitava }>({});
 
-      if (this.isAmmatillinen) {
-        this.stores.tutkinnonOsat = new TutkinnonOsaStore(this.perusteStore);
-      }
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value;
+});
 
-      if (this.peruste?.koulutustyyppi === Koulutustyyppi.aikuistenperusopetus) {
-        this.stores.vaiheet = new AipeVaiheetStore(this.perusteId, this.perusteStore);
-      }
+const isAmmatillinen = computed(() => {
+  return props.perusteStore.isAmmatillinen.value;
+});
 
-      this.store = new EditointiStore(new JarjestysStore(this.stores));
+const onProjektiChange = async () => {
+  if (props.perusteId) {
+    stores.value = {
+      tekstit: new TekstiRakenneStore(props.perusteId),
+    };
+
+    if (isAmmatillinen.value) {
+      stores.value.tutkinnonOsat = new TutkinnonOsaStore(props.perusteStore);
     }
+
+    if (peruste.value?.koulutustyyppi === Koulutustyyppi.aikuistenperusopetus) {
+      stores.value.vaiheet = new AipeVaiheetStore(props.perusteId, props.perusteStore);
+    }
+
+    store.value = new EditointiStore(new JarjestysStore(stores.value));
   }
-}
+};
+
+// Initialize component when mounted
+onMounted(async () => {
+  await onProjektiChange();
+});
+
+// Watch for changes in perusteId or projektiId
+watch([() => props.projektiId, () => props.perusteId], async () => {
+  if (props.projektiId && props.perusteId) {
+    await onProjektiChange();
+  }
+});
 </script>

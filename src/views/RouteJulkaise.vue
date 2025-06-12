@@ -149,26 +149,19 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Mixins, Prop, Component } from 'vue-property-decorator';
-import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute, LocationQuery, RouteParams, RouteLocationNormalizedLoaded, Location } from 'vue-router';
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
-import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { PerusteDtoTilaEnum, NavigationNodeDto, Perusteprojektit, PerusteprojektiDtoTilaEnum, Julkaisut, Maintenance } from '@shared/api/eperusteet';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteStore } from '@/stores/PerusteStore';
-import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
-import EpValidation from '@shared/mixins/EpValidation';
-import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import _ from 'lodash';
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpJulkaisuHistoria from '@/components/EpJulkaisu/EpJulkaisuHistoria.vue';
 import EpJulkaisuButton from '@shared/components/EpJulkaisuButton/EpJulkaisuButton.vue';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
@@ -178,187 +171,165 @@ import { Kielet } from '@shared/stores/kieli';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
 import EpJulkaisuMuutosmaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosmaarays.vue';
 import { nodeToRoute } from '@/utils/routing';
-import { Location } from 'vue-router';
 import EpJulkaisuValidointi from '@shared/components/EpJulkaisuValidointi/EpJulkaisuValidointi.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { Validations } from 'vuelidate-property-decorators';
-import { requiredIf } from 'vuelidate/lib/validators';
-import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import EpInfoBanner from '@shared/components/EpInfoBanner/EpInfoBanner.vue';
+import { $t, $success, $fail } from '@shared/utils/globals';
+import { usePerusteprojekti } from './PerusteprojektiRoute';
 
-@Component({
-  components: {
-    EpInfoPopover,
-    EpButton,
-    EpCollapse,
-    EpContent,
-    EpDatepicker,
-    EpEditointi,
-    EpInput,
-    EpKoodistoSelect,
-    EpKoulutustyyppiSelect,
-    EpMainView,
-    EpMultiSelect,
-    EpSpinner,
-    EpToggle,
-    PerustetyoryhmaSelect,
-    EpJulkaisuHistoria,
-    EpJulkaisuButton,
-    EpExternalLink,
-    EpJulkaisuForm,
-    EpJulkaisuValidointi,
-    EpMaterialIcon,
-    EpJulkaisuMuutosmaarays,
-  },
-})
-export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValidation) {
-  @Prop({ required: true })
-  protected perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  tiedotSivu: Location;
+}>();
 
-  @Prop({ required: true })
-  protected tiedotSivu!: Location;
+const julkaisu = ref({
+  tiedote: {},
+  julkinenTiedote: {},
+  julkinen: true,
+  muutosmaaraysVoimaan: null,
+  liitteet: [],
+  muutosmaarays: null,
+  liittyyMuutosmaarays: false,
+});
 
-  private julkaisu = {
-    tiedote: {},
-    julkinenTiedote: {},
-    julkinen: true,
-    muutosmaaraysVoimaan: null,
-    liitteet: [],
-    muutosmaarays: null,
-    liittyyMuutosmaarays: false,
-  };
+const hallintaLoading = ref(false);
+const router = useRouter();
+const route = useRoute();
+const { peruste, projekti, isPohja, isNormaali, isAmmatillinen, koulutustyyppiKohtaisetKaannokset } = usePerusteprojekti({ perusteStore: props.perusteStore });
 
-  private hallintaLoading: boolean = false;
+onMounted(async () => {
+  await validoi();
+  await props.perusteStore.fetchMaaraykset();
+});
 
-  async mounted() {
-    this.validoi();
-    await this.perusteStore.fetchMaaraykset();
+const muutosmaaraykset = computed(() => {
+  if (props.perusteStore.muutosmaaraykset.value) {
+    return props.perusteStore.muutosmaaraykset.value;
   }
+  return undefined;
+});
 
-  get muutosmaaraykset() {
-    if (this.perusteStore.muutosmaaraykset.value) {
-      return this.perusteStore.muutosmaaraykset.value;
-    }
+const julkaisuMahdollinen = computed(() => {
+  return _.toLower(peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && isPerusteValid.value;
+});
+
+const valmiiksiMahdollinen = computed(() => {
+  return _.toLower(projekti.value?.tila) === _.toLower(PerusteprojektiDtoTilaEnum.LAADINTA);
+});
+
+const julkaisut = computed(() => {
+  return props.perusteStore.julkaisut.value;
+});
+
+const validoinnit = computed(() => {
+  if (props.perusteStore.validoinnit.value) {
+    return _.map(props.perusteStore.validoinnit.value, validointi => {
+      return {
+        ...validointi,
+        virheet: listNodeToRoute(validointi.virheet),
+        huomautukset: listNodeToRoute(validointi.huomautukset),
+        huomiot: listNodeToRoute(validointi.huomiot),
+      };
+    });
   }
+  return undefined;
+});
 
-  get julkaisuMahdollinen() {
-    return _.toLower(this.peruste?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU) && this.isPerusteValid;
+const listNodeToRoute = (list: any[]) => {
+  return _.map(list, item => ({ ...item, route: nodeToRouteHandle(item.navigationNode) }));
+};
+
+const isPerusteValid = computed(() => {
+  if (validoinnit.value) {
+    return _.every(validoinnit.value, validointi => _.isEmpty(validointi.virheet));
   }
+  return undefined;
+});
 
-  get valmiiksiMahdollinen() {
-    return _.toLower(this.projekti?.tila) === _.toLower(PerusteprojektiDtoTilaEnum.LAADINTA);
+const validoi = async () => {
+  await props.perusteStore.updateValidointi();
+};
+
+const julkaise = async () => {
+  try {
+    await props.perusteStore.julkaise({
+      tiedote: julkaisu.value.tiedote,
+      julkinenTiedote: julkaisu.value.julkinenTiedote,
+      julkinen: julkaisu.value.julkinen,
+      muutosmaaraysVoimaan: julkaisu.value.muutosmaaraysVoimaan,
+      liitteet: julkaisu.value.liitteet,
+      muutosmaarays: julkaisu.value.liittyyMuutosmaarays ? julkaisu.value.muutosmaarays : null,
+    });
+
+    julkaisu.value.tiedote = {};
+    julkaisu.value.julkinenTiedote = {};
+    julkaisu.value.julkinen = true;
+    julkaisu.value.muutosmaaraysVoimaan = null;
+    julkaisu.value.liitteet = [];
+    julkaisu.value.liittyyMuutosmaarays = false;
+
+    $success($t('julkaisu-kaynnistetty'));
   }
-
-  get julkaisut() {
-    return this.perusteStore.julkaisut.value;
+  catch (err) {
+    $fail($t('julkaisu-epaonnistui'));
   }
+};
 
-  get validoinnit() {
-    if (this.perusteStore.validoinnit.value) {
-      return _.map(this.perusteStore.validoinnit.value, validointi => {
-        return {
-          ...validointi,
-          virheet: this.listNodeToRoute(validointi.virheet),
-          huomautukset: this.listNodeToRoute(validointi.huomautukset),
-          huomiot: this.listNodeToRoute(validointi.huomiot),
-        };
-      });
-    }
+const palautaJulkaisu = async (julkaisu: any) => {
+  try {
+    await props.perusteStore.palautaJulkaisu(julkaisu);
+    $success($t('perusteen-julkaisuversio-palautettu-julkiseksi'));
   }
-
-  listNodeToRoute(list) {
-    return _.map(list, item => ({ ...item, route: this.nodeToRoute(item.navigationNode) }));
+  catch (err) {
+    $fail($t('palautus-epaonnistui'));
   }
+};
 
-  get isPerusteValid() {
-    if (this.validoinnit) {
-      return _.every(this.validoinnit, validointi => _.isEmpty(validointi.virheet));
-    }
-  }
-
-  protected async onProjektiChange() {
-  }
-
-  async validoi() {
-    await this.perusteStore.updateValidointi();
-  }
-
-  async julkaise() {
-    try {
-      await this.perusteStore!.julkaise({
-        tiedote: this.julkaisu.tiedote,
-        julkinenTiedote: this.julkaisu.julkinenTiedote,
-        julkinen: this.julkaisu.julkinen,
-        muutosmaaraysVoimaan: this.julkaisu.muutosmaaraysVoimaan,
-        liitteet: this.julkaisu.liitteet,
-        muutosmaarays: this.julkaisu.liittyyMuutosmaarays ? this.julkaisu.muutosmaarays : null,
-      });
-
-      this.julkaisu.tiedote = {};
-      this.julkaisu.julkinenTiedote = {};
-      this.julkaisu.julkinen = true;
-      this.julkaisu.muutosmaaraysVoimaan = null;
-      this.julkaisu.liitteet = [];
-      this.julkaisu.liittyyMuutosmaarays = false;
-      this.$success(this.$t('julkaisu-kaynnistetty') as string);
-    }
-    catch (err) {
-      this.$fail(this.$t('julkaisu-epaonnistui') as string);
-    }
-  }
-
-  async palautaJulkaisu(julkaisu) {
-    try {
-      await this.perusteStore.palautaJulkaisu(julkaisu);
-      this.$success(this.$t('perusteen-julkaisuversio-palautettu-julkiseksi') as string);
-    }
-    catch (err) {
-      this.$fail(this.$t('palautus-epaonnistui') as string);
-    }
-  }
-
-  get julkaisuValid() {
-    return !this.$v.$invalid;
-  }
-
-  get julkaisuKesken() {
-    return this.perusteStore?.viimeisinJulkaisuTila.value === 'KESKEN';
-  }
-
-  nodeToRoute(navigationNode: NavigationNodeDto | undefined): Location | null {
-    if (!navigationNode) {
-      return null;
-    }
-
-    switch (navigationNode.type) {
-    case 'tiedot':
-      return this.tiedotSivu;
-    default:
-      return nodeToRoute(navigationNode as any);
-    }
-  }
-
-  opintopolkuKatseluUrl(julkaisu) {
-    let revision = julkaisu.revision;
-    if (revision === _.max(_.map(this.julkaisut, 'revision'))) {
-      revision = null;
-    }
-    if (julkaisu.peruste && julkaisu.peruste.id) {
-      return buildKatseluUrl(Kielet.getSisaltoKieli.value, `/${koulutustyyppiTheme(this.perusteStore.peruste.value!.koulutustyyppi!)}/${julkaisu.peruste.id}`, revision);
-    }
-    return '';
-  }
-
-  @Validations()
-  validations = {
+const rules = computed(() => {
+  return {
     julkaisu: {
       muutosmaarays: {
-        required: requiredIf((value) => {
-          return value && value.liittyyMuutosmaarays;
+        required: requiredIf(() => {
+          return julkaisu.value && julkaisu.value.liittyyMuutosmaarays;
         }),
       },
     },
   };
-}
+});
+
+const v$ = useVuelidate(rules, { julkaisu });
+
+const julkaisuValid = computed(() => {
+  return !v$.value.$invalid;
+});
+
+const julkaisuKesken = computed(() => {
+  return props.perusteStore?.viimeisinJulkaisuTila.value === 'KESKEN';
+});
+
+const nodeToRouteHandle = (navigationNode: NavigationNodeDto | undefined): Location | null => {
+  if (!navigationNode) {
+    return null;
+  }
+
+  switch (navigationNode.type) {
+    case 'tiedot':
+      return props.tiedotSivu;
+    default:
+      return nodeToRoute(navigationNode as any);
+  }
+};
+
+const opintopolkuKatseluUrl = (julkaisu: any) => {
+  let revision = julkaisu.revision;
+  if (revision === _.max(_.map(julkaisut.value, 'revision'))) {
+    revision = null;
+  }
+  if (julkaisu.peruste && julkaisu.peruste.id) {
+    return buildKatseluUrl(Kielet.getSisaltoKieli.value, `/${koulutustyyppiTheme(props.perusteStore.peruste.value!.koulutustyyppi!)}/${julkaisu.peruste.id}`, revision);
+  }
+  return '';
+};
 </script>
 
 <style lang="scss" scoped>
@@ -409,5 +380,4 @@ export default class RouteJulkaise extends Mixins(PerusteprojektiRoute, EpValida
 .julkaisu:nth-of-type(even) {
   background-color: $gray-lighten-13;
 }
-
 </style>

@@ -457,26 +457,24 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
-import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMuutosmaaraykset from '@/components/EpPerusteenTiedot/EpMuutosmaaraykset.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { Api, Liitetiedostot, Koodisto, LiiteDtoTyyppiEnum, LiitetiedostotParam, baseURL } from '@shared/api/eperusteet';
 import { AmmatillisetKoulutustyypit, Koulutustyyppi } from '@shared/tyypit';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
+import { usePerusteprojekti } from './PerusteprojektiRoute';
 import { PerusteEditStore } from '@/stores/PerusteEditStore';
 import { PerusteetStore } from '@/stores/PerusteetStore';
-import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
+import { PerusteStore } from '@/stores/PerusteStore';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
@@ -485,6 +483,12 @@ import { UiKielet, Kielet } from '@shared/stores/kieli';
 import _ from 'lodash';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import { KayttajaStore } from '@/stores/kayttaja';
+import { TiedotteetStore } from '@/stores/TiedotteetStore';
+import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
+import { AikatauluStore } from '@/stores/AikatauluStore';
+import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
+import { $t, $kaanna, $success, $fail, $slang, $sdt, $isAdmin } from '@shared/utils/globals';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
@@ -510,465 +514,469 @@ const koulutustyyppiTietoFilters = [
   },
 ];
 
-@Component({
-  components: {
-    EpInfoPopover,
-    EpButton,
-    EpCollapse,
-    EpContent,
-    EpDatepicker,
-    EpEditointi,
-    EpInput,
-    EpKoodistoSelect,
-    EpKoulutustyyppiSelect,
-    EpMultiSelect,
-    EpMuutosmaaraykset,
-    EpSpinner,
-    EpTiedostoLataus,
-    EpToggle,
-    PerustetyoryhmaSelect,
-    EpMaterialIcon,
-    EpMaaraysAsiasanat,
-  },
-})
-export default class RoutePerusteenTiedot extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  private perusteetStore!: PerusteetStore;
+const props = defineProps<{
+  perusteetStore: PerusteetStore;
+  perusteStore: PerusteStore;
+  kayttajaStore: KayttajaStore;
+  tiedotteetStore: TiedotteetStore;
+  muokkaustietoStore: MuokkaustietoStore;
+  aikatauluStore: AikatauluStore;
+  tyoryhmaStore: TyoryhmaStore;
+}>();
 
-  private store: EditointiStore | null = null;
-  private maarayskirjeFile: any | null = null;
-  private koulutusvienninOhjeFile: any | null = null;
-  private kaannosFile: any | null = null;
-  private liitteet: any[] | null = null;
-  private liitteenNimi = '';
-  private korvattavatPerusteet: { [diaari: string]: any } = {};
-  private korvattavaDiaarinumero = '';
-  private poikkeamismaaraysTyyppi: 'ei_tarvita_ohjetta' | 'ei_voi_poiketa' | 'koulutusvientiliite' | null = null;
-  private fileMaxSize = 10;
+const route = useRoute();
+const store = ref<EditointiStore | null>(null);
+const maarayskirjeFile = ref<any | null>(null);
+const koulutusvienninOhjeFile = ref<any | null>(null);
+const kaannosFile = ref<any | null>(null);
+const liitteet = ref<any[] | null>(null);
+const liitteenNimi = ref('');
+const korvattavatPerusteet = ref<{ [diaari: string]: any }>({});
+const korvattavaDiaarinumero = ref('');
+const poikkeamismaaraysTyyppi = ref<'ei_tarvita_ohjetta' | 'ei_voi_poiketa' | 'koulutusvientiliite' | null>(null);
+const fileMaxSize = ref(10);
 
-  async onProjektiChange(projektiId: number, perusteId: number) {
-    this.store = new EditointiStore(new PerusteEditStore(projektiId, perusteId, this.perusteStore, this.tallennaKoulutusvienninOhjeDiaari));
-    await this.fetchLiitteet();
-    await this.perusteStore.fetchMaaraykset();
-  }
+const {
+  isInitializing,
+  perusteId,
+  isAmmatillinen,
+} = usePerusteprojekti({
+  perusteStore: props.perusteStore,
+  kayttajaStore: props.kayttajaStore,
+  tiedotteetStore: props.tiedotteetStore,
+  muokkaustietoStore: props.muokkaustietoStore,
+  aikatauluStore: props.aikatauluStore,
+  tyoryhmaStore: props.tyoryhmaStore,
+});
 
-  async fetchLiitteet() {
-    const res = await Liitetiedostot.getAllLiitteet(Number(this.perusteId!));
-    this.liitteet = _.map(res.data, liite => ({
-      ...liite,
-      lisatieto: liite.lisatieto || '',
-      url: baseURL + LiitetiedostotParam.getLiite(this.perusteId!, liite.id!).url,
-    }));
-  }
+const fetchLiitteet = async () => {
+  const res = await Liitetiedostot.getAllLiitteet(Number(perusteId.value!));
+  liitteet.value = _.map(res.data, liite => ({
+    ...liite,
+    lisatieto: liite.lisatieto || '',
+    url: baseURL + LiitetiedostotParam.getLiite(perusteId.value!, liite.id!).url,
+  }));
+};
 
-  get koulutusvienninOhjeet() {
-    return _.filter(this.liitteet, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KOULUTUSVIENNINOHJE));
-  }
+const koulutusvienninOhjeet = computed(() => {
+  return _.filter(liitteet.value, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KOULUTUSVIENNINOHJE));
+});
 
-  get kaannokset() {
-    return _.filter(this.liitteet, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KAANNOS));
-  }
+const kaannokset = computed(() => {
+  return _.filter(liitteet.value, liite => liite.tyyppi === _.toLower(LiiteDtoTyyppiEnum.KAANNOS));
+});
 
-  get valittavatKoulutustyypit() {
-    return AmmatillisetKoulutustyypit;
-  }
+const valittavatKoulutustyypit = computed(() => {
+  return AmmatillisetKoulutustyypit;
+});
 
-  get kielet() {
-    return UiKielet;
-  }
+const kielet = computed(() => {
+  return UiKielet;
+});
 
-  get data() {
-    return this.store?.data?.value || null;
-  }
+const data = computed(() => {
+  return store.value?.data?.value || null;
+});
 
-  get tutkintonimikkeet() {
-    return this.store?.data?.value?.tutkintonimikkeet || [];
-  }
+const tutkintonimikkeet = computed(() => {
+  return store.value?.data?.value?.tutkintonimikkeet || [];
+});
 
-  get osaamisalat() {
-    return this.store?.data?.value?.osaamisalat || [];
-  }
+const osaamisalat = computed(() => {
+  return store.value?.data?.value?.osaamisalat || [];
+});
 
-  get korvattavatDiaarinumerot() {
-    return this.store?.data?.value?.korvattavatDiaarinumerot || null;
-  }
+const korvattavatDiaarinumerot = computed(() => {
+  return store.value?.data?.value?.korvattavatDiaarinumerot || null;
+});
 
-  @Watch('koulutusvienninOhjeet', { deep: true })
-  async onKoulutusvienninOhjeetChanged() {
-    this.store!.setData({
-      ...this.store!.data.value,
-      koulutusvienninOhjeLiitteet: this.koulutusvienninOhjeet,
-    });
-  }
+const onProjektiChange = async (projektiId: number, perusteId: number) => {
+  store.value = new EditointiStore(new PerusteEditStore(projektiId, perusteId, props.perusteStore, tallennaKoulutusvienninOhjeDiaari));
+  await fetchLiitteet();
+  await props.perusteStore.fetchMaaraykset();
+};
 
-  @Watch('korvattavatDiaarinumerot')
-  async fetchKorvattavat(diaarit) {
-    const uudet: any = {};
-    for (const diaarinumero of diaarit) {
-      if (this.korvattavatPerusteet[diaarinumero] === undefined) {
-        const res = await this.perusteetStore.findPerusteet({ diaarinumero });
-        uudet[diaarinumero] = _.first(res.data) || null;
-      }
-    }
-
-    this.korvattavatPerusteet = {
-      ...this.korvattavatPerusteet,
-      ...uudet,
-    };
-  }
-
-  get fields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-      thStyle: { width: '80%' },
-    }, {
-      key: 'koodi',
-      label: this.$t('koodi'),
-    }];
-  }
-
-  get koulutuksetFields() {
-    return [{
-      key: 'koodi',
-      label: this.$t('koodi'),
-    }, {
-      key: 'nimi',
-      label: this.$t('koulutuksen-nimi'),
-    }, {
-      key: 'poista',
-      label: '',
-    }];
-  }
-
-  get korvattavatFields() {
-    return [{
-      key: 'diaarinumero',
-      label: this.$t('diaarinumero'),
-      thStyle: { width: '20%' },
-      sortable: true,
-    }, {
-      key: 'peruste',
-      label: this.$t('perusteen-nimi'),
-      sortable: true,
-    }, {
-      key: 'toiminnot',
-      label: '',
-      thStyle: { width: '10%', borderBottom: '0px' },
-      sortable: false,
-    }];
-  }
-
-  get liitetableFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-      thStyle: { width: '60%' },
-      sortable: false,
-      thClass: 'border-bottom-1',
-      tdClass: 'align-middle',
-    }, {
-      key: 'luotu',
-      label: this.$t('julkaistu'),
-      sortable: false,
-      thClass: 'border-bottom-1',
-      tdClass: 'align-middle',
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sdt(value);
-      },
-    }, {
-      key: 'toiminnot',
-      label: '',
-      thStyle: { width: '10%' },
-      sortable: false,
-      thClass: 'border-bottom-1',
-      tdClass: 'align-middle',
-    }];
-  }
-
-  get koulutusvientiOhjeFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-      thStyle: { width: '50%' },
-      tdClass: ['liite-nimi', 'align-middle'],
-      sortable: false,
-    }, {
-      key: 'diaarinumero',
-      label: this.$t('diaarinumero'),
-      thStyle: { width: '25%' },
-      tdClass: 'align-middle',
-      sortable: false,
-    }, {
-      key: 'luotu',
-      label: this.$t('julkaistu'),
-      thStyle: { width: '15%' },
-      tdClass: 'align-middle',
-      sortable: false,
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sdt(value);
-      },
-    }, {
-      key: 'toiminnot',
-      label: '',
-      thStyle: { width: '10%' },
-      sortable: false,
-    }];
-  }
-
-  get kaannoksetFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('nimi'),
-      thStyle: { width: '40%' },
-      sortable: false,
-    }, {
-      key: 'luotu',
-      label: this.$t('julkaistu'),
-      sortable: false,
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sdt(value);
-      },
-    }, {
-      key: 'toiminnot',
-      label: '',
-      thStyle: { width: '10%' },
-      sortable: false,
-    }];
-  }
-
-  get poikkeamismaaraysTyyppiText() {
-    if (this.store?.data?.value?.poikkeamismaaraysTyyppi === 'ei_tarvita_ohjetta') {
-      return this.$t('voi-kayttaa-tutkintoviennissa');
-    }
-    else if (this.store?.data?.value?.poikkeamismaaraysTyyppi === 'ei_voi_poiketa') {
-      return this.$t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa');
-    }
-    return '';
-  }
-
-  private koulutuskoodisto = new KoodistoSelectStore({
-    koodisto: 'koulutus',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
+// Watch handlers
+watch(koulutusvienninOhjeet, async () => {
+  store.value!.setData({
+    ...store.value!.data.value,
+    koulutusvienninOhjeLiitteet: koulutusvienninOhjeet.value,
   });
+}, { deep: true });
 
-  addKoulutuskoodi(data, koodi) {
-    data.koulutukset = [...data.koulutukset, {
-      nimi: koodi.nimi,
-      koulutuskoodiUri: koodi.uri,
-      koulutuskoodiArvo: koodi.arvo,
-    }];
-  }
+watch(korvattavatDiaarinumerot, async (diaarit) => {
+  if (!diaarit) return;
 
-  @Watch('maarayskirjeFile')
-  async maarayskirjeFileChange() {
-    if (this.maarayskirjeFile) {
-      const data = new FormData();
-      data.append('file', window.btoa(this.maarayskirjeFile.binary));
-      data.set('nimi', this.maarayskirjeFile.file.name);
-      data.set('tyyppi', 'maarayskirje');
-      const maarayskirjeUuid = _.get(await Api.request({
-        method: 'POST',
-        url: `api/perusteet/${this.perusteId!}/liitteet/b64`,
-        data,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }), 'data');
-      this.$success(this.$t('kaannos-tallennettu') as string);
-      await this.fetchLiitteet();
-      this.maarayskirje = _.find(this.liitteet, liite => liite.id === maarayskirjeUuid);
-      this.maarayskirjeFile = null;
+  const uudet: any = {};
+  for (const diaarinumero of diaarit) {
+    if (korvattavatPerusteet.value[diaarinumero] === undefined) {
+      const res = await props.perusteetStore.findPerusteet({ diaarinumero });
+      uudet[diaarinumero] = _.first(res.data) || null;
     }
   }
 
-  get maarayskirje() {
-    const maarayskirjeLiite = this.store?.data.value?.maarayskirje?.liitteet[this.$slang.value];
+  korvattavatPerusteet.value = {
+    ...korvattavatPerusteet.value,
+    ...uudet,
+  };
+});
+
+watch(maarayskirjeFile, async () => {
+  if (maarayskirjeFile.value) {
+    const data = new FormData();
+    data.append('file', window.btoa(maarayskirjeFile.value.binary));
+    data.set('nimi', maarayskirjeFile.value.file.name);
+    data.set('tyyppi', 'maarayskirje');
+    const maarayskirjeUuid = _.get(await Api.request({
+      method: 'POST',
+      url: `api/perusteet/${perusteId.value!}/liitteet/b64`,
+      data,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }), 'data');
+    $success($t('kaannos-tallennettu') as string);
+    await fetchLiitteet();
+    maarayskirje.value = _.find(liitteet.value, liite => liite.id === maarayskirjeUuid);
+    maarayskirjeFile.value = null;
+  }
+});
+
+watch(koulutusvienninOhjeFile, async () => {
+  if (koulutusvienninOhjeFile.value) {
+    const data = new FormData();
+    data.append('file', window.btoa(koulutusvienninOhjeFile.value.binary));
+    data.set('nimi', koulutusvienninOhjeFile.value.file.name);
+    data.set('tyyppi', 'koulutusvienninohje');
+    await Api.request({
+      method: 'POST',
+      url: `api/perusteet/${perusteId.value!}/liitteet/b64`,
+      data,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    $success($t('koulutusvienninohje-tallennettu') as string);
+    fetchLiitteet();
+    koulutusvienninOhjeFile.value = null;
+  }
+});
+
+watch(kaannosFile, async () => {
+  if (kaannosFile.value) {
+    const data = new FormData();
+    data.append('file', window.btoa(kaannosFile.value.binary));
+    data.set('nimi', kaannosFile.value.file.name);
+    data.set('tyyppi', 'kaannos');
+    await Api.request({
+      method: 'POST',
+      url: `api/perusteet/${perusteId.value!}/liitteet/b64`,
+      data,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    $success($t('kaannos-tallennettu') as string);
+    fetchLiitteet();
+    kaannosFile.value = null;
+  }
+});
+
+// Computed properties
+const fields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+    thStyle: { width: '80%' },
+  }, {
+    key: 'koodi',
+    label: $t('koodi'),
+  }];
+});
+
+const koulutuksetFields = computed(() => {
+  return [{
+    key: 'koodi',
+    label: $t('koodi'),
+  }, {
+    key: 'nimi',
+    label: $t('koulutuksen-nimi'),
+  }, {
+    key: 'poista',
+    label: '',
+  }];
+});
+
+const korvattavatFields = computed(() => {
+  return [{
+    key: 'diaarinumero',
+    label: $t('diaarinumero'),
+    thStyle: { width: '20%' },
+    sortable: true,
+  }, {
+    key: 'peruste',
+    label: $t('perusteen-nimi'),
+    sortable: true,
+  }, {
+    key: 'toiminnot',
+    label: '',
+    thStyle: { width: '10%', borderBottom: '0px' },
+    sortable: false,
+  }];
+});
+
+const liitetableFields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+    thStyle: { width: '60%' },
+    sortable: false,
+    thClass: 'border-bottom-1',
+    tdClass: 'align-middle',
+  }, {
+    key: 'luotu',
+    label: $t('julkaistu'),
+    sortable: false,
+    thClass: 'border-bottom-1',
+    tdClass: 'align-middle',
+    formatter: (value: any, key: any, item: any) => {
+      return $sdt(value);
+    },
+  }, {
+    key: 'toiminnot',
+    label: '',
+    thStyle: { width: '10%' },
+    sortable: false,
+    thClass: 'border-bottom-1',
+    tdClass: 'align-middle',
+  }];
+});
+
+const koulutusvientiOhjeFields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+    thStyle: { width: '50%' },
+    tdClass: ['liite-nimi', 'align-middle'],
+    sortable: false,
+  }, {
+    key: 'diaarinumero',
+    label: $t('diaarinumero'),
+    thStyle: { width: '25%' },
+    tdClass: 'align-middle',
+    sortable: false,
+  }, {
+    key: 'luotu',
+    label: $t('julkaistu'),
+    thStyle: { width: '15%' },
+    tdClass: 'align-middle',
+    sortable: false,
+    formatter: (value: any, key: any, item: any) => {
+      return $sdt(value);
+    },
+  }, {
+    key: 'toiminnot',
+    label: '',
+    thStyle: { width: '10%' },
+    sortable: false,
+  }];
+});
+
+const kaannoksetFields = computed(() => {
+  return [{
+    key: 'nimi',
+    label: $t('nimi'),
+    thStyle: { width: '40%' },
+    sortable: false,
+  }, {
+    key: 'luotu',
+    label: $t('julkaistu'),
+    sortable: false,
+    formatter: (value: any, key: any, item: any) => {
+      return $sdt(value);
+    },
+  }, {
+    key: 'toiminnot',
+    label: '',
+    thStyle: { width: '10%' },
+    sortable: false,
+  }];
+});
+
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
+
+const asiasanat = computed(() => {
+  if (_.isEmpty(store.value?.supportData.value?.asiasanat?.[kieli.value])) {
+    return [];
+  }
+  return store.value?.supportData.value.asiasanat[kieli.value];
+});
+
+const peruste = computed(() => {
+  return store.value?.data?.value || {};
+});
+
+const koulutustyyppiFilters = computed(() => {
+  return _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, peruste.value.koulutustyyppi))
+    || _.find(perustetyyppiTietoFilters, filter => _.includes(filter.tyyppi, peruste.value.tyyppi));
+});
+
+const tietoFilters = computed(() => {
+  return _.get(koulutustyyppiFilters.value ? koulutustyyppiFilters.value : _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, 'default')), 'filters');
+});
+
+const tyypinVaihtoSallittu = computed(() => {
+  return isAmmatillinen.value && $isAdmin() && _.includes(_.map(perusteenTyypit.value, 'value'), peruste.value.tyyppi);
+});
+
+const perusteenTyypit = computed(() => {
+  return [
+    { text: $t('perustetyyppi-normaali'), value: 'normaali' },
+    { text: $t('perustetyyppi-amosaayhteinen'), value: 'amosaayhteinen' },
+  ];
+});
+
+const poikkeamismaaraysTyyppiText = computed(() => {
+  if (store.value?.data?.value?.poikkeamismaaraysTyyppi === 'ei_tarvita_ohjetta') {
+    return $t('voi-kayttaa-tutkintoviennissa');
+  }
+  else if (store.value?.data?.value?.poikkeamismaaraysTyyppi === 'ei_voi_poiketa') {
+    return $t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa');
+  }
+  return '';
+});
+
+const maarayskirje = computed({
+  get: () => {
+    const maarayskirjeLiite = store.value?.data.value?.maarayskirje?.liitteet[$slang.value];
     if (maarayskirjeLiite) {
-      return _.find(this.liitteet, liite => liite.id === maarayskirjeLiite.id);
+      return _.find(liitteet.value, liite => liite.id === maarayskirjeLiite.id);
     }
-
     return null;
-  }
-
-  get liitteetMaarayskirje() {
-    return this.maarayskirje
-      ? [
-        {
-          ...this.maarayskirje,
-          url: this.maarayskirjeUrl,
-        },
-      ] : [];
-  }
-
-  set maarayskirje(liite: any) {
-    this.store!.setData({
-      ...this.store!.data.value,
+  },
+  set: (liite: any) => {
+    store.value!.setData({
+      ...store.value!.data.value,
       maarayskirje: {
         liitteet: {
-          ...(this.store!.data.value.maarayskirje?.liitteet ? this.store!.data.value.maarayskirje?.liitteet : []),
-          [this.$slang.value]: liite,
+          ...(store.value!.data.value.maarayskirje?.liitteet ? store.value!.data.value.maarayskirje?.liitteet : []),
+          [$slang.value]: liite,
         },
       },
     });
   }
+});
 
-  get maarayskirjeUrl() {
-    if (this.maarayskirje) {
-      return `/eperusteet-service/api/perusteet/${this.perusteId!}/liitteet/${this.maarayskirje.id}`;
-    }
-    else {
-      return null;
-    }
+const maarayskirjeUrl = computed(() => {
+  if (maarayskirje.value) {
+    return `/eperusteet-service/api/perusteet/${perusteId.value!}/liitteet/${maarayskirje.value.id}`;
   }
+  else {
+    return null;
+  }
+});
 
-  async poistaMaarayskirje(maarayskirje) {
-    await this.poistaLiite(maarayskirje);
-    this.store!.setData({
-      ...this.store!.data.value,
-      maarayskirje: {
-        ...this.store?.data.value.maarayskirje,
-        liitteet: _.omit(this.store?.data.value.maarayskirje.liitteet, this.$slang.value),
+const liitteetMaarayskirje = computed(() => {
+  return maarayskirje.value
+    ? [
+      {
+        ...maarayskirje.value,
+        url: maarayskirjeUrl.value,
       },
-    });
+    ] : [];
+});
+
+// Methods
+const filtersContain = (filter: string) => {
+  return _.includes(tietoFilters.value, filter);
+};
+
+const koulutuskoodisto = new KoodistoSelectStore({
+  koodisto: 'koulutus',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
+
+const poistaMaarayskirje = async (maarayskirje: any) => {
+  await poistaLiite(maarayskirje);
+  store.value!.setData({
+    ...store.value!.data.value,
+    maarayskirje: {
+      ...store.value?.data.value.maarayskirje,
+      liitteet: _.omit(store.value?.data.value.maarayskirje.liitteet, $slang.value),
+    },
+  });
+};
+
+const poistaLiite = async (item: any) => {
+  try {
+    await Liitetiedostot._delete(Number(perusteId.value!), item.id);
+    $success($t('liitetiedoston-poisto-onnistui') as string);
+    fetchLiitteet();
   }
-
-  async poistaLiite(item: any) {
-    try {
-      await Liitetiedostot._delete(Number(this.perusteId!), item.id);
-      this.$success(this.$t('liitetiedoston-poisto-onnistui') as string);
-      this.fetchLiitteet();
-    }
-    catch (err) {
-      this.$fail(this.$t('liitetiedoston-poisto-epaonnistui') as string);
-      console.log(err);
-    }
+  catch (err) {
+    $fail($t('liitetiedoston-poisto-epaonnistui') as string);
+    console.log(err);
   }
+};
 
-  lisaaDiaarinumero() {
-    const data = this.store?.data?.value;
-    this.store!.setData({
-      ...data,
-      korvattavatDiaarinumerot: [
-        ...data?.korvattavatDiaarinumerot || [],
-        this.korvattavaDiaarinumero,
-      ],
-    });
-    this.korvattavaDiaarinumero = '';
+const lisaaDiaarinumero = () => {
+  const dataValue = store.value?.data?.value;
+  store.value!.setData({
+    ...dataValue,
+    korvattavatDiaarinumerot: [
+      ...dataValue?.korvattavatDiaarinumerot || [],
+      korvattavaDiaarinumero.value,
+    ],
+  });
+  korvattavaDiaarinumero.value = '';
+};
+
+const poistaKorvattava = (diaarinumero: string) => {
+  const dataValue = store.value?.data?.value;
+  store.value!.setData({
+    ...dataValue,
+    korvattavatDiaarinumerot: _.reject(dataValue?.korvattavatDiaarinumerot, x => x === diaarinumero),
+  });
+};
+
+const addKoulutuskoodi = (data: any, koodi: any) => {
+  data.koulutukset = [...data.koulutukset, {
+    nimi: koodi.nimi,
+    koulutuskoodiUri: koodi.uri,
+    koulutuskoodiArvo: koodi.arvo,
+  }];
+};
+
+const poistaKoulutusKoodi = ({ item }: { item: any }) => {
+  store.value!.setData({
+    ...store.value?.data.value,
+    koulutukset: _.filter(store.value?.data.value.koulutukset, koulutus => koulutus.koulutuskoodiUri !== item.koulutuskoodiUri),
+  });
+};
+
+const tallennaKoulutusvienninOhjeDiaari = async () => {
+  if (!_.isEmpty(koulutusvienninOhjeet.value)) {
+    await Promise.all(_.map(koulutusvienninOhjeet.value, liite =>
+      Liitetiedostot.paivitaLisatieto(perusteId.value!, liite.id, liite.lisatieto)));
   }
+};
 
-  poistaKorvattava(diaarinumero: string) {
-    const data = this.store?.data?.value;
-    this.store!.setData({
-      ...data,
-      korvattavatDiaarinumerot: _.reject(data?.korvattavatDiaarinumerot, x => x === diaarinumero),
-    });
+// Setup watch for projektiId
+onMounted(async () => {
+  const projektiIdNumber = _.parseInt(route.params.projektiId as string);
+  if (projektiIdNumber) {
+    await onProjektiChange(projektiIdNumber, perusteId.value!);
   }
-
-  get peruste() {
-    return this.store?.data?.value || {};
-  }
-
-  get koulutustyyppiFilters() {
-    return _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, this.peruste.koulutustyyppi))
-      || _.find(perustetyyppiTietoFilters, filter => _.includes(filter.tyyppi, this.peruste.tyyppi));
-  }
-
-  get tietoFilters() {
-    return _.get(this.koulutustyyppiFilters ? this.koulutustyyppiFilters : _.find(koulutustyyppiTietoFilters, filter => _.includes(filter.koulutustyypit, 'default')), 'filters');
-  }
-
-  filtersContain(filter) {
-    return _.includes(this.tietoFilters, filter);
-  }
-
-  @Watch('koulutusvienninOhjeFile')
-  async koulutusvienninOhjeFileChange() {
-    if (this.koulutusvienninOhjeFile) {
-      const data = new FormData();
-      data.append('file', window.btoa(this.koulutusvienninOhjeFile.binary));
-      data.set('nimi', this.koulutusvienninOhjeFile.file.name);
-      data.set('tyyppi', 'koulutusvienninohje');
-      await Api.request({
-        method: 'POST',
-        url: `api/perusteet/${this.perusteId!}/liitteet/b64`,
-        data,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      this.$success(this.$t('koulutusvienninohje-tallennettu') as string);
-      this.fetchLiitteet();
-      this.koulutusvienninOhjeFile = null;
-    }
-  }
-
-  @Watch('kaannosFile')
-  async kaannosFileChange() {
-    if (this.kaannosFile) {
-      const data = new FormData();
-      data.append('file', window.btoa(this.kaannosFile.binary));
-      data.set('nimi', this.kaannosFile.file.name);
-      data.set('tyyppi', 'kaannos');
-      await Api.request({
-        method: 'POST',
-        url: `api/perusteet/${this.perusteId!}/liitteet/b64`,
-        data,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      this.$success(this.$t('kaannos-tallennettu') as string);
-      this.fetchLiitteet();
-      this.kaannosFile = null;
-    }
-  }
-
-  async tallennaKoulutusvienninOhjeDiaari() {
-    if (!_.isEmpty(this.koulutusvienninOhjeet)) {
-      await Promise.all(_.map(this.koulutusvienninOhjeet, liite =>
-        Liitetiedostot.paivitaLisatieto(this.perusteId!, liite.id, liite.lisatieto)));
-    }
-  }
-
-  get tyypinVaihtoSallittu() {
-    return this.isAmmatillinen && this.$isAdmin() && _.includes(_.map(this.perusteenTyypit, 'value'), this.peruste.tyyppi);
-  }
-
-  get perusteenTyypit() {
-    return [
-      { text: this.$t('perustetyyppi-normaali'), value: 'normaali' },
-      { text: this.$t('perustetyyppi-amosaayhteinen'), value: 'amosaayhteinen' },
-    ];
-  }
-
-  poistaKoulutusKoodi({ item }) {
-    this.store!.setData({
-      ...this.store?.data.value,
-      koulutukset: _.filter(this.store?.data.value.koulutukset, koulutus => koulutus.koulutuskoodiUri !== item.koulutuskoodiUri),
-    });
-  }
-
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
-
-  get asiasanat() {
-    if (_.isEmpty(this.store?.supportData.value.asiasanat[this.kieli])) {
-      return [];
-    }
-
-    return this.store?.supportData.value.asiasanat[this.kieli];
-  }
-}
-
+});
 </script>
 
 <style lang="scss" scoped>

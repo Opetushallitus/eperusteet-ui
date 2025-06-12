@@ -59,9 +59,10 @@
 
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -70,54 +71,50 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpSisaltoTekstikappaleet,
-    EpCollapse,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  vlkId?: any;
+}>();
+
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+// Watch for changes in vlkId
+watch(() => props.vlkId, async () => {
+  const vlkStore = new PerusopetusVuosiluokkakokonaisuusStore(
+    perusteId.value!,
+    props.vlkId,
+    props.perusteStore,
+    { $router: router }
+  );
+  store.value = new EditointiStore(vlkStore);
+}, { immediate: true });
+
+const storeData = computed({
+  get() {
+    return store.value?.data.value;
   },
-})
-export default class RouteVuosiluokkakokonaisuus extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 
-  @Prop({ required: false })
-  vlkId: any;
+const vuosiluokat = computed(() => {
+  return _.sortBy(store.value?.data.value.vuosiluokat);
+});
 
-  store: EditointiStore | null = null;
-
-  @Watch('vlkId', { immediate: true })
-  async laoChange() {
-    const store = new PerusopetusVuosiluokkakokonaisuusStore(this.perusteId!, this.vlkId, this.perusteStore, this);
-    this.store = new EditointiStore(store);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-
-  get vuosiluokat() {
-    return _.sortBy(this.store?.data.value.vuosiluokat);
-  }
-
-  get valittavatVuosiluokat(): any {
-    return _.map(_.range(1, 10), vlk => ({
-      name: this.$t('vuosiluokka') + ' ' + vlk,
-      value: 'vuosiluokka_' + vlk,
-    }));
-  }
-}
+const valittavatVuosiluokat = computed((): any => {
+  return _.map(_.range(1, 10), vlk => ({
+    name: $t('vuosiluokka') + ' ' + vlk,
+    value: 'vuosiluokka_' + vlk,
+  }));
+});
 </script>
 
 <style scoped lang="scss">

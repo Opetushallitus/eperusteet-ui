@@ -27,9 +27,6 @@ const props = defineProps<{
   pohjatStore: PerusteetStore;
 }>();
 
-const instance = getCurrentInstance();
-const $isAdmin = (instance?.proxy?.$root as any)?.$isAdmin;
-
 const pohjatStore = computed(() => {
   return props.pohjatStore;
 });

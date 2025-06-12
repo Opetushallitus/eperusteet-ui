@@ -42,9 +42,10 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusopetusOppiaineetStore } from '@/stores/PerusopetusOppiaineetStore';
@@ -54,62 +55,54 @@ import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpEditointi,
-    EpMaterialIcon,
-    draggable,
-  },
-})
-export default class RouteOppiaineet extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
 
-  store: EditointiStore | null = null;
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  async mounted() {
-    const store = new PerusopetusOppiaineetStore(this.perusteId!, this.perusteStore);
-    this.store = new EditointiStore(store);
-  }
+onMounted(async () => {
+  const storeInstance = new PerusopetusOppiaineetStore(perusteId.value!, props.perusteStore);
+  store.value = new EditointiStore(storeInstance);
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  get fields() {
-    return [{
-      label: this.$t('nimi'),
-      key: 'nimi',
-      sortable: true,
-    }];
-  }
+const fields = computed(() => {
+  return [{
+    label: $t('nimi'),
+    key: 'nimi',
+    sortable: true,
+  }];
+});
 
-  async lisaaOppiaine() {
-    const newOppiaine = await PerusopetusOppiaineStore.create(this.perusteId);
-    await this.perusteStore.updateNavigation();
-    await EditointiStore.cancelAll();
-    this.$router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing.value;
+});
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'oppiaineet',
-      },
-    };
-  }
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'oppiaineet',
+    },
+  };
+});
 
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
-}
+const lisaaOppiaine = async () => {
+  const newOppiaine = await PerusopetusOppiaineStore.create(perusteId.value);
+  await props.perusteStore.updateNavigation();
+  await EditointiStore.cancelAll();
+  router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

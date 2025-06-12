@@ -45,8 +45,9 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
@@ -62,89 +63,72 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { TermitStore } from '@/stores/TermitStore';
 import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpSpinner,
-    EpContent,
-    EpKoodistoSelect,
-    EpToggle,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
+
+const store = ref<EditointiStore | null>(null);
+const route = useRoute();
+
+const laajaalainenOsaaminenKoodisto = new KoodistoSelectStore({
+  koodisto: 'tutkintokoulutukseenvalmentavakoulutuslaajaalainenosaaminen',
+  async query(query: string, sivu = 0, koodisto: string) {
+    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    }));
+    return data as any;
   },
-})
-export default class RouteLaajaalainenOsaaminen extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  private store: EditointiStore | null = null;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('laajaalainenosaaminenId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-    await this.fetch();
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
+
+const laajaalainenosaaminenId = computed(() => {
+  return route.params.laajaalainenosaaminenId;
+});
+
+
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const tkstore = new LaajaalainenOsaaminenStore(perusteId.value!, Number(laajaalainenosaaminenId.value), versionumero.value);
+  store.value = new EditointiStore(tkstore);
+};
+
+watch(() => laajaalainenosaaminenId.value, async (id, oldId) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
-
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new LaajaalainenOsaaminenStore(this.perusteId!, Number(this.laajaalainenosaaminenId), this.versionumero);
-    this.store = new EditointiStore(tkstore);
-  }
-
-  private readonly laajaalainenOsaaminenKoodisto = new KoodistoSelectStore({
-    koodisto: 'tutkintokoulutukseenvalmentavakoulutuslaajaalainenosaaminen',
-    async query(query: string, sivu = 0, koodisto: string) {
-      const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      }));
-      return data as any;
-    },
-  });
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get laajaalainenosaaminenId() {
-    return this.$route.params.laajaalainenosaaminenId;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
-}
+watch(() => versionumero.value, async () => {
+  await fetch();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
 
-  ::v-deep fieldset {
-    padding-right: 0;
-  }
+:deep(fieldset) {
+  padding-right: 0;
+}
 
-  ::v-deep .input-wrapper {
-    flex: 1 1 0;
+:deep(.input-wrapper) {
+  flex: 1 1 0;
 
-    input {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
+  input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
+}
 </style>

@@ -290,7 +290,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, provide } from 'vue';
+import { useRoute } from 'vue-router';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
@@ -306,8 +308,7 @@ import MuodostumisNode from '@/components/muodostuminen/MuodostumisNode.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
 import { Koodisto } from '@shared/api/eperusteet';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
-import { Watch, Prop, Component, ProvideReactive } from 'vue-property-decorator';
+import { usePerusteprojekti } from './PerusteprojektiRoute';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
 import draggable from 'vuedraggable';
@@ -317,558 +318,582 @@ import { Kielet } from '@shared/stores/kieli';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolor } from '@/components/muodostuminen/utils';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { PerusteStore } from '@/stores/PerusteStore';
+import { KayttajaStore } from '@/stores/kayttaja';
+import { TiedotteetStore } from '@/stores/TiedotteetStore';
+import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
+import { AikatauluStore } from '@/stores/AikatauluStore';
+import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
+import { inject } from 'vue';
+import { $bvModal, $kaanna, $filterBy } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpContent,
-    EpEditointi,
-    EpInput,
-    EpJarjesta,
-    EpKoodistoSelect,
-    EpMainView,
-    EpSearch,
-    EpSpinner,
-    EpToggle,
-    MuodostumisNode,
-    draggable,
-    EpRakenneModal,
-    EpMaterialIcon,
+const props = defineProps<{
+  browserStore: BrowserStore;
+  tutkinnonOsaStore: TutkinnonOsaStore;
+  perusteStore: PerusteStore;
+  kayttajaStore: KayttajaStore;
+  tiedotteetStore: TiedotteetStore;
+  muokkaustietoStore: MuokkaustietoStore;
+  aikatauluStore: AikatauluStore;
+  tyoryhmaStore: TyoryhmaStore;
+}>();
+
+const route = useRoute();
+
+const query = ref('');
+const queryTutkinnonOsa = ref('');
+const showUnusedTutkinnonOsat = ref(false);
+const store = ref<EditointiStore | null>(null);
+const uusi = ref<any | null>(_.cloneDeep(DefaultRyhma));
+const naytaKuvaukset = ref(false);
+const naytaRakenne = ref(true);
+const nimiValinta = ref<'paikallinen' | 'tutkinnonosato' | 'korkeakoulu' | 'yhteinen' | 'muu' | null>(null);
+const osaamisalatSivu = ref(1);
+const tutkintonimikkeetSivu = ref(1);
+const tutkinnonosatSivu = ref(1);
+const sivukoot = ref(5);
+const leikelauta = ref<any[]>([]);
+const root = ref<any>(null);
+const eprakennemodalUusiRyhma = ref<any>(null);
+const editModal = ref<any>(null);
+
+const {
+  isInitializing,
+  perusteId,
+} = usePerusteprojekti({
+  perusteStore: props.perusteStore,
+  kayttajaStore: props.kayttajaStore,
+  tiedotteetStore: props.tiedotteetStore,
+  muokkaustietoStore: props.muokkaustietoStore,
+  aikatauluStore: props.aikatauluStore,
+  tyoryhmaStore: props.tyoryhmaStore,
+});
+
+const osaamisalaStore = new KoodistoSelectStore({
+  koodisto: 'osaamisala',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
   },
-  inject: [],
-})
-export default class RouteMuodostuminen extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  private browserStore!: BrowserStore;
+});
 
-  @Prop({ required: true })
-  private tutkinnonOsaStore!: TutkinnonOsaStore;
+const tutkintonimikeStore = new KoodistoSelectStore({
+  koodisto: 'tutkintonimikkeet',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  private query = '';
-  private queryTutkinnonOsa = '';
-  private showUnusedTutkinnonOsat = false;
-  private store: EditointiStore | null = null;
-  private uusi: any | null = _.cloneDeep(DefaultRyhma);
-  private naytaKuvaukset = false;
-  private naytaRakenne = true;
-  private nimiValinta: 'paikallinen' | 'tutkinnonosato' | 'korkeakoulu' | 'yhteinen' | 'muu' | null = null;
-  private osaamisalatSivu = 1;
-  private tutkintonimikkeetSivu = 1;
-  private tutkinnonosatSivu = 1;
-  private sivukoot = 5;
-  private leikelauta: any[] = [];
+// Computed properties
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value;
+});
 
-  private osaamisalaStore = new KoodistoSelectStore({
-    koodisto: 'osaamisala',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
+const tutkinnonOsatRaw = computed(() => {
+  return props.tutkinnonOsaStore.tutkinnonOsat.value;
+});
+
+const tutkinnonOsatMap = computed(() => {
+  return _.keyBy(tutkinnonOsatRaw.value, 'id');
+});
+
+const laajuustyyppi = computed(() => {
+  return 'osp';
+});
+
+const vaadittuLaajuus = computed(() => {
+  return store.value?.data.value?.rakenne.muodostumisSaanto?.laajuus?.minimi;
+});
+
+const laskettuLaajuus = computed(() => {
+  return _(store.value?.data.value?.rakenne.osat)
+    .map(osa => osa.muodostumisSaanto?.laajuus?.maksimi || osa.muodostumisSaanto?.laajuus?.minimi || tutkinnonOsatMap.value[osa._tutkinnonOsaViite]?.laajuus || 0)
+    .filter()
+    .sum();
+});
+
+const colorMap = computed(() => {
+  return ColorMap;
+});
+
+const browserEvents = computed(() => {
+  return {
+    focused: props.browserStore.activeElement.value,
+    key: props.browserStore.latestKeypress.value,
+  };
+});
+
+const paaryhmat = computed((): RakenneMainType[] => {
+  return [{
+    kind: 'pakollinen',
+    label: 'rakenne-moduuli-pakollinen',
+    uuid: genUuid(),
+    create: () => ({
+      ...ryhmaTemplate('rakenne-moduuli-pakollinen'),
+    }),
+  }, {
+    kind: 'valinnainen',
+    label: 'rakenne-moduuli-valinnainen',
+    uuid: genUuid(),
+    create: () => ({
+      ...ryhmaTemplate('rakenne-moduuli-valinnainen'),
+    }),
+  }, {
+    kind: 'ammatilliset',
+    label: 'rakenne-moduuli-ammatilliset',
+    uuid: genUuid(),
+    create: () => ({
+      ...ryhmaTemplate('rakenne-moduuli-ammatilliset'),
+    }),
+  }, {
+    kind: 'yhteiset',
+    label: 'rakenne-moduuli-yhteiset',
+    uuid: genUuid(),
+    create: () => ({
+      ...ryhmaTemplate('rakenne-moduuli-yhteiset'),
+    }),
+  }, {
+    kind: 'paikalliset',
+    label: 'rakenne-moduuli-paikalliset',
+    uuid: genUuid(),
+    create: () => ({
+      ...ryhmaTemplate('rakenne-moduuli-paikalliset'),
+    }),
+  }];
+});
+
+const optionsKoodit = computed(() => {
+  return {
+    ...defaultOptions.value,
+    disabled: !isEditing.value,
+    group: {
+      name: 'rakennepuu',
+      pull: 'clone',
+      put: false,
     },
-  });
-
-  private tutkintonimikeStore = new KoodistoSelectStore({
-    koodisto: 'tutkintonimikkeet',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  get peruste() {
-    return this.perusteStore.peruste.value;
-  }
-
-  get tutkinnonOsatRaw() {
-    return this.tutkinnonOsaStore.tutkinnonOsat.value;
-  }
-
-  get tutkinnonOsatMap() {
-    return _.keyBy(this.tutkinnonOsatRaw, 'id');
-  }
-
-  get laajuustyyppi() {
-    return 'osp';
-  }
-
-  get vaadittuLaajuus() {
-    return this.store?.data.value?.rakenne.muodostumisSaanto?.laajuus?.minimi;
-  }
-
-  get laskettuLaajuus() {
-    return _(this.store?.data.value?.rakenne.osat)
-      .map(osa => osa.muodostumisSaanto?.laajuus?.maksimi || osa.muodostumisSaanto?.laajuus?.minimi || this.tutkinnonOsatMap[osa._tutkinnonOsaViite]?.laajuus || 0)
-      .filter()
-      .sum();
-  }
-
-  get colorMap() {
-    return ColorMap;
-  }
-
-  get browserEvents() {
-    return {
-      focused: this.browserStore.activeElement.value,
-      key: this.browserStore.latestKeypress.value,
-    };
-  }
-
-  @Watch('browserEvents')
-  onInput({ focused, key }) {
-    if (focused && key) {
-      const uuid = focused.getAttribute('moduuli');
-      if (uuid) {
-        const dir = {
-          ArrowDown: 'down',
-          ArrowUp: 'up',
-          ArrowLeft: 'left',
-          ArrowRight: 'right',
-        }[key.code];
-        if (key.ctrlKey && dir) {
-          (this.$refs.root as any).move(uuid, dir);
-        }
-      }
-    }
-  }
-
-  get paaryhmat(): RakenneMainType[] {
-    return [{
-      kind: 'pakollinen',
-      label: 'rakenne-moduuli-pakollinen',
-      uuid: genUuid(),
-      create: () => ({
-        ...ryhmaTemplate('rakenne-moduuli-pakollinen', this),
-      }),
-    }, {
-      kind: 'valinnainen',
-      label: 'rakenne-moduuli-valinnainen',
-      uuid: genUuid(),
-      create: () => ({
-        ...ryhmaTemplate('rakenne-moduuli-valinnainen', this),
-      }),
-    }, {
-      kind: 'ammatilliset',
-      label: 'rakenne-moduuli-ammatilliset',
-      uuid: genUuid(),
-      create: () => ({
-        ...ryhmaTemplate('rakenne-moduuli-ammatilliset', this),
-      }),
-    }, {
-      kind: 'yhteiset',
-      label: 'rakenne-moduuli-yhteiset',
-      uuid: genUuid(),
-      create: () => ({
-        ...ryhmaTemplate('rakenne-moduuli-yhteiset', this),
-      }),
-    }, {
-      kind: 'paikalliset',
-      label: 'rakenne-moduuli-paikalliset',
-      uuid: genUuid(),
-      create: () => ({
-        ...ryhmaTemplate('rakenne-moduuli-paikalliset', this),
-      }),
-    }];
-  }
-
-  get optionsKoodit() {
-    return {
-      ...this.defaultOptions,
-      disabled: !this.isEditing,
-      group: {
-        name: 'rakennepuu',
-        pull: 'clone',
-        put: false,
-      },
-      clone(original) {
-        return {
-          ...original,
-          muodostumisSaanto: {
-            laajuus: {},
-          },
-        };
-      },
-    };
-  }
-
-  get optionsTutkinnonOsat() {
-    return {
-      ...this.defaultOptions,
-      disabled: !this.isEditing,
-      group: {
-        name: 'rakennepuu',
-        pull: 'clone',
-        put: false,
-      },
-      clone(original) {
-        return {
-          kuvaus: null,
-          vieras: null,
-          tunniste: null,
-          pakollinen: false,
-          erikoisuus: null,
-          _tutkinnonOsaViite: '' + original.id,
-        };
-      },
-    };
-  }
-
-  get isEditing() {
-    return !!this.store?.isEditing;
-  }
-
-  get optionsPaaryhma() {
-    return {
-      ...this.defaultOptions,
-      disabled: !this.isEditing,
-      group: {
-        name: 'rakennepuu',
-        pull: 'clone',
-        put: false,
-      },
-      clone(original) {
-        if (original.create) {
-          return original.create();
-        }
-      },
-    };
-  }
-
-  get optionsLeikelauta() {
-    const self = this;
-    return {
-      ...this.defaultOptions,
-      disabled: !this.isEditing,
-      group: {
-        name: 'rakennepuu',
-      },
-      emptyInsertThreshold: 10,
-    };
-  }
-
-  onLeikelautaAdd(evt) {
-    this.leikelauta = _.map(this.leikelauta, leike => {
+    clone(original) {
       return {
-        ...this.recursiveClone(leike),
+        ...original,
+        muodostumisSaanto: {
+          laajuus: {},
+        },
       };
-    });
-  }
+    },
+  };
+});
 
-  get defaultOptions() {
-    return {
-      sort: false,
-      scrollSensitivity: 100,
-      forceFallback: true,
-    };
-  }
-
-  get liitetytOsat() {
-    if (!this.store) {
-      return null;
-    }
-    const osat = [] as any[];
-    const walk = (node) => {
-      if (node) {
-        if (node._tutkinnonOsaViite) {
-          osat.push(node);
-        }
-        _.forEach(node.osat, walk);
-      }
-    };
-    walk(this.store.data.value?.rakenne);
-    return _.keyBy(osat, '_tutkinnonOsaViite');
-  }
-
-  @ProvideReactive('kayttamattomatTutkinnonOsat')
-  get kayttamattomatTutkinnonOsat() {
-    if (!this.liitetytOsat) {
-      return [];
-    }
-    return _.filter(this.tutkinnonOsatRaw, osa => !this.liitetytOsat![osa.id!]);
-  }
-
-  get tutkinnonOsat() {
-    return _(this.showUnusedTutkinnonOsat
-      ? this.kayttamattomatTutkinnonOsat : this.tutkinnonOsatRaw)
-      .filter(this.$filterBy('nimi', this.queryTutkinnonOsa))
-      .sortBy(tosa => this.$kaanna(tosa.nimi as any))
-      .value();
-  }
-
-  editMuodostuminen() {
-    (this.$refs.editModal as any).show();
-  }
-
-  async onProjektiChange(projektiId: number) {
-    if (this.perusteId) {
-      const store = new MuodostuminenStore(this.perusteId);
-      this.store = new EditointiStore(store);
-      this.tutkinnonOsaStore.fetch();
-    }
-  }
-
-  toggleDescription() {
-    this.naytaKuvaukset = !this.naytaKuvaukset;
-    (this.$refs['root'] as any).toggleDescription(this.naytaKuvaukset);
-  }
-
-  addUusi(root) {
-    const template = ryhmaTemplate(this.uusi.tyyppi, this);
-    if (this.uusi) {
-      root.osat = [{
-        ...template,
-        ...this.uusi.ryhma,
-      }, ...root.osat];
-      this.uusi = _.cloneDeep(DefaultRyhma);
-    }
-  }
-
-  addRyhma() {
-    (this.$refs.eprakennemodalUusiRyhma as any).show(true);
-  }
-
-  @ProvideReactive('tutkintonimikkeet')
-  get tutkintonimikkeet() {
-    return _.map(this.store?.data?.value?.tutkintonimikkeet, tutkintonimike => {
+const optionsTutkinnonOsat = computed(() => {
+  return {
+    ...defaultOptions.value,
+    disabled: !isEditing.value,
+    group: {
+      name: 'rakennepuu',
+      pull: 'clone',
+      put: false,
+    },
+    clone(original) {
       return {
-        ...ryhmaTemplate('tutkintonimike', this),
+        kuvaus: null,
+        vieras: null,
+        tunniste: null,
+        pakollinen: false,
+        erikoisuus: null,
+        _tutkinnonOsaViite: '' + original.id,
+      };
+    },
+  };
+});
+
+const isEditing = computed(() => {
+  return !!store.value?.isEditing;
+});
+
+const optionsPaaryhma = computed(() => {
+  return {
+    ...defaultOptions.value,
+    disabled: !isEditing.value,
+    group: {
+      name: 'rakennepuu',
+      pull: 'clone',
+      put: false,
+    },
+    clone(original) {
+      if (original.create) {
+        return original.create();
+      }
+    },
+  };
+});
+
+const optionsLeikelauta = computed(() => {
+  return {
+    ...defaultOptions.value,
+    disabled: !isEditing.value,
+    group: {
+      name: 'rakennepuu',
+    },
+    emptyInsertThreshold: 10,
+  };
+});
+
+const defaultOptions = computed(() => {
+  return {
+    sort: false,
+    scrollSensitivity: 100,
+    forceFallback: true,
+  };
+});
+
+const liitetytOsat = computed(() => {
+  if (!store.value) {
+    return null;
+  }
+  const osat = [] as any[];
+  const walk = (node) => {
+    if (node) {
+      if (node._tutkinnonOsaViite) {
+        osat.push(node);
+      }
+      _.forEach(node.osat, walk);
+    }
+  };
+  walk(store.value.data.value?.rakenne);
+  return _.keyBy(osat, '_tutkinnonOsaViite');
+});
+
+const kayttamattomatTutkinnonOsat = computed(() => {
+  if (!liitetytOsat.value) {
+    return [];
+  }
+  return _.filter(tutkinnonOsatRaw.value, osa => !liitetytOsat.value![osa.id!]);
+});
+
+const tutkinnonOsat = computed(() => {
+  return _(showUnusedTutkinnonOsat.value
+    ? kayttamattomatTutkinnonOsat.value : tutkinnonOsatRaw.value)
+    .filter($filterBy('nimi', queryTutkinnonOsa.value))
+    .sortBy(tosa => $kaanna(tosa.nimi as any))
+    .value();
+});
+
+const tutkintonimikkeet = computed(() => {
+  return _.map(store.value?.data?.value?.tutkintonimikkeet, tutkintonimike => {
+    return {
+      ...ryhmaTemplate('tutkintonimike'),
+      nimi: tutkintonimike.nimi,
+      tutkintonimike: {
         nimi: tutkintonimike.nimi,
-        tutkintonimike: {
-          nimi: tutkintonimike.nimi,
-          uri: tutkintonimike.tutkintonimikeUri,
-          arvo: tutkintonimike.tutkintonimikeArvo,
-          rakenteessa: _.some(this.rakenteenOsat, osa => osa.tutkintonimike && osa.tutkintonimike.uri === tutkintonimike.tutkintonimikeUri),
-        },
-      };
-    });
-  }
+        uri: tutkintonimike.tutkintonimikeUri,
+        arvo: tutkintonimike.tutkintonimikeArvo,
+        rakenteessa: _.some(rakenteenOsat.value, osa => osa.tutkintonimike && osa.tutkintonimike.uri === tutkintonimike.tutkintonimikeUri),
+      },
+    };
+  });
+});
 
-  tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex) {
-    return tutkintonimikeIndex + (this.tutkintonimikkeetSivu - 1) * this.sivukoot;
-  }
+const rakenteenOsat = computed(() => {
+  return recursiveFlattenRakenneOsat(store.value?.data.value.rakenne.osat);
+});
 
-  tutkintonimikeNimiChange(ryhma, tutkintonimikeIndex) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        tutkintonimikkeet: _.map(this.store.data.value.tutkintonimikkeet,
-          (tutkintonimike, index) => index === this.tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex) ? { ...tutkintonimike, nimi: ryhma.nimi } : tutkintonimike),
-      });
-  }
-
-  lisaaTutkintonimike() {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        tutkintonimikkeet: [
-          ...this.store.data.value.tutkintonimikkeet,
-          {
-            nimi: {},
-            tutkintonimikeUri: 'temporary_tutkintonimikkeet_' + genUuid(),
-          },
-        ],
-      });
-  }
-
-  tutkintonimikeKoodiLisays(koodi, tutkintonimikeIndex) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        tutkintonimikkeet: _.map(this.store.data.value.tutkintonimikkeet,
-          (tutkintonimike, index) => index === this.tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)
-            ? {
-              nimi: koodi.nimi,
-              'tutkintonimikeUri': koodi.uri,
-              'tutkintonimikeArvo': koodi.arvo,
-            }
-            : tutkintonimike),
-      });
-  }
-
-  @ProvideReactive('osaamisalat')
-  get osaamisalat() {
-    return _.map(this.store?.data?.value?.osaamisalat, osaamisala => {
-      return {
-        ...ryhmaTemplate('osaamisala', this),
+const osaamisalat = computed(() => {
+  return _.map(store.value?.data?.value?.osaamisalat, osaamisala => {
+    return {
+      ...ryhmaTemplate('osaamisala'),
+      nimi: osaamisala.nimi,
+      osaamisala: {
         nimi: osaamisala.nimi,
-        osaamisala: {
-          nimi: osaamisala.nimi,
-          'osaamisalakoodiArvo': osaamisala.arvo,
-          'osaamisalakoodiUri': osaamisala.uri,
-          rakenteessa: _.some(this.rakenteenOsat, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri === osaamisala.uri),
-        },
-      };
-    });
-  }
-
-  osaamisalaNimiChange(ryhma, osaamisalaIndex) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        osaamisalat: _.map(this.store.data.value.osaamisalat,
-          (osaamisala, index) => index === this.osaamisalaSivutettuIndeksi(osaamisalaIndex) ? { ...osaamisala, nimi: ryhma.nimi } : osaamisala),
-      });
-  }
-
-  lisaaOsaamisala() {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        osaamisalat: [
-          ...this.store.data.value.osaamisalat,
-          {
-            nimi: {},
-            uri: 'temporary_osaamisala_' + genUuid(),
-          },
-        ],
-      });
-  }
-
-  osaamisalaSivutettuIndeksi(osaamisalaIndex) {
-    return osaamisalaIndex + (this.osaamisalatSivu - 1) * this.sivukoot;
-  }
-
-  osaamisalaKoodiLisays(koodi, osaamisalaIndex) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        osaamisalat: _.map(this.store.data.value.osaamisalat,
-          (osaamisala, index) => index === this.osaamisalaSivutettuIndeksi(osaamisalaIndex) ? koodi : osaamisala),
-      });
-  }
-
-  poistaOsaamisala(osaamisalaIndex) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        osaamisalat: _.filter(this.store.data.value.osaamisalat, (osaamisala, index) => index !== this.osaamisalaSivutettuIndeksi(osaamisalaIndex)),
-      });
-  }
-
-  poistaTutkintonimike(tutkintonimikeIndex) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        tutkintonimikkeet: _.filter(this.store.data.value.tutkintonimikkeet, (tutkintonimike, index) => index !== this.tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)),
-      });
-  }
-
-  recursiveFlattenRakenneOsat(osat) {
-    return _.flatMap(osat, osa => osa.osat ? [osa, ...this.recursiveFlattenRakenneOsat(osa.osat)] : osa);
-  }
-
-  get rakenteenOsat() {
-    return this.recursiveFlattenRakenneOsat(this.store?.data.value.rakenne.osat);
-  }
-
-  get osaamisalatPaged() {
-    return this.pageSliced(this.osaamisalat, this.osaamisalatSivu);
-  }
-
-  get tutkintonimikkeetPaged() {
-    return this.pageSliced(this.tutkintonimikkeet, this.tutkintonimikkeetSivu);
-  }
-
-  get tutkinnonosatPaged() {
-    return this.pageSliced(this.tutkinnonOsat, this.tutkinnonosatSivu);
-  }
-
-  pageSliced(array, page) {
-    return _.slice(array, (page - 1) * this.sivukoot, ((page - 1) * this.sivukoot) + this.sivukoot);
-  }
-
-  toggleRakenne() {
-    this.naytaRakenne = !this.naytaRakenne;
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        rakenne: {
-          ...this.store.data.value.rakenne,
-          osat: _.map(this.store.data.value.rakenne.osat, osa => this.toggleOsa(osa, this.naytaRakenne)),
-        },
-      });
-  }
-
-  toggleOsa(osa, isOpen) {
-    return {
-      ...osa,
-      isOpen,
-      osat: _.map(osa.osat, lapsi => this.toggleOsa(lapsi, isOpen)),
+        'osaamisalakoodiArvo': osaamisala.arvo,
+        'osaamisalakoodiUri': osaamisala.uri,
+        rakenteessa: _.some(rakenteenOsat.value, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri === osaamisala.uri),
+      },
     };
-  }
+  });
+});
 
-  copy(val) {
-    const clone = _.cloneDeep(val);
-    this.leikelauta = [
-      ...this.leikelauta,
-      this.recursiveClone(clone),
-    ];
-  }
+const osaamisalatPaged = computed(() => {
+  return pageSliced(osaamisalat.value, osaamisalatSivu.value);
+});
 
-  recursiveClone(clone) {
+const tutkintonimikkeetPaged = computed(() => {
+  return pageSliced(tutkintonimikkeet.value, tutkintonimikkeetSivu.value);
+});
+
+const tutkinnonosatPaged = computed(() => {
+  return pageSliced(tutkinnonOsat.value, tutkinnonosatSivu.value);
+});
+
+const leikelautaWithColor = computed(() => {
+  return _.map(leikelauta.value, lauta => {
     return {
-      ...clone,
-      ...(clone.uuid && { uuid: genUuid() }),
-      ...(clone.tunniste && { tunniste: genUuid() }),
-      osat: _.map(clone.osat, osa => this.recursiveClone(osa)),
+      ...lauta,
+      color: rakenneNodecolor(lauta, false),
     };
-  }
+  });
+});
 
-  get leikelautaWithColor() {
-    return _.map(this.leikelauta, lauta => {
-      return {
-        ...lauta,
-        color: rakenneNodecolor(lauta, false, this),
-      };
-    });
-  }
-
-  async tarkistaTallennusLeikelauta() {
-    if (_.size(this.leikelauta) > 0) {
-      const ok = await this.$bvModal.msgBoxConfirm(
-        Kielet.kaannaOlioTaiTeksti('leikelauta-varoitus'), {
-          title: Kielet.kaannaOlioTaiTeksti('vahvista-tallennus'),
-          okTitle: Kielet.kaannaOlioTaiTeksti('tallenna'),
-          cancelTitle: Kielet.kaannaOlioTaiTeksti('peruuta'),
-          size: 'lg',
-        });
-
-      if (ok) {
-        this.leikelauta = [];
+// Methods
+function onInput({ focused, key }) {
+  if (focused && key) {
+    const uuid = focused.getAttribute('moduuli');
+    if (uuid) {
+      const dir = {
+        ArrowDown: 'down',
+        ArrowUp: 'up',
+        ArrowLeft: 'left',
+        ArrowRight: 'right',
+      }[key.code];
+      if (key.ctrlKey && dir) {
+        root.value.move(uuid, dir);
       }
-
-      return ok;
     }
-
-    return true;
-  }
-
-  async tarkistaPeruutusLeikelauta() {
-    if (_.size(this.leikelauta) > 0) {
-      const ok = await this.$bvModal.msgBoxConfirm(
-        Kielet.kaannaOlioTaiTeksti('leikelauta-varoitus'), {
-          title: Kielet.kaannaOlioTaiTeksti('vahvista-peruutus'),
-          okTitle: Kielet.kaannaOlioTaiTeksti('vahvista-peruutus'),
-          cancelTitle: Kielet.kaannaOlioTaiTeksti('peruuta'),
-          size: 'lg',
-        });
-
-      if (ok) {
-        this.leikelauta = [];
-      }
-
-      return ok;
-    }
-
-    return true;
   }
 }
+
+function onLeikelautaAdd(evt) {
+  leikelauta.value = _.map(leikelauta.value, leike => {
+    return {
+      ...recursiveClone(leike),
+    };
+  });
+}
+
+function editMuodostuminen() {
+  editModal.value.show();
+}
+
+async function onProjektiChange(projektiId: number) {
+  if (perusteId.value) {
+    const storeInstance = new MuodostuminenStore(perusteId.value);
+    store.value = new EditointiStore(storeInstance);
+    props.tutkinnonOsaStore.fetch();
+  }
+}
+
+function toggleDescription() {
+  naytaKuvaukset.value = !naytaKuvaukset.value;
+  root.value.toggleDescription(naytaKuvaukset.value);
+}
+
+function addUusi(root) {
+  const template = ryhmaTemplate(uusi.value.tyyppi);
+  if (uusi.value) {
+    root.osat = [{
+      ...template,
+      ...uusi.value.ryhma,
+    }, ...root.osat];
+    uusi.value = _.cloneDeep(DefaultRyhma);
+  }
+}
+
+function addRyhma() {
+  eprakennemodalUusiRyhma.value.show(true);
+}
+
+function tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex) {
+  return tutkintonimikeIndex + (tutkintonimikkeetSivu.value - 1) * sivukoot.value;
+}
+
+function tutkintonimikeNimiChange(ryhma, tutkintonimikeIndex) {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      tutkintonimikkeet: _.map(store.value.data.value.tutkintonimikkeet,
+        (tutkintonimike, index) => index === tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex) ? { ...tutkintonimike, nimi: ryhma.nimi } : tutkintonimike),
+    });
+}
+
+function lisaaTutkintonimike() {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      tutkintonimikkeet: [
+        ...store.value.data.value.tutkintonimikkeet,
+        {
+          nimi: {},
+          tutkintonimikeUri: 'temporary_tutkintonimikkeet_' + genUuid(),
+        },
+      ],
+    });
+}
+
+function tutkintonimikeKoodiLisays(koodi, tutkintonimikeIndex) {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      tutkintonimikkeet: _.map(store.value.data.value.tutkintonimikkeet,
+        (tutkintonimike, index) => index === tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)
+          ? {
+            nimi: koodi.nimi,
+            'tutkintonimikeUri': koodi.uri,
+            'tutkintonimikeArvo': koodi.arvo,
+          }
+          : tutkintonimike),
+    });
+}
+
+function osaamisalaNimiChange(ryhma, osaamisalaIndex) {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      osaamisalat: _.map(store.value.data.value.osaamisalat,
+        (osaamisala, index) => index === osaamisalaSivutettuIndeksi(osaamisalaIndex) ? { ...osaamisala, nimi: ryhma.nimi } : osaamisala),
+    });
+}
+
+function lisaaOsaamisala() {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      osaamisalat: [
+        ...store.value.data.value.osaamisalat,
+        {
+          nimi: {},
+          uri: 'temporary_osaamisala_' + genUuid(),
+        },
+      ],
+    });
+}
+
+function osaamisalaSivutettuIndeksi(osaamisalaIndex) {
+  return osaamisalaIndex + (osaamisalatSivu.value - 1) * sivukoot.value;
+}
+
+function osaamisalaKoodiLisays(koodi, osaamisalaIndex) {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      osaamisalat: _.map(store.value.data.value.osaamisalat,
+        (osaamisala, index) => index === osaamisalaSivutettuIndeksi(osaamisalaIndex) ? koodi : osaamisala),
+    });
+}
+
+function poistaOsaamisala(osaamisalaIndex) {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      osaamisalat: _.filter(store.value.data.value.osaamisalat, (osaamisala, index) => index !== osaamisalaSivutettuIndeksi(osaamisalaIndex)),
+    });
+}
+
+function poistaTutkintonimike(tutkintonimikeIndex) {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      tutkintonimikkeet: _.filter(store.value.data.value.tutkintonimikkeet, (tutkintonimike, index) => index !== tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)),
+    });
+}
+
+function recursiveFlattenRakenneOsat(osat) {
+  return _.flatMap(osat, osa => osa.osat ? [osa, ...recursiveFlattenRakenneOsat(osa.osat)] : osa);
+}
+
+function pageSliced(array, page) {
+  return _.slice(array, (page - 1) * sivukoot.value, ((page - 1) * sivukoot.value) + sivukoot.value);
+}
+
+function toggleRakenne() {
+  naytaRakenne.value = !naytaRakenne.value;
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      rakenne: {
+        ...store.value.data.value.rakenne,
+        osat: _.map(store.value.data.value.rakenne.osat, osa => toggleOsa(osa, naytaRakenne.value)),
+      },
+    });
+}
+
+function toggleOsa(osa, isOpen) {
+  return {
+    ...osa,
+    isOpen,
+    osat: _.map(osa.osat, lapsi => toggleOsa(lapsi, isOpen)),
+  };
+}
+
+function copy(val) {
+  const clone = _.cloneDeep(val);
+  leikelauta.value = [
+    ...leikelauta.value,
+    recursiveClone(clone),
+  ];
+}
+
+function recursiveClone(clone) {
+  return {
+    ...clone,
+    ...(clone.uuid && { uuid: genUuid() }),
+    ...(clone.tunniste && { tunniste: genUuid() }),
+    osat: _.map(clone.osat, osa => recursiveClone(osa)),
+  };
+}
+
+async function tarkistaTallennusLeikelauta() {
+  if (_.size(leikelauta.value) > 0) {
+    const ok = await $bvModal.msgBoxConfirm(
+      Kielet.kaannaOlioTaiTeksti('leikelauta-varoitus'), {
+        title: Kielet.kaannaOlioTaiTeksti('vahvista-tallennus'),
+        okTitle: Kielet.kaannaOlioTaiTeksti('tallenna'),
+        cancelTitle: Kielet.kaannaOlioTaiTeksti('peruuta'),
+        size: 'lg',
+      });
+
+    if (ok) {
+      leikelauta.value = [];
+    }
+
+    return ok;
+  }
+
+  return true;
+}
+
+async function tarkistaPeruutusLeikelauta() {
+  if (_.size(leikelauta.value) > 0) {
+    const ok = await $bvModal.msgBoxConfirm(
+      Kielet.kaannaOlioTaiTeksti('leikelauta-varoitus'), {
+        title: Kielet.kaannaOlioTaiTeksti('vahvista-peruutus'),
+        okTitle: Kielet.kaannaOlioTaiTeksti('vahvista-peruutus'),
+        cancelTitle: Kielet.kaannaOlioTaiTeksti('peruuta'),
+        size: 'lg',
+      });
+
+    if (ok) {
+      leikelauta.value = [];
+    }
+
+    return ok;
+  }
+
+  return true;
+}
+
+// Watchers
+watch(browserEvents, (newVal) => {
+  onInput(newVal);
+});
+
+// Lifecycle hooks
+onMounted(async () => {
+  const projektiIdNumber = _.parseInt(route.params.projektiId as string);
+  if (projektiIdNumber) {
+    await onProjektiChange(projektiIdNumber);
+  }
+});
+
+// Provide values for child components
+provide('kayttamattomatTutkinnonOsat', kayttamattomatTutkinnonOsat);
+provide('tutkintonimikkeet', tutkintonimikkeet);
+provide('osaamisalat', osaamisalat);
 </script>
 
 <style scoped lang="scss">
@@ -975,7 +1000,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
 
 .actions {
 
-  ::v-deep .ep-button .btn-link {
+  :deep(.ep-button .btn-link) {
     padding-left: 0 !important;
     .teksti{
       padding-left: 0 !important;

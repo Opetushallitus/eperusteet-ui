@@ -49,10 +49,10 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
 import { OppiaineenVuosiluokkaKokonaisuusDto } from '@shared/api/eperusteet';
-import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import _ from 'lodash';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
@@ -64,79 +64,58 @@ import draggable from 'vuedraggable';
 import EpSisaltoalueetEditModal from '@/views/perusopetus/EpSisaltoalueetEditModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
-@Component({
-  components: {
-    EpSisaltoTekstikappaleet,
-    EpCollapse,
-    EpOppiaineenTavoite,
-    EpInput,
-    EpContent,
-    draggable,
-    EpButton,
-    EpSisaltoalueetEditModal,
-    EpMaterialIcon,
-  },
-})
-export default class EpOppiaineenVuosiluokkakokonaisuus extends Vue {
-  @Prop({ required: true })
-  value!: OppiaineenVuosiluokkaKokonaisuusDto;
-
-  @Prop({ required: false, default: false })
-  isEditing!: boolean;
-
-  @Prop()
-  vuosiluokat!: string;
-
-  @Prop({ required: true })
-  supportData!: any;
-
-  @Prop({ required: true })
+const props = defineProps<{
+  modelValue: OppiaineenVuosiluokkaKokonaisuusDto;
+  isEditing?: boolean;
+  vuosiluokat: string;
+  supportData: any;
   oppiaineId: any;
-
-  @Prop({ required: true })
   perusteId: any;
+}>();
 
-  get model() {
-    return this.value;
-  }
+const emit = defineEmits(['update:modelValue']);
 
-  set model(val) {
-    this.$emit('input', val);
-  }
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  get tavoitteetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'tavoitteet',
-      },
-    };
-  }
+const tavoitteetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !props.isEditing,
+    group: {
+      name: 'tavoitteet',
+    },
+  };
+});
 
-  lisaaTavoite() {
-    this.model.tavoitteet = [
-      ...this.model.tavoitteet!,
-      {
-        laajattavoitteet: [],
-        arvioinninkohteet: [],
-        sisaltoalueet: [],
-        oppiaineenTavoitteenOpetuksenTavoitteet: [],
-      },
-    ];
-  }
+const lisaaTavoite = () => {
+  model.value.tavoitteet = [
+    ...model.value.tavoitteet!,
+    {
+      laajattavoitteet: [],
+      arvioinninkohteet: [],
+      sisaltoalueet: [],
+      oppiaineenTavoitteenOpetuksenTavoitteet: [],
+    },
+  ];
+};
 
-  get vlkSupportData() {
-    return {
-      ...this.supportData,
-      sisaltoalueet: this.model.sisaltoalueet,
-    };
-  }
+const vlkSupportData = computed(() => {
+  return {
+    ...props.supportData,
+    sisaltoalueet: model.value.sisaltoalueet,
+  };
+});
 
-  poistaTavoite(poistettavaTavoite) {
-    this.model.tavoitteet = _.reject(this.model.tavoitteet, poistettavaTavoite);
-  }
-}
+const poistaTavoite = (poistettavaTavoite) => {
+  model.value.tavoitteet = _.reject(model.value.tavoitteet, poistettavaTavoite);
+};
 </script>
 
 <style scoped lang="scss">

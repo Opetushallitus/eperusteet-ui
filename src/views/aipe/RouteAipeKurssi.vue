@@ -70,87 +70,83 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { computed, inject, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { TermitStore } from '@/stores/TermitStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { AipeKurssiStore } from '@/stores/AipeKurssiStore';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpButton,
-    EpKoodistoSelect,
-    EpContent,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteAipeKurssi extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  vaiheId: {
+    type: [String, Number],
+    required: false,
+  },
+  oppiaineId: {
+    type: [String, Number],
+    required: false,
+  },
+  kurssiId: {
+    type: [String, Number],
+    required: false,
+  },
+});
 
-  @Prop({ required: false })
-  vaiheId: any;
+const route = useRoute();
+const store = ref<EditointiStore | null>(null);
 
-  @Prop({ required: false })
-  oppiaineId: any;
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
 
-  @Prop({ required: false })
-  kurssiId: any;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  store: EditointiStore | null = null;
 
-  @Watch('kurssiId', { immediate: true })
-  async kurssiChange() {
-    const store = new AipeKurssiStore(this.perusteId!, this.vaiheId, this.oppiaineId, this.kurssiId, this.perusteStore, this, this.versionumero);
-    this.store = new EditointiStore(store);
-  }
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'oppiaineetyleissivistava2',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.kurssiChange();
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing.value;
+});
 
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
+const tavoitteet = computed(() => {
+  return _.filter(store.value?.supportData.value?.tavoitteet, tavoite => _.includes(store.value?.data.value?.tavoitteet, _.toString(tavoite.id)));
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const kurssiChange = async () => {
+  const storeInstance = new AipeKurssiStore(perusteId.value!, props.vaiheId, props.oppiaineId, props.kurssiId, props.perusteStore, versionumero.value);
+  store.value = new EditointiStore(storeInstance);
+};
 
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
+watch(() => props.kurssiId, async () => {
+  await kurssiChange();
+}, { immediate: true });
 
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'oppiaineetyleissivistava2',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
-
-  get tavoitteet() {
-    return _.filter(this.store?.supportData.value?.tavoitteet, tavoite => _.includes(this.store?.data.value?.tavoitteet, _.toString(tavoite.id)));
-  }
-}
+watch(versionumero, async () => {
+  await kurssiChange();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
@@ -162,5 +158,4 @@ export default class RouteAipeKurssi extends Vue {
 .listaus:nth-of-type(odd) {
   background-color: $table-odd-row-bg-color;
 }
-
 </style>

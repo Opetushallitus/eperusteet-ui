@@ -9,7 +9,7 @@ Use composition API and <script setup>
 
 Always file content order is <template>, <script>, <style>
 
-Always follow all these rules, separated by '-------------------------------------------------' below to the end of the file:
+Always follow all these rules:
 
 -------------------------------------------------
 
@@ -87,10 +87,7 @@ import { $kaanna, $kaannaPlaceholder } from '@shared/utils/globals';
 IF component uses any of these
 this.$bvModal
 
-THEN get instance from proxy like
-
-const instance = getCurrentInstance();
-const $bvModal = (instance?.proxy?.$root as any)?.$bvModal;
+THEN get instance from '@shared/utils/globals'
 
 -------------------------------------------------
 
@@ -160,4 +157,14 @@ for example
 to
 
 :deep(.collapse-button)
+
+-------------------------------------------------
+
+IF component has
+get kasiteHandler() or get kuvaHandler
+THEN
+inject using
+
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
 

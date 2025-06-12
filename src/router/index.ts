@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
 import RouteArviointi from '@/views/RouteArviointi.vue';
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue';
@@ -73,11 +72,11 @@ import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import { isYleissivistavaKoulutustyyppi } from '@shared/utils/perusteet';
+import { createRouter, createWebHashHistory } from 'vue-router';
 
-Vue.use(VueRouter);
-Vue.use(VueMeta, {
-  refreshOnceOnNavigation: true,
-});
+// Vue.use(VueMeta, {
+//   refreshOnceOnNavigation: true,
+// });
 
 const props = (route: any) => {
   return {
@@ -86,11 +85,14 @@ const props = (route: any) => {
   };
 };
 
-const router = new VueRouter({
+const router = createRouter({
+  history: createWebHashHistory(),
   routes: [{
     path: '',
+    redirect: () => '/fi',
   }, {
     path: '/',
+    redirect: () => '/fi',
   }, {
     path: '/:lang',
     component: RouteRoot,
@@ -676,6 +678,30 @@ router.beforeEach(async (to, from, next) => {
     stores.kayttajaStore.clear();
     stores.perusteStore.clear();
   }
+  next();
+});
+
+router.beforeEach(async (to, from, next) => {
+
+  if (to.params.projektiId && to.params.projektiId !== from.params.projektiId) {
+    const projektiIdNumber = _.parseInt(to.params.projektiId);
+    window.scrollTo(0, 0);
+    try {
+      stores.kayttajaStore?.clear();
+      stores.muokkaustietoStore?.clear();
+      stores.aikatauluStore?.clear();
+      stores.tiedotteetStore?.clear();
+      stores.tyoryhmaStore?.clear();
+      await stores.kayttajaStore?.setPerusteprojekti(projektiIdNumber);
+      await stores.perusteStore?.init(projektiIdNumber);
+      await stores.perusteStore?.blockUntilInitialized();
+    }
+    catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
   next();
 });
 

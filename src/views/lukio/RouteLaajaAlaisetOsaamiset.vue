@@ -70,9 +70,9 @@
 
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { ref, computed, onMounted } from 'vue';
 import { LukioLaajaAlaisetOsaamisetStore } from '@/stores/LukioLaajaAlaisetOsaamisetStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -86,76 +86,63 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpDraggableCollapse from '@shared/components/EpDraggableCollapse/EpDraggableCollapse.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpSpinner,
-    EpEditointi,
-    EpContent,
-    EpKoodistoSelect,
-    EpDraggableCollapse,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
+
+const store = ref<EditointiStore | null>(null);
+
+onMounted(async () => {
+  const lukioStore = new LukioLaajaAlaisetOsaamisetStore(perusteId.value!);
+  store.value = new EditointiStore(lukioStore);
+});
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'laajaalainenosaaminenlops2021',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
   },
-})
-export default class RouteLaajaAlaisetOsaamiset extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  store: EditointiStore | null = null;
-
-  async mounted() {
-    const store = new LukioLaajaAlaisetOsaamisetStore(this.perusteId!);
-    this.store = new EditointiStore(store);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'laajaalainenosaaminenlops2021',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
+const lisaaLaajaAlainenOsaaminen = () => {
+  store.value?.setData({
+    ...store.value.data.value,
+    laajaAlaisetOsaamiset: [
+      ...store.value.data.value!.laajaAlaisetOsaamiset,
+      {},
+    ],
   });
+};
 
-  lisaaLaajaAlainenOsaaminen() {
-    this.store?.setData({
-      ...this.store.data.value,
-      laajaAlaisetOsaamiset: [
-        ...this.store.data.value!.laajaAlaisetOsaamiset,
-        {},
-      ],
-    });
-  }
+const poistaLaajaAlainenOsaaminen = (poistettavaLao: any) => {
+  store.value?.setData({
+    ...store.value.data.value,
+    laajaAlaisetOsaamiset: _.filter(laajaAlaisetOsaamiset.value, lao => lao !== poistettavaLao),
+  });
+};
 
-  poistaLaajaAlainenOsaaminen(poistettavaLao) {
-    this.store?.setData({
-      ...this.store.data.value,
-      laajaAlaisetOsaamiset: _.filter(this.laajaAlaisetOsaamiset, lao => lao !== poistettavaLao),
-    });
-  }
+const laajaAlaisetOsaamiset = computed(() => {
+  return store.value?.data.value.laajaAlaisetOsaamiset;
+});
 
-  get laajaAlaisetOsaamiset() {
-    return this.store?.data.value.laajaAlaisetOsaamiset;
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing.value;
+});
 
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
 
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-}
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

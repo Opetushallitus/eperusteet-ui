@@ -34,66 +34,47 @@
   </EpContentView>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusopetusVuosiluokkakokonaisuudetStore } from '@/stores/PerusopetusVuosiluokkakokonaisuudetStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpContentView from '@shared/components/EpContentView/EpContentView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import { $kaanna, $t, $sdt } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpEditointi,
-    EpContentView,
-    EpSpinner,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteVuosiluokkakokonaisuudet extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  store: PerusopetusVuosiluokkakokonaisuudetStore | null = null;
+const router = useRouter();
+const store = ref<PerusopetusVuosiluokkakokonaisuudetStore | null>(null);
 
-  async mounted() {
-    this.store = new PerusopetusVuosiluokkakokonaisuudetStore(this.perusteId!);
-  }
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const vuosiluokkakokonaisuudet = computed(() => {
+  return store.value?.vuosiluokkakokonaisuudet.value;
+});
 
-  get vuosiluokkakokonaisuudet() {
-    return this.store?.vuosiluokkakokonaisuudet.value;
-  }
 
-  get fields() {
-    return [{
-      label: this.$t('nimi'),
-      key: 'nimi',
-      sortable: true,
-    }, {
-      label: this.$t('muokattu'),
-      key: 'muokattu',
-      thStyle: { width: '30%' },
-      sortable: true,
-      formatter: (value: any, key: string, item: any) => {
-        return value != null ? this.$sdt(value) : '';
-      },
-    }];
-  }
+const lisaaVuosiluokkakokonaisuus = () => {
+  router.push({
+    name: 'perusopetusVuosiluokkakokonaisuus',
+  });
+};
 
-  lisaaVuosiluokkakokonaisuus() {
-    this.$router.push({
-      name: 'perusopetusVuosiluokkakokonaisuus',
-    });
-  }
-}
+onMounted(async () => {
+  store.value = new PerusopetusVuosiluokkakokonaisuudetStore(perusteId.value!);
+});
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

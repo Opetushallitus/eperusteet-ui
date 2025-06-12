@@ -90,16 +90,10 @@ interface Julkaisu {
   liitteet?: any;
 }
 
-const props = defineProps({
-  store: {
-    type: Object as () => PerusteStore,
-    required: true,
-  },
-  palauta: {
-    type: Function,
-    required: false,
-  },
-});
+const props = defineProps<{
+  store: PerusteStore;
+  palauta?: (julkaisu: any) => Promise<any>;
+}>();
 
 const palautuksessa = ref(null);
 const julkaisuModal = useTemplateRef('julkaisuModal');
@@ -171,11 +165,11 @@ const muutosmaaraysLiite = (julkaisu) => {
 };
 
 const muutosmaaraysUrl = (muutosmaarays) => {
-  if (!_.find(muutosmaarays.liitteet![$slang()].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI)) {
+  if (!_.find(muutosmaarays.liitteet![$slang.value].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI)) {
     return null;
   }
 
-  return baseURL + MaarayksetParams.getMaaraysLiite(_.toString(_.get(_.find(muutosmaarays.liitteet![$slang()].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI), 'id'))).url;
+  return baseURL + MaarayksetParams.getMaaraysLiite(_.toString(_.get(_.find(muutosmaarays.liitteet![$slang.value].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI), 'id'))).url;
 };
 
 const avaaMuokkausModal = (julkaisu) => {

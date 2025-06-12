@@ -34,9 +34,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import _ from 'lodash';
-import { Prop, Mixins, Component, Vue, Watch } from 'vue-property-decorator';
+import { computed, watch, onMounted } from 'vue';
 import EpPerusteAikataulu from '@/components/EpYleisnakyma/EpPerusteAikataulu.vue';
 import EpPerustePerustiedot from '@/components/EpYleisnakyma/EpPerustePerustiedot.vue';
 import EpOpasPerustiedot from '@/components/EpYleisnakyma/EpOpasPerustiedot.vue';
@@ -45,50 +45,55 @@ import EpPerusteTiedotteet from '@/components/EpYleisnakyma/EpPerusteTiedotteet.
 import EpPerusteRakenne from '@/components/EpYleisnakyma/EpPerusteRakenne.vue';
 import EpViimeaikainenToiminta from '@shared/components/EpViimeaikainenToiminta/EpViimeaikainenToiminta.vue';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 
-@Component({
-  components: {
-    EpPerusteAikataulu,
-    EpPerusteTutkinnonOsat,
-    EpPerustePerustiedot,
-    EpPerusteTiedotteet,
-    EpOpasPerustiedot,
-    EpPerusteRakenne,
-    EpViimeaikainenToiminta,
-  },
-})
-export default class RouteYleisnakyma extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  private tutkinnonOsaStore!: TutkinnonOsaStore;
+const props = withDefaults(defineProps<{
+  tutkinnonOsaStore: TutkinnonOsaStore;
+  tyyppi?: 'opas' | 'peruste';
+  perusteStore: any;
+  muokkaustietoStore: any;
+  aikatauluStore: any;
+  tiedotteetStore: any;
+  tyoryhmaStore: any;
+  isAmmatillinen?: boolean;
+}>(), {
+  tyyppi: 'peruste',
+});
 
-  @Prop({ required: false, default: 'peruste' })
-  private tyyppi!: 'opas' | 'peruste';
+const projekti = computed(() => {
+  return props.perusteStore.projekti.value;
+});
 
-  async onProjektiChange() {
-    if (this.peruste && this.peruste.id) {
-      await Promise.all([
-        this.muokkaustietoStore.init(this.peruste.id),
-        this.aikatauluStore.init(this.peruste),
-        this.tiedotteetStore.init({ perusteIds: [this.peruste.id] }),
-        this.tyoryhmaStore.init(this.projekti?.ryhmaOid),
-        ...(this.isAmmatillinen ? [this.tutkinnonOsaStore.fetch()] : []),
-      ]);
-    }
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value;
+});
+
+const perusteTyyppi = computed(() => {
+  return _.get(peruste.value, 'tyyppi');
+});
+
+const onProjektiChange = async () => {
+  if (peruste.value && peruste.value.id) {
+    await Promise.all([
+      props.muokkaustietoStore.init(peruste.value.id),
+      props.aikatauluStore.init(peruste.value),
+      props.tiedotteetStore.init({ perusteIds: [peruste.value.id] }),
+      props.tyoryhmaStore.init(projekti.value?.ryhmaOid),
+      ...(props.isAmmatillinen ? [props.tutkinnonOsaStore.fetch()] : []),
+    ]);
   }
+};
 
-  get projekti() {
-    return this.perusteStore.projekti.value;
-  }
+// Initialize component when mounted
+onMounted(async () => {
+  await onProjektiChange();
+});
 
-  get peruste() {
-    return this.perusteStore.peruste.value;
+// Watch for changes in peruste
+watch(peruste, async (newValue) => {
+  if (newValue && newValue.id) {
+    await onProjektiChange();
   }
-
-  get perusteTyyppi() {
-    return _.get(this.peruste, 'tyyppi');
-  }
-}
+}, { deep: true });
 </script>
 
 <style scoped lang="scss">

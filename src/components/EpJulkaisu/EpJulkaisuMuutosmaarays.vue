@@ -22,44 +22,43 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed } from 'vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { MaaraysDto } from '@shared/api/eperusteet';
+import { $t, $kaanna, $sd } from '@shared/utils/globals';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 
-@Component({
-  components: {
-    EpMultiSelect,
+const props = defineProps<{
+  modelValue: any;
+  muutosmaaraykset: MaaraysDto[];
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const julkaisu = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpJulkaisuMuutosmaarays extends Vue {
-  @Prop({ required: true })
-  private value!: any;
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: true })
-  private muutosmaaraykset!: MaaraysDto[];
-
-  set julkaisu(val) {
-    this.$emit('input', val);
-  }
-
-  get julkaisu() {
-    return this.value;
-  }
-
-  set liittyyMuutosmaarays(val) {
-    this.julkaisu.liittyyMuutosmaarays = val;
+const liittyyMuutosmaarays = computed({
+  get() {
+    return julkaisu.value.liittyyMuutosmaarays;
+  },
+  set(val) {
+    julkaisu.value.liittyyMuutosmaarays = val;
 
     if (!val) {
-      this.julkaisu.muutosmaarays = null;
+      julkaisu.value.muutosmaarays = null;
     }
-  }
-
-  get liittyyMuutosmaarays() {
-    return this.julkaisu.liittyyMuutosmaarays;
-  }
-}
+  },
+});
 </script>
 
 <style scoped lang="scss">

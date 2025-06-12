@@ -79,16 +79,15 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
+import _ from 'lodash';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { TermitStore } from '@/stores/TermitStore';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -96,120 +95,115 @@ import EpOsaAlue from '@shared/components/EpOsaamiskokonaisuus/EpOsaAlue.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import draggable from 'vuedraggable';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    EpOsaAlue,
-    EpMaterialIcon,
-    draggable,
-  },
-})
-export default class RouteOsaamiskokonaisuusPaaAlue extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  osaamiskokonaisuusPaaAlueId: number;
+}>();
 
-  editointiStore: EditointiStore | null = null;
+const route = useRoute();
+const editointiStore = ref<EditointiStore | null>(null);
 
-  @Prop({ required: true })
-  osaamiskokonaisuusPaaAlueId!: number;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('osaamiskokonaisuusPaaAlueId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
 
-    await this.fetch();
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
+
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const store = new OsaamiskokonaisuusPaaAlueStore(
+    perusteId.value!,
+    Number(props.osaamiskokonaisuusPaaAlueId),
+    versionumero.value,
+  );
+  editointiStore.value = new EditointiStore(store);
+};
+
+// Watch for changes in osaamiskokonaisuusPaaAlueId
+watch(() => props.osaamiskokonaisuusPaaAlueId, async (id, oldId) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const store = new OsaamiskokonaisuusPaaAlueStore(this.perusteId!, Number(this.osaamiskokonaisuusPaaAlueId), this.versionumero);
-    this.editointiStore = new EditointiStore(store);
-  }
+// Watch for changes in versionumero
+watch(versionumero, async () => {
+  await fetch();
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const lisaaOsaalue = async () => {
+  if (!editointiStore.value?.data.value) return;
 
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
+  const currentData = editointiStore.value.data.value;
+  const currentOsaAlueet = currentData.osaAlueet || [];
 
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
+  editointiStore.value.setData({
+    ...currentData,
+    osaAlueet: [
+      ...currentOsaAlueet,
+      {
+        tasokuvaukset: [
+          {
+            taso: 'VARHAISKASVATUS',
+            osaamiset: [],
+          },
+          {
+            taso: 'ESIOPETUS',
+            edelleenKehittyvatOsaamiset: [],
+            osaamiset: [],
+          },
+          {
+            taso: 'VUOSILUOKKA_12',
+            edelleenKehittyvatOsaamiset: [],
+            osaamiset: [],
+            edistynytOsaaminenKuvaukset: [],
+          },
+          {
+            taso: 'VUOSILUOKKA_3456',
+            edelleenKehittyvatOsaamiset: [],
+            osaamiset: [],
+            edistynytOsaaminenKuvaukset: [],
+          },
+          {
+            taso: 'VUOSILUOKKA_789',
+            edelleenKehittyvatOsaamiset: [],
+            osaamiset: [],
+            edistynytOsaaminenKuvaukset: [],
+          },
+        ],
+      },
+    ],
+  });
+};
 
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
+const poistaOsaAlue = async (poistettavaOsaAlue: any) => {
+  if (!editointiStore.value?.data.value) return;
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
+  const currentData = editointiStore.value.data.value;
 
-  async lisaaOsaalue() {
-    this.editointiStore?.setData({
-      ...this.editointiStore.data.value,
-      osaAlueet: [
-        ...this.editointiStore.data.value.osaAlueet,
-        {
-          tasokuvaukset: [
-            {
-              taso: 'VARHAISKASVATUS',
-              osaamiset: [],
-            },
-            {
-              taso: 'ESIOPETUS',
-              edelleenKehittyvatOsaamiset: [],
-              osaamiset: [],
-            },
-            {
-              taso: 'VUOSILUOKKA_12',
-              edelleenKehittyvatOsaamiset: [],
-              osaamiset: [],
-              edistynytOsaaminenKuvaukset: [],
-            },
-            {
-              taso: 'VUOSILUOKKA_3456',
-              edelleenKehittyvatOsaamiset: [],
-              osaamiset: [],
-              edistynytOsaaminenKuvaukset: [],
-            },
-            {
-              taso: 'VUOSILUOKKA_789',
-              edelleenKehittyvatOsaamiset: [],
-              osaamiset: [],
-              edistynytOsaaminenKuvaukset: [],
-            },
-          ],
-        },
-      ],
-    });
-  }
+  editointiStore.value.setData({
+    ...currentData,
+    osaAlueet: _.filter(currentData.osaAlueet || [], osaAlue => osaAlue !== poistettavaOsaAlue),
+  });
+};
 
-  async poistaOsaAlue(poistettavaOsaAlue) {
-    this.editointiStore?.setData({
-      ...this.editointiStore.data.value,
-      osaAlueet: _.filter(this.editointiStore.data.value.osaAlueet, osaAlue => osaAlue !== poistettavaOsaAlue),
-    });
-  }
-
-  get defaultDragOptions() {
-    return {
-      animation: 300,
-      emptyInsertThreshold: 10,
-      handle: '.order-handle',
-      disabled: !this.editointiStore!.isEditing,
-      ghostClass: 'dragged',
-    };
-  }
-}
+const defaultDragOptions = computed(() => {
+  return {
+    animation: 300,
+    emptyInsertThreshold: 10,
+    handle: '.order-handle',
+    disabled: !editointiStore.value?.isEditing.value,
+    ghostClass: 'dragged',
+  };
+});
 </script>
 
 <style scoped lang="scss">

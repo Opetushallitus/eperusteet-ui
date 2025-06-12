@@ -187,9 +187,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from 'vue';
+import _ from 'lodash';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
@@ -199,6 +199,7 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
+import { $kaanna } from '@shared/utils/globals';
 
 interface OppiaineenTavoiteSupportData {
   kohdealueet: any[];
@@ -206,139 +207,128 @@ interface OppiaineenTavoiteSupportData {
   sisaltoalueet?: any[];
 }
 
-@Component({
-  components: {
-    EpContent,
-    EpInput,
-    EpSelect,
-    EpButton,
-    EpCollapse,
-    EpMaterialIcon,
-    draggable,
+const props = defineProps<{
+  modelValue: any;
+  supportData: OppiaineenTavoiteSupportData;
+  isEditing?: boolean;
+}>();
+
+const emit = defineEmits(['update:modelValue', 'poista']);
+
+const model = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpOppiaineenTavoite extends Vue {
-  @Prop({ required: true })
-  value!: any;
-
-  @Prop({ required: true })
-  supportData!: OppiaineenTavoiteSupportData;
-
-  @Prop({ required: false, default: false })
-  isEditing!: boolean;
-
-  get model() {
-    return this.value;
+  set(val) {
+    emit('update:modelValue', val);
   }
+});
 
-  set model(val) {
-    this.$emit('input', val);
-  }
-
-  get kohdealue() {
-    return _.find(this.supportData.kohdealueet, kohdealue => _.toString(kohdealue.id) === _.first(this.model.kohdealueet));
-  }
-
-  set kohdealue(val: any) {
+const kohdealue = computed({
+  get() {
+    return _.find(props.supportData.kohdealueet, kohdealue => _.toString(kohdealue.id) === _.first(model.value.kohdealueet));
+  },
+  set(val: any) {
     if (val) {
-      this.model.kohdealueet = [_.toString(val.id)];
+      model.value.kohdealueet = [_.toString(val.id)];
     }
     else {
-      this.model.kohdealueet = [];
+      model.value.kohdealueet = [];
     }
-  }
+  },
+});
 
-  get laajaAlaisetOsaamisetValinnat() {
-    return _.map(this.supportData.laajaAlaisetOsaamiset, lao => {
+const laajaAlaisetOsaamisetValinnat = computed(() => {
+  return _.map(props.supportData.laajaAlaisetOsaamiset, lao => {
+    return {
+      ...lao,
+      valittu: _.includes(model.value.laajattavoitteet, _.toString(lao.id)),
+    };
+  });
+});
+
+const laajaAlaisetOsaamiset = computed(() => {
+  return _.filter(props.supportData.laajaAlaisetOsaamiset, lao => _.includes(model.value.laajattavoitteet, _.toString(lao.id)));
+});
+
+const lisaaLaajaAlainenOsaaminen = (lao) => {
+  model.value.laajattavoitteet = [
+    ...model.value.laajattavoitteet,
+    _.toString(lao.id),
+  ];
+};
+
+const poistaLaajaAlainenOsaaminen = (lao) => {
+  model.value.laajattavoitteet = _.filter(model.value.laajattavoitteet, laajatavoite => laajatavoite !== _.toString(lao.id));
+};
+
+const sisaltoalueetValinnat = computed(() => {
+  if (props.supportData.sisaltoalueet) {
+    return _.map(props.supportData.sisaltoalueet, sisaltoalue => {
       return {
-        ...lao,
-        valittu: _.includes(this.model.laajattavoitteet, _.toString(lao.id)),
+        ...sisaltoalue,
+        valittu: _.includes(model.value.sisaltoalueet, _.toString(sisaltoalue.id)),
       };
     });
   }
+  return [];
+});
 
-  get laajaAlaisetOsaamiset() {
-    return _.filter(this.supportData.laajaAlaisetOsaamiset, lao => _.includes(this.model.laajattavoitteet, _.toString(lao.id)));
-  }
+const sisaltoalueet = computed(() => {
+  return _.filter(props.supportData.sisaltoalueet, sisaltoalue => _.includes(model.value.sisaltoalueet, _.toString(sisaltoalue.id)));
+});
 
-  lisaaLaajaAlainenOsaaminen(lao) {
-    this.model.laajattavoitteet = [
-      ...this.model.laajattavoitteet,
-      _.toString(lao.id),
-    ];
-  }
+const lisaaSisaltoalue = (sisaltoalue) => {
+  model.value.sisaltoalueet = [
+    ...model.value.sisaltoalueet,
+    _.toString(sisaltoalue.id),
+  ];
+};
 
-  poistaLaajaAlainenOsaaminen(lao) {
-    this.model.laajattavoitteet = _.filter(this.model.laajattavoitteet, laajatavoite => laajatavoite !== _.toString(lao.id));
-  }
+const poistaSisaltoalue = (poistettavaSisaltoalue) => {
+  model.value.sisaltoalueet = _.filter(model.value.sisaltoalueet, sisaltoalue => sisaltoalue !== _.toString(poistettavaSisaltoalue.id));
+};
 
-  get sisaltoalueetValinnat() {
-    if (this.supportData.sisaltoalueet) {
-      return _.map(this.supportData.sisaltoalueet, sisaltoalue => {
-        return {
-          ...sisaltoalue,
-          valittu: _.includes(this.model.sisaltoalueet, _.toString(sisaltoalue.id)),
-        };
-      });
-    }
-  }
+const arvosanat = computed(() => {
+  return [10, 9, 8, 7, 6, 5, 1];
+});
 
-  get sisaltoalueet() {
-    return _.filter(this.supportData.sisaltoalueet, sisaltoalue => _.includes(this.model.sisaltoalueet, _.toString(sisaltoalue.id)));
-  }
+const lisaaArvosanaRivi = () => {
+  model.value.arvioinninkohteet = [
+    ...model.value.arvioinninkohteet,
+    {},
+  ];
+};
 
-  lisaaSisaltoalue(sisaltoalue) {
-    this.model.sisaltoalueet = [
-      ...this.model.sisaltoalueet,
-      _.toString(sisaltoalue.id),
-    ];
-  }
+const sisaltokieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
 
-  poistaSisaltoalue(poistettavaSisaltoalue) {
-    this.model.sisaltoalueet = _.filter(this.model.sisaltoalueet, sisaltoalue => sisaltoalue !== _.toString(poistettavaSisaltoalue.id));
-  }
+const poistaArviointi = (arviointi) => {
+  model.value.arvioinninkohteet = _.filter(model.value.arvioinninkohteet, arvioinninkohde => arvioinninkohde !== arviointi);
+};
 
-  get arvosanat() {
-    return [10, 9, 8, 7, 6, 5, 1];
-  }
+const poistaTavoite = () => {
+  emit('poista', model.value);
+};
 
-  lisaaArvosanaRivi() {
-    this.model.arvioinninkohteet = [
-      ...this.model.arvioinninkohteet,
-      {},
-    ];
-  }
+const arvioinninKohteetSorted = computed(() => {
+  return _.sortBy(model.value.arvioinninkohteet, 'arvosana');
+});
 
-  get sisaltokieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
+const poistaOsaamisenTavoite = (poistettavaTavoite) => {
+  model.value.oppiaineenTavoitteenOpetuksenTavoitteet = _.filter(model.value.oppiaineenTavoitteenOpetuksenTavoitteet, (tavoite) => tavoite !== poistettavaTavoite);
+};
 
-  poistaArviointi(arviointi) {
-    this.model.arvioinninkohteet = _.filter(this.model.arvioinninkohteet, arvioinninkohde => arvioinninkohde !== arviointi);
-  }
+const lisaaOsaamisenTavoite = () => {
+  model.value.oppiaineenTavoitteenOpetuksenTavoitteet?.push({ tavoite: undefined });
+};
 
-  poistaTavoite() {
-    this.$emit('poista', this.model);
-  }
-
-  get arvioinninKohteetSorted() {
-    return _.sortBy(this.model.arvioinninkohteet, 'arvosana');
-  }
-
-  poistaOsaamisenTavoite(poistettavaTavoite) {
-    this.model.oppiaineenTavoitteenOpetuksenTavoitteet = _.filter(this.model.oppiaineenTavoitteenOpetuksenTavoitteet, (tavoite) => tavoite !== poistettavaTavoite);
-  }
-
-  lisaaOsaamisenTavoite() {
-    this.model.oppiaineenTavoitteenOpetuksenTavoitteet?.push({ tavoite: undefined });
-  }
-
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
-}
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+  };
+});
 </script>
 
 <style scoped lang="scss">

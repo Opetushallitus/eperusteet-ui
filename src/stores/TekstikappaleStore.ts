@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { Router } from 'vue-router';
 import { reactive, computed } from 'vue';
 import { Matala, Perusteenosat, Sisallot, PerusteDtoTyyppiEnum, Laaja } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
@@ -8,11 +8,12 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { requiredOneLang } from '@shared/validators/required';
 import { PerusteenOsaDto } from '@shared/generated/eperusteet';
+import { App } from 'vue';
 
 interface TekstikappaleStoreConfig {
   // notifikaatiotStore: NotifikaatiotStore;
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: Router;
 }
 
 export class TekstikappaleStore implements IEditoitava {
@@ -22,7 +23,7 @@ export class TekstikappaleStore implements IEditoitava {
 
   private static config: TekstikappaleStoreConfig;
 
-  public static install(vue: typeof Vue, config: TekstikappaleStoreConfig) {
+  public static install(app: App, config: TekstikappaleStoreConfig) {
     TekstikappaleStore.config = config;
   }
 

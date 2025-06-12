@@ -72,8 +72,9 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
@@ -88,126 +89,110 @@ import { KuvaStore } from '@/stores/KuvaStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna, $vahvista } from '@shared/utils/globals';
 
 interface LaajaaAlainenOsaaminenKoodi {
   nimi: { [locale: string]: string };
   arvo: string;
   uri: string;
   koodisto: string;
-  isAlreadySelected: boolean
+  isAlreadySelected: boolean;
 }
 
-@Component({
-  components: {
-    EpEditointi,
-    EpSpinner,
-    EpContent,
-    EpInput,
-    EpMaterialIcon,
-  },
-})
-export default class RouteKotoLaajaalainenOsaaminen extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
 
-  private editointiStore: EditointiStore | null = null;
-  private laajaAlaisetKoodit: LaajaaAlainenOsaaminenKoodi[] = [];
+const route = useRoute();
+const editointiStore = ref<EditointiStore | null>(null);
+const laajaAlaisetKoodit = ref<LaajaaAlainenOsaaminenKoodi[]>([]);
 
-  async mounted() {
-    try {
-      const koodit = (await Koodisto.kaikki(
-        'laajaalainenosaaminenkoto2022')).data;
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
 
-      this.laajaAlaisetKoodit = koodit
-        .sort(x => parseInt(x.koodiArvo!))
-        .reverse()
-        .map(koodi => ({
-          uri: koodi.koodiUri!,
-          arvo: koodi.koodiArvo!,
-          koodisto: koodi.koodisto!.koodistoUri!,
-          nimi: this.extractNimi(koodi),
-          isAlreadySelected: false,
-        }));
-    }
-    catch (err) {
-      console.error(err);
-    }
+const kotoLaajaalainenOsaaminenId = computed(() => {
+  return route.params.kotoLaajaalainenOsaaminenId;
+});
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
+
+onMounted(async () => {
+  try {
+    const koodit = (await Koodisto.kaikki(
+      'laajaalainenosaaminenkoto2022')).data;
+
+    laajaAlaisetKoodit.value = koodit
+      .sort(x => parseInt(x.koodiArvo!))
+      .reverse()
+      .map(koodi => ({
+        uri: koodi.koodiUri!,
+        arvo: koodi.koodiArvo!,
+        koodisto: koodi.koodisto!.koodistoUri!,
+        nimi: extractNimi(koodi),
+        isAlreadySelected: false,
+      }));
   }
-
-  @Watch('kotoLaajaalainenOsaaminenId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-    await this.fetch();
+  catch (err) {
+    console.error(err);
   }
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
+watch(kotoLaajaalainenOsaaminenId, async (id: string, oldId: string) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const kotoStore = new KotoLaajaalainenOsaaminenStore(this.perusteId!, Number(this.kotoLaajaalainenOsaaminenId), this.versionumero);
-    this.editointiStore = new EditointiStore(kotoStore);
-  }
+watch(versionumero, async () => {
+  await fetch();
+}, { immediate: true });
 
-  private extractNimi(koodi) {
-    const nimet: { [locale: string]: string } = {};
+async function fetch() {
+  await props.perusteStore.blockUntilInitialized();
+  const kotoStore = new KotoLaajaalainenOsaaminenStore(perusteId.value!, Number(kotoLaajaalainenOsaaminenId.value), versionumero.value);
+  editointiStore.value = new EditointiStore(kotoStore);
+}
 
-    koodi.metadata!.forEach(meta => {
-      nimet[meta.kieli!.toLowerCase()] = meta.nimi;
-    });
+function extractNimi(koodi) {
+  const nimet: { [locale: string]: string } = {};
 
-    return nimet;
-  }
+  koodi.metadata!.forEach(meta => {
+    nimet[meta.kieli!.toLowerCase()] = meta.nimi;
+  });
 
-  private addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
-    this.setKoodiSelected(laajaAlainenKoodi.arvo);
-    this.editointiStore!.data.value.osaamisAlueet.push({ koodi: laajaAlainenKoodi });
-  }
+  return nimet;
+}
 
-  private setKoodiSelected(koodiarvo) {
-    let selectedOsaaminen = this.laajaAlaisetKoodit.find(koodi => koodi.arvo === koodiarvo);
-    if (selectedOsaaminen) {
-      selectedOsaaminen.isAlreadySelected = true;
-    }
-  }
+function addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
+  setKoodiSelected(laajaAlainenKoodi.arvo);
+  editointiStore.value!.data.value.osaamisAlueet.push({ koodi: laajaAlainenKoodi });
+}
 
-  private async removeLaajaAlainenOsaaminen(index, koodiarvo) {
-    if (await this.$vahvista(this.$t('vahvista-poisto') as string, this.$t('poista-koto-laaja-alainen-osaamisalue') as string)) {
-      this.editointiStore!.data.value.osaamisAlueet.splice(index, 1);
-      this.setKoodiNotSelected(koodiarvo);
-    }
-  }
-
-  private setKoodiNotSelected(koodiarvo) {
-    let selectedOsaaminen = this.laajaAlaisetKoodit.find(koodi => koodi.arvo === koodiarvo);
-    if (selectedOsaaminen) {
-      selectedOsaaminen.isAlreadySelected = false;
-    }
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get kotoLaajaalainenOsaaminenId() {
-    return this.$route.params.kotoLaajaalainenOsaaminenId;
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
+function setKoodiSelected(koodiarvo) {
+  let selectedOsaaminen = laajaAlaisetKoodit.value.find(koodi => koodi.arvo === koodiarvo);
+  if (selectedOsaaminen) {
+    selectedOsaaminen.isAlreadySelected = true;
   }
 }
 
+async function removeLaajaAlainenOsaaminen(index, koodiarvo) {
+  if (await $vahvista($t('vahvista-poisto'), $t('poista-koto-laaja-alainen-osaamisalue'))) {
+    editointiStore.value!.data.value.osaamisAlueet.splice(index, 1);
+    setKoodiNotSelected(koodiarvo);
+  }
+}
+
+function setKoodiNotSelected(koodiarvo) {
+  let selectedOsaaminen = laajaAlaisetKoodit.value.find(koodi => koodi.arvo === koodiarvo);
+  if (selectedOsaaminen) {
+    selectedOsaaminen.isAlreadySelected = false;
+  }
+}
 </script>

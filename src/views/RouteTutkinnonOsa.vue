@@ -249,8 +249,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -275,321 +275,307 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import { Kielet } from '@shared/stores/kieli';
 import EpTutkinnonOsaKaytossaModal from '@/components/EpTutkinnonOsaKaytossaModal.vue';
 import EpArvioinninKohdeAlueet from '@/views/tutkinnonosat/EpArvioinninKohdeAlueet.vue';
+import { $kaanna, $t, $success, $fail } from '@shared/utils/globals';
+import { useRoute, useRouter } from 'vue-router';
 
-@Component({
-  components: {
-    EpAlert,
-    EpAmmattitaitovaatimukset,
-    EpBalloonList,
-    EpButton,
-    EpCollapse,
-    EpContent,
-    EpEditointi,
-    EpErrorWrapper,
-    EpInput,
-    EpLaajuusInput,
-    EpSpinner,
-    EpKoodistoSelect,
-    EpTutkinnonOsaKaytossaModal,
-    EpArvioinninKohdeAlueet,
-  },
-})
-export default class RouteTutkinnonosa extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  arviointiStore: ArviointiStore;
+}>();
 
-  @Prop({ required: true })
-  arviointiStore!: ArviointiStore;
+const router = useRouter();
+const route = useRoute();
 
-  private store: EditointiStore | null = null;
-  private koodiTallennus = false;
-  private arvioinninTyyppi: 'geneerinen' | 'tutkinnonosa-kohtainen' | null = null;
+const store = ref<EditointiStore | null>(null);
+const koodiTallennus = ref(false);
+const arvioinninTyyppi = ref<'geneerinen' | 'tutkinnonosa-kohtainen' | null>(null);
 
-  private readonly tutkinnonosaKoodisto = new KoodistoSelectStore({
-    koodisto: 'tutkinnonosat',
-    async query(query: string, sivu = 0, koodisto: string) {
-      const koodit = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-
-      const kaytetyt = (await TutkinnonosatPrivate.getTutkinnonOsaByKoodit(_.map(koodit.data, 'koodiUri'))).data;
-
-      return {
-        ...koodit,
-        data: _.map(koodit.data, koodi => {
-          return {
-            ...koodi,
-            kaytossa: kaytetyt[koodi.koodiUri],
-          };
-        }),
-      };
-    },
-  });
-
-  get tutkinnonOsaEditable() {
-    return this.store?.features.value?.editable;
-  }
-
-  get tutkinnonosaKoodistoKaytossaField() {
-    return [{
-      key: 'kaytossa',
-      label: this.$t('kaytossa'),
-      thStyle: { width: '10rem' },
-      formatter: (value, key, item) => {
-        if (value) {
-          return this.$t('kylla');
-        }
-
-        return '';
+const tutkinnonosaKoodisto = new KoodistoSelectStore({
+  koodisto: 'tutkinnonosat',
+  async query(query: string, sivu = 0, koodisto: string) {
+    const koodit = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
       },
-    }];
-  }
+    })).data as any;
 
-  get isNew() {
-    return this.tutkinnonOsaId === 'uusi';
-  }
-
-  get tov() {
-    if (!this.store) {
-      return null;
-    }
-    return this.store.data.value;
-  }
-
-  @Watch('tov')
-  onDataChange(tov) {
-    if (tov && tov.tutkinnonOsa) {
-      Murupolku.aseta('tutkinnonosa', this.$kaanna(tov.tutkinnonOsa.nimi), {
-        name: 'tutkinnonosa',
-      });
-    }
-  }
-
-  get tutkinnonOsaId() {
-    return this.$route.params.tutkinnonOsaId;
-  }
-
-  get arviointiasteikot() {
-    return this.arviointiStore.arviointiasteikot.value;
-  }
-
-  get arviointiasteikotKeyById() {
-    return _.keyBy(_.map(this.arviointiasteikot, arviointiasteikko => {
-      return {
-        ...arviointiasteikko,
-        osaamistasot: _.keyBy(arviointiasteikko.osaamistasot, 'id'),
-      };
-    }), 'id');
-  }
-
-  get kaikkiGeneeriset() {
-    return this.arviointiStore.geneeriset.value;
-  }
-
-  get valittuGeneerinen(): YhdistettyGeneerinen | null {
-    if (!this.tov || !this.tov.tutkinnonOsa?._geneerinenArviointiasteikko) {
-      return null;
-    }
-
-    const geneerinen = _.first(_.filter(this.kaikkiGeneeriset,
-      g => g.id === Number(this.tov!.tutkinnonOsa._geneerinenArviointiasteikko)));
-
-    if (!geneerinen) {
-      return null;
-    }
-
-    const asteikko = _.first(_.filter(this.arviointiasteikot,
-      g => g.id === Number((geneerinen as any)._arviointiAsteikko)));
-
-    if (!asteikko) {
-      return null;
-    }
-
-    const kriteeriMap = _.keyBy(geneerinen.osaamistasonKriteerit, '_osaamistaso');
+    const kaytetyt = (await TutkinnonosatPrivate.getTutkinnonOsaByKoodit(_.map(koodit.data, 'koodiUri'))).data;
 
     return {
-      nimi: geneerinen.nimi as any,
-      kohde: geneerinen.kohde as any,
-      osaamistasot: _.map(_.reverse(asteikko?.osaamistasot || []), (ot: any) => {
+      ...koodit,
+      data: _.map(koodit.data, koodi => {
         return {
-          otsikko: ot.otsikko as any,
-          kriteerit: kriteeriMap[ot.id!]!.kriteerit!,
+          ...koodi,
+          kaytossa: kaytetyt[koodi.koodiUri],
         };
       }),
     };
-  }
+  },
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const tutkinnonOsaEditable = computed(() => {
+  return store.value?.features.value?.editable;
+});
 
-  get geneeriset() {
-    return _.filter(this.arviointiStore.geneeriset.value, 'julkaistu');
-  }
+const tutkinnonosaKoodistoKaytossaField = computed(() => {
+  return [{
+    key: 'kaytossa',
+    label: $t('kaytossa'),
+    thStyle: { width: '10rem' },
+    formatter: (value, key, item) => {
+      if (value) {
+        return $t('kylla');
+      }
 
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
+      return '';
+    },
+  }];
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
+const isNew = computed(() => {
+  return tutkinnonOsaId.value === 'uusi';
+});
 
-  @Watch('tutkinnonOsaId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === _.toString(oldId)) {
-      return;
-    }
-    await this.arviointiStore.fetchArviointiasteikot();
-    await this.arviointiStore.fetchGeneeriset();
-    await this.fetch();
+const tov = computed(() => {
+  if (!store.value) {
+    return null;
   }
+  return store.value.data.value;
+});
 
-  async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const store = new TutkinnonOsaEditStore(this.perusteId!, !this.isNew ? this.tutkinnonOsaId : undefined, this, this.versionumero);
-    this.store = new EditointiStore(store);
-  }
-
-  async lisaaOsaAlue(tutkinnonOsa) {
-    this.$router.push({
-      name: 'osaalue',
-      params: {
-        osaalueId: 'uusi',
-      },
-      query: {
-        tutkinnonOsaId: this.tutkinnonOsaId,
-      },
+// Watch tov for changes to update Murupolku
+watch(tov, (newTov) => {
+  if (newTov && newTov.tutkinnonOsa) {
+    Murupolku.aseta('tutkinnonosa', $kaanna(newTov.tutkinnonOsa.nimi), {
+      name: 'tutkinnonosa',
     });
   }
+});
 
-  get hasNimi() {
-    return !_.isEmpty(_.get(this.store?.data.value.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value));
+const tutkinnonOsaId = computed(() => {
+  return route.params.tutkinnonOsaId as string;
+});
+
+const arviointiasteikot = computed(() => {
+  return props.arviointiStore.arviointiasteikot.value;
+});
+
+const arviointiasteikotKeyById = computed(() => {
+  return _.keyBy(_.map(arviointiasteikot.value, arviointiasteikko => {
+    return {
+      ...arviointiasteikko,
+      osaamistasot: _.keyBy(arviointiasteikko.osaamistasot, 'id'),
+    };
+  }), 'id');
+});
+
+const kaikkiGeneeriset = computed(() => {
+  return props.arviointiStore.geneeriset.value;
+});
+
+const valittuGeneerinen = computed((): YhdistettyGeneerinen | null => {
+  if (!tov.value || !tov.value.tutkinnonOsa?._geneerinenArviointiasteikko) {
+    return null;
   }
 
-  set nimi(value) {
-    this.store?.setData({
-      ...this.store?.data.value,
+  const geneerinen = _.first(_.filter(kaikkiGeneeriset.value,
+    g => g.id === Number(tov.value!.tutkinnonOsa._geneerinenArviointiasteikko)));
+
+  if (!geneerinen) {
+    return null;
+  }
+
+  const asteikko = _.first(_.filter(arviointiasteikot.value,
+    g => g.id === Number((geneerinen as any)._arviointiAsteikko)));
+
+  if (!asteikko) {
+    return null;
+  }
+
+  const kriteeriMap = _.keyBy(geneerinen.osaamistasonKriteerit, '_osaamistaso');
+
+  return {
+    nimi: geneerinen.nimi as any,
+    kohde: geneerinen.kohde as any,
+    osaamistasot: _.map(_.reverse(asteikko?.osaamistasot || []), (ot: any) => {
+      return {
+        otsikko: ot.otsikko as any,
+        kriteerit: kriteeriMap[ot.id!]!.kriteerit!,
+      };
+    }),
+  };
+});
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const geneeriset = computed(() => {
+  return _.filter(props.arviointiStore.geneeriset.value, 'julkaistu');
+});
+
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
+
+// Watch version number changes
+watch(versionumero, async () => {
+  await fetch();
+}, { immediate: true });
+
+// Watch tutkinnonOsaId changes
+watch(tutkinnonOsaId, async (id, oldId) => {
+  if (!id || id === _.toString(oldId)) {
+    return;
+  }
+  await props.arviointiStore.fetchArviointiasteikot();
+  await props.arviointiStore.fetchGeneeriset();
+  await fetch();
+}, { immediate: true });
+
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const editStore = new TutkinnonOsaEditStore(perusteId.value!, !isNew.value ? tutkinnonOsaId.value : undefined, null, versionumero.value);
+  store.value = new EditointiStore(editStore);
+};
+
+const lisaaOsaAlue = async (tutkinnonOsa) => {
+  router.push({
+    name: 'osaalue',
+    params: {
+      osaalueId: 'uusi',
+    },
+    query: {
+      tutkinnonOsaId: tutkinnonOsaId.value,
+    },
+  });
+};
+
+const hasNimi = computed(() => {
+  return !_.isEmpty(_.get(store.value?.data.value.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value));
+});
+
+// Computed property for nimi with getter and setter
+const nimi = computed({
+  get() {
+    return _.get(store.value?.data.value.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value);
+  },
+  set(value) {
+    store.value?.setData({
+      ...store.value?.data.value,
       tutkinnonOsa: {
-        ...this.store?.data.value.tutkinnonOsa,
+        ...store.value?.data.value.tutkinnonOsa,
         nimi: {
-          ...this.store?.data.value.tutkinnonOsa.nimi,
+          ...store.value?.data.value.tutkinnonOsa.nimi,
           [Kielet.getSisaltoKieli.value]: value,
         },
       },
     });
   }
+});
 
-  get nimi() {
-    return _.get(this.store?.data.value.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value);
+const tutkinnonOsaNimiKoodiLisays = (koodi) => {
+  if (koodi.kaytossa) {
+    $fail($t('tutkinnon-osan-koodi-kaytossa') as string);
+    tyhjennaTutkinnonosaKoodi();
   }
+  else {
+    store.value?.setData({
+      ...store.value?.data.value,
+      tutkinnonOsa: {
+        ...store.value?.data.value.tutkinnonOsa,
+        nimi: koodi.nimi,
+        koodi,
+      },
+    });
+  }
+};
 
-  tutkinnonOsaNimiKoodiLisays(koodi) {
-    if (koodi.kaytossa) {
-      this.$fail(this.$t('tutkinnon-osan-koodi-kaytossa') as string);
-      this.tyhjennaTutkinnonosaKoodi();
+const tyhjennaTutkinnonosaKoodi = () => {
+  store.value?.setData({
+    ...store.value?.data.value,
+    tutkinnonOsa: {
+      ...store.value?.data.value.tutkinnonOsa,
+      koodi: null,
+      nimi: null,
+    },
+  });
+};
+
+const lisaaTutkinnonosaNimiKoodistoon = async () => {
+  koodiTallennus.value = true;
+
+  try {
+    if (_.isEmpty(_.get(store.value?.data.value.tutkinnonOsa.nimi, 'fi')) || _.isEmpty(_.get(store.value?.data.value.tutkinnonOsa.nimi, 'sv'))) {
+      $fail($t('koodistoon-vienti-epaonnistui') as string, $t('tutkinnon-osan-nimi-koodisto-vienti-vaadittu-kieli-virhe') as string);
     }
     else {
-      this.store?.setData({
-        ...this.store?.data.value,
+      const koodi = (await Koodisto.lisaaUusiKoodi('tutkinnonosat', store.value?.data.value.tutkinnonOsa.nimi)).data as any;
+
+      store.value?.setData({
+        ...store.value?.data.value,
         tutkinnonOsa: {
-          ...this.store?.data.value.tutkinnonOsa,
-          nimi: koodi.nimi,
-          koodi,
+          ...store.value?.data.value.tutkinnonOsa,
+          koodi: {
+            uri: koodi.koodiUri,
+            koodisto: koodi.koodisto.koodistoUri,
+            arvo: koodi.koodiArvo,
+          },
+          nimi: _.mapValues(_.keyBy(koodi.metadata, v => _.toLower(v.kieli)), v => v.nimi),
         },
       });
     }
   }
+  catch (e) {
+    $fail($t('virhe-palvelu-virhe') as string);
+  }
+  finally {
+    koodiTallennus.value = false;
+  }
+};
 
-  tyhjennaTutkinnonosaKoodi() {
-    this.store?.setData({
-      ...this.store?.data.value,
-      tutkinnonOsa: {
-        ...this.store?.data.value.tutkinnonOsa,
-        koodi: null,
-        nimi: null,
-      },
-    });
+const kopioiTutkinnonoOsa = async () => {
+  await store.value?.copy();
+  $success($t('tutkinnon-osa-kopioitu') as string);
+};
+
+const muokkaaTutkinnonOsaa = async () => {
+  await store.value?.start();
+};
+
+const valittuArviointiTyyppi = computed(() => {
+  if (valittuGeneerinen.value) {
+    return 'geneerinen';
   }
 
-  async lisaaTutkinnonosaNimiKoodistoon() {
-    this.koodiTallennus = true;
-
-    try {
-      if (_.isEmpty(_.get(this.store?.data.value.tutkinnonOsa.nimi, 'fi')) || _.isEmpty(_.get(this.store?.data.value.tutkinnonOsa.nimi, 'sv'))) {
-        this.$fail(this.$t('koodistoon-vienti-epaonnistui') as string, this.$t('tutkinnon-osan-nimi-koodisto-vienti-vaadittu-kieli-virhe') as string);
-      }
-      else {
-        const koodi = (await Koodisto.lisaaUusiKoodi('tutkinnonosat', this.store?.data.value.tutkinnonOsa.nimi)).data as any;
-
-        this.store?.setData({
-          ...this.store?.data.value,
-          tutkinnonOsa: {
-            ...this.store?.data.value.tutkinnonOsa,
-            koodi: {
-              uri: koodi.koodiUri,
-              koodisto: koodi.koodisto.koodistoUri,
-              arvo: koodi.koodiArvo,
-            },
-            nimi: _.mapValues(_.keyBy(koodi.metadata, v => _.toLower(v.kieli)), v => v.nimi),
-          },
-        });
-      }
-    }
-    catch (e) {
-      this.$fail(this.$t('virhe-palvelu-virhe') as string);
-    }
-    finally {
-      this.koodiTallennus = false;
-    }
+  if (_.size(store.value?.data.value?.tutkinnonOsa?.arviointi?.arvioinninKohdealueet) > 0) {
+    return 'tutkinnonosa-kohtainen';
   }
 
-  async kopioiTutkinnonoOsa() {
-    await this.store?.copy();
-    this.$success(this.$t('tutkinnon-osa-kopioitu') as string);
-  }
+  return arvioinninTyyppi.value;
+});
 
-  async muokkaaTutkinnonOsaa() {
-    await this.store?.start();
-  }
+const poistaGeneerinenaArviointi = () => {
+  store.value?.setData({
+    ...store.value?.data.value,
+    tutkinnonOsa: {
+      ...store.value?.data.value.tutkinnonOsa,
+      _geneerinenArviointiasteikko: null,
+    },
+  });
 
-  get valittuArviointiTyyppi() {
-    if (this.valittuGeneerinen) {
-      return 'geneerinen';
-    }
+  arvioinninTyyppi.value = null;
+};
 
-    if (_.size(this.store?.data.value?.tutkinnonOsa?.arviointi?.arvioinninKohdealueet) > 0) {
-      return 'tutkinnonosa-kohtainen';
-    }
-
-    return this.arvioinninTyyppi;
-  }
-
-  poistaGeneerinenaArviointi() {
-    this.store?.setData({
-      ...this.store?.data.value,
-      tutkinnonOsa: {
-        ...this.store?.data.value.tutkinnonOsa,
-        _geneerinenArviointiasteikko: null,
-      },
-    });
-
-    this.arvioinninTyyppi = null;
-  }
-
-  get kriteeritonGeneerinenValittu() {
-    return this.valittuGeneerinen?.osaamistasot?.length === 1
-      && _.chain(this.valittuGeneerinen.osaamistasot)
-        .map('kriteerit')
-        .flatten()
-        .isEmpty()
-        .value();
-  }
-}
+const kriteeritonGeneerinenValittu = computed(() => {
+  return valittuGeneerinen.value?.osaamistasot?.length === 1
+    && _.chain(valittuGeneerinen.value.osaamistasot)
+      .map('kriteerit')
+      .flatten()
+      .isEmpty()
+      .value();
+});
 </script>
 
 <style lang="scss" scoped>

@@ -80,15 +80,14 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { AipeVaiheStore } from '@/stores/AipeVaiheStore';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { TermitStore } from '@/stores/TermitStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -97,112 +96,101 @@ import draggable from 'vuedraggable';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    draggable,
-    EpCollapse,
-    EpSisaltoTekstikappaleet,
-    EpMaterialIcon,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteAipeVaihe extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  vaiheId: {
+    type: [String, Number],
+    required: false,
+  },
+});
 
-  @Prop({ required: false })
-  vaiheId: any;
+const route = useRoute();
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  store: EditointiStore | null = null;
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
 
-  @Watch('vaiheId', { immediate: true })
-  async vaiheChange() {
-    const store = new AipeVaiheStore(this.perusteId!, this.vaiheId, this.perusteStore, this, this.versionumero);
-    this.store = new EditointiStore(store);
-  }
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.vaiheChange();
-  }
+const sisaltoTekstiAvaimet = computed(() => {
+  return _.filter(['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava'], avain => !!_.get(store.value?.data.value, avain));
+});
 
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
+const storeData = computed({
+  get: () => store.value?.data.value,
+  set: (data) => store.value?.setData(data),
+});
 
-  get sisaltoTekstiAvaimet() {
-    return _.filter(['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava'], avain => !!_.get(this.store?.data.value, avain));
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing.value;
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+  };
+});
 
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
+const oppiaineetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'oppiaineet',
+    },
+  };
+});
 
-  async postSave() {
-    await this.perusteStore.updateNavigation();
-  }
+const postSave = async () => {
+  await props.perusteStore.updateNavigation();
+};
 
-  get storeData() {
-    return this.store?.data.value;
-  }
+const lisaaKohdealue = () => {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      opetuksenKohdealueet: [
+        ...store.value.data.value.opetuksenKohdealueet,
+        {},
+      ],
+    },
+  );
+};
 
-  set storeData(data) {
-    this.store?.setData(data);
-  }
+const poistaKohdealue = (poistettavaKohdealue) => {
+  store.value?.setData(
+    {
+      ...store.value.data.value,
+      opetuksenKohdealueet: _.filter(store.value.data.value.opetuksenKohdealueet, kohdealue => kohdealue !== poistettavaKohdealue),
+    },
+  );
+};
 
-  lisaaKohdealue() {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        opetuksenKohdealueet: [
-          ...this.store.data.value.opetuksenKohdealueet,
-          {},
-        ],
-      },
-    );
-  }
+const lisaaOppiaine = () => {
+  router.push({ name: 'aipeoppiaine', params: { vaiheId: props.vaiheId } });
+};
 
-  poistaKohdealue(poistettavaKohdealue) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        opetuksenKohdealueet: _.filter(this.store.data.value.opetuksenKohdealueet, kohdealue => kohdealue !== poistettavaKohdealue),
-      },
-    );
-  }
+const vaiheChange = async () => {
+  const storeInstance = new AipeVaiheStore(perusteId.value!, props.vaiheId, props.perusteStore, versionumero.value);
+  store.value = new EditointiStore(storeInstance);
+};
 
-  lisaaOppiaine() {
-    this.$router.push({ name: 'aipeoppiaine', params: { vaiheId: this.vaiheId } });
-  }
+watch(() => props.vaiheId, async () => {
+  await vaiheChange();
+}, { immediate: true });
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
-
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
-
-  get oppiaineetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'oppiaineet',
-      },
-    };
-  }
-}
+watch(versionumero, async () => {
+  await vaiheChange();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
@@ -214,5 +202,4 @@ export default class RouteAipeVaihe extends Vue {
   .oppiaine:nth-of-type(odd) {
     background-color: $table-odd-row-bg-color;
   }
-
 </style>

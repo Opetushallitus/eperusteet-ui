@@ -1,14 +1,14 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
 import { reactive, computed } from 'vue';
 import { Matala, Sisallot } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
+import { App } from 'vue';
 
 interface TekstiRakenneStoreConfig {
   perusteStore: PerusteStore;
-  router: typeof VueRouter;
+  router: any;
 }
 
 export class TekstiRakenneStore implements IEditoitava {
@@ -18,7 +18,7 @@ export class TekstiRakenneStore implements IEditoitava {
 
   private static config: TekstiRakenneStoreConfig;
 
-  public static install(vue: typeof Vue, config: TekstiRakenneStoreConfig) {
+  public static install(app: App, config: TekstiRakenneStoreConfig) {
     TekstiRakenneStore.config = config;
   }
 

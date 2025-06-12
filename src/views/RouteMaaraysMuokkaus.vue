@@ -139,9 +139,10 @@
   </ep-main-view>
 </template>
 
-<script lang="ts">
-import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue';
+import { useRoute } from 'vue-router';
+import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import { Murupolku } from '@shared/stores/murupolku';
 import { MaaraysDtoTyyppiEnum, MaaraysDtoTilaEnum, MaaraysLiiteDtoTyyppiEnum, MaaraysDtoLiittyyTyyppiEnum, baseURL } from '@shared/api/eperusteet';
@@ -154,7 +155,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { nimiSearchIdentity } from '@shared/utils/helpers';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
@@ -164,197 +165,182 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
+import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpEditointi,
-    EpButton,
-    EpContent,
-    EpInput,
-    EpDatepicker,
-    EpTiedostoLataus,
-    EpMaterialIcon,
-    EpMultiSelect,
-    EpSpinner,
-    EpMaaraysAsiasanat,
-    EpMaaraysLiitteet,
-    EpMaaraysLiittyyMuuttaaValinta,
-    EpInfoPopover,
-    EpMaarayskokoelmaKoulutustyyppiSelect,
+const route = useRoute();
+const instance = getCurrentInstance();
+
+const store = ref<EditointiStore | null>(null);
+const LUONNOS = MaaraysDtoTilaEnum.LUONNOS;
+const JULKAISTU = MaaraysDtoTilaEnum.JULKAISTU;
+const LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
+const MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
+const EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
+const MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
+const KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
+
+const maaraysliittyy = ref<'eiliity' | 'muuttaa' | 'korvaa'>('eiliity');
+const arvioinninTyyppi = ref<'geneerinen' | 'tutkinnonosa-kohtainen' | null>(null);
+
+onMounted(() => {
+  Murupolku.aseta('maaraysMuokkaus', $t(header.value), {
+    name: 'maaraysMuokkaus',
+  });
+});
+
+const maaraysId = computed(() => {
+  if (route.params.maaraysId === 'uusi') {
+    return route.params.maaraysId;
+  }
+
+  return _.toNumber(route.params.maaraysId);
+});
+
+// Initialize the store when maaraysId changes
+watch(maaraysId, (newId) => {
+  const tkstore = new MaarayksetEditStore(newId, instance?.proxy as any);
+  store.value = new EditointiStore(tkstore as any);
+}, { immediate: true });
+
+const tyypit = computed(() => {
+  return [
+    MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
+    MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
+    MaaraysDtoTyyppiEnum.PERUSTE,
+  ];
+});
+
+const isUusi = computed(() => {
+  return maaraysId.value === 'uusi';
+});
+
+const header = computed(() => {
+  return isUusi.value ? 'lisaa-maarays' : 'maarays';
+});
+
+const storeData = computed({
+  get() {
+    return store.value?.data.value;
   },
-})
-export default class RouteMaaraysMuokkaus extends Vue {
-  private store: EditointiStore | null = null;
-  private LUONNOS = MaaraysDtoTilaEnum.LUONNOS;
-  private JULKAISTU = MaaraysDtoTilaEnum.JULKAISTU;
-  private LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
-  private MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
-  private EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
-  private MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
-  private KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 
-  private maaraysliittyy: 'eiliity' | 'muuttaa' | 'korvaa' = 'eiliity';
-  private nimiSearchIdentity = nimiSearchIdentity;
+const tallenna = async (tila, save) => {
+  store.value?.setData({
+    ...store.value?.data.value,
+    tila,
+  });
 
-  mounted() {
-    Murupolku.aseta('maaraysMuokkaus', this.$t(this.header), {
-      name: 'maaraysMuokkaus',
+  await save();
+};
+
+const isRequired = computed(() => {
+  return store.value?.isEditing.value ? ' *' : '';
+});
+
+const muokkaajaNimi = computed(() => {
+  return parsiEsitysnimi(store.value?.data.value?.muokkaajaKayttaja);
+});
+
+const liittyyTyyppi = computed(() => {
+  return store.value?.data.value?.liittyyTyyppi;
+});
+
+// Watch liittyyTyyppi changes
+watch(liittyyTyyppi, (newType) => {
+  if (newType !== MaaraysDtoLiittyyTyyppiEnum.MUUTTAA) {
+    store.value?.setData({
+      ...store.value?.data.value,
+      muutettavatMaaraykset: [],
     });
   }
 
-  @Watch('maaraysId', { immediate: true })
-  maaraysIdChange() {
-    const tkstore = new MaarayksetEditStore(this.maaraysId, this);
-    this.store = new EditointiStore(tkstore);
+  if (newType !== MaaraysDtoLiittyyTyyppiEnum.KORVAA) {
+    store.value?.setData({
+      ...store.value?.data.value,
+      korvattavatMaaraykset: [],
+    });
+  }
+});
+
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
+
+const liittyykoToiseenMaaraykseenOtsikko = computed(() => {
+  if (store.value?.isEditing.value) {
+    return $t('maarayksen-liittyminen-aiempaan-maaraykseen') + isRequired.value;
   }
 
-  get tyypit() {
-    return [
-      MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
-      MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
-      MaaraysDtoTyyppiEnum.PERUSTE,
-    ];
+  if (store.value?.data.value?.liittyyTyyppi === EILIITY) {
+    return $t('ei-liity-toiseen-maaraykseen');
   }
 
-  get isUusi() {
-    return this.maaraysId === 'uusi';
+  if (store.value?.data.value?.liittyyTyyppi === MUUTTAA) {
+    return $t('muuttaa-maaraysta');
   }
 
-  get header() {
-    return this.isUusi ? 'lisaa-maarays' : 'maarays';
+  if (store.value?.data.value?.liittyyTyyppi === KORVAA) {
+    return $t('korvaa-maarayksen');
   }
 
-  get maaraysId() {
-    if (this.$route.params.maaraysId === 'uusi') {
-      return this.$route.params.maaraysId;
-    }
+  return '';
+});
 
-    return _.toNumber(this.$route.params.maaraysId);
-  }
-
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-
-  async tallenna(tila, save) {
-    this.store?.setData({
-      ...this.store.data.value,
-      tila,
+const poista = async (remove) => {
+  const varmistaPoisto = await $bvModal.msgBoxConfirm(
+    $t('maarays-poisto-varmistus-teksti'), {
+      title: $t('poista-maarays'),
+      okTitle: $t('poista'),
+      cancelTitle: $t('peruuta'),
+      size: 'sm',
     });
 
-    await save();
+  if (varmistaPoisto) {
+    await remove();
+  }
+};
+
+const peruste = computed(() => {
+  return store.value?.supportData.value?.peruste;
+});
+
+const maarayskirje = computed(() => {
+  return peruste.value?.maarayskirje?.liitteet[kieli.value] || null;
+});
+
+const maarayskirjeUrl = computed(() => {
+  if (peruste.value && !_.find(storeData.value?.liitteet[kieli.value]?.liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI) && maarayskirje.value) {
+    return `${baseURL}/perusteet/${peruste.value.id}/liitteet/${maarayskirje.value.id}`;
+  }
+  else {
+    return null;
+  }
+});
+
+const asiasanat = computed(() => {
+  if (_.isEmpty(store.value?.supportData.value?.asiasanat[kieli.value])) {
+    return [];
   }
 
-  get isRequired() {
-    return this.store?.isEditing.value ? ' *' : '';
-  }
-
-  get muokkaajaNimi() {
-    return parsiEsitysnimi(this.store?.data.value?.muokkaajaKayttaja);
-  }
-
-  get liittyyTyyppi() {
-    return this.store?.data.value?.liittyyTyyppi;
-  }
-
-  @Watch('liittyyTyyppi')
-  liittyyTyyppiChange() {
-    if (this.liittyyTyyppi !== MaaraysDtoLiittyyTyyppiEnum.MUUTTAA) {
-      this.store?.setData({
-        ...this.store.data.value,
-        muutettavatMaaraykset: [],
-      });
-    }
-
-    if (this.liittyyTyyppi !== MaaraysDtoLiittyyTyyppiEnum.KORVAA) {
-      this.store?.setData({
-        ...this.store.data.value,
-        korvattavatMaaraykset: [],
-      });
-    }
-  }
-
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
-
-  get liittyykoToiseenMaaraykseenOtsikko() {
-    if (this.store?.isEditing.value) {
-      return this.$t('maarayksen-liittyminen-aiempaan-maaraykseen') + this.isRequired;
-    }
-
-    if (this.store?.data.value.liittyyTyyppi === this.EILIITY) {
-      return this.$t('ei-liity-toiseen-maaraykseen');
-    }
-
-    if (this.store?.data.value.liittyyTyyppi === this.MUUTTAA) {
-      return this.$t('muuttaa-maaraysta');
-    }
-
-    if (this.store?.data.value.liittyyTyyppi === this.KORVAA) {
-      return this.$t('korvaa-maarayksen');
-    }
-  }
-
-  async poista(remove) {
-    const varmistaPoisto = await this.$bvModal.msgBoxConfirm(
-          this.$t('maarays-poisto-varmistus-teksti') as any, {
-            title: this.$t('poista-maarays') as any,
-            okTitle: this.$t('poista') as any,
-            cancelTitle: this.$t('peruuta') as any,
-            size: 'sm',
-          });
-
-    if (varmistaPoisto) {
-      await remove();
-    }
-  }
-
-  get maarayskirje() {
-    return this.peruste?.maarayskirje?.liitteet[this.kieli] || null;
-  }
-
-  get maarayskirjeUrl() {
-    if (this.peruste && !_.find(this.storeData?.liitteet[this.kieli].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI) && this.maarayskirje) {
-      return `${baseURL}/perusteet/${this.peruste.id!}/liitteet/${this.maarayskirje.id}`;
-    }
-    else {
-      return null;
-    }
-  }
-
-  get asiasanat() {
-    if (_.isEmpty(this.store?.supportData.value.asiasanat[this.kieli])) {
-      return [];
-    }
-
-    return this.store?.supportData.value.asiasanat[this.kieli];
-  }
-
-  get peruste() {
-    return this.store?.supportData.value?.peruste;
-  }
-}
+  return store.value?.supportData.value?.asiasanat[kieli.value];
+});
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @import '@shared/styles/_variables.scss';
 
-  ::v-deep .editointikontrolli .sisalto {
-    padding: 0;
+:deep(.editointikontrolli .sisalto) {
+  padding: 0;
+}
+
+.header {
+  background: $white;
+
+  &.editing {
+    border-bottom: 1px solid #E7E7E7;
   }
-
-  .header {
-    background: $white;
-
-    &.editing {
-      border-bottom: 1px solid #E7E7E7;
-    }
-  }
-
+}
 </style>

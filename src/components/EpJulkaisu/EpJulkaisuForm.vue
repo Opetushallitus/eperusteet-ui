@@ -82,24 +82,12 @@ import { requiredIf } from 'vuelidate/lib/validators';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t } from '@shared/utils/globals';
 
-const props = defineProps({
-  store: {
-    type: Object as () => PerusteStore,
-    required: true,
-  },
-  julkaisu: {
-    type: Object,
-    required: true,
-  },
-  isLatest: {
-    type: Boolean,
-    default: false,
-  },
-  muutosmaarays: {
-    type: Boolean,
-    default: false,
-  },
-});
+const props = defineProps<{
+  store: PerusteStore;
+  julkaisu: any;
+  isLatest?: boolean;
+  muutosmaarays?: boolean;
+}>();
 
 const emit = defineEmits(['setInvalid']);
 const file = ref(null);

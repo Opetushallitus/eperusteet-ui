@@ -7,6 +7,7 @@ import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
 import { required } from 'vuelidate/lib/validators';
 import { translated, requiredOneLang } from '@shared/validators/required';
+import { App } from 'vue';
 
 interface OsaalueStoreConfig {
   perusteStore: PerusteStore;
@@ -22,7 +23,7 @@ export class OsaalueStore implements IEditoitava {
 
   private static config: OsaalueStoreConfig;
 
-  public static install(vue: typeof Vue, config: OsaalueStoreConfig) {
+  public static install(app: App, config: OsaalueStoreConfig) {
     OsaalueStore.config = config;
   }
 

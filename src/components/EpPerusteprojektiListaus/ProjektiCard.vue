@@ -62,6 +62,7 @@ const classes = computed(() => {
 }
 
 .project-card {
+  display: block;
   border-radius: 16px;
   border: 1px solid #ebebeb;
   box-shadow: 5px 5px 20px 1px rgba(27,61,142,0.08);

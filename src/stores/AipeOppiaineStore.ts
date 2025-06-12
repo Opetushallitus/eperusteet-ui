@@ -3,6 +3,7 @@ import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eper
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
 import { Revision } from '@shared/tyypit';
+import { useRouter } from 'vue-router';
 
 export class AipeOppiaineStore implements IEditoitava {
   constructor(
@@ -11,7 +12,6 @@ export class AipeOppiaineStore implements IEditoitava {
     private oppiaineId: number | null,
     private parentId: number | null,
     private perusteStore: PerusteStore,
-    private el: any,
     public versionumero?: number,
   ) {
   }
@@ -82,7 +82,8 @@ export class AipeOppiaineStore implements IEditoitava {
     if (newData) {
       await this.perusteStore.updateNavigation();
       await EditointiStore.cancelAll();
-      this.el.$router.push({ name: 'aipeoppiaine', params: { oppiaineId: newData.id } });
+      const router = useRouter();
+      router.push({ name: 'aipeoppiaine', params: { oppiaineId: newData.id } });
     }
   }
 
@@ -90,7 +91,8 @@ export class AipeOppiaineStore implements IEditoitava {
     if (this.oppiaineId) {
       await Aipeopetuksensisalto.removeAipeOppiaine(this.perusteId, this.vaiheId, this.oppiaineId);
       await this.perusteStore.updateNavigation();
-      this.el.$router.push({ name: 'aipevaihe', params: { vaiheId: this.vaiheId } });
+      const router = useRouter();
+      router.push({ name: 'aipevaihe', params: { vaiheId: this.vaiheId } });
     }
   }
 

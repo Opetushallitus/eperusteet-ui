@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { computed, onMounted, getCurrentInstance } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { TilastotStore } from '@/stores/TilastotStore';
 import EpAmosaaTilastot from '@/components/tilastot/EpAmosaaTilastot.vue';
 import EpYlopsTilastot from '@/components/tilastot/EpYlopsTilastot.vue';
