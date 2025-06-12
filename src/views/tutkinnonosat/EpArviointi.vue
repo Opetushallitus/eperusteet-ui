@@ -78,98 +78,88 @@
   </b-form-group>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
 import draggable from 'vuedraggable';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed } from 'vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import OsaamistasonKriteeri from '@/views/tutkinnonosat/OsaamistasonKriteeri.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMaterialIcon,
-    draggable,
-    EpInput,
-    EpButton,
-    OsaamistasonKriteeri,
+const props = defineProps<{
+  modelValue: any;
+  isEditing: boolean;
+  arviointiasteikot: any;
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const arvioinninKohdeAlue = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpArviointi extends Vue {
-  @Prop({ required: true })
-  private value!: any;
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: true })
-  private isEditing!: boolean;
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
 
-  @Prop({ required: true })
-  private arviointiasteikot!: any;
-
-  get arvioinninKohdeAlue() {
-    return this.value;
-  }
-
-  set arvioinninKohdeAlue(val) {
-    this.$emit('input', val);
-  }
-
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
-
-  get arviointiasteikotKeyById() {
-    return _.keyBy(_.map(this.arviointiasteikot, arviointiasteikko => {
-      return {
-        ...arviointiasteikko,
-        osaamistasot: _.keyBy(arviointiasteikko.osaamistasot, 'id'),
-      };
-    }), 'id');
-  }
-
-  lisaaArvionninkohde() {
-    this.arvioinninKohdeAlue.arvioinninKohteet = [
-      ...this.arvioinninKohdeAlue.arvioinninKohteet,
-      {
-        selite: {
-          [this.kieli]: this.$t('opiskelija') },
-      },
-    ];
-  }
-
-  poistaArvioinninKohde(poistettavaKohde) {
-    this.arvioinninKohdeAlue.arvioinninKohteet = _.filter(this.arvioinninKohdeAlue.arvioinninKohteet, arvioinninKohde => arvioinninKohde !== poistettavaKohde);
-  }
-
-  arviointiVaihdos(muokattavaArvioinninKohde) {
-    this.arvioinninKohdeAlue.arvioinninKohteet = _.map(this.arvioinninKohdeAlue.arvioinninKohteet, arvioinninKohde => {
-      if (arvioinninKohde === muokattavaArvioinninKohde) {
-        const arviointiasteikko = this.arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko];
-        return {
-          ...arvioinninKohde,
-          osaamistasonKriteerit: _.map(arviointiasteikko.osaamistasot, osaamistaso => ({
-            _osaamistaso: _.toString(osaamistaso.id),
-            kriteerit: [],
-          })),
-        };
-      }
-
-      return arvioinninKohde;
-    });
-  }
-
-  poistaArviointiasteikko(arvioinninKohde) {
-    arvioinninKohde._arviointiAsteikko = null;
-  }
-
-  get defaultDragOptions() {
+const arviointiasteikotKeyById = computed(() => {
+  return _.keyBy(_.map(props.arviointiasteikot, arviointiasteikko => {
     return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
+      ...arviointiasteikko,
+      osaamistasot: _.keyBy(arviointiasteikko.osaamistasot, 'id'),
     };
-  }
+  }), 'id');
+});
+
+function lisaaArvionninkohde() {
+  arvioinninKohdeAlue.value.arvioinninKohteet = [
+    ...arvioinninKohdeAlue.value.arvioinninKohteet,
+    {
+      selite: {
+        [kieli.value]: $t('opiskelija') },
+    },
+  ];
 }
+
+function poistaArvioinninKohde(poistettavaKohde: any) {
+  arvioinninKohdeAlue.value.arvioinninKohteet = _.filter(arvioinninKohdeAlue.value.arvioinninKohteet, arvioinninKohde => arvioinninKohde !== poistettavaKohde);
+}
+
+function arviointiVaihdos(muokattavaArvioinninKohde: any) {
+  arvioinninKohdeAlue.value.arvioinninKohteet = _.map(arvioinninKohdeAlue.value.arvioinninKohteet, arvioinninKohde => {
+    if (arvioinninKohde === muokattavaArvioinninKohde) {
+      const arviointiasteikko = arviointiasteikotKeyById.value[arvioinninKohde._arviointiAsteikko];
+      return {
+        ...arvioinninKohde,
+        osaamistasonKriteerit: _.map(arviointiasteikko.osaamistasot, osaamistaso => ({
+          _osaamistaso: _.toString(osaamistaso.id),
+          kriteerit: [],
+        })),
+      };
+    }
+
+    return arvioinninKohde;
+  });
+}
+
+function poistaArviointiasteikko(arvioinninKohde: any) {
+  arvioinninKohde._arviointiAsteikko = null;
+}
+
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+  };
+});
 </script>
 
 <style scoped lang="scss">

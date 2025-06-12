@@ -55,8 +55,9 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
@@ -65,110 +66,82 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import { Koodisto } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { TermitStore } from '@/stores/TermitStore';
-import { KuvaStore } from '@/stores/KuvaStore';
-import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import EpKotoTaitotasot from '@shared/components/EpKotoTaitotasot/EpKotoTaitotasot.vue';
 import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import { Murupolku } from '@shared/stores/murupolku';
 import * as _ from 'lodash';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpSpinner,
-    EpContent,
-    EpKoodistoSelect,
-    EpKotoTaitotasot,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteKotoOpinto extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  private store: EditointiStore | null = null;
+const route = useRoute();
+const store = ref<EditointiStore | null>(null);
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
 
-  @Watch('kotoOpintoId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-    await this.fetch();
+const tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
+  koodisto: 'tavoitesisaltoalueenotsikko',
+  async query(query: string, sivu = 0, koodisto: string) {
+    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    }));
+    return data as any;
+  },
+});
+
+const kotoOpintoId = computed(() => route.params.kotoOpintoId);
+const perusteId = computed(() => props.perusteStore.perusteId.value);
+const versionumero = computed(() => _.toNumber(route.query.versionumero));
+const kotoSisalto = computed(() => store.value?.data?.value || null);
+
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const tkstore = new KotoOpintoStore(perusteId.value!, Number(kotoOpintoId.value), versionumero.value);
+  store.value = new EditointiStore(tkstore);
+};
+
+watch(kotoOpintoId, async (id, oldId) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
+watch(versionumero, async () => {
+  await fetch();
+}, { immediate: true });
+
+watch(kotoSisalto, (kotoSisalto) => {
+  if (kotoSisalto) {
+
+    Murupolku.aseta('koto_opinto', kotoSisalto.nimiKoodi ? $kaanna(kotoSisalto.nimiKoodi.nimi) : $t('nimeton-opinto'), {
+      name: 'koto_opinto',
+    });
   }
-
-  @Watch('kotoSisalto')
-  onDataChange(kotoSisalto) {
-    if (kotoSisalto) {
-      Murupolku.aseta('koto_opinto', kotoSisalto.nimiKoodi ? this.$kaanna(kotoSisalto.nimiKoodi.nimi) : this.$t('nimeton-opinto'), {
-        name: 'koto_opinto',
-      });
-    }
-  }
-
-  async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new KotoOpintoStore(this.perusteId!, Number(this.kotoOpintoId), this.versionumero);
-    this.store = new EditointiStore(tkstore);
-  }
-
-  private readonly tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
-    koodisto: 'tavoitesisaltoalueenotsikko',
-    async query(query: string, sivu = 0, koodisto: string) {
-      const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      }));
-      return data as any;
-    },
-  });
-
-  get kotoOpintoId() {
-    return this.$route.params.kotoOpintoId;
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get kotoSisalto() {
-    return this.store?.data?.value || null;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
-}
+});
 </script>
 
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
 
-  ::v-deep fieldset {
-    padding-right: 0;
-  }
+:deep(fieldset) {
+  padding-right: 0;
+}
 
-  ::v-deep .input-wrapper {
-    flex: 1 1 0;
+:deep(.input-wrapper) {
+  flex: 1 1 0;
 
-    input {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
+  input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
+}
 </style>

@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, getCurrentInstance } from 'vue';
+import { ref, computed, watch } from 'vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpBulletEditor from '@/components/EpBulletEditor/EpBulletEditor.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -87,6 +87,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import * as _ from 'lodash';
 import { KayttajaStore } from '@/stores/kayttaja';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
 
 const props = defineProps<{
   value: GeneerinenArviointiasteikkoDto;
@@ -94,9 +95,6 @@ const props = defineProps<{
   kayttajaStore: KayttajaStore;
   editing?: boolean;
 }>();
-
-const instance = getCurrentInstance();
-const $bvModal = (instance?.proxy?.$root as any)?.$bvModal;
 
 const isEditing = ref(false);
 const inner = ref<GeneerinenArviointiasteikkoDto | null>(null);
@@ -132,11 +130,11 @@ const osaamistasot = computed(() => {
 const fields = computed(() => {
   return [{
     key: 'osaamistaso',
-    label: instance?.proxy?.$t('osaamistaso') as string,
+    label: $t('osaamistaso') as string,
     sortable: false,
   }, {
     key: 'kriteerit',
-    label: instance?.proxy?.$t('kriteerit') as string,
+    label: $t('kriteerit') as string,
     sortable: false,
   }];
 });
@@ -191,87 +189,103 @@ const onSave = async () => {
 
 const onPublish = async () => {
   await $bvModal?.msgBoxConfirm(
-    instance?.proxy?.$t('julkaistaanko-geneerinen-arviointi-kuvaus') as any, {
-      title: instance?.proxy?.$t('julkaistaanko-geneerinen-arviointi') as any,
-      okTitle: instance?.proxy?.$t('julkaise') as any,
-      cancelTitle: instance?.proxy?.$t('peruuta') as any,
+    $t('julkaistaanko-geneerinen-arviointi-kuvaus') as any, {
+      title: $t('julkaistaanko-geneerinen-arviointi') as any,
+      okTitle: $t('julkaise') as any,
+      cancelTitle: $t('peruuta') as any,
       size: 'lg',
     });
   isEditing.value = false;
-  await props.arviointiStore.publish(inner.value!, true);
+  try {
+    isLoading.value = true;
+    await props.arviointiStore.publish(inner.value!);
+  }
+  finally {
+    await props.arviointiStore.fetchGeneeriset();
+    isEditing.value = false;
+    isLoading.value = false;
+  }
 };
 
 const onUnPublish = async () => {
   await $bvModal?.msgBoxConfirm(
-    ' ' as any, {
-      title: instance?.proxy?.$t('palautetaanko-geneerinen-arviointi-keskeneraiseksi') as any,
-      okTitle: instance?.proxy?.$t('palauta') as any,
-      cancelTitle: instance?.proxy?.$t('peruuta') as any,
+    $t('palautetaanko-geneerinen-arviointi-keskeneraiseksi-kuvaus') as any, {
+      title: $t('palautetaanko-geneerinen-arviointi-keskeneraiseksi') as any,
+      okTitle: $t('palauta-keskeneraiseksi') as any,
+      cancelTitle: $t('peruuta') as any,
       size: 'lg',
     });
   isEditing.value = false;
-  await props.arviointiStore.publish(inner.value!, false);
-};
-
-const onRemove = async () => {
-  const poisto = await $bvModal?.msgBoxConfirm(
-    instance?.proxy?.$t('poistetaanko-geneerinen-arviointi-kuvaus') as any, {
-      title: instance?.proxy?.$t('vahvista-poisto') as any,
-      okTitle: instance?.proxy?.$t('poista') as any,
-      cancelTitle: instance?.proxy?.$t('peruuta') as any,
-      size: 'md',
-    });
-
-  if (poisto) {
-    await props.arviointiStore.remove(inner.value!);
+  try {
+    isLoading.value = true;
+    await props.arviointiStore.unpublish(inner.value!);
+  }
+  finally {
+    await props.arviointiStore.fetchGeneeriset();
+    isEditing.value = false;
+    isLoading.value = false;
   }
 };
 
 const onCopy = async () => {
+  try {
+    isLoading.value = true;
+    await props.arviointiStore.copy(inner.value!);
+  }
+  finally {
+    await props.arviointiStore.fetchGeneeriset();
+    isLoading.value = false;
+  }
+};
+
+const onRemove = async () => {
+  if (!inner.value?.id) {
+    return;
+  }
+
   await $bvModal?.msgBoxConfirm(
-    instance?.proxy?.$t('kopioi-geneerinen-arviointi-kuvaus') as any, {
-      title: instance?.proxy?.$t('kopioi-geneerinen-arviointi') as any,
-      okTitle: instance?.proxy?.$t('kopioi') as any,
-      cancelTitle: instance?.proxy?.$t('peruuta') as any,
+    $t('poistetaanko-geneerinen-arviointi-kuvaus') as any, {
+      title: $t('poistetaanko-geneerinen-arviointi') as any,
+      okTitle: $t('poista') as any,
+      cancelTitle: $t('peruuta') as any,
       size: 'lg',
     });
-  await props.arviointiStore.add({
-    ...inner.value!,
-    julkaistu: false,
-    id: undefined,
-  });
+  isEditing.value = false;
+  try {
+    isLoading.value = true;
+    await props.arviointiStore.remove(inner.value);
+  }
+  finally {
+    await props.arviointiStore.fetchGeneeriset();
+    isEditing.value = false;
+    isLoading.value = false;
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 .geneerinen {
-  padding: 18px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  box-shadow: 3px 3px 10px #eee;
-
-  table {
-    width: auto !important;
-    table-layout: auto !important;
-  }
-
-  .osaamistaso {
-    font-weight: 600;
-  }
+  border: 1px solid #C4C4C4;
+  margin-top: 20px;
+  border-radius: 5px;
 
   .otsikko {
-    font-weight: 600;
-    font-size: 1.2rem;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 500;
     cursor: pointer;
   }
 
   .sisalto {
+    padding: 0 20px 20px 20px;
   }
 
   .kohde-otsikko {
-    font-weight: 600;
+    font-weight: 500;
   }
-  .kohde-arvo {
+
+  .osaamistaso {
+    font-weight: 500;
   }
 }
 </style>

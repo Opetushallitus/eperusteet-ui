@@ -56,8 +56,9 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
@@ -74,102 +75,86 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KotoKielitaitotasoStore } from '@/stores/Koto/KotoKielitaitotasoStore';
 import EpKotoTaitotasot from '@shared/components/EpKotoTaitotasot/EpKotoTaitotasot.vue';
 import { Murupolku } from '@shared/stores/murupolku';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpSpinner,
-    EpContent,
-    EpKoodistoSelect,
-    EpKotoTaitotasot,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
+
+const route = useRoute();
+const store = ref<EditointiStore | null>(null);
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
+
+const tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
+  koodisto: 'tavoitesisaltoalueenotsikko',
+  async query(query: string, sivu = 0, koodisto: string) {
+    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    }));
+    return data as any;
   },
-})
-export default class RouteTavoitesisaltoalue extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  private store: EditointiStore | null = null;
+const kotoSisalto = computed(() => {
+  return store.value?.data?.value || null;
+});
 
-  @Watch('kotokielitaitotasoId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-    await this.fetch();
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const kotokielitaitotasoId = computed(() => {
+  return route.params.kotokielitaitotasoId;
+});
+
+
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const tkstore = new KotoKielitaitotasoStore(perusteId.value!, Number(kotokielitaitotasoId.value), versionumero.value);
+  store.value = new EditointiStore(tkstore);
+};
+
+watch(kotokielitaitotasoId, async (id: string, oldId: string) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  @Watch('kotoSisalto')
-  onDataChange(kotoSisalto) {
-    if (kotoSisalto) {
-      Murupolku.aseta('koto_kielitaitotaso', kotoSisalto.nimiKoodi ? this.$kaanna(kotoSisalto.nimiKoodi.nimi) : this.$t('nimeton-kielitaitotaso'), {
-        name: 'koto_kielitaitotaso',
-      });
-    }
+watch(kotoSisalto, (newKotoSisalto) => {
+  if (newKotoSisalto) {
+    Murupolku.aseta('koto_kielitaitotaso', newKotoSisalto.nimiKoodi ? $kaanna(newKotoSisalto.nimiKoodi.nimi) : $t('nimeton-kielitaitotaso'), {
+      name: 'koto_kielitaitotaso',
+    });
   }
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
-
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new KotoKielitaitotasoStore(this.perusteId!, Number(this.kotokielitaitotasoId), this.versionumero);
-    this.store = new EditointiStore(tkstore);
-  }
-
-  private readonly tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
-    koodisto: 'tavoitesisaltoalueenotsikko',
-    async query(query: string, sivu = 0, koodisto: string) {
-      const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      }));
-      return data as any;
-    },
-  });
-
-  get kotoSisalto() {
-    return this.store?.data?.value || null;
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get kotokielitaitotasoId() {
-    return this.$route.params.kotokielitaitotasoId;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
-}
+watch(versionumero, async () => {
+  await fetch();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
 
-  ::v-deep fieldset {
-    padding-right: 0;
-  }
-
-  ::v-deep .input-wrapper {
+  :deep(.input-wrapper) {
     flex: 1 1 0;
 
     input {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
+  }
+
+  :deep(fieldset) {
+    padding-right: 0;
   }
 </style>

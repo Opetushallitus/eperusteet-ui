@@ -183,9 +183,10 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -202,138 +203,127 @@ import { LukioModuuliStore } from '@/stores/LukioModuuliStore';
 import EpTavoitealueTavoitteet from '@shared/components/EpTavoitesisaltoalue/EpTavoitealueTavoitteet.vue';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    draggable,
-    EpKoodistoSelect,
-    EpCollapse,
-    EpTavoitealueTavoitteet,
-    EpInfoPopover,
-    EpMaterialIcon,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  oppiaineId?: number;
+  moduuliId?: number;
+  pakollinen?: boolean;
+}>();
+
+const store = ref<EditointiStore | null>(null);
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'moduulikoodistolops2021',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
   },
-})
-export default class RouteModuuli extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  @Prop({ required: false })
-  oppiaineId!: number;
+const storeData = computed({
+  get: () => store.value?.data.value,
+  set: (data) => store.value?.setData(data),
+});
 
-  @Prop({ required: false })
-  moduuliId!: number;
+const isEditing = computed(() => {
+  return store.value?.isEditing.value;
+});
 
-  @Prop({ required: false })
-  pakollinen!: boolean;
+const tavoitteetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'tavoitteet',
+    },
+  };
+});
 
-  store: EditointiStore | null = null;
+const keskeisetSisallotDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'keskeisetSisallot',
+    },
+  };
+});
 
-  @Watch('moduuliId', { immediate: true })
-  async oppiaineChange() {
-    const store = new LukioModuuliStore(this.perusteId!, this.oppiaineId, this.moduuliId, this.pakollinen, this.perusteStore, this);
-    this.store = new EditointiStore(store);
-  }
+// Methods
+function poistaSisaltoalue(poistettavaSisaltoalue) {
+  store.value?.setData({
+    ...store.value.data.value,
+    sisallot: _.without(store.value.data.value.sisallot, poistettavaSisaltoalue),
+  });
+}
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+function lisaaSisaltoalue() {
+  store.value?.setData({
+    ...store.value.data.value,
+    sisallot: [
+      ...store.value.data.value.sisallot,
+      {
+        sisallot: [],
+      },
+    ],
+  });
+}
 
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'moduulikoodistolops2021',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
+function poistaTavoite(poistettavaTavoite) {
+  store.value?.setData({
+    ...store.value.data.value,
+    tavoitteet: {
+      ...store.value.data.value.tavoitteet,
+      tavoitteet: _.filter(store.value.data.value.tavoitteet.tavoitteet, tavoite => tavoite !== poistettavaTavoite),
     },
   });
-
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-
-  poistaSisaltoalue(poistettavaSisaltoalue) {
-    this.store?.setData({
-      ...this.store.data.value,
-      sisallot: _.without(this.store.data.value.sisallot, poistettavaSisaltoalue),
-    });
-  }
-
-  lisaaSisaltoalue() {
-    this.store?.setData({
-      ...this.store.data.value,
-      sisallot: [
-        ...this.store.data.value.sisallot,
-        {
-          sisallot: [],
-        },
-      ],
-    });
-  }
-
-  poistaTavoite(poistettavaTavoite) {
-    this.store?.setData({
-      ...this.store.data.value,
-      tavoitteet: {
-        ...this.store.data.value.tavoitteet,
-        tavoitteet: _.filter(this.store.data.value.tavoitteet.tavoitteet, tavoite => tavoite !== poistettavaTavoite),
-      },
-    });
-  }
-
-  lisaaTavoite() {
-    this.store?.setData({
-      ...this.store.data.value,
-      tavoitteet: {
-        ...this.store.data.value.tavoitteet,
-        tavoitteet: [
-          ...this.store.data.value.tavoitteet.tavoitteet,
-          [],
-        ],
-      },
-    });
-  }
-
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
-
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
-
-  get tavoitteetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'tavoitteet',
-      },
-    };
-  }
-
-  get keskeisetSisallotDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'keskeisetSisallot',
-      },
-    };
-  }
 }
+
+function lisaaTavoite() {
+  store.value?.setData({
+    ...store.value.data.value,
+    tavoitteet: {
+      ...store.value.data.value.tavoitteet,
+      tavoitteet: [
+        ...store.value.data.value.tavoitteet.tavoitteet,
+        [],
+      ],
+    },
+  });
+}
+
+async function initStore() {
+  const storeInstance = new LukioModuuliStore(
+    perusteId.value!,
+    props.oppiaineId!,
+    props.moduuliId!,
+    props.pakollinen!,
+    props.perusteStore,
+  );
+  store.value = new EditointiStore(storeInstance);
+}
+
+// Watchers
+watch(() => props.moduuliId, async () => {
+  await initStore();
+}, { immediate: true });
+
+// Lifecycle hooks
+onMounted(async () => {
+  if (!store.value) {
+    await initStore();
+  }
+});
 </script>
 
 <style scoped lang="scss">

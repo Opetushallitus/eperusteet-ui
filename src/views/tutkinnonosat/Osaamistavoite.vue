@@ -21,55 +21,45 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator'; import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
-
+import { $t } from '@shared/utils/globals';
 import _ from 'lodash';
 
-@Component({
-  components: {
-    EpAmmattitaitovaatimukset,
-    EpLaajuusInput,
-  },
-})
-export default class Osaamistavoite extends Vue {
-  @Prop({ required: true })
-  value!: any;
+const props = defineProps<{
+  modelValue: Object;
+  isValinnainen: boolean;
+  isEditing?: boolean;
+  validation?: Object;
+}>();
 
-  @Prop({ required: true })
-  isValinnainen!: boolean;
+const emit = defineEmits(['update:modelValue']);
 
-  get inner() {
-    return this.value || {
+const inner = computed({
+  get() {
+    return props.modelValue || {
       laajuus: 0,
-      tavoitteet: {
-      },
+      tavoitteet: {},
     };
-  }
+  },
+  set(v) {
+    emit('update:modelValue', v);
+  },
+});
 
-  set inner(v) {
-    this.$emit('input', v);
-  }
-
-  get tavoitteet() {
-    return this.inner.tavoitteet || null;
-  }
-
-  set tavoitteet(tavoitteet) {
-    this.$emit('input', {
-      ...this.inner,
+const tavoitteet = computed({
+  get() {
+    return inner.value.tavoitteet || null;
+  },
+  set(tavoitteet) {
+    emit('update:modelValue', {
+      ...inner.value,
       tavoitteet,
     });
-  }
-
-  @Prop({ default: false })
-  isEditing!: boolean;
-
-  @Prop({ required: false })
-  validation!: any;
-}
+  },
+});
 </script>
 
 <style lang="scss" scoped>

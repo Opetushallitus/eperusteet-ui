@@ -42,8 +42,9 @@
 
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { AipeLaajaAlaisetOsaamisetStore } from '@/stores/AipeLaajaAlaisetOsaamisetStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -53,70 +54,49 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna, $t, $sdt } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpSpinner,
-    draggable,
-    EpEditointi,
-    EpMaterialIcon,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteAipeLaajaAlaisetOsaamiset extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  store: EditointiStore | null = null;
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  async mounted() {
-    const store = new AipeLaajaAlaisetOsaamisetStore(this.perusteId!, this.perusteStore);
-    this.store = new EditointiStore(store);
-  }
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
 
-  get fields() {
-    return [{
-      label: this.$t('nimi'),
-      key: 'nimi',
-      sortable: true,
-    }, {
-      label: this.$t('muokattu'),
-      key: 'muokattu',
-      thStyle: { width: '30%' },
-      sortable: true,
-      formatter: (value: any, key: string, item: any) => {
-        return value != null ? this.$sdt(value) : '';
-      },
-    }];
-  }
+const lisaaLaajaAlainenOsaaminen = () => {
+  router.push({
+    name: 'aipelaajaAlainenOsaaminen',
+  });
+};
 
-  lisaaLaajaAlainenOsaaminen() {
-    this.$router.push({
-      name: 'aipelaajaAlainenOsaaminen',
-    });
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing.value;
+});
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'laot',
-      },
-    };
-  }
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'laot',
+    },
+  };
+});
 
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
-}
+onMounted(async () => {
+  const storeInstance = new AipeLaajaAlaisetOsaamisetStore(perusteId.value!, props.perusteStore);
+  store.value = new EditointiStore(storeInstance);
+});
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

@@ -72,8 +72,9 @@
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Mixins } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
@@ -91,151 +92,129 @@ import { PerusteetStore } from '@/stores/PerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import * as _ from 'lodash';
 import { themes, koulutustyyppiRyhmaSort, EperusteetKoulutustyypit } from '@shared/utils/perusteet';
-import { validationMixin } from 'vuelidate';
+import { useVuelidate } from '@vuelidate/core';
 import { requiredOneLang } from '../../eperusteet-frontend-utils/vue/src/validators/required';
 import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perusteet';
+import { $t, $kaanna, $kaannaOlioTaiTeksti, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpAikataulu,
-    EpButton,
-    EpColorIndicator,
-    EpInput,
-    EpMainView,
-    EpMultiSelect,
-    EpSearch,
-    EpSelect,
-    EpSpinner,
-    EpSteps,
-    EpMultiListSelect,
-    KoulutustyyppiSelect,
-  },
-  validations() {
+const props = defineProps<{
+  pohjatStore: PerusteetStore;
+  ulkopuolisetStore: UlkopuolisetStore;
+  perusteprojektiStore: PerusteprojektiStore;
+}>();
+
+const router = useRouter();
+const data = ref<any>({});
+const tyyppi = ref<'pohjasta' | 'uusi'>('uusi');
+const currentStep = ref<string | null>(null);
+
+// Computed properties
+const pohjat = computed(() => {
+  return _.map(props.pohjatStore.projects.value?.data, pohja => {
     return {
-      data: this.validator,
+      ...pohja,
+      $isDisabled: !isKoulutustyyppiSupported(pohja.koulutustyyppi),
     };
-  },
-})
-export default class RoutePohjatLuonti extends Mixins(validationMixin) {
-  @Prop({ required: true })
-  pohjatStore!: PerusteetStore;
+  });
+});
 
-  @Prop({ required: true })
-  ulkopuolisetStore!: UlkopuolisetStore;
+const validator = computed(() => {
+  return {
+    nimi: requiredOneLang(),
+  };
+});
 
-  @Prop({ required: true })
-  perusteprojektiStore!: PerusteprojektiStore;
+const $v = useVuelidate(validator.value, { data });
 
-  private data: any = {};
-  private tyyppi: 'pohjasta' | 'uusi' = 'uusi';
-  private currentStep: string | null = null;
-
-  async mounted() {
-    await Promise.all([
-      this.ulkopuolisetStore.fetchTyoryhmat(),
-      this.pohjatStore.updateQuery({}),
-    ]);
-  }
-
-  @Watch('tyyppi')
-  onTyyppiChange() {
-    this.data = {
-      ...this.data,
-      pohja: null,
-    };
-  }
-
-  get pohjat() {
-    return _.map(this.pohjatStore.projects.value?.data, pohja => {
-      return {
-        ...pohja,
-        $isDisabled: !isKoulutustyyppiSupported(pohja.koulutustyyppi),
-      };
-    });
-  }
-
-  get steps() {
-    const self = this;
-    return [{
-      key: 'pohja',
-      name: this.$t('pohjan-valinta'),
-      isValid() {
-        return !(self.tyyppi === 'pohjasta' && !self.data.pohja);
-      },
-    }, {
-      key: 'tiedot',
-      name: this.$t('projektin-tiedot'),
-      isValid() {
-        return !self.$v.$invalid
-        && !_.isEmpty(self.data.koulutustyyppi);
-      },
+const steps = computed(() => {
+  return [{
+    key: 'pohja',
+    name: $t('pohjan-valinta'),
+    isValid() {
+      return !(tyyppi.value === 'pohjasta' && !data.value.pohja);
     },
-    ];
-  }
+  }, {
+    key: 'tiedot',
+    name: $t('projektin-tiedot'),
+    isValid() {
+      return !$v.value.$invalid && !_.isEmpty(data.value.koulutustyyppi);
+    },
+  }];
+});
 
-  stepChange(step) {
-    this.currentStep = step;
-  }
+const tyoryhmat = computed(() => {
+  return _.sortBy(props.ulkopuolisetStore.tyoryhmat.value, tyoryhmaSearchIdentity);
+});
 
-  tyoryhmaSearchIdentity(tr: any) {
-    return _.toLower(this.$kaanna(tr.nimi));
-  }
+const vaihtoehdotKoulutustyypit = computed(() => {
+  return _.sortBy(EperusteetKoulutustyypit, x => koulutustyyppiRyhmaSort[ktToRyhma(x)]);
+});
 
-  koulutustyyppiSearchIdentity(kt) {
-    return _.toLower(this.$kaannaOlioTaiTeksti(kt));
-  }
+const eiTuetutKoulutustyypit = computed(() => {
+  return EiTuetutKoulutustyypit;
+});
 
-  ktToRyhma(koulutustyyppi) {
-    return themes[koulutustyyppi];
-  }
+// Methods
+function stepChange(step) {
+  currentStep.value = step;
+}
 
-  get tyoryhmat() {
-    return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.tyoryhmaSearchIdentity);
-  }
+function tyoryhmaSearchIdentity(tr: any) {
+  return _.toLower($kaanna(tr.nimi));
+}
 
-  get vaihtoehdotKoulutustyypit() {
-    return _.sortBy(EperusteetKoulutustyypit, x => koulutustyyppiRyhmaSort[this.ktToRyhma(x)]);
-  }
+function koulutustyyppiSearchIdentity(kt) {
+  return _.toLower($kaannaOlioTaiTeksti(kt));
+}
 
-  async onSave() {
-    try {
-      const luotu = await this.perusteprojektiStore.addPerusteprojektiPohja({
-        nimi: this.data.nimi[Kielet.getSisaltoKieli.value],
-        ryhmaOid: this.data.tyoryhma ? this.data.tyoryhma.oid : undefined,
-        koulutustyyppi: this.data.koulutustyyppi,
-        perusteId: this.data.pohja?.peruste.id,
-        tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.POHJA,
-      });
-      this.$router.push({
-        name: 'perusteprojekti',
-        params: {
-          projektiId: '' + luotu.id,
-        },
-      });
-    }
-    catch (e) {
-      this.$fail(this.$t('virhe-palvelu-virhe') as string);
-    }
-  }
+function ktToRyhma(koulutustyyppi) {
+  return themes[koulutustyyppi];
+}
 
-  onCancel() {
-    this.$router.push({
-      name: 'pohjat',
+async function onSave() {
+  try {
+    const luotu = await props.perusteprojektiStore.addPerusteprojektiPohja({
+      nimi: data.value.nimi[Kielet.getSisaltoKieli.value],
+      ryhmaOid: data.value.tyoryhma ? data.value.tyoryhma.oid : undefined,
+      koulutustyyppi: data.value.koulutustyyppi,
+      perusteId: data.value.pohja?.peruste.id,
+      tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.POHJA,
+    });
+    router.push({
+      name: 'perusteprojekti',
+      params: {
+        projektiId: '' + luotu.id,
+      },
     });
   }
-
-  get validator() {
-    return {
-      nimi: requiredOneLang(),
-    };
-  }
-
-  get eiTuetutKoulutustyypit() {
-    return EiTuetutKoulutustyypit;
+  catch (e) {
+    $fail($t('virhe-palvelu-virhe') as string);
   }
 }
+
+function onCancel() {
+  router.push({
+    name: 'pohjat',
+  });
+}
+
+// Watchers
+watch(tyyppi, () => {
+  data.value = {
+    ...data.value,
+    pohja: null,
+  };
+});
+
+// Lifecycle hooks
+onMounted(async () => {
+  await Promise.all([
+    props.ulkopuolisetStore.fetchTyoryhmat(),
+    props.pohjatStore.updateQuery({}),
+  ]);
+});
 </script>
 
 <style lang="scss" scoped>

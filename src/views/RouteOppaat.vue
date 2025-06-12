@@ -55,8 +55,8 @@
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -65,40 +65,31 @@ import * as _ from 'lodash';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
+import { $t, $isAdmin, $hasOphCrud } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpPerusteprojektiListaus,
-    EpColorIndicator,
-    EpJulkiLista,
-    EpButton,
-  },
-})
-export default class RouteOppaat extends Vue {
-  @Prop({ required: true })
-  perusteOppaatStore!: PerusteetStore;
+const props = defineProps<{
+  perusteOppaatStore: PerusteetStore;
+}>();
 
-  mounted() {
-    this.perusteOppaatStore.clear();
+onMounted(() => {
+  props.perusteOppaatStore.clear();
+});
+
+function ensimmainenKoulutustyyppi(perusteProjekti) {
+  if (perusteProjekti.peruste.oppaanKoulutustyypit && perusteProjekti.peruste.oppaanKoulutustyypit.length > 0) {
+    return _.head(perusteProjekti.peruste.oppaanKoulutustyypit);
   }
+}
 
-  ensimmainenKoulutustyyppi(perusteProjekti) {
-    if (perusteProjekti.peruste.oppaanKoulutustyypit && perusteProjekti.peruste.oppaanKoulutustyypit.length > 0) {
-      return _.head(perusteProjekti.peruste.oppaanKoulutustyypit);
-    }
-  }
-
-  koulutustyypit(perusteProjekti) {
-    return _.chain(perusteProjekti.peruste.oppaanKoulutustyypit)
-      .map(koulutustyyppi => {
-        return {
-          otsikko: koulutustyyppi,
-        };
-      })
-      .sortBy(item => koulutustyyppiRyhmaSort[themes[item.otsikko]])
-      .value();
-  }
+function koulutustyypit(perusteProjekti) {
+  return _.chain(perusteProjekti.peruste.oppaanKoulutustyypit)
+    .map(koulutustyyppi => {
+      return {
+        otsikko: koulutustyyppi,
+      };
+    })
+    .sortBy(item => koulutustyyppiRyhmaSort[themes[item.otsikko]])
+    .value();
 }
 </script>
 

@@ -10,18 +10,16 @@ import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { tutoriaaliStore } from '@shared/stores/tutoriaali';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import { OppaatStore } from '@/stores/OppaatStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { TermitStore } from '@/stores/TermitStore';
-import { TilastotStore, useTilastotStore } from '@/stores/TilastotStore';
+import { TilastotStore } from '@/stores/TilastotStore';
 import { PoistetutStore } from './PoistetutStore';
 import { DigitaalisetOsaamisetStore } from './DigitaalisetOsaamisetStore';
 import { YllapitoStore } from '@/stores/YllapitoStore';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
-import { useMaarayksetStore } from '@shared/stores/MaarayksetStore';
-import { pinia } from './pinia';
+import { MaarayksetStore } from '@shared/stores/maarayksetStore';
 
 // Create instances of class-based stores
 const arviointiStore = new ArviointiStore(Kielet);
@@ -42,7 +40,7 @@ const oppaatStore = new OppaatStore();
 const tyoryhmaStore = new TyoryhmaStore();
 const termitStore = new TermitStore();
 const tilastotStore = new TilastotStore();
-const maarayksetStore = useMaarayksetStore(pinia);
+const maarayksetStore = new MaarayksetStore();
 const poistetutStore = new PoistetutStore();
 const yllapitoStore = new YllapitoStore();
 const osaamismerkitStore = new OsaamismerkitStore();
@@ -64,7 +62,6 @@ export const stores = Object.freeze({
   pohjatStore,
   tiedotteetStore,
   tutkinnonOsaStore,
-  tutoriaaliStore,
   tyoryhmaStore,
   ulkopuolisetStore,
   termitStore,
@@ -74,10 +71,3 @@ export const stores = Object.freeze({
   osaamismerkitStore,
   maarayksetStore,
 });
-
-// Export Pinia stores
-export const piniaStores = {
-  // Get Pinia store instances
-  tilastot: useTilastotStore(pinia),
-  maaraykset: useMaarayksetStore(pinia),
-};

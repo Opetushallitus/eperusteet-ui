@@ -1,5 +1,5 @@
 <template>
-  <ep-main-view :tutoriaaliStore="tutoriaaliStore">
+  <ep-main-view>
     <template #icon>
       <ep-icon class="float-right" icon="add">
       </ep-icon>
@@ -62,8 +62,8 @@
   </ep-main-view>
 </template>
 
-<script lang="ts">
-import { Prop, Vue, Component, Mixins, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, useTemplateRef } from 'vue';
 import _ from 'lodash';
 
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
@@ -72,195 +72,165 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
-import { TutoriaaliStore } from '@shared/stores/tutoriaali';
 import { Perusteet, TiedoteDto } from '@shared/api/eperusteet';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { PerusteKevytDto } from '@shared/generated/eperusteet';
+import { $t, $sdt, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpIcon,
-    EpMainView,
-    EpSearch,
-    EpFormContent,
-    EpMultiSelect,
-    EpTiedoteModal,
-    EpSpinner,
+const props = defineProps<{
+  tiedotteetStore: TiedotteetStore;
+}>();
+
+const eptiedotemodal = useTemplateRef('eptiedotemodal');
+const sivu = ref(0);
+const perPage = ref(10);
+const nimiFilter = ref('');
+const sort = ref({});
+const valitutJulkaisupaikat = ref<any[]>([]);
+const perusteet = ref<PerusteKevytDto[] | null>(null);
+
+onMounted(async () => {
+  props.tiedotteetStore.init({
+    sivu: sivu.value,
+    sivukoko: 10,
+  });
+  perusteet.value = (await Perusteet.getJulkaistutPerusteet()).data;
+});
+
+watch(nimiFilter, () => {
+  fetch({
+    sivu: 0,
+    nimi: nimiFilter.value,
+  });
+});
+
+watch(valitutJulkaisupaikat, () => {
+  fetch({
+    sivu: 0,
+    tiedoteJulkaisuPaikka: _.map(valitutJulkaisupaikat.value, 'value'),
+  });
+});
+
+watch(sivu, () => {
+  fetch({
+    sivu: sivu.value,
+  });
+});
+
+const sortingChanged = (sortValue) => {
+  sort.value = sortValue;
+  fetch({
+    sivu: 0,
+    jarjestys: sortValue.sortBy,
+    jarjestysNouseva: !sortValue.sortDesc,
+  });
+};
+
+const fetch = (query) => {
+  props.tiedotteetStore.init({
+    ...props.tiedotteetStore.options.value,
+    ...query,
+  });
+};
+
+const tiedotteetPage = computed(() => {
+  return props.tiedotteetStore?.tiedotteetPage.value || null;
+});
+
+const totalRows = computed(() => {
+  return tiedotteetPage.value!.kokonaismäärä;
+});
+
+const page = computed({
+  get() {
+    return tiedotteetPage.value!.sivu + 1;
   },
-} as any)
-export default class RouteTiedotteet extends Vue {
-  @Prop({ required: true })
-  private tiedotteetStore!: TiedotteetStore;
-
-  @Prop({ required: true })
-  private tutoriaaliStore!: TutoriaaliStore;
-
-  private sivu = 0;
-  private perPage = 10;
-  private nimiFilter = '';
-  private sort = {};
-  private valitutJulkaisupaikat: [] = [];
-  private perusteet: PerusteKevytDto[] | null = null;
-
-  async mounted() {
-    this.tiedotteetStore.init(
-      {
-        sivu: this.sivu,
-        sivukoko: 10,
-      },
-    );
-    this.perusteet = (await Perusteet.getJulkaistutPerusteet()).data;
+  set(value: number) {
+    sivu.value = value - 1;
   }
+});
 
-  @Watch('nimiFilter')
-  nimiChange() {
-    this.fetch(
-      {
-        sivu: 0,
-        nimi: this.nimiFilter,
-      },
-    );
-  }
+const tiedotteetFiltered = computed(() => {
+  return _.map(props.tiedotteetStore.tiedotteet.value, tiedote => {
+    return {
+      ...tiedote,
+      julkaisupaikat: _.chain(tiedote.julkaisupaikat)
+        .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
+        .value(),
+    };
+  });
+});
 
-  @Watch('valitutJulkaisupaikat')
-  valitutJulkaispaikatChange() {
-    this.fetch(
-      {
-        sivu: 0,
-        tiedoteJulkaisuPaikka: _.map(this.valitutJulkaisupaikat, 'value'),
-      },
-    );
-  }
+const valitutJulkaisuPaikatValues = computed(() => {
+  return _.map(valitutJulkaisupaikat.value, 'value');
+});
 
-  @Watch('sivu')
-  sivuChange() {
-    this.fetch(
-      {
-        sivu: this.sivu,
-      },
-    );
-  }
+const julkaisupaikatItems = computed(() => {
+  return [
+    { text: $t('tiedote-julkaisupaikka-opintopolku'), value: julkaisupaikka.opintopolku_etusivu },
+    { text: $t('tiedote-julkaisupaikka-ops'), value: julkaisupaikka.ops },
+    { text: $t('tiedote-julkaisupaikka-lops'), value: julkaisupaikka.lops },
+    { text: $t('tiedote-julkaisupaikka-amosaa'), value: julkaisupaikka.amosaa },
+    { text: $t('tiedote-julkaisupaikka-vst'), value: julkaisupaikka.vst },
+  ];
+});
 
-  sortingChanged(sort) {
-    this.sort = sort;
-    this.fetch(
-      {
-        sivu: 0,
-        jarjestys: sort.sortBy,
-        jarjestysNouseva: !sort.sortDesc,
-      },
-    );
-  }
+const tableFields = computed(() => {
+  return [{
+    key: 'luotu',
+    label: $t('julkaistu'),
+    sortable: true,
+    formatter: (value: any, key: any, item: any) => {
+      return $sdt(value);
+    },
+  }, {
+    key: 'muokattu',
+    label: $t('muokattu'),
+    sortable: true,
+    formatter: (value: any, key: any, item: any) => {
+      if (item.luotu !== item.muokattu) {
+        return $sdt(value);
+      }
 
-  private fetch(query) {
-    this.tiedotteetStore.init(
-      {
-        ...this.tiedotteetStore.options.value,
-        ...query,
-      },
-    );
-  }
+      return '';
+    },
+  }, {
+    key: 'otsikko',
+    label: $t('tiedotteen-otsikko'),
+    sortable: false,
+    thStyle: { width: '35%', borderBottom: '0px' },
+    formatter: (value: any, key: any, item: any) => {
+      return $kaanna(value);
+    },
+  }, {
+    key: 'julkaisupaikat',
+    label: $t('tiedote-julkaistu'),
+    sortable: false,
+    thStyle: { width: '35%', borderBottom: '0px' },
+    formatter: (value: any, key: any, item: any) => {
+      return _.join(
+        [
+          ..._.chain(value)
+            .sortBy(julkaisupaikka => julkaisupaikkaSort[julkaisupaikka])
+            .map((julkaisupaikka) => $t('tiedote-julkaisupaikka-' + julkaisupaikka))
+            .value(),
+          ..._.map(item.koulutustyypit, kt => $t(kt)),
+        ],
+        ', ',
+      );
+    },
+  }];
+});
 
-  get tiedotteetPage() {
-    return this.tiedotteetStore?.tiedotteetPage.value || null;
-  }
-
-  get totalRows() {
-    return this.tiedotteetPage!.kokonaismäärä;
-  }
-
-  get page() {
-    return this.tiedotteetPage!.sivu + 1;
-  }
-
-  set page(value: number) {
-    this.sivu = value - 1;
-  }
-
-  get tiedotteetFiltered() {
-    return _.map(this.tiedotteetStore.tiedotteet.value, tiedote => {
-      return {
-        ...tiedote,
-        julkaisupaikat: _.chain(tiedote.julkaisupaikat)
-          .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
-          .value(),
-      };
-    });
-  }
-
-  get valitutJulkaisuPaikatValues() {
-    return _.map(this.valitutJulkaisupaikat, 'value');
-  }
-
-  get julkaisupaikatItems() {
-    return [
-      { text: this.$t('tiedote-julkaisupaikka-opintopolku'), value: julkaisupaikka.opintopolku_etusivu },
-      { text: this.$t('tiedote-julkaisupaikka-ops'), value: julkaisupaikka.ops },
-      { text: this.$t('tiedote-julkaisupaikka-lops'), value: julkaisupaikka.lops },
-      { text: this.$t('tiedote-julkaisupaikka-amosaa'), value: julkaisupaikka.amosaa },
-      { text: this.$t('tiedote-julkaisupaikka-vst'), value: julkaisupaikka.vst },
-    ];
-  }
-
-  get tableFields() {
-    return [{
-      key: 'luotu',
-      label: this.$t('julkaistu'),
-      sortable: true,
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sdt(value);
-      },
-    }, {
-      key: 'muokattu',
-      label: this.$t('muokattu'),
-      sortable: true,
-      formatter: (value: any, key: any, item: any) => {
-        if (item.luotu !== item.muokattu) {
-          return (this as any).$sdt(value);
-        }
-
-        return '';
-      },
-    }, {
-      key: 'otsikko',
-      label: this.$t('tiedotteen-otsikko'),
-      sortable: false,
-      thStyle: { width: '35%', borderBottom: '0px' },
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$kaanna(value);
-      },
-    }, {
-      key: 'julkaisupaikat',
-      label: this.$t('tiedote-julkaistu'),
-      sortable: false,
-      thStyle: { width: '35%', borderBottom: '0px' },
-      formatter: (value: any, key: any, item: any) => {
-        return _.join(
-          [
-            ..._.chain(value)
-              .sortBy(julkaisupaikka => julkaisupaikkaSort[julkaisupaikka])
-              .map((julkaisupaikka) => this.$t('tiedote-julkaisupaikka-' + julkaisupaikka))
-              .value(),
-            ..._.map(item.koulutustyypit, kt => this.$t(kt)),
-          ],
-          ', ',
-        );
-      },
-    }];
-  }
-
-  avaaTiedote(tiedote: TiedoteDto) {
-    (this as any).$refs['eptiedotemodal'].muokkaa(tiedote);
-  }
-}
+const avaaTiedote = (tiedote: TiedoteDto) => {
+  eptiedotemodal.value.muokkaa(tiedote);
+};
 </script>
 
 <style scoped lang="scss">
-
-  .tiedote-muokkaustieto {
-    font-size: 0.8rem;
-  }
-
+.tiedote-muokkaustieto {
+  font-size: 0.8rem;
+}
 </style>

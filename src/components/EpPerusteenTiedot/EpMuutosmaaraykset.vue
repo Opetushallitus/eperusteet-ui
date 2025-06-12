@@ -11,7 +11,7 @@
       <tbody>
         <tr v-for="(muutos, idx) in modelValue" :key="'muutos' + idx">
           <td>
-            <ep-input v-model="muutos.nimi" :is-editing="isEditing" :placeholder="(muutos.liitteet && muutos.liitteet[$slang()]) ? muutos.liitteet[$slang()].nimi : ''"/>
+            <ep-input v-model="muutos.nimi" :is-editing="isEditing" :placeholder="(muutos.liitteet && muutos.liitteet[$slang]) ? muutos.liitteet[$slang].nimi : ''"/>
           </td>
           <td>
             <span v-if="!!muutos.liitteet && muutos.liitteet[$slang.value]">
@@ -96,7 +96,7 @@ const poista = (idx) => {
 
 const updateLiite = (idx, liite) => {
   const temp = props.modelValue;
-  temp[idx].liitteet[$slang()] = { ...liite };
+  temp[idx].liitteet[$slang.value] = { ...liite };
   emit('update:modelValue', temp);
 };
 

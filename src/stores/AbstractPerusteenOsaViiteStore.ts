@@ -4,18 +4,19 @@ import { Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { PerusteStore } from '@/stores/PerusteStore';
-import VueRouter from 'vue-router';
+import { Router } from 'vue-router';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { App } from 'vue';
 
 interface AbstractPerusteenOsaViiteStoreStoreConfig {
   perusteStore: PerusteStore;
-  router: any;
+  router: Router;
 }
 
 export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
   protected static config: AbstractPerusteenOsaViiteStoreStoreConfig;
 
-  public static install(vue: typeof Vue, config: AbstractPerusteenOsaViiteStoreStoreConfig) {
+  public static install(app: App, config: AbstractPerusteenOsaViiteStoreStoreConfig) {
     AbstractPerusteenOsaViiteStore.config = config;
   }
 

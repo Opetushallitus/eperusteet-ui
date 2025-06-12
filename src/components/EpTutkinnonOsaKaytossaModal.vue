@@ -41,7 +41,7 @@ import { useRoute } from 'vue-router';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteprojektinPerusteenosaDto, PerusteInfoDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
-import { $t, $kaanna, $sd } from '@shared/utils/globals';
+import { $t, $kaanna, $sd, $bvModal } from '@shared/utils/globals';
 
 const props = defineProps<{
   projektit: PerusteprojektinPerusteenosaDto[];
@@ -50,8 +50,6 @@ const props = defineProps<{
   muokkaa: Function;
 }>();
 
-const instance = getCurrentInstance();
-const $bvModal = (instance?.proxy?.$root as any)?.$bvModal;
 const route = useRoute();
 
 const kopiointiLoading = ref(false);
@@ -101,6 +99,8 @@ const kaynnistaMuokkaus = async () => {
   await props.muokkaa();
   $bvModal.hide('EpTutkinnonOsaKaytossaModal');
 };
+
+defineExpose({ avaa });
 </script>
 
 <style scoped lang="scss">

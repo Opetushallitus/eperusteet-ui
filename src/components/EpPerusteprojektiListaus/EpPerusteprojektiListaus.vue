@@ -97,11 +97,13 @@
           </div>
           <div class="m-2 flex-fill" v-if="filtersInclude('peruste')">
             <label>{{ $t('peruste') }}</label>
-            <EpMultiSelect v-model="peruste"
-                      :enable-empty-option="true"
-                      placeholder="kaikki"
-                      :is-editing="true"
-                      :options="perusteet">
+            <EpMultiSelect
+              v-model="peruste"
+              name="peruste"
+              :enable-empty-option="true"
+              placeholder="kaikki"
+              :is-editing="true"
+              :options="perusteet">
               <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
@@ -112,11 +114,12 @@
           </div>
           <div class="m-2 flex-fill" v-if="filtersInclude('voimassaolo')">
             <label>{{ $t('voimassaolo') }}</label>
-            <EpMultiSelect v-model="voimassaolo"
-                      :enable-empty-option="true"
-                      placeholder="kaikki"
-                      :is-editing="true"
-                      :options="vaihtoehdotVoimassaolo">
+            <EpMultiSelect
+              v-model="voimassaolo"
+              :enable-empty-option="true"
+              placeholder="kaikki"
+              :is-editing="true"
+              :options="vaihtoehdotVoimassaolo">
               <template #singleLabel="{ option }">
                 {{ $t('ajoitus-' + option.toLowerCase()) }}
               </template>
@@ -132,7 +135,9 @@
 
         <div class="d-lg-flex align-items-end">
           <div class="m-2" v-if="filtersInclude('tila')">
-            <b-form-checkbox-group v-model="tila">
+            <b-form-checkbox-group
+              :value="tila"
+              @input="tila = $event">
               <b-form-checkbox v-for="tila in vaihtoehdotTilat" :key="tila" :value="tila">
                 {{ $t('tila-' + tila.toLowerCase()) }}
               </b-form-checkbox>
@@ -194,8 +199,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -213,313 +218,283 @@ import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelec
 import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
 import { perusteTile } from '@shared/utils/bannerIcons';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $sd, $kaanna, $hasOphCrud, $fail } from '@shared/utils/globals';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
-@Component({
-  components: {
-    EpColorIndicator,
-    EpMainView,
-    EpMultiSelect,
-    EpPagination,
-    EpSearch,
-    EpSpinner,
-    ProjektiCard,
-    KoulutustyyppiSelect,
-    EpButton,
-    EpMaterialIcon,
-  },
-})
-export default class EpPerusteprojektiListaus extends Vue {
-  @Prop({ required: true })
-  provider!: IProjektiProvider;
+const props = defineProps({
+  provider: { type: Object as () => IProjektiProvider, required: true },
+  newRoute: { type: Object as () => any, required: true },
+  editRoute: { type: String, required: true },
+  showCards: { type: Boolean, default: true },
+  isPohja: { type: Boolean, default: false },
+  vainKortit: { type: Boolean, default: false },
+  fieldKeys: { type: Array as () => string[], default: () => [] },
+  filters: { type: Array as () => ProjektiFilter[], default: () => ['koulutustyyppi', 'tila', 'voimassaolo'] },
+  luontioikeus: { type: Object as () => any, default: () => ({ 'oikeus': 'hallinta', 'kohde': 'peruste' }) },
+  eiTuetutKoulutustyypit: { type: Array as () => string[], default: () => [] },
+});
 
-  @Prop({ required: true })
-  newRoute!: any;
+const koulutustyyppi = ref<string | null>(null);
+const peruste = ref<PerusteKevytDto | null>(null);
+const tila = ref<string[]>([]);
+const voimassaolo = ref<string | null>(null);
+const isLoading = ref(false);
+const sort = ref({});
+const perusteet = ref<PerusteKevytDto[]>([]);
 
-  @Prop({ required: true })
-  editRoute!: string;
+const query = ref<PerusteprojektiQuery>({
+  sivu: 0,
+  sivukoko: 10,
+  koulutustyyppi: null as any,
+  voimassaolo: false,
+  siirtyma: false,
+  tuleva: false,
+  poistunut: false,
+  koulutusvienti: true,
+  tila: props.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU'],
+  nimi: '',
+  jarjestysOrder: false,
+  jarjestysTapa: 'nimi',
+  perusteet: [],
+});
 
-  @Prop({ required: false, default: true })
-  showCards!: boolean;
+onMounted(async () => {
+  props.provider.updateOwnProjects();
+  await onQueryChange(query.value);
 
-  @Prop({ required: false, default: false })
-  isPohja!: boolean;
+  if (filtersInclude('peruste')) {
+    perusteet.value = (await Perusteet.getAllOppaidenPerusteet()).data;
+  }
+});
 
-  @Prop({ required: false, default: false })
-  vainKortit!: boolean;
+watch(query, async (newQuery: PerusteQuery) => {
+  await onQueryChange(newQuery);
+}, { deep: true });
 
-  @Prop({ required: false })
-  fieldKeys!: string[];
+const onQueryChange = async (newQuery: PerusteQuery) => {
+  isLoading.value = true;
+  try {
+    if (!naytaVainKortit.value) {
+      await props.provider.updateQuery({
+        ...newQuery,
+      });
+    }
+  }
+  catch (e) {
+    $fail($t('virhe-palvelu-virhe') as string);
+  }
+  finally {
+    isLoading.value = false;
+  }
+};
 
-  @Prop({ required: false, default: () => ['koulutustyyppi', 'tila', 'voimassaolo'] })
-  filters!: ProjektiFilter[];
+watch(tila, (newTila: string[]) => {
+  query.value = {
+    ...query.value,
+    tila: newTila
+      ? [newTila]
+      : (props.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU']),
+  };
+});
 
-  @Prop({ required: false, default: () => ({ 'oikeus': 'hallinta', 'kohde': 'peruste' }) })
-  luontioikeus!: any;
-
-  @Prop({ required: false, default: () => [] })
-  eiTuetutKoulutustyypit!: string[];
-
-  private koulutustyyppi: string | null = null;
-  private peruste: PerusteKevytDto | null = null;
-  private tila: string[] | null = null;
-  private voimassaolo: string | null = null;
-  private isLoading = false;
-  private sort = {};
-
-  private query = {
-    sivu: 0,
-    sivukoko: 10,
-    koulutustyyppi: null as unknown,
+watch(voimassaolo, (newTila: string) => {
+  console.log('voimassaolo', newTila);
+  const defaults = {
     voimassaolo: false,
     siirtyma: false,
     tuleva: false,
     poistunut: false,
-    koulutusvienti: true,
-    tila: this.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU'],
-    nimi: '',
-    jarjestysOrder: false,
-    jarjestysTapa: 'nimi',
-    perusteet: [],
-  } as PerusteprojektiQuery;
+  };
 
-  private perusteet: PerusteKevytDto[] = [];
-
-  async mounted() {
-    this.tila = this.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU'];
-    this.provider.updateOwnProjects();
-
-    if (this.filtersInclude('peruste')) {
-      this.perusteet = (await Perusteet.getAllOppaidenPerusteet()).data;
-    }
-  }
-
-  @Watch('query', { deep: true, immediate: true })
-  async onQueryChange(query: PerusteQuery) {
-    this.isLoading = true;
-    try {
-      if (!this.naytaVainKortit) {
-        await this.provider.updateQuery({
-          ...query,
-        });
-      }
-    }
-    catch (e) {
-      this.$fail(this.$t('virhe-palvelu-virhe') as string);
-    }
-    finally {
-      this.isLoading = false;
-    }
-  }
-
-  @Watch('tila')
-  onTilaChange(tila: string) {
-    this.query = {
-      ...this.query,
-      tila: tila
-        ? [tila]
-        : (this.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU']),
+  switch (newTila) {
+  case 'tuleva':
+    query.value = { ...query.value, ...defaults, tuleva: true };
+    break;
+  case 'voimassaolo':
+    query.value = { ...query.value, ...defaults, voimassaolo: true };
+    break;
+  case 'siirtyma':
+    query.value = { ...query.value, ...defaults, siirtyma: true };
+    break;
+  case 'poistunut':
+    query.value = { ...query.value, ...defaults, poistunut: true };
+    break;
+  default:
+    query.value = {
+      ...query.value,
+      ...defaults,
     };
+    break;
   }
+});
 
-  @Watch('voimassaolo')
-  onChangeVoimassaolo(tila: string) {
-    const defaults = {
-      voimassaolo: false,
-      siirtyma: false,
-      tuleva: false,
-      poistunut: false,
-    };
+watch(koulutustyyppi, (newKt: string) => {
+  query.value.koulutustyyppi = [newKt];
+});
 
-    switch (tila) {
-    case 'tuleva':
-      this.query = { ...this.query, ...defaults, tuleva: true };
-      break;
-    case 'voimassaolo':
-      this.query = { ...this.query, ...defaults, voimassaolo: true };
-      break;
-    case 'siirtyma':
-      this.query = { ...this.query, ...defaults, siirtyma: true };
-      break;
-    case 'poistunut':
-      this.query = { ...this.query, ...defaults, poistunut: true };
-      break;
-    default:
-      this.query = {
-        ...this.query,
-        ...defaults,
-      };
-      break;
-    }
+watch(peruste, (newPeruste: PerusteKevytDto) => {
+  query.value.perusteet = [newPeruste.id as number];
+});
+
+const sortingChanged = (newSort) => {
+  sort.value = newSort;
+  query.value = {
+    ...query.value,
+    sivu: 0,
+    jarjestysOrder: newSort.sortDesc,
+    jarjestysTapa: newSort.sortBy,
+  };
+};
+
+const stateChangeAllowed = (rights: string[]): boolean => {
+  return _.includes(rights, 'tilanvaihto');
+};
+
+const koulutustyyppiOptions = computed(() => {
+  if (_.upperCase(props.editRoute) === 'OPAS') {
+    return [...EperusteetKoulutustyypit, 'koulutustyyppi_muu'];
   }
+  return EperusteetKoulutustyypit;
+});
 
-  @Watch('koulutustyyppi')
-  onKoulutustyyppiChange(kt: string) {
-    this.query.koulutustyyppi = [kt];
-  }
+const vaihtoehdotTilat = computed(() => {
+  return props.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'VALMIS', 'JULKAISTU', 'POISTETTU'];
+});
 
-  @Watch('peruste')
-  onPerusteChange(peruste: PerusteKevytDto) {
-    this.query.perusteet = [peruste.id as number];
-  }
+const vaihtoehdotVoimassaolo = computed(() => {
+  return [
+    'kaikki',
+    'tuleva',
+    'voimassaolo',
+    'siirtyma',
+    'poistunut',
+  ];
+});
 
-  sortingChanged(sort) {
-    this.sort = sort;
-    this.query = {
-      ...this.query,
-      sivu: 0,
-      jarjestysOrder: sort.sortDesc,
-      jarjestysTapa: sort.sortBy,
-    };
+const sivu = computed({
+  get() {
+    return items.value?.sivu! + 1;
+  },
+  set(value: number) {
+    query.value.sivu = value - 1;
   }
+});
 
-  stateChangeAllowed(rights: string[]): boolean {
-    return _.includes(rights, 'tilanvaihto');
-  }
+const perPage = computed(() => {
+  return items.value?.sivukoko || 10;
+});
 
-  get koulutustyyppiOptions() {
-    if (_.upperCase(this.editRoute) === 'OPAS') {
-      return [...EperusteetKoulutustyypit, 'koulutustyyppi_muu'];
-    }
-    return EperusteetKoulutustyypit;
-  }
+const total = computed(() => {
+  return items.value?.kokonaismäärä || 0;
+});
 
-  get vaihtoehdotTilat() {
-    return this.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'VALMIS', 'JULKAISTU', 'POISTETTU'];
+const ownProjects = computed(() => {
+  if (props.provider.ownProjects.value) {
+    return _.map(_.filter(props.provider.ownProjects.value, project => project.tila === 'laadinta'), projekti => setTileImage(projekti));
   }
+  return [];
+});
 
-  get vaihtoehdotVoimassaolo() {
-    return [
-      'kaikki',
-      'tuleva',
-      'voimassaolo',
-      'siirtyma',
-      'poistunut',
-    ];
+const ownPublishedProjects = computed(() => {
+  if (props.provider.ownProjects.value) {
+    return _.map(_.filter(props.provider.ownProjects.value, project => project.tila === 'julkaistu'), projekti => setTileImage(projekti));
   }
+  return [];
+});
 
-  get sivu() {
-    return this.items?.sivu! + 1;
-  }
+const setTileImage = (projekti) => {
+  return {
+    ...projekti,
+    tileImage: perusteTile(projekti.peruste),
+  };
+};
 
-  set sivu(value: number) {
-    this.query.sivu = value - 1;
-  }
+const items = computed(() => {
+  return props.provider.projects.value;
+});
 
-  get perPage() {
-    return this.items?.sivukoko || 10;
-  }
+const initialFields = computed((): BvTableFieldArray => {
+  const dateFormatter = (value: Date) => {
+    return value
+      ? $sd(value)
+      : '-';
+  };
 
-  get total() {
-    return this.items?.kokonaismäärä || 0;
-  }
+  return [{
+    key: 'nimi',
+    label: $t('projektin-nimi') as string,
+    sortable: true,
+    sortByFormatted: true,
+    formatter(value: any, key: string, item: PerusteprojektiKevytDto) {
+      return _.upperCase(item.peruste!.tyyppi) === 'OPAS' ? $kaanna(item.peruste!.nimi!) : item.nimi;
+    },
+  }, {
+    key: 'koulutustyyppi',
+    sortable: true,
+    label: $t('koulutustyyppi') as string,
+  }, {
+    key: 'tila',
+    sortable: true,
+    label: $t('tila') as string,
+    formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
+      return $t('tila-' + item!.tila);
+    },
+  }, {
+    key: 'luotu',
+    sortable: true,
+    label: $t('luotu') as string,
+    formatter: dateFormatter,
+  }, {
+    key: 'muokattu',
+    sortable: true,
+    label: $t('muokattu') as string,
+    formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
+      return dateFormatter(item.globalVersion?.aikaleima!);
+    },
+  }, {
+    key: 'peruste.voimassaoloAlkaa',
+    sortable: true,
+    label: $t('voimassaolo-alkaa') as string,
+    formatter: dateFormatter,
+  }, {
+    key: 'peruste.voimassaoloLoppuu',
+    sortable: true,
+    label: $t('voimassaolo-loppuu') as string,
+    formatter: dateFormatter,
+  }, {
+    key: 'peruste.paatospvm',
+    sortable: true,
+    label: $t('paatospaivamaara') as string,
+    formatter: dateFormatter,
+  }];
+});
 
-  get ownProjects() {
-    if (this.provider.ownProjects.value) {
-      return _.map(_.filter(this.provider.ownProjects.value, project => project.tila === 'laadinta'), projekti => this.setTileImage(projekti));
-    }
-  }
+const fields = computed(() => {
+  return _.filter(initialFields.value, (field: any) => props.fieldKeys.length === 0 || _.includes(props.fieldKeys, field.key));
+});
 
-  get ownPublishedProjects() {
-    if (this.provider.ownProjects.value) {
-      return _.map(_.filter(this.provider.ownProjects.value, project => project.tila === 'julkaistu'), projekti => this.setTileImage(projekti));
-    }
-  }
+const filtersInclude = (filter) => {
+  return !props.filters || _.includes(props.filters, filter);
+};
 
-  setTileImage(projekti) {
-    return {
-      ...projekti,
-      tileImage: perusteTile(projekti.peruste),
-    };
-  }
+const restore = async (item) => {
+  await vaihdaPerusteTilaConfirm(
+    this,
+    {
+      title: 'palauta-peruste',
+      confirm: 'palauta-peruste-vahvistus',
+      tila: 'laadinta',
+      projektiId: item.id,
+    },
+  );
+  await onQueryChange(query.value);
+  await props.provider.updateOwnProjects();
+};
 
-  get items() {
-    return this.provider.projects.value;
-  }
-
-  get fields() {
-    return _.filter(this.initialFields, (field: any) => !this.fieldKeys || _.includes(this.fieldKeys, field.key));
-  }
-
-  get initialFields(): BvTableFieldArray {
-    const dateFormatter = (value: Date) => {
-      return value
-        ? this.$sd(value)
-        : '-';
-    };
-    const self = this;
-    return [{
-      key: 'nimi',
-      label: this.$t('projektin-nimi') as string,
-      sortable: true,
-      sortByFormatted: true,
-      formatter(value: any, key: string, item: PerusteprojektiKevytDto) {
-        return _.upperCase(item.peruste!.tyyppi) === 'OPAS' ? self.$kaanna(item.peruste!.nimi!) : item.nimi;
-      },
-    }, {
-      key: 'koulutustyyppi',
-      sortable: true,
-      label: this.$t('koulutustyyppi') as string,
-    }, {
-      key: 'tila',
-      sortable: true,
-      label: this.$t('tila') as string,
-      formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
-        return this.$t('tila-' + item!.tila);
-      },
-    }, {
-      key: 'luotu',
-      sortable: true,
-      label: this.$t('luotu') as string,
-      formatter: dateFormatter,
-    }, {
-      key: 'muokattu',
-      sortable: true,
-      label: this.$t('muokattu') as string,
-      formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
-        return dateFormatter(item.globalVersion?.aikaleima!);
-      },
-    }, {
-      key: 'peruste.voimassaoloAlkaa',
-      sortable: true,
-      label: this.$t('voimassaolo-alkaa') as string,
-      formatter: dateFormatter,
-    }, {
-      key: 'peruste.voimassaoloLoppuu',
-      sortable: true,
-      label: this.$t('voimassaolo-loppuu') as string,
-      formatter: dateFormatter,
-    }, {
-      key: 'peruste.paatospvm',
-      sortable: true,
-      label: this.$t('paatospaivamaara') as string,
-      formatter: dateFormatter,
-    }];
-  }
-
-  filtersInclude(filter) {
-    return !this.filters || _.includes(this.filters, filter);
-  }
-
-  async restore(item) {
-    await vaihdaPerusteTilaConfirm(
-      this,
-      {
-        title: 'palauta-peruste',
-        confirm: 'palauta-peruste-vahvistus',
-        tila: 'laadinta',
-        projektiId: item.id,
-      },
-    );
-    await this.onQueryChange(this.query);
-    await this.provider.updateOwnProjects();
-  }
-
-  get naytaVainKortit() {
-    return this.vainKortit || !this.$hasOphCrud();
-  }
-}
+const naytaVainKortit = computed(() => {
+  return props.vainKortit || !$hasOphCrud();
+});
 </script>
 
 <style lang="scss" scoped>

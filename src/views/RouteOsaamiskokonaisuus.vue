@@ -82,89 +82,70 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, inject } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TermitStore } from '@/stores/TermitStore';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteOsaamiskokonaisuus extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  osaamiskokonaisuusId: {
+    type: Number,
+    required: true,
+  },
+});
 
-  editointiStore: EditointiStore | null = null;
+const route = useRoute();
+const router = useRouter();
+const editointiStore = ref<EditointiStore | null>(null);
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
 
-  @Prop({ required: true })
-  osaamiskokonaisuusId!: number;
+const perusteId = computed(() => props.perusteStore.perusteId.value);
+const versionumero = computed(() => _.toNumber(route.query.versionumero));
 
-  @Watch('osaamiskokonaisuusId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const store = new OsaamiskokonaisuusStore(perusteId.value!, Number(props.osaamiskokonaisuusId), versionumero.value);
+  editointiStore.value = new EditointiStore(store);
+};
 
-    await this.fetch();
+const lisaaPaaAlue = async () => {
+  const tallennettu = await OsaamiskokonaisuusPaaAlueStore.create(props.osaamiskokonaisuusId);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'osaamiskokonaisuus_paa_alue',
+    params: {
+      osaamiskokonaisuusPaaAlueId: '' + tallennettu!.id,
+    },
+  });
+};
+
+watch(() => props.osaamiskokonaisuusId, async (id, oldId) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const store = new OsaamiskokonaisuusStore(this.perusteId!, Number(this.osaamiskokonaisuusId), this.versionumero);
-    this.editointiStore = new EditointiStore(store);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
-
-  async lisaaPaaAlue() {
-    const tallennettu = await OsaamiskokonaisuusPaaAlueStore.create(this.osaamiskokonaisuusId);
-    await this.perusteStore.updateNavigation();
-    await this.$router.push({
-      name: 'osaamiskokonaisuus_paa_alue',
-      params: {
-        osaamiskokonaisuusPaaAlueId: '' + tallennettu!.id,
-      },
-    });
-  }
-}
+watch(versionumero, async () => {
+  await fetch();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

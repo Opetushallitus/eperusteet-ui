@@ -41,78 +41,55 @@
 
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { LukioOppiaineetStore } from '@/stores/LukioOppiaineetStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import draggable from 'vuedraggable';
+import { $t, $kaanna, $sdt } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpSpinner,
-    draggable,
-    EpEditointi,
-    EpMaterialIcon,
-  },
-})
-export default class RouteOppiaineet extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
 
-  store: EditointiStore | null = null;
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  async mounted() {
-    const store = new LukioOppiaineetStore(this.perusteId!);
-    this.store = new EditointiStore(store);
-  }
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+onMounted(async () => {
+  const lukioOppiaineetStore = new LukioOppiaineetStore(perusteId.value!);
+  store.value = new EditointiStore(lukioOppiaineetStore);
+});
 
-  get fields() {
-    return [{
-      label: this.$t('nimi'),
-      key: 'nimi',
-      sortable: true,
-    }, {
-      label: this.$t('muokattu'),
-      key: 'muokattu',
-      thStyle: { width: '30%' },
-      sortable: true,
-      formatter: (value: any, key: string, item: any) => {
-        return value != null ? this.$sdt(value) : '';
-      },
-    }];
-  }
 
-  lisaaOppiaine() {
-    this.$router.push({
-      name: 'lukio_oppiaine',
-    });
-  }
+const lisaaOppiaine = () => {
+  router.push({
+    name: 'lukio_oppiaine',
+  });
+};
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'oppiaineet',
-      },
-    };
-  }
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'oppiaineet',
+    },
+  };
+});
 
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
-}
+const isEditing = computed(() => {
+  return store.value?.isEditing.value;
+});
 </script>
 
 <style scoped lang="scss">

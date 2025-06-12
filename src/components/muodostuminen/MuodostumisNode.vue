@@ -92,32 +92,14 @@ function swapped<T>(array: T[], a: number, b: number): T[] {
   return result;
 }
 
-const props = defineProps({
-  modelValue: {
-    type: Array,
-    required: true,
-  },
-  isEditing: {
-    type: Boolean,
-    default: false,
-  },
-  depth: {
-    type: Number,
-    default: 0,
-  },
-  tutkinnonOsatMap: {
-    type: Object,
-    required: true,
-  },
-  parentMandatory: {
-    type: Boolean,
-    default: null,
-  },
-  copyToClipBoard: {
-    type: Function,
-    default: false,
-  },
-});
+const props = defineProps<{
+  modelValue: any[];
+  isEditing?: boolean;
+  depth?: number;
+  tutkinnonOsatMap: any;
+  parentMandatory?: boolean | null;
+  copyToClipBoard?: (node: any) => void;
+}>();
 
 const emit = defineEmits(['update:modelValue']);
 

@@ -1,10 +1,6 @@
-import { PerusteStore } from '@/stores/PerusteStore';
-import VueRouter from 'vue-router';
 import { computed, reactive } from 'vue';
-import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import _ from 'lodash';
-import { Revision } from '@shared/tyypit';
 import { requiredOneLang } from '@shared/validators/required';
 import { AbstractPerusteenOsaViiteStore } from './AbstractPerusteenOsaViiteStore';
 

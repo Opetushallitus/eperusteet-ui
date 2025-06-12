@@ -1,22 +1,32 @@
-import Vue, { createApp } from 'vue';
+import Vue from 'vue';
 
 import App from './App.vue';
 import '@shared/config/bootstrap';
 import '@shared/config/styles';
 import 'animate.css/animate.min.css';
+import 'material-icons/iconfont/material-icons.css';
+import '@shared/config/defaultcomponents';
 
-import { createI18n } from 'vue-i18n';
+import VueI18n from 'vue-i18n';
+import VueCompositionApi from '@vue/composition-api';
 import VueScrollTo from 'vue-scrollto';
-import { LoadingPlugin } from 'vue-loading-overlay';
-import Notifications from '@kyvg/vue3-notification';
+import Loading from 'vue-loading-overlay';
+import Notifications from 'vue-notification';
+import PortalVue from 'portal-vue';
+import Vuelidate from 'vuelidate';
 import VueApexCharts from 'vue-apexcharts';
 
 import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 import Aikaleima from '@shared/plugins/aikaleima';
+import { Vahvistus } from '@shared/plugins/vahvistus';
+import Kaannos from '@shared/plugins/kaannos';
 import { Notifikaatiot } from '@shared/plugins/notifikaatiot';
 import { Kielet } from '@shared/stores/kieli';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { Kayttajat } from '@/stores/kayttaja';
+import { VueTutorial } from '@shared/plugins/tutoriaali';
+import { tutoriaaliStore } from '@shared/stores/tutoriaali';
+import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
@@ -25,153 +35,135 @@ import { KoulutuksenOsaStore } from './stores/KoulutuksenOsaStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
 import { KotoKielitaitotasoStore } from '@/stores/Koto/KotoKielitaitotasoStore';
 import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
+import { registerIconColorSchemeChange } from '@shared/utils/icon';
+
 import router from './router';
+
 import { stores } from '@/stores';
 import { TavoitesisaltoalueStore } from './stores/TavoitesisaltoalueStore';
 import { LaajaalainenOsaaminenStore } from './stores/LaajaalainenOsaaminenStore';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 import { OsaamiskokonaisuusStore } from './stores/OsaamiskokonaisuusStore';
 import { OsaamiskokonaisuusPaaAlueStore } from './stores/OsaamiskokonaisuusPaaAlueStore';
-import { configureCompat } from '@vue/compat';
-import { Kieli } from '@shared/tyypit';
-import fiLocale from '@shared/translations/locale-fi.json';
-import svLocale from '@shared/translations/locale-sv.json';
-import enLocale from '@shared/translations/locale-en.json';
-import { TekstikappaleStore } from './stores/TekstikappaleStore';
-import { setAppInstance } from '@shared/utils/globals';
-import { createPinia } from 'pinia';
-import Kaannos from '@shared/plugins/kaannos';
-import { createHead } from '@unhead/vue/client';
 
-const app = createApp(App);
+Vue.config.productionTip = false;
 
-configureCompat({
-  COMPONENT_V_MODEL: false,
+Vue.use(VueI18n);
+Vue.use(VueCompositionApi);
+Vue.use(Vuelidate);
+Vue.use(VueScrollTo);
+Vue.use(Notifications);
+Vue.use(PortalVue);
+Vue.use(Loading, {
+  fullPage: true,
+  color: '#159ecb',
+  loader: 'dots',
 });
-
-setAppInstance(app);
-
-app.use(createPinia());
-app.use(router);
-app.use(Kaannos);
-
-export const i18n = createI18n({
-  legacy: false, // Set to false to use Composition API
-  locale: Kieli.fi,
-  fallbackLocale: Kieli.fi,
+Vue.use(Kielet, {
   messages: {
     fi: {
-      ...fiLocale,
+      ...require('@shared/translations/locale-fi.json'),
     },
     sv: {
-      ...svLocale,
+      ...require('@shared/translations/locale-sv.json'),
     },
     en: {
-      ...enLocale,
+      ...require('@shared/translations/locale-en.json'),
     },
   },
 });
 
-app.use(i18n);
-app.use(Kielet, { i18n });
-app.use(Aikaleima);
-app.use(LoadingPlugin);
-app.use(createHead());
-app.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
-// app.use(Notifications);
-app.use(Notifikaatiot);
-
-// Vue.use(Vahvistus);
-Vue.use(VueScrollTo, {
-  duration: 1000,
-});
+Vue.use(Kaannos);
+Vue.use(Vahvistus);
+Vue.use(Aikaleima);
+Vue.use(Notifikaatiot);
+Vue.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
+Vue.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
+Vue.use(VueTutorial, { tutoriaaliStore });
 Vue.use(VueApexCharts);
 Vue.component('apexchart', VueApexCharts);
 
-app.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
-app.use(TekstikappaleStore, {
+Vue.use(TekstikappaleStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(TekstiRakenneStore, {
+Vue.use(TekstiRakenneStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(TutkinnonOsaEditStore, {
+Vue.use(TutkinnonOsaEditStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(TutkinnonOsaEditStore, {
+Vue.use(TutkinnonOsaEditStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(MuodostuminenStore, {
+Vue.use(MuodostuminenStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(OpintokokonaisuusStore, {
+Vue.use(OpintokokonaisuusStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(TavoitesisaltoalueStore, {
+Vue.use(TavoitesisaltoalueStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(KoulutuksenOsaStore, {
+Vue.use(KoulutuksenOsaStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(LaajaalainenOsaaminenStore, {
+Vue.use(LaajaalainenOsaaminenStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(KotoKielitaitotasoStore, {
+Vue.use(KotoKielitaitotasoStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(KotoOpintoStore, {
+Vue.use(KotoOpintoStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(KotoLaajaalainenOsaaminenStore, {
+Vue.use(KotoLaajaalainenOsaaminenStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(OsaamiskokonaisuusStore, {
+Vue.use(OsaamiskokonaisuusStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(OsaamiskokonaisuusPaaAlueStore, {
+Vue.use(OsaamiskokonaisuusPaaAlueStore, {
   perusteStore: stores.perusteStore,
   router,
 });
 
-app.use(OsaalueStore, {
+Vue.use(OsaalueStore, {
   perusteStore: stores.perusteStore,
 });
 
-// async function main() {
-//   registerIconColorSchemeChange();
-//   new Vue({
-//     router,
-//     i18n: Kielet.i18n,
-//     render: h => h(App),
-//   }).$mount('#app');
-// }
+async function main() {
+  registerIconColorSchemeChange();
+  new Vue({
+    router,
+    i18n: Kielet.i18n,
+    render: h => h(App),
+  }).$mount('#app');
+}
 
-// main();
-
-app.mount('#app');
+main();

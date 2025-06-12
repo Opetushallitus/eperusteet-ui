@@ -74,10 +74,10 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed, ref } from 'vue';
 import draggable from 'vuedraggable';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -87,114 +87,112 @@ import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import { OppiaineenVuosiluokkaKokonaisuusDto } from '@shared/api/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna, $t, $fail } from '@shared/utils/globals';
+import { useTemplateRef } from 'vue';
 
-@Component({
-  components: {
-    draggable,
-    EpInput,
-    EpButton,
-    EpContent,
-    EpKielivalinta,
-    EpMaterialIcon,
+const props = defineProps({
+  modelValue: {
+    type: Object as () => OppiaineenVuosiluokkaKokonaisuusDto,
+    required: true,
   },
-})
-export default class EpSisaltoalueetEditModal extends Vue {
-  @Prop({ required: true })
-  value!: OppiaineenVuosiluokkaKokonaisuusDto;
+  vuosiluokat: {
+    type: String,
+    required: false,
+  },
+  isEditing: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  oppiaineId: {
+    type: [String, Number],
+    required: true,
+  },
+  perusteId: {
+    type: [String, Number],
+    required: true,
+  },
+});
 
-  @Prop()
-  vuosiluokat!: string;
+const emit = defineEmits(['update:modelValue']);
 
-  @Prop({ required: false, default: false })
-  isEditing!: boolean;
+const tempModel = ref<OppiaineenVuosiluokkaKokonaisuusDto | null>(null);
+const tallennetaan = ref(false);
+const EpSisaltoalueetEditModal = useTemplateRef('EpSisaltoalueetEditModal');
 
-  @Prop({ required: true })
-  oppiaineId: any;
+const model = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val),
+});
 
-  @Prop({ required: true })
-  perusteId: any;
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
 
-  tempModel: OppiaineenVuosiluokkaKokonaisuusDto | null = null;
-  tallennetaan: boolean = false;
-
-  get model() {
-    return this.value;
+const title = computed(() => {
+  if (model.value.sisaltoalueinfo?.otsikko && model.value.sisaltoalueinfo?.otsikko[kieli.value]) {
+    return $kaanna(model.value.sisaltoalueinfo.otsikko);
   }
 
-  set model(val) {
-    this.$emit('input', val);
-  }
+  return $t('sisaltoalueet-vuosiluokilla-' + props.vuosiluokat);
+});
 
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
+const sisaltoalueetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    group: {
+      name: 'sisaltoalueet',
+    },
+  };
+});
 
-  get title() {
-    if (this.model.sisaltoalueinfo?.otsikko && this.model.sisaltoalueinfo?.otsikko[this.kieli]) {
-      return this.$kaanna(this.model.sisaltoalueinfo.otsikko);
-    }
+const avaa = () => {
+  tempModel.value = _.cloneDeep(model.value);
+  EpSisaltoalueetEditModal.value.show();
+};
 
-    return this.$t('sisaltoalueet-vuosiluokilla-' + this.vuosiluokat);
-  }
+const sulje = () => {
+  tallennetaan.value = false;
+  EpSisaltoalueetEditModal.value.hide();
+};
 
-  get sisaltoalueetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      group: {
-        name: 'sisaltoalueet',
-      },
-    };
+const tallenna = async () => {
+  tallennetaan.value = true;
+  try {
+    model.value = await PerusopetusOppiaineStore.updateOppiaineenVuosiluokkakokonaisuus(props.perusteId, props.oppiaineId, model.value);
+    sulje();
   }
+  catch (e) {
+    $fail($t('virhe-palvelu-virhe') as string);
+  }
+  finally {
+    tallennetaan.value = false;
+  }
+};
 
-  avaa() {
-    this.tempModel = _.cloneDeep(this.model);
-    (this.$refs['EpSisaltoalueetEditModal'] as any).show();
-  }
+const peruuta = () => {
+  model.value = tempModel.value!;
+  sulje();
+};
 
-  sulje() {
-    this.tallennetaan = false;
-    (this.$refs['EpSisaltoalueetEditModal'] as any).hide();
-  }
+const lisaaSisaltoalue = () => {
+  model.value.sisaltoalueet = [
+    ...model.value.sisaltoalueet!,
+    {},
+  ];
+};
 
-  async tallenna() {
-    this.tallennetaan = true;
-    try {
-      this.model = await PerusopetusOppiaineStore.updateOppiaineenVuosiluokkakokonaisuus(this.perusteId, this.oppiaineId, this.model);
-      this.sulje();
-    }
-    catch (e) {
-      this.$fail(this.$t('virhe-palvelu-virhe') as string);
-    }
-    finally {
-      this.tallennetaan = false;
-    }
-  }
-
-  peruuta() {
-    this.model = this.tempModel!;
-    this.sulje();
-  }
-
-  lisaaSisaltoalue() {
-    this.model.sisaltoalueet = [
-      ...this.model.sisaltoalueet!,
-      {},
-    ];
-  }
-
-  poistaSisaltoalue(poistettavaSisaltoalue) {
-    this.model.sisaltoalueet = _.reject(this.model.sisaltoalueet, poistettavaSisaltoalue);
-  }
-}
+const poistaSisaltoalue = (poistettavaSisaltoalue) => {
+  model.value.sisaltoalueet = _.reject(model.value.sisaltoalueet, poistettavaSisaltoalue);
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
 
 .muokkaa {
-  ::v-deep .btn {
+  :deep(.btn) {
     padding-left: 0px;
   }
 }
-
 </style>

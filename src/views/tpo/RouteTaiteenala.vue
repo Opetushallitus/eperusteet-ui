@@ -45,9 +45,10 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
@@ -62,86 +63,77 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    EpCollapse,
-    EpSisaltoTekstikappaleet,
-    EpKoodistoSelect,
-  },
-})
-export default class RouteTaiteenala extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
-
-  @Prop({ required: true })
+const props = defineProps<{
+  perusteStore: PerusteStore;
   taiteenalaId: any;
+  uusi?: string;
+}>();
 
-  @Prop({ required: false })
-  uusi!: string;
+const route = useRoute();
+const store = ref<EditointiStore | null>(null);
 
-  store: EditointiStore | null = null;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('taiteenalaId', { immediate: true })
-  async taiteenalaChange() {
-    await this.fetch();
-  }
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
+const kasiteHandler = inject('kasiteHandler');
 
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const store = new TaiteenalaStore(this.perusteId!, this.taiteenalaId, this.versionumero, !!this.uusi);
-    this.store = new EditointiStore(store);
-  }
+const sisaltoTekstiAvaimet = computed(() => {
+  return ['aikuistenOpetus', 'kasvatus', 'oppimisenArviointiOpetuksessa', 'teemaopinnot', 'tyotavatOpetuksessa', 'yhteisetOpinnot'];
+});
 
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'oppiaineetyleissivistava2',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
+const storeData = computed({
+  get() {
+    return store.value?.data.value;
+  },
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 
-  get sisaltoTekstiAvaimet() {
-    return ['aikuistenOpetus', 'kasvatus', 'oppimisenArviointiOpetuksessa', 'teemaopinnot', 'tyotavatOpetuksessa', 'yhteisetOpinnot'];
-  }
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const taiteenalaStore = new TaiteenalaStore(
+    perusteId.value!,
+    props.taiteenalaId,
+    versionumero.value,
+    !!props.uusi,
+  );
+  store.value = new EditointiStore(taiteenalaStore);
+};
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+// Initialize koodisto
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'oppiaineetyleissivistava2',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
+// Watch for changes in taiteenalaId
+watch(() => props.taiteenalaId, async () => {
+  await fetch();
+}, { immediate: true });
 
-  async postSave() {
-    await this.perusteStore.updateNavigation();
-  }
+// Watch for changes in versionumero
+watch(versionumero, async () => {
+  await fetch();
+});
 
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-}
+const postSave = async () => {
+  await props.perusteStore.updateNavigation();
+};
 </script>
 
 <style scoped lang="scss">

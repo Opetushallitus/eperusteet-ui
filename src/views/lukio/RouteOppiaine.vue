@@ -172,9 +172,10 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
-import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import _ from 'lodash';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -192,146 +193,131 @@ import EpTavoitealueTavoitteet from '@shared/components/EpTavoitesisaltoalue/EpT
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpModuuli from '@shared/components/EpModuuli/EpModuuli.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    draggable,
-    EpKoodistoSelect,
-    EpCollapse,
-    EpTavoitealueTavoitteet,
-    EpColorIndicator,
-    EpModuuli,
-    EpMaterialIcon,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  oppiaineId?: any;
+  parentId?: any;
+}>();
+
+const router = useRouter();
+const route = useRoute();
+
+const store = ref<EditointiStore | null>(null);
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'oppiaineetjaoppimaaratlops2021',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
   },
-})
-export default class RouteOppiaine extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  @Prop({ required: false })
-  oppiaineId: any;
+// Watch for oppiaineId changes
+watch(() => props.oppiaineId, async () => {
+  const lukioOppiaineStore = new LukioOppiaineStore(
+    perusteId.value!,
+    props.oppiaineId,
+    props.parentId,
+    props.perusteStore,
+    null,
+  );
+  store.value = new EditointiStore(lukioOppiaineStore);
+}, { immediate: true });
 
-  @Prop({ required: false })
-  parentId: any;
+const storeData = computed({
+  get() {
+    return store.value?.data.value;
+  },
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 
-  store: EditointiStore | null = null;
-
-  @Watch('oppiaineId', { immediate: true })
-  async oppiaineChange() {
-    const store = new LukioOppiaineStore(this.perusteId!, this.oppiaineId, this.parentId, this.perusteStore, this);
-    this.store = new EditointiStore(store);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'oppiaineetjaoppimaaratlops2021',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
+const poistaTavoitealue = (poistettavaTavoitealue) => {
+  store.value?.setData({
+    ...store.value.data.value,
+    tavoitteet: {
+      ...store.value.data.value.tavoitteet,
+      tavoitealueet: _.filter(store.value.data.value.tavoitteet.tavoitealueet, tavoitealue => tavoitealue !== poistettavaTavoitealue),
     },
   });
+};
 
-  get storeData() {
-    return this.store?.data.value;
-  }
+const lisaaTavoitealue = () => {
+  store.value?.setData({
+    ...store.value.data.value,
+    tavoitteet: {
+      ...store.value.data.value.tavoitteet,
+      tavoitealueet: [
+        ...store.value.data.value.tavoitteet.tavoitealueet,
+        {
+          tavoitteet: [],
+        },
+      ],
+    },
+  });
+};
 
-  set storeData(data) {
-    this.store?.setData(data);
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing.value;
+});
 
-  poistaTavoitealue(poistettavaTavoitealue) {
-    this.store?.setData({
-      ...this.store.data.value,
-      tavoitteet: {
-        ...this.store.data.value.tavoitteet,
-        tavoitealueet: _.filter(this.store.data.value.tavoitteet.tavoitealueet, tavoitealue => tavoitealue !== poistettavaTavoitealue),
-      },
-    });
-  }
+const tavoitealueDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'tavoitealue',
+    },
+  };
+});
 
-  lisaaTavoitealue() {
-    this.store?.setData({
-      ...this.store.data.value,
-      tavoitteet: {
-        ...this.store.data.value.tavoitteet,
-        tavoitealueet: [
-          ...this.store.data.value.tavoitteet.tavoitealueet,
-          {
-            tavoitteet: [],
-          },
-        ],
-      },
-    });
-  }
+const oppiaineetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'oppiaineet',
+    },
+  };
+});
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
+const lisaaOppimaara = () => {
+  router.push({
+    name: 'lukio_oppiaine',
+    params: {
+      parentId: props.oppiaineId,
+    },
+  });
+};
 
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
+const lisaaModuuli = (pakollinen: boolean) => {
+  router.push({
+    name: 'moduuli',
+    params: {
+      oppiaineId: props.oppiaineId,
+      pakollinen: _.toString(pakollinen),
+    },
+  });
+};
 
-  get tavoitealueDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'tavoitealue',
-      },
-    };
-  }
+const pakollisetModuulit = computed(() => {
+  return _.filter(store.value?.data.value.moduulit, 'pakollinen');
+});
 
-  get oppiaineetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'oppiaineet',
-      },
-    };
-  }
-
-  lisaaOppimaara() {
-    this.$router.push({
-      name: 'lukio_oppiaine',
-      params: {
-        parentId: this.oppiaineId,
-      },
-    });
-  }
-
-  lisaaModuuli(pakollinen: boolean) {
-    this.$router.push({
-      name: 'moduuli',
-      params: {
-        oppiaineId: this.oppiaineId,
-        pakollinen: _.toString(pakollinen),
-      },
-    });
-  }
-
-  get pakollisetModuulit() {
-    return _.filter(this.store?.data.value.moduulit, 'pakollinen');
-  }
-
-  get valinnaisetModuulit() {
-    return _.reject(this.store?.data.value.moduulit, 'pakollinen');
-  }
-}
+const valinnaisetModuulit = computed(() => {
+  return _.reject(store.value?.data.value.moduulit, 'pakollinen');
+});
 </script>
 
 <style scoped lang="scss">

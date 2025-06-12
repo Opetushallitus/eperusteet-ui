@@ -102,10 +102,11 @@
   </ep-main-view>
 </template>
 
-<script lang="ts">
-import * as _ from 'lodash';
-import { Prop, Component, Vue, ProvideReactive, Watch } from 'vue-property-decorator';
-import { MaarayksetStore, MaaraysQueryDto } from '@shared/stores/MaarayksetStore';
+<script setup lang="ts">
+import _ from 'lodash';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { MaarayksetStore, MaaraysQueryDto } from '@shared/stores/maarayksetStore';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -116,10 +117,11 @@ import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vu
 import { Murupolku } from '@shared/stores/murupolku';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
-import { Debounced } from '@shared/utils/delay';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
+import { pinia } from '@/stores/pinia';
+import { $kaanna, $t, $sd } from '@shared/utils/globals';
 
 interface MaaraysQuery {
   nimi: string,
@@ -128,168 +130,149 @@ interface MaaraysQuery {
   jarjestysTapa?: string;
   jarjestys: string;
   koulutustyyppi: string | null,
+  luonnos?: boolean,
+  julkaistu?: boolean,
+  tyyppi?: any,
 }
 
-@Component({
-  components: {
-    EpIcon,
-    EpMainView,
-    EpSearch,
-    EpSpinner,
-    EpButton,
-    EpMaterialIcon,
-    EpMultiSelect,
-    EpMaarayskokoelmaKoulutustyyppiSelect,
-    EpPagination,
-    EpToggle,
-  },
-})
-export default class RouteMaaraysKokoelma extends Vue {
-  @Prop({ required: true })
-  private maarayksetStore!: MaarayksetStore;
 
-  private perPage = 10;
-  private sivu = 1;
-  private sort = {};
-  private query: MaaraysQuery = {
-    nimi: '',
-    sivukoko: 10,
-    voimassaolo: null,
-    jarjestysTapa: 'nimi',
-    jarjestys: 'ASC',
-    koulutustyyppi: null,
-  };
+const props = defineProps<{
+  maarayksetStore: MaarayksetStore;
+}>();
 
-  async mounted() {
-    Murupolku.aseta('maarayskokoelma', this.$t('route-maaraykset'), {
-      name: 'maarayskokoelma',
-    });
-  }
+const route = useRoute();
+const router = useRouter();
 
-  @Watch('maaraysId', { immediate: true })
-  async maaraysChange() {
-    if (!this.maaraysId) {
-      await this.fetch();
-    }
-  }
+const perPage = ref(10);
+const sivu = ref(1);
+const sort = ref({});
+const query = ref<MaaraysQuery>({
+  nimi: '',
+  sivukoko: 10,
+  voimassaolo: null,
+  jarjestysTapa: 'nimi',
+  jarjestys: 'ASC',
+  koulutustyyppi: null,
+});
 
-  get maaraykset() {
-    return this.maarayksetStore.maaraykset.value?.data;
-  }
+onMounted(async () => {
+  Murupolku.aseta('maarayskokoelma', $t('route-maaraykset'), {
+    name: 'maarayskokoelma',
+  });
+});
 
-  get maarayksetCount() {
-    return this.maarayksetStore.maaraykset.value?.kokonaismäärä;
-  }
+const maaraysId = computed(() => route.params.maaraysId);
 
-  get tyyppiVaihtoehdot() {
-    return [
-      MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
-      MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
-      MaaraysDtoTyyppiEnum.PERUSTE,
-    ];
-  }
+const maaraykset = computed(() => props.maarayksetStore.maaraykset.value?.data);
+const maarayksetCount = computed(() => props.maarayksetStore.maaraykset.value?.kokonaismäärä);
 
-  get voimassaVaihtoehdot() {
-    return [
-      'KAIKKI',
-      'TULEVA',
-      'VOIMASSAOLO',
-      'POISTUNUT',
-    ];
-  }
+const tyyppiVaihtoehdot = computed(() => [
+  MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
+  MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
+  MaaraysDtoTyyppiEnum.PERUSTE,
+]);
 
-  @Watch('sivu')
-  async sivuChange() {
-    await this.fetch();
-  }
+const voimassaVaihtoehdot = computed(() => [
+  'KAIKKI',
+  'TULEVA',
+  'VOIMASSAOLO',
+  'POISTUNUT',
+]);
 
-  @Watch('query', { deep: true })
-  async queryChange() {
-    this.sivu = 1;
-    await this.fetch();
-  }
-
-  @Debounced(300)
-  async fetch() {
-    await this.maarayksetStore.fetch(
-      {
-        ...this.query as any,
-        kieli: Kielet.getSisaltoKieli.value,
-        sivu: this.sivu - 1,
-        tuleva: this.query.voimassaolo === 'TULEVA',
-        voimassaolo: this.query.voimassaolo === 'VOIMASSAOLO',
-        poistunut: this.query.voimassaolo === 'POISTUNUT',
-        koulutustyypit: this.query.koulutustyyppi ? [this.query.koulutustyyppi] : [],
-      });
-  }
-
-  get tableFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('maarayksen-nimi'),
-      sortable: true,
-      sortByFormatted: true,
-      thStyle: { width: '35%' },
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$kaanna(value);
-      },
-    }, {
-      key: 'tila',
-      label: this.$t('tila'),
-      sortable: false,
-      thClass: 'border-0',
-      formatter: (value: any, key: any, item: any) => {
-        return this.$t(value.toLowerCase());
-      },
-    }, {
-      key: 'muokattu',
-      label: this.$t('muokattu'),
-      sortable: false,
-      thClass: 'border-0',
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sd(value);
-      },
-    }, {
-      key: 'voimassaoloAlkaa',
-      label: this.$t('voimaantulo'),
-      sortable: false,
-      thClass: 'border-0',
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sd(value);
-      },
-    }, {
-      key: 'voimassaoloLoppuu',
-      label: this.$t('voimassaolo-paattyy'),
-      sortable: false,
-      thClass: 'border-0',
-      formatter: (value: any, key: any, item: any) => {
-        if (value) {
-          return (this as any).$sd(value);
-        }
-
-        return null;
-      },
+const tableFields = computed(() => [
+  {
+    key: 'nimi',
+    label: $t('maarayksen-nimi'),
+    sortable: true,
+    sortByFormatted: true,
+    thStyle: { width: '35%' },
+    formatter: (value: any) => {
+      return $kaanna(value);
     },
-    ];
-  }
+  },
+  {
+    key: 'tila',
+    label: $t('tila'),
+    sortable: false,
+    thClass: 'border-0',
+    formatter: (value: any) => {
+      return $t(value.toLowerCase());
+    },
+  },
+  {
+    key: 'muokattu',
+    label: $t('muokattu'),
+    sortable: false,
+    thClass: 'border-0',
+    formatter: (value: any) => {
+      return $sd(value);
+    },
+  },
+  {
+    key: 'voimassaoloAlkaa',
+    label: $t('voimaantulo'),
+    sortable: false,
+    thClass: 'border-0',
+    formatter: (value: any) => {
+      return $sd(value);
+    },
+  },
+  {
+    key: 'voimassaoloLoppuu',
+    label: $t('voimassaolo-paattyy'),
+    sortable: false,
+    thClass: 'border-0',
+    formatter: (value: any) => {
+      if (value) {
+        return $sd(value);
+      }
+      return null;
+    },
+  },
+]);
 
-  sortingChanged(sort) {
-    this.sort = sort;
-    this.sivu = 1;
-    this.query = {
-      ...this.query,
-      jarjestys: sort.sortDesc ? 'DESC' : 'ASC',
-      jarjestysTapa: sort.sortBy,
-    };
+// Watch for changes in maaraysId
+watch(maaraysId, async () => {
+  if (!maaraysId.value) {
+    await fetch();
   }
+}, { immediate: true });
 
-  get maaraysId() {
-    return this.$route.params.maaraysId;
-  }
-}
+// Watch for changes in sivu
+watch(sivu, async () => {
+  await fetch();
+});
+
+// Watch for changes in query
+watch(query, async () => {
+  sivu.value = 1;
+  await fetch();
+}, { deep: true });
+
+const fetch = _.debounce(async () => {
+  await props.maarayksetStore.fetch(
+    {
+      ...query.value as any,
+      kieli: Kielet.getSisaltoKieli.value,
+      sivu: sivu.value - 1,
+      tuleva: query.value.voimassaolo === 'TULEVA',
+      voimassaolo: query.value.voimassaolo === 'VOIMASSAOLO',
+      poistunut: query.value.voimassaolo === 'POISTUNUT',
+      koulutustyypit: query.value.koulutustyyppi ? [query.value.koulutustyyppi] : [],
+    });
+}, 300);
+
+const sortingChanged = (sortVal: any) => {
+  sort.value = sortVal;
+  sivu.value = 1;
+  query.value = {
+    ...query.value,
+    jarjestys: sortVal.sortDesc ? 'DESC' : 'ASC',
+    jarjestysTapa: sortVal.sortBy,
+  };
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

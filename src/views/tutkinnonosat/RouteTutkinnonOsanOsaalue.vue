@@ -113,8 +113,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Prop, Component } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -133,159 +134,137 @@ import EpGeneerinenAsteikko from '@/components/EpGeneerinenAsteikko/EpGeneerinen
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import { PerusteprojektiRoute } from '../PerusteprojektiRoute';
 import { findDeep } from 'deepdash/standalone';
 import _ from 'lodash';
 import { UiKielet } from '@shared/stores/kieli';
 import { Koodistot } from '@shared/utils/koodi';
+import { $t, $kaanna } from '@shared/utils/globals';
+import { PerusteStore } from '@/stores/PerusteStore';
 
-@Component({
-  components: {
-    EpAmmattitaitovaatimukset,
-    EpButton,
-    EpCollapse,
-    EpContent,
-    EpEditointi,
-    EpGeneerinenAsteikko,
-    EpInput,
-    EpKoodistoSelect,
-    EpLaajuusInput,
-    EpSpinner,
-    EpToggle,
-    Osaamistavoite,
-    EpSelect,
-  },
-  watch: {
-    'osaalueId': {
-      handler: 'onOsaAlueChange',
-      immediate: true,
-    } as any,
-  },
-})
-export default class RouteTutkinnonOsanOsaalue extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  private arviointiStore!: ArviointiStore;
+const props = defineProps<{
+  arviointiStore: ArviointiStore;
+  perusteStore: PerusteStore;
+}>();
 
-  private store: EditointiStore | null = null;
+const route = useRoute();
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  get isNew() {
-    return this.osaalueId === 'uusi';
+const isNew = computed(() => {
+  return osaalueId.value === 'uusi';
+});
+
+const tov = computed(() => {
+  if (!store.value) {
+    return null;
   }
+  return store.value.data.value;
+});
 
-  get tov() {
-    if (!this.store) {
-      return null;
-    }
-    return this.store.data.value;
-  }
-
-  set arviointi(id) {
-    this.store?.setData({
-      ...this.store?.data.value,
+const arviointi = computed({
+  get: () => store.value?.data.value.arviointi?.id || null,
+  set: (id) => {
+    store.value?.setData({
+      ...store.value?.data.value,
       arviointi: { id },
     });
+  },
+});
+
+const osaalueId = computed(() => {
+  return route?.params?.osaalueId || null;
+});
+
+const arviointiasteikot = computed(() => {
+  return props.arviointiStore.arviointiasteikot.value;
+});
+
+const kaikkiGeneeriset = computed(() => {
+  return props.arviointiStore.geneeriset.value;
+});
+
+const navigation = computed(() => {
+  return props.perusteStore.navigation.value;
+});
+
+const osaalueIdObject = computed(() => {
+  return { id: _.toNumber(osaalueId.value) };
+});
+
+const osaalueNavigationNode = computed(() => {
+  return _.get(findDeep(props.perusteStore.navigation.value, (value, key) => {
+    if (_.keys(osaalueIdObject.value)[0] === key && _.values(osaalueIdObject.value)[0] === value) return true;
+    return false;
+  }), 'parent');
+});
+
+const tutkinnonOsaId = computed(() => {
+  return _.get(osaalueNavigationNode.value, 'meta.tutkinnonOsaViite') || route.query.tutkinnonOsaId;
+});
+
+const kielet = computed(() => {
+  return UiKielet;
+});
+
+const koodisto = new KoodistoSelectStore({
+  koodisto: Koodistot.AMMATILLISENOPPIAINEET,
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
+
+const kielikoodisto = new KoodistoSelectStore({
+  koodisto: Koodistot.KIELIVALIKOIMA,
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
+
+const onOsaAlueChange = async () => {
+  if (!tutkinnonOsaId.value || !osaalueId.value) {
+    return;
   }
 
-  get arviointi() {
-    return this.store?.data.value.arviointi?.id || null;
-  }
+  props.arviointiStore.fetchArviointiasteikot();
+  props.arviointiStore.fetchGeneeriset();
+  await props.perusteStore.blockUntilInitialized();
+  const storeInstance = new OsaalueStore(
+    Number(props.perusteStore.perusteId),
+    Number(tutkinnonOsaId.value),
+    osaalueId.value as string,
+    router);
+  store.value = new EditointiStore(storeInstance);
+};
 
-  get osaalueId() {
-    return this.$route?.params?.osaalueId || null;
-  }
-
-  get arviointiasteikot() {
-    return this.arviointiStore.arviointiasteikot.value;
-  }
-
-  get kaikkiGeneeriset() {
-    return this.arviointiStore.geneeriset.value;
-  }
-
-  get navigation() {
-    return this.perusteStore.navigation.value;
-  }
-
-  get osaalueNavigationNode() {
-    return _.get(findDeep(this.perusteStore.navigation.value, (value, key) => {
-      if (_.keys(this.osaalueIdObject)[0] === key && _.values(this.osaalueIdObject)[0] === value) return true;
-      return false;
-    }), 'parent');
-  }
-
-  get tutkinnonOsaId() {
-    return _.get(this.osaalueNavigationNode, 'meta.tutkinnonOsaViite') || this.$route.query.tutkinnonOsaId;
-  }
-
-  get osaalueIdObject() {
-    return { id: _.toNumber(this.osaalueId) };
-  }
-
-  protected async onProjektiChange() {
-  }
-
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: Koodistot.AMMATILLISENOPPIAINEET,
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
+const poistaValinnaisetOsaamistavoitteet = () => {
+  store.value!.setData({
+    ...store.value!.data.value,
+    valinnaisetOsaamistavoitteet: null,
   });
+};
 
-  private readonly kielikoodisto = new KoodistoSelectStore({
-    koodisto: Koodistot.KIELIVALIKOIMA,
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
+const lisaaValinnaisetOsaamistavoitteet = () => {
+  store.value!.setData({
+    ...store.value!.data.value,
+    valinnaisetOsaamistavoitteet: {},
   });
+};
 
-  async onOsaAlueChange() {
-    if (!this.tutkinnonOsaId || !this.osaalueId) {
-      return;
-    }
-
-    this.arviointiStore.fetchArviointiasteikot();
-    this.arviointiStore.fetchGeneeriset();
-    await this.perusteStore.blockUntilInitialized();
-    const store = new OsaalueStore(
-      Number(this.perusteId),
-      Number(this.tutkinnonOsaId),
-      this.osaalueId,
-      this.$router);
-    this.store = new EditointiStore(store);
-  }
-
-  get kielet() {
-    return UiKielet;
-  }
-
-  poistaValinnaisetOsaamistavoitteet() {
-    this.store!.setData({
-      ...this.store!.data.value,
-      valinnaisetOsaamistavoitteet: null,
-    });
-  }
-
-  lisaaValinnaisetOsaamistavoitteet() {
-    this.store!.setData({
-      ...this.store!.data.value,
-      valinnaisetOsaamistavoitteet: {},
-    });
-  }
-}
+// Watch for changes in osaalueId
+watch(osaalueId, onOsaAlueChange, { immediate: true });
 </script>
 
 <style lang="scss" scoped>
-
   .kieli-select {
     width: 300px;
   }

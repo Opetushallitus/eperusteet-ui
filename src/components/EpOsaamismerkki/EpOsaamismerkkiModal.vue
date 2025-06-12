@@ -178,12 +178,9 @@ import { notNull, requiredLokalisoituTeksti } from '@shared/validators/required'
 import { required } from 'vuelidate/lib/validators';
 import { $t, $kaanna, $sdt, $success, $fail } from '@shared/utils/globals';
 
-const props = defineProps({
-  store: {
-    type: Object as () => OsaamismerkitStore,
-    required: true,
-  },
-});
+const props = defineProps<{
+  store: OsaamismerkitStore;
+}>();
 
 const osaamismerkkiModal = useTemplateRef('osaamismerkkiModal');
 const osaamismerkki = ref<OsaamismerkkiDto>({

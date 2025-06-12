@@ -1,5 +1,4 @@
 <template>
-
   <ep-sub-view :header="$t('kasitteet')">
     <ep-spinner v-if="!termit" />
     <div v-else>
@@ -66,11 +65,10 @@
   </ep-sub-view>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import _ from 'lodash';
-
-import { Component, Prop } from 'vue-property-decorator';
-import { validationMixin } from 'vuelidate';
+import { ref, computed, watch, onMounted, useTemplateRef, getCurrentInstance } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
 import { Kielet } from '@shared/stores/kieli';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -78,133 +76,120 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpField from '@shared/components/forms/EpField.vue';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { TermitStore } from '@/stores/TermitStore';
 import { TermiDto } from '@shared/api/eperusteet';
 import EpSubView from '@shared/components/EpSubView/EpSubView.vue';
 import { kasiteValidator } from '@shared/validators/kasite';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
-import { createLogger } from '@shared/utils/logger';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $success, $fail } from '@shared/utils/globals';
 
-const logger = createLogger('RouteKasite');
 
-@Component({
-  components: {
-    EpFormContent,
-    EpInput,
-    EpSearch,
-    EpSpinner,
-    EpSubView,
-    EpButton,
-    EpKielivalinta,
-    EpField,
-    EpContent,
-    EpToggle,
-    EpMaterialIcon,
-  },
-  mixins: [
-    validationMixin,
-  ],
-  validations() {
+const props = defineProps<{
+  termitStore: TermitStore;
+  perusteId?: number;
+}>();
+
+const kasitteenPoistoModal = useTemplateRef('kasitteenPoistoModal');
+const kasitteenLuontiModal = useTemplateRef('kasitteenLuontiModal');
+
+const query = ref('');
+const kasite = ref<TermiDto>({});
+const toggled = ref<number[]>([]);
+
+const validator = computed(() => {
+  return kasiteValidator([
+    Kielet.getSisaltoKieli.value,
+  ]);
+});
+
+const rules = computed(() => ({
+  kasite: validator.value,
+}));
+
+const v$ = useVuelidate(rules, { kasite });
+const validation = computed(() => v$.value.kasite);
+
+const termit = computed(() => {
+  return props.termitStore.termit.value;
+});
+
+const termitToggled = computed(() => {
+  return _.map(termit.value, termi => {
     return {
-      kasite: {
-        ...(this as any).validator,
-      },
+      ...termi,
+      closed: !_.includes(toggled.value, termi.id),
     };
-  },
-} as any)
-export default class RouteKasite extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  private termitStore!: TermitStore;
+  });
+});
 
-  private query = '';
-  private kasite: TermiDto = {};
-  private toggled: number[] = [];
+const termitFiltered = computed(() => {
+  return _.filter(termitToggled.value, termi => Kielet.search(query.value, termi.termi) || Kielet.search(query.value, termi.selitys));
+});
 
-  async onProjektiChange() {
-    if (this.perusteId) {
-      this.termitStore.init(this.perusteId);
-    }
+const onProjektiChange = async () => {
+  if (props.perusteId) {
+    props.termitStore.init(props.perusteId);
   }
+};
 
-  get termit() {
-    return this.termitStore.termit.value;
+const toggleTermi = (termi: any) => {
+  if (_.includes(toggled.value, termi.id)) {
+    toggled.value = _.reject(toggled.value, id => id === termi.id);
   }
-
-  get termitToggled() {
-    return _.map(this.termit, termi => {
-      return {
-        ...termi,
-        closed: !_.includes(this.toggled, termi.id),
-      };
-    });
+  else {
+    toggled.value = [...toggled.value, termi.id];
   }
+};
 
-  get termitFiltered() {
-    return _.filter(this.termitToggled, termi => Kielet.search(this.query, termi.termi) || Kielet.search(this.query, termi.selitys));
+const avaaMuokkausModal = (kasite?: TermiDto) => {
+  if (!kasite) {
+    kasite.value = {};
   }
-
-  toggleTermi(termi) {
-    if (_.includes(this.toggled, termi.id)) {
-      this.toggled = _.reject(this.toggled, id => id === termi.id);
-    }
-    else {
-      this.toggled = [...this.toggled, termi.id];
-    }
+  else {
+    kasite.value = _.cloneDeep(kasite);
   }
+  (kasitteenLuontiModal.value as any).show();
+};
 
-  avaaMuokkausModal(kasite?: TermiDto) {
-    if (!kasite) {
-      this.kasite = {};
-    }
-    else {
-      this.kasite = _.cloneDeep(kasite);
-    }
-    (this as any).$refs.kasitteenLuontiModal.show();
+const avaaPoistoModal = (kasiteItem: any) => {
+  kasite.value = _.cloneDeep(kasiteItem);
+  (kasitteenPoistoModal.value as any).show();
+};
+
+const poistaKasite = async () => {
+  try {
+    await props.termitStore.delete(props.perusteId!, kasite.value);
+    $success($t('kasite-poistettu') as string);
   }
-
-  avaaPoistoModal(kasite) {
-    this.kasite = _.cloneDeep(kasite);
-    (this as any).$refs.kasitteenPoistoModal.show();
+  catch (err) {
+    $fail($t('kasite-poisto-epaonnistui') as string);
   }
+};
 
-  async poistaKasite() {
-    try {
-      await this.termitStore.delete(this.perusteId!, this.kasite);
-      this.$success(this.$t('kasite-poistettu') as string);
-    }
-    catch (err) {
-      logger.error(err);
-      this.$fail(this.$t('kasite-poisto-epaonnistui') as string);
-    }
+const tallennaKasite = async () => {
+  try {
+    await props.termitStore.save(props.perusteId!, kasite.value);
+    $success($t('kasite-tallennettu') as string);
   }
-
-  async tallennaKasite() {
-    try {
-      await this.termitStore.save(this.perusteId!, this.kasite);
-      this.$success(this.$t('kasite-tallennettu') as string);
-    }
-    catch (err) {
-      logger.error(err);
-      this.$fail(this.$t('kasite-tallennus-epaonnistui') as string);
-    }
+  catch (err) {
+    $fail($t('kasite-tallennus-epaonnistui') as string);
   }
+};
 
-  get validator() {
-    return kasiteValidator([
-      Kielet.getSisaltoKieli.value,
-    ]);
-  }
+// Initialize component when projekti changes
+onMounted(async () => {
+  await onProjektiChange();
+});
 
-  get validation() {
-    return (this as any).$v.kasite;
-  }
-}
-
+// Watch for changes in perusteId
+watch(() => props.perusteId, async () => {
+  await onProjektiChange();
+});
 </script>
+
 <style scoped lang="scss">
 @import '@shared/styles/_variables';
 
@@ -220,7 +205,7 @@ export default class RouteKasite extends PerusteprojektiRoute {
         padding-bottom: 10px;
       }
 
-      ::v-deep p {
+      :deep(p) {
         margin: 0;
       }
 
@@ -237,7 +222,7 @@ export default class RouteKasite extends PerusteprojektiRoute {
       white-space: nowrap;
       text-overflow: ellipsis;
 
-      ::v-deep p {
+      :deep(p) {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -246,5 +231,4 @@ export default class RouteKasite extends PerusteprojektiRoute {
 
     }
   }
-
 </style>

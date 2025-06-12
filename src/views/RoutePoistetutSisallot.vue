@@ -26,7 +26,6 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import PoistetutHakuTable from '@shared/components/EpPoistettuTable/PoistetutHakuTable.vue';
 import { PoistetutStore } from '@/stores/PoistetutStore';
 import { PoistettuSisaltoDtoTyyppiEnum } from '@shared/api/eperusteet';
-import { success, fail } from '@shared/utils/notifications';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { $t, $success, $fail } from '@shared/utils/globals';
 
@@ -35,11 +34,7 @@ const props = defineProps<{
   perusteStore: PerusteStore;
 }>();
 
-// Get instance for accessing inherited properties from mixin
-const instance = getCurrentInstance();
-
 const tabIndex = ref(0);
-
 
 const perusteId = computed(() => {
   return props.perusteStore.perusteId.value;

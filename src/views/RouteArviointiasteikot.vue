@@ -125,8 +125,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -136,123 +136,111 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import { ArviointiAsteikkoDto, Koodisto } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import VueScrollTo from 'vue-scrollto';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $success, $fail, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpJulkiLista,
-    EpButton,
-    EpSpinner,
-    EpInput,
-    EpKoodistoSelect,
-    EpInfoPopover,
-    EpMaterialIcon,
-  },
-})
-export default class RouteArviointiasteikot extends Vue {
-  @Prop({ required: true })
-  arviointiStore!: ArviointiStore;
+const props = defineProps<{
+  arviointiStore: ArviointiStore;
+}>();
 
-  private isEditing: boolean | null = false;
-  private isSaving = false;
-  private arviointiasteikot: ArviointiAsteikkoDto[] | null = null;
+const isEditing = ref<boolean | null>(false);
+const isSaving = ref(false);
+const arviointiasteikot = ref<ArviointiAsteikkoDto[] | null>(null);
 
-  mounted() {
-    this.init();
-  }
-
-  toggleEdit() {
-    this.isEditing = !this.isEditing;
-    if (!this.isEditing) {
-      this.init();
-    }
-  }
-
-  lisaaArviointiasteikko() {
-    this.isEditing = true;
-    this.arviointiasteikot = [
-      ...(this.arviointiasteikot || []),
-      {
-        osaamistasot: [],
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'arviointiasteikkoammatillinen15',
+  async query(query: string, sivu = 0, koodisto: string) {
+    const { data } = await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
       },
-    ];
-
-    VueScrollTo.scrollTo('footer', {
-      offset: 200,
-      x: false,
-      y: true,
     });
-  }
+    return data as any;
+  },
+});
 
-  poistaArviointiasteikko(asteikko) {
-    this.arviointiasteikot = _.reject(this.arviointiasteikot, arviointiasteikko => arviointiasteikko === asteikko);
-  }
+const init = async () => {
+  await props.arviointiStore.fetchArviointiasteikot();
+  arviointiasteikot.value = props.arviointiStore.arviointiasteikot.value as ArviointiAsteikkoDto[];
+};
 
-  poistaOsaamistaso(asteikko, taso) {
-    this.arviointiasteikot = _.map(this.arviointiasteikot, arviointiasteikko => {
-      return {
-        ...arviointiasteikko,
-        osaamistasot: (asteikko === arviointiasteikko ? _.filter(asteikko.osaamistasot, osaamistaso => osaamistaso !== taso) : arviointiasteikko.osaamistasot),
-      };
-    });
+const toggleEdit = () => {
+  isEditing.value = !isEditing.value;
+  if (!isEditing.value) {
+    init();
   }
+};
 
-  lisaaOsaamistaso(asteikko) {
-    asteikko.osaamistasot = [
-      ...asteikko.osaamistasot,
-      {},
-    ];
-  }
-
-  async init() {
-    await this.arviointiStore.fetchArviointiasteikot();
-    this.arviointiasteikot = this.arviointiStore.arviointiasteikot.value as ArviointiAsteikkoDto[];
-  }
-
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'arviointiasteikkoammatillinen15',
-    async query(query: string, sivu = 0, koodisto: string) {
-      const { data } = await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      });
-      return data as any;
+const lisaaArviointiasteikko = () => {
+  isEditing.value = true;
+  arviointiasteikot.value = [
+    ...(arviointiasteikot.value || []),
+    {
+      osaamistasot: [],
     },
+  ];
+
+  VueScrollTo.scrollTo('footer', {
+    offset: 200,
+    x: false,
+    y: true,
+  });
+};
+
+const poistaArviointiasteikko = (asteikko: any) => {
+  arviointiasteikot.value = _.reject(arviointiasteikot.value, arviointiasteikko => arviointiasteikko === asteikko);
+};
+
+const poistaOsaamistaso = (asteikko: any, taso: any) => {
+  arviointiasteikot.value = _.map(arviointiasteikot.value, arviointiasteikko => {
+    return {
+      ...arviointiasteikko,
+      osaamistasot: (asteikko === arviointiasteikko ? _.filter(asteikko.osaamistasot, osaamistaso => osaamistaso !== taso) : arviointiasteikko.osaamistasot),
+    };
+  });
+};
+
+const lisaaOsaamistaso = (asteikko: any) => {
+  asteikko.osaamistasot = [
+    ...asteikko.osaamistasot,
+    {},
+  ];
+};
+
+const saveArviointiAsteikko = async () => {
+  isSaving.value = true;
+
+  const koodittomia = _.some(arviointiasteikot.value, arviointiasteikko => {
+    return _.size(_.reject(arviointiasteikko.osaamistasot, 'koodi')) > 0;
   });
 
-  async saveArviointiAsteikko() {
-    this.isSaving = true;
-
-    const koodittomia = _.some(this.arviointiasteikot, arviointiasteikko => {
-      return _.size(_.reject(arviointiasteikko.osaamistasot, 'koodi')) > 0;
-    });
-
-    if (koodittomia) {
-      this.$fail(this.$t('osaamistasolta-puuttuu-pakollinen-koodi') as string);
-      this.isSaving = false;
-      return;
-    }
-
-    try {
-      await this.arviointiStore.updateArviointiasteikot(this.arviointiasteikot as ArviointiAsteikkoDto[]);
-      this.isEditing = false;
-      this.$success(this.$t('arviointiasteikko-tallennettu-onnistuneesti') as string);
-      this.init();
-    }
-    catch (_err) {
-      this.$fail(this.$t('arviointiasteikon-tallennus-epaonnistui') as string);
-    }
-    finally {
-      this.isSaving = false;
-    }
+  if (koodittomia) {
+    $fail($t('osaamistasolta-puuttuu-pakollinen-koodi') as string);
+    isSaving.value = false;
+    return;
   }
-}
+
+  try {
+    await props.arviointiStore.updateArviointiasteikot(arviointiasteikot.value as ArviointiAsteikkoDto[]);
+    isEditing.value = false;
+    $success($t('arviointiasteikko-tallennettu-onnistuneesti') as string);
+    await init();
+  }
+  catch (_err) {
+    $fail($t('arviointiasteikon-tallennus-epaonnistui') as string);
+  }
+  finally {
+    isSaving.value = false;
+  }
+};
+
+onMounted(async () => {
+  await init();
+});
 </script>
 
 <style lang="scss">

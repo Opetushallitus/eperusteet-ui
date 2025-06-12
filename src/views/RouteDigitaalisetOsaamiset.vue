@@ -45,76 +45,65 @@
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import * as _ from 'lodash';
-import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
-import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
+import _ from 'lodash';
 import EpArkistoidutModal from '@shared/components/EpArkistoidutModal/EpArkistoidutModal.vue';
 import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
 import { DigitaalisetOsaamisetStore } from '@/stores/DigitaalisetOsaamisetStore';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpPerusteprojektiListaus,
-    EpColorIndicator,
-    EpJulkiLista,
-    EpButton,
-    EpArkistoidutModal,
-  },
-})
-export default class RouteDigitaalisetOsaamiset extends Vue {
-  @Prop({ required: true })
-  digitaalisetOsaamisetStore!: DigitaalisetOsaamisetStore;
+const props = defineProps<{
+  digitaalisetOsaamisetStore: DigitaalisetOsaamisetStore;
+}>();
 
-  async mounted() {
-    this.digitaalisetOsaamisetStore.clear();
-    await this.haePoistetut();
-  }
+const haePoistetut = async () => {
+  await props.digitaalisetOsaamisetStore.updateQuery({
+    sivu: 0,
+    sivukoko: 100,
+    tila: ['POISTETTU'],
+    jarjestysOrder: false,
+    jarjestysTapa: 'nimi',
+  });
+};
 
-  async haePoistetut() {
-    await this.digitaalisetOsaamisetStore.updateQuery({
-      sivu: 0,
-      sivukoko: 100,
-      tila: ['POISTETTU'],
-      jarjestysOrder: false,
-      jarjestysTapa: 'nimi',
+const arkistoidut = computed(() => {
+  if (props.digitaalisetOsaamisetStore.projects.value) {
+    return _.map(props.digitaalisetOsaamisetStore.projects.value?.data, (perusteprojekti: any) => {
+      return {
+        ...perusteprojekti,
+        muokattu: perusteprojekti.peruste.muokattu,
+      };
     });
   }
+  return [];
+});
 
-  get arkistoidut() {
-    if (this.digitaalisetOsaamisetStore.projects.value) {
-      return _.map(this.digitaalisetOsaamisetStore.projects.value?.data, (perusteprojekti: any) => {
-        return {
-          ...perusteprojekti,
-          muokattu: perusteprojekti.peruste.muokattu,
-        };
-      });
-    }
-  }
+const palautusoikeus = (perusteprojekti: any) => {
+  return _.includes(perusteprojekti.oikeudet.perusteprojekti, 'tilanvaihto');
+};
 
-  palautusoikeus(perusteprojekti) {
-    return _.includes(perusteprojekti.oikeudet.perusteprojekti, 'tilanvaihto');
-  }
+const onRestore = async (perusteprojekti: any) => {
+  await vaihdaPerusteTilaConfirm(
+    null, // This was 'this' in the Vue 2 version, but in Vue 3 we don't need to pass 'this'
+    {
+      title: 'palauta-peruste',
+      confirm: 'palauta-peruste-vahvistus',
+      tila: 'laadinta',
+      projektiId: perusteprojekti.id,
+    },
+  );
+  await haePoistetut();
+  await props.digitaalisetOsaamisetStore.updateOwnProjects();
+};
 
-  async onRestore(perusteprojekti) {
-    await vaihdaPerusteTilaConfirm(
-      this,
-      {
-        title: 'palauta-peruste',
-        confirm: 'palauta-peruste-vahvistus',
-        tila: 'laadinta',
-        projektiId: perusteprojekti.id,
-      },
-    );
-    await this.haePoistetut();
-    await this.digitaalisetOsaamisetStore.updateOwnProjects();
-  }
-}
+onMounted(async () => {
+  props.digitaalisetOsaamisetStore.clear();
+  await haePoistetut();
+});
 </script>
 
 <style lang="scss">

@@ -233,8 +233,9 @@
   <EpSpinner v-else class="my-3"/>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, inject, useTemplateRef } from 'vue';
+import { useRoute } from 'vue-router';
 import * as _ from 'lodash';
 import draggable from 'vuedraggable';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -254,143 +255,143 @@ import {
   KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum,
   KoulutuksenOsaDtoKoulutusOsanTyyppiEnum,
 } from '@shared/api/eperusteet';
-import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSpinner,
-    EpEditointi,
-    EpKoodistoSelect,
-    EpInput,
-    EpContent,
-    EpButton,
-    draggable,
-    EpAlert,
-    EpMaterialIcon,
-  },
-})
-export default class RouteKoulutuksenOsa extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
 
-  private store: EditointiStore | null = null;
-  private tempNimiValue = null;
+const route = useRoute();
+const store = ref<EditointiStore | null>(null);
+const tempNimiValue = ref(null);
+const inputNimi =  useTemplateRef('inputNimi');
 
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'koulutuksenosattuva',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
+
+const koulutuksenosaId = computed(() => {
+  return route.params.koulutuksenosaId;
+});
+
+const kuvaHandler = inject('kuvaHandler');
+
+const koulutusOsanKoulutustyypit = computed((): string[] => {
+  return [
+    _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA),
+    _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.PERUSOPETUS),
+    _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.LUKIOKOULUTUS),
+    _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.AMMATILLINENKOULUTUS),
+  ];
+});
+
+const koulutusOsanTyypit = computed((): string[] => {
+  return [
+    _.toLower(KoulutuksenOsaDtoKoulutusOsanTyyppiEnum.YHTEINEN),
+    _.toLower(KoulutuksenOsaDtoKoulutusOsanTyyppiEnum.VALINNAINEN),
+  ];
+});
+
+const defaultDragOptions = computed(() => {
+  return {
+    animation: 300,
+    emptyInsertThreshold: 10,
+    handle: '.order-handle',
+    disabled: !store.value?.isEditing.value,
+    ghostClass: 'dragged',
+  };
+});
+
+const tavoitteetOptions = computed(() => {
+  return {
+    ...defaultDragOptions.value,
+    group: {
+      name: 'tavoitteet',
     },
-  });
+  };
+});
 
-  @Watch('koulutuksenosaId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-    await this.fetch();
-  }
+const laajuusAnnettu = computed(() => {
+  return !_.isNull(store.value?.data.value.laajuusMinimi) && !_.isNull(store.value?.data.value.laajuusMaksimi);
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
-
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new KoulutuksenOsaStore(this.perusteId!, Number(this.koulutuksenosaId), this.versionumero);
-    this.store = new EditointiStore(tkstore);
-    this.tempNimiValue = null;
-  }
-
-  onAddListItem(array): void {
-    this.store?.setData({
-      ...this.store?.data.value,
-      [array]: [
-        ..._.get(this.store?.data.value, array),
-        {},
-      ],
-    });
-  }
-
-  onRemoveListItem(rowToRemove, array) {
-    this.store?.setData({
-      ...this.store?.data.value,
-      [array]: _.filter(_.get(this.store?.data.value, array), rivi => rivi !== rowToRemove),
-    });
-  }
-
-  onNimiKoodiAdd() {
-    ((this.$refs.inputNimi as Vue).$el.querySelector('input') as HTMLInputElement).dispatchEvent(new Event('input'));
-  }
-
-  setNimiValue(nimiKoodi) {
-    const julkaisukielet = this.perusteStore.julkaisukielet.value;
-    const sourceLang = _.includes(julkaisukielet as string[], 'fi') ? 'fi' : julkaisukielet[0];
-    return julkaisukielet.reduce((obj, key) => ({ ...obj, [key]: nimiKoodi.nimi?.[sourceLang] }), {});
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get koulutuksenosaId() {
-    return this.$route.params.koulutuksenosaId;
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get koulutusOsanKoulutustyypit(): string[] {
-    return [
-      _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.TUTKINTOKOULUTUKSEENVALMENTAVA),
-      _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.PERUSOPETUS),
-      _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.LUKIOKOULUTUS),
-      _.toLower(KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum.AMMATILLINENKOULUTUS),
-    ];
-  }
-
-  get koulutusOsanTyypit(): string[] {
-    return [
-      _.toLower(KoulutuksenOsaDtoKoulutusOsanTyyppiEnum.YHTEINEN),
-      _.toLower(KoulutuksenOsaDtoKoulutusOsanTyyppiEnum.VALINNAINEN),
-    ];
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
-
-  get defaultDragOptions() {
-    return {
-      animation: 300,
-      emptyInsertThreshold: 10,
-      handle: '.order-handle',
-      disabled: !this.store!.isEditing,
-      ghostClass: 'dragged',
-    };
-  }
-
-  get tavoitteetOptions() {
-    return {
-      ...this.defaultDragOptions,
-      group: {
-        name: 'tavoitteet',
+// Initialize koodisto
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'koulutuksenosattuva',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
       },
-    };
-  }
+    })).data as any;
+  },
+});
 
-  get laajuusAnnettu() {
-    return !_.isNull(this.store?.data.value.laajuusMinimi) && !_.isNull(this.store?.data.value.laajuusMaksimi);
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const tkstore = new KoulutuksenOsaStore(
+    perusteId.value!,
+    Number(koulutuksenosaId.value),
+    versionumero.value
+  );
+  store.value = new EditointiStore(tkstore);
+  tempNimiValue.value = null;
+};
+
+const onAddListItem = (array: string): void => {
+  if (!store.value) return;
+
+  store.value.setData({
+    ...store.value.data.value,
+    [array]: [
+      ..._.get(store.value.data.value, array),
+      {},
+    ],
+  });
+};
+
+const onRemoveListItem = (rowToRemove: any, array: string) => {
+  if (!store.value) return;
+
+  store.value.setData({
+    ...store.value.data.value,
+    [array]: _.filter(_.get(store.value.data.value, array), rivi => rivi !== rowToRemove),
+  });
+};
+
+const onNimiKoodiAdd = () => {
+  if (!inputNimi.value) return;
+
+  // possible broken
+  (inputNimi.value.$el.querySelector('input') as HTMLInputElement)?.dispatchEvent(new Event('input'));
+};
+
+const setNimiValue = (nimiKoodi: any) => {
+  if (!nimiKoodi?.nimi) return {};
+
+  const julkaisukielet = props.perusteStore.julkaisukielet.value;
+  const sourceLang = _.includes(julkaisukielet as string[], 'fi') ? 'fi' : julkaisukielet[0];
+  return julkaisukielet.reduce((obj, key) => ({ ...obj, [key]: nimiKoodi.nimi?.[sourceLang] }), {});
+};
+
+// Watch for changes in koulutuksenosaId
+watch(koulutuksenosaId, async (id, oldId) => {
+  if (!id || id === oldId) {
+    return;
   }
-}
+  await fetch();
+}, { immediate: true });
+
+// Watch for changes in versionumero
+watch(versionumero, async () => {
+  await fetch();
+});
 </script>
 
 <style scoped lang="scss">

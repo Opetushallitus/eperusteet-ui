@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
 import { computed } from 'vue';
 import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Perusteenosat, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
@@ -7,7 +6,8 @@ import _ from 'lodash';
 import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { Kielet } from '@shared/stores/kieli';
-
+import { App } from 'vue';
+import { Router } from 'vue-router';
 
 export function notNull() {
   return {
@@ -17,7 +17,7 @@ export function notNull() {
 
 interface TutkinnonOsaEditStoreConfig {
   perusteStore: PerusteStore;
-  router: any;
+  router: Router;
 }
 
 export class TutkinnonOsaEditStore implements IEditoitava {
@@ -25,7 +25,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   private tutkinnonOsaId: number | null = null;
   private projektitJoissaKaytossa: any[] | null = null;
 
-  public static install(vue: typeof Vue, config: TutkinnonOsaEditStoreConfig) {
+  public static install(app: App, config: TutkinnonOsaEditStoreConfig) {
     TutkinnonOsaEditStore.config = config;
   }
 

@@ -21,42 +21,39 @@
 
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, getCurrentInstance } from 'vue';
+import { useRouter } from 'vue-router';
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusopetusLaajaAlainenOsaaminenStore } from '@/stores/PerusopetusLaajaAlainenOsaaminenStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-  },
-})
-export default class RouteLaajaAlainenOsaaminen extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  laoId?: any;
+}>();
 
-  @Prop({ required: false })
-  laoId: any;
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  store: EditointiStore | null = null;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('laoId', { immediate: true })
-  async laoChange() {
-    const store = new PerusopetusLaajaAlainenOsaaminenStore(this.perusteId!, this.laoId, this.perusteStore, this);
-    this.store = new EditointiStore(store);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-}
+// Watch for changes in laoId
+watch(() => props.laoId, async () => {
+  const laoStore = new PerusopetusLaajaAlainenOsaaminenStore(
+    perusteId.value!,
+    props.laoId,
+    props.perusteStore,
+  );
+  store.value = new EditointiStore(laoStore);
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">

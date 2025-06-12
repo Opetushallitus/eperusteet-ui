@@ -16,7 +16,7 @@
 
     <b-modal
       v-if="isEditing"
-      id="EpSisaltoalueetEditModal"
+      ref="EpSisaltoalueetEditModal"
       :title="$t('tavoitealueet-kaikilla-vuosiluokilla')"
       size="xl">
 
@@ -52,89 +52,87 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed, ref, useTemplateRef } from 'vue';
 import EpSortableTextList from '@shared/components/EpSortableTextList/EpSortableTextList.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
+import { $kaanna, $t, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSortableTextList,
-    EpInput,
-    EpButton,
-    EpKielivalinta,
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    required: true,
   },
-})
-export default class EpTavoitealueetEditModal extends Vue {
-  @Prop({ required: true })
-  value!: any;
+  isEditing: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  oppiaineId: {
+    type: [String, Number],
+    required: true,
+  },
+  perusteId: {
+    type: [String, Number],
+    required: true,
+  },
+});
 
-  @Prop({ required: false, default: false })
-  isEditing!: boolean;
+const emit = defineEmits(['update:modelValue']);
 
-  @Prop({ required: true })
-  oppiaineId: any;
+const tempModel = ref<any | null>(null);
+const tallennetaan = ref(false);
+const EpSisaltoalueetEditModal = useTemplateRef('EpSisaltoalueetEditModal');
 
-  @Prop({ required: true })
-  perusteId: any;
+const model = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val),
+});
 
-  tempModel: any | null = null;
-  tallennetaan: boolean = false;
+const avaa = () => {
+  tempModel.value = _.cloneDeep(model.value);
+  EpSisaltoalueetEditModal.value.show();
+};
 
-  get model() {
-    return this.value;
+const sulje = () => {
+  tallennetaan.value = false;
+  EpSisaltoalueetEditModal.value.hide();
+};
+
+const tallenna = async () => {
+  tallennetaan.value = true;
+  try {
+    model.value.kohdealueet = await PerusopetusOppiaineStore.saveTavoitealueet(props.perusteId, props.oppiaineId, model.value.kohdealueet);
+    sulje();
   }
-
-  set model(val) {
-    this.$emit('input', val);
+  catch (e) {
+    $fail($t('virhe-palvelu-virhe') as string);
   }
-
-  avaa() {
-    this.tempModel = _.cloneDeep(this.model);
-    this.$bvModal.show('EpSisaltoalueetEditModal');
+  finally {
+    tallennetaan.value = false;
   }
+};
 
-  sulje() {
-    this.tallennetaan = false;
-    this.$bvModal.hide('EpSisaltoalueetEditModal');
-  }
-
-  async tallenna() {
-    this.tallennetaan = true;
-    try {
-      this.model.kohdealueet = await PerusopetusOppiaineStore.saveTavoitealueet(this.perusteId, this.oppiaineId, this.model.kohdealueet);
-      this.sulje();
-    }
-    catch (e) {
-      this.$fail(this.$t('virhe-palvelu-virhe') as string);
-    }
-    finally {
-      this.tallennetaan = false;
-    }
-  }
-
-  peruuta() {
-    this.model = this.tempModel!;
-    this.sulje();
-  }
-}
+const peruuta = () => {
+  model.value = tempModel.value!;
+  sulje();
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
 
-  ::v-deep ul {
+  :deep(ul) {
     padding-inline-start: 25px;
   }
 
   .muokkaa {
-    ::v-deep .btn {
+    :deep(.btn) {
       padding-left: 0px;
     }
   }
-
 </style>

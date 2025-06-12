@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Portal to="headerExtension">
+    <Teleport defer to="#headerExtension">
       <div class="container">
         <div class="container-fluid">
           <div class="row no-gutters">
@@ -11,7 +11,8 @@
           </div>
         </div>
       </div>
-    </Portal>
+    </Teleport>
+
     <div class="container tile-container">
       <div class="d-flex flex-row flex-wrap justify-content-center">
         <TilePerusteprojektit v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
@@ -30,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance } from 'vue';
+import { computed, getCurrentInstance, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useHead } from '@unhead/vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -84,7 +85,7 @@ useHead({
   .header {
     color: white;
     background-color: $etusivu-header-background;
-    background-image: url('~@assets/img/banners/header.svg');
+    background-image: url('@assets/img/banners/header.svg');
     background-position: 100% 0;
     background-repeat: no-repeat;
     @media only screen and (min-width: 2503px)  {

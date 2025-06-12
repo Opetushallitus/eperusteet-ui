@@ -95,39 +95,67 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import _ from 'lodash';
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
-
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { usePerusteprojekti } from './PerusteprojektiRoute';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { KvliiteEditStore } from '@/stores/KvliiteEditStore';
-
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import { perusteenSuoritustapa } from '@shared/utils/perusteet';
+import { $t, $kaanna, $kaannaOlioTaiTeksti } from '@shared/utils/globals';
+import { KayttajaStore } from '@/stores/kayttaja';
+import { TiedotteetStore } from '@/stores/TiedotteetStore';
+import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
+import { AikatauluStore } from '@/stores/AikatauluStore';
+import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
+import { PerusteStore } from '@/stores/PerusteStore';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpSpinner,
-    EpContent,
-  },
-})
-export default class RouteKvliite extends PerusteprojektiRoute {
-  private store: EditointiStore | null = null;
+const props = defineProps<{
+  kayttajaStore: KayttajaStore;
+  tiedotteetStore: TiedotteetStore;
+  muokkaustietoStore: MuokkaustietoStore;
+  aikatauluStore: AikatauluStore;
+  tyoryhmaStore: TyoryhmaStore;
+  perusteStore: PerusteStore;
+}>();
 
-  async onProjektiChange(projektiId: number, perusteId: number) {
-    this.store = new EditointiStore(new KvliiteEditStore(projektiId, perusteId));
+const store = ref<EditointiStore | null>(null);
+const route = useRoute();
+
+const {
+  isInitializing,
+  perusteId,
+} = usePerusteprojekti({
+  perusteStore: props.perusteStore,
+  kayttajaStore: props.kayttajaStore,
+  tiedotteetStore: props.tiedotteetStore,
+  muokkaustietoStore: props.muokkaustietoStore,
+  aikatauluStore: props.aikatauluStore,
+  tyoryhmaStore: props.tyoryhmaStore,
+});
+
+const tutkinnonMuodostuminen = computed(() => {
+  if (props.perusteStore.perusteSuoritustapa.value && store.value?.data.value?.kvliite) {
+    return store.value?.data.value?.kvliite.muodostumisenKuvaus[_.toLower(props.perusteStore.perusteSuoritustapa.value)];
   }
+  return null;
+});
 
-  get tutkinnonMuodostuminen() {
-    if (this.perusteStore.perusteSuoritustapa.value && this.store?.data.value?.kvliite) {
-      return this.store?.data.value?.kvliite.muodostumisenKuvaus[_.toLower(this.perusteStore.perusteSuoritustapa.value)];
-    }
+// Setup watch for projektiId
+onMounted(async () => {
+  const projektiIdNumber = _.parseInt(route.params.projektiId as string);
+  if (projektiIdNumber) {
+    await onProjektiChange(projektiIdNumber, perusteId.value!);
   }
-}
+});
+
+const onProjektiChange = async (projektiId: number, perusteId: number) => {
+  store.value = new EditointiStore(new KvliiteEditStore(projektiId, perusteId));
+};
 </script>
 
 <style lang="scss" scoped>

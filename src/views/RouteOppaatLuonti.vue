@@ -38,7 +38,7 @@
 
           <b-form-group :label="$t('oppaan-nimi') + ' *'" required class="pl-0">
             <ep-input v-model="data.lokalisoituNimi" :is-editing="true" :placeholder="$t('kirjoita-oppaan-nimi')"
-                :validation="$v.data.lokalisoituNimi" />
+                :validation="v$.data.lokalisoituNimi" />
           </b-form-group>
 
           <b-form-group :label="$t('opastyoryhma') + ' *'" required class="pl-0">
@@ -100,8 +100,9 @@
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Mixins } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
@@ -118,179 +119,152 @@ import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { OppaatStore } from '@/stores/OppaatStore';
 import * as _ from 'lodash';
 import { themes, koulutustyyppiRyhmaSort, EperusteetKoulutustyypit } from '@shared/utils/perusteet';
-import { validationMixin } from 'vuelidate';
 import { requiredOneLang } from '../../eperusteet-frontend-utils/vue/src/validators/required';
 import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
+import { useRouter } from 'vue-router';
 
-export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
+const props = defineProps<{
+  perusteprojektiStore: PerusteprojektiStore;
+  ulkopuolisetStore: UlkopuolisetStore;
+  oppaatStore: OppaatStore;
+}>();
 
-@Component({
-  components: {
-    EpAikataulu,
-    EpButton,
-    EpColorIndicator,
-    EpInput,
-    EpMainView,
-    EpMultiSelect,
-    EpSearch,
-    EpSelect,
-    EpSpinner,
-    EpSteps,
-    EpMultiListSelect,
-    KoulutustyyppiSelect,
-  },
-  validations() {
-    return {
-      data: this.validator,
-    };
-  },
-})
-export default class RouteOppaatLuonti extends Mixins(validationMixin) {
-  @Prop({ required: true })
-  perusteprojektiStore!: PerusteprojektiStore;
+const router = useRouter();
 
-  @Prop({ required: true })
-  ulkopuolisetStore!: UlkopuolisetStore;
+const data = ref<any>({
+  koulutustyypit: [null],
+});
+const tyyppi = ref<'oppaasta' | 'uusi'>('uusi');
+const currentStep = ref<string | null>(null);
 
-  @Prop({ required: true })
-  oppaatStore!: OppaatStore;
+onMounted(async () => {
+  await Promise.all([
+    props.ulkopuolisetStore.fetchTyoryhmat(),
+    props.oppaatStore.updateQuery(),
+    props.perusteprojektiStore.fetchPohjaProjektit(),
+  ]);
+});
 
-  private data: any = {
-    koulutustyypit: [null],
-  };
-  private tyyppi: 'oppaasta' | 'uusi' = 'uusi';
-  private currentStep: string | null = null;
-
-  async mounted() {
-    await Promise.all([
-      this.ulkopuolisetStore.fetchTyoryhmat(),
-      this.oppaatStore.updateQuery(),
-      this.perusteprojektiStore.fetchPohjaProjektit(),
-    ]);
-  }
-
-  @Watch('tyyppi')
-  onTyyppiChange() {
-    this.data = {
-      ...this.data,
-      pohja: null,
-      koulutustyypit: [
-        null,
-      ],
-    };
-  }
-
-  get koulutustyyppiOptions() {
-    return [...EperusteetKoulutustyypit, 'koulutustyyppi_muu'];
-  }
-
-  get oppaat() {
-    return this.oppaatStore.oppaat.value;
-  }
-
-  get steps() {
-    const self = this;
-    return [{
-      key: 'pohja',
-      name: this.$t('pohjan-valinta'),
-      isValid() {
-        return !(self.tyyppi === 'oppaasta' && !self.data.pohja);
-      },
-    }, {
-      key: 'tiedot',
-      name: this.$t('oppaan-tiedot'),
-      isValid() {
-        return !self.$v.$invalid && !_.isEmpty(self.data.tyoryhma);
-      },
-    },
-    ];
-  }
-
-  stepChange(step) {
-    this.currentStep = step;
-  }
-
-  tyoryhmaSearchIdentity(tr: any) {
-    return _.toLower(this.$kaanna(tr.nimi));
-  }
-
-  ktToRyhma(koulutustyyppi) {
-    return themes[koulutustyyppi];
-  }
-
-  get tyoryhmat() {
-    return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.tyoryhmaSearchIdentity);
-  }
-
-  get koulutustyypit() {
-    return _.chain(EperusteetKoulutustyypit)
-      .map(koulutustyyppi => {
-        return {
-          value: koulutustyyppi,
-          text: this.$t(koulutustyyppi),
-        } as MultiListSelectItem;
-      })
-      .sortBy(item => koulutustyyppiRyhmaSort[this.ktToRyhma(item.value)])
-      .value();
-  }
-
-  get perusteet() {
-    return _.chain(this.perusteprojektiStore.perusteet.value)
-      .map(peruste => {
-        return {
-          value: peruste,
-          text: this.$kaanna((peruste as any).nimi),
-        } as MultiListSelectItem;
-      })
-      .sortBy(peruste => _.toLower(peruste.text))
-      .value();
-  }
-
-  async onSave() {
-    const luotu = await this.oppaatStore.saveOpas({
-      nimi: this.data.lokalisoituNimi[Kielet.getSisaltoKieli.value],
-      lokalisoituNimi: this.data.lokalisoituNimi,
-      ryhmaOid: this.data.tyoryhma.oid,
-      oppaanKoulutustyypit: _.filter(this.data.koulutustyypit, koulutustyyppi => koulutustyyppi !== null),
-      oppaanPerusteet: this.data.perusteet,
-      pohjaId: this.data.pohja?.peruste.id,
-    });
-    this.$router.push({
-      name: 'opas',
-      params: {
-        projektiId: '' + luotu.id,
-      },
-    });
-  }
-
-  onCancel() {
-    this.$router.push({
-      name: 'oppaat',
-    });
-  }
-
-  get validator() {
-    return {
-      lokalisoituNimi: requiredOneLang(),
-    };
-  }
-
-  lisaaKoulutustyyppi() {
-    this.data.koulutustyypit = [
-      ...this.data.koulutustyypit,
+watch(tyyppi, () => {
+  data.value = {
+    ...data.value,
+    pohja: null,
+    koulutustyypit: [
       null,
-    ];
-  }
+    ],
+  };
+});
 
-  poistaKoulutustyyppi(index) {
-    this.data.koulutustyypit = _.filter(this.data.koulutustyypit, (val, valIndex) => index !== valIndex);
+const rules = {
+  data: {
+    lokalisoituNimi: requiredOneLang(),
   }
-}
+};
+
+const v$ = useVuelidate(rules, { data });
+
+const koulutustyyppiOptions = computed(() => {
+  return [...EperusteetKoulutustyypit, 'koulutustyyppi_muu'];
+});
+
+const oppaat = computed(() => {
+  return props.oppaatStore.oppaat.value;
+});
+
+const steps = computed(() => {
+  return [{
+    key: 'pohja',
+    name: $t('pohjan-valinta'),
+    isValid() {
+      return !(tyyppi.value === 'oppaasta' && !data.value.pohja);
+    },
+  }, {
+    key: 'tiedot',
+    name: $t('oppaan-tiedot'),
+    isValid() {
+      return !v$.value.$invalid && !_.isEmpty(data.value.tyoryhma);
+    },
+  }];
+});
+
+const stepChange = (step) => {
+  currentStep.value = step;
+};
+
+const tyoryhmaSearchIdentity = (tr: any) => {
+  return _.toLower($kaanna(tr.nimi));
+};
+
+const ktToRyhma = (koulutustyyppi) => {
+  return themes[koulutustyyppi];
+};
+
+const tyoryhmat = computed(() => {
+  return _.sortBy(props.ulkopuolisetStore.tyoryhmat.value, tyoryhmaSearchIdentity);
+});
+
+const koulutustyypit = computed(() => {
+  return _.chain(EperusteetKoulutustyypit)
+    .map(koulutustyyppi => {
+      return {
+        value: koulutustyyppi,
+        text: $t(koulutustyyppi),
+      } as MultiListSelectItem;
+    })
+    .sortBy(item => koulutustyyppiRyhmaSort[ktToRyhma(item.value)])
+    .value();
+});
+
+const perusteet = computed(() => {
+  return _.chain(props.perusteprojektiStore.perusteet.value)
+    .map(peruste => {
+      return {
+        value: peruste,
+        text: $kaanna((peruste as any).nimi),
+      } as MultiListSelectItem;
+    })
+    .sortBy(peruste => _.toLower(peruste.text))
+    .value();
+});
+
+const onSave = async () => {
+  const luotu = await props.oppaatStore.saveOpas({
+    nimi: data.value.lokalisoituNimi[Kielet.getSisaltoKieli.value],
+    lokalisoituNimi: data.value.lokalisoituNimi,
+    ryhmaOid: data.value.tyoryhma.oid,
+    oppaanKoulutustyypit: _.filter(data.value.koulutustyypit, koulutustyyppi => koulutustyyppi !== null),
+    oppaanPerusteet: data.value.perusteet,
+    pohjaId: data.value.pohja?.peruste.id,
+  });
+  router.push({
+    name: 'opas',
+    params: {
+      projektiId: '' + luotu.id,
+    },
+  });
+};
+
+const onCancel = () => {
+  router.push({
+    name: 'oppaat',
+  });
+};
+
+const lisaaKoulutustyyppi = () => {
+  data.value.koulutustyypit = [
+    ...data.value.koulutustyypit,
+    null,
+  ];
+};
+
+const poistaKoulutustyyppi = (index) => {
+  data.value.koulutustyypit = _.filter(data.value.koulutustyypit, (val, valIndex) => index !== valIndex);
+};
 </script>
 
 <style lang="scss" scoped>
-
 .tieto {
   padding: 20px;
 
@@ -298,5 +272,4 @@ export default class RouteOppaatLuonti extends Mixins(validationMixin) {
     font-weight: 600;
   }
 }
-
 </style>

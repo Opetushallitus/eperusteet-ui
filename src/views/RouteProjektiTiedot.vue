@@ -81,8 +81,8 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Prop, Component } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -91,7 +91,6 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PerusteprojektiEditStore } from '@/stores/PerusteprojektiEditStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
@@ -102,68 +101,66 @@ import { TermitStore } from '@/stores/TermitStore';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 import { Maintenance, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpCollapse,
-    EpContent,
-    EpEditointi,
-    EpInput,
-    EpSpinner,
-    EpToggle,
-    PerustetyoryhmaSelect,
-    EpExternalLink,
-    EpEsikatselu,
+const props = defineProps<{
+  ulkopuolisetStore: UlkopuolisetStore;
+  projektiId?: number;
+  perusteId?: number;
+  isInitializing?: boolean;
+  perusteStore: any;
+}>();
+
+const store = ref<EditointiStore | null>(null);
+
+const kuvaus = computed(() => {
+  return {
+    uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
+    korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
+  };
+});
+
+const kasiteHandler = computed(() => {
+  return createKasiteHandler(new TermitStore(props.perusteId!));
+});
+
+const kuvaHandler = computed(() => {
+  return createKuvaHandler(new KuvaStore(props.perusteId!));
+});
+
+const storeData = computed({
+  get() {
+    return store.value?.data.value;
   },
-})
-export default class RouteProjektiTiedot extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  ulkopuolisetStore!: UlkopuolisetStore;
-
-  private store: EditointiStore | null = null;
-
-  async onProjektiChange(projektiId: number) {
-    this.store = new EditointiStore(new PerusteprojektiEditStore(projektiId, this.perusteStore));
+  set(data) {
+    store.value?.setData(data);
   }
+});
 
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
+const onProjektiChange = async (projektiId: number) => {
+  store.value = new EditointiStore(new PerusteprojektiEditStore(projektiId, props.perusteStore));
+};
 
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
+const exportPeruste = async () => {
+  const peruste = JSON.stringify((await Maintenance.viePerusteJson(props.perusteId!)).data);
+  const blob = new Blob([peruste as any], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'peruste';
+  link.click();
+  URL.revokeObjectURL(link.href);
+};
 
-  get kuvaus() {
-    return {
-      uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
-      korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
-    };
+// Watch for changes in projektiId
+watch(() => props.projektiId, async (newProjektiId) => {
+  if (newProjektiId) {
+    await onProjektiChange(newProjektiId);
   }
-
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-
-  async exportPeruste() {
-    const peruste = JSON.stringify((await Maintenance.viePerusteJson(this.perusteId!)).data);
-    const blob = new Blob([peruste as any], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'peruste';
-    link.click();
-    URL.revokeObjectURL(link.href);
-  }
-}
+}, { immediate: true });
 </script>
 
 <style lang="scss" scoped>
-::v-deep .form-group {
+:deep(.form-group) {
   padding-right: 30px !important;
 }
 

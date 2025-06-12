@@ -36,7 +36,7 @@
       </div>
       <div v-else class="d-flex justify-content-between">
         <div>
-          <ep-button class="ml-2" variant="primary" @click="onSave()" :disabled="$v.$invalid">{{ $t('tallenna') }}</ep-button>
+          <ep-button class="ml-2" variant="primary" @click="onSave()" :disabled="v$.$invalid">{{ $t('tallenna') }}</ep-button>
         </div>
       </div>
       <hr class="my-4"/>
@@ -66,167 +66,158 @@
   </ep-main-view>
 </template>
 
-<script lang="ts" >
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
 import { YllapitoStore } from '@/stores/YllapitoStore';
 import { YllapitoDto } from '@shared/generated/eperusteet';
-import { Validations } from 'vuelidate-property-decorators';
+import { useVuelidate } from '@vuelidate/core';
 import { notNull } from '@shared/validators/required';
 import { Maintenance } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { EperusteetKoulutustyyppiRyhmaSort, julkisivuPerusteKoosteJarjestys, themes } from '@shared/utils/perusteet';
-import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
+import { $t, $kaanna, $success } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpButton,
-    EpInput,
-    EpSpinner,
-    EpToggle,
-    EpBalloonList,
-  },
-})
-export default class RouteYllapito extends Vue {
-  @Prop({ required: true })
-  private yllapitoStore!: YllapitoStore;
+const props = defineProps<{
+  yllapitoStore: YllapitoStore;
+}>();
 
-  private isEditing = false;
-  private isEditingPerusteJarjestys = false;
-  private yllapitoTiedot: YllapitoDto[] | null = null;
-  private amosaaKtPaivitysLoading = false;
-  private julkisivunPerusteetRyhmiteltyna: any[] | null = null;
+const isEditing = ref(false);
+const isEditingPerusteJarjestys = ref(false);
+const yllapitoTiedot = ref<YllapitoDto[] | null>(null);
+const amosaaKtPaivitysLoading = ref(false);
+const julkisivunPerusteetRyhmiteltyna = ref<any[] | null>(null);
 
-  @Validations()
-  validations = {
-    inner: {
-      $each: {
-        kuvaus: notNull(),
-        key: notNull(),
-        value: notNull(),
-      },
+const rules = {
+  inner: {
+    $each: {
+      kuvaus: notNull(),
+      key: notNull(),
+      value: notNull(),
     },
-  };
+  },
+};
 
-  async mounted() {
-    this.yllapitoTiedot = await this.yllapitoStore.fetch();
-    await this.fetchJulkisivunPerusteet();
-  }
+const v$ = useVuelidate(rules, { inner: yllapitoTiedot });
 
-  async fetchJulkisivunPerusteet() {
-    this.julkisivunPerusteetRyhmiteltyna = null;
-    await this.yllapitoStore.fetchJulkisivunPerusteet();
-    this.julkisivunPerusteetRyhmiteltyna = this.ryhmittelePerusteet();
-  }
+onMounted(async () => {
+  yllapitoTiedot.value = await props.yllapitoStore.fetch();
+  await fetchJulkisivunPerusteet();
+});
 
-  get julkisivunPerusteet() {
-    return this.yllapitoStore.julkisivunPerusteet.value;
-  }
+const fetchJulkisivunPerusteet = async () => {
+  julkisivunPerusteetRyhmiteltyna.value = null;
+  await props.yllapitoStore.fetchJulkisivunPerusteet();
+  julkisivunPerusteetRyhmiteltyna.value = ryhmittelePerusteet();
+};
 
-  ryhmittelePerusteet() {
-    const ryhmitetty = _.map(this.julkisivunPerusteet, (peruste) => {
+const julkisivunPerusteet = computed(() => {
+  return props.yllapitoStore.julkisivunPerusteet.value;
+});
+
+const ryhmittelePerusteet = () => {
+  const ryhmitetty = _.map(julkisivunPerusteet.value, (peruste) => {
+    return {
+      ...peruste,
+      ryhma: themes[peruste.koulutustyyppi!],
+    };
+  });
+
+  return _.chain(ryhmitetty)
+    .groupBy('ryhma')
+    .map((perusteet, ryhma) => {
       return {
-        ...peruste,
-        ryhma: themes[peruste.koulutustyyppi!],
+        ryhma,
+        perusteet: _.chain(perusteet)
+          .map(peruste => {
+            return {
+              ...peruste,
+              kaannettyNimi: $kaanna(peruste.nimi!),
+            };
+          })
+          .orderBy(julkisivuPerusteKoosteJarjestys.keys, julkisivuPerusteKoosteJarjestys.sortby)
+          .value(),
       };
-    });
+    })
+    .orderBy(perusteRyhma => EperusteetKoulutustyyppiRyhmaSort[perusteRyhma.ryhma])
+    .value();
+};
 
-    return _.chain(ryhmitetty)
-      .groupBy('ryhma')
-      .map((perusteet, ryhma) => {
-        return {
-          ryhma,
-          perusteet: _.chain(perusteet)
-            .map(peruste => {
-              return {
-                ...peruste,
-                kaannettyNimi: this.$kaanna(peruste.nimi!),
-              };
-            })
-            .orderBy(julkisivuPerusteKoosteJarjestys.keys, julkisivuPerusteKoosteJarjestys.sortby)
-            .value(),
-        };
-      })
-      .orderBy(perusteRyhma => EperusteetKoulutustyyppiRyhmaSort[perusteRyhma.ryhma])
-      .value();
+const onSave = async () => {
+  await props.yllapitoStore.save(yllapitoTiedot.value!);
+  $success($t('tallennus-onnistui') as string);
+  isEditing.value = false;
+};
+
+const fields = computed(() => {
+  return [{
+    key: 'kuvaus',
+    label: $t('kuvaus') as string,
+    thStyle: { width: '33%' },
+    sortable: false,
+  }, {
+    key: 'key',
+    label: $t('avain') as string,
+    thStyle: { width: '33%' },
+    sortable: false,
+  }, {
+    key: 'value',
+    label: $t('arvo') as string,
+    thStyle: { width: '33%' },
+    sortable: false,
+  }];
+});
+
+const onEdit = () => {
+  isEditing.value = true;
+};
+
+const isBoolean = (val) => {
+  return val === false || val === true || val === 'false' || val === 'true';
+};
+
+const amosaaKoulutustoimijaPaivitys = async () => {
+  amosaaKtPaivitysLoading.value = true;
+  try {
+    await Maintenance.paivitaAmosaaKoulutustoimijat();
+    $success('Päivitys käynnistetty');
   }
-
-  async onSave() {
-    await this.yllapitoStore.save(this.yllapitoTiedot!);
-    this.$success(this.$t('tallennus-onnistui') as string);
-    this.isEditing = false;
+  catch (e) {
+    $success($t('virhe-palvelu-virhe') as string);
   }
+  amosaaKtPaivitysLoading.value = false;
+};
 
-  get fields() {
-    return [{
-      key: 'kuvaus',
-      label: this.$t('kuvaus') as string,
-      thStyle: { width: '33%' },
-      sortable: false,
-    }, {
-      key: 'key',
-      label: this.$t('avain') as string,
-      thStyle: { width: '33%' },
-      sortable: false,
-    }, {
-      key: 'value',
-      label: this.$t('arvo') as string,
-      thStyle: { width: '33%' },
-      sortable: false,
-    }];
-  }
+const muokkaaPerusteidenJarjestysta = () => {
+  isEditingPerusteJarjestys.value = !isEditingPerusteJarjestys.value;
+};
 
-  onEdit() {
-    this.isEditing = true;
-  }
+const peruuta = async () => {
+  isEditingPerusteJarjestys.value = !isEditingPerusteJarjestys.value;
+  await fetchJulkisivunPerusteet();
+};
 
-  isBoolean(val) {
-    return val === false || val === true || val === 'false' || val === 'true';
-  }
+const tallenna = async () => {
+  const perusteet = _.chain(julkisivunPerusteetRyhmiteltyna.value)
+    .reduce((acc, ryhma) => {
+      return acc.concat(ryhma.perusteet);
+    }, [])
+    .map((peruste, index) => ({
+      ...peruste as any,
+      julkisivuJarjestysNro: index,
+    }))
+    .value();
 
-  async amosaaKoulutustoimijaPaivitys() {
-    this.amosaaKtPaivitysLoading = true;
-    try {
-      await Maintenance.paivitaAmosaaKoulutustoimijat();
-      this.$success('Päivitys käynnistetty');
-    }
-    catch (e) {
-      this.$success(this.$t('virhe-palvelu-virhe') as string);
-    }
-    this.amosaaKtPaivitysLoading = false;
-  }
-
-  muokkaaPerusteidenJarjestysta() {
-    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
-  }
-
-  async peruuta() {
-    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
-    await this.fetchJulkisivunPerusteet();
-  }
-
-  async tallenna() {
-    const perusteet = _.chain(this.julkisivunPerusteetRyhmiteltyna)
-      .reduce((acc, ryhma) => {
-        return acc.concat(ryhma.perusteet);
-      }, [])
-      .map((peruste, index) => ({
-        ...peruste as any,
-        julkisivuJarjestysNro: index,
-      }))
-      .value();
-
-    await this.yllapitoStore.tallennaJulkisivunPerusteet(perusteet);
-    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
-    this.$success(this.$t('tallennus-onnistui') as string);
-    await this.fetchJulkisivunPerusteet();
-  }
-}
+  await props.yllapitoStore.tallennaJulkisivunPerusteet(perusteet);
+  isEditingPerusteJarjestys.value = !isEditingPerusteJarjestys.value;
+  $success($t('tallennus-onnistui') as string);
+  await fetchJulkisivunPerusteet();
+};
 </script>
 
 <style scoped lang="scss">

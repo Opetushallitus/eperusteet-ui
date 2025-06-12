@@ -1,4 +1,5 @@
-import { Component, Watch, Prop, Vue } from 'vue-property-decorator';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
@@ -12,114 +13,122 @@ import { isYleissivistavaKoulutustyyppi } from '@shared/utils/perusteet';
 
 const browserStore = new BrowserStore();
 
-@Component
-export class PerusteprojektiRoute extends Vue {
-  @Prop({ required: true })
-  protected perusteStore!: PerusteStore;
+export function usePerusteprojekti(props: {
+  perusteStore?: PerusteStore;
+  kayttajaStore?: KayttajaStore;
+  tiedotteetStore?: TiedotteetStore;
+  muokkaustietoStore?: MuokkaustietoStore;
+  aikatauluStore?: AikatauluStore;
+  tyoryhmaStore?: TyoryhmaStore;
+}) {
+  const route = useRoute();
+  const isInitingProjekti = ref(false);
 
-  @Prop({ required: true })
-  protected kayttajaStore!: KayttajaStore;
-
-  @Prop({ required: true })
-  protected tiedotteetStore!: TiedotteetStore;
-
-  @Prop({ required: true })
-  protected muokkaustietoStore!: MuokkaustietoStore;
-
-  @Prop({ required: true })
-  protected aikatauluStore!: AikatauluStore;
-
-  @Prop({ required: true })
-  protected tyoryhmaStore!: TyoryhmaStore;
-
-  protected get showNavigation() {
+  const showNavigation = computed(() => {
     return browserStore.navigationVisible.value;
-  }
+  });
 
-  private isInitingProjekti = false;
+  const isInitializing = computed(() => {
+    return isInitingProjekti.value;
+  });
 
-  protected get isInitializing() {
-    return this.isInitingProjekti;
-  }
+  const projektiId = computed(() => {
+    return route.params.projektiId as string;
+  });
 
-  protected get projektiId() {
-    return this.$route.params.projektiId;
-  }
+  const perusteId = computed(() => {
+    return props.perusteStore?.perusteId.value;
+  });
 
-  protected get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+  const isAmmatillinen = computed(() => {
+    return props.perusteStore?.isAmmatillinen.value;
+  });
 
-  protected get isAmmatillinen() {
-    return this.perusteStore.isAmmatillinen.value;
-  }
+  const isVapaasivistystyo = computed(() => {
+    return props.perusteStore?.isVapaasivistystyo.value;
+  });
 
-  protected get isVapaasivistystyo() {
-    return this.perusteStore.isVapaasivistystyo.value;
-  }
+  const peruste = computed(() => {
+    return props.perusteStore?.peruste?.value || null;
+  });
 
-  protected get peruste() {
-    return this.perusteStore?.peruste?.value || null;
-  }
+  const projekti = computed(() => {
+    return props.perusteStore?.projekti?.value || null;
+  });
 
-  protected get projekti() {
-    return this.perusteStore?.projekti?.value || null;
-  }
+  const julkaisukielet = computed(() => {
+    return props.perusteStore?.julkaisukielet.value;
+  });
 
-  protected get julkaisukielet() {
-    return this.perusteStore.julkaisukielet.value;
-  }
-
-  protected get isPohja() {
-    if (this.peruste) {
-      return _.toLower(this.peruste.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.POHJA);
+  const isPohja = computed(() => {
+    if (peruste.value) {
+      return _.toLower(peruste.value.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.POHJA);
     }
-  }
+    return false;
+  });
 
-  protected get isNormaali() {
-    if (this.peruste) {
-      return _.toLower(this.peruste.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.NORMAALI);
+  const isNormaali = computed(() => {
+    if (peruste.value) {
+      return _.toLower(peruste.value.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.NORMAALI);
     }
-  }
+    return false;
+  });
 
-  protected async onProjektiChange(projektiId?: number, perusteId?: number) {
-  }
-
-  @Watch('projektiId', { immediate: true })
-  async onProjektiChangeImpl(newValue: string, oldValue: string) {
-    if (newValue && newValue !== oldValue && !this.isInitingProjekti) {
-      const projektiId = _.parseInt(newValue);
-      this.isInitingProjekti = true;
-      window.scrollTo(0, 0);
-      try {
-        this.kayttajaStore.clear();
-        this.muokkaustietoStore.clear();
-        this.aikatauluStore.clear();
-        this.tiedotteetStore.clear();
-        this.tyoryhmaStore.clear();
-        await this.kayttajaStore.setPerusteprojekti(projektiId);
-        await this.perusteStore.init(projektiId);
-        await this.perusteStore.blockUntilInitialized();
-        await this.onProjektiChange(projektiId, this.perusteStore.perusteId.value!);
-      }
-      catch (err) {
-        console.error(err);
-        throw err;
-      }
-      finally {
-        this.isInitingProjekti = false;
-      }
-    }
-  }
-
-  protected get koulutustyyppiKohtaisetKaannokset() {
+  const koulutustyyppiKohtaisetKaannokset = computed(() => {
     return {
-      perusteentiedot: isYleissivistavaKoulutustyyppi(this.perusteStore.peruste.value?.koulutustyyppi)
+      perusteentiedot: isYleissivistavaKoulutustyyppi(props.perusteStore?.peruste.value?.koulutustyyppi)
         ? 'perusteen-tiedot-yleissivistava'
         : 'perusteen-tiedot',
-      perusteennimi: isYleissivistavaKoulutustyyppi(this.perusteStore.peruste.value?.koulutustyyppi)
+      perusteennimi: isYleissivistavaKoulutustyyppi(props.perusteStore?.peruste.value?.koulutustyyppi)
         ? 'perusteen-nimi-yleissivistava'
         : 'perusteen-nimi',
     };
-  }
+  });
+
+  const onProjektiChange = async (projektiId?: number, perusteId?: number) => {
+    // This can be overridden in the component using this composition function
+  };
+
+  // Watch for changes in the project ID
+  // watch(projektiId, async (newValue, oldValue) => {
+  //   if (newValue && newValue !== oldValue && !isInitingProjekti.value) {
+  //     const projektiIdNumber = _.parseInt(newValue);
+  //     isInitingProjekti.value = true;
+  //     window.scrollTo(0, 0);
+  //     try {
+  //       props.kayttajaStore?.clear();
+  //       props.muokkaustietoStore?.clear();
+  //       props.aikatauluStore?.clear();
+  //       props.tiedotteetStore?.clear();
+  //       props.tyoryhmaStore?.clear();
+  //       await props.kayttajaStore?.setPerusteprojekti(projektiIdNumber);
+  //       await props.perusteStore?.init(projektiIdNumber);
+  //       await props.perusteStore?.blockUntilInitialized();
+  //       await onProjektiChange(projektiIdNumber, props.perusteStore?.perusteId.value!);
+  //     }
+  //     catch (err) {
+  //       console.error(err);
+  //       throw err;
+  //     }
+  //     finally {
+  //       isInitingProjekti.value = false;
+  //     }
+  //   }
+  // }, { immediate: true });
+
+  return {
+    showNavigation,
+    isInitializing,
+    projektiId,
+    perusteId,
+    isAmmatillinen,
+    isVapaasivistystyo,
+    peruste,
+    projekti,
+    julkaisukielet,
+    isPohja,
+    isNormaali,
+    koulutustyyppiKohtaisetKaannokset,
+    onProjektiChange,
+  };
 }

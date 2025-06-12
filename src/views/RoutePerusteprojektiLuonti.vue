@@ -2,81 +2,78 @@
   <EpMainView>
     <b-container>
       <EpSteps ref="epsteps" :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel" @stepChange="onStepChange">
-
         <template v-slot:pohja>
-
           <div class="row">
             <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
             <div class="col-sm-10 mb-4">
-              <b-form-group class="mt-0 pt-0">
-                <b-form-radio class="p-2 d-flex" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">
-                  <div class="d-flex">
-                    <div>{{ $t('perustepohjaa') }}</div>
-                    <EpSpinner v-if="!pohjat" small/>
-                  </div>
-                </b-form-radio>
-                <div v-if="tyyppi === 'pohjasta'">
-                  <EpMultiSelect
-                    v-if="pohjat"
-                    :value="data.peruste"
-                    @input="valitsePeruste($event)"
-                    :placeholder="$t('valitse-pohja')"
-                    :is-editing="true"
-                    :search-identity="nimiSearchIdentity"
-                    :options="pohjat">
-                    <template #singleLabel="{ option }">
-                      {{ $kaanna(option.nimi) }}
-                    </template>
-                    <template #option="{ option }">
-                      {{ $kaanna(option.nimi) }}
-                    </template>
-                  </EpMultiSelect>
+              <EpRadio v-model="tyyppi" class="p-2" value="pohjasta" :disabled="!pohjat || pohjat.length === 0">
+                {{ $t('perustepohjaa') }} <EpSpinner v-if="!pohjat" small/>
+              </EpRadio>
+              <div v-if="tyyppi === 'pohjasta'">
+                <EpMultiSelect
+                  v-if="pohjat"
+                  :model-value="data.peruste"
+                  @update:modelValue="valitsePeruste($event)"
+                  :placeholder="$t('valitse-pohja')"
+                  :is-editing="true"
+                  :search-identity="nimiSearchIdentity"
+                  :options="pohjat">
+                  <template #singleLabel="{ option }">
+                    {{ $kaanna(option.nimi) }}
+                  </template>
+                  <template #option="{ option }">
+                    {{ $kaanna(option.nimi) }}
+                  </template>
+                </EpMultiSelect>
+              </div>
+
+              <EpRadio v-model="tyyppi" class="mt-3 p-2" value="perusteesta" :disabled="!perusteet || perusteet.length === 0">
+                <div class="d-flex">
+                  <div>{{ $t('toista-perusteprojektia') }}</div>
+                  <EpInfoPopover class="ml-2">
+                    {{$t('vain-ammatilliset-tutkinnot')}}
+                  </EpInfoPopover>
+                  <EpSpinner v-if="!perusteet" small/>
                 </div>
+              </EpRadio>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">
-                  <div class="d-flex">
-                    <div>{{ $t('toista-perusteprojektia') }}</div>
-                    <EpInfoPopover class="ml-2">
-                      {{$t('vain-ammatilliset-tutkinnot')}}
-                    </EpInfoPopover>
-                    <EpSpinner v-if="!perusteet" small/>
-                  </div>
-                </b-form-radio>
-                <div v-if="tyyppi === 'perusteesta'">
-                  <EpMultiSelect
-                    v-if="perusteet"
-                    :value="data.peruste"
-                    @input="valitsePeruste($event)"
-                    :placeholder="$t('valitse-peruste')"
-                    :is-editing="true"
-                    :search-identity="nimiSearchIdentity"
-                    :options="perusteet"
-                    class="perustevalinta">
-                    <template #singleLabel="{ option }">
-                      {{ $kaanna(option.nimi) }}
-                      <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
-                        (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span>-<span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
-                      </span>
-                    </template>
-                    <template #option="{ option }">
-                      {{ $kaanna(option.nimi) }}
-                      <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
-                        (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span> - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
-                      </span>
-                    </template>
-                  </EpMultiSelect>
+              <div v-if="tyyppi === 'perusteesta'">
+                <EpMultiSelect
+                  v-if="perusteet"
+                  :model-value="data.peruste"
+                  @update:modelValue="valitsePeruste($event)"
+                  :placeholder="$t('valitse-peruste')"
+                  :is-editing="true"
+                  :search-identity="nimiSearchIdentity"
+                  :options="perusteet"
+                  class="perustevalinta">
+                  <template #singleLabel="{ option }">
+                    {{ $kaanna(option.nimi) }}
+                    <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
+                      (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span>-<span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                    </span>
+                  </template>
+                  <template #option="{ option }">
+                    {{ $kaanna(option.nimi) }}
+                    <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
+                      (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span> - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                    </span>
+                  </template>
+                </EpMultiSelect>
+              </div>
+
+              <EpRadio v-model="tyyppi" value="uusi" class="mt-3 p-2">
+                {{ $t('luo-uusi-ilman-pohjaa') }}
+              </EpRadio>
+
+              <template v-if="$isAdmin()">
+                <EpRadio v-model="tyyppi" value="tiedostosta" class="mt-3 p-2">
+                  {{ $t('tuo-tiedostosta') }}
+                </EpRadio>
+                <div v-if="tyyppi === 'tiedostosta'">
+                  <ep-tiedosto-lataus :fileTypes="['application/json']" v-model="data.tiedosto" />
                 </div>
-
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi-ilman-pohjaa') }}</b-form-radio>
-
-                <template v-if="$isAdmin()">
-                  <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="tiedostosta" name="tyyppi">{{ $t('tuo-tiedostosta') }}</b-form-radio>
-                  <div v-if="tyyppi === 'tiedostosta'">
-                    <ep-tiedosto-lataus :fileTypes="['application/json']" v-model="data.tiedosto" />
-                  </div>
-                </template>
-
-              </b-form-group>
+              </template>
             </div>
           </div>
         </template>
@@ -97,8 +94,12 @@
           </b-form-group>
 
           <b-form-group :label="$t('projektin-kuvaus')" required>
-            <b-form-radio class="ml-1" v-model="data.projektiKuvaus" :value="kuvaus.uudistus" name="tyyppi">{{ $t('perusteen-uudistaminen-kuvaus') }}</b-form-radio>
-            <b-form-radio class="ml-1" v-model="data.projektiKuvaus" :value="kuvaus.korjaus" name="tyyppi">{{ $t('perusteen-korjaus-kuvaus') }}</b-form-radio>
+            <EpRadio v-model="data.projektiKuvaus" class="ml-1" :value="kuvaus.uudistus">
+              {{ $t('perusteen-uudistaminen-kuvaus') }}
+            </EpRadio>
+            <EpRadio v-model="data.projektiKuvaus" class="ml-1" :value="kuvaus.korjaus">
+              {{ $t('perusteen-korjaus-kuvaus') }}
+            </EpRadio>
             <ep-input class="mt-1" v-model="data.kuvaus" type="localized" :is-editing="true" :placeholder="$t('projektin-vapaamuotoinen-kuvaus')" />
           </b-form-group>
 
@@ -150,13 +151,13 @@
 
           <div v-for="(tpvm, idx) in data.tavoitepaivamaarat" :key="idx" class="row p-0 m-0" >
             <b-form-group :label="$t('tavoitteen-pvm')" class="col-md-4 col-12">
-              <ep-datepicker v-model="tpvm.tapahtumapaiva" class="mb-2" :isEditing="true" :validation="$v.data.tavoitepaivamaarat.$each.$iter[idx].tapahtumapaiva"/>
+              <ep-datepicker v-model="tpvm.tapahtumapaiva" class="mb-2" :isEditing="true" :validation="$v.data.tavoitepaivamaarat[idx].tapahtumapaiva"/>
               <ep-toggle v-model="tpvm.julkinen" v-if="isAmmatillinen" class="mb-2">
                 {{$t('julkinen')}}
               </ep-toggle>
             </b-form-group>
             <b-form-group :label="$t('tavoitteen-nimi-kuvaus') + '*'" class="col-md-7 col-11">
-              <ep-input v-model="tpvm.tavoite" type="localized" :is-editing="true" :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')" :validation="$v.data.tavoitepaivamaarat.$each.$iter[idx].tavoite" />
+              <ep-input v-model="tpvm.tavoite" type="localized" :is-editing="true" :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')" :validation="$v.data.tavoitepaivamaarat[idx].tavoite" />
             </b-form-group>
             <b-form-group class="col-1 col-sm-1 text-center">
               <template v-slot:label><br/></template>
@@ -198,7 +199,7 @@
               <div v-else-if="data.projektiKuvaus === kuvaus.uudistus">
                 {{ $t('perusteen-uudistus') }}
               </div>
-              <ep-input type="localized" :value="data.kuvaus" />
+              <ep-input type="localized" :model-value="data.kuvaus" />
             </div>
             <div class="tieto w-50">
               <div>
@@ -241,12 +242,14 @@
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, defineProps, onMounted, nextTick } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
@@ -267,321 +270,313 @@ import { Kielet } from '@shared/stores/kieli';
 import { notNull } from '@shared/validators/required';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { MaarayksetEditStore } from '@/stores/MaarayksetEditStore';
+import { useVuelidate } from '@vuelidate/core';
+import { $t, $kaanna, $sd, $kaannaOlioTaiTeksti } from '@shared/utils/globals';
+import { helpers } from '@vuelidate/validators';
 
-export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
+const props = defineProps<{
+  perusteprojektiStore: PerusteprojektiStore;
+  ulkopuolisetStore: UlkopuolisetStore;
+}>();
 
-@Component({
-  components: {
-    EpAikataulu,
-    EpButton,
-    EpColorIndicator,
-    EpInput,
-    EpMainView,
-    EpMultiSelect,
-    EpSearch,
-    EpSelect,
-    EpSpinner,
-    EpSteps,
-    EpTiedostoLataus,
-    EpDatepicker,
-    KoulutustyyppiSelect,
-    EpToggle,
-    EpInfoPopover,
-  },
-  validations() {
+const router = useRouter();
+const route = useRoute();
+
+const data = ref<any>({
+  nimi: null,
+  voimassaoloAlkaa: null,
+  tavoitepaivamaarat: [] as any[],
+  paatavoitteet: [] as any[],
+  koulutustyyppi: null,
+  tyoryhma: null,
+  peruste: null,
+  kuvaus: null,
+  projektiKuvaus: null,
+});
+
+const tyyppi = ref<'pohjasta' | 'perusteesta' | 'tiedostosta' | 'uusi'>('uusi');
+const currentStep = ref<Step | null>(null);
+const epsteps = ref<any>(null);
+
+// Validation rules
+const validator = computed(() => {
+  if (currentStep.value && currentStep.value.key === 'tiedot') {
     return {
-      data: this.validator,
-    };
-  },
-})
-export default class RoutePerusteprojektiLuonti extends Vue {
-  @Prop({ required: true })
-  perusteprojektiStore!: PerusteprojektiStore;
-
-  @Prop({ required: true })
-  ulkopuolisetStore!: UlkopuolisetStore;
-
-  private data: any = {
-    voimassaoloAlkaa: null,
-    tavoitepaivamaarat: [] as any[],
-    paatavoitteet: [] as any[],
-    koulutustyyppi: null,
-    tyoryhma: null,
-    peruste: null,
-    kuvaus: null,
-    projektiKuvaus: null,
-  };
-  private tyyppi: 'pohjasta' | 'perusteesta' | 'tiedostosta' | 'uusi' | null = 'uusi';
-  private currentStep: Step | null = null;
-
-  async mounted() {
-    this.ulkopuolisetStore.fetchTyoryhmat();
-    await Promise.all([
-      this.perusteprojektiStore.fetchPohjat(),
-      this.perusteprojektiStore.fetchPohjaProjektit(),
-    ]);
-
-    this.data.paatavoitteet = this.defaultPaatavoitteet;
-  }
-
-  @Watch('tyyppi')
-  onTyyppiChange() {
-    this.data = {
-      ...this.data,
-      tiedosto: null,
-      peruste: null,
-      koulutustyyppi: null,
-    };
-  }
-
-  get pohjat() {
-    if (this.perusteprojektiStore.pohjat.value) {
-      return _.sortBy(this.setIsDisabled(this.perusteprojektiStore.pohjat.value), pohja => _.toLower(this.$kaanna(pohja.nimi!)));
-    }
-  }
-
-  get perusteet() {
-    if (this.perusteprojektiStore.perusteet.value) {
-      let ammatilliset = _.filter(this.perusteprojektiStore.perusteet.value, peruste => isKoulutustyyppiAmmatillinen(peruste.koulutustyyppi!));
-      return _.sortBy(ammatilliset, peruste => _.toLower(this.$kaanna(peruste.nimi!)));
-    }
-  }
-
-  setIsDisabled(koulutustyypilliset) {
-    return _.map(koulutustyypilliset, koulutustyypillinen => {
-      return {
-        ...koulutustyypillinen,
-        $isDisabled: !isKoulutustyyppiSupported(koulutustyypillinen.koulutustyyppi),
-      };
-    });
-  }
-
-  get steps() {
-    const self = this;
-    return [{
-      key: 'pohja',
-      name: this.$t('pohjan-valinta'),
-      isValid() {
-        if ((self.tyyppi === 'pohjasta' || self.tyyppi === 'perusteesta') && !self.data.peruste) {
-          return false;
-        }
-
-        if (self.tyyppi === 'tiedostosta' && !self.data.tiedosto) {
-          return false;
-        }
-
-        return true;
-      },
-      onNext() {
-        if (self.data.tiedosto && !_.isEmpty(self.data.tiedosto.content.projekti)) {
-          self.data.nimi = self.data.tiedosto.content.projekti.nimi;
-          self.data.diaarinumero = self.data.tiedosto.content.projekti.diaarinumero;
-          self.data.koulutustyyppi = self.data.tiedosto.content.projekti.koulutustyyppi;
-          self.data.kuvaus = self.data.tiedosto.content.peruste.kuvaus;
-
-          if (self.data.tiedosto.content.projekti.ryhmaOid) {
-            self.data.tyoryhma = _.head(_.filter(self.tyoryhmat, tyoryhma => tyoryhma.oid === self.data.tiedosto.content.projekti.ryhmaOid));
-          }
-        }
-      },
-    }, {
-      key: 'tiedot',
-      name: this.$t('projektin-tiedot'),
-      description: this.$t('projektin-tiedot-kuvaus'),
-      isValid() {
-        return !self.$v.$invalid;
-      },
-    }, {
-      key: 'aikataulu',
-      name: this.$t('aikataulu'),
-      description: this.$t('aikataulu-kuvaus'),
-      isValid() {
-        return !self.$v.$invalid;
-      },
-    }, {
-      key: 'yhteenveto',
-      name: this.$t('tietojen-tarkistus'),
-      description: this.$t('yhteenveto-kuvaus-tallenna-tiedot'),
-    }];
-  }
-
-  valitsePeruste(event) {
-    this.data.peruste = event;
-    this.data.koulutustyyppi = event ? event.koulutustyyppi : null;
-  }
-
-  ktSearchIdentity(kt: any) {
-    return _.toLower(this.$kaannaOlioTaiTeksti(kt));
-  }
-
-  nimiSearchIdentity(obj: any) {
-    return _.toLower(this.$kaanna(obj.nimi));
-  }
-
-  get tyoryhmat() {
-    return _.sortBy(this.ulkopuolisetStore.tyoryhmat.value, this.nimiSearchIdentity);
-  }
-
-  get vaihtoehdotKoulutustyypit() {
-    return _.sortBy(EperusteetKoulutustyypit, x => this.$t(x));
-  }
-
-  get tapahtumat() {
-    return _.chain([{
-      tapahtuma: 'luominen',
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('peruste-luotu') },
-      tapahtumapaiva: new Date(),
-    },
-    ...this.data.paatavoitteet,
-    ...this.data.tavoitepaivamaarat,
-    ])
-      .filter('tapahtumapaiva')
-      .value();
-  }
-
-  get defaultPaatavoitteet() {
-    return [{
-      tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.LAUSUNTOKIERROS),
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('lausuntokierros-alkaa') },
-      tapahtumapaiva: null,
-      julkinen: false,
-    }, {
-      tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.JOHTOKUNNANKASITTELY),
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('johtokunnan-kasittely') },
-      tapahtumapaiva: null,
-      julkinen: false,
-    }, {
-      tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.ARVIOITUJULKAISUPAIVA),
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('perusteen-arvioitu-julkaisupaiva') },
-      tapahtumapaiva: null,
-      julkinen: false,
-    }, {
-      tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.JULKAISU),
-      tavoite: { [Kielet.getSisaltoKieli.value]: this.$t('peruste-astuu-voimaan') },
-      tapahtumapaiva: null,
-      julkinen: false,
-    }];
-  }
-
-  poistaTavoite(tavoitepaivamaara) {
-    this.data.tavoitepaivamaarat = _.without(this.data.tavoitepaivamaarat, tavoitepaivamaara);
-  }
-
-  get tavoiteHeading() {
-    return ' ';
-  }
-
-  async onSave() {
-    let luotu;
-    const projekti = {
-      diaarinumero: this.data.diaarinumero,
-      johtokunnanKasittely: this.data.johtokunnanKasittely,
-      koulutustyyppi: this.data.koulutustyyppi,
-      lausuntakierrosAlkaa: this.data.lausuntakierrosAlkaa,
-      nimi: this.data.nimi,
-      perusteId: this.data.peruste?.id,
-      laajuusYksikko: 'OSAAMISPISTE' as any,
-      ryhmaOid: this.data.tyoryhma ? this.data.tyoryhma.oid : null,
-      yhteistyotaho: this.data.yhteyshenkilo,
-      perusteenAikataulut: this.tapahtumat,
-      kuvaus: this.data.kuvaus,
-      projektiKuvaus: this.data.projektiKuvaus,
-      ...(isLukiokoulutus(this.data.koulutustyyppi) && { toteutus: 'lops2019' as any }),
-      maarays: MaarayksetEditStore.createEmptyMaarays({
-        nimi: { [Kielet.getSisaltoKieli.value]: this.data.nimi },
-        tyyppi: MaaraysDtoTyyppiEnum.PERUSTE,
-        koulutustyypit: [this.data.koulutustyyppi],
-        tila: MaaraysDtoTilaEnum.LUONNOS,
-      }),
-    };
-
-    if (this.data.tiedosto) {
-      luotu = await this.perusteprojektiStore.importPerusteprojekti({
-        ...this.data.tiedosto.content,
-        projekti: {
-          ...this.data.tiedosto.content.projekti,
-          ...projekti,
-        },
-        peruste: {
-          ...this.data.tiedosto.content.peruste,
-          perusteenAikataulut: this.tapahtumat,
-          kuvaus: this.data.kuvaus,
-        },
-      });
-    }
-    else {
-      luotu = await this.perusteprojektiStore.addPerusteprojekti(projekti);
-    }
-
-    this.$router.push({
-      name: 'perusteprojekti',
-      params: {
-        projektiId: '' + luotu.id,
-      },
-    });
-  }
-
-  lisaaTavoite() {
-    this.data.tavoitepaivamaarat = [
-      ...this.data.tavoitepaivamaarat, {
-        tapahtuma: 'tavoite',
-        tavoite: { [Kielet.getSisaltoKieli.value]: '' },
-        tapahtumapaiva: new Date(),
-        julkinen: false,
-      },
-    ];
-  }
-
-  onCancel() {
-    this.$router.push({
-      name: 'perusteprojektit',
-    });
-  }
-
-  onStepChange(step) {
-    this.currentStep = step;
-  }
-
-  get validator() {
-    if (this.currentStep && this.currentStep.key === 'tiedot') {
-      return {
+      data: {
         nimi: notNull(),
         koulutustyyppi: notNull(),
-      };
-    }
-
-    if (this.currentStep && this.currentStep.key === 'aikataulu') {
-      return {
-        tavoitepaivamaarat: {
-          $each: {
-            tapahtumapaiva: notNull(),
-            tavoite: {
-              [Kielet.getSisaltoKieli.value]: notNull(),
-            },
-          },
-        },
-      };
-    }
-
-    return {};
-  }
-
-  get kuvaus() {
-    return {
-      uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
-      korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
+      },
     };
   }
 
-  get isAmmatillinen() {
-    if (this.data.koulutustyyppi) {
-      return isKoulutustyyppiAmmatillinen(this.data.koulutustyyppi);
-    }
+  if (currentStep.value && currentStep.value.key === 'aikataulu') {
+    return {
+      data: {
+        tavoitepaivamaarat: [{
+          tapahtumapaiva: notNull(),
+          tavoite: {
+            [Kielet.getSisaltoKieli.value]: notNull(),
+          },
+        }],
+      },
+    };
   }
 
-  get eiTuetutKoulutustyypit() {
-    return EiTuetutKoulutustyypit;
+  return {};
+});
+
+const $v = useVuelidate(validator, { data });
+
+// Lifecycle hooks
+onMounted(async () => {
+  tyyppi.value = 'uusi';
+  await nextTick();
+  props.ulkopuolisetStore.fetchTyoryhmat();
+  await Promise.all([
+    props.perusteprojektiStore.fetchPohjat(),
+    props.perusteprojektiStore.fetchPohjaProjektit(),
+  ]);
+
+  data.value.paatavoitteet = defaultPaatavoitteet.value;
+});
+
+// Watchers
+watch(() => tyyppi.value, () => {
+  data.value = {
+    ...data.value,
+    tiedosto: null,
+    peruste: null,
+    koulutustyyppi: null,
+  };
+});
+
+// Computed properties
+const pohjat = computed(() => {
+  if (props.perusteprojektiStore.pohjat.value) {
+    return _.sortBy(setIsDisabled(props.perusteprojektiStore.pohjat.value), pohja => _.toLower($kaanna(pohja.nimi!)));
   }
+  return [];
+});
+
+const perusteet = computed(() => {
+  if (props.perusteprojektiStore.perusteet.value) {
+    let ammatilliset = _.filter(props.perusteprojektiStore.perusteet.value, peruste => isKoulutustyyppiAmmatillinen(peruste.koulutustyyppi!));
+    return _.sortBy(ammatilliset, peruste => _.toLower($kaanna(peruste.nimi!)));
+  }
+  return [];
+});
+
+const tyoryhmat = computed(() => {
+  return _.sortBy(props.ulkopuolisetStore.tyoryhmat.value, nimiSearchIdentity);
+});
+
+const vaihtoehdotKoulutustyypit = computed(() => {
+  return _.sortBy(EperusteetKoulutustyypit, x => $t(x));
+});
+
+const tapahtumat = computed(() => {
+  return _.chain([{
+    tapahtuma: 'luominen',
+    tavoite: { [Kielet.getSisaltoKieli.value]: $t('peruste-luotu') },
+    tapahtumapaiva: new Date(),
+  },
+  ...data.value.paatavoitteet,
+  ...data.value.tavoitepaivamaarat,
+  ])
+    .filter('tapahtumapaiva')
+    .value();
+});
+
+const defaultPaatavoitteet = computed(() => {
+  return [{
+    tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.LAUSUNTOKIERROS),
+    tavoite: { [Kielet.getSisaltoKieli.value]: $t('lausuntokierros-alkaa') },
+    tapahtumapaiva: null,
+    julkinen: false,
+  }, {
+    tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.JOHTOKUNNANKASITTELY),
+    tavoite: { [Kielet.getSisaltoKieli.value]: $t('johtokunnan-kasittely') },
+    tapahtumapaiva: null,
+    julkinen: false,
+  }, {
+    tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.ARVIOITUJULKAISUPAIVA),
+    tavoite: { [Kielet.getSisaltoKieli.value]: $t('perusteen-arvioitu-julkaisupaiva') },
+    tapahtumapaiva: null,
+    julkinen: false,
+  }, {
+    tapahtuma: _.toLower(PerusteAikatauluDtoTapahtumaEnum.JULKAISU),
+    tavoite: { [Kielet.getSisaltoKieli.value]: $t('peruste-astuu-voimaan') },
+    tapahtumapaiva: null,
+    julkinen: false,
+  }];
+});
+
+const kuvaus = computed(() => {
+  return {
+    uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
+    korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
+  };
+});
+
+const isAmmatillinen = computed(() => {
+  if (data.value.koulutustyyppi) {
+    return isKoulutustyyppiAmmatillinen(data.value.koulutustyyppi);
+  }
+  return false;
+});
+
+const eiTuetutKoulutustyypit = computed(() => {
+  return EiTuetutKoulutustyypit;
+});
+
+const tavoiteHeading = computed(() => {
+  return ' ';
+});
+
+const steps = computed(() => {
+  return [{
+    key: 'pohja',
+    name: $t('pohjan-valinta'),
+    isValid() {
+      if ((tyyppi.value === 'pohjasta' || tyyppi.value === 'perusteesta') && !data.value.peruste) {
+        return false;
+      }
+
+      if (tyyppi.value === 'tiedostosta' && !data.value.tiedosto) {
+        return false;
+      }
+
+      return true;
+    },
+    onNext() {
+      if (data.value.tiedosto && !_.isEmpty(data.value.tiedosto.content.projekti)) {
+        data.value.nimi = data.value.tiedosto.content.projekti.nimi;
+        data.value.diaarinumero = data.value.tiedosto.content.projekti.diaarinumero;
+        data.value.koulutustyyppi = data.value.tiedosto.content.projekti.koulutustyyppi;
+        data.value.kuvaus = data.value.tiedosto.content.peruste.kuvaus;
+
+        if (data.value.tiedosto.content.projekti.ryhmaOid) {
+          data.value.tyoryhma = _.head(_.filter(tyoryhmat.value, tyoryhma => tyoryhma.oid === data.value.tiedosto.content.projekti.ryhmaOid));
+        }
+      }
+    },
+  }, {
+    key: 'tiedot',
+    name: $t('projektin-tiedot'),
+    description: $t('projektin-tiedot-kuvaus'),
+    isValid() {
+      return !$v.value.$invalid;
+    },
+  }, {
+    key: 'aikataulu',
+    name: $t('aikataulu'),
+    description: $t('aikataulu-kuvaus'),
+    isValid() {
+      return !$v.value.$invalid;
+    },
+  }, {
+    key: 'yhteenveto',
+    name: $t('tietojen-tarkistus'),
+    description: $t('yhteenveto-kuvaus-tallenna-tiedot'),
+  }];
+});
+
+// Methods
+function setIsDisabled(koulutustyypilliset) {
+  return _.map(koulutustyypilliset, koulutustyypillinen => {
+    return {
+      ...koulutustyypillinen,
+      $isDisabled: !isKoulutustyyppiSupported(koulutustyypillinen.koulutustyyppi),
+    };
+  });
+}
+
+function valitsePeruste(event) {
+  data.value.peruste = event;
+  data.value.koulutustyyppi = event ? event.koulutustyyppi : null;
+}
+
+function ktSearchIdentity(kt: any) {
+  return _.toLower($kaannaOlioTaiTeksti(kt));
+}
+
+function nimiSearchIdentity(obj: any) {
+  return _.toLower($kaanna(obj.nimi));
+}
+
+function poistaTavoite(tavoitepaivamaara) {
+  data.value.tavoitepaivamaarat = _.without(data.value.tavoitepaivamaarat, tavoitepaivamaara);
+}
+
+async function onSave() {
+  let luotu;
+  const projekti = {
+    diaarinumero: data.value.diaarinumero,
+    johtokunnanKasittely: data.value.johtokunnanKasittely,
+    koulutustyyppi: data.value.koulutustyyppi,
+    lausuntakierrosAlkaa: data.value.lausuntakierrosAlkaa,
+    nimi: data.value.nimi,
+    perusteId: data.value.peruste?.id,
+    laajuusYksikko: 'OSAAMISPISTE' as any,
+    ryhmaOid: data.value.tyoryhma ? data.value.tyoryhma.oid : null,
+    yhteistyotaho: data.value.yhteyshenkilo,
+    perusteenAikataulut: tapahtumat.value,
+    kuvaus: data.value.kuvaus,
+    projektiKuvaus: data.value.projektiKuvaus,
+    ...(isLukiokoulutus(data.value.koulutustyyppi) && { toteutus: 'lops2019' as any }),
+    maarays: MaarayksetEditStore.createEmptyMaarays({
+      nimi: { [Kielet.getSisaltoKieli.value]: data.value.nimi },
+      tyyppi: MaaraysDtoTyyppiEnum.PERUSTE,
+      koulutustyypit: [data.value.koulutustyyppi],
+      tila: MaaraysDtoTilaEnum.LUONNOS,
+    }),
+  };
+
+  if (data.value.tiedosto) {
+    luotu = await props.perusteprojektiStore.importPerusteprojekti({
+      ...data.value.tiedosto.content,
+      projekti: {
+        ...data.value.tiedosto.content.projekti,
+        ...projekti,
+      },
+      peruste: {
+        ...data.value.tiedosto.content.peruste,
+        perusteenAikataulut: tapahtumat.value,
+        kuvaus: data.value.kuvaus,
+      },
+    });
+  }
+  else {
+    luotu = await props.perusteprojektiStore.addPerusteprojekti(projekti);
+  }
+
+  router.push({
+    name: 'perusteprojekti',
+    params: {
+      projektiId: '' + luotu.id,
+    },
+  });
+}
+
+function lisaaTavoite() {
+  data.value.tavoitepaivamaarat = [
+    ...data.value.tavoitepaivamaarat, {
+      tapahtuma: 'tavoite',
+      tavoite: { [Kielet.getSisaltoKieli.value]: '' },
+      tapahtumapaiva: new Date(),
+      julkinen: false,
+    },
+  ];
+}
+
+function onCancel() {
+  router.push({
+    name: 'perusteprojektit',
+  });
+}
+
+function onStepChange(step) {
+  currentStep.value = step;
 }
 </script>
 

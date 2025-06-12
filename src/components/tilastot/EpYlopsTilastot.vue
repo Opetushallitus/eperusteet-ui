@@ -231,7 +231,7 @@ const opetussuunnitelmatFilled = computed(() => {
     return _.map(props.opetussuunnitelmat, (opetussuunnitelma: Opetussuunnitelma) => {
       return {
         ...opetussuunnitelma,
-        url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[ops.koulutustyyppi])?.url + '/#/fi/opetussuunnitelmat/' + ops.id + '/yleisnakyma',
+        url: _.find(EPERUSTEET_SOVELLUKSET, sovellus => sovellus.sovellus === EPERUSTEET_KOULUTUSTYYPPI_PAIKALLISET_SOVELLUKSET[opetussuunnitelma.koulutustyyppi])?.url + '/#/fi/opetussuunnitelmat/' + opetussuunnitelma.id + '/yleisnakyma',
       };
     });
   }
@@ -240,14 +240,14 @@ const opetussuunnitelmatFilled = computed(() => {
 
 const opetussuunnitelmatFiltered = computed(() => {
   return _.chain(opetussuunnitelmatFilled.value)
-    .filter(ops => _.isEmpty(valitutTilat) || _.includes(_.map(valitutTilat, 'value'), ops.tila))
-    .filter(ops => _.isEmpty(valitutKoulutustyypit) || _.includes(_.map(valitutKoulutustyypit, 'value'), ops.koulutustyyppi))
-    .filter(ops => Kielet.search(query, ops.nimi))
-    .filter(ops => _.isEmpty(valitutVoimassaolot) || _.includes(_.map(valitutVoimassaolot, 'value'), opetussuunnitelmaVoimassaolo(ops)))
-    .filter(ops => _.isEmpty(valitutPerusteet) || _.includes(_.map(valitutPerusteet, 'value'), ops.perusteenId))
-    .filter(ops => _.isEmpty(valitutKoulutuksenjarjestajat) || _.includes(_.map(valitutKoulutuksenjarjestajat, 'value'), ops.koulutuksenjarjestaja!.oid))
-    .filter(ops => _.isEmpty(valitutKoulutuksenjarjestajaTyypit)
-      || _.some(_.map(valitutKoulutuksenjarjestajaTyypit, 'value'), tyyppi => _.includes(ops.koulutuksenjarjestaja?.tyypit, tyyppi) || (tyyppi === 'maarittelematon' && _.isEmpty(ops.koulutuksenjarjestaja?.tyypit))))
+    .filter(ops => _.isEmpty(valitutTilat.value) || _.includes(_.map(valitutTilat.value, 'value'), ops.tila))
+    .filter(ops => _.isEmpty(valitutKoulutustyypit.value) || _.includes(_.map(valitutKoulutustyypit.value, 'value'), ops.koulutustyyppi))
+    .filter(ops => Kielet.search(query.value, ops.nimi))
+    .filter(ops => _.isEmpty(valitutVoimassaolot.value) || _.includes(_.map(valitutVoimassaolot.value, 'value'), opetussuunnitelmaVoimassaolo(ops)))
+    .filter(ops => _.isEmpty(valitutPerusteet.value) || _.includes(_.map(valitutPerusteet.value, 'value'), ops.perusteenId))
+    .filter(ops => _.isEmpty(valitutKoulutuksenjarjestajat.value) || _.includes(_.map(valitutKoulutuksenjarjestajat.value, 'value'), ops.koulutuksenjarjestaja?.oid))
+    .filter(ops => _.isEmpty(valitutKoulutuksenjarjestajaTyypit.value)
+      || _.some(_.map(valitutKoulutuksenjarjestajaTyypit.value, 'value'), tyyppi => _.includes(ops.koulutuksenjarjestaja?.tyypit, tyyppi) || (tyyppi === 'maarittelematon' && _.isEmpty(ops.koulutuksenjarjestaja?.tyypit))))
     .filter(ops => aikavertailu(ops))
     .sortBy(ops => Kielet.kaanna(ops.nimi))
     .value();
@@ -285,8 +285,8 @@ function aikavertailu(ops: Opetussuunnitelma) {
     return false;
   }
 
-  return ops[aikavaliValue.value as keyof Opetussuunnitelma] >= aikavaliAlkuVrt.value &&
-         ops[aikavaliValue.value as keyof Opetussuunnitelma] <= aikavaliLoppuVrt.value;
+  return ops[aikavaliValue.value] >= aikavaliAlkuVrt.value &&
+         ops[aikavaliValue.value] <= aikavaliLoppuVrt.value;
 }
 
 const aikavaliAlkuVrt = computed(() => {

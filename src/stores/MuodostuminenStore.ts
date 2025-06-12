@@ -1,20 +1,21 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
+import VueRouter, { Router } from 'vue-router';
 import { reactive, computed } from 'vue';
 import { Api, TutkinnonRakenne, Perusteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
+import { App } from 'vue';
 
 interface MuodostuminenStoreConfig {
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: Router;
 }
 
 export class MuodostuminenStore implements IEditoitava {
   private static config: MuodostuminenStoreConfig;
 
-  public static install(vue: typeof Vue, config: MuodostuminenStoreConfig) {
+  public static install(app: App, config: MuodostuminenStoreConfig) {
     MuodostuminenStore.config = config;
   }
 

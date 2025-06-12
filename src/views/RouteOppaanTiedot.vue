@@ -258,8 +258,10 @@
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, provide, reactive, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import * as _ from 'lodash';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -269,12 +271,11 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
+import { usePerusteprojekti } from './PerusteprojektiRoute';
 import { OpasEditStore } from '@/stores/OpasEditStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
-import _ from 'lodash';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import { themes, koulutustyyppiRyhmaSort, EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms/EpMultiListSelect.vue';
@@ -287,302 +288,306 @@ import { Koodisto, PerusteBaseDtoOpasTyyppiEnum } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 import { KoulutusTyyppi } from '@/utils/perusteet';
+import { $t, $kaanna } from '@shared/utils/globals';
+import { PerusteStore } from '@/stores/PerusteStore';
 
-@Component({
-  components: {
-    EpButton,
-    EpCollapse,
-    EpContent,
-    EpEditointi,
-    EpInput,
-    EpSpinner,
-    EpToggle,
-    PerustetyoryhmaSelect,
-    EpKoulutustyyppiSelect,
-    EpDatepicker,
-    EpMultiListSelect,
-    EpColorIndicator,
-    EpExternalLink,
-    EpKoodistoSelectTable,
-    EpEsikatselu,
+const props = defineProps<{
+  ulkopuolisetStore: UlkopuolisetStore;
+  perusteprojektiStore: PerusteprojektiStore;
+  perusteStore: PerusteStore;
+}>();
+
+const store = ref<EditointiStore | null>(null);
+const maintenanceStore = ref<MaintenanceStore | null>(null);
+
+// Use the composition function
+const {
+  isInitializing,
+  projektiId,
+  perusteStore,
+} = usePerusteprojekti(props);
+
+onMounted(async () => {
+  await props.perusteprojektiStore.fetchPohjaProjektit();
+});
+
+watch(projektiId, async (newValue, oldValue) => {
+  if (newValue && newValue !== oldValue) {
+    await onProjektiChange(parseInt(newValue), perusteStore.perusteId.value!);
+  }
+}, { immediate: true });
+
+async function onProjektiChange(projektiId: number, perusteId: number) {
+  store.value = new EditointiStore(new OpasEditStore(projektiId, perusteId, props.perusteStore));
+  maintenanceStore.value = new MaintenanceStore(projektiId, perusteId);
+}
+
+const kielet = computed(() => {
+  return UiKielet;
+});
+
+function ktToRyhma(koulutustyyppi) {
+  return themes[koulutustyyppi];
+}
+
+const koulutustyypit = computed(() => {
+  return _.chain([...EperusteetKoulutustyypit, KoulutusTyyppi.MUU])
+    .map(koulutustyyppi => {
+      return {
+        value: koulutustyyppi,
+        text: $t(koulutustyyppi),
+      } as MultiListSelectItem;
+    })
+    .sortBy(item => koulutustyyppiRyhmaSort[ktToRyhma(item.value)])
+    .value();
+});
+
+const perusteet = computed(() => {
+  return _.chain(props.perusteprojektiStore.perusteet.value)
+    .map(peruste => {
+      return {
+        value: {
+          id: peruste.id,
+        },
+        text: $kaanna((peruste as any).nimi),
+      } as MultiListSelectItem;
+    })
+    .sortBy(peruste => _.toLower(peruste.text))
+    .value();
+});
+
+async function lataa() {
+  await maintenanceStore.value?.exportPeruste();
+}
+
+const tutkinnonOsatKoodisto = new KoodistoSelectStore({
+  koodisto: 'tutkinnonosat',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
   },
-})
-export default class RouteOppaanTiedot extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  ulkopuolisetStore!: UlkopuolisetStore;
+});
 
-  @Prop({ required: true })
-  perusteprojektiStore!: PerusteprojektiStore;
+const osaamisalaKoodisto = new KoodistoSelectStore({
+  koodisto: 'osaamisala',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  private store: EditointiStore | null = null;
-  private maintenanceStore: MaintenanceStore | null = null;
+const oppiaineKoodisto = new KoodistoSelectStore({
+  koodisto: 'oppiaineetjaoppimaaratlops2021',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  async mounted() {
-    await this.perusteprojektiStore.fetchPohjaProjektit();
-  }
+const opintokokonaisuusKoodisto = new KoodistoSelectStore({
+  koodisto: 'opintokokonaisuusnimet',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  async onProjektiChange(projektiId: number, perusteId: number) {
-    this.store = new EditointiStore(new OpasEditStore(projektiId, perusteId, this.perusteStore));
-    this.maintenanceStore = new MaintenanceStore(projektiId, perusteId);
-  }
+const koulutuksenosaKoodisto = new KoodistoSelectStore({
+  koodisto: 'koulutuksenosattuva',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  get kielet() {
-    return UiKielet;
-  }
+const oppaanKiinnitetytKoodit = computed(() => {
+  return store.value!.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit;
+});
 
-  ktToRyhma(koulutustyyppi) {
-    return themes[koulutustyyppi];
-  }
+const oppaanKiinnitetytKooditUris = computed(() => {
+  return _.map(oppaanKiinnitetytKoodit.value, okk => okk.koodi.uri);
+});
 
-  get koulutustyypit() {
-    return _.chain([...EperusteetKoulutustyypit, KoulutusTyyppi.MUU])
-      .map(koulutustyyppi => {
-        return {
-          value: koulutustyyppi,
-          text: this.$t(koulutustyyppi),
-        } as MultiListSelectItem;
-      })
-      .sortBy(item => koulutustyyppiRyhmaSort[this.ktToRyhma(item.value)])
-      .value();
-  }
-
-  get perusteet() {
-    return _.chain(this.perusteprojektiStore.perusteet.value)
-      .map(peruste => {
-        return {
-          value: {
-            id: peruste.id,
-          },
-          text: this.$kaanna((peruste as any).nimi),
-        } as MultiListSelectItem;
-      })
-      .sortBy(peruste => _.toLower(peruste.text))
-      .value();
-  }
-
-  async lataa() {
-    await this.maintenanceStore?.exportPeruste();
-  }
-
-  private tutkinnonOsatKoodisto = new KoodistoSelectStore({
-    koodisto: 'tutkinnonosat',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  private osaamisalaKoodisto = new KoodistoSelectStore({
-    koodisto: 'osaamisala',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  private oppiaineKoodisto = new KoodistoSelectStore({
-    koodisto: 'oppiaineetjaoppimaaratlops2021',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  private opintokokonaisuusKoodisto = new KoodistoSelectStore({
-    koodisto: 'opintokokonaisuusnimet',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  private koulutuksenosaKoodisto = new KoodistoSelectStore({
-    koodisto: 'koulutuksenosattuva',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  get tutkinnonosaKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const tutkinnonosaKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'TUTKINNONOSA')
       .map('koodi')
       .value();
-  }
-
-  set tutkinnonosaKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'TUTKINNONOSA',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get osaamisalaKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const osaamisalaKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OSAAMISALA')
       .map('koodi')
       .value();
-  }
-
-  set osaamisalaKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'OSAAMISALA',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get oppiaineKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const oppiaineKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OPPIAINE')
       .map('koodi')
       .value();
-  }
-
-  set oppiaineKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'OPPIAINE',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get opintokokonaisuusKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const opintokokonaisuusKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OPINTOKOKONAISUUS')
       .map('koodi')
       .value();
-  }
-
-  set opintokokonaisuusKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'OPINTOKOKONAISUUS',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get koulutuksenosaKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const koulutuksenosaKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'KOULUTUKSENOSA')
       .map('koodi')
       .value();
-  }
-
-  set koulutuksenosaKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'KOULUTUKSENOSA',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get oppaanKiinnitetytKoodit() {
-    return this.store!.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit;
-  }
-
-  get oppaanKiinnitetytKooditUris() {
-    return _.map(this.oppaanKiinnitetytKoodit, okk => okk.koodi.uri);
-  }
-
-  asetaOppaanKoodit(kiinnitettyKoodi) {
-    this.store!.setData(
+function asetaOppaanKoodit(kiinnitettyKoodi) {
+  if (store.value) {
+    store.value.setData(
       {
-        ...this.store?.data.value,
+        ...store.value.data.value,
         peruste: {
-          ...this.store?.data.value.peruste,
+          ...store.value.data.value.peruste,
           oppaanSisalto: {
-            ...this.store?.data.value.peruste.oppaanSisalto,
+            ...store.value.data.value.peruste.oppaanSisalto,
             oppaanKiinnitetytKoodit: [
-              ...this.store?.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit,
-              ..._.filter(kiinnitettyKoodi, koodi => !_.includes(this.oppaanKiinnitetytKooditUris, koodi.koodi.uri)),
+              ...store.value.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit,
+              ..._.filter(kiinnitettyKoodi, koodi => !_.includes(oppaanKiinnitetytKooditUris.value, koodi.koodi.uri)),
             ],
           },
         },
       },
     );
   }
+}
 
-  removeOppaanKoodi(koodi) {
-    this.store!.setData(
+function removeOppaanKoodi(koodi) {
+  if (store.value) {
+    store.value.setData(
       {
-        ...this.store?.data.value,
+        ...store.value.data.value,
         peruste: {
-          ...this.store?.data.value.peruste,
+          ...store.value.data.value.peruste,
           oppaanSisalto: {
-            ...this.store?.data.value.peruste.oppaanSisalto,
-            oppaanKiinnitetytKoodit: _.filter(this.store?.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit, kiinnitettyKoodi => kiinnitettyKoodi.koodi.uri !== koodi.uri),
+            ...store.value.data.value.peruste.oppaanSisalto,
+            oppaanKiinnitetytKoodit: _.filter(store.value.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit, kiinnitettyKoodi => kiinnitettyKoodi.koodi.uri !== koodi.uri),
           },
         },
       },
     );
   }
+}
 
-  get oppaanTyypit() {
-    return [
-      _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA),
-    ];
-  }
+const oppaanTyypit = [
+  _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA),
+];
 
-  get oppaanTyyppi() {
-    if (!this.store?.data.value.peruste.opasTyyppi || this.store?.data.value.peruste.opasTyyppi === _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI)) {
+const oppaanTyyppi = computed({
+  get() {
+    if (!store.value?.data.value.peruste.opasTyyppi || store.value?.data.value.peruste.opasTyyppi === _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI)) {
       return [];
     }
-
-    return [this.store?.data.value.peruste.opasTyyppi];
-  }
-
-  set oppaanTyyppi(tyyppi) {
-    this.store!.setData(
-      {
-        ...this.store?.data.value,
-        peruste: {
-          ...this.store?.data.value.peruste,
-          opasTyyppi: tyyppi[0] || _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI),
+    return [store.value?.data.value.peruste.opasTyyppi];
+  },
+  set(tyyppi) {
+    if (store.value) {
+      store.value.setData(
+        {
+          ...store.value.data.value,
+          peruste: {
+            ...store.value.data.value.peruste,
+            opasTyyppi: tyyppi[0] || _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI),
+          },
         },
-      },
-    );
-  };
+      );
+    }
+  },
+});
 
-  get oppaanTyyppiTietoaPalvelusta() {
-    return _.includes(this.oppaanTyyppi, _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA));
-  }
+const oppaanTyyppiTietoaPalvelusta = computed(() => {
+  return _.includes(oppaanTyyppi.value, _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA));
+});
 
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-}
+const storeData = computed({
+  get() {
+    return store.value?.data.value;
+  },
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 </script>
 
 <style lang="scss" scoped>

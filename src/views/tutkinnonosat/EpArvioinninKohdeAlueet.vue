@@ -31,68 +31,59 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
 import draggable from 'vuedraggable';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed } from 'vue';
 import EpArviointi from '@/views/tutkinnonosat/EpArviointi.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMaterialIcon,
-    draggable,
-    EpArviointi,
-    EpButton,
+const props = defineProps<{
+  modelValue: any[];
+  isEditing: boolean;
+  arviointiasteikot: any;
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const model = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpArvioinninKohdeAlueet extends Vue {
-  @Prop({ required: true })
-  private value!: any[];
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: true })
-  private isEditing!: boolean;
-
-  @Prop({ required: true })
-  private arviointiasteikot!: any;
-
-  get model() {
-    return this.value;
-  }
-
-  set model(val) {
-    this.$emit('input', val);
-  }
-
-  lisaaArvioinninKohdeAlue() {
-    this.model = [
-      ...this.model,
-      {
-        arvioinninKohteet: [],
-      },
-    ];
-  }
-
-  poistaArvioinninKohdealue(arvioinninKohdeAlue) {
-    this.model = _.filter(this.model, arv => arv !== arvioinninKohdeAlue);
-  }
-
-  get lisaaBtnTeksti() {
-    if (_.size(this.model) > 0) {
-      return 'lisaa-ammattitaitovaatimus-tekemisena';
-    }
-
-    return 'lisaa-tutkinnon-osa-kohtainen-arviointi';
-  }
-
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
+function lisaaArvioinninKohdeAlue() {
+  model.value = [
+    ...model.value,
+    {
+      arvioinninKohteet: [],
+    },
+  ];
 }
+
+function poistaArvioinninKohdealue(arvioinninKohdeAlue: any) {
+  model.value = _.filter(model.value, arv => arv !== arvioinninKohdeAlue);
+}
+
+const lisaaBtnTeksti = computed(() => {
+  if (_.size(model.value) > 0) {
+    return 'lisaa-ammattitaitovaatimus-tekemisena';
+  }
+
+  return 'lisaa-tutkinnon-osa-kohtainen-arviointi';
+});
+
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+  };
+});
 </script>
 
 <style scoped lang="scss">
