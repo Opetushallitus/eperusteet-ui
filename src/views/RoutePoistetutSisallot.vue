@@ -70,10 +70,10 @@ const palauta = async (poistettu: any) => {
     await props.poistetutStore.palauta(perusteId.value, poistettu);
     await fetch();
     await props.perusteStore.updateNavigation();
-    $success('palautus-onnistui');
+    $success($t('palautus-onnistui'));
   }
   catch (e) {
-    $fail('virhe-palvelu-virhe');
+    $fail($t('virhe-palvelu-virhe'));
   }
 };
 

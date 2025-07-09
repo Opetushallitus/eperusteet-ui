@@ -1,6 +1,6 @@
 <template>
   <ep-main-view container>
-    <EpEditointi :store="store" :confirmRemove="false">
+    <EpEditointi v-if="store" :store="store" :confirmRemove="false">
       <template v-slot:customheader="{ data, isEditing, cancel, save, disabled, validation, isSaving, modify, remove, editable }">
         <div class="d-flex justify-content-between header py-2" :class="{'editing': isEditing}">
           <h1 class="mb-4 mr-auto">{{ $t(header) }}</h1>
@@ -70,9 +70,9 @@
             </div>
           </template>
           <template v-if="isEditing">
-            <b-form-radio v-for="tyyppi in tyypit" v-model="data.tyyppi" :value="tyyppi" :key="'tyyppivalinta_'+tyyppi">
+            <EpRadio v-for="tyyppi in tyypit" v-model="data.tyyppi" :value="tyyppi" :key="'tyyppivalinta_'+tyyppi">
               {{ $t('maarays-tyyppi-' + tyyppi.toLowerCase()) }}
-            </b-form-radio>
+            </EpRadio>
           </template>
           <div v-else>
             {{ $t('maarays-tyyppi-' + data.tyyppi.toLowerCase()) }}
@@ -154,10 +154,6 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
-import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
-import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import { nimiSearchIdentity } from '@shared/utils/helpers';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
 import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
@@ -166,6 +162,7 @@ import { Kielet } from '@shared/stores/kieli';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
 import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const route = useRoute();
 const instance = getCurrentInstance();
@@ -182,11 +179,6 @@ const KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
 const maaraysliittyy = ref<'eiliity' | 'muuttaa' | 'korvaa'>('eiliity');
 const arvioinninTyyppi = ref<'geneerinen' | 'tutkinnonosa-kohtainen' | null>(null);
 
-onMounted(() => {
-  Murupolku.aseta('maaraysMuokkaus', $t(header.value), {
-    name: 'maaraysMuokkaus',
-  });
-});
 
 const maaraysId = computed(() => {
   if (route.params.maaraysId === 'uusi') {
@@ -196,9 +188,15 @@ const maaraysId = computed(() => {
   return _.toNumber(route.params.maaraysId);
 });
 
+onMounted(() => {
+  Murupolku.aseta('maaraysMuokkaus', $t(header.value), {
+    name: 'maaraysMuokkaus',
+  });
+});
+
 // Initialize the store when maaraysId changes
 watch(maaraysId, (newId) => {
-  const tkstore = new MaarayksetEditStore(newId, instance?.proxy as any);
+  const tkstore = new MaarayksetEditStore(newId);
   store.value = new EditointiStore(tkstore as any);
 }, { immediate: true });
 
@@ -220,7 +218,7 @@ const header = computed(() => {
 
 const storeData = computed({
   get() {
-    return store.value?.data.value;
+    return store.value?.data;
   },
   set(data) {
     store.value?.setData(data);
@@ -229,7 +227,7 @@ const storeData = computed({
 
 const tallenna = async (tila, save) => {
   store.value?.setData({
-    ...store.value?.data.value,
+    ...store.value?.data,
     tila,
   });
 
@@ -237,29 +235,29 @@ const tallenna = async (tila, save) => {
 };
 
 const isRequired = computed(() => {
-  return store.value?.isEditing.value ? ' *' : '';
+  return store.value?.isEditing ? ' *' : '';
 });
 
 const muokkaajaNimi = computed(() => {
-  return parsiEsitysnimi(store.value?.data.value?.muokkaajaKayttaja);
+  return parsiEsitysnimi(store.value?.data?.muokkaajaKayttaja);
 });
 
 const liittyyTyyppi = computed(() => {
-  return store.value?.data.value?.liittyyTyyppi;
+  return store.value?.data?.liittyyTyyppi;
 });
 
 // Watch liittyyTyyppi changes
 watch(liittyyTyyppi, (newType) => {
   if (newType !== MaaraysDtoLiittyyTyyppiEnum.MUUTTAA) {
     store.value?.setData({
-      ...store.value?.data.value,
+      ...store.value?.data,
       muutettavatMaaraykset: [],
     });
   }
 
   if (newType !== MaaraysDtoLiittyyTyyppiEnum.KORVAA) {
     store.value?.setData({
-      ...store.value?.data.value,
+      ...store.value?.data,
       korvattavatMaaraykset: [],
     });
   }
@@ -270,19 +268,19 @@ const kieli = computed(() => {
 });
 
 const liittyykoToiseenMaaraykseenOtsikko = computed(() => {
-  if (store.value?.isEditing.value) {
+  if (store.value?.isEditing) {
     return $t('maarayksen-liittyminen-aiempaan-maaraykseen') + isRequired.value;
   }
 
-  if (store.value?.data.value?.liittyyTyyppi === EILIITY) {
+  if (store.value?.data?.liittyyTyyppi === EILIITY) {
     return $t('ei-liity-toiseen-maaraykseen');
   }
 
-  if (store.value?.data.value?.liittyyTyyppi === MUUTTAA) {
+  if (store.value?.data?.liittyyTyyppi === MUUTTAA) {
     return $t('muuttaa-maaraysta');
   }
 
-  if (store.value?.data.value?.liittyyTyyppi === KORVAA) {
+  if (store.value?.data?.liittyyTyyppi === KORVAA) {
     return $t('korvaa-maarayksen');
   }
 
@@ -304,7 +302,7 @@ const poista = async (remove) => {
 };
 
 const peruste = computed(() => {
-  return store.value?.supportData.value?.peruste;
+  return store.value?.supportData?.peruste;
 });
 
 const maarayskirje = computed(() => {
@@ -321,11 +319,11 @@ const maarayskirjeUrl = computed(() => {
 });
 
 const asiasanat = computed(() => {
-  if (_.isEmpty(store.value?.supportData.value?.asiasanat[kieli.value])) {
+  if (_.isEmpty(store.value?.supportData?.asiasanat[kieli.value])) {
     return [];
   }
 
-  return store.value?.supportData.value?.asiasanat[kieli.value];
+  return store.value?.supportData?.asiasanat[kieli.value];
 });
 </script>
 

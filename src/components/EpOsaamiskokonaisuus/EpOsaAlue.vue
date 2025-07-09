@@ -14,7 +14,7 @@
       <hr/>
 
       <b-form-group v-for="(tasokuvaus, index) in osaAlue.tasokuvaukset" :key="'tasokuvaus' + index" :label="$t('osa-alue-otsiko-' + tasokuvaus.taso.toLowerCase())">
-        <draggable
+        <VueDraggable
             v-bind="defaultDragOptions"
             tag="div"
             v-model="tasokuvaus.kuvaukset">
@@ -36,7 +36,7 @@
               </b-col>
             </b-row>
 
-          </draggable>
+          </VueDraggable>
 
           <ep-button @click="lisaaKuvaus('kuvaukset', tasokuvaus.taso)" variant="outline" icon="add" class="mt-2">
             {{ $t('lisaa-kuvaus') }}
@@ -44,7 +44,7 @@
 
           <template v-if="tasokuvaus.taso === 'VUOSILUOKKA_12' || tasokuvaus.taso === 'VUOSILUOKKA_3456' || tasokuvaus.taso === 'VUOSILUOKKA_789'">
             <div class="mt-3 mb-2">{{$t('edistynyt-osaaminen')}}</div>
-            <draggable
+            <VueDraggable
               v-bind="defaultDragOptions"
               tag="div"
               v-model="tasokuvaus.edistynytOsaaminenKuvaukset">
@@ -65,7 +65,7 @@
                   </div>
                 </b-col>
               </b-row>
-            </draggable>
+            </VueDraggable>
 
             <ep-button @click="lisaaKuvaus('edistynytOsaaminenKuvaukset', tasokuvaus.taso)" variant="outline" icon="add" class="mt-1">
               {{ $t('lisaa-kuvaus') }}
@@ -105,7 +105,7 @@ import * as _ from 'lodash';
 import { computed } from 'vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { Kielet } from '@shared/stores/kieli';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';

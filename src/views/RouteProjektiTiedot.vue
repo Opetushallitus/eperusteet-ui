@@ -130,7 +130,7 @@ const kuvaHandler = computed(() => {
 
 const storeData = computed({
   get() {
-    return store.value?.data.value;
+    return store.value?.data;
   },
   set(data) {
     store.value?.setData(data);

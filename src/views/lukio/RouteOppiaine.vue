@@ -58,7 +58,7 @@
 
             <div v-if="isEditing">
 
-              <draggable
+              <VueDraggable
                 v-bind="tavoitealueDragOptions"
                 tag="div"
                 v-model="data.tavoitealueet">
@@ -100,7 +100,7 @@
                     </div>
                   </div>
                 </div>
-              </draggable>
+              </VueDraggable>
 
               <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaTavoitealue()">{{ $t('lisaa-tavoitealue') }}</EpButton>
 
@@ -153,7 +153,7 @@
           <EpCollapse :collapsable="!isEditing" :usePadding="false" :borderBottom="false" class="mt-4" v-if="!data._oppiaine || !data.id">
             <template #header><h4>{{$t('oppimaarat')}}</h4></template>
 
-            <draggable
+            <VueDraggable
               v-bind="oppiaineetDragOptions"
               tag="div"
               v-model="data.oppimaarat">
@@ -161,7 +161,7 @@
                   <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
                   <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
                 </div>
-            </draggable>
+            </VueDraggable>
 
             <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaOppimaara()" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-oppimaara') }}</EpButton>
           </EpCollapse>
@@ -182,7 +182,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -236,7 +236,7 @@ watch(() => props.oppiaineId, async () => {
 
 const storeData = computed({
   get() {
-    return store.value?.data.value;
+    return store.value?.data;
   },
   set(data) {
     store.value?.setData(data);
@@ -269,7 +269,7 @@ const lisaaTavoitealue = () => {
 };
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 const tavoitealueDragOptions = computed(() => {
@@ -312,11 +312,11 @@ const lisaaModuuli = (pakollinen: boolean) => {
 };
 
 const pakollisetModuulit = computed(() => {
-  return _.filter(store.value?.data.value.moduulit, 'pakollinen');
+  return _.filter(store.value?.data.moduulit, 'pakollinen');
 });
 
 const valinnaisetModuulit = computed(() => {
-  return _.reject(store.value?.data.value.moduulit, 'pakollinen');
+  return _.reject(store.value?.data.moduulit, 'pakollinen');
 });
 </script>
 

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { computed, reactive } from 'vue';
+import { computed, reactive, unref } from 'vue';
 import { Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
@@ -66,7 +66,7 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
     if (data.nimiKoodi) {
       data.nimi = data.nimiKoodi.nimi;
     }
-    const res = await Perusteenosat.updatePerusteenOsa(this.perusteenOsaId.value!, data);
+    const res = await Perusteenosat.updatePerusteenOsa(this.state.perusteenOsaId!, data);
 
     AbstractPerusteenOsaViiteStore.config.perusteStore!.updateNavigationEntry({
       id: this.perusteenOsaViiteId!,
@@ -111,7 +111,7 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
 
   public async lock() {
     try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.perusteenOsaId.value!);
+      const res = await Perusteenosat.checkPerusteenOsaLock(this.state.perusteenOsaId!);
       return res.data;
     }
     catch (err) {
@@ -120,22 +120,22 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
   }
 
   public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.perusteenOsaId.value!);
+    const res = await Perusteenosat.lockPerusteenOsa(this.state.perusteenOsaId!);
     return res.data;
   }
 
   public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.perusteenOsaId.value!);
+    await Perusteenosat.unlockPerusteenOsa(this.state.perusteenOsaId!);
   }
 
   public async revisions() {
-    const res = await Perusteenosat.getPerusteenOsaVersiot(this.perusteenOsaId.value!);
+    const res = await Perusteenosat.getPerusteenOsaVersiot(this.state.perusteenOsaId!);
     return res.data as Revision[];
   }
 
   public async restore(rev: number) {
     await this.acquire();
-    await Perusteenosat.revertPerusteenOsaToVersio(this.perusteenOsaId.value!, rev);
+    await Perusteenosat.revertPerusteenOsaToVersio(this.state.perusteenOsaId!, rev);
     await this.release();
   }
 

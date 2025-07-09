@@ -79,6 +79,10 @@ export class PerusopetusVuosiluokkakokonaisuusStore implements IEditoitava {
   }
 
   public async lock() {
+    if (!this.vlkId) {
+      return null;
+    }
+
     try {
       const res = await PerusopetusVuosiluokkaKokonaisuusLukko.checkLockPerusopetusVlk(this.perusteId, this.vlkId!);
       return res.data;

@@ -72,7 +72,7 @@
     </div>
 
     <b-form-group :label="$t('osaamistavoitteet') + ' *'">
-      <draggable v-bind="defaultDragOptions"
+      <VueDraggable v-bind="defaultDragOptions"
                  tag="div"
                  v-model="osaamismerkki.osaamistavoitteet">
         <div v-if="osaamismerkki.osaamistavoitteet?.length > 0" class="mb-1 font-italic">
@@ -97,7 +97,7 @@
             </EpButton>
           </div>
         </div>
-      </draggable>
+      </VueDraggable>
       <EpButton @click="lisaaTavoite"
                  variant="outline-primary"
                  icon="add">
@@ -106,7 +106,7 @@
     </b-form-group>
 
     <b-form-group :label="$t('arviointikriteerit') + ' *'">
-      <draggable v-bind="defaultDragOptions"
+      <VueDraggable v-bind="defaultDragOptions"
                  tag="div"
                  v-model="osaamismerkki.arviointikriteerit">
         <div v-if="osaamismerkki.arviointikriteerit?.length > 0" class="mb-1 font-italic">
@@ -131,7 +131,7 @@
             </EpButton>
           </div>
         </div>
-      </draggable>
+      </VueDraggable>
       <EpButton @click="lisaaKriteeri"
                  variant="outline-primary"
                  icon="add">
@@ -162,7 +162,7 @@
 
 <script setup lang="ts">
 import { ref, computed, useTemplateRef, reactive } from 'vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';

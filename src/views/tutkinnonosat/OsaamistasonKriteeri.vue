@@ -11,7 +11,7 @@
       </template>
 
       <template v-else>
-        <draggable v-bind="defaultDragOptions"
+        <VueDraggable v-bind="defaultDragOptions"
                    tag="div"
                    v-model="osaamistasonkriteeri.kriteerit">
           <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
@@ -26,7 +26,7 @@
               <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaKriteeri(kriteeri)"/>
             </div>
           </div>
-        </draggable>
+        </VueDraggable>
         <EpButton :paddingx="false" v-if="isEditing" class="mb-3" variant="link" icon="add" @click="lisaaKriteeri()">
           {{ $t('lisaa-kriteeri') }}
         </EpButton>
@@ -39,7 +39,7 @@
 import { computed } from 'vue';
 import { $kaanna } from '@shared/utils/globals';
 import * as _ from 'lodash';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';

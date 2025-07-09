@@ -1,5 +1,5 @@
 <template>
-  <draggable
+  <VueDraggable
     v-if="value"
     v-bind="options"
     tag="div"
@@ -33,13 +33,13 @@
           </MuodostumisNode>
         </div>
       </div>
-  </draggable>
+  </VueDraggable>
 </template>
 
 <script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ref, computed } from 'vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import _ from 'lodash';
 import { RooliToTheme, ColorMap } from '@/components/muodostuminen/utils';
 import MuodostumisItem from './MuodostumisItem.vue';

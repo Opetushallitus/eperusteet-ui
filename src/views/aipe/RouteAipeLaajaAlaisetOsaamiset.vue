@@ -18,7 +18,7 @@
         <b-col cols="5" class="font-weight-bold">{{$t('muokattu')}}</b-col>
       </b-row>
 
-      <draggable
+      <VueDraggable
         v-bind="defaultDragOptions"
         tag="div"
         v-model="data.laajaAlaisetOsaamiset">
@@ -36,7 +36,7 @@
             <span v-if="lao.muokattu">{{$sdt(lao.muokattu)}}</span>
           </b-col>
         </b-row>
-      </draggable>
+      </VueDraggable>
     </template>
   </EpEditointi>
 
@@ -52,7 +52,7 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $kaanna, $t, $sdt } from '@shared/utils/globals';
 
@@ -78,7 +78,7 @@ const lisaaLaajaAlainenOsaaminen = () => {
 };
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 const defaultDragOptions = computed(() => {

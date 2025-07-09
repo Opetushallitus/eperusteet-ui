@@ -147,31 +147,31 @@ const peruste = computed(() => {
 });
 
 const tekstikappaleet = computed(() => {
-  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Viite);
+  return _.filter(props.naviStore!.connected, node => node.type === NavigationNodeDtoTypeEnum.Viite);
 });
 
 const opintokokonaisuudet = computed(() => {
-  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Opintokokonaisuus);
+  return _.filter(props.naviStore!.connected, node => node.type === NavigationNodeDtoTypeEnum.Opintokokonaisuus);
 });
 
 const koulutuksenosat = computed(() => {
-  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Koulutuksenosa);
+  return _.filter(props.naviStore!.connected, node => node.type === NavigationNodeDtoTypeEnum.Koulutuksenosa);
 });
 
 const laajaalaisetosaamiset = computed(() => {
-  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Laajaalainenosaaminen);
+  return _.filter(props.naviStore!.connected, node => node.type === NavigationNodeDtoTypeEnum.Laajaalainenosaaminen);
 });
 
 const tavoitesisaltoalueet = computed(() => {
-  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.Tavoitesisaltoalue);
+  return _.filter(props.naviStore!.connected, node => node.type === NavigationNodeDtoTypeEnum.Tavoitesisaltoalue);
 });
 
 const kotoKielitaitotasot = computed(() => {
-  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.KotoKielitaitotaso);
+  return _.filter(props.naviStore!.connected, node => node.type === NavigationNodeDtoTypeEnum.KotoKielitaitotaso);
 });
 
 const kotoOpinnot = computed(() => {
-  return _.filter(props.naviStore!.connected.value, node => node.type === NavigationNodeDtoTypeEnum.KotoOpinto);
+  return _.filter(props.naviStore!.connected, node => node.type === NavigationNodeDtoTypeEnum.KotoOpinto);
 });
 
 const perusteenOsat = computed(() => {

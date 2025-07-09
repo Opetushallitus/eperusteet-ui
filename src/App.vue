@@ -1,7 +1,7 @@
 <template>
   <div class="minfull h-100">
     <router-view v-if="mounted"/>
-    <!-- <EpNotification /> -->
+    <EpNotification />
   </div>
 </template>
 
@@ -12,6 +12,10 @@ import { Kielet } from '@shared/stores/kieli';
 import { getKaannokset } from '@shared/api/eperusteet';
 import { useLoading } from 'vue-loading-overlay';
 import { loadingOptions } from './utils/loading';
+import { getCurrentInstance } from 'vue';
+import { nextTick } from 'vue';
+import { setGlobalBvModal } from '@shared/utils/globals';
+import EpNotification from '@shared/components/EpNotification/EpNotification.vue';
 
 const $loading = useLoading({
   ...loadingOptions,
@@ -21,6 +25,10 @@ const $loading = useLoading({
 const mounted = ref(false);
 
 onMounted(async () => {
+  const instance = getCurrentInstance() as any;
+  await nextTick();
+  setGlobalBvModal(instance.ctx._bv__modal);
+
   const loading = $loading.show();
   Kielet.load(await getKaannokset());
   await Kayttajat.init();

@@ -27,7 +27,7 @@
       <h4 class="mt-4">{{$t('sisaltoalueen-kuvaus')}}</h4>
       <ep-content layout="normal" v-model="model.sisaltoalueinfo.teksti" :is-editable="true"> </ep-content>
 
-      <draggable
+      <VueDraggable
         v-bind="sisaltoalueetDragOptions"
         tag="div"
         v-model="model.sisaltoalueet">
@@ -57,7 +57,7 @@
             </ep-button>
           </div>
         </div>
-      </draggable>
+      </VueDraggable>
 
       <ep-button variant="outline-primary" icon="add" v-if="model.sisaltoalueet && model.sisaltoalueet.length === 0" @click="lisaaSisaltoalue()" class="mt-3">
         {{ $t('lisaa-sisaltoalue') }}
@@ -78,7 +78,7 @@
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import * as _ from 'lodash';
 import { computed, ref } from 'vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -118,7 +118,7 @@ const emit = defineEmits(['update:modelValue']);
 
 const tempModel = ref<OppiaineenVuosiluokkaKokonaisuusDto | null>(null);
 const tallennetaan = ref(false);
-const EpSisaltoalueetEditModal = useTemplateRef('EpSisaltoalueetEditModal');
+const EpSisaltoalueetEditModal = ref(null);
 
 const model = computed({
   get: () => props.modelValue,

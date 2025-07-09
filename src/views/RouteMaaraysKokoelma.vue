@@ -236,7 +236,7 @@ watch(maaraysId, async () => {
   if (!maaraysId.value) {
     await fetch();
   }
-}, { immediate: true });
+});
 
 // Watch for changes in sivu
 watch(sivu, async () => {
@@ -271,6 +271,11 @@ const sortingChanged = (sortVal: any) => {
     jarjestysTapa: sortVal.sortBy,
   };
 };
+
+onMounted(async () => {
+  await fetch();
+});
+
 </script>
 
 <style scoped lang="scss">

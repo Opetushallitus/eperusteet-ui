@@ -32,14 +32,14 @@
         </div>
 
         <b-table
-            v-else
-            striped
-            hover
-            responsive
-            show-empty
-            :empty-text="$t('ei-sisaltoa')"
-            :items="osaamistasot"
-            :fields="fields">
+          v-else
+          striped
+          hover
+          responsive
+          show-empty
+          :empty-text="$t('ei-sisaltoa')"
+          :items="osaamistasot"
+          :fields="fields">
 
           <template v-slot:table-colgroup="scope">
             <col v-for="field in scope.fields" :key="field.key" :style="{ width: field.key === 'osaamistaso' && '160px' }" />
@@ -50,7 +50,7 @@
           </template>
 
           <template v-slot:cell(kriteerit)="data">
-            <EpBulletEditor kohde="" v-model="data.item.kriteerit" :is-editable="isEditing" :allowStructureChange="!inner.julkaistu">
+            <EpBulletEditor kohde="" :model-value="data.item.kriteerit" :is-editable="isEditing" :allowStructureChange="!inner.julkaistu">
               <template #add>{{ $t('lisaa-kriteeri') }}</template>
             </EpBulletEditor>
           </template>
@@ -198,7 +198,7 @@ const onPublish = async () => {
   isEditing.value = false;
   try {
     isLoading.value = true;
-    await props.arviointiStore.publish(inner.value!);
+    await props.arviointiStore.publish(inner.value!, true);
   }
   finally {
     await props.arviointiStore.fetchGeneeriset();
@@ -218,7 +218,7 @@ const onUnPublish = async () => {
   isEditing.value = false;
   try {
     isLoading.value = true;
-    await props.arviointiStore.unpublish(inner.value!);
+    await props.arviointiStore.publish(inner.value!, false);
   }
   finally {
     await props.arviointiStore.fetchGeneeriset();

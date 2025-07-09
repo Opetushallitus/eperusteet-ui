@@ -313,10 +313,10 @@ const nodeToRouteHandle = (navigationNode: NavigationNodeDto | undefined): Locat
   }
 
   switch (navigationNode.type) {
-    case 'tiedot':
-      return props.tiedotSivu;
-    default:
-      return nodeToRoute(navigationNode as any);
+  case 'tiedot':
+    return props.tiedotSivu;
+  default:
+    return nodeToRoute(navigationNode as any);
   }
 };
 

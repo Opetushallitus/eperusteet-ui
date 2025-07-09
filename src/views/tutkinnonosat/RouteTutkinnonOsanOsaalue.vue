@@ -158,14 +158,14 @@ const tov = computed(() => {
   if (!store.value) {
     return null;
   }
-  return store.value.data.value;
+  return store.value.data;
 });
 
 const arviointi = computed({
-  get: () => store.value?.data.value.arviointi?.id || null,
+  get: () => store.value?.data.arviointi?.id || null,
   set: (id) => {
     store.value?.setData({
-      ...store.value?.data.value,
+      ...store.value?.data,
       arviointi: { id },
     });
   },

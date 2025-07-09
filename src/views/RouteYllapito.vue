@@ -185,7 +185,7 @@ const amosaaKoulutustoimijaPaivitys = async () => {
   amosaaKtPaivitysLoading.value = true;
   try {
     await Maintenance.paivitaAmosaaKoulutustoimijat();
-    $success('Päivitys käynnistetty');
+    $success($t('Päivitys käynnistetty'));
   }
   catch (e) {
     $success($t('virhe-palvelu-virhe') as string);

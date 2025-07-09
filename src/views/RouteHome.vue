@@ -32,10 +32,6 @@
 
 <script setup lang="ts">
 import { computed, getCurrentInstance, onMounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useHead } from '@unhead/vue';
-import EpSearch from '@shared/components/forms/EpSearch.vue';
-import TileArkistoidut from './tiles/TileArkistoidut.vue';
 import TileOppaat from './tiles/TileOppaat.vue';
 import TilePerusteprojektit from './tiles/TilePerusteprojektit.vue';
 import TilePohjat from './tiles/TilePohjat.vue';
@@ -58,20 +54,10 @@ const props = defineProps<{
   digitaalisetOsaamisetStore: PerusteetStore;
 }>();
 
-
-// Get global functions from instance proxy
-const instance = getCurrentInstance();
-const $hasOphCrud = () => (instance?.proxy?.$root as any)?.$hasOphCrud?.();
-const $isAdmin = () => (instance?.proxy?.$root as any)?.$isAdmin?.();
-
 const nimi = computed(() => {
   return props.kayttajaStore?.nimi?.value || null;
 });
 
-useHead({
-  title: $t('eperusteet'),
-  titleTemplate: null,
-});
 </script>
 
 <style lang="scss" scoped>

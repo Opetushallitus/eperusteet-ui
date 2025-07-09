@@ -30,6 +30,9 @@ import { TilastotStore } from '@/stores/TilastotStore';
 import { koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
 import { suunnitelmatTilastoksi, koulutustyyppiTilastoSort } from './tilastot';
 import { $t } from '@shared/utils/globals';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpFormContent from '@shared/components/forms/EpFormContent.vue';
+import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 
 const props = defineProps<{
   tilastotStore: TilastotStore;

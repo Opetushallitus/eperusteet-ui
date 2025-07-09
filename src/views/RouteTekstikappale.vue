@@ -68,14 +68,17 @@
           </div>
           <ep-toggle class="mt-4" v-model="data.liite">{{$t('nayta-tekstikappale-liitteena')}}</ep-toggle>
         </div>
+
         <div :class="{ 'mt-4': isEditing }">
-          <ep-content v-model="data.teksti"
-                      layout="normal"
-                      :is-editable="isEditing"
-                      :kasiteHandler="kasiteHandler"
-                      :kuvaHandler="kuvaHandler"></ep-content>
+          <EpContent
+            v-model="data.teksti"
+            layout="normal"
+            :is-editable="isEditing"
+            :kasiteHandler="kasiteHandler"
+            :kuvaHandler="kuvaHandler"/>
         </div>
       </template>
+
     </EpEditointi>
   </div>
   <EpSpinner v-else />
@@ -84,20 +87,15 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import { $kaanna } from '@shared/utils/globals';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
-import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
-import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import EpButton from '@shared/components/EpButton/EpButton.vue';
 import * as _ from 'lodash';
 import { Murupolku } from '@shared/stores/murupolku';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
@@ -105,7 +103,7 @@ import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t } from '@shared/utils/globals';
+import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
 
 interface koodistoryhma {
   ryhma: string;
@@ -125,14 +123,14 @@ const tekstikappaleTyyppi = ref<'osaamisala' | 'tutkintonimike' | 'tekstikappale
 const projektiId = computed(() => route.params.projektiId);
 const tekstikappaleId = computed(() => route.params.tekstiKappaleId);
 const perusteId = computed(() => props.perusteStore.perusteId.value);
-const versionumero = computed(() => _.toNumber(route.query.versionumero));
+const versionumero = computed(() => _.toNumber(route.query.versionumero) || undefined);
 
 const osaamisalat = computed(() => {
-  return props.perusteStore.peruste.value?.osaamisalat || [];
+  return props.perusteStore.peruste?.osaamisalat || [];
 });
 
 const tutkintonimikkeet = computed(() => {
-  return _.map(props.perusteStore.peruste.value?.tutkintonimikkeet, tutkintonimike => {
+  return _.map(props.perusteStore.peruste?.tutkintonimikkeet, tutkintonimike => {
     return {
       nimi: tutkintonimike.nimi,
       uri: tutkintonimike.tutkintonimikeUri,
@@ -144,11 +142,11 @@ const tutkintonimikkeet = computed(() => {
 });
 
 const tekstikappale = computed(() => {
-  return store.value?.data?.value || null;
+  return store.value?.data || null;
 });
 
 const oldNimi = computed(() => {
-  return store.value?.data.value?.originalNimi;
+  return store.value?.data?.originalNimi;
 });
 
 const kasiteHandler = computed(() => {
@@ -182,7 +180,7 @@ const fields = computed(() => {
     thStyle: 'width: 10%',
   }];
 
-  if (store.value?.isEditing.value) {
+  if (store.value?.isEditing) {
     return [
       ...baseFields,
       {
@@ -204,24 +202,23 @@ const koodiNimikeChange = (val, oldVal) => {
   }
   if (!_.isEqual(val, oldVal)) {
     store.value?.setData({
-      ...store.value?.data.value,
+      ...store.value?.data,
       nimi: val.nimi,
     });
   }
 };
 
 const fetch = async () => {
-  await props.perusteStore.blockUntilInitialized();
   const tkstore = new TekstikappaleStore(perusteId.value!, Number(tekstikappaleId.value), versionumero.value);
   store.value = new EditointiStore(tkstore);
 };
 
 const tekstikappaleTyyppiInit = () => {
-  if (store.value?.data.value.id) {
-    if (store.value?.data.value?.tutkintonimike) {
+  if (store.value?.data.id) {
+    if (store.value?.data?.tutkintonimike) {
       tekstikappaleTyyppi.value = 'tutkintonimike';
     }
-    else if (store.value?.data.value?.osaamisala) {
+    else if (store.value?.data?.osaamisala) {
       tekstikappaleTyyppi.value = 'osaamisala';
     }
     else {
@@ -241,27 +238,27 @@ const handleDropdownValueChange = (val, oldVal) => {
 
 const resetNimi = () => {
   store.value?.setData({
-    ...store.value?.data.value,
+    ...store.value?.data,
     nimi: null,
   });
 };
 
 const resetTutkintonimike = () => {
   store.value?.setData({
-    ...store.value?.data.value,
+    ...store.value?.data,
     tutkintonimike: null,
   });
 };
 
 const resetOsaamisala = () => {
   store.value?.setData({
-    ...store.value?.data.value,
+    ...store.value?.data,
     osaamisala: null,
   });
 };
 
 // Watchers
-watch(() => store.value?.isEditing.value, () => {
+watch(() => store.value?.isEditing, () => {
   koodiNimikeChange(null, null);
   tekstikappaleTyyppiInit();
 });
@@ -289,18 +286,18 @@ watch(tekstikappale, (tk) => {
 });
 
 watch(tekstikappaleTyyppi, async () => {
-  if (store.value?.isEditing.value) {
+  if (store.value?.isEditing) {
     resetTutkintonimike();
     resetOsaamisala();
     resetNimi();
   }
 });
 
-watch(() => store.value?.data.value?.osaamisala, (val, oldVal) => {
+watch(() => store.value?.data?.osaamisala, (val, oldVal) => {
   handleDropdownValueChange(val, oldVal);
 });
 
-watch(() => store.value?.data.value?.tutkintonimike, (val, oldVal) => {
+watch(() => store.value?.data?.tutkintonimike, (val, oldVal) => {
   handleDropdownValueChange(val, oldVal);
 });
 </script>

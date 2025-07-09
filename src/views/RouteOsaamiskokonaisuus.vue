@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="editointiStore" :versionumero="versionumero">
+  <EpEditointi v-if="editointiStore" :store="editointiStore" :versionumero="versionumero">
     <template v-slot:header="{ data }">
       <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
       <h2 v-else>{{ $t('nimeton-osaamiskokonaisuus') }}</h2>
@@ -96,6 +96,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
+import { onMounted } from 'vue';
 
 const props = defineProps({
   perusteStore: {

@@ -133,7 +133,7 @@
           <h3 class="mb-4">{{$t('tavoitteet')}}</h3>
           <b-form-group :label="$t('opiskelija')">
             <template v-if="isEditing">
-              <draggable
+              <VueDraggable
                 v-bind="tavoitteetOptions"
                 tag="div"
                 v-model="data.tavoitteet">
@@ -157,7 +157,7 @@
                     </div>
                   </b-col>
                 </b-row>
-              </draggable>
+              </VueDraggable>
               <EpButton
                 variant="outline"
                 icon="add"
@@ -237,7 +237,7 @@
 import { ref, computed, watch, inject, useTemplateRef } from 'vue';
 import { useRoute } from 'vue-router';
 import * as _ from 'lodash';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 import { KuvaStore } from '@/stores/KuvaStore';
@@ -302,7 +302,7 @@ const defaultDragOptions = computed(() => {
     animation: 300,
     emptyInsertThreshold: 10,
     handle: '.order-handle',
-    disabled: !store.value?.isEditing.value,
+    disabled: !store.value?.isEditing,
     ghostClass: 'dragged',
   };
 });
@@ -317,7 +317,7 @@ const tavoitteetOptions = computed(() => {
 });
 
 const laajuusAnnettu = computed(() => {
-  return !_.isNull(store.value?.data.value.laajuusMinimi) && !_.isNull(store.value?.data.value.laajuusMaksimi);
+  return !_.isNull(store.value?.data.laajuusMinimi) && !_.isNull(store.value?.data.laajuusMaksimi);
 });
 
 // Initialize koodisto

@@ -2,7 +2,7 @@
   <div v-if="isEditable">
     <div v-for="(bullet, idx) in state" :key="idx" class="d-flex mb-1">
       <div class="flex-grow-1">
-        <ep-input :value="bullet" @input="onInput($event, idx)" :is-editing="true" />
+        <ep-input :model-value="bullet" @update:model-value="onInput($event, idx)" :is-editing="true" />
       </div>
       <div class="flex-shrink-1" v-if="allowStructureChange">
         <b-button variant="link" @click="remove(idx)">
@@ -29,7 +29,6 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import draggable from 'vuedraggable';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';

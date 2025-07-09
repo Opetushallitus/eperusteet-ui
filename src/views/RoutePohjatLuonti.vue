@@ -120,13 +120,13 @@ const pohjat = computed(() => {
   });
 });
 
-const validator = computed(() => {
-  return {
+const rules = {
+  data: {
     nimi: requiredOneLang(),
-  };
-});
+  },
+};
 
-const $v = useVuelidate(validator.value, { data });
+const $v = useVuelidate(rules, { data });
 
 const steps = computed(() => {
   return [{

@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="store">
+  <EpEditointi v-if="store" :store="store">
     <template #header>
       <h3>{{$t('oppiaineet')}}</h3>
     </template>
@@ -17,7 +17,7 @@
         <b-col cols="5" class="font-weight-bold">{{$t('nimi')}}</b-col>
       </b-row>
 
-      <draggable
+      <VueDraggable
         v-bind="defaultDragOptions"
         tag="div"
         v-model="data.oppiaineet">
@@ -36,7 +36,7 @@
             </div>
           </b-col>
         </b-row>
-      </draggable>
+      </VueDraggable>
     </template>
 
   </EpEditointi>
@@ -52,7 +52,7 @@ import { PerusopetusOppiaineetStore } from '@/stores/PerusopetusOppiaineetStore'
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
@@ -82,7 +82,7 @@ const fields = computed(() => {
 });
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 const defaultDragOptions = computed(() => {

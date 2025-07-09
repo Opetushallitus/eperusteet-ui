@@ -2,9 +2,20 @@ import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/Edit
 import { PerusopetuksenPerusteenSisalto, PerusopetusLaajaAlainenOsaaminenLukko } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
-import { useRouter } from 'vue-router';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+
+interface PerusopetusLaajaAlainenOsaaminenStoreConfig {
+  router: Router;
+}
 
 export class PerusopetusLaajaAlainenOsaaminenStore implements IEditoitava {
+  private static config: PerusopetusLaajaAlainenOsaaminenStoreConfig;
+
+  public static install(app: App, config: PerusopetusLaajaAlainenOsaaminenStoreConfig) {
+    PerusopetusLaajaAlainenOsaaminenStore.config = config;
+  }
+
   constructor(
     private perusteId: number,
     private laoId: number | null,
@@ -34,8 +45,7 @@ export class PerusopetusLaajaAlainenOsaaminenStore implements IEditoitava {
       this.laoId = lao.id!;
       await this.perusteStore.updateNavigation();
       await EditointiStore.cancelAll();
-      const router = useRouter();
-      router.push({ name: 'perusopetusLaajaAlainenOsaaminen', params: { laoId: lao.id } });
+      PerusopetusLaajaAlainenOsaaminenStore.config.router.push({ name: 'perusopetusLaajaAlainenOsaaminen', params: { laoId: lao.id } });
     }
   }
 
@@ -43,8 +53,7 @@ export class PerusopetusLaajaAlainenOsaaminenStore implements IEditoitava {
     if (this.laoId) {
       await PerusopetuksenPerusteenSisalto.deletePerusopetusOsaaminen(this.perusteId, this.laoId);
       await this.perusteStore.updateNavigation();
-      const router = useRouter();
-      router.push({ name: 'perusopetusLaajaAlaisetOsaamiset' });
+      PerusopetusLaajaAlainenOsaaminenStore.config.router.push({ name: 'perusopetusLaajaAlaisetOsaamiset' });
     }
   }
 

@@ -76,7 +76,7 @@
                   <div class="menu p-3">
                     <h5 class="font-weight-600">{{ $t('leikelauta') }}</h5>
                     <div class="mt-3">
-                      <draggable v-model="leikelauta" v-bind="optionsLeikelauta" tag="div" class="leikelauta" :class="{'empty': leikelauta.length === 0}" @add="onLeikelautaAdd">
+                      <VueDraggable v-bind="optionsLeikelauta" v-model="leikelauta" tag="div" class="leikelauta" :class="{'empty': leikelauta.length === 0}" @add="onLeikelautaAdd">
                         <div v-for="lauta in leikelautaWithColor"
                           :key="'leikelauta' + (lauta.tunniste || lauta.uuid)"
                           class="mb-1 d-flex justify-content-center align-items-center draggable kopioitava">
@@ -89,19 +89,19 @@
                             </div>
                           </div>
                         </div>
-                      </draggable>
+                      </VueDraggable>
                     </div>
 
                     <h5 class="mt-4 font-weight-600">{{ $t('paaryhmat') }}</h5>
                     <div class="mt-3">
-                      <draggable :value="paaryhmat" v-bind="optionsPaaryhma" tag="div" class="paaryhmat">
+                      <VueDraggable v-bind="optionsPaaryhma" :value="paaryhmat" tag="div" class="paaryhmat">
                         <div v-for="ryhma in paaryhmat" :key="ryhma.uuid" class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable">
                           <div class="colorblock" :style="{ height: '44px', background: colorMap[ryhma.kind] }"></div>
                           <div class="flex-grow-1 paaryhma-label pl-2 noselect">
                             {{ $t(ryhma.label) }}
                           </div>
                         </div>
-                      </draggable>
+                      </VueDraggable>
                     </div>
 
                     <h5 class="mt-4 font-weight-600">{{ $t('tutkinnon-osat') }}</h5>
@@ -114,7 +114,7 @@
                           </span>
                         </ep-toggle>
                       </div>
-                      <draggable :value="tutkinnonosatPaged" v-bind="optionsTutkinnonOsat" tag="div">
+                      <VueDraggable v-bind="optionsTutkinnonOsat" :value="tutkinnonosatPaged" tag="div">
                         <div v-for="tosa in tutkinnonosatPaged" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pr-3 m-1 tosa draggable tosa">
                           <div class="grip mr-2" v-if="isEditing">
                             <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -126,7 +126,7 @@
                             {{ tosa.laajuus }}
                           </div>
                         </div>
-                      </draggable>
+                      </VueDraggable>
                       <b-pagination
                         v-if="tutkinnonOsat && tutkinnonOsat.length > 0"
                         v-model="tutkinnonosatSivu"
@@ -141,7 +141,7 @@
                       <ep-button @click="lisaaOsaamisala" icon="add" variant="outline" class="mb-2">
                         {{ $t('lisaa-osaamisala') }}
                       </ep-button>
-                      <draggable :value="osaamisalatPaged" v-bind="optionsKoodit" tag="div">
+                      <VueDraggable v-bind="optionsKoodit" :value="osaamisalatPaged" tag="div">
                         <div v-for="(ryhma, index) in osaamisalatPaged" :key="'osaamisala' + index" class="mb-1 d-flex justify-content-center align-items-center draggable osaamisalat">
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['osaamisala'],  background: colorMap['osaamisala'] }">
                             <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -186,7 +186,7 @@
                             </b-popover>
                           </div>
                         </div>
-                      </draggable>
+                      </VueDraggable>
                       <b-pagination
                         v-if="osaamisalat && osaamisalat.length > 0"
                         v-model="osaamisalatSivu"
@@ -202,7 +202,7 @@
                         {{ $t('lisaa-tutkintonimike') }}
                       </ep-button>
 
-                      <draggable :value="tutkintonimikkeetPaged" v-bind="optionsKoodit" tag="div">
+                      <VueDraggable v-bind="optionsKoodit" :value="tutkintonimikkeetPaged" tag="div">
                         <div v-for="(ryhma, index) in tutkintonimikkeetPaged" :key="ryhma.tutkintonimike.uri" class="mb-1 d-flex justify-content-center align-items-center draggable tutkintonimikkeet">
                           <div class="colorblock" :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }">
                             <EpMaterialIcon size="20px">drag_indicator</EpMaterialIcon>
@@ -247,7 +247,7 @@
                             </b-popover>
                           </div>
                         </div>
-                      </draggable>
+                      </VueDraggable>
                       <b-pagination
                         v-if="tutkintonimikkeet && tutkintonimikkeet.length > 0"
                         v-model="tutkintonimikkeetSivu"
@@ -311,7 +311,7 @@ import { Koodisto } from '@shared/api/eperusteet';
 import { usePerusteprojekti } from './PerusteprojektiRoute';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
@@ -411,11 +411,11 @@ const laajuustyyppi = computed(() => {
 });
 
 const vaadittuLaajuus = computed(() => {
-  return store.value?.data.value?.rakenne.muodostumisSaanto?.laajuus?.minimi;
+  return store.value?.data?.rakenne.muodostumisSaanto?.laajuus?.minimi;
 });
 
 const laskettuLaajuus = computed(() => {
-  return _(store.value?.data.value?.rakenne.osat)
+  return _(store.value?.data?.rakenne.osat)
     .map(osa => osa.muodostumisSaanto?.laajuus?.maksimi || osa.muodostumisSaanto?.laajuus?.minimi || tutkinnonOsatMap.value[osa._tutkinnonOsaViite]?.laajuus || 0)
     .filter()
     .sum();
@@ -566,7 +566,7 @@ const liitetytOsat = computed(() => {
       _.forEach(node.osat, walk);
     }
   };
-  walk(store.value.data.value?.rakenne);
+  walk(store.value.data.rakenne);
   return _.keyBy(osat, '_tutkinnonOsaViite');
 });
 
@@ -601,7 +601,7 @@ const tutkintonimikkeet = computed(() => {
 });
 
 const rakenteenOsat = computed(() => {
-  return recursiveFlattenRakenneOsat(store.value?.data.value.rakenne.osat);
+  return recursiveFlattenRakenneOsat(store.value?.data.rakenne.osat);
 });
 
 const osaamisalat = computed(() => {
@@ -991,7 +991,7 @@ provide('osaamisalat', osaamisalat);
     padding: 0.5rem 0.3rem 0.45rem 0 !important;
   }
 
-  .koodi-input ::v-deep input{
+  .koodi-input :deep(input){
     border-radius: 0;
     border-right: 0;
     border-left: 0;

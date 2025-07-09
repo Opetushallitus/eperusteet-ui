@@ -1,21 +1,21 @@
 <template>
-<EpHomeTile icon="description" :route="{ name: 'tiedotteet' }" :count="uudetTiedotteetCount">
-  <template #header>
-    <span>{{ $t('tiedotteet') }}</span>
-  </template>
-  <template #content>
-    <div v-if="tiedotteet">
-      <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
-        <div class="col-2">{{$sd(tiedote.muokattu)}}</div>
-        <div class="col-8 otsikko" :class="{'font-weight-bold': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}}</div>
+  <EpHomeTile icon="description" :route="{ name: 'tiedotteet' }" :count="uudetTiedotteetCount">
+    <template #header>
+      <span>{{ $t('tiedotteet') }}</span>
+    </template>
+    <template #content>
+      <div v-if="tiedotteet.length > 0">
+        <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
+          <div class="col-2">{{$sd(tiedote.muokattu)}}</div>
+          <div class="col-8 otsikko" :class="{'font-weight-bold': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}}</div>
+        </div>
       </div>
-    </div>
-    <div v-else-if="tiedotteet === []">
-      <p>{{ $t('ei-tiedotteita') }}</p>
-    </div>
-    <ep-spinner v-else />
-  </template>
-</EpHomeTile>
+      <div v-else-if="tiedotteet.length === 0">
+        <p>{{ $t('ei-tiedotteita') }}</p>
+      </div>
+      <ep-spinner v-else />
+    </template>
+  </EpHomeTile>
 </template>
 
 <script setup lang="ts">
@@ -53,7 +53,7 @@ const tiedotteet = computed(() => {
       .value();
   }
 
-  return undefined;
+  return [];
 });
 
 const viimeisimmatTiedotteet = computed(() => {

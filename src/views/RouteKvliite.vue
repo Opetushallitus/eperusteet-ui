@@ -139,8 +139,8 @@ const {
 });
 
 const tutkinnonMuodostuminen = computed(() => {
-  if (props.perusteStore.perusteSuoritustapa.value && store.value?.data.value?.kvliite) {
-    return store.value?.data.value?.kvliite.muodostumisenKuvaus[_.toLower(props.perusteStore.perusteSuoritustapa.value)];
+  if (props.perusteStore.perusteSuoritustapa.value && store.value?.data?.kvliite) {
+    return store.value?.data?.kvliite.muodostumisenKuvaus[_.toLower(props.perusteStore.perusteSuoritustapa.value)];
   }
   return null;
 });

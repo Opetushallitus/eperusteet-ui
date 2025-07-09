@@ -47,30 +47,26 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async fetch() {
-    try {
-      if (this.versionumero) {
-        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.tekstiKappaleViiteId)).data as Revision[];
-        const rev = revisions[revisions.length - this.versionumero];
-        this.state.tekstikappale = (await Perusteenosat.getPerusteenOsaVersioByViite(this.tekstiKappaleViiteId, rev.numero)).data;
-      }
-      else {
-        this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleViiteId)).data;
-      }
+    if (this.versionumero) {
+      const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.tekstiKappaleViiteId)).data as Revision[];
+      const rev = revisions[revisions.length - this.versionumero];
+      this.state.tekstikappale = (await Perusteenosat.getPerusteenOsaVersioByViite(this.tekstiKappaleViiteId, rev.numero)).data;
     }
-    catch (err) {
+    else {
+      this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleViiteId)).data;
     }
   }
 
   public async load() {
     await this.fetch();
     return {
-      ...this.tekstikappale.value,
-      originalNimi: (this.tekstikappale.value as any).nimi,
+      ...this.tekstikappale,
+      originalNimi: (this.tekstikappale as any).nimi,
     };
   }
 
   public async save(data: Matala) {
-    const res = await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.id.value!, data);
+    const res = await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.id!, data);
 
     TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
       id: this.tekstiKappaleViiteId,
@@ -92,12 +88,11 @@ export class TekstikappaleStore implements IEditoitava {
     TekstikappaleStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tekstiKappaleViiteId,
     });
-    TekstikappaleStore.config.router.push({ name: 'perusteprojekti' });
   }
 
   public async lock() {
     try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.id.value!);
+      const res = await Perusteenosat.checkPerusteenOsaLock(this.id!);
       return res.data;
     }
     catch (err) {
@@ -106,12 +101,12 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.id.value!);
+    const res = await Perusteenosat.lockPerusteenOsa(this.id!);
     return res.data;
   }
 
   public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.id.value!);
+    await Perusteenosat.unlockPerusteenOsa(this.id!);
   }
 
   public async preview() {
@@ -133,13 +128,13 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async revisions() {
-    const res = await Perusteenosat.getPerusteenOsaVersiot(this.id.value!);
+    const res = await Perusteenosat.getPerusteenOsaVersiot(this.id!);
     return res.data as Revision[];
   }
 
   public async restore(rev: number) {
     await this.acquire();
-    await Perusteenosat.revertPerusteenOsaToVersio(this.id.value!, rev);
+    await Perusteenosat.revertPerusteenOsaToVersio(this.id!, rev);
     await this.release();
   }
 

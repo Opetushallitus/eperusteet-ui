@@ -6,6 +6,7 @@ import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot
 import { KieliStore } from '@shared/stores/kieli';
 import { Debounced } from '@shared/utils/delay';
 import { fail, success } from '@shared/utils/notifications';
+import { $fail, $success, $t } from '@shared/utils/globals';
 
 export class ArviointiStore {
   constructor(
@@ -91,11 +92,11 @@ export class ArviointiStore {
         };
       });
       this.state.geneeriset = [...(this.state.geneeriset || []), res.data];
-      success('tallennettu');
+      $success($t('tallennettu'));
       return res.data;
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail($t('virhe-palvelu-virhe'));
     }
   }
 
@@ -106,10 +107,10 @@ export class ArviointiStore {
       if (this.state.geneeriset) {
         this.state.geneeriset[idx] = res.data;
       }
-      success('tallennettu');
+      $success($t('tallennettu'));
     }
     catch (err) {
-      fail('tallennus-epaonnistui');
+      $fail($t('tallennus-epaonnistui'));
     }
   }
 
@@ -123,10 +124,10 @@ export class ArviointiStore {
       if (this.state.geneeriset) {
         this.state.geneeriset[idx] = res.data;
       }
-      success('geneerinen-arviointi-julkaistu');
+      $success($t('geneerinen-arviointi-julkaistu'));
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail($t('virhe-palvelu-virhe'));
     }
   }
 
@@ -137,10 +138,10 @@ export class ArviointiStore {
       if (this.state.geneeriset) {
         this.state.geneeriset.splice(idx, 1);
       }
-      success('geneerinen-arviointi-poistettu');
+      $success($t('geneerinen-arviointi-poistettu'));
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail($t('virhe-palvelu-virhe'));
     }
   }
 }

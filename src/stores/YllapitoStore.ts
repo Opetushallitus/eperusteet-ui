@@ -1,5 +1,5 @@
 import { reactive, computed } from 'vue';
-import { Maintenance, PerusteDto, Perusteet, PerusteKevytDto, YllapitoDto } from '@shared/api/eperusteet';
+import { Maintenance, Perusteet, PerusteKevytDto, YllapitoDto } from '@shared/api/eperusteet';
 import _ from 'lodash';
 
 export class YllapitoStore {

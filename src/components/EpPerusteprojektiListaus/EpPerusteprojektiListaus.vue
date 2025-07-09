@@ -92,7 +92,7 @@
           <div class="m-2 flex-fill" v-if="filtersInclude('koulutustyyppi')">
             <label>{{ $t('koulutustyyppi') }}</label>
             <koulutustyyppi-select v-model="koulutustyyppi"
-                                   :koulutustyypit="koulutustyyppiOptions"
+                                   :koulutustyypit="koulutustyyppiOptions as unknown[]"
                                    :isEditing="true"/>
           </div>
           <div class="m-2 flex-fill" v-if="filtersInclude('peruste')">
@@ -135,13 +135,11 @@
 
         <div class="d-lg-flex align-items-end">
           <div class="m-2" v-if="filtersInclude('tila')">
-            <b-form-checkbox-group
-              :value="tila"
-              @input="tila = $event">
-              <b-form-checkbox v-for="tila in vaihtoehdotTilat" :key="tila" :value="tila">
-                {{ $t('tila-' + tila.toLowerCase()) }}
-              </b-form-checkbox>
-            </b-form-checkbox-group>
+            <EpToggleGroup v-model="tila" :items="vaihtoehdotTilat">
+              <template v-slot="{ item }">
+                {{ $t('tila-' + (item as string).toLowerCase()) }}
+              </template>
+            </EpToggleGroup>
           </div>
         </div>
 
@@ -156,7 +154,9 @@
             @sort-changed="sortingChanged"
             :sort-by.sync="sort.sortBy"
             :sort-desc.sync="sort.sortDesc">
-            <template v-slot:head(nimi)>
+            <template
+              v-if="hasNimiSlot"
+              v-slot:head(nimi)>
               <slot name="nimiotsikko"></slot>
             </template>
             <template v-slot:cell(nimi)="data">
@@ -219,6 +219,9 @@ import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
 import { perusteTile } from '@shared/utils/bannerIcons';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $sd, $kaanna, $hasOphCrud, $fail } from '@shared/utils/globals';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import { hasSlotContent } from '@shared/utils/vue-utils';
+import { useSlots } from 'vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -237,21 +240,21 @@ const props = defineProps({
 
 const koulutustyyppi = ref<string | null>(null);
 const peruste = ref<PerusteKevytDto | null>(null);
-const tila = ref<string[]>([]);
+const tila = ref<string[]>(props.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU']);
 const voimassaolo = ref<string | null>(null);
 const isLoading = ref(false);
-const sort = ref({});
+const sort = ref<{ sortBy?: string; sortDesc?: boolean }>({});
 const perusteet = ref<PerusteKevytDto[]>([]);
+const slots = useSlots();
 
 const query = ref<PerusteprojektiQuery>({
   sivu: 0,
   sivukoko: 10,
-  koulutustyyppi: null as any,
+  koulutustyyppi: undefined,
   voimassaolo: false,
   siirtyma: false,
   tuleva: false,
   poistunut: false,
-  koulutusvienti: true,
   tila: props.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU'],
   nimi: '',
   jarjestysOrder: false,
@@ -289,17 +292,16 @@ const onQueryChange = async (newQuery: PerusteQuery) => {
   }
 };
 
-watch(tila, (newTila: string[]) => {
+watch(() => tila.value, (newTila: string[]) => {
   query.value = {
     ...query.value,
-    tila: newTila
-      ? [newTila]
+    tila: newTila.length > 0
+      ? newTila
       : (props.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU']),
   };
 });
 
-watch(voimassaolo, (newTila: string) => {
-  console.log('voimassaolo', newTila);
+watch(() => voimassaolo.value, (newTila: string | null) => {
   const defaults = {
     voimassaolo: false,
     siirtyma: false,
@@ -329,12 +331,12 @@ watch(voimassaolo, (newTila: string) => {
   }
 });
 
-watch(koulutustyyppi, (newKt: string) => {
-  query.value.koulutustyyppi = [newKt];
+watch(() => koulutustyyppi.value, (newKt: string | null) => {
+  query.value.koulutustyyppi = newKt ? [newKt] : undefined;
 });
 
-watch(peruste, (newPeruste: PerusteKevytDto) => {
-  query.value.perusteet = [newPeruste.id as number];
+watch(() => peruste.value, (newPeruste: PerusteKevytDto | null) => {
+  query.value.perusteet = newPeruste?.id ? [newPeruste.id] : [];
 });
 
 const sortingChanged = (newSort) => {
@@ -374,11 +376,11 @@ const vaihtoehdotVoimassaolo = computed(() => {
 
 const sivu = computed({
   get() {
-    return items.value?.sivu! + 1;
+    return (items.value?.sivu ?? 0) + 1;
   },
   set(value: number) {
     query.value.sivu = value - 1;
-  }
+  },
 });
 
 const perPage = computed(() => {
@@ -393,7 +395,7 @@ const ownProjects = computed(() => {
   if (props.provider.ownProjects.value) {
     return _.map(_.filter(props.provider.ownProjects.value, project => project.tila === 'laadinta'), projekti => setTileImage(projekti));
   }
-  return [];
+  return undefined;
 });
 
 const ownPublishedProjects = computed(() => {
@@ -415,7 +417,7 @@ const items = computed(() => {
 });
 
 const initialFields = computed((): BvTableFieldArray => {
-  const dateFormatter = (value: Date) => {
+  const dateFormatter = (value: Date | null | undefined) => {
     return value
       ? $sd(value)
       : '-';
@@ -450,7 +452,7 @@ const initialFields = computed((): BvTableFieldArray => {
     sortable: true,
     label: $t('muokattu') as string,
     formatter: (value: any, key: string, item: PerusteprojektiKevytDto) => {
-      return dateFormatter(item.globalVersion?.aikaleima!);
+      return dateFormatter(item.globalVersion?.aikaleima ?? null);
     },
   }, {
     key: 'peruste.voimassaoloAlkaa',
@@ -494,6 +496,10 @@ const restore = async (item) => {
 
 const naytaVainKortit = computed(() => {
   return props.vainKortit || !$hasOphCrud();
+});
+
+const hasNimiSlot = computed(() => {
+  return hasSlotContent(slots.nimiotsikko);
 });
 </script>
 

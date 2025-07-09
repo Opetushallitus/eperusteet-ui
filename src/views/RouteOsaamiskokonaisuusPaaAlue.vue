@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="editointiStore" :versionumero="versionumero">
+  <EpEditointi v-if="editointiStore" :store="editointiStore" :versionumero="versionumero">
     <template v-slot:header="{ data }">
       <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
       <h2 v-else>{{ $t('nimeton-osaamiskokonaisuus_paa_alue') }}</h2>
@@ -36,7 +36,7 @@
 
       <template v-if="isEditing">
         <h3 class="mt-4">{{$t('osa-alueet')}}</h3>
-        <draggable
+        <VueDraggable
           v-bind="defaultDragOptions"
           tag="div"
           v-model="data.osaAlueet">
@@ -60,7 +60,7 @@
               </div>
             </b-col>
           </b-row>
-        </draggable>
+        </VueDraggable>
 
         <ep-button @click="lisaaOsaalue()" variant="outline" icon="add" class="mt-2">
           {{ $t('lisaa-osa-alue') }}
@@ -94,7 +94,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpOsaAlue from '@shared/components/EpOsaamiskokonaisuus/EpOsaAlue.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { $kaanna, $t } from '@shared/utils/globals';
 
 const props = defineProps<{
@@ -140,9 +140,9 @@ watch(versionumero, async () => {
 });
 
 const lisaaOsaalue = async () => {
-  if (!editointiStore.value?.data.value) return;
+  if (!editointiStore.value?.data) return;
 
-  const currentData = editointiStore.value.data.value;
+  const currentData = editointiStore.value.data;
   const currentOsaAlueet = currentData.osaAlueet || [];
 
   editointiStore.value.setData({
@@ -185,9 +185,9 @@ const lisaaOsaalue = async () => {
 };
 
 const poistaOsaAlue = async (poistettavaOsaAlue: any) => {
-  if (!editointiStore.value?.data.value) return;
+  if (!editointiStore.value?.data) return;
 
-  const currentData = editointiStore.value.data.value;
+  const currentData = editointiStore.value.data;
 
   editointiStore.value.setData({
     ...currentData,
@@ -200,7 +200,7 @@ const defaultDragOptions = computed(() => {
     animation: 300,
     emptyInsertThreshold: 10,
     handle: '.order-handle',
-    disabled: !editointiStore.value?.isEditing.value,
+    disabled: !editointiStore.value?.isEditing,
     ghostClass: 'dragged',
   };
 });

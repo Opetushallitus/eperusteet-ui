@@ -6,7 +6,6 @@
       </template>
 
       <template v-slot:default="{ data, isEditing, validation }">
-
         <b-tabs>
           <b-tab :title="$t('perustiedot')">
             <b-container fluid="xl" class="perustiedot-container">
@@ -71,16 +70,11 @@
                 </b-col>
                 <b-col lg="6" v-if="filtersContain('perusteenkieli')" class="mb-4">
                   <b-form-group :label="$t('perusteen-kielet')">
-                    <b-form-checkbox-group v-if="isEditing" v-model="data.kielet" stacked>
-                      <b-form-checkbox v-for="kieli in kielet" :key="kieli" :value="kieli">
-                        {{ $t(kieli) }}
-                      </b-form-checkbox>
-                    </b-form-checkbox-group>
-                    <div v-else class="text-nowrap">
-                      <span v-for="(kieli, idx) in data.kielet" :key="kieli" :value="kieli">
-                        {{ $t(kieli) }}<span class="mr-0" v-if="idx < data.kielet.length - 1">,</span>
-                      </span>
-                    </div>
+                    <EpToggleGroup v-model="data.kielet" :label="$t('perusteen-kielet')" :items="kielet" stacked :is-editing="isEditing">
+                      <template v-slot="{ item }">
+                        {{ $t(item) }}
+                      </template>
+                    </EpToggleGroup>
                   </b-form-group>
                 </b-col>
                 <b-col lg="6" v-if="tyypinVaihtoSallittu" class="mb-4">
@@ -489,6 +483,7 @@ import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { $t, $kaanna, $success, $fail, $slang, $sdt, $isAdmin } from '@shared/utils/globals';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
@@ -574,20 +569,16 @@ const kielet = computed(() => {
   return UiKielet;
 });
 
-const data = computed(() => {
-  return store.value?.data?.value || null;
-});
-
 const tutkintonimikkeet = computed(() => {
-  return store.value?.data?.value?.tutkintonimikkeet || [];
+  return store.value?.data?.tutkintonimikkeet || [];
 });
 
 const osaamisalat = computed(() => {
-  return store.value?.data?.value?.osaamisalat || [];
+  return store.value?.data?.osaamisalat || [];
 });
 
 const korvattavatDiaarinumerot = computed(() => {
-  return store.value?.data?.value?.korvattavatDiaarinumerot || null;
+  return store.value?.data?.korvattavatDiaarinumerot || null;
 });
 
 const onProjektiChange = async (projektiId: number, perusteId: number) => {
@@ -599,7 +590,7 @@ const onProjektiChange = async (projektiId: number, perusteId: number) => {
 // Watch handlers
 watch(koulutusvienninOhjeet, async () => {
   store.value!.setData({
-    ...store.value!.data.value,
+    ...store.value!.data,
     koulutusvienninOhjeLiitteet: koulutusvienninOhjeet.value,
   });
 }, { deep: true });
@@ -808,14 +799,14 @@ const kieli = computed(() => {
 });
 
 const asiasanat = computed(() => {
-  if (_.isEmpty(store.value?.supportData.value?.asiasanat?.[kieli.value])) {
+  if (_.isEmpty(store.value?.supportData?.asiasanat?.[kieli.value])) {
     return [];
   }
-  return store.value?.supportData.value.asiasanat[kieli.value];
+  return store.value?.supportData.asiasanat[kieli.value];
 });
 
 const peruste = computed(() => {
-  return store.value?.data?.value || {};
+  return store.value?.data || {};
 });
 
 const koulutustyyppiFilters = computed(() => {
@@ -839,10 +830,10 @@ const perusteenTyypit = computed(() => {
 });
 
 const poikkeamismaaraysTyyppiText = computed(() => {
-  if (store.value?.data?.value?.poikkeamismaaraysTyyppi === 'ei_tarvita_ohjetta') {
+  if (store.value?.data?.poikkeamismaaraysTyyppi === 'ei_tarvita_ohjetta') {
     return $t('voi-kayttaa-tutkintoviennissa');
   }
-  else if (store.value?.data?.value?.poikkeamismaaraysTyyppi === 'ei_voi_poiketa') {
+  else if (store.value?.data?.poikkeamismaaraysTyyppi === 'ei_voi_poiketa') {
     return $t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa');
   }
   return '';
@@ -850,7 +841,7 @@ const poikkeamismaaraysTyyppiText = computed(() => {
 
 const maarayskirje = computed({
   get: () => {
-    const maarayskirjeLiite = store.value?.data.value?.maarayskirje?.liitteet[$slang.value];
+    const maarayskirjeLiite = store.value?.data?.maarayskirje?.liitteet[$slang.value];
     if (maarayskirjeLiite) {
       return _.find(liitteet.value, liite => liite.id === maarayskirjeLiite.id);
     }
@@ -858,10 +849,10 @@ const maarayskirje = computed({
   },
   set: (liite: any) => {
     store.value!.setData({
-      ...store.value!.data.value,
+      ...store.value!.data,
       maarayskirje: {
         liitteet: {
-          ...(store.value!.data.value.maarayskirje?.liitteet ? store.value!.data.value.maarayskirje?.liitteet : []),
+          ...(store.value!.data.maarayskirje?.liitteet ? store.value!.data.maarayskirje?.liitteet : []),
           [$slang.value]: liite,
         },
       },
@@ -908,10 +899,10 @@ const koulutuskoodisto = new KoodistoSelectStore({
 const poistaMaarayskirje = async (maarayskirje: any) => {
   await poistaLiite(maarayskirje);
   store.value!.setData({
-    ...store.value!.data.value,
+    ...store.value!.data,
     maarayskirje: {
-      ...store.value?.data.value.maarayskirje,
-      liitteet: _.omit(store.value?.data.value.maarayskirje.liitteet, $slang.value),
+      ...store.value?.data.lue.maarayskirje,
+      liitteet: _.omit(store.value?.data.maarayskirje.liitteet, $slang.value),
     },
   });
 };
@@ -958,8 +949,8 @@ const addKoulutuskoodi = (data: any, koodi: any) => {
 
 const poistaKoulutusKoodi = ({ item }: { item: any }) => {
   store.value!.setData({
-    ...store.value?.data.value,
-    koulutukset: _.filter(store.value?.data.value.koulutukset, koulutus => koulutus.koulutuskoodiUri !== item.koulutuskoodiUri),
+    ...store.value?.data,
+    koulutukset: _.filter(store.value?.data.koulutukset, koulutus => koulutus.koulutuskoodiUri !== item.koulutuskoodiUri),
   });
 };
 
@@ -1018,7 +1009,7 @@ hr {
   align-self: center;
 }
 
-::v-deep .liite-nimi {
+:deep(.liite-nimi) {
   overflow-x: auto;
 }
 </style>

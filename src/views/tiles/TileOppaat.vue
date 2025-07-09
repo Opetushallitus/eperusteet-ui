@@ -1,7 +1,7 @@
 <template>
   <EpHomeTile icon="menu_book" :route="{ name: 'oppaat' }">
     <template #header>
-      <span>{{ $t('oppaat') }} : {{ $hasOphCrud()}}</span>
+      <span>{{ $t('oppaat') }}</span>
     </template>
     <template #content>
       <template v-if="$hasOphCrud()">
@@ -14,7 +14,7 @@
               {{$kaanna(opas.nimi)}}
             </div>
             <ep-button variant="link" v-if="kokonaismaara > viimeisimmatOppaat.length" buttonClass="pl-0 btn-sm" class="no-padding">
-              {{kokonaismaara - oppaat.length}} {{$t('muuta-opasta')}}
+              {{ kokonaismaara - oppaat.length}} {{$t('muuta-opasta')}}
             </ep-button>
           </div>
         </div>

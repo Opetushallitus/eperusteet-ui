@@ -4,7 +4,7 @@
     <ep-input v-if="isEditing" v-model="model.tavoite" :is-editing="isEditing"></ep-input>
 
     <b-form-group class="mt-4" :label="$t('opetuksen-tavoitteet')">
-      <draggable v-bind="defaultDragOptions"
+      <VueDraggable v-bind="defaultDragOptions"
                  tag="div"
                  v-model="model.oppiaineenTavoitteenOpetuksenTavoitteet">
         <div class="row mb-2" v-for="(tavoite, i) in model.oppiaineenTavoitteenOpetuksenTavoitteet" :key="'tavoite'+i">
@@ -27,7 +27,7 @@
             </EpButton>
           </div>
         </div>
-      </draggable>
+      </VueDraggable>
       <EpButton v-if="isEditing"
                 @click="lisaaOsaamisenTavoite"
                 variant="outline-primary"
@@ -198,7 +198,7 @@ import { Kielet } from '@shared/stores/kieli';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { $kaanna } from '@shared/utils/globals';
 
 interface OppiaineenTavoiteSupportData {

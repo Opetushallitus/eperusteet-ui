@@ -13,15 +13,17 @@
         </div>
 
         <b-form-group class="mt-4" :label="$t('vuosiluokat') + (isEditing ? ' *' : '')">
-            <b-form-checkbox-group v-model="data.vuosiluokat" v-if="isEditing">
-                <b-form-checkbox :value="vuosiluokka.value" v-for="(vuosiluokka, index) in valittavatVuosiluokat" :key="'vl' + index" class="col-3" size="lg">
-                  {{ vuosiluokka.name }}
-                </b-form-checkbox>
-            </b-form-checkbox-group>
+          <EpToggleGroup v-model="data.vuosiluokat" :items="valittavatVuosiluokat" v-if="isEditing">
+            <template v-slot="{ item }">
+              <div class="mr-5">
+                {{ $t('vuosiluokka') }} {{ $t(item) }}
+              </div>
+            </template>
+          </EpToggleGroup>
 
-            <div v-else>
-              <span v-for="(vuosiluokka, index) in vuosiluokat" :key="'vlk' + index"><span v-if="index > 0">, </span>{{$t(vuosiluokka)}}</span>
-            </div>
+          <div v-else>
+            <span v-for="(vuosiluokka, index) in vuosiluokat" :key="'vlk' + index"><span v-if="index > 0">, </span>{{ $t(vuosiluokka) }}</span>
+          </div>
         </b-form-group>
 
         <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava', 'laajaalainenOsaaminen']" />
@@ -72,6 +74,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -98,7 +101,7 @@ watch(() => props.vlkId, async () => {
 
 const storeData = computed({
   get() {
-    return store.value?.data.value;
+    return store.value?.data;
   },
   set(data) {
     store.value?.setData(data);
@@ -106,14 +109,11 @@ const storeData = computed({
 });
 
 const vuosiluokat = computed(() => {
-  return _.sortBy(store.value?.data.value.vuosiluokat);
+  return _.sortBy(store.value?.data.vuosiluokat);
 });
 
 const valittavatVuosiluokat = computed((): any => {
-  return _.map(_.range(1, 10), vlk => ({
-    name: $t('vuosiluokka') + ' ' + vlk,
-    value: 'vuosiluokka_' + vlk,
-  }));
+  return _.map(_.range(1, 10), vlk => ('vuosiluokka_' + vlk));
 });
 </script>
 

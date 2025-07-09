@@ -132,16 +132,13 @@ import { TutkinnonosatTuontiStore } from '@/stores/TutkinnonosatTuontiStore';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { PerusteDto, TutkinnonOsaViiteKontekstiDto } from '@shared/generated/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t, $kaanna, $sd, $success, $fail } from '@shared/utils/globals';
+import { $t, $kaanna, $sd, $success, $fail, $bvModal } from '@shared/utils/globals';
 
 const props = defineProps<{
   peruste: PerusteDto;
 }>();
 
 const emit = defineEmits(['refresh']);
-
-const instance = getCurrentInstance();
-const $bvModal = (instance?.proxy?.$root as any)?.$bvModal;
 
 const tutkinnonosaTuontiModal = useTemplateRef('tutkinnonosaTuontiModal');
 
