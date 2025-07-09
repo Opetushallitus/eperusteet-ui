@@ -15,37 +15,35 @@
     <hr class="mt-4"/>
 
     <b-form-group :label="$t('opetuksen-tavoitteet-vuosiluokilla-' + vuosiluokat)" class="mt-4 pt-3">
-      <draggable
+      <VueDraggable
         v-bind="tavoitteetDragOptions"
         tag="div"
         v-model="model.tavoitteet">
+        <EpCollapse
+          v-for="(tavoite, tavoiteIndex) in model.tavoitteet"
+          :key="'tavoite'+tavoiteIndex"
+          class="tavoite p-3 mb-4 w-100"
+          :borderBottom="false"
+          :usePadding="false">
 
-          <EpCollapse
-            v-for="(tavoite, tavoiteIndex) in model.tavoitteet"
-            :key="'tavoite'+tavoiteIndex"
-            class="tavoite p-3 mb-4 w-100"
-            :borderBottom="false"
-            :usePadding="false">
-
-            <template #header>
-              <div class="d-flex">
-                <div class="order-handle mr-3" v-if="isEditing">
-                  <EpMaterialIcon v-if="isEditing">drag_indicator</EpMaterialIcon>
-                </div>
-                <h4 class="mb-0" v-html="$kaanna(tavoite.tavoite)"></h4>
+          <template #header>
+            <div class="d-flex">
+              <div class="order-handle mr-3" v-if="isEditing">
+                <EpMaterialIcon v-if="isEditing">drag_indicator</EpMaterialIcon>
               </div>
-            </template>
+              <h4 class="mb-0" v-html="$kaanna(tavoite.tavoite)"></h4>
+            </div>
+          </template>
 
-            <EpOppiaineenTavoite v-model="model.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="vlkSupportData" @poista="poistaTavoite(tavoite)"/>
+          <EpOppiaineenTavoite v-model="model.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="vlkSupportData" @poista="poistaTavoite(tavoite)"/>
 
-          </EpCollapse>
-      </draggable>
+        </EpCollapse>
+      </VueDraggable>
 
       <ep-button @click="lisaaTavoite" variant="outline" icon="add" v-if="isEditing">
         {{ $t('lisaa-tavoite') }}
       </ep-button>
     </b-form-group>
-
   </div>
 </template>
 
@@ -60,7 +58,7 @@ import EpOppiaineenTavoite from '@/views/aipe/yleiset/EpOppiaineenTavoite.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import EpSisaltoalueetEditModal from '@/views/perusopetus/EpSisaltoalueetEditModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 

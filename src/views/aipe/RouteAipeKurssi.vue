@@ -128,11 +128,11 @@ const koodisto = new KoodistoSelectStore({
 });
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 const tavoitteet = computed(() => {
-  return _.filter(store.value?.supportData.value?.tavoitteet, tavoite => _.includes(store.value?.data.value?.tavoitteet, _.toString(tavoite.id)));
+  return _.filter(store.value?.supportData?.tavoitteet, tavoite => _.includes(store.value?.data?.tavoitteet, _.toString(tavoite.id)));
 });
 
 const kurssiChange = async () => {

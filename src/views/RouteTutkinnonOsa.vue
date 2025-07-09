@@ -315,7 +315,7 @@ const tutkinnonosaKoodisto = new KoodistoSelectStore({
 });
 
 const tutkinnonOsaEditable = computed(() => {
-  return store.value?.features.value?.editable;
+  return store.value?.features?.editable;
 });
 
 const tutkinnonosaKoodistoKaytossaField = computed(() => {
@@ -341,7 +341,7 @@ const tov = computed(() => {
   if (!store.value) {
     return null;
   }
-  return store.value.data.value;
+  return store.value.data;
 });
 
 // Watch tov for changes to update Murupolku
@@ -453,26 +453,26 @@ const lisaaOsaAlue = async (tutkinnonOsa) => {
 };
 
 const hasNimi = computed(() => {
-  return !_.isEmpty(_.get(store.value?.data.value.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value));
+  return !_.isEmpty(_.get(store.value?.data.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value));
 });
 
 // Computed property for nimi with getter and setter
 const nimi = computed({
   get() {
-    return _.get(store.value?.data.value.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value);
+    return _.get(store.value?.data.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value);
   },
   set(value) {
     store.value?.setData({
-      ...store.value?.data.value,
+      ...store.value?.data,
       tutkinnonOsa: {
-        ...store.value?.data.value.tutkinnonOsa,
+        ...store.value?.data.tutkinnonOsa,
         nimi: {
-          ...store.value?.data.value.tutkinnonOsa.nimi,
+          ...store.value?.data.tutkinnonOsa.nimi,
           [Kielet.getSisaltoKieli.value]: value,
         },
       },
     });
-  }
+  },
 });
 
 const tutkinnonOsaNimiKoodiLisays = (koodi) => {
@@ -549,7 +549,7 @@ const valittuArviointiTyyppi = computed(() => {
     return 'geneerinen';
   }
 
-  if (_.size(store.value?.data.value?.tutkinnonOsa?.arviointi?.arvioinninKohdealueet) > 0) {
+  if (_.size(store.value?.data.tutkinnonOsa?.arviointi?.arvioinninKohdealueet) > 0) {
     return 'tutkinnonosa-kohtainen';
   }
 

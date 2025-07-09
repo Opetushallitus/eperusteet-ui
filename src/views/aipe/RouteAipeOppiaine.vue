@@ -42,7 +42,7 @@
 
           <template v-if="!data['_oppiaine'] && oppiaineId && (!data.kurssit || data.kurssit.length == 0)">
             <b-form-group :label="$t('oppimaarat')">
-              <draggable
+              <VueDraggable
                 v-bind="oppiaineetDragOptions"
                 tag="div"
                 v-model="data.oppimaarat">
@@ -50,7 +50,7 @@
                     <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
                     <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
                   </div>
-              </draggable>
+              </VueDraggable>
             </b-form-group>
 
             <ep-button variant="outline-primary" icon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
@@ -60,7 +60,7 @@
 
           <template v-if="oppiaineId && (!data.oppimaarat || data.oppimaarat.length == 0)">
             <b-form-group :label="$t('kurssit')" class="mt-4">
-              <draggable
+              <VueDraggable
                 v-bind="kurssitDragOptions"
                 tag="div"
                 v-model="data.kurssit">
@@ -68,7 +68,7 @@
                     <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
                     <router-link :to="{ name: 'aipekurssi', params: { kurssiId: kurssi.id } }">{{ $kaanna(kurssi.nimi) || $t('nimeton-kurssi') }}</router-link>
                   </div>
-              </draggable>
+              </VueDraggable>
             </b-form-group>
 
             <ep-button variant="outline-primary" icon="add" @click="lisaaKurssi" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
@@ -77,7 +77,7 @@
           </template>
 
           <b-form-group :label="$t('opetuksen-tavoitteet')" class="mt-4 pt-3">
-            <draggable
+            <VueDraggable
               v-bind="tavoitteetDragOptions"
               tag="div"
               v-model="data.tavoitteet">
@@ -99,7 +99,7 @@
                   <EpOppiaineenTavoite v-model="data.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="supportData" @poista="poistaTavoite(tavoite)"/>
 
                 </EpCollapse>
-            </draggable>
+            </VueDraggable>
 
             <ep-button @click="lisaaTavoite" variant="outline" icon="add" v-if="isEditing">
               {{ $t('lisaa-tavoite') }}
@@ -122,7 +122,7 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { AipeOppiaineStore } from '@/stores/AipeOppiaineStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -177,12 +177,12 @@ const koodisto = new KoodistoSelectStore({
 });
 
 const storeData = computed({
-  get: () => store.value?.data.value,
+  get: () => store.value?.data,
   set: (data) => store.value?.setData(data),
 });
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 const oppiaineetDragOptions = computed(() => {

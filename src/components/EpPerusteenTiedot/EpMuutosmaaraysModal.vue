@@ -51,15 +51,13 @@ import { useVuelidate } from '@vuelidate/core';
 import { requiredOneLang } from '@shared/validators/required';
 import { required } from 'vuelidate/lib/validators';
 import { Maaraykset, MaaraysKevytDto } from '@shared/api/eperusteet';
-import { $t, $success, $fail } from '@shared/utils/globals';
+import { $t, $success, $fail, $bvModal } from '@shared/utils/globals';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
 }>();
 
 const muutosmaaraysModal = useTemplateRef('muutosmaaraysModal');
-const instance = getCurrentInstance();
-const $bvModal = (instance?.proxy?.$root as any)?.$bvModal;
 
 const muutosmaarays = ref<any | null>(null);
 const tallennetaan = ref(false);
@@ -77,7 +75,7 @@ const rules = {
   },
 };
 
-const v$ = useVuelidate(rules, { muutosmaarays });
+const v$ = useVuelidate(rules, { muutosmaarays }, { $stopPropagation: true });
 
 const tallenna = async () => {
   tallennetaan.value = true;

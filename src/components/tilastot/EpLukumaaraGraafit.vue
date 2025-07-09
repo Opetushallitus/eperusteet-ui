@@ -3,24 +3,13 @@
     <EpSpinner v-if="!toteutussuunnitelmat || !opetussuunnitelmat" />
 
     <template v-else>
-
       <div class="d-flex">
         <ep-form-content name="koulutustyyppi">
           <koulutustyyppi-select class="koulutustyyppi-select" v-model="koulutustyyppi" :isEditing="true" :koulutustyypit="koulutustyyppiValinnat"/>
         </ep-form-content>
         <ep-form-content name="ajanjakso" class="ml-5">
-          <b-form-group class="mt-0">
-            <b-form-radio
-              v-model="ajanjakso"
-              name="ajanjakso"
-              value="kuukausi">{{ $t('kuukausittain') }}
-            </b-form-radio>
-            <b-form-radio
-              v-model="ajanjakso"
-              name="ajanjakso"
-              value="vuosi">{{ $t('vuosittain') }}
-            </b-form-radio>
-          </b-form-group>
+          <EpRadio v-model="ajanjakso" value="kuukausi">{{ $t('kuukausittain') }}</EpRadio>
+          <EpRadio v-model="ajanjakso" value="vuosi">{{ $t('vuosittain') }}</EpRadio>
         </ep-form-content>
         <ep-form-content name="vuosi" class="ml-5">
           <b-form-select v-model="vuosi" :options="vuosivalinnat" :disabled="ajanjakso === 'vuosi'"/>
@@ -28,9 +17,11 @@
       </div>
 
       <ep-form-content name="tila" class="mb-4">
-        <b-form-checkbox-group v-model="tila">
-          <b-form-checkbox v-for="tila in tilaValinnat" :key="'tila' + tila" :value="tila">{{$t(tila)}}</b-form-checkbox>
-        </b-form-checkbox-group>
+        <EpToggleGroup v-model="tila" :items="tilaValinnat">
+          <template #default="{item}">
+            <span>{{$t(item)}}</span>
+          </template>
+        </EpToggleGroup>
       </ep-form-content>
 
       <div class="mb-2">{{$t('suunnitelmien-lukumaarat-graafi-selite')}}</div>
@@ -49,6 +40,9 @@ import moment from 'moment';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { $t } from '@shared/utils/globals';
+import EpFormContent from '@shared/components/forms/EpFormContent.vue';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 type Ajanjakso = 'kuukausi' | 'vuosi';
 
@@ -248,16 +242,16 @@ const chartSeries = computed(() => {
   max-width:800px;
 }
 
-::v-deep .apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title {
+:deep(.apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title) {
   background: $white;
   border: none;
 }
 
-::v-deep .apexcharts-tooltip-y-group {
+:deep(.apexcharts-tooltip-y-group) {
   padding: 0;
 }
 
-::v-deep .form-content {
+:deep(.form-content) {
   margin-bottom: 0;
 }
 

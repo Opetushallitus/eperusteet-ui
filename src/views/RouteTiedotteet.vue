@@ -83,7 +83,7 @@ const props = defineProps<{
   tiedotteetStore: TiedotteetStore;
 }>();
 
-const eptiedotemodal = useTemplateRef('eptiedotemodal');
+const eptiedotemodalRef = useTemplateRef('eptiedotemodal');
 const sivu = ref(0);
 const perPage = ref(10);
 const nimiFilter = ref('');
@@ -225,7 +225,7 @@ const tableFields = computed(() => {
 });
 
 const avaaTiedote = (tiedote: TiedoteDto) => {
-  eptiedotemodal.value.muokkaa(tiedote);
+  eptiedotemodalRef.value.muokkaa(tiedote);
 };
 </script>
 

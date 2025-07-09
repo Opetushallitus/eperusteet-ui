@@ -151,13 +151,13 @@
 
           <div v-for="(tpvm, idx) in data.tavoitepaivamaarat" :key="idx" class="row p-0 m-0" >
             <b-form-group :label="$t('tavoitteen-pvm')" class="col-md-4 col-12">
-              <ep-datepicker v-model="tpvm.tapahtumapaiva" class="mb-2" :isEditing="true" :validation="$v.data.tavoitepaivamaarat[idx].tapahtumapaiva"/>
+              <ep-datepicker v-model="tpvm.tapahtumapaiva" class="mb-2" :isEditing="true"/>
               <ep-toggle v-model="tpvm.julkinen" v-if="isAmmatillinen" class="mb-2">
                 {{$t('julkinen')}}
               </ep-toggle>
             </b-form-group>
             <b-form-group :label="$t('tavoitteen-nimi-kuvaus') + '*'" class="col-md-7 col-11">
-              <ep-input v-model="tpvm.tavoite" type="localized" :is-editing="true" :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')" :validation="$v.data.tavoitepaivamaarat[idx].tavoite" />
+              <ep-input v-model="tpvm.tavoite" type="localized" :is-editing="true" :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')" />
             </b-form-group>
             <b-form-group class="col-1 col-sm-1 text-center">
               <template v-slot:label><br/></template>
@@ -310,6 +310,11 @@ const validator = computed(() => {
   }
 
   if (currentStep.value && currentStep.value.key === 'aikataulu') {
+
+    if (data.value.tavoitepaivamaarat.length === 0) {
+      return {};
+    }
+
     return {
       data: {
         tavoitepaivamaarat: [{

@@ -7,7 +7,7 @@
       </div>
       <div class="arviointi-wrapper" v-for="(geneerinen, idx) in julkaistut" :key="idx + '-julkaistut'">
         <GeneerinenArviointi
-        :value="geneerinen"
+          :value="geneerinen"
           :arviointi-store="arviointiStore"
           :kayttajaStore="kayttajaStore">
         </GeneerinenArviointi>

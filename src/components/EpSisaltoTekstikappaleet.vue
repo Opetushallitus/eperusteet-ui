@@ -30,8 +30,10 @@
     </ep-collapse>
 
     <EpDraggableCollapse v-model="model.vapaatTekstit" :isEditing="isEditing">
-      <template #header="{data}" v-if="!isEditing">
-        <h4 v-if="!isEditing">{{ $kaanna(data.nimi)}}</h4>
+      <template #header="{data}">
+        <template v-if="!isEditing">
+          <h4>{{ $kaanna(data.nimi)}}</h4>
+        </template>
       </template>
 
       <template #default="{data}">

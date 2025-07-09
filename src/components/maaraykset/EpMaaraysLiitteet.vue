@@ -1,6 +1,12 @@
 <template>
   <div>
-    <ep-tiedosto-lataus ref="liiteLataus" :fileTypes="['application/pdf']" @input="lisaaLiite" :as-binary="true" :fileMaxSize="LIITE_MAX_KOKO" v-if="isEditing && (liitteet.length === 0 || !yksittainen)"/>
+    <ep-tiedosto-lataus
+      v-if="isEditing && (liitteet.length === 0 || !yksittainen)"
+      ref="liitelataus"
+      :fileTypes="['application/pdf']"
+      @update:modelValue="lisaaLiite($event)"
+      :as-binary="true"
+      :fileMaxSize="LIITE_MAX_KOKO"/>
 
     <div class="row mt-4 ml-1" v-if="liitteet.length > 0 && !yksittainen">
       <div class="col font-weight-bold border-bottom ml-0 pl-0 pb-2">{{$t('nimi')}}</div>
@@ -30,6 +36,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import { MaaraysLiiteDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
 import { $t } from '@shared/utils/globals';
+import { ref } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -55,9 +62,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue']);
-
-const liiteLataus = useTemplateRef('liiteLataus');
-
+const liitelatausRef = useTemplateRef('liitelataus');
 const LIITE_MAX_KOKO = 99 * 1024 * 1024;
 
 const model = computed({
@@ -78,6 +83,7 @@ const poistaLiite = (liite) => {
 };
 
 const lisaaLiite = (liite) => {
+  console.log(liite);
   model.value = [
     ...model.value,
     {
@@ -88,7 +94,7 @@ const lisaaLiite = (liite) => {
     },
   ];
 
-  (liiteLataus.value as any).resetFile();
+  (liitelatausRef.value as any).resetFile();
 };
 </script>
 

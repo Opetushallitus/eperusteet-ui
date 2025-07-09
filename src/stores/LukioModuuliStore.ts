@@ -4,9 +4,20 @@ import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
 import { computed } from 'vue';
 import { required } from 'vuelidate/lib/validators';
-import { useRouter } from 'vue-router';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+
+interface LukioModuuliStoreConfig {
+  router: Router;
+}
 
 export class LukioModuuliStore implements IEditoitava {
+  private static config: LukioModuuliStoreConfig;
+
+  public static install(app: App, config: LukioModuuliStoreConfig) {
+    LukioModuuliStore.config = config;
+  }
+
   constructor(
     private perusteId: number,
     private oppiaineId: number,
@@ -71,8 +82,7 @@ export class LukioModuuliStore implements IEditoitava {
       }));
       await this.perusteStore.updateNavigation();
       await EditointiStore.cancelAll();
-      const router = useRouter();
-      router.push({
+      LukioModuuliStore.config.router.push({
         name: 'moduuli',
         params: {
           oppiaineId: oppiaine.id,
@@ -86,8 +96,7 @@ export class LukioModuuliStore implements IEditoitava {
     if (this.moduuliId) {
       await Lops2019.deleteModuuli(this.perusteId, this.oppiaineId, this.moduuliId);
       await this.perusteStore.updateNavigation();
-      const router = useRouter();
-      router.push({ name: 'lukio_oppiaine', params: { oppiaineId: this.oppiaineId } });
+      LukioModuuliStore.config.router.push({ name: 'lukio_oppiaine', params: { oppiaineId: this.oppiaineId } });
     }
   }
 

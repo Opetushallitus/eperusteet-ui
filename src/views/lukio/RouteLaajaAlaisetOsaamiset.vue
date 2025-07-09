@@ -133,11 +133,11 @@ const poistaLaajaAlainenOsaaminen = (poistettavaLao: any) => {
 };
 
 const laajaAlaisetOsaamiset = computed(() => {
-  return store.value?.data.value.laajaAlaisetOsaamiset;
+  return store.value?.data.laajaAlaisetOsaamiset;
 });
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 

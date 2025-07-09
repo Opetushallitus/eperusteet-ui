@@ -60,7 +60,7 @@ const perusteId = computed(() => {
 });
 
 const vuosiluokkakokonaisuudet = computed(() => {
-  return store.value?.vuosiluokkakokonaisuudet.value;
+  return store.value?.vuosiluokkakokonaisuudet;
 });
 
 

@@ -421,7 +421,7 @@ const koulutuksenosaKoodisto = new KoodistoSelectStore({
 });
 
 const oppaanKiinnitetytKoodit = computed(() => {
-  return store.value!.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit;
+  return store.value!.data.peruste.oppaanSisalto.oppaanKiinnitetytKoodit;
 });
 
 const oppaanKiinnitetytKooditUris = computed(() => {
@@ -556,18 +556,18 @@ const oppaanTyypit = [
 
 const oppaanTyyppi = computed({
   get() {
-    if (!store.value?.data.value.peruste.opasTyyppi || store.value?.data.value.peruste.opasTyyppi === _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI)) {
+    if (!store.value?.data.peruste.opasTyyppi || store.value?.data.peruste.opasTyyppi === _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI)) {
       return [];
     }
-    return [store.value?.data.value.peruste.opasTyyppi];
+    return [store.value?.data.peruste.opasTyyppi];
   },
   set(tyyppi) {
     if (store.value) {
       store.value.setData(
         {
-          ...store.value.data.value,
+          ...store.value.data,
           peruste: {
-            ...store.value.data.value.peruste,
+            ...store.value.data.peruste,
             opasTyyppi: tyyppi[0] || _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI),
           },
         },
@@ -582,7 +582,7 @@ const oppaanTyyppiTietoaPalvelusta = computed(() => {
 
 const storeData = computed({
   get() {
-    return store.value?.data.value;
+    return store.value?.data;
   },
   set(data) {
     store.value?.setData(data);

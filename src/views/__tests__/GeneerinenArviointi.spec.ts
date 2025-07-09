@@ -1,14 +1,13 @@
-import { mock } from '@/utils/tests';
-import { mount, createLocalVue, RouterLinkStub } from '@vue/test-utils';
+import { mount, RouterLinkStub } from '@vue/test-utils';
 import { getMockGeneeriset } from './data';
 import { GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
 import GeneerinenArviointi from '../GeneerinenArviointi.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import '@shared/config/bootstrap';
 import { KayttajaStore } from '@/stores/kayttaja';
+import { mock } from '@shared/utils/jestutils';
+import { globalStubs } from '@shared/utils/__tests__/stubs';
 
 describe('GeneerinenArviointi', () => {
-  const localVue = createLocalVue();
 
   test('Mounting', async () => {
     const arviointiStore = mock(ArviointiStore);
@@ -27,13 +26,8 @@ describe('GeneerinenArviointi', () => {
         arviointiStore,
         kayttajaStore,
       },
-      localVue,
-      mocks: {
-        $t: x => x,
-        $kaanna: x => '[' + x?.fi + ']',
-      },
-      stubs: {
-        RouterLink: RouterLinkStub,
+      global: {
+        ...globalStubs,
       },
     });
 

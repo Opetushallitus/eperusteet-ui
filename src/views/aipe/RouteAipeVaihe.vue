@@ -19,7 +19,7 @@
 
         <template v-if="vaiheId">
           <b-form-group :label="$t('oppiaineet')">
-            <draggable
+            <VueDraggable
               v-bind="oppiaineetDragOptions"
               tag="div"
               v-model="data.oppiaineet">
@@ -27,7 +27,7 @@
                   <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
                   <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppiaine.id } }">{{ $kaanna(oppiaine.nimi) || $t('nimeton-oppiaine') }}</router-link>
                 </div>
-            </draggable>
+            </VueDraggable>
           </b-form-group>
 
           <ep-button variant="outline-primary" icon="add" @click="lisaaOppiaine" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
@@ -39,7 +39,7 @@
 
         <b-form-group class="mt-4" :label="$t('opetuksen-tavoitealueet')">
           <div v-if="isEditing">
-            <draggable
+            <VueDraggable
               v-bind="defaultDragOptions"
               tag="div"
               v-model="data.opetuksenKohdealueet">
@@ -60,7 +60,7 @@
                   </div>
                 </b-col>
               </b-row>
-            </draggable>
+            </VueDraggable>
 
             <ep-button variant="outline" icon="add" @click="lisaaKohdealue" v-if="isEditing">
               {{ $t('lisaa-tavoitealue') }}
@@ -92,7 +92,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
@@ -122,16 +122,16 @@ const perusteId = computed(() => {
 });
 
 const sisaltoTekstiAvaimet = computed(() => {
-  return _.filter(['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava'], avain => !!_.get(store.value?.data.value, avain));
+  return _.filter(['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava'], avain => !!_.get(store.value?.data, avain));
 });
 
 const storeData = computed({
-  get: () => store.value?.data.value,
+  get: () => store.value?.data,
   set: (data) => store.value?.setData(data),
 });
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 const defaultDragOptions = computed(() => {

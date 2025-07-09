@@ -1,13 +1,12 @@
-import { mock } from '@/utils/tests';
-import { mount, createLocalVue, RouterLinkStub } from '@vue/test-utils';
+import { mount, RouterLinkStub } from '@vue/test-utils';
 import { getMockGeneeriset } from './data';
 import RouteGeneerinenArviointi from '../RouteGeneerinenArviointi.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import '@shared/config/bootstrap';
 import { KayttajaStore } from '@/stores/kayttaja';
+import { mock } from '@shared/utils/jestutils';
+import { globalStubs } from '@shared/utils/__tests__/stubs';
 
 describe('RouteGeneerinenArviointi', () => {
-  const localVue = createLocalVue();
 
   test('Mounting', async () => {
     const arviointiStore = mock(ArviointiStore);
@@ -15,8 +14,8 @@ describe('RouteGeneerinenArviointi', () => {
     const { geneeriset, arviointiasteikot } = getMockGeneeriset();
     arviointiStore.state.arviointiasteikot = arviointiasteikot;
     arviointiStore.state.geneeriset = geneeriset;
-    arviointiStore.fetchArviointiasteikot = jest.fn(async () => {});
-    arviointiStore.fetchGeneeriset = jest.fn(async () => {});
+    arviointiStore.fetchArviointiasteikot = vi.fn(async () => {});
+    arviointiStore.fetchGeneeriset = vi.fn(async () => {});
     kayttajaStore.state.tiedot = {
       oikeudet: ['ROLE_APP_EPERUSTEET_ADMIN_1.2.246.562.10.00000000001'],
     };
@@ -26,13 +25,8 @@ describe('RouteGeneerinenArviointi', () => {
         arviointiStore,
         kayttajaStore,
       },
-      localVue,
-      mocks: {
-        $t: x => x,
-        $kaanna: x => '[' + x?.fi + ']',
-      },
-      stubs: {
-        RouterLink: RouterLinkStub,
+      global: {
+        ...globalStubs,
       },
     });
 

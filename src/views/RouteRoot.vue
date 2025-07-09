@@ -22,7 +22,6 @@ import { ref, computed, watch, onMounted, provide } from 'vue';
 import { useRoute } from 'vue-router';
 import { useHead } from '@unhead/vue';
 import _ from 'lodash';
-import Sticky from 'vue-sticky-directive';
 import EpNavbar from '@shared/components/EpNavbar/EpNavbar.vue';
 import { KayttajaStore } from '@/stores/kayttaja';
 import EpFooter from '@shared/components/EpFooter/EpFooter.vue';
@@ -32,6 +31,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import EpTestiymparisto from '@shared/components/EpTestiymparisto/EpTestiymparisto.vue';
 import { baseURL } from '@shared/api/eperusteet';
 import { $t } from '@shared/utils/globals';
+
 
 const props = defineProps<{
   browserStore: BrowserStore;
@@ -53,12 +53,14 @@ const routeStickyNavi = computed(() => {
   return route.name !== 'root';
 });
 
+const routeName = computed(() => {
+  return route.name;
+});
+
 const meta = computed(() => {
   const lang = _.get(route, 'params.lang');
-  const hasRouteName = route && route.name;
   return {
-    title: hasRouteName ? $t('route-' + route.name) : $t('eperusteet'),
-    titleTemplate: hasRouteName ? '%s - ' + $t('eperusteet') : null,
+    title: $t('eperusteet-laadinta'),
     htmlAttrs: {
       lang: lang || 'fi',
     },

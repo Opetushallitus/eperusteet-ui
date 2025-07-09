@@ -1,6 +1,6 @@
 <template>
   <div>
-    <draggable v-bind="defaultDragOptions"
+    <VueDraggable v-bind="defaultDragOptions"
                tag="div"
                v-model="model">
       <div v-for="(arvioinninKohdeAlue, index) in model" :key="'arvioinninKohdeAlue' + index" class="arviointi">
@@ -19,7 +19,7 @@
           </template>
         </EpArviointi>
       </div>
-    </draggable>
+    </VueDraggable>
 
     <EpButton v-if="isEditing"
               class="mt-3"
@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import * as _ from 'lodash';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { computed } from 'vue';
 import EpArviointi from '@/views/tutkinnonosat/EpArviointi.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';

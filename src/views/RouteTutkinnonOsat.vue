@@ -37,9 +37,9 @@
                 <th>{{ $t('muokattu') }}</th>
               </tr>
             </thead>
-            <draggable v-model="items"
-                       tag="tbody"
-                       v-bind="options">
+            <VueDraggable v-bind="options"
+                       v-model="items"
+                       tag="tbody">
               <tr v-for="(item, idx) in raw" :key="idx" role="row">
                 <td>
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -49,7 +49,7 @@
                 <td>{{ item.laajuus }}</td>
                 <td>{{ $ago(item.muokattu) }}</td>
               </tr>
-            </draggable>
+            </VueDraggable>
           </table>
         </div>
 
@@ -83,7 +83,7 @@ import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import _ from 'lodash';
 import EpTutkinnonosaTuontiModal from '@/components/EpTutkinnonosaTuontiModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
@@ -118,7 +118,7 @@ const raw = computed(() => {
     return null;
   }
 
-  return _.map(store.value.data.value,
+  return _.map(store.value.data,
     (item, idx) => ({
       ...item,
       idx: idx + 1,

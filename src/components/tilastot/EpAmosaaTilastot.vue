@@ -107,7 +107,9 @@
                 :current-page="opsPage"
                 :per-page="perPage">
         <template v-slot:cell(nimi)="{item, value}">
-          <a :href="item.url" rel="noopener noreferrer" target="_blank">{{ value }}</a>
+          <template v-if="item">
+            <a :href="item.url" rel="noopener noreferrer" target="_blank">{{ value }}</a>
+          </template>
         </template>
       </b-table>
 

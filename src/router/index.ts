@@ -73,6 +73,10 @@ import { Kielet } from '@shared/stores/kieli';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import { isYleissivistavaKoulutustyyppi } from '@shared/utils/perusteet';
 import { createRouter, createWebHashHistory } from 'vue-router';
+import { useLoading } from 'vue-loading-overlay';
+import { loadingOptions } from '@/utils/loading';
+import { $bvModal } from '@shared/utils/globals';
+import { convertRouteParamsToNumbers } from '@/utils/routing';
 
 // Vue.use(VueMeta, {
 //   refreshOnceOnNavigation: true,
@@ -80,7 +84,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 
 const props = (route: any) => {
   return {
-    ...route.params,
+    ...convertRouteParamsToNumbers(route.params),
     ...stores,
   };
 };
@@ -634,21 +638,13 @@ window.addEventListener('beforeunload', e => {
 });
 
 router.beforeEach((to, from, next) => {
-  const hash = window.location.hash;
-
-  if (hash.includes('%2F')) {
-    const decoded = decodeURIComponent(hash).replace('//', '/');
-    window.location.replace(window.location.pathname + window.location.search + decoded);
-    window.location.reload();
-  }
-  else {
-    next();
-  }
+  loader = $loading.show();
+  next();
 });
 
 router.beforeEach(async (to, from, next) => {
   if (EditointiStore.anyEditing()) {
-    const value = await router.app.$bvModal.msgBoxConfirm(
+    const value = await $bvModal.msgBoxConfirm(
       Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti-dialogi'), {
         title: Kielet.kaannaOlioTaiTeksti('haluatko-poistua-tallentamatta'),
         okTitle: Kielet.kaannaOlioTaiTeksti('poistu-tallentamatta'),
@@ -718,8 +714,19 @@ router.beforeEach(async (to, from, next) => {
   next();
 });
 
+const $loading = useLoading(loadingOptions);
+let loader: any = null;
+
 router.afterEach(() => {
+  hideLoading();
   BrowserStore.changeLocation(location.href);
 });
+
+function hideLoading() {
+  if (loader !== null) {
+    (loader as any).hide();
+    loader = null;
+  }
+}
 
 export default router;

@@ -51,7 +51,7 @@
 
     </b-table>
 
-    <EpMuutosmaaraysModal ref="muutosmaaraysModal" :perusteStore="perusteStore"/>
+    <EpMuutosmaaraysModal ref="muutosmaaraysModal" :perusteStore="perusteStore" />
   </div>
 </template>
 

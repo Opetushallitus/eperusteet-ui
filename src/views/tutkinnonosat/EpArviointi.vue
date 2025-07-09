@@ -6,7 +6,7 @@
         <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
       </div>
     </template>
-    <draggable v-bind="defaultDragOptions"
+    <VueDraggable v-bind="defaultDragOptions"
                tag="div"
                v-model="arvioinninKohdeAlue.arvioinninKohteet">
       <div class="ml-3 mt-2 d-flex" v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
@@ -69,7 +69,7 @@
           <hr v-if="arvindex < arvioinninKohdeAlue.arvioinninKohteet.length - 1" class="mb-2"/>
         </div>
       </div>
-    </draggable>
+    </VueDraggable>
     <hr v-if="isEditing" class="mb-2"/>
     <div class="d-flex justify-content-between">
       <EpButton v-if="isEditing" variant="outline" icon="add" @click="lisaaArvionninkohde">{{$t('lisaa-ryhmittelyotsikko')}}</EpButton>
@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import * as _ from 'lodash';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { computed } from 'vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';

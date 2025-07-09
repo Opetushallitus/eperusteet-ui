@@ -50,15 +50,13 @@
           <hr/>
 
           <b-form-group class="mt-4 mb-4" :label="$t('vuosiluokat')" v-if="isEditing">
-            <b-form-checkbox-group v-model="valitutVuosiluokkakokonaisuudet" stacked @change="vlkChange">
-                <b-form-checkbox
-                  v-for="(vlk, index) in valittavatVuosiluokkakokonaisuudet"
-                  :value="vlk"
-                  :key="'valittavaVlk' + index"
-                  class="col-3 mb-1">
-                  {{ vlk.nimi }}
-                </b-form-checkbox>
-            </b-form-checkbox-group>
+            <EpToggleGroup v-model="valitutVuosiluokkakokonaisuudet" :items="valittavatVuosiluokkakokonaisuudet">
+              <template #default="{ item }">
+                <div class="mb-1">
+                  {{ item.nimi }}
+                </div>
+              </template>
+            </EpToggleGroup>
           </b-form-group>
 
           <b-tabs v-if="valitutVuosiluokkakokonaisuudet.length > 0">
@@ -77,7 +75,7 @@
 
           <template v-if="!isOppimaara">
             <b-form-group :label="$t('oppimaarat')" v-if="!isEditing || (data.oppimaarat && data.oppimaarat.length > 0)">
-              <draggable
+              <VueDraggable
                 v-bind="oppiaineetDragOptions"
                 tag="div"
                 v-model="data.oppimaarat">
@@ -85,7 +83,7 @@
                     <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
                     <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
                   </div>
-              </draggable>
+              </VueDraggable>
             </b-form-group>
 
             <ep-button variant="outline-primary" icon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
@@ -111,7 +109,7 @@ import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -122,6 +120,7 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpTavoitealueetEditModal from '@/views/perusopetus/EpTavoitealueetEditModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -156,7 +155,6 @@ watch(() => props.oppiaineId, async () => {
     props.oppiaineId,
     props.perusteStore,
     props.uusi === 'uusi',
-    { $router: router },
   );
   store.value = new EditointiStore(oppiaineStore);
 }, { immediate: true });
@@ -167,7 +165,7 @@ const isOppimaara = computed(() => {
 
 const storeData = computed({
   get() {
-    return store.value?.data.value;
+    return store.value?.data;
   },
   set(data) {
     store.value?.setData(data);
@@ -190,7 +188,7 @@ const lisaaOppimaara = async () => {
 
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 const getVuosiluokkaNumerot = (vuosiluokat) => {
@@ -202,7 +200,7 @@ const getVuosiluokkaNumerot = (vuosiluokat) => {
 };
 
 const valittavatVuosiluokkakokonaisuudet = computed(() => {
-  return _.sortBy(_.map(store.value?.supportData.value.perusteenVuosiluokkakokonaisuudet, valittavaVlk => {
+  return _.sortBy(_.map(store.value?.supportData.perusteenVuosiluokkakokonaisuudet, valittavaVlk => {
     return {
       id: _.toString(valittavaVlk.id),
       vuosiluokat: _.min(getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)) + '-' + _.max(getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)),
@@ -216,7 +214,7 @@ const valittavatVuosiluokkakokonaisuudetById = computed(() => {
 });
 
 const vuosiluokkakokonaisuudet = computed(() => {
-  return store.value?.data.value.vuosiluokkakokonaisuudet;
+  return store.value?.data?.vuosiluokkakokonaisuudet;
 });
 
 const valitutVuosiluokkakokonaisuudet = ref([]);
@@ -311,8 +309,8 @@ watch(valitutVuosiluokkakokonaisuudet, (valitutVlk) => {
 
 const vlkSupportData = computed(() => {
   return {
-    ...store.value!.supportData.value,
-    kohdealueet: store.value!.data.value.kohdealueet,
+    ...store.value!.supportData,
+    kohdealueet: store.value!.data.kohdealueet,
   };
 });
 

@@ -14,6 +14,7 @@
             @validoi="validoi"
             tyyppi="peruste"
             :julkaisu-route="julkaisuRoute"/>
+
         </div>
         <div class="flex-grow-1 align-self-center">
           <div class="mb-5 p-2" v-if="peruste && projekti">
@@ -451,6 +452,8 @@ import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { useHead } from '@unhead/vue';
 import { $t, $kaanna, $hasOikeus } from '@shared/utils/globals';
+import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import { onMounted } from 'vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -469,7 +472,7 @@ interface ValidationStats {
   fails: number;
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   perusteStore: PerusteStore;
   kayttajaStore: KayttajaStore;
   tiedotteetStore: TiedotteetStore;
@@ -480,7 +483,10 @@ const props = defineProps<{
   palautusMeta: any;
   julkaisuRoute?: any;
   jarjestaRoute?: any;
-}>();
+}>(), {
+  julkaisuRoute: { name: 'julkaise' },
+  jarjestaRoute: { name: 'jarjesta' },
+});
 
 const route = useRoute();
 const naviStore = ref<EpTreeNavibarStore | null>(null);
@@ -498,15 +504,16 @@ const {
   isPohja,
 } = usePerusteprojekti(props);
 
+onMounted(() => {
+  updateHead();
+});
+
 // Meta info
 watch(() => peruste.value, (newPeruste) => {
   if (newPeruste && newPeruste.nimi && !_.isEmpty($kaanna(newPeruste.nimi))) {
-    useHead({
-      title: $kaanna(newPeruste.nimi),
-      titleTemplate: '%s - ' + $t('eperusteet-ops-tyokalu'),
-    });
+    updateHead();
   }
-}, { immediate: true });
+});
 
 // Project change handler
 const onProjektiChange = async (projektiId: number) => {
@@ -517,6 +524,13 @@ const onProjektiChange = async (projektiId: number) => {
         disableNesting: true,
       },
     });
+};
+
+const updateHead = () => {
+  useHead({
+    title: $kaanna(peruste.value?.nimi),
+    titleTemplate: '%s - ' + $t('eperusteet-laadinta'),
+  });
 };
 
 // Watch project ID changes to initialize the navigation
@@ -735,7 +749,7 @@ const asetaPohjaValmiiksi = async () => {
 
 const validoi = async () => {
   isValidating.value = true;
-  await props.perusteStore.updateCurrent();
+  await props.perusteStore.updateValidointi();
   isValidating.value = false;
 };
 

@@ -59,11 +59,11 @@
 
       <div class="row align-items-end">
         <div class="col-4">
-          <b-form-checkbox-group v-model="tila">
-            <b-form-checkbox v-for="tila in osaamismerkkiTilat" :key="tila" :value="tila">
-              {{ $t('tila-' + tila.toLowerCase()) }}
-            </b-form-checkbox>
-          </b-form-checkbox-group>
+          <EpToggleGroup v-model="tila" :items="osaamismerkkiTilat">
+            <template #default="{item}">
+              <span>{{$t('tila-' + item.toLowerCase())}}</span>
+            </template>
+          </EpToggleGroup>
         </div>
       </div>
 
@@ -114,6 +114,7 @@ import * as _ from 'lodash';
 import { Murupolku } from '@shared/stores/murupolku';
 import { Kielet } from '@shared/stores/kieli';
 import { $kaanna, $t, $sdt, $sd, $fail } from '@shared/utils/globals';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 
 const props = defineProps({
   osaamismerkitStore: {

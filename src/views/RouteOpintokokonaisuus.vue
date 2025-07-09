@@ -62,7 +62,7 @@
       <b-form-group :label="$t('tavoitteet')  + (isEditing ? ' *' : '')" required>
 
         <div v-if="isEditing">
-          <draggable
+          <VueDraggable
             v-bind="tavoitteetOptions"
             tag="div"
             v-model="data.opetuksenTavoitteet">
@@ -83,7 +83,7 @@
                 </div>
               </b-col>
             </b-row>
-          </draggable>
+          </VueDraggable>
 
           <ep-button v-if="isEditing" variant="outline" icon="add" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')">
             {{ $t('lisaa-tavoite') }}
@@ -106,7 +106,7 @@
       <b-form-group :label="$t('opiskelijan-osaamisen-arvioinnin-kohteet')  + (isEditing ? ' *' : '')" required>
 
         <div v-if="isEditing">
-          <draggable
+          <VueDraggable
             v-bind="arvioinnitOptions"
             tag="div"
             v-model="data.arvioinnit">
@@ -127,7 +127,7 @@
                 </div>
               </b-col>
             </b-row>
-          </draggable>
+          </VueDraggable>
 
           <ep-button v-if="isEditing" variant="outline" icon="add" @click="lisaa('arvioinnit')">
             {{ $t('lisaa-arvioinnin-kohde') }}
@@ -165,7 +165,7 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
 import { TermitStore } from '@/stores/TermitStore';
 import { KuvaStore } from '@/stores/KuvaStore';

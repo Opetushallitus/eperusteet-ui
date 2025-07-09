@@ -1,20 +1,20 @@
 <template>
   <div>
     <template v-if="isEditing">
-      <b-form-radio v-model="model.liittyyTyyppi" :value="EILIITY" :disabled="disabloidutValinnat.includes(EILIITY)">
+      <EpRadio v-model="model.liittyyTyyppi" :value="EILIITY" :disabled="disabloidutValinnat.includes(EILIITY)">
         {{ $t('ei-liity-toiseen-maaraykseen') }}
-      </b-form-radio>
-      <b-form-radio v-model="model.liittyyTyyppi" :value="MUUTTAA">
+      </EpRadio>
+      <EpRadio v-model="model.liittyyTyyppi" :value="MUUTTAA">
         {{ $t('muuttaa-toista-maaraysta') }}
-      </b-form-radio>
+      </EpRadio>
 
       <div v-if="model.liittyyTyyppi === MUUTTAA" class="my-3 ml-4">
         <EpMaaraysLiittyyMaaraykseen v-model="model.muutettavatMaaraykset" :maarayksetNimella="maarayksetNimella" tyyppi="muuttaa"/>
       </div>
 
-      <b-form-radio v-model="model.liittyyTyyppi" :value="KORVAA">
+      <EpRadio v-model="model.liittyyTyyppi" :value="KORVAA">
         {{ $t('korvaa-toisen-maarayksen') }}
-      </b-form-radio>
+      </EpRadio>
 
       <div v-if="model.liittyyTyyppi === KORVAA" class="my-3 ml-4">
         <EpMaaraysLiittyyMaaraykseen v-model="model.korvattavatMaaraykset" :maarayksetNimella="maarayksetNimella" tyyppi="korvaa"/>
@@ -43,6 +43,7 @@ import * as _ from 'lodash';
 import { computed } from 'vue';
 import EpMaaraysLiittyyMaaraykseen from '@/components/maaraykset/EpMaaraysLiittyyMaaraykseen.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
 const MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;

@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="store" :versionumero="versionumero">
+  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
     <template #header="{ data }">
       <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
       <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
@@ -64,10 +64,11 @@ import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/Koodist
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import { onMounted } from 'vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
-  taiteenalaId: any;
+  taiteenalaId: number;
   uusi?: string;
 }>();
 
@@ -79,7 +80,7 @@ const perusteId = computed(() => {
 });
 
 const versionumero = computed(() => {
-  return _.toNumber(route.query.versionumero);
+  return route.query.versionumero ? _.toNumber(route.query.versionumero) : undefined;
 });
 
 const kasiteHandler = inject('kasiteHandler');
@@ -90,15 +91,18 @@ const sisaltoTekstiAvaimet = computed(() => {
 
 const storeData = computed({
   get() {
-    return store.value?.data.value;
+    return store.value?.data;
   },
   set(data) {
     store.value?.setData(data);
   },
 });
 
+const taiteenalaIdType = computed(() => {
+  return typeof props.taiteenalaId;
+});
+
 const fetch = async () => {
-  await props.perusteStore.blockUntilInitialized();
   const taiteenalaStore = new TaiteenalaStore(
     perusteId.value!,
     props.taiteenalaId,
@@ -124,7 +128,7 @@ const koodisto = new KoodistoSelectStore({
 // Watch for changes in taiteenalaId
 watch(() => props.taiteenalaId, async () => {
   await fetch();
-}, { immediate: true });
+});
 
 // Watch for changes in versionumero
 watch(versionumero, async () => {
@@ -134,6 +138,10 @@ watch(versionumero, async () => {
 const postSave = async () => {
   await props.perusteStore.updateNavigation();
 };
+
+onMounted(async () => {
+  await fetch();
+});
 </script>
 
 <style scoped lang="scss">

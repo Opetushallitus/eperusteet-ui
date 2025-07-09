@@ -8,7 +8,7 @@ import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
-import { fail } from '@shared/utils/notifications';
+import { $fail, $t } from '@shared/utils/globals';
 
 export class PerusteStore implements IEditoitava {
   private blocklist = [] as (() => void)[];
@@ -102,7 +102,7 @@ export class PerusteStore implements IEditoitava {
         }
         catch (e) {
           this.state.validoinnit = [];
-          fail('validointi-epaonnistui');
+          $fail($t('validointi-epaonnistui'));
         }
       }
       else {
@@ -151,7 +151,7 @@ export class PerusteStore implements IEditoitava {
       this.state.isInitialized = true;
     }
     catch (err) {
-      console.error(err);
+      $fail($t('perusteen-hakeminen-epaonnistui'));
     }
     finally {
       this.state.initializing = false;

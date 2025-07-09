@@ -3,14 +3,10 @@ import Vue, { createApp } from 'vue';
 import App from './App.vue';
 import '@shared/config/bootstrap';
 import '@shared/config/styles';
-import 'animate.css/animate.min.css';
-
 import { createI18n } from 'vue-i18n';
 import VueScrollTo from 'vue-scrollto';
 import { LoadingPlugin } from 'vue-loading-overlay';
-import Notifications from '@kyvg/vue3-notification';
 import VueApexCharts from 'vue-apexcharts';
-
 import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 import Aikaleima from '@shared/plugins/aikaleima';
 import { Notifikaatiot } from '@shared/plugins/notifikaatiot';
@@ -32,6 +28,14 @@ import { LaajaalainenOsaaminenStore } from './stores/LaajaalainenOsaaminenStore'
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 import { OsaamiskokonaisuusStore } from './stores/OsaamiskokonaisuusStore';
 import { OsaamiskokonaisuusPaaAlueStore } from './stores/OsaamiskokonaisuusPaaAlueStore';
+import { MaarayksetEditStore } from './stores/MaarayksetEditStore';
+import { AipeKurssiStore } from './stores/AipeKurssiStore';
+import { AipeLaajaAlainenOsaaminenStore } from './stores/AipeLaajaAlainenOsaaminenStore';
+import { AipeOppiaineStore } from './stores/AipeOppiaineStore';
+import { AipeVaiheStore } from './stores/AipeVaiheStore';
+import { LukioModuuliStore } from './stores/LukioModuuliStore';
+import { PerusopetusLaajaAlainenOsaaminenStore } from './stores/PerusopetusLaajaAlainenOsaaminenStore';
+import { PerusopetusOppiaineStore } from './stores/PerusopetusOppiaineStore';
 import { configureCompat } from '@vue/compat';
 import { Kieli } from '@shared/tyypit';
 import fiLocale from '@shared/translations/locale-fi.json';
@@ -42,6 +46,8 @@ import { setAppInstance } from '@shared/utils/globals';
 import { createPinia } from 'pinia';
 import Kaannos from '@shared/plugins/kaannos';
 import { createHead } from '@unhead/vue/client';
+import Sticky from 'vue-sticky-directive';
+import { TaiteenalaStore } from './stores/TaiteenalaStore';
 
 const app = createApp(App);
 
@@ -78,7 +84,6 @@ app.use(Aikaleima);
 app.use(LoadingPlugin);
 app.use(createHead());
 app.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
-// app.use(Notifications);
 app.use(Notifikaatiot);
 
 // Vue.use(Vahvistus);
@@ -93,6 +98,7 @@ app.use(TekstikappaleStore, {
   perusteStore: stores.perusteStore,
   router,
 });
+app.use(Sticky);
 
 app.use(TekstiRakenneStore, {
   perusteStore: stores.perusteStore,
@@ -161,6 +167,43 @@ app.use(OsaamiskokonaisuusPaaAlueStore, {
 
 app.use(OsaalueStore, {
   perusteStore: stores.perusteStore,
+});
+
+app.use(MaarayksetEditStore, {
+  router,
+});
+
+app.use(AipeKurssiStore, {
+  router,
+});
+
+app.use(AipeLaajaAlainenOsaaminenStore, {
+  router,
+});
+
+app.use(AipeOppiaineStore, {
+  router,
+});
+
+app.use(AipeVaiheStore, {
+  router,
+});
+
+app.use(LukioModuuliStore, {
+  router,
+});
+
+app.use(PerusopetusLaajaAlainenOsaaminenStore, {
+  router,
+});
+
+app.use(PerusopetusOppiaineStore, {
+  router,
+});
+
+app.use(TaiteenalaStore, {
+  perusteStore: stores.perusteStore,
+  router,
 });
 
 // async function main() {

@@ -17,7 +17,7 @@
         <b-col cols="5" class="font-weight-bold pb-2">{{$t('nimi')}}</b-col>
       </b-row>
 
-      <draggable
+      <VueDraggable
         v-bind="defaultDragOptions"
         tag="div"
         v-model="data.oppiaineet">
@@ -35,7 +35,7 @@
             <span v-if="oppiaine.muokattu">{{$sdt(oppiaine.muokattu)}}</span>
           </b-col>
         </b-row>
-      </draggable>
+      </VueDraggable>
     </template>
   </EpEditointi>
 
@@ -51,7 +51,7 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { $t, $kaanna, $sdt } from '@shared/utils/globals';
 
 const props = defineProps<{
@@ -88,7 +88,7 @@ const defaultDragOptions = computed(() => {
 });
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 </script>
 

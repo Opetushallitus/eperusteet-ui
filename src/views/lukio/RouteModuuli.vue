@@ -84,7 +84,7 @@
           </div>
 
           <div class="mb-2 mt-3 font-weight-bold">{{$t('tavoitteet')}}</div>
-          <draggable v-bind="tavoitteetDragOptions"
+          <VueDraggable v-bind="tavoitteetDragOptions"
                      tag="div"
                      v-model="data.tavoitteet.tavoitteet">
             <div class="row mb-2" v-for="(tavoite, tavoiteindex) in data.tavoitteet.tavoitteet" :key="'tavoitteet' +tavoiteindex">
@@ -105,7 +105,7 @@
                   </div>
                 </div>
               </div>
-          </draggable>
+          </VueDraggable>
 
           <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaTavoite()">{{ $t('lisaa-tavoite') }}</EpButton>
         </template>
@@ -123,7 +123,7 @@
         <template #header><h4>{{$t('keskeiset-sisallot')}}</h4></template>
 
         <div v-if="isEditing">
-          <draggable
+          <VueDraggable
             v-bind="keskeisetSisallotDragOptions"
             tag="div"
             v-model="data.sisallot">
@@ -164,7 +164,7 @@
                 </div>
               </div>
             </div>
-          </draggable>
+          </VueDraggable>
 
           <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaSisaltoalue()">{{ $t('lisaa-sisaltoalue') }}</EpButton>
 
@@ -193,7 +193,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -231,12 +231,12 @@ const koodisto = new KoodistoSelectStore({
 });
 
 const storeData = computed({
-  get: () => store.value?.data.value,
+  get: () => store.value?.data,
   set: (data) => store.value?.setData(data),
 });
 
 const isEditing = computed(() => {
-  return store.value?.isEditing.value;
+  return store.value?.isEditing;
 });
 
 const tavoitteetDragOptions = computed(() => {

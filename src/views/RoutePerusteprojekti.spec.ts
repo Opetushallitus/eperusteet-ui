@@ -1,37 +1,31 @@
-import { mock } from '@/utils/tests';
-import { mount, createLocalVue, RouterLinkStub } from '@vue/test-utils';
+import { mount, RouterLinkStub } from '@vue/test-utils';
 import { PerusteStore } from '@/stores/PerusteStore';
 import RoutePerusteprojekti from './RoutePerusteprojekti.vue';
-import '@shared/config/bootstrap';
+import { globalStubs } from '@shared/utils/__tests__/stubs';
+import { mock } from '@shared/utils/jestutils';
+import { vi } from 'vitest';
 
-window.scrollTo = jest.fn();
+vi.mock('vue-router', () => ({
+  useRoute: vi.fn(() => ({
+    params: {
+      projektiId: '123'
+    }
+  })),
+  useRouter: vi.fn(),
+}));
 
 describe('RoutePerusteprojekti', () => {
-  const localVue = createLocalVue();
 
   test('Mounting', async () => {
-    const perusteStore = mock(PerusteStore);
-
     const wrapper = mount(RoutePerusteprojekti, {
-      propsData: {
-        perusteStore,
+      props: {
+        perusteStore: mock(PerusteStore),
       },
-      localVue,
-      mocks: {
-        $t: x => x,
-        $kaanna: x => '[' + x?.fi + ']',
-        $route: {
-          params: {
-            projektiId: 42,
-          },
-        },
-      },
-      stubs: {
-        RouterLink: RouterLinkStub,
-        Portal: '<div></div>',
+      global: {
+        ...globalStubs,
       },
     });
 
-    // expect(wrapper.text()).not.toBeFalsy();
+    expect(wrapper).toBeTruthy();
   });
 });
