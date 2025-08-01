@@ -1,15 +1,32 @@
 <template>
-  <router-link :to="link" tag="div" :class="classes">
-    <div v-if="koulutustyyppi" class="p-2 pl-4 flex-shrink-1">
-      <EpColorIndicator size="16" :kind="koulutustyyppi" />
+  <router-link
+    :to="link"
+    tag="div"
+    :class="classes"
+  >
+    <div
+      v-if="koulutustyyppi"
+      class="p-2 pl-4 flex-shrink-1"
+    >
+      <EpColorIndicator
+        size="16"
+        :kind="koulutustyyppi"
+      />
     </div>
-    <div v-else-if=" tileImage" :style="style" class="w-100 h-100"></div>
-    <div v-else></div>
+    <div
+      v-else-if=" tileImage"
+      :style="style"
+      class="w-100 h-100"
+    />
+    <div v-else />
     <div class="flex-grow-1 mainslot h-100">
       <slot />
     </div>
-    <div class="flex-shrink-1 lower d-flex align-items-center justify-content-center text-center" v-if="hasLowerSlot">
-      <slot name="lower"></slot>
+    <div
+      v-if="hasLowerSlot"
+      class="flex-shrink-1 lower d-flex align-items-center justify-content-center text-center"
+    >
+      <slot name="lower" />
     </div>
   </router-link>
 </template>

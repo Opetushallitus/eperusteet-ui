@@ -1,39 +1,49 @@
 <template>
-  <b-modal class="backdrop"
-           id="julkaisuModal"
-           ref="julkaisuModal"
-           :no-close-on-backdrop="true"
-           :no-enforce-focus="true"
-           :lazy="true"
-           size="xl"
-           :hide-footer="true">
+  <b-modal
+    id="julkaisuModal"
+    ref="julkaisuModal"
+    class="backdrop"
+    :no-close-on-backdrop="true"
+    :no-enforce-focus="true"
+    :lazy="true"
+    size="xl"
+    :hide-footer="true"
+  >
     <template #modal-header>
       <div class="d-flex justify-content-between w-100">
-        <div class="mt-1">{{ $t('muokkaa')}}</div>
-        <EpKielivalinta/>
+        <div class="mt-1">
+          {{ $t('muokkaa') }}
+        </div>
+        <EpKielivalinta />
       </div>
     </template>
 
     <EpJulkaisuMuutosmaarays
       v-if="isNormaali"
       v-model="muokattavaJulkaisu"
-      :muutosmaaraykset="muutosmaaraykset"/>
+      :muutosmaaraykset="muutosmaaraykset"
+    />
 
     <EpJulkaisuForm
       class="mt-4"
-      :isLatest="isLatest"
+      :is-latest="isLatest"
       :store="perusteStore"
       :julkaisu="muokattavaJulkaisu"
-      @setInvalid="hasRequiredData" />
+      @setInvalid="hasRequiredData"
+    />
 
     <div class="float-right">
-      <EpButton @click="sulje"
-                variant="link">
+      <EpButton
+        variant="link"
+        @click="sulje"
+      >
         {{ $t('peruuta') }}
       </EpButton>
-      <EpButton @click="tallenna"
-                :show-spinner="tallennetaan"
-                :disabled="invalid">
+      <EpButton
+        :show-spinner="tallennetaan"
+        :disabled="invalid"
+        @click="tallenna"
+      >
         {{ $t('tallenna') }}
       </EpButton>
     </div>

@@ -1,248 +1,368 @@
 <template>
   <div>
     <div v-if="store">
-      <EpEditointi :store="store" :versionumero="versionumero" :labelCopyConfirm="'kopioidaanko-tutkinnonosa'" :labelRemove="'poista-tutkinnonosa'">
-      <template v-slot:header="{ data }">
-        <h2 class="m-0" style="white-space: pre">
-          <span v-if="data.tutkinnonOsa.nimi">{{$kaanna(data.tutkinnonOsa.nimi)}}</span>
-          <span v-else> {{$t('nimeton-tutkinnonosa')}}</span>
-          <span v-if="data.laajuus">, {{ data.laajuus }} {{ $t('OSAAMISPISTE') }}</span>
-        </h2>
-      </template>
+      <EpEditointi
+        :store="store"
+        :versionumero="versionumero"
+        :label-copy-confirm="'kopioidaanko-tutkinnonosa'"
+        :label-remove="'poista-tutkinnonosa'"
+      >
+        <template #header="{ data }">
+          <h2
+            class="m-0"
+            style="white-space: pre"
+          >
+            <span v-if="data.tutkinnonOsa.nimi">{{ $kaanna(data.tutkinnonOsa.nimi) }}</span>
+            <span v-else> {{ $t('nimeton-tutkinnonosa') }}</span>
+            <span v-if="data.laajuus">, {{ data.laajuus }} {{ $t('OSAAMISPISTE') }}</span>
+          </h2>
+        </template>
 
-      <template v-slot:kopioi="{ data, supportData }">
-        <EpTutkinnonOsaKaytossaModal
-          v-if="supportData.projektitJoissaKaytossa.length > 1"
-          :alkuperainenPeruste="data.tutkinnonOsa.alkuperainenPeruste"
-          :projektit="supportData.projektitJoissaKaytossa"
-          :kopioi="kopioiTutkinnonoOsa"
-          :muokkaa="muokkaaTutkinnonOsaa"/>
-      </template>
+        <template #kopioi="{ data, supportData }">
+          <EpTutkinnonOsaKaytossaModal
+            v-if="supportData.projektitJoissaKaytossa.length > 1"
+            :alkuperainen-peruste="data.tutkinnonOsa.alkuperainenPeruste"
+            :projektit="supportData.projektitJoissaKaytossa"
+            :kopioi="kopioiTutkinnonoOsa"
+            :muokkaa="muokkaaTutkinnonOsaa"
+          />
+        </template>
 
-      <template v-slot:default="{ data, isEditing, validation }">
-        <div class="mt-1" v-if="isEditing && isNew">
-          <ep-error-wrapper>
-            <b-form-group :label="$t('tyyppi')">
-              <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="normaali">
-                {{ $t('ammatillinen-tutkinnon-osa') }}
-              </b-form-radio>
-              <b-form-radio v-model="data.tutkinnonOsa.tyyppi" name="tyyppi" value="reformi_tutke2">
-                {{ $t('yhteinen-tutkinnon-osa') }}
-              </b-form-radio>
-            </b-form-group>
-          </ep-error-wrapper>
-        </div>
-
-        <b-row class="mb-4">
-          <b-col md="8">
-            <b-form-group :label="$t('tutkinnon-osan-nimi')">
-              <ep-koodisto-select v-if="isEditing || !nimi"
-                :store="tutkinnonosaKoodisto"
-                v-model="data.tutkinnonOsa.koodi"
-                :is-editing="isEditing"
-                :naytaArvo="false"
-                :additionalFields="tutkinnonosaKoodistoKaytossaField"
-                @add="tutkinnonOsaNimiKoodiLisays">
-                <template #default="{ open }">
-                  <div class="d-flex">
-                    <b-input-group>
-                      <b-form-input v-model="nimi" :disabled="data.tutkinnonOsa.koodi !== null || koodiTallennus"></b-form-input>
-                      <b-input-group-append>
-                        <b-button @click="open" variant="primary">
-                          {{ $t('hae-koodistosta') }}
-                        </b-button>
-                      </b-input-group-append>
-                    </b-input-group>
-
-                    <ep-button v-if="data.tutkinnonOsa.koodi" icon="delete" variant="link" @click="tyhjennaTutkinnonosaKoodi"/>
-                    <ep-button variant="link" v-if="!data.tutkinnonOsa.koodi" @click="lisaaTutkinnonosaNimiKoodistoon" :disabled="!hasNimi">
-                      {{$t('vie-koodistoon')}}
-                    </ep-button>
-                    <ep-spinner v-if="koodiTallennus" />
-                  </div>
-                </template>
-              </ep-koodisto-select>
-              <div v-else>
-                {{nimi}}
-              </div>
-            </b-form-group>
-          </b-col>
-
-          <b-col md="4">
-            <b-form-group :label="$t('laajuus')">
-              <ep-laajuus-input v-model="data.laajuus" :is-editing="isEditing" :validation="validation.laajuus" />
-            </b-form-group>
-          </b-col>
-        </b-row>
-
-        <b-row class="mb-4">
-          <b-col>
-            <b-form-group :label="$t('koodi')">
-              <div v-if="data.tutkinnonOsa.koodi">{{data.tutkinnonOsa.koodi.arvo}}</div>
-            </b-form-group>
-          </b-col>
-        </b-row>
-
-        <b-row>
-          <b-col>
-            <b-form-group :label="$t('kuvaus')">
-              <ep-content v-model="data.tutkinnonOsa.kuvaus"
-                          :validation="validation.tutkinnonOsa.kuvaus"
-                          layout="normal"
-                          :is-editable="isEditing"></ep-content>
-            </b-form-group>
-          </b-col>
-        </b-row>
-
-        <div v-if="data.tutkinnonOsa.tyyppi === 'normaali'">
-          <ep-collapse tyyppi="ammattitaitovaatimukset" :border-bottom="false" :border-top="isEditing">
-            <template #header>
-              <h3>{{ $t('ammattitaitovaatimukset') }}</h3>
-            </template>
-            <b-form-group>
-              <ep-content v-if="data.tutkinnonOsa.ammattitaitovaatimukset"
-                          v-model="data.tutkinnonOsa.ammattitaitovaatimukset"
-                          layout="normal"
-                          :is-editable="isEditing"
-                          class="mb-4"></ep-content>
-
-              <EpAmmattitaitovaatimukset v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
-                                         :validation="validation.tutkinnonOsa.ammattitaitovaatimukset2019"
-                                         :is-editing="isEditing" />
-            </b-form-group>
-          </ep-collapse>
-
-          <ep-collapse tyyppi="osaamisen-arviointi" :border-bottom="false" :border-top="true">
-            <template #header>
-              <h3>{{ $t('osaamisen-arviointi') }}</h3>
-            </template>
-
-            <EpButton v-if="isEditing && !valittuArviointiTyyppi"
-                      variant="outline"
-                      icon="add"
-                      @click="arvioinninTyyppi = 'geneerinen'">
-              {{$t('lisaa-geneerinen-arviointi')}}
-            </EpButton>
-
-            <div class="mb-4" v-if="valittuArviointiTyyppi === 'geneerinen'">
-              <div class="font-weight-600">{{$t('geneerinen-arviointi')}}</div>
-              <b-form-group v-if="isEditing">
+        <template #default="{ data, isEditing, validation }">
+          <div
+            v-if="isEditing && isNew"
+            class="mt-1"
+          >
+            <ep-error-wrapper>
+              <b-form-group :label="$t('tyyppi')">
                 <b-form-radio
-                  class="ml-1"
-                  v-for="geneerinen in geneeriset"
-                  v-model="data.tutkinnonOsa._geneerinenArviointiasteikko"
-                  name="geneerinen"
-                  :value="'' + geneerinen.id"
-                  :key="'geneerinen-' + geneerinen.id">
-                  {{ $kaanna(geneerinen.nimi) }}
+                  v-model="data.tutkinnonOsa.tyyppi"
+                  name="tyyppi"
+                  value="normaali"
+                >
+                  {{ $t('ammatillinen-tutkinnon-osa') }}
+                </b-form-radio>
+                <b-form-radio
+                  v-model="data.tutkinnonOsa.tyyppi"
+                  name="tyyppi"
+                  value="reformi_tutke2"
+                >
+                  {{ $t('yhteinen-tutkinnon-osa') }}
                 </b-form-radio>
               </b-form-group>
-              <b-form-group v-else-if="valittuGeneerinen">
-                <div class="mt-3 mb-4">
-                  <div class="font-weight-bold">{{ $t('arvioinnin-kohde') }}</div>
-                  <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
-                </div>
+            </ep-error-wrapper>
+          </div>
 
-                <div v-if="kriteeritonGeneerinenValittu">
-                  {{ $kaanna(valittuGeneerinen.osaamistasot[0].otsikko)}}
-                </div>
+          <b-row class="mb-4">
+            <b-col md="8">
+              <b-form-group :label="$t('tutkinnon-osan-nimi')">
+                <ep-koodisto-select
+                  v-if="isEditing || !nimi"
+                  v-model="data.tutkinnonOsa.koodi"
+                  :store="tutkinnonosaKoodisto"
+                  :is-editing="isEditing"
+                  :nayta-arvo="false"
+                  :additional-fields="tutkinnonosaKoodistoKaytossaField"
+                  @add="tutkinnonOsaNimiKoodiLisays"
+                >
+                  <template #default="{ open }">
+                    <div class="d-flex">
+                      <b-input-group>
+                        <b-form-input
+                          v-model="nimi"
+                          :disabled="data.tutkinnonOsa.koodi !== null || koodiTallennus"
+                        />
+                        <b-input-group-append>
+                          <b-button
+                            variant="primary"
+                            @click="open"
+                          >
+                            {{ $t('hae-koodistosta') }}
+                          </b-button>
+                        </b-input-group-append>
+                      </b-input-group>
 
-                <table v-else class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th width="20%">{{ $t('osaamistaso') }}</th>
-                      <th>{{ $t('kriteerit') }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(ot, idx) in valittuGeneerinen.osaamistasot" :key="'ot-' + idx">
-                      <td>{{ $kaanna(ot.otsikko) }}</td>
-                      <td>
-                        <ul class="pl-4">
-                          <li v-for="(kriteeri, idx) in ot.kriteerit" :key="idx">
-                            {{ $kaanna(kriteeri) }}
-                          </li>
-                        </ul>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </b-form-group>
-
-              <EpButton v-if="isEditing"
-                        class="no-padding"
-                        variant="link"
+                      <ep-button
+                        v-if="data.tutkinnonOsa.koodi"
                         icon="delete"
-                        @click="poistaGeneerinenaArviointi">
-                {{$t('poista-geneerinen-arviointi')}}
+                        variant="link"
+                        @click="tyhjennaTutkinnonosaKoodi"
+                      />
+                      <ep-button
+                        v-if="!data.tutkinnonOsa.koodi"
+                        variant="link"
+                        :disabled="!hasNimi"
+                        @click="lisaaTutkinnonosaNimiKoodistoon"
+                      >
+                        {{ $t('vie-koodistoon') }}
+                      </ep-button>
+                      <ep-spinner v-if="koodiTallennus" />
+                    </div>
+                  </template>
+                </ep-koodisto-select>
+                <div v-else>
+                  {{ nimi }}
+                </div>
+              </b-form-group>
+            </b-col>
+
+            <b-col md="4">
+              <b-form-group :label="$t('laajuus')">
+                <ep-laajuus-input
+                  v-model="data.laajuus"
+                  :is-editing="isEditing"
+                  :validation="validation.laajuus"
+                />
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row class="mb-4">
+            <b-col>
+              <b-form-group :label="$t('koodi')">
+                <div v-if="data.tutkinnonOsa.koodi">
+                  {{ data.tutkinnonOsa.koodi.arvo }}
+                </div>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <b-row>
+            <b-col>
+              <b-form-group :label="$t('kuvaus')">
+                <ep-content
+                  v-model="data.tutkinnonOsa.kuvaus"
+                  :validation="validation.tutkinnonOsa.kuvaus"
+                  layout="normal"
+                  :is-editable="isEditing"
+                />
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <div v-if="data.tutkinnonOsa.tyyppi === 'normaali'">
+            <ep-collapse
+              tyyppi="ammattitaitovaatimukset"
+              :border-bottom="false"
+              :border-top="isEditing"
+            >
+              <template #header>
+                <h3>{{ $t('ammattitaitovaatimukset') }}</h3>
+              </template>
+              <b-form-group>
+                <ep-content
+                  v-if="data.tutkinnonOsa.ammattitaitovaatimukset"
+                  v-model="data.tutkinnonOsa.ammattitaitovaatimukset"
+                  layout="normal"
+                  :is-editable="isEditing"
+                  class="mb-4"
+                />
+
+                <EpAmmattitaitovaatimukset
+                  v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
+                  :validation="validation.tutkinnonOsa.ammattitaitovaatimukset2019"
+                  :is-editing="isEditing"
+                />
+              </b-form-group>
+            </ep-collapse>
+
+            <ep-collapse
+              tyyppi="osaamisen-arviointi"
+              :border-bottom="false"
+              :border-top="true"
+            >
+              <template #header>
+                <h3>{{ $t('osaamisen-arviointi') }}</h3>
+              </template>
+
+              <EpButton
+                v-if="isEditing && !valittuArviointiTyyppi"
+                variant="outline"
+                icon="add"
+                @click="arvioinninTyyppi = 'geneerinen'"
+              >
+                {{ $t('lisaa-geneerinen-arviointi') }}
               </EpButton>
-            </div>
 
-            <div v-if="valittuArviointiTyyppi !== 'geneerinen'">
-              <EpArvioinninKohdeAlueet
-                v-model="data.tutkinnonOsa.arviointi.arvioinninKohdealueet"
-                :isEditing="isEditing"
-                :arviointiasteikot="arviointiasteikot"
+              <div
+                v-if="valittuArviointiTyyppi === 'geneerinen'"
+                class="mb-4"
+              >
+                <div class="font-weight-600">
+                  {{ $t('geneerinen-arviointi') }}
+                </div>
+                <b-form-group v-if="isEditing">
+                  <b-form-radio
+                    v-for="geneerinen in geneeriset"
+                    :key="'geneerinen-' + geneerinen.id"
+                    v-model="data.tutkinnonOsa._geneerinenArviointiasteikko"
+                    class="ml-1"
+                    name="geneerinen"
+                    :value="'' + geneerinen.id"
+                  >
+                    {{ $kaanna(geneerinen.nimi) }}
+                  </b-form-radio>
+                </b-form-group>
+                <b-form-group v-else-if="valittuGeneerinen">
+                  <div class="mt-3 mb-4">
+                    <div class="font-weight-bold">
+                      {{ $t('arvioinnin-kohde') }}
+                    </div>
+                    <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
+                  </div>
+
+                  <div v-if="kriteeritonGeneerinenValittu">
+                    {{ $kaanna(valittuGeneerinen.osaamistasot[0].otsikko) }}
+                  </div>
+
+                  <table
+                    v-else
+                    class="table table-striped"
+                  >
+                    <thead>
+                      <tr>
+                        <th width="20%">
+                          {{ $t('osaamistaso') }}
+                        </th>
+                        <th>{{ $t('kriteerit') }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(ot, idx) in valittuGeneerinen.osaamistasot"
+                        :key="'ot-' + idx"
+                      >
+                        <td>{{ $kaanna(ot.otsikko) }}</td>
+                        <td>
+                          <ul class="pl-4">
+                            <li
+                              v-for="(kriteeri, idx) in ot.kriteerit"
+                              :key="idx"
+                            >
+                              {{ $kaanna(kriteeri) }}
+                            </li>
+                          </ul>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </b-form-group>
+
+                <EpButton
+                  v-if="isEditing"
+                  class="no-padding"
+                  variant="link"
+                  icon="delete"
+                  @click="poistaGeneerinenaArviointi"
+                >
+                  {{ $t('poista-geneerinen-arviointi') }}
+                </EpButton>
+              </div>
+
+              <div v-if="valittuArviointiTyyppi !== 'geneerinen'">
+                <EpArvioinninKohdeAlueet
+                  v-model="data.tutkinnonOsa.arviointi.arvioinninKohdealueet"
+                  :is-editing="isEditing"
+                  :arviointiasteikot="arviointiasteikot"
+                />
+              </div>
+
+              <EpAlert
+                v-if="!isEditing && !data.tutkinnonOsa.arviointi && !valittuGeneerinen"
+                :text="$t('arviointia-ei-asetettu')"
               />
-            </div>
+            </ep-collapse>
 
-            <EpAlert :text="$t('arviointia-ei-asetettu')" v-if="!isEditing && !data.tutkinnonOsa.arviointi && !valittuGeneerinen" />
-          </ep-collapse>
+            <ep-collapse
+              tyyppi="ammattitaidon-osoittamistavat"
+              :border-bottom="false"
+              :border-top="true"
+            >
+              <template #header>
+                <h3>{{ $t('ammattitaidon-osoittamistavat') }}</h3>
+              </template>
+              <b-form-group>
+                <ep-content
+                  v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
+                  :validation="validation.tutkinnonOsa.ammattitaidonOsoittamistavat"
+                  layout="normal"
+                  :is-editable="isEditing"
+                />
+              </b-form-group>
+            </ep-collapse>
 
-          <ep-collapse tyyppi="ammattitaidon-osoittamistavat" :border-bottom="false" :border-top="true">
-            <template #header>
-              <h3>{{ $t('ammattitaidon-osoittamistavat') }}</h3>
-            </template>
-            <b-form-group>
-              <ep-content v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
-                          :validation="validation.tutkinnonOsa.ammattitaidonOsoittamistavat"
-                          layout="normal"
-                          :is-editable="isEditing"></ep-content>
-            </b-form-group>
-          </ep-collapse>
+            <ep-collapse
+              v-if="data.tutkinnonOsa.tavoitteet"
+              :border-bottom="false"
+              :border-top="true"
+            >
+              <template #header>
+                <h3>{{ $t('tavoitteet') }}</h3>
+              </template>
+              <b-form-group>
+                <ep-content
+                  v-model="data.tutkinnonOsa.tavoitteet"
+                  layout="normal"
+                  :is-editable="isEditing"
+                />
+              </b-form-group>
+            </ep-collapse>
 
-          <ep-collapse :border-bottom="false" :border-top="true" v-if="data.tutkinnonOsa.tavoitteet">
-            <template #header>
-              <h3>{{ $t('tavoitteet') }}</h3>
-            </template>
-            <b-form-group>
-              <ep-content v-model="data.tutkinnonOsa.tavoitteet"
-                          layout="normal"
-                          :is-editable="isEditing"></ep-content>
-            </b-form-group>
-          </ep-collapse>
-
-          <ep-collapse :border-bottom="false" :border-top="true" v-if="data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.lisatiedot">
-            <template #header>
-              <h3>{{ $t('arviointi') }}</h3>
-            </template>
-            <b-form-group>
-              <ep-content v-model="data.tutkinnonOsa.arviointi.lisatiedot"
-                          layout="normal"
-                          :is-editable="isEditing"></ep-content>
-            </b-form-group>
-          </ep-collapse>
-
-        </div>
-        <div v-else>
-          <ep-collapse tyyppi="osa-alueet" :border-bottom="false" :border-top="true">
-            <template #header>
-              <h3>{{ $t('osa-alueet') }}</h3>
-            </template>
-            <div>
-              <EpBalloonList v-if="data.tutkinnonOsa.osaAlueet" v-model="data.tutkinnonOsa.osaAlueet" :isEditing="isEditing" sortable>
-                <template v-slot:default="{ item }">
-                  <router-link :to="{ name: 'osaalue', params: { osaalueId: item.id } }">{{ $kaanna(item.nimi) || $t('nimeton') }}</router-link>
-                  <span v-if="item.koodi" class="ml-1">({{ item.koodi.arvo }})</span>
-                </template>
-              </EpBalloonList>
-            </div>
-            <ep-button @click="lisaaOsaAlue(data.tutkinonOsa)" variant="outline" icon="add" v-if="!isEditing && tutkinnonOsaEditable">
-              {{ $t('lisaa-osa-alue') }}
-            </ep-button>
-          </ep-collapse>
-        </div>
-      </template>
+            <ep-collapse
+              v-if="data.tutkinnonOsa.arviointi && data.tutkinnonOsa.arviointi.lisatiedot"
+              :border-bottom="false"
+              :border-top="true"
+            >
+              <template #header>
+                <h3>{{ $t('arviointi') }}</h3>
+              </template>
+              <b-form-group>
+                <ep-content
+                  v-model="data.tutkinnonOsa.arviointi.lisatiedot"
+                  layout="normal"
+                  :is-editable="isEditing"
+                />
+              </b-form-group>
+            </ep-collapse>
+          </div>
+          <div v-else>
+            <ep-collapse
+              tyyppi="osa-alueet"
+              :border-bottom="false"
+              :border-top="true"
+            >
+              <template #header>
+                <h3>{{ $t('osa-alueet') }}</h3>
+              </template>
+              <div>
+                <EpBalloonList
+                  v-if="data.tutkinnonOsa.osaAlueet"
+                  v-model="data.tutkinnonOsa.osaAlueet"
+                  :is-editing="isEditing"
+                  sortable
+                >
+                  <template #default="{ item }">
+                    <router-link :to="{ name: 'osaalue', params: { osaalueId: item.id } }">
+                      {{ $kaanna(item.nimi) || $t('nimeton') }}
+                    </router-link>
+                    <span
+                      v-if="item.koodi"
+                      class="ml-1"
+                    >({{ item.koodi.arvo }})</span>
+                  </template>
+                </EpBalloonList>
+              </div>
+              <ep-button
+                v-if="!isEditing && tutkinnonOsaEditable"
+                variant="outline"
+                icon="add"
+                @click="lisaaOsaAlue(data.tutkinonOsa)"
+              >
+                {{ $t('lisaa-osa-alue') }}
+              </ep-button>
+            </ep-collapse>
+          </div>
+        </template>
       </EpEditointi>
     </div>
     <EpSpinner v-else />

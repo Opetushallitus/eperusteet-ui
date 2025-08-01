@@ -1,33 +1,52 @@
 <template>
   <div>
-    <VueDraggable v-bind="defaultDragOptions"
-               tag="div"
-               v-model="model">
-      <div v-for="(arvioinninKohdeAlue, index) in model" :key="'arvioinninKohdeAlue' + index" class="arviointi">
-        <div v-if="isEditing" class="order-handle">
+    <VueDraggable
+      v-bind="defaultDragOptions"
+      v-model="model"
+      tag="div"
+    >
+      <div
+        v-for="(arvioinninKohdeAlue, index) in model"
+        :key="'arvioinninKohdeAlue' + index"
+        class="arviointi"
+      >
+        <div
+          v-if="isEditing"
+          class="order-handle"
+        >
           <EpMaterialIcon>drag_indicator</EpMaterialIcon>
         </div>
-        <EpArviointi class="w-100"
-                     v-model="model[index]"
-                     :isEditing="isEditing"
-                     :arviointiasteikot="arviointiasteikot">
-
+        <EpArviointi
+          v-model="model[index]"
+          class="w-100"
+          :is-editing="isEditing"
+          :arviointiasteikot="arviointiasteikot"
+        >
           <template #poisto>
             <div>
-              <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)">{{$t('poista-ammattitaitovaatimus-tekemisena')}}</EpButton>
+              <EpButton
+                v-if="isEditing"
+                variant="link"
+                icon="delete"
+                @click="poistaArvioinninKohdealue(arvioinninKohdeAlue)"
+              >
+                {{ $t('poista-ammattitaitovaatimus-tekemisena') }}
+              </EpButton>
             </div>
           </template>
         </EpArviointi>
       </div>
     </VueDraggable>
 
-    <EpButton v-if="isEditing"
-              class="mt-3"
-              variant="outline"
-              icon="add"
-              @click="lisaaArvioinninKohdeAlue">
-        {{$t(lisaaBtnTeksti)}}
-      </EpButton>
+    <EpButton
+      v-if="isEditing"
+      class="mt-3"
+      variant="outline"
+      icon="add"
+      @click="lisaaArvioinninKohdeAlue"
+    >
+      {{ $t(lisaaBtnTeksti) }}
+    </EpButton>
   </div>
 </template>
 

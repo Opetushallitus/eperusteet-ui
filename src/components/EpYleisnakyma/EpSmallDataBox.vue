@@ -1,7 +1,11 @@
 <template>
   <div class="box d-inline-flex flex-column  align-items-center justify-content-center text-center">
-    <div class="count">{{count}}</div>
-    <div class="topic">{{topic}}</div>
+    <div class="count">
+      {{ count }}
+    </div>
+    <div class="topic">
+      {{ topic }}
+    </div>
   </div>
 </template>
 

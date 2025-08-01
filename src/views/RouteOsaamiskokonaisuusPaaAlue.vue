@@ -1,16 +1,31 @@
 <template>
-  <EpEditointi v-if="editointiStore" :store="editointiStore" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else>{{ $t('nimeton-osaamiskokonaisuus_paa_alue') }}</h2>
+  <EpEditointi
+    v-if="editointiStore"
+    :store="editointiStore"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2 v-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2 v-else>
+        {{ $t('nimeton-osaamiskokonaisuus_paa_alue') }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing }">
-
-      <b-row v-if="isEditing" class="mb-4">
+    <template #default="{ data, isEditing }">
+      <b-row
+        v-if="isEditing"
+        class="mb-4"
+      >
         <b-col lg="8">
-          <b-form-group :label="$t('paa-alueen-nimi') + ' *'" required>
-            <ep-input v-model="data.nimi" :is-editing="isEditing">
-            </ep-input>
+          <b-form-group
+            :label="$t('paa-alueen-nimi') + ' *'"
+            required
+          >
+            <ep-input
+              v-model="data.nimi"
+              :is-editing="isEditing"
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -20,40 +35,55 @@
           <b-form-group>
             <template #label>
               <div v-if="isEditing">
-                {{$t('paa-alueen-kuvaus')}}
+                {{ $t('paa-alueen-kuvaus') }}
               </div>
             </template>
-            <ep-content v-model="data.kuvaus"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+            <ep-content
+              v-model="data.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
         </b-col>
       </b-row>
 
-      <hr/>
+      <hr>
 
       <template v-if="isEditing">
-        <h3 class="mt-4">{{$t('osa-alueet')}}</h3>
+        <h3 class="mt-4">
+          {{ $t('osa-alueet') }}
+        </h3>
         <VueDraggable
           v-bind="defaultDragOptions"
+          v-model="data.osaAlueet"
           tag="div"
-          v-model="data.osaAlueet">
-
-          <b-row v-for="(osaAlue, index) in data.osaAlueet" :key="'tavoite'+index" class="pb-2">
+        >
+          <b-row
+            v-for="(osaAlue, index) in data.osaAlueet"
+            :key="'tavoite'+index"
+            class="pb-2"
+          >
             <b-col md="8">
               <div class="d-flex">
                 <div class="order-handle mr-3">
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
-                <EpOsaAlue v-model="data.osaAlueet[index]" :isEditing="isEditing" class="w-100">
+                <EpOsaAlue
+                  v-model="data.osaAlueet[index]"
+                  :is-editing="isEditing"
+                  class="w-100"
+                >
                   <template #poisto>
                     <div>
-                      <b-button variant="link" @click.stop="poistaOsaAlue(osaAlue)">
+                      <b-button
+                        variant="link"
+                        @click.stop="poistaOsaAlue(osaAlue)"
+                      >
                         <EpMaterialIcon>delete</EpMaterialIcon>
                         {{ $t('poista-osa-alue') }}
-                    </b-button>
+                      </b-button>
                     </div>
                   </template>
                 </EpOsaAlue>
@@ -62,19 +92,29 @@
           </b-row>
         </VueDraggable>
 
-        <ep-button @click="lisaaOsaalue()" variant="outline" icon="add" class="mt-2">
+        <ep-button
+          variant="outline"
+          icon="add"
+          class="mt-2"
+          @click="lisaaOsaalue()"
+        >
           {{ $t('lisaa-osa-alue') }}
         </ep-button>
       </template>
 
       <template v-else>
-        <div v-for="(osaAlue, index) in data.osaAlueet" :key="'osa-alue' + index" class="mt-4">
-          <EpOsaAlue v-model="data.osaAlueet[index]" :isEditing="isEditing"/>
-          <hr v-if="index !== data.osaAlueet.length -1" />
+        <div
+          v-for="(osaAlue, index) in data.osaAlueet"
+          :key="'osa-alue' + index"
+          class="mt-4"
+        >
+          <EpOsaAlue
+            v-model="data.osaAlueet[index]"
+            :is-editing="isEditing"
+          />
+          <hr v-if="index !== data.osaAlueet.length -1">
         </div>
-
       </template>
-
     </template>
   </EpEditointi>
 </template>

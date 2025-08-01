@@ -4,31 +4,43 @@
       <div class="d-flex justify-content-between">
         <h1>{{ $t('osaamismerkki-teemojen-hallinta') }}</h1>
         <div class="d-flex">
-          <EpButton class="m-0 p-0"
-                    variant="outlined"
-                    icon="add"
-                    @click="avaaKategoriaModal">{{$t('lisaa-teema')}}</EpButton>
+          <EpButton
+            class="m-0 p-0"
+            variant="outlined"
+            icon="add"
+            @click="avaaKategoriaModal"
+          >
+            {{ $t('lisaa-teema') }}
+          </EpButton>
         </div>
       </div>
     </template>
 
     <EpSpinner v-if="!kategoriat" />
     <div v-else-if="kategoriat.length > 0">
-      <b-table responsive
-               borderless
-               striped
-               fixed
-               hover
-               no-local-sorting
-               :items="kategoriat"
-               :fields="tableFields"
-               @row-clicked="avaaKategoriaModal"/>
+      <b-table
+        responsive
+        borderless
+        striped
+        fixed
+        hover
+        no-local-sorting
+        :items="kategoriat"
+        :fields="tableFields"
+        @row-clicked="avaaKategoriaModal"
+      />
     </div>
-    <div v-else class="m-2 alert alert-info">
+    <div
+      v-else
+      class="m-2 alert alert-info"
+    >
       {{ $t('ei-hakutuloksia') }}
     </div>
 
-    <EpOsaamismerkkiKategoriaModal ref="osaamismerkkiKategoriaModal" :store="osaamismerkitStore"/>
+    <EpOsaamismerkkiKategoriaModal
+      ref="osaamismerkkiKategoriaModal"
+      :store="osaamismerkitStore"
+    />
   </EpMainView>
 </template>
 

@@ -1,44 +1,55 @@
 <template>
   <div v-if="!isInitializing && store">
     <EpEditointi :store="store">
-      <template v-slot:header>
-        <h2 class="m-0">{{ $t('projektin-tiedot') }}</h2>
+      <template #header>
+        <h2 class="m-0">
+          {{ $t('projektin-tiedot') }}
+        </h2>
       </template>
-      <template v-slot:default="{ data, isEditing, validation }">
+      <template #default="{ data, isEditing, validation }">
         <h3>{{ $t('perustiedot') }}</h3>
         <b-container fluid>
           <b-row no-gutters>
             <b-col lg="6">
               <b-form-group :label="$t('projektin-nimi') + '*'">
-                <ep-input v-model="data.nimi"
-                          type="string"
-                          :is-editing="isEditing"
-                          :validation="validation.nimi"></ep-input>
+                <ep-input
+                  v-model="data.nimi"
+                  type="string"
+                  :is-editing="isEditing"
+                  :validation="validation.nimi"
+                />
               </b-form-group>
             </b-col>
-            <b-col lg="6">
-            </b-col>
+            <b-col lg="6" />
           </b-row>
           <b-row no-gutters>
             <b-col lg="6">
               <b-form-group :label="$t('perustetyoryhma')">
-                <perustetyoryhma-select v-model="data.ryhmaOid"
-                                        :ulkopuoliset-store="ulkopuolisetStore"
-                                        :is-editing="isEditing" />
-                <ep-button v-if="isEditing"
-                           class="btn-tyhjenna"
-                           variant="link"
-                           :paddingx="false"
-                           :disabled="!data.ryhmaOid"
-                           @click="data.ryhmaOid = null">{{ $t('tyhjenna-valinta') }}</ep-button>
+                <perustetyoryhma-select
+                  v-model="data.ryhmaOid"
+                  :ulkopuoliset-store="ulkopuolisetStore"
+                  :is-editing="isEditing"
+                />
+                <ep-button
+                  v-if="isEditing"
+                  class="btn-tyhjenna"
+                  variant="link"
+                  :paddingx="false"
+                  :disabled="!data.ryhmaOid"
+                  @click="data.ryhmaOid = null"
+                >
+                  {{ $t('tyhjenna-valinta') }}
+                </ep-button>
               </b-form-group>
             </b-col>
             <b-col lg="6">
               <b-form-group :label="$t('yhteyshenkilo')">
-                <ep-input v-model="data.yhteistyotaho"
-                          type="string"
-                          :is-editing="isEditing"
-                          :validation="validation.yhteistyotaho"></ep-input>
+                <ep-input
+                  v-model="data.yhteistyotaho"
+                  type="string"
+                  :is-editing="isEditing"
+                  :validation="validation.yhteistyotaho"
+                />
               </b-form-group>
             </b-col>
           </b-row>
@@ -49,9 +60,17 @@
                   <div class="text-muted mb-3">
                     {{ $t('perusteprojekti-ohje-kuvaus') }}
                   </div>
-                  <b-form-radio-group stacked v-model="data.projektiKuvaus" class="mb-3">
-                    <b-form-radio :value="kuvaus.korjaus">{{ $t('perusteen-korjaus') }}</b-form-radio>
-                    <b-form-radio :value="kuvaus.uudistus">{{ $t('perusteen-uudistus') }}</b-form-radio>
+                  <b-form-radio-group
+                    v-model="data.projektiKuvaus"
+                    stacked
+                    class="mb-3"
+                  >
+                    <b-form-radio :value="kuvaus.korjaus">
+                      {{ $t('perusteen-korjaus') }}
+                    </b-form-radio>
+                    <b-form-radio :value="kuvaus.uudistus">
+                      {{ $t('perusteen-uudistus') }}
+                    </b-form-radio>
                   </b-form-radio-group>
                 </div>
                 <div v-else-if="data.projektiKuvaus === kuvaus.korjaus">
@@ -60,17 +79,36 @@
                 <div v-else-if="data.projektiKuvaus === kuvaus.uudistus">
                   {{ $t('perusteen-uudistus') }}
                 </div>
-                <ep-content v-model="data.kuvaus" layout="normal" :is-editable="isEditing" :kasiteHandler="kasiteHandler" :kuvaHandler="kuvaHandler"></ep-content>
+                <ep-content
+                  v-model="data.kuvaus"
+                  layout="normal"
+                  :is-editable="isEditing"
+                  :kasite-handler="kasiteHandler"
+                  :kuva-handler="kuvaHandler"
+                />
               </b-form-group>
             </b-col>
           </b-row>
           <b-row no-gutters>
             <b-col lg="6">
-              <EpEsikatselu peruste v-model="storeData" :is-editing="isEditing" />
+              <EpEsikatselu
+                v-model="storeData"
+                peruste
+                :is-editing="isEditing"
+              />
             </b-col>
             <b-col lg="6">
-              <b-form-group :label="$t('perusteen-lataus')" v-if="!isEditing">
-                <ep-button variant="primary" icon="description" @click="exportPeruste">{{ $t('lataa-peruste-json') }}</ep-button>
+              <b-form-group
+                v-if="!isEditing"
+                :label="$t('perusteen-lataus')"
+              >
+                <ep-button
+                  variant="primary"
+                  icon="description"
+                  @click="exportPeruste"
+                >
+                  {{ $t('lataa-peruste-json') }}
+                </ep-button>
               </b-form-group>
             </b-col>
           </b-row>
@@ -134,7 +172,7 @@ const storeData = computed({
   },
   set(data) {
     store.value?.setData(data);
-  }
+  },
 });
 
 const onProjektiChange = async (projektiId: number) => {

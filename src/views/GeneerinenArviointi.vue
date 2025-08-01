@@ -1,33 +1,70 @@
 <template>
-  <div class="geneerinen" v-if="inner">
-    <div class="otsikko" role="button" @click="toggleOpen()">
+  <div
+    v-if="inner"
+    class="geneerinen"
+  >
+    <div
+      class="otsikko"
+      role="button"
+      @click="toggleOpen()"
+    >
       <div class="d-flex">
         <div class="flex-grow-1">
           {{ $kaanna(inner.nimi) }}
         </div>
         <div class="flex-shrink-1">
-          <EpMaterialIcon v-if="isOpen">expand_less</EpMaterialIcon>
-          <EpMaterialIcon v-else>expand_more</EpMaterialIcon>
+          <EpMaterialIcon v-if="isOpen">
+            expand_less
+          </EpMaterialIcon>
+          <EpMaterialIcon v-else>
+            expand_more
+          </EpMaterialIcon>
         </div>
       </div>
     </div>
-    <div v-if="isOpen" class="sisalto mt-4">
+    <div
+      v-if="isOpen"
+      class="sisalto mt-4"
+    >
       <div v-if="isEditing && !inner.julkaistu">
-        <div class="kohde-otsikko">{{ $t('arvioinnin-nimi') }}</div>
-        <ep-input v-model="inner.nimi" :is-editing="true" />
+        <div class="kohde-otsikko">
+          {{ $t('arvioinnin-nimi') }}
+        </div>
+        <ep-input
+          v-model="inner.nimi"
+          :is-editing="true"
+        />
       </div>
       <div class="mt-4">
-        <div class="kohde-otsikko">{{ $t('arvioinnin-kohde') }}</div>
-        <ep-input v-model="inner.kohde" :is-editing="isEditing" />
+        <div class="kohde-otsikko">
+          {{ $t('arvioinnin-kohde') }}
+        </div>
+        <ep-input
+          v-model="inner.kohde"
+          :is-editing="isEditing"
+        />
       </div>
-      <div class="mt-4" v-if="inner.julkaistu">
-        <div class="kohde-otsikko">{{ $t('oletusvalinta') }}</div>
-        <b-form-checkbox v-model="inner.oletusvalinta" v-if="isEditing" switch></b-form-checkbox>
-        <div v-else>{{ $t('' + inner.oletusvalinta) }}</div>
+      <div
+        v-if="inner.julkaistu"
+        class="mt-4"
+      >
+        <div class="kohde-otsikko">
+          {{ $t('oletusvalinta') }}
+        </div>
+        <b-form-checkbox
+          v-if="isEditing"
+          v-model="inner.oletusvalinta"
+          switch
+        />
+        <div v-else>
+          {{ $t('' + inner.oletusvalinta) }}
+        </div>
       </div>
       <div class="mt-4">
-
-        <div v-if="!isEditing && kriteeriton" class="mb-3">
+        <div
+          v-if="!isEditing && kriteeriton"
+          class="mb-3"
+        >
           <div> {{ $kaanna(osaamistaso) }} </div>
         </div>
 
@@ -39,19 +76,32 @@
           show-empty
           :empty-text="$t('ei-sisaltoa')"
           :items="osaamistasot"
-          :fields="fields">
-
-          <template v-slot:table-colgroup="scope">
-            <col v-for="field in scope.fields" :key="field.key" :style="{ width: field.key === 'osaamistaso' && '160px' }" />
+          :fields="fields"
+        >
+          <template #table-colgroup="scope">
+            <col
+              v-for="field in scope.fields"
+              :key="field.key"
+              :style="{ width: field.key === 'osaamistaso' && '160px' }"
+            >
           </template>
 
-          <template v-slot:cell(osaamistaso)="data">
-            <div class="osaamistaso">{{ $kaanna(data.item.otsikko) }}</div>
+          <template #cell(osaamistaso)="data">
+            <div class="osaamistaso">
+              {{ $kaanna(data.item.otsikko) }}
+            </div>
           </template>
 
-          <template v-slot:cell(kriteerit)="data">
-            <EpBulletEditor kohde="" :model-value="data.item.kriteerit" :is-editable="isEditing" :allowStructureChange="!inner.julkaistu">
-              <template #add>{{ $t('lisaa-kriteeri') }}</template>
+          <template #cell(kriteerit)="data">
+            <EpBulletEditor
+              kohde=""
+              :model-value="data.item.kriteerit"
+              :is-editable="isEditing"
+              :allow-structure-change="!inner.julkaistu"
+            >
+              <template #add>
+                {{ $t('lisaa-kriteeri') }}
+              </template>
             </EpBulletEditor>
           </template>
         </b-table>
@@ -59,15 +109,56 @@
       <EpSpinner v-if="isLoading" />
       <div v-else>
         <div v-if="!isEditing">
-          <ep-button variant="primary" @click="onCopy()" v-if="inner.julkaistu">{{ $t('kopioi') }}</ep-button>
-          <ep-button variant="primary ml-2" @click="onEdit()" v-if="!inner.julkaistu || kayttajaIsAdmin">{{ $t('muokkaa') }}</ep-button>
+          <ep-button
+            v-if="inner.julkaistu"
+            variant="primary"
+            @click="onCopy()"
+          >
+            {{ $t('kopioi') }}
+          </ep-button>
+          <ep-button
+            v-if="!inner.julkaistu || kayttajaIsAdmin"
+            variant="primary ml-2"
+            @click="onEdit()"
+          >
+            {{ $t('muokkaa') }}
+          </ep-button>
         </div>
-        <div class="d-flex justify-content-between" v-else>
+        <div
+          v-else
+          class="d-flex justify-content-between"
+        >
           <div>
-            <ep-button variant="link" @click="onRemove()" v-if="!inner.julkaistu">{{ $t('poista') }}</ep-button>
-            <ep-button class="ml-2" variant="primary" @click="onSave()">{{ $t('tallenna') }}</ep-button>
-            <ep-button class="ml-2" variant="primary" @click="onPublish()" v-if="!inner.julkaistu">{{ $t('julkaise') }}</ep-button>
-            <ep-button class="ml-2" variant="primary" @click="onUnPublish()" v-if="inner.julkaistu && kayttajaIsAdmin">{{ $t('palauta-keskeneraiseksi') }}</ep-button>
+            <ep-button
+              v-if="!inner.julkaistu"
+              variant="link"
+              @click="onRemove()"
+            >
+              {{ $t('poista') }}
+            </ep-button>
+            <ep-button
+              class="ml-2"
+              variant="primary"
+              @click="onSave()"
+            >
+              {{ $t('tallenna') }}
+            </ep-button>
+            <ep-button
+              v-if="!inner.julkaistu"
+              class="ml-2"
+              variant="primary"
+              @click="onPublish()"
+            >
+              {{ $t('julkaise') }}
+            </ep-button>
+            <ep-button
+              v-if="inner.julkaistu && kayttajaIsAdmin"
+              class="ml-2"
+              variant="primary"
+              @click="onUnPublish()"
+            >
+              {{ $t('palauta-keskeneraiseksi') }}
+            </ep-button>
           </div>
         </div>
       </div>

@@ -1,20 +1,40 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
+      <h2 v-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing, supportData }">
       <div class="col-11 pl-0">
-        <div class="mt-1" v-if="isEditing">
-          <h3>{{$t('vuosiluokkakokonaisuuden-nimi')}} *</h3>
-          <ep-input v-model="data.nimi" :is-editing="true"></ep-input>
+        <div
+          v-if="isEditing"
+          class="mt-1"
+        >
+          <h3>{{ $t('vuosiluokkakokonaisuuden-nimi') }} *</h3>
+          <ep-input
+            v-model="data.nimi"
+            :is-editing="true"
+          />
         </div>
 
-        <b-form-group class="mt-4" :label="$t('vuosiluokat') + (isEditing ? ' *' : '')">
-          <EpToggleGroup v-model="data.vuosiluokat" :items="valittavatVuosiluokat" v-if="isEditing">
-            <template v-slot="{ item }">
+        <b-form-group
+          class="mt-4"
+          :label="$t('vuosiluokat') + (isEditing ? ' *' : '')"
+        >
+          <EpToggleGroup
+            v-if="isEditing"
+            v-model="data.vuosiluokat"
+            :items="valittavatVuosiluokat"
+          >
+            <template #default="{ item }">
               <div class="mr-5">
                 {{ $t('vuosiluokka') }} {{ $t(item) }}
               </div>
@@ -22,43 +42,77 @@
           </EpToggleGroup>
 
           <div v-else>
-            <span v-for="(vuosiluokka, index) in vuosiluokat" :key="'vlk' + index"><span v-if="index > 0">, </span>{{ $t(vuosiluokka) }}</span>
+            <span
+              v-for="(vuosiluokka, index) in vuosiluokat"
+              :key="'vlk' + index"
+            ><span v-if="index > 0">, </span>{{ $t(vuosiluokka) }}</span>
           </div>
         </b-form-group>
 
-        <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava', 'laajaalainenOsaaminen']" />
+        <EpSisaltoTekstikappaleet
+          v-model="storeData"
+          :is-editing="isEditing"
+          :sisalto-avaimet="['siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava', 'laajaalainenOsaaminen']"
+        />
 
-        <b-form-group class="mt-4" :label="$t('laaja-alaiset-osaamiset')">
-          <div v-for="(lao, index) in data.laajaalaisetOsaamiset" :key="'lao' +index" :class="{'mb-5': index + 1 < data.laajaalaisetOsaamiset.length}">
-            <h5>{{$kaanna(supportData.laajaalaisetOsaamiset[lao._laajaalainenOsaaminen].nimi)}}</h5>
+        <b-form-group
+          class="mt-4"
+          :label="$t('laaja-alaiset-osaamiset')"
+        >
+          <div
+            v-for="(lao, index) in data.laajaalaisetOsaamiset"
+            :key="'lao' +index"
+            :class="{'mb-5': index + 1 < data.laajaalaisetOsaamiset.length}"
+          >
+            <h5>{{ $kaanna(supportData.laajaalaisetOsaamiset[lao._laajaalainenOsaaminen].nimi) }}</h5>
 
-            <ep-content layout="normal" v-model="lao.kuvaus" :is-editable="isEditing"> </ep-content>
+            <ep-content
+              v-model="lao.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
 
-            <ep-collapse v-if="isEditing" :borderBottom="false" :usePadding="false" chevronLocation="left" :expandedByDefault="false">
+            <ep-collapse
+              v-if="isEditing"
+              :border-bottom="false"
+              :use-padding="false"
+              chevron-location="left"
+              :expanded-by-default="false"
+            >
               <template #header>
-                <div class="link-style">{{ $t('nayta-osaamiskokonaisuuden-yleiskuvaus')}}</div>
+                <div class="link-style">
+                  {{ $t('nayta-osaamiskokonaisuuden-yleiskuvaus') }}
+                </div>
               </template>
 
-              <ep-content layout="normal" :value="supportData.laajaalaisetOsaamiset[lao._laajaalainenOsaaminen].kuvaus" :is-editable="false"> </ep-content>
+              <ep-content
+                layout="normal"
+                :value="supportData.laajaalaisetOsaamiset[lao._laajaalainenOsaaminen].kuvaus"
+                :is-editable="false"
+              />
             </ep-collapse>
-
           </div>
-
         </b-form-group>
 
-        <hr/>
+        <hr>
 
-        <ep-collapse :collapsable="!isEditing" :borderBottom="false" :usePadding="false">
+        <ep-collapse
+          :collapsable="!isEditing"
+          :border-bottom="false"
+          :use-padding="false"
+        >
           <template #header>
-            <h4>{{ $t('paikallisesti-paatettavat-asiat')}}</h4>
+            <h4>{{ $t('paikallisesti-paatettavat-asiat') }}</h4>
           </template>
-          <ep-content layout="normal" v-model="data.paikallisestiPaatettavatAsiat.teksti" :is-editable="isEditing"> </ep-content>
+          <ep-content
+            v-model="data.paikallisestiPaatettavatAsiat.teksti"
+            layout="normal"
+            :is-editable="isEditing"
+          />
         </ep-collapse>
-
       </div>
     </template>
   </EpEditointi>
-
 </template>
 
 <script setup lang="ts">
@@ -94,7 +148,7 @@ watch(() => props.vlkId, async () => {
     perusteId.value!,
     props.vlkId,
     props.perusteStore,
-    { $router: router }
+    { $router: router },
   );
   store.value = new EditointiStore(vlkStore);
 }, { immediate: true });

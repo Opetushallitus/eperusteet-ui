@@ -5,27 +5,46 @@
     </template>
 
     <b-tabs>
-      <b-tab :title="$t('suunnitelmien-lukumaarat')" class="mt-3 taulukko-graafi">
+      <b-tab
+        :title="$t('suunnitelmien-lukumaarat')"
+        class="mt-3 taulukko-graafi"
+      >
         <b-tabs pills>
-          <b-tab :title="$t('taulukko')" active>
-            <EpLukumaaraTilastot :tilastotStore="tilastotStore" class="mt-4"/>
+          <b-tab
+            :title="$t('taulukko')"
+            active
+          >
+            <EpLukumaaraTilastot
+              :tilastot-store="tilastotStore"
+              class="mt-4"
+            />
           </b-tab>
           <b-tab :title="$t('graafi')">
-            <EpLukumaaraGraafit :tilastotStore="tilastotStore" class="mt-4"/>
+            <EpLukumaaraGraafit
+              :tilastot-store="tilastotStore"
+              class="mt-4"
+            />
           </b-tab>
         </b-tabs>
       </b-tab>
 
-      <b-tab :title="$t('amosaa-tyokalu')" class="mt-5">
+      <b-tab
+        :title="$t('amosaa-tyokalu')"
+        class="mt-5"
+      >
         <EpAmosaaTilastot :toteutussuunnitelmat="toteutussuunnitelmat" />
       </b-tab>
 
-      <b-tab :title="$t('ops-tyokalu')" class="mt-5">
-        <EpYlopsTilastot :opetussuunnitelmat="opetussuunnitelmat" :perusteet="perusteet"/>
+      <b-tab
+        :title="$t('ops-tyokalu')"
+        class="mt-5"
+      >
+        <EpYlopsTilastot
+          :opetussuunnitelmat="opetussuunnitelmat"
+          :perusteet="perusteet"
+        />
       </b-tab>
-
     </b-tabs>
-
   </ep-main-view>
 </template>
 

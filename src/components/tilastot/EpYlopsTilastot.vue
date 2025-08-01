@@ -1,7 +1,6 @@
 <template>
   <ep-spinner v-if="!opetussuunnitelmat || !perusteet" />
-  <div v-else >
-
+  <div v-else>
     <div class="row">
       <div class="col-xl-3 col-md-6 col-sm-12">
         <ep-form-content name="nimi">
@@ -11,132 +10,176 @@
 
       <div class="col-xl-3 col-md-6 col-sm-12">
         <ep-form-content name="koulutustyyppi">
-          <ep-multi-select :multiple="true"
+          <ep-multi-select
+            v-model="valitutKoulutustyypit"
+            :multiple="true"
             :is-editing="true"
             :options="koulutustyyppiItems"
-            v-model="valitutKoulutustyypit"
             :placeholder="$t('kaikki')"
             track-by="value"
-            label="text">
-          </ep-multi-select>
+            label="text"
+          />
         </ep-form-content>
       </div>
 
       <div class="col-xl-3 col-md-6 col-sm-12">
         <ep-form-content name="tila">
-          <ep-multi-select :multiple="true"
+          <ep-multi-select
+            v-model="valitutTilat"
+            :multiple="true"
             :is-editing="true"
             :options="tilaItems"
-            v-model="valitutTilat"
             :placeholder="$t('kaikki')"
             track-by="value"
-            label="text">
-          </ep-multi-select>
+            label="text"
+          />
         </ep-form-content>
       </div>
 
       <div class="col-xl-3 col-md-6 col-sm-12">
         <ep-form-content name="voimassaolo">
-          <ep-multi-select :multiple="true"
+          <ep-multi-select
+            v-model="valitutVoimassaolot"
+            :multiple="true"
             :is-editing="true"
             :options="voimassaoloItems"
-            v-model="valitutVoimassaolot"
             :placeholder="$t('kaikki')"
             track-by="value"
-            label="text">
-          </ep-multi-select>
+            label="text"
+          />
         </ep-form-content>
       </div>
 
-      <EpTilastoAikavaliVertailu class="col-12" v-model="aikavali"/>
+      <EpTilastoAikavaliVertailu
+        v-model="aikavali"
+        class="col-12"
+      />
 
       <div class="col-xl-6 col-md-6 col-sm-12">
         <ep-form-content name="peruste">
-          <ep-multi-select :multiple="true"
+          <ep-multi-select
+            v-model="valitutPerusteet"
+            :multiple="true"
             :is-editing="true"
             :options="perusteItems"
-            v-model="valitutPerusteet"
             :placeholder="$t('kaikki')"
             track-by="value"
-            label="text">
-          </ep-multi-select>
+            label="text"
+          />
         </ep-form-content>
       </div>
 
       <div class="col-xl-6 col-md-6 col-sm-12">
         <ep-form-content name="koulutuksenjarjestaja">
-          <ep-multi-select :multiple="true"
+          <ep-multi-select
+            v-model="valitutKoulutuksenjarjestajat"
+            :multiple="true"
             :is-editing="true"
             :options="koulutuksenjarjestajaItems"
-            v-model="valitutKoulutuksenjarjestajat"
             :placeholder="$t('kaikki')"
             track-by="value"
-            label="text">
-          </ep-multi-select>
+            label="text"
+          />
         </ep-form-content>
       </div>
 
       <div class="col-xl-3 col-md-3 col-sm-12">
         <ep-form-content name="koulutuksenjarjestajan-tyyppi">
-          <ep-multi-select :multiple="true"
+          <ep-multi-select
+            v-model="valitutKoulutuksenjarjestajaTyypit"
+            :multiple="true"
             :is-editing="true"
             :options="koulutuksenjarjestajaTyyppiItems"
-            v-model="valitutKoulutuksenjarjestajaTyypit"
             :placeholder="$t('kaikki')"
             track-by="value"
-            label="text">
-          </ep-multi-select>
+            label="text"
+          />
         </ep-form-content>
       </div>
     </div>
 
-    <h2 class="mt-5">{{$t('opetussuunnitelmien-lukumaarat')}}</h2>
+    <h2 class="mt-5">
+      {{ $t('opetussuunnitelmien-lukumaarat') }}
+    </h2>
 
     <div class="row">
-      <div class="col-xl-4 col-md-6 col-sm-12 tilastotyyppi" v-for="(tilastotieto,i) in statistiikkaData" :key="i">
-        <div class="otsake">{{$t(tilastotieto.otsikko)}}</div>
-        <apexchart type="donut" :options="tilastotieto.graafiAvaimet" :series="tilastotieto.graafiData" v-if="!opetussuunnitelmatEmpty"/>
-        <apexchart type="donut" :options="tyhjaGraafiOptions" :series="tyhjaGraafiData" v-else/>
+      <div
+        v-for="(tilastotieto,i) in statistiikkaData"
+        :key="i"
+        class="col-xl-4 col-md-6 col-sm-12 tilastotyyppi"
+      >
+        <div class="otsake">
+          {{ $t(tilastotieto.otsikko) }}
+        </div>
+        <apexchart
+          v-if="!opetussuunnitelmatEmpty"
+          type="donut"
+          :options="tilastotieto.graafiAvaimet"
+          :series="tilastotieto.graafiData"
+        />
+        <apexchart
+          v-else
+          type="donut"
+          :options="tyhjaGraafiOptions"
+          :series="tyhjaGraafiData"
+        />
       </div>
     </div>
 
     <h2 class="mt-5">
-      <span>{{$t('opetussuunnitelmat')}} {{opetussuunnitelmatFiltered.length}} {{$t('kpl')}}</span>
-      <EpButton class="ml-5" variant="link" @click="downloadTiedosto('csv')" noPadding>Lataa csv</EpButton>
-      <EpButton variant="link" @click="downloadTiedosto('xlsx')" noPadding>Lataa xlsx</EpButton>
+      <span>{{ $t('opetussuunnitelmat') }} {{ opetussuunnitelmatFiltered.length }} {{ $t('kpl') }}</span>
+      <EpButton
+        class="ml-5"
+        variant="link"
+        no-padding
+        @click="downloadTiedosto('csv')"
+      >
+        Lataa csv
+      </EpButton>
+      <EpButton
+        variant="link"
+        no-padding
+        @click="downloadTiedosto('xlsx')"
+      >
+        Lataa xlsx
+      </EpButton>
     </h2>
 
-    <b-table responsive
-            borderless
-            striped
-            fixed
-            :items="opetussuunnitelmatFiltered"
-            :fields="tableFields"
-            :current-page="currentPage"
-            :per-page="perPage">
-
-      <template v-slot:cell(nimi)="{item, value}">
+    <b-table
+      responsive
+      borderless
+      striped
+      fixed
+      :items="opetussuunnitelmatFiltered"
+      :fields="tableFields"
+      :current-page="currentPage"
+      :per-page="perPage"
+    >
+      <template #cell(nimi)="{item, value}">
         <template v-if="item">
-          <a :href="item.url" rel="noopener noreferrer" target="_blank">{{ value }}</a>
+          <a
+            :href="item.url"
+            rel="noopener noreferrer"
+            target="_blank"
+          >{{ value }}</a>
         </template>
       </template>
 
-      <template v-slot:cell(koulutustyyppi)="data">
+      <template #cell(koulutustyyppi)="data">
         {{ $t(data.value) }}
       </template>
 
-      <template v-slot:cell(tila)="data">
+      <template #cell(tila)="data">
         {{ $t(data.value) }}
       </template>
 
-      <template v-slot:cell(perusteenVoimassaoloAlkaa)="data">
+      <template #cell(perusteenVoimassaoloAlkaa)="data">
         {{ $sd(data.value) }}
       </template>
 
-      <template v-slot:cell(perusteenVoimassaoloLoppuu)="data">
+      <template #cell(perusteenVoimassaoloLoppuu)="data">
         {{ $sd(data.value) }}
       </template>
-
     </b-table>
 
     <b-pagination
@@ -144,29 +187,31 @@
       :total-rows="opetussuunnitelmatFiltered.length"
       :per-page="perPage"
       aria-controls="opetussuunnitelmat"
-      align="center">
-    </b-pagination>
+      align="center"
+    />
 
-    <h2 class="mt-5">{{$t('koulutuksenjarjestajat')}} {{koulutuksenjarjestajaFiltered.length}} {{$t('kpl')}}</h2>
+    <h2 class="mt-5">
+      {{ $t('koulutuksenjarjestajat') }} {{ koulutuksenjarjestajaFiltered.length }} {{ $t('kpl') }}
+    </h2>
 
-      <b-table responsive
-                borderless
-                striped
-                fixed
-                :items="koulutuksenjarjestajaFiltered"
-                :fields="koulutuksenjarjestajaFields"
-                :current-page="koulutuksenjarjestajaPage"
-                :per-page="perPage">
-      </b-table>
+    <b-table
+      responsive
+      borderless
+      striped
+      fixed
+      :items="koulutuksenjarjestajaFiltered"
+      :fields="koulutuksenjarjestajaFields"
+      :current-page="koulutuksenjarjestajaPage"
+      :per-page="perPage"
+    />
 
-      <b-pagination
-        v-model="koulutuksenjarjestajaPage"
-        :total-rows="koulutuksenjarjestajaFiltered.length"
-        :per-page="perPage"
-        aria-controls="opetussuunnitelmat"
-        align="center">
-      </b-pagination>
-
+    <b-pagination
+      v-model="koulutuksenjarjestajaPage"
+      :total-rows="koulutuksenjarjestajaFiltered.length"
+      :per-page="perPage"
+      aria-controls="opetussuunnitelmat"
+      align="center"
+    />
   </div>
 </template>
 
@@ -287,8 +332,8 @@ function aikavertailu(ops: Opetussuunnitelma) {
     return false;
   }
 
-  return ops[aikavaliValue.value] >= aikavaliAlkuVrt.value &&
-         ops[aikavaliValue.value] <= aikavaliLoppuVrt.value;
+  return ops[aikavaliValue.value] >= aikavaliAlkuVrt.value
+         && ops[aikavaliValue.value] <= aikavaliLoppuVrt.value;
 }
 
 const aikavaliAlkuVrt = computed(() => {

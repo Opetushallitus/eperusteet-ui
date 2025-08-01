@@ -1,65 +1,150 @@
 <template>
-  <ep-collapse class="collapsable" :collapsable="isEditing" :border-bottom="borderBottom">
+  <ep-collapse
+    class="collapsable"
+    :collapsable="isEditing"
+    :border-bottom="borderBottom"
+  >
     <template #header>
-      <h3 v-if="isEditing" class="mt-4">{{ $t('tekstikappaleet') }}</h3>
+      <h3
+        v-if="isEditing"
+        class="mt-4"
+      >
+        {{ $t('tekstikappaleet') }}
+      </h3>
     </template>
 
-    <ep-collapse class="collapsable" v-for="(avain, index) in sisaltoTekstiAvaimet" :key="avain" :collapsable="!isEditing" :border-bottom="isEditing" :class="{'mb-4': !isEditing}">
+    <ep-collapse
+      v-for="(avain, index) in sisaltoTekstiAvaimet"
+      :key="avain"
+      class="collapsable"
+      :collapsable="!isEditing"
+      :border-bottom="isEditing"
+      :class="{'mb-4': !isEditing}"
+    >
       <template #header>
-        <h4 v-if="!isEditing" class="mb-0">
-          <span v-if="model[avain][sisaltoTekstiOtsikkoField]">{{ $kaanna(model[avain][sisaltoTekstiOtsikkoField])}}</span>
-          <span v-else>{{ $t(avain)}}</span>
+        <h4
+          v-if="!isEditing"
+          class="mb-0"
+        >
+          <span v-if="model[avain][sisaltoTekstiOtsikkoField]">{{ $kaanna(model[avain][sisaltoTekstiOtsikkoField]) }}</span>
+          <span v-else>{{ $t(avain) }}</span>
         </h4>
       </template>
-      <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-otsikko')}}</h4>
-      <ep-input v-if="isEditing" v-model="model[avain][sisaltoTekstiOtsikkoField]" :is-editing="isEditing" :placeholder="$t(avain)"></ep-input>
+      <h4
+        v-if="isEditing"
+        class="mt-4"
+      >
+        {{ $t('tekstikappaleen-otsikko') }}
+      </h4>
+      <ep-input
+        v-if="isEditing"
+        v-model="model[avain][sisaltoTekstiOtsikkoField]"
+        :is-editing="isEditing"
+        :placeholder="$t(avain)"
+      />
 
-      <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
-      <ep-content layout="normal" v-model="model[avain].teksti" :is-editable="isEditing"> </ep-content>
+      <h4
+        v-if="isEditing"
+        class="mt-4"
+      >
+        {{ $t('tekstikappaleen-sisalto') }}
+      </h4>
+      <ep-content
+        v-model="model[avain].teksti"
+        layout="normal"
+        :is-editable="isEditing"
+      />
 
-      <div class="d-flex justify-content-between mt-1" v-if="isEditing">
-        <ep-button variant="outline-primary" icon="add" v-if="index+1 === sisaltoTekstiAvaimet.length && vapaatTekstit.length === 0" @click="lisaaTekstikappale()">
+      <div
+        v-if="isEditing"
+        class="d-flex justify-content-between mt-1"
+      >
+        <ep-button
+          v-if="index+1 === sisaltoTekstiAvaimet.length && vapaatTekstit.length === 0"
+          variant="outline-primary"
+          icon="add"
+          @click="lisaaTekstikappale()"
+        >
           {{ $t('lisaa-tekstikappale') }}
         </ep-button>
-        <div v-else/>
+        <div v-else />
 
-        <ep-button variant="link" icon="delete" @click="poistaSisaltoteksti(avain)">
+        <ep-button
+          variant="link"
+          icon="delete"
+          @click="poistaSisaltoteksti(avain)"
+        >
           {{ $t('poista-tekstikappale') }}
         </ep-button>
       </div>
     </ep-collapse>
 
-    <EpDraggableCollapse v-model="model.vapaatTekstit" :isEditing="isEditing">
+    <EpDraggableCollapse
+      v-model="model.vapaatTekstit"
+      :is-editing="isEditing"
+    >
       <template #header="{data}">
         <template v-if="!isEditing">
-          <h4>{{ $kaanna(data.nimi)}}</h4>
+          <h4>{{ $kaanna(data.nimi) }}</h4>
         </template>
       </template>
 
       <template #default="{data}">
-        <h4 v-if="isEditing" class="otsikko">{{$t('tekstikappaleen-otsikko')}}</h4>
-        <ep-input v-if="isEditing" v-model="data.nimi" :is-editing="isEditing"></ep-input>
+        <h4
+          v-if="isEditing"
+          class="otsikko"
+        >
+          {{ $t('tekstikappaleen-otsikko') }}
+        </h4>
+        <ep-input
+          v-if="isEditing"
+          v-model="data.nimi"
+          :is-editing="isEditing"
+        />
 
-        <h4 v-if="isEditing" class="mt-4">{{$t('tekstikappaleen-sisalto')}}</h4>
-        <ep-content layout="normal" v-model="data.teksti" :is-editable="isEditing"> </ep-content>
+        <h4
+          v-if="isEditing"
+          class="mt-4"
+        >
+          {{ $t('tekstikappaleen-sisalto') }}
+        </h4>
+        <ep-content
+          v-model="data.teksti"
+          layout="normal"
+          :is-editable="isEditing"
+        />
 
-        <div class="d-flex justify-content-between mt-1" v-if="isEditing">
-          <ep-button variant="outline-primary" icon="add" @click="lisaaTekstikappale()">
+        <div
+          v-if="isEditing"
+          class="d-flex justify-content-between mt-1"
+        >
+          <ep-button
+            variant="outline-primary"
+            icon="add"
+            @click="lisaaTekstikappale()"
+          >
             {{ $t('lisaa-tekstikappale') }}
           </ep-button>
 
-          <ep-button variant="link" icon="delete" @click="poistaTeksti(data)">
+          <ep-button
+            variant="link"
+            icon="delete"
+            @click="poistaTeksti(data)"
+          >
             {{ $t('poista-tekstikappale') }}
           </ep-button>
         </div>
-
       </template>
     </EpDraggableCollapse>
 
-    <ep-button variant="outline-primary" icon="add" v-if="isEditing && sisaltoTekstiAvaimet.length === 0 && vapaatTekstit.length === 0" @click="lisaaTekstikappale()">
+    <ep-button
+      v-if="isEditing && sisaltoTekstiAvaimet.length === 0 && vapaatTekstit.length === 0"
+      variant="outline-primary"
+      icon="add"
+      @click="lisaaTekstikappale()"
+    >
       {{ $t('lisaa-tekstikappale') }}
     </ep-button>
-
   </ep-collapse>
 </template>
 

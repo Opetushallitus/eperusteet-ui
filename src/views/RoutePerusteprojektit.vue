@@ -1,9 +1,11 @@
 <template>
   <EpMainView>
-    <EpPerusteprojektiListaus :provider="perusteetStore"
-                              :edit-route="'perusteprojekti'"
-                              :new-route="{ name: 'perusteprojektiLuonti' }"
-                              :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
+    <EpPerusteprojektiListaus
+      :provider="perusteetStore"
+      :edit-route="'perusteprojekti'"
+      :new-route="{ name: 'perusteprojektiLuonti' }"
+      :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
+    >
       <template #upperheader>
         <h2>{{ $t('perusteprojektisi') }}</h2>
       </template>

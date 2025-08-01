@@ -1,16 +1,29 @@
 <template>
   <div>
-    <ep-button v-if="isEditing" icon="edit" @click="avaa" variant="link" class="muokkaa mb-3 ml-1">
-      {{$t('muokkaa-tavoitealueita')}}
+    <ep-button
+      v-if="isEditing"
+      icon="edit"
+      variant="link"
+      class="muokkaa mb-3 ml-1"
+      @click="avaa"
+    >
+      {{ $t('muokkaa-tavoitealueita') }}
     </ep-button>
 
-    <EpSortableTextList v-model="model.kohdealueet" :isEditing="false" group="tavoitealueet" :sortable="false">
-      <template v-slot:input="{model}">
-        <EpInput v-model="model.nimi" :is-editing="false">
-        </EpInput>
+    <EpSortableTextList
+      v-model="model.kohdealueet"
+      :is-editing="false"
+      group="tavoitealueet"
+      :sortable="false"
+    >
+      <template #input="{model}">
+        <EpInput
+          v-model="model.nimi"
+          :is-editing="false"
+        />
       </template>
-      <template v-slot:li="{model}">
-        {{$kaanna(model.nimi)}}
+      <template #li="{model}">
+        {{ $kaanna(model.nimi) }}
       </template>
     </EpSortableTextList>
 
@@ -18,37 +31,52 @@
       v-if="isEditing"
       ref="EpSisaltoalueetEditModal"
       :title="$t('tavoitealueet-kaikilla-vuosiluokilla')"
-      size="xl">
-
+      size="xl"
+    >
       <template #modal-header>
         <div class="d-flex justify-content-between w-100">
-          <div>{{ $t('tavoitealueet-kaikilla-vuosiluokilla')}}</div>
+          <div>{{ $t('tavoitealueet-kaikilla-vuosiluokilla') }}</div>
           <ep-kielivalinta />
         </div>
       </template>
 
-      <EpSortableTextList v-model="model.kohdealueet" :isEditing="true" group="tavoitealueet" :sortable="false">
-        <template v-slot:input="{model}">
-          <EpInput v-model="model.nimi" :is-editing="true">
-          </EpInput>
+      <EpSortableTextList
+        v-model="model.kohdealueet"
+        :is-editing="true"
+        group="tavoitealueet"
+        :sortable="false"
+      >
+        <template #input="{model}">
+          <EpInput
+            v-model="model.nimi"
+            :is-editing="true"
+          />
         </template>
-        <template v-slot:li="{model}">
-          {{$kaanna(model.nimi)}}
+        <template #li="{model}">
+          {{ $kaanna(model.nimi) }}
         </template>
-        <template v-slot:default>
+        <template #default>
           {{ $t('lisaa-tavoitealue') }}
         </template>
       </EpSortableTextList>
 
       <template #modal-footer>
         <div>
-          <ep-button @click="peruuta" variant="link">{{ $t('peruuta')}}</ep-button>
-          <ep-button :showSpinner="tallennetaan" @click="tallenna">{{ $t('tallenna')}}</ep-button>
+          <ep-button
+            variant="link"
+            @click="peruuta"
+          >
+            {{ $t('peruuta') }}
+          </ep-button>
+          <ep-button
+            :show-spinner="tallennetaan"
+            @click="tallenna"
+          >
+            {{ $t('tallenna') }}
+          </ep-button>
         </div>
       </template>
-
     </b-modal>
-
   </div>
 </template>
 

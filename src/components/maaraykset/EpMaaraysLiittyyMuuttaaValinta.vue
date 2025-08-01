@@ -1,35 +1,65 @@
 <template>
   <div>
     <template v-if="isEditing">
-      <EpRadio v-model="model.liittyyTyyppi" :value="EILIITY" :disabled="disabloidutValinnat.includes(EILIITY)">
+      <EpRadio
+        v-model="model.liittyyTyyppi"
+        :value="EILIITY"
+        :disabled="disabloidutValinnat.includes(EILIITY)"
+      >
         {{ $t('ei-liity-toiseen-maaraykseen') }}
       </EpRadio>
-      <EpRadio v-model="model.liittyyTyyppi" :value="MUUTTAA">
+      <EpRadio
+        v-model="model.liittyyTyyppi"
+        :value="MUUTTAA"
+      >
         {{ $t('muuttaa-toista-maaraysta') }}
       </EpRadio>
 
-      <div v-if="model.liittyyTyyppi === MUUTTAA" class="my-3 ml-4">
-        <EpMaaraysLiittyyMaaraykseen v-model="model.muutettavatMaaraykset" :maarayksetNimella="maarayksetNimella" tyyppi="muuttaa"/>
+      <div
+        v-if="model.liittyyTyyppi === MUUTTAA"
+        class="my-3 ml-4"
+      >
+        <EpMaaraysLiittyyMaaraykseen
+          v-model="model.muutettavatMaaraykset"
+          :maaraykset-nimella="maarayksetNimella"
+          tyyppi="muuttaa"
+        />
       </div>
 
-      <EpRadio v-model="model.liittyyTyyppi" :value="KORVAA">
+      <EpRadio
+        v-model="model.liittyyTyyppi"
+        :value="KORVAA"
+      >
         {{ $t('korvaa-toisen-maarayksen') }}
       </EpRadio>
 
-      <div v-if="model.liittyyTyyppi === KORVAA" class="my-3 ml-4">
-        <EpMaaraysLiittyyMaaraykseen v-model="model.korvattavatMaaraykset" :maarayksetNimella="maarayksetNimella" tyyppi="korvaa"/>
+      <div
+        v-if="model.liittyyTyyppi === KORVAA"
+        class="my-3 ml-4"
+      >
+        <EpMaaraysLiittyyMaaraykseen
+          v-model="model.korvattavatMaaraykset"
+          :maaraykset-nimella="maarayksetNimella"
+          tyyppi="korvaa"
+        />
       </div>
     </template>
     <template v-else-if="model.muutettavatMaaraykset.length > 0 || model.korvattavatMaaraykset.length > 0">
       <ul>
-        <li v-for="(muuttaa, index) in model.muutettavatMaaraykset" :key="'muuttaa' + index">
+        <li
+          v-for="(muuttaa, index) in model.muutettavatMaaraykset"
+          :key="'muuttaa' + index"
+        >
           <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: muuttaa.id } }">
-            {{$kaanna(muuttaa.nimi)}}
+            {{ $kaanna(muuttaa.nimi) }}
           </router-link>
         </li>
-        <li v-for="(korvaa, index) in model.korvattavatMaaraykset" :key="'korvaa' + index">
+        <li
+          v-for="(korvaa, index) in model.korvattavatMaaraykset"
+          :key="'korvaa' + index"
+        >
           <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: korvaa.id } }">
-            {{$kaanna(korvaa.nimi)}}
+            {{ $kaanna(korvaa.nimi) }}
           </router-link>
         </li>
       </ul>

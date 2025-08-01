@@ -2,37 +2,46 @@
   <VueDraggable
     v-if="value"
     v-bind="options"
+    v-model="model"
     tag="div"
     :class="classes"
-    v-model="model"
     @add="add"
     @start="onDragStart"
-    @end="onDragEnd">
-      <div v-for="(node, idx) in model" :key="node.tunniste || node.uuid || idx" class="muodostumisnode" :class="{'draggable': isEditing}">
-        <MuodostumisItem v-model="model[idx]"
-                        :depth="depth"
-                        :is-editing="isEditing"
-                        :tutkinnonOsatMap="tutkinnonOsatMap"
-                        @remove="remove(idx)"
-                        @copy="copy(idx)"
-                        :pakollinen="isPakollinen(node)"
-                        ref="muodostumisItem">
-        </MuodostumisItem>
-        <div class="children"
-            :class="{muodostumisryhma: !!node.rooli && depth > 0}"
-            :style="{ 'padding-left': 30 + 'px' }"
-            v-if="node.isOpen || node.isOpen === undefined">
-          <MuodostumisNode
-            ref="childNode"
-            :tutkinnonOsatMap="tutkinnonOsatMap"
-            :depth="depth + 1"
-            v-model="node.osat"
-            :is-editing="isEditing"
-            :parentMandatory="isPakollinen(node)"
-            :copyToClipBoard="copyToClipBoard">
-          </MuodostumisNode>
-        </div>
+    @end="onDragEnd"
+  >
+    <div
+      v-for="(node, idx) in model"
+      :key="node.tunniste || node.uuid || idx"
+      class="muodostumisnode"
+      :class="{'draggable': isEditing}"
+    >
+      <MuodostumisItem
+        ref="muodostumisItem"
+        v-model="model[idx]"
+        :depth="depth"
+        :is-editing="isEditing"
+        :tutkinnon-osat-map="tutkinnonOsatMap"
+        :pakollinen="isPakollinen(node)"
+        @remove="remove(idx)"
+        @copy="copy(idx)"
+      />
+      <div
+        v-if="node.isOpen || node.isOpen === undefined"
+        class="children"
+        :class="{muodostumisryhma: !!node.rooli && depth > 0}"
+        :style="{ 'padding-left': 30 + 'px' }"
+      >
+        <MuodostumisNode
+          ref="childNode"
+          v-model="node.osat"
+          :tutkinnon-osat-map="tutkinnonOsatMap"
+          :depth="depth + 1"
+          :is-editing="isEditing"
+          :parent-mandatory="isPakollinen(node)"
+          :copy-to-clip-board="copyToClipBoard"
+        />
       </div>
+    </div>
   </VueDraggable>
 </template>
 

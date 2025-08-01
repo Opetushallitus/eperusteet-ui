@@ -3,23 +3,50 @@
     <ep-tiedosto-lataus
       v-if="isEditing && (liitteet.length === 0 || !yksittainen)"
       ref="liitelataus"
-      :fileTypes="['application/pdf']"
-      @update:modelValue="lisaaLiite($event)"
+      :file-types="['application/pdf']"
       :as-binary="true"
-      :fileMaxSize="LIITE_MAX_KOKO"/>
+      :file-max-size="LIITE_MAX_KOKO"
+      @update:modelValue="lisaaLiite($event)"
+    />
 
-    <div class="row mt-4 ml-1" v-if="liitteet.length > 0 && !yksittainen">
-      <div class="col font-weight-bold border-bottom ml-0 pl-0 pb-2">{{$t('nimi')}}</div>
-      <div class="col font-weight-bold border-bottom ml-0 pl-0 pb-2">{{$t('tiedosto')}}</div>
+    <div
+      v-if="liitteet.length > 0 && !yksittainen"
+      class="row mt-4 ml-1"
+    >
+      <div class="col font-weight-bold border-bottom ml-0 pl-0 pb-2">
+        {{ $t('nimi') }}
+      </div>
+      <div class="col font-weight-bold border-bottom ml-0 pl-0 pb-2">
+        {{ $t('tiedosto') }}
+      </div>
     </div>
-    <div class="row mt-2 align-items-center" v-for="(liite, index) in liitteet" :key="'liite' + index">
-      <div class="col" v-if="nimisyote">
-        <ep-input v-model="liite.nimi" :is-editing="isEditing"/>
+    <div
+      v-for="(liite, index) in liitteet"
+      :key="'liite' + index"
+      class="row mt-2 align-items-center"
+    >
+      <div
+        v-if="nimisyote"
+        class="col"
+      >
+        <ep-input
+          v-model="liite.nimi"
+          :is-editing="isEditing"
+        />
       </div>
       <div class="col d-flex">
-        <a v-if="liite.url" :href="liite.url" target="_blank" rel="noopener noreferrer">{{liite.tiedostonimi}}</a>
-        <span v-else>{{liite.tiedostonimi}}</span>
-        <div class="default-icon clickable ml-2" @click="poistaLiite(liite)" v-if="isEditing">
+        <a
+          v-if="liite.url"
+          :href="liite.url"
+          target="_blank"
+          rel="noopener noreferrer"
+        >{{ liite.tiedostonimi }}</a>
+        <span v-else>{{ liite.tiedostonimi }}</span>
+        <div
+          v-if="isEditing"
+          class="default-icon clickable ml-2"
+          @click="poistaLiite(liite)"
+        >
           <EpMaterialIcon>delete</EpMaterialIcon>
         </div>
       </div>

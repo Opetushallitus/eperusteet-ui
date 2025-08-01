@@ -1,36 +1,62 @@
 <template>
   <EpContentView>
-    <template v-slot:header>
+    <template #header>
       <h3 class="mb-0">
         {{ $t('laaja-alaiset-osaamiset') }}
       </h3>
     </template>
 
-    <EpSpinner v-if="!laajaAlaisetOsaamiset"/>
+    <EpSpinner v-if="!laajaAlaisetOsaamiset" />
     <div v-else>
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="add" @click="lisaaLaajaAlainenOsaaminen" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-          {{ $t('uusi-laaja-alainen-osaaminen')}}
+        <EpButton
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+          variant="outline"
+          icon="add"
+          @click="lisaaLaajaAlainenOsaaminen"
+        >
+          {{ $t('uusi-laaja-alainen-osaaminen') }}
         </EpButton>
       </div>
 
-      <b-row class="border-bottom-1 m-0 pb-2" v-if="laajaAlaisetOsaamiset.length > 0">
-        <b-col cols="5" class="font-weight-bold">{{$t('nimi')}}</b-col>
-        <b-col cols="5" class="font-weight-bold">{{$t('muokattu')}}</b-col>
+      <b-row
+        v-if="laajaAlaisetOsaamiset.length > 0"
+        class="border-bottom-1 m-0 pb-2"
+      >
+        <b-col
+          cols="5"
+          class="font-weight-bold"
+        >
+          {{ $t('nimi') }}
+        </b-col>
+        <b-col
+          cols="5"
+          class="font-weight-bold"
+        >
+          {{ $t('muokattu') }}
+        </b-col>
       </b-row>
 
-      <b-row v-for="(lao, index) in laajaAlaisetOsaamiset" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
-        <b-col cols="5" class="d-flex">
+      <b-row
+        v-for="(lao, index) in laajaAlaisetOsaamiset"
+        :key="'lao'+index"
+        class="taulukko-rivi-varitys py-3 m-0"
+      >
+        <b-col
+          cols="5"
+          class="d-flex"
+        >
           <div>
-            <router-link :to="{ name: 'perusopetusLaajaAlainenOsaaminen', params: { laoId: lao.id } }">{{ $kaanna(lao.nimi) }}</router-link>
+            <router-link :to="{ name: 'perusopetusLaajaAlainenOsaaminen', params: { laoId: lao.id } }">
+              {{ $kaanna(lao.nimi) }}
+            </router-link>
           </div>
         </b-col>
         <b-col cols="5">
-          <span v-if="lao.muokattu">{{$sdt(lao.muokattu)}}</span>
+          <span v-if="lao.muokattu">{{ $sdt(lao.muokattu) }}</span>
         </b-col>
       </b-row>
     </div>
-
   </EpContentView>
 </template>
 

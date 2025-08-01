@@ -1,34 +1,58 @@
 <template>
   <EpEditointi :store="store">
-    <template v-slot:header>
+    <template #header>
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tutkinnon-osat') }}</h1>
       </div>
     </template>
 
-    <template v-slot:default="{ isEditing }">
-      <div v-if="!isEditing" class="d-md-flex justify-content-between align-items-center">
+    <template #default="{ isEditing }">
+      <div
+        v-if="!isEditing"
+        class="d-md-flex justify-content-between align-items-center"
+      >
         <div>
           <ep-search v-model="query" />
         </div>
         <div>
-          <ep-button @click="lisaaTutkinnonOsa" variant="outline" icon="add">
+          <ep-button
+            variant="outline"
+            icon="add"
+            @click="lisaaTutkinnonOsa"
+          >
             {{ $t('lisaa-tutkinnon-osa') }}
           </ep-button>
-          <ep-button @click="tuoTutkinnonOsa" variant="outline" icon="add">
+          <ep-button
+            variant="outline"
+            icon="add"
+            @click="tuoTutkinnonOsa"
+          >
             {{ $t('tuo-tutkinnon-osa') }}
           </ep-button>
-          <EpTutkinnonosaTuontiModal ref="tutkinnonosaTuontiModal" :peruste="peruste" @refresh="refresh"/>
+          <EpTutkinnonosaTuontiModal
+            ref="tutkinnonosaTuontiModal"
+            :peruste="peruste"
+            @refresh="refresh"
+          />
         </div>
       </div>
 
       <ep-spinner v-if="!items" />
-      <div v-else-if="items.length === 0" class="p-4">
+      <div
+        v-else-if="items.length === 0"
+        class="p-4"
+      >
         <EpAlert :text="$t('tutkinnon-osia-ei-luotu')" />
       </div>
       <div v-else>
-        <div class="table-responsive" v-if="isEditing">
-          <table class="table table-borderless table-striped table-hover" role="table">
+        <div
+          v-if="isEditing"
+          class="table-responsive"
+        >
+          <table
+            class="table table-borderless table-striped table-hover"
+            role="table"
+          >
             <thead role="rowgroup">
               <tr>
                 <th>{{ $t('no') }}</th>
@@ -37,10 +61,16 @@
                 <th>{{ $t('muokattu') }}</th>
               </tr>
             </thead>
-            <VueDraggable v-bind="options"
-                       v-model="items"
-                       tag="tbody">
-              <tr v-for="(item, idx) in raw" :key="idx" role="row">
+            <VueDraggable
+              v-bind="options"
+              v-model="items"
+              tag="tbody"
+            >
+              <tr
+                v-for="(item, idx) in raw"
+                :key="idx"
+                role="row"
+              >
                 <td>
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   {{ idx + 1 }}
@@ -61,8 +91,9 @@
           fixed
           hover
           :items="items"
-          :fields="fields">
-          <template v-slot:cell(nimi)="{ item }">
+          :fields="fields"
+        >
+          <template #cell(nimi)="{ item }">
             <router-link :to="item.to">
               {{ $kaanna(item.tutkinnonOsa.nimi) || $t('nimeton-tutkinnonosa') }}
             </router-link>
@@ -141,7 +172,7 @@ const items = computed({
   },
   set(value: any) {
     store.value!.setData(value);
-  }
+  },
 });
 
 const fields = computed(() => {

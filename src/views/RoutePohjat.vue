@@ -1,11 +1,13 @@
 <template>
   <EpMainView>
-    <EpPerusteprojektiListaus :provider="pohjatStore"
-                              :edit-route="'perusteprojekti'"
-                              :new-route="{ name: 'pohjaLuonti' }"
-                              :is-pohja="true"
-                              :luontioikeus="{ 'oikeus': 'hallinta', 'kohde': 'pohja' }"
-                              :showCards="$isAdmin()">
+    <EpPerusteprojektiListaus
+      :provider="pohjatStore"
+      :edit-route="'perusteprojekti'"
+      :new-route="{ name: 'pohjaLuonti' }"
+      :is-pohja="true"
+      :luontioikeus="{ 'oikeus': 'hallinta', 'kohde': 'pohja' }"
+      :show-cards="$isAdmin()"
+    >
       <template #upperheader>
         <h2>{{ $t('pohjasi') }}</h2>
       </template>

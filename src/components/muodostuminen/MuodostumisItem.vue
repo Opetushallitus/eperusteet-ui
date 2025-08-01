@@ -1,18 +1,43 @@
 <template>
-  <div class="d-flex flex-column h-100 moduuli mb-3" :style="style">
+  <div
+    class="d-flex flex-column h-100 moduuli mb-3"
+    :style="style"
+  >
     <div class="d-flex align-items-center flex-grow-1 h-100">
-      <div class="pl-1" v-if="hasChildren">
-        <b-button variant="link" @click="toggleOpen">
-          <EpMaterialIcon v-if="isOpen">expand_less</EpMaterialIcon>
-          <EpMaterialIcon v-else>expand_more</EpMaterialIcon>
+      <div
+        v-if="hasChildren"
+        class="pl-1"
+      >
+        <b-button
+          variant="link"
+          @click="toggleOpen"
+        >
+          <EpMaterialIcon v-if="isOpen">
+            expand_less
+          </EpMaterialIcon>
+          <EpMaterialIcon v-else>
+            expand_more
+          </EpMaterialIcon>
         </b-button>
       </div>
       <div class="flex-grow-1 h-100 p-2 nimi">
-        <EpColorIndicator :size="10" :backgroundColor="tutkinnonOsaColor" class="ml-2 mr-2" v-if="tosa"/>
-        {{ $kaanna(nimi) }} <span v-if="koodiArvo">({{koodiArvo}})</span>
+        <EpColorIndicator
+          v-if="tosa"
+          :size="10"
+          :background-color="tutkinnonOsaColor"
+          class="ml-2 mr-2"
+        />
+        {{ $kaanna(nimi) }} <span v-if="koodiArvo">({{ koodiArvo }})</span>
       </div>
-      <div style="width: 100px;" class="text-center">
-        <b-button variant="none" :class="{ 'text-danger': !validity.isValid }" v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu">
+      <div
+        style="width: 100px;"
+        class="text-center"
+      >
+        <b-button
+          v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu"
+          variant="none"
+          :class="{ 'text-danger': !validity.isValid }"
+        >
           <span v-if="laajuusMinimi > 0 || laajuusMaksimi > 0">
             {{ laajuusMinimi }}
           </span>
@@ -22,49 +47,97 @@
           </span>
         </b-button>
       </div>
-      <div style="width: 80px" class="clearfix">
+      <div
+        style="width: 80px"
+        class="clearfix"
+      >
         <div class="float-right">
           <b-dropdown
             v-if="isEditing"
             size="lg"
             variant="link"
             toggle-class="text-decoration-none"
-            no-caret>
-            <template v-slot:button-content>
+            no-caret
+          >
+            <template #button-content>
               <EpMaterialIcon>more_horiz</EpMaterialIcon>
               <span class="sr-only">{{ $t('muokkaa-ryhmaa') }}</span>
             </template>
-            <b-dropdown-item-button @click="edit">{{ $t('muokkaa') }}</b-dropdown-item-button>
-            <b-dropdown-item-button @click="remove">{{ $t('poista') }}</b-dropdown-item-button>
+            <b-dropdown-item-button @click="edit">
+              {{ $t('muokkaa') }}
+            </b-dropdown-item-button>
+            <b-dropdown-item-button @click="remove">
+              {{ $t('poista') }}
+            </b-dropdown-item-button>
 
             <template v-if="isRyhma">
-              <b-dropdown-item-button @click="copy">{{ $t('kopioi-leikelaudalle') }}</b-dropdown-item-button>
-              <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
+              <b-dropdown-item-button @click="copy">
+                {{ $t('kopioi-leikelaudalle') }}
+              </b-dropdown-item-button>
+              <b-dropdown-divider v-if="isRyhma" />
               <b-dropdown-text v-if="isRyhma">
-                <ep-button icon="add" variant="outline" @click="liitaTosa">{{ $t('liita-tutkinnon-osa') }}</ep-button>
-                <ep-button icon="add" variant="outline" @click="lisaaRyhma">{{ $t('lisaa-ryhma') }}</ep-button>
+                <ep-button
+                  icon="add"
+                  variant="outline"
+                  @click="liitaTosa"
+                >
+                  {{ $t('liita-tutkinnon-osa') }}
+                </ep-button>
+                <ep-button
+                  icon="add"
+                  variant="outline"
+                  @click="lisaaRyhma"
+                >
+                  {{ $t('lisaa-ryhma') }}
+                </ep-button>
               </b-dropdown-text>
             </template>
           </b-dropdown>
         </div>
       </div>
     </div>
-    <div v-if="modelValue.kuvaus" class="text-muted kuvaus-wrapper">
-      <div v-if="showDescription" class="kuvaus">
-        <ep-content v-model="modelValue.kuvaus" :is-editable="false" layout="normal"></ep-content>
+    <div
+      v-if="modelValue.kuvaus"
+      class="text-muted kuvaus-wrapper"
+    >
+      <div
+        v-if="showDescription"
+        class="kuvaus"
+      >
+        <ep-content
+          v-model="modelValue.kuvaus"
+          :is-editable="false"
+          layout="normal"
+        />
       </div>
       <div class="text-center description-button">
-        <b-button variant="link" @click="toggleDescription()">
+        <b-button
+          variant="link"
+          @click="toggleDescription()"
+        >
           <EpMaterialIcon>more_horiz</EpMaterialIcon>
         </b-button>
       </div>
     </div>
-    <EpRakenneModal v-model="innerModel" ref="eprakennemodal" @remove="remove" :tutkinnonOsatMap="tutkinnonOsatMap" muokkaus/>
+    <EpRakenneModal
+      ref="eprakennemodal"
+      v-model="innerModel"
+      :tutkinnon-osat-map="tutkinnonOsatMap"
+      muokkaus
+      @remove="remove"
+    />
 
-    <EpRakenneModal v-model="uusi.ryhma" ref="eprakennemodalNew" @save="addUusi(modelValue)"/>
+    <EpRakenneModal
+      ref="eprakennemodalNew"
+      v-model="uusi.ryhma"
+      @save="addUusi(modelValue)"
+    />
 
-    <TutkinnonosatAddModal ref="tutkinnonosatModal" :tutkinnonosat="tutkinnonosat" @save="lisaaTutkinnonosat" />
-
+    <TutkinnonosatAddModal
+      ref="tutkinnonosatModal"
+      :tutkinnonosat="tutkinnonosat"
+      @save="lisaaTutkinnonosat"
+    />
   </div>
 </template>
 

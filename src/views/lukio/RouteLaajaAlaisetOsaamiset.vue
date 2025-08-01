@@ -1,28 +1,51 @@
 <template>
   <EpEditointi :store="store">
     <template #header>
-      <h3>{{$t('laaja-alaisen-osaamisen-osa-alueet')}}</h3>
+      <h3>{{ $t('laaja-alaisen-osaamisen-osa-alueet') }}</h3>
     </template>
     <template #default="{ data, isEditing }">
       <b-row>
         <b-col cols="11">
-          <EpDraggableCollapse v-model="data.laajaAlaisetOsaamiset" :isEditing="isEditing">
-            <template #header="{data}" v-if="!isEditing">
-              <h4 class="ml-3 mt-3" v-if="data.koodi">{{$kaanna(data.koodi.nimi)}}</h4>
+          <EpDraggableCollapse
+            v-model="data.laajaAlaisetOsaamiset"
+            :is-editing="isEditing"
+          >
+            <template
+              v-if="!isEditing"
+              #header="{data}"
+            >
+              <h4
+                v-if="data.koodi"
+                class="ml-3 mt-3"
+              >
+                {{ $kaanna(data.koodi.nimi) }}
+              </h4>
             </template>
 
             <template #default="{data}">
               <div class="row">
-                <div class="col-10" v-if="isEditing">
+                <div
+                  v-if="isEditing"
+                  class="col-10"
+                >
                   <b-form-group :label="$t('laaja-alaisen-osaamisen-otsikko')">
-                    <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+                    <ep-koodisto-select
+                      v-model="data.koodi"
+                      :store="koodisto"
+                      :is-editing="isEditing"
+                      :nayta-arvo="false"
+                    >
                       <template #default="{ open }">
                         <b-input-group>
                           <b-form-input
                             :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                            disabled></b-form-input>
+                            disabled
+                          />
                           <b-input-group-append>
-                            <b-button @click="open" variant="primary">
+                            <b-button
+                              variant="primary"
+                              @click="open"
+                            >
                               {{ $t('hae-koodistosta') }}
                             </b-button>
                           </b-input-group-append>
@@ -30,44 +53,62 @@
                       </template>
                     </ep-koodisto-select>
                   </b-form-group>
-
                 </div>
                 <div class="col-2">
-                  <b-form-group :label="$t('koodi')" v-if="data.koodi && data.koodi.arvo">
-                    {{data.koodi.arvo}}
+                  <b-form-group
+                    v-if="data.koodi && data.koodi.arvo"
+                    :label="$t('koodi')"
+                  >
+                    {{ data.koodi.arvo }}
                   </b-form-group>
                 </div>
               </div>
 
               <b-form-group>
-                <template #label v-if="isEditing">
+                <template
+                  v-if="isEditing"
+                  #label
+                >
                   <div class="mt-4">
-                    {{$t('kuvaus')}}
+                    {{ $t('kuvaus') }}
                   </div>
                 </template>
-                <ep-content v-model="data.kuvaus"
-                      layout="normal"
-                      :is-editable="isEditing"
-                      :kasiteHandler="kasiteHandler"/>
+                <ep-content
+                  v-model="data.kuvaus"
+                  layout="normal"
+                  :is-editable="isEditing"
+                  :kasite-handler="kasiteHandler"
+                />
               </b-form-group>
 
-              <div v-if="isEditing" class="d-flex justify-content-end">
-                <ep-button variant="link" icon="delete" @click="poistaLaajaAlainenOsaaminen(data)">
+              <div
+                v-if="isEditing"
+                class="d-flex justify-content-end"
+              >
+                <ep-button
+                  variant="link"
+                  icon="delete"
+                  @click="poistaLaajaAlainenOsaaminen(data)"
+                >
                   {{ $t('poista-laaja-alainen') }}
                 </ep-button>
               </div>
             </template>
-
           </EpDraggableCollapse>
 
-          <ep-button @click="lisaaLaajaAlainenOsaaminen()" variant="outline" icon="add" v-if="isEditing" class="ml-3 mt-3">
+          <ep-button
+            v-if="isEditing"
+            variant="outline"
+            icon="add"
+            class="ml-3 mt-3"
+            @click="lisaaLaajaAlainenOsaaminen()"
+          >
             {{ $t('uusi-laaja-alainen') }}
           </ep-button>
         </b-col>
       </b-row>
     </template>
   </EpEditointi>
-
 </template>
 
 <script setup lang="ts">

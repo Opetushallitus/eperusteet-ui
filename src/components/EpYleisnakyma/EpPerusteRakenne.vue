@@ -1,12 +1,18 @@
 <template>
   <div class="content">
-    <h3>{{$t('rakenne')}}</h3>
+    <h3>{{ $t('rakenne') }}</h3>
 
     <ep-spinner v-if="!peruste" />
 
-    <ep-small-data-box :topic="$t('tekstikappaleita')" :count="tekstikappaleita" />
-    <ep-small-data-box v-if="hasLisasisalto" :topic="$t(lisasisaltoOtsikko)" :count="lisasisaltoMaara" />
-
+    <ep-small-data-box
+      :topic="$t('tekstikappaleita')"
+      :count="tekstikappaleita"
+    />
+    <ep-small-data-box
+      v-if="hasLisasisalto"
+      :topic="$t(lisasisaltoOtsikko)"
+      :count="lisasisaltoMaara"
+    />
   </div>
 </template>
 

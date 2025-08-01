@@ -2,25 +2,41 @@
   <b-modal
     ref="rakenneModal"
     size="xl"
-    :cancelTitle="$t('peruuta')">
-
+    :cancel-title="$t('peruuta')"
+  >
     <template #modal-header>
-      <h2 v-if="muokkaus">{{ $t('muokkaa-ryhmaa') }}: {{$kaanna(nimi)}}</h2>
-      <h2 v-else>{{ $t('lisaa-ryhma') }}</h2>
+      <h2 v-if="muokkaus">
+        {{ $t('muokkaa-ryhmaa') }}: {{ $kaanna(nimi) }}
+      </h2>
+      <h2 v-else>
+        {{ $t('lisaa-ryhma') }}
+      </h2>
 
-      <EpKielivalinta/>
+      <EpKielivalinta />
     </template>
 
     <template #modal-footer>
       <div class="d-flex justify-content-end w-100">
-        <ep-button @click="remove" icon="delete" variant="link" class="flex-grow-1" v-if="muokkaus">
-          {{$t('poista')}}
+        <ep-button
+          v-if="muokkaus"
+          icon="delete"
+          variant="link"
+          class="flex-grow-1"
+          @click="remove"
+        >
+          {{ $t('poista') }}
         </ep-button>
-        <ep-button @click="cancel" variant="link">
-          {{$t('peruuta')}}
+        <ep-button
+          variant="link"
+          @click="cancel"
+        >
+          {{ $t('peruuta') }}
         </ep-button>
-        <ep-button @click="save" :disabled="invalid">
-          {{$t('tallenna')}}
+        <ep-button
+          :disabled="invalid"
+          @click="save"
+        >
+          {{ $t('tallenna') }}
         </ep-button>
       </div>
     </template>
@@ -28,113 +44,233 @@
     <template #default>
       <div v-if="isRyhma">
         <b-form-group :label="$t('ryhma') + ' *'">
-          <b-form-radio class="ml-1" v-model="tyyppi" value="osaamisala" name="tyyppi">
+          <b-form-radio
+            v-model="tyyppi"
+            class="ml-1"
+            value="osaamisala"
+            name="tyyppi"
+          >
             {{ $t('osaamisala') }}
           </b-form-radio>
-          <b-form-radio class="ml-1" v-model="tyyppi" value="tutkintonimike" name="tyyppi">
+          <b-form-radio
+            v-model="tyyppi"
+            class="ml-1"
+            value="tutkintonimike"
+            name="tyyppi"
+          >
             {{ $t('tutkintonimike') }}
           </b-form-radio>
-          <b-form-radio class="ml-1 mt-2" v-model="tyyppi" value="rakenne-moduuli-pakollinen" name="tyyppi">
+          <b-form-radio
+            v-model="tyyppi"
+            class="ml-1 mt-2"
+            value="rakenne-moduuli-pakollinen"
+            name="tyyppi"
+          >
             {{ $t('rakenne-moduuli-pakollinen') }}
           </b-form-radio>
-          <b-form-radio class="ml-1" v-model="tyyppi" value="rakenne-moduuli-valinnainen" name="tyyppi">
+          <b-form-radio
+            v-model="tyyppi"
+            class="ml-1"
+            value="rakenne-moduuli-valinnainen"
+            name="tyyppi"
+          >
             {{ $t('rakenne-moduuli-valinnainen') }}
           </b-form-radio>
-          <b-form-radio class="ml-1" v-model="tyyppi" value="rakenne-moduuli-ammatilliset" name="tyyppi">
+          <b-form-radio
+            v-model="tyyppi"
+            class="ml-1"
+            value="rakenne-moduuli-ammatilliset"
+            name="tyyppi"
+          >
             {{ $t('rakenne-moduuli-ammatilliset') }}
           </b-form-radio>
-          <b-form-radio class="ml-1" v-model="tyyppi" value="rakenne-moduuli-yhteiset" name="tyyppi">
+          <b-form-radio
+            v-model="tyyppi"
+            class="ml-1"
+            value="rakenne-moduuli-yhteiset"
+            name="tyyppi"
+          >
             {{ $t('rakenne-moduuli-yhteiset') }}
           </b-form-radio>
-          <b-form-radio class="ml-1 mt-2" v-model="tyyppi" value="rakenne-moduuli-paikalliset" name="tyyppi">
+          <b-form-radio
+            v-model="tyyppi"
+            class="ml-1 mt-2"
+            value="rakenne-moduuli-paikalliset"
+            name="tyyppi"
+          >
             {{ $t('rakenne-moduuli-paikalliset') }}
           </b-form-radio>
         </b-form-group>
 
-        <b-form-group :label="$t('osaamisala') + ' *'" v-if="tyyppi ==='osaamisala'">
+        <b-form-group
+          v-if="tyyppi ==='osaamisala'"
+          :label="$t('osaamisala') + ' *'"
+        >
           <div class="mb-2">
-            <span v-if="selectableOsaamisalat.length === 0">{{$t('ei-valittavia-osaamisaloja')}} </span>
-            <span v-else>{{$t('valitse-osaamisala')}} </span>
-            <span>{{$t('uusia-osaamisaloja-voit-luoda')}} </span>
-            <a class="btn-link" @click="cancel()">{{$t('tutkinnon-muodostumisen')}} </a>
-            <span>{{$t('nakymasta')}}</span>
+            <span v-if="selectableOsaamisalat.length === 0">{{ $t('ei-valittavia-osaamisaloja') }} </span>
+            <span v-else>{{ $t('valitse-osaamisala') }} </span>
+            <span>{{ $t('uusia-osaamisaloja-voit-luoda') }} </span>
+            <a
+              class="btn-link"
+              @click="cancel()"
+            >{{ $t('tutkinnon-muodostumisen') }} </a>
+            <span>{{ $t('nakymasta') }}</span>
           </div>
-          <b-form-radio v-for="(osaamisala, index) in selectableOsaamisalat" :key='"osaamisala"+index'
-              class="ml-1" v-model="innerModel.osaamisala" :value="osaamisala" name="osaamisalaValinta">
+          <b-form-radio
+            v-for="(osaamisala, index) in selectableOsaamisalat"
+            :key="&quot;osaamisala&quot;+index"
+            v-model="innerModel.osaamisala"
+            class="ml-1"
+            :value="osaamisala"
+            name="osaamisalaValinta"
+          >
             {{ $kaanna(osaamisala.nimi) }}
           </b-form-radio>
         </b-form-group>
 
-        <b-form-group :label="$t('tutkintonimike') + ' *'" v-if="tyyppi ==='tutkintonimike'">
+        <b-form-group
+          v-if="tyyppi ==='tutkintonimike'"
+          :label="$t('tutkintonimike') + ' *'"
+        >
           <div class="mb-2">
-            <span v-if="selectableOsaamisalat.length === 0">{{$t('ei-valittavia-tutkintonimikkeita')}} </span>
-            <span v-else>{{$t('valitse-tutkintonimike')}} </span>
-            <span>{{$t('uusia-tutkintonimikkeita-voit-luoda')}} </span>
-            <a class="btn-link" @click="cancel()">{{$t('tutkinnon-muodostumisen')}} </a>
-            <span>{{$t('nakymasta')}}</span>
+            <span v-if="selectableOsaamisalat.length === 0">{{ $t('ei-valittavia-tutkintonimikkeita') }} </span>
+            <span v-else>{{ $t('valitse-tutkintonimike') }} </span>
+            <span>{{ $t('uusia-tutkintonimikkeita-voit-luoda') }} </span>
+            <a
+              class="btn-link"
+              @click="cancel()"
+            >{{ $t('tutkinnon-muodostumisen') }} </a>
+            <span>{{ $t('nakymasta') }}</span>
           </div>
-          <b-form-radio v-for="(tutkintonimike, index) in selectableTutkintonimikkeet" :key='"tutkintonimike"+index'
-              class="ml-1" v-model="innerModel.tutkintonimike" :value="tutkintonimike" name="tutkintonimikeValinta">
+          <b-form-radio
+            v-for="(tutkintonimike, index) in selectableTutkintonimikkeet"
+            :key="&quot;tutkintonimike&quot;+index"
+            v-model="innerModel.tutkintonimike"
+            class="ml-1"
+            :value="tutkintonimike"
+            name="tutkintonimikeValinta"
+          >
             {{ $kaanna(tutkintonimike.nimi) }}
           </b-form-radio>
         </b-form-group>
 
-        <b-form-group :label="$t('nimi') + ' *'" v-if="tyyppi ==='rakenne-moduuli-paikalliset'">
-          <b-form-radio class="ml-1" v-model="nimiValinta" value="paikallinen" name="nimiValinta">
+        <b-form-group
+          v-if="tyyppi ==='rakenne-moduuli-paikalliset'"
+          :label="$t('nimi') + ' *'"
+        >
+          <b-form-radio
+            v-model="nimiValinta"
+            class="ml-1"
+            value="paikallinen"
+            name="nimiValinta"
+          >
             {{ $t(nimiValintaTekstit['paikallinen']) }}
           </b-form-radio>
-          <b-form-radio class="ml-1" v-model="nimiValinta" value="tutkinnonosato" name="nimiValinta">
+          <b-form-radio
+            v-model="nimiValinta"
+            class="ml-1"
+            value="tutkinnonosato"
+            name="nimiValinta"
+          >
             {{ $t(nimiValintaTekstit['tutkinnonosato']) }}
           </b-form-radio>
-          <b-form-radio class="ml-1" v-model="nimiValinta" value="korkeakoulu" name="nimiValinta">
+          <b-form-radio
+            v-model="nimiValinta"
+            class="ml-1"
+            value="korkeakoulu"
+            name="nimiValinta"
+          >
             {{ $t(nimiValintaTekstit['korkeakoulu']) }}
           </b-form-radio>
-          <b-form-radio class="ml-1" v-model="nimiValinta" value="yhteinen" name="nimiValinta">
+          <b-form-radio
+            v-model="nimiValinta"
+            class="ml-1"
+            value="yhteinen"
+            name="nimiValinta"
+          >
             {{ $t(nimiValintaTekstit['yhteinen']) }}
           </b-form-radio>
-          <b-form-radio class="ml-1" v-model="nimiValinta" value="muu" name="nimiValinta">
+          <b-form-radio
+            v-model="nimiValinta"
+            class="ml-1"
+            value="muu"
+            name="nimiValinta"
+          >
             {{ $t(nimiValintaTekstit['muu']) }}
           </b-form-radio>
 
-          <ep-input class="mt-1 ml-4" is-editing v-model="innerModel.nimi" v-if="nimiValinta === 'muu' || tyyppi !=='rakenne-moduuli-paikalliset'"/>
-          <ep-input class="mt-1 ml-4" is-editing value="" v-else :disabled="true"/>
-
+          <ep-input
+            v-if="nimiValinta === 'muu' || tyyppi !=='rakenne-moduuli-paikalliset'"
+            v-model="innerModel.nimi"
+            class="mt-1 ml-4"
+            is-editing
+          />
+          <ep-input
+            v-else
+            class="mt-1 ml-4"
+            is-editing
+            value=""
+            :disabled="true"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('laajuus')" v-if="innerModel.muodostumisSaanto">
+        <b-form-group
+          v-if="innerModel.muodostumisSaanto"
+          :label="$t('laajuus')"
+        >
           <div class="d-flex align-items-center">
             <div>
-              <ep-input type="number" is-editing v-model="innerModel.muodostumisSaanto.laajuus.minimi">
-              </ep-input>
+              <ep-input
+                v-model="innerModel.muodostumisSaanto.laajuus.minimi"
+                type="number"
+                is-editing
+              />
             </div>
-            <div class="ml-2" v-if="innerModel.muodostumisSaanto.laajuus.maksimi">
+            <div
+              v-if="innerModel.muodostumisSaanto.laajuus.maksimi"
+              class="ml-2"
+            >
               -
             </div>
-            <div class="ml-2" v-if="innerModel.muodostumisSaanto.laajuus.maksimi">
-              <ep-input type="number" is-editing v-model="innerModel.muodostumisSaanto.laajuus.maksimi">
-              </ep-input>
+            <div
+              v-if="innerModel.muodostumisSaanto.laajuus.maksimi"
+              class="ml-2"
+            >
+              <ep-input
+                v-model="innerModel.muodostumisSaanto.laajuus.maksimi"
+                type="number"
+                is-editing
+              />
             </div>
             <div class="ml-2">
-                {{$t('osaamispiste')}}
+              {{ $t('osaamispiste') }}
             </div>
           </div>
           <ep-toggle
             :value="!!innerModel.muodostumisSaanto.laajuus.maksimi"
+            switch
             @input="toggleMaksimi"
-            switch>
-          {{ $t('aseta-myos-maksimiarvo') }}
+          >
+            {{ $t('aseta-myos-maksimiarvo') }}
           </ep-toggle>
         </b-form-group>
       </div>
       <div v-else>
         <b-form-group :label="$t('pakollisuus')">
-          <ep-toggle v-model="modelValue.pakollinen" switch>
+          <ep-toggle
+            v-model="modelValue.pakollinen"
+            switch
+          >
             {{ $t('tutkinnon-osa-on-pakollinen') }}
           </ep-toggle>
         </b-form-group>
       </div>
       <b-form-group :label="$t('kuvaus')">
-        <ep-content v-model="modelValue.kuvaus" :is-editable="true" layout="normal"></ep-content>
+        <ep-content
+          v-model="modelValue.kuvaus"
+          :is-editable="true"
+          layout="normal"
+        />
       </b-form-group>
     </template>
   </b-modal>
@@ -430,7 +566,7 @@ const nimiChanged = (newVal, oldVal) => {
       emit('update:modelValue', { ...innerModel.value, nimi: null });
     }
   }
-}
+};
 
 watch(tyyppi, (newVal, oldVal) => {
   if (!newVal || !oldVal) {

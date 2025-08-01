@@ -92,7 +92,8 @@ describe('RoutePohjatLuonti component', () => {
     const wrapper = mountWrapper({});
 
     expect(wrapper.text()).toContain('kayta-pohjana');
-    wrapper.findAll('.b-button').at(1).trigger('click');
+    wrapper.findAll('.b-button').at(1)
+      .trigger('click');
 
     await nextTick();
     expect(wrapper.text()).not.toContain('kayta-pohjana');
@@ -109,7 +110,8 @@ describe('RoutePohjatLuonti component', () => {
     const wrapper = mountWrapper({});
 
     expect(wrapper.text()).toContain('kayta-pohjana');
-    wrapper.findAll('.b-button').at(1).trigger('click');
+    wrapper.findAll('.b-button').at(1)
+      .trigger('click');
 
     await nextTick();
     expect(wrapper.text()).not.toContain('kayta-pohjana');
@@ -128,7 +130,8 @@ describe('RoutePohjatLuonti component', () => {
       },
     });
 
-    wrapper.findAll('.b-button').at(1).trigger('click');
+    wrapper.findAll('.b-button').at(1)
+      .trigger('click');
 
     await nextTick();
     expect(wrapper.findAll('.b-button').at(2)
@@ -144,7 +147,8 @@ describe('RoutePohjatLuonti component', () => {
 
     await nextTick();
 
-    wrapper.findAll('.b-button').at(2).trigger('click');
+    wrapper.findAll('.b-button').at(2)
+      .trigger('click');
 
     await nextTick();
 

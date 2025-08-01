@@ -3,19 +3,32 @@
     <div v-if="showCards">
       <div class="upper">
         <slot name="upperheader">
-          <h1 class="bg-danger">slot: upperheader</h1>
+          <h1 class="bg-danger">
+            slot: upperheader
+          </h1>
         </slot>
 
         <EpSpinner v-if="!ownProjects" />
-        <div class="mt-5" v-else>
-          <slot name="unpublished-header"></slot>
+        <div
+          v-else
+          class="mt-5"
+        >
+          <slot name="unpublished-header" />
           <div class="d-flex flex-wrap pt-4">
-            <div class="card-wrapper" v-oikeustarkastelu="luontioikeus">
-              <ProjektiCard :full-background="true" :link="newRoute">
+            <div
+              v-oikeustarkastelu="luontioikeus"
+              class="card-wrapper"
+            >
+              <ProjektiCard
+                :full-background="true"
+                :link="newRoute"
+              >
                 <div class="d-flex align-items-center flex-column h-100">
                   <div class="h-50 text-center d-flex align-items-center pt-5">
                     <div class="ikoni">
-                      <EpMaterialIcon size="50px">add</EpMaterialIcon>
+                      <EpMaterialIcon size="50px">
+                        add
+                      </EpMaterialIcon>
                     </div>
                   </div>
                   <div class="h-50 text-center d-flex align-items-center pb-5">
@@ -26,13 +39,22 @@
                 </div>
               </ProjektiCard>
             </div>
-            <EpSpinner v-if="!ownProjects" class="m-5"/>
+            <EpSpinner
+              v-if="!ownProjects"
+              class="m-5"
+            />
             <template v-else>
-              <div class="card-wrapper" v-for="project in ownProjects" :key="project.id">
-                <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                              :koulutustyyppi="project.peruste.koulutustyyppi"
-                              :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"
-                              :tileImage="project.tileImage">
+              <div
+                v-for="project in ownProjects"
+                :key="project.id"
+                class="card-wrapper"
+              >
+                <ProjektiCard
+                  :link="{ name: editRoute, params: { projektiId: project.id } }"
+                  :koulutustyyppi="project.peruste.koulutustyyppi"
+                  :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
+                  :tile-image="project.tileImage"
+                >
                   <template #lower>
                     <div class="small-text">
                       {{ $t('tila-' + project.tila) }}
@@ -49,18 +71,29 @@
 
         <template v-if="ownProjects && naytaVainKortit && ownProjects.length === 0 && ownPublishedProjects && ownPublishedProjects.length === 0">
           <slot name="cardsEmpty">
-            <h3>{{$t('ei-perusteprojekteja')}}</h3>
+            <h3>{{ $t('ei-perusteprojekteja') }}</h3>
           </slot>
         </template>
 
-        <div class="mt-4" v-if="ownPublishedProjects && naytaVainKortit && ownPublishedProjects.length > 0">
-          <slot name="published-header"><h2>{{$t('julkaistut-perusteet')}}</h2></slot>
+        <div
+          v-if="ownPublishedProjects && naytaVainKortit && ownPublishedProjects.length > 0"
+          class="mt-4"
+        >
+          <slot name="published-header">
+            <h2>{{ $t('julkaistut-perusteet') }}</h2>
+          </slot>
           <div class="d-flex flex-wrap pt-4">
-            <div class="card-wrapper" v-for="project in ownPublishedProjects" :key="project.id">
-              <ProjektiCard :link="{ name: editRoute, params: { projektiId: project.id } }"
-                            :koulutustyyppi="project.peruste.koulutustyyppi"
-                            :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"
-                            :tileImage="project.tileImage">
+            <div
+              v-for="project in ownPublishedProjects"
+              :key="project.id"
+              class="card-wrapper"
+            >
+              <ProjektiCard
+                :link="{ name: editRoute, params: { projektiId: project.id } }"
+                :koulutustyyppi="project.peruste.koulutustyyppi"
+                :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
+                :tile-image="project.tileImage"
+              >
                 <template #lower>
                   <div class="small-text">
                     {{ $t('tila-' + project.tila) }}
@@ -73,29 +106,50 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <div v-oikeustarkastelu="{oikeus:'hallinta'}" v-if="!naytaVainKortit">
-      <div class="lower" :class="{'mt-0': !showCards}">
+    <div
+      v-if="!naytaVainKortit"
+      v-oikeustarkastelu="{oikeus:'hallinta'}"
+    >
+      <div
+        class="lower"
+        :class="{'mt-0': !showCards}"
+      >
         <slot name="lowerheader">
-          <h1 class="bg-danger">slot: lowerheader</h1>
+          <h1 class="bg-danger">
+            slot: lowerheader
+          </h1>
         </slot>
       </div>
 
-      <div class="filters" v-if="items">
+      <div
+        v-if="items"
+        class="filters"
+      >
         <div class="d-lg-flex align-items-end">
           <div class="mt-2 mb-2 mr-2 flex-fill">
-            <EpSearch v-model="query.nimi" :placeholder="$t('etsi-perusteprojektia')"/>
+            <EpSearch
+              v-model="query.nimi"
+              :placeholder="$t('etsi-perusteprojektia')"
+            />
           </div>
-          <div class="m-2 flex-fill" v-if="filtersInclude('koulutustyyppi')">
+          <div
+            v-if="filtersInclude('koulutustyyppi')"
+            class="m-2 flex-fill"
+          >
             <label>{{ $t('koulutustyyppi') }}</label>
-            <koulutustyyppi-select v-model="koulutustyyppi"
-                                   :koulutustyypit="koulutustyyppiOptions as unknown[]"
-                                   :isEditing="true"/>
+            <koulutustyyppi-select
+              v-model="koulutustyyppi"
+              :koulutustyypit="koulutustyyppiOptions as unknown[]"
+              :is-editing="true"
+            />
           </div>
-          <div class="m-2 flex-fill" v-if="filtersInclude('peruste')">
+          <div
+            v-if="filtersInclude('peruste')"
+            class="m-2 flex-fill"
+          >
             <label>{{ $t('peruste') }}</label>
             <EpMultiSelect
               v-model="peruste"
@@ -103,7 +157,8 @@
               :enable-empty-option="true"
               placeholder="kaikki"
               :is-editing="true"
-              :options="perusteet">
+              :options="perusteet"
+            >
               <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
@@ -112,14 +167,18 @@
               </template>
             </EpMultiSelect>
           </div>
-          <div class="m-2 flex-fill" v-if="filtersInclude('voimassaolo')">
+          <div
+            v-if="filtersInclude('voimassaolo')"
+            class="m-2 flex-fill"
+          >
             <label>{{ $t('voimassaolo') }}</label>
             <EpMultiSelect
               v-model="voimassaolo"
               :enable-empty-option="true"
               placeholder="kaikki"
               :is-editing="true"
-              :options="vaihtoehdotVoimassaolo">
+              :options="vaihtoehdotVoimassaolo"
+            >
               <template #singleLabel="{ option }">
                 {{ $t('ajoitus-' + option.toLowerCase()) }}
               </template>
@@ -134,9 +193,15 @@
         </div>
 
         <div class="d-lg-flex align-items-end">
-          <div class="m-2" v-if="filtersInclude('tila')">
-            <EpToggleGroup v-model="tila" :items="vaihtoehdotTilat">
-              <template v-slot="{ item }">
+          <div
+            v-if="filtersInclude('tila')"
+            class="m-2"
+          >
+            <EpToggleGroup
+              v-model="tila"
+              :items="vaihtoehdotTilat"
+            >
+              <template #default="{ item }">
                 {{ $t('tila-' + (item as string).toLowerCase()) }}
               </template>
             </EpToggleGroup>
@@ -151,46 +216,62 @@
             :items="items.data"
             :fields="fields"
             no-local-sorting
-            @sort-changed="sortingChanged"
             :sort-by.sync="sort.sortBy"
-            :sort-desc.sync="sort.sortDesc">
+            :sort-desc.sync="sort.sortDesc"
+            @sort-changed="sortingChanged"
+          >
             <template
               v-if="hasNimiSlot"
-              v-slot:head(nimi)>
-              <slot name="nimiotsikko"></slot>
+              #head(nimi)
+            >
+              <slot name="nimiotsikko" />
             </template>
-            <template v-slot:cell(nimi)="data">
+            <template #cell(nimi)="data">
               <router-link :to="{ name: editRoute, params: { projektiId: data.item.id } }">
                 {{ data.value }}
               </router-link>
             </template>
-            <template v-slot:cell(koulutustyyppi)="data">
-              <slot name="koulutustyyppisarake" :perusteProjekti="data.item">
+            <template #cell(koulutustyyppi)="data">
+              <slot
+                name="koulutustyyppisarake"
+                :peruste-projekti="data.item"
+              >
                 <span class="text-nowrap">
-                  <EpColorIndicator :size="10" :kind="data.item.koulutustyyppi" v-if="data.item.koulutustyyppi"/>
+                  <EpColorIndicator
+                    v-if="data.item.koulutustyyppi"
+                    :size="10"
+                    :kind="data.item.koulutustyyppi"
+                  />
                   <span class="ml-1">
                     {{ $t(data.item.koulutustyyppi) }}
                   </span>
                 </span>
               </slot>
             </template>
-            <template v-slot:cell(tila)="data">
+            <template #cell(tila)="data">
               <div class="d-flex">
                 {{ $t(data.item.tila) }}
-                <ep-button v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
-                           variant="link py-0"
-                           icon="keyboard_return"
-                           @click="restore(data.item)">
+                <ep-button
+                  v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
+                  variant="link py-0"
+                  icon="keyboard_return"
+                  @click="restore(data.item)"
+                >
                   {{ $t('palauta') }}
                 </ep-button>
               </div>
             </template>
           </b-table>
-          <ep-pagination v-model="sivu"
-                        :per-page="perPage"
-                        :total-rows="total"/>
+          <ep-pagination
+            v-model="sivu"
+            :per-page="perPage"
+            :total-rows="total"
+          />
         </div>
-        <div v-else class="m-2 alert alert-info">
+        <div
+          v-else
+          class="m-2 alert alert-info"
+        >
           {{ $t('ei-hakutuloksia') }}
         </div>
       </div>

@@ -1,14 +1,19 @@
 <template>
   <div class="content">
-    <h3>{{$t('tutkinnon-osat')}}</h3>
+    <h3>{{ $t('tutkinnon-osat') }}</h3>
 
     <ep-spinner v-if="!tutkinnonOsat || !peruste" />
 
     <div v-else>
-      <ep-small-data-box :topic="$t('tuotua')" :count="tutkinnonOsiaTuotu" />
-      <ep-small-data-box :topic="$t('luotu')" :count="tutkinnonOsiaLuotu" />
+      <ep-small-data-box
+        :topic="$t('tuotua')"
+        :count="tutkinnonOsiaTuotu"
+      />
+      <ep-small-data-box
+        :topic="$t('luotu')"
+        :count="tutkinnonOsiaLuotu"
+      />
     </div>
-
   </div>
 </template>
 

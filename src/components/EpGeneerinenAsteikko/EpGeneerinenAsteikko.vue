@@ -4,31 +4,42 @@
       <b-form-radio-group v-model="inner">
         <b-form-radio
           v-for="geneerinen in geneeriset"
+          :key="'geneerinen-' + geneerinen.id"
           name="geneerinen"
           :value="geneerinen.id"
-          :key="'geneerinen-' + geneerinen.id">
+        >
           {{ $kaanna(geneerinen.nimi) }}
         </b-form-radio>
       </b-form-radio-group>
     </b-form-group>
     <div v-else-if="valittuGeneerinen">
       <div class="mt-3 mb-4">
-        <div class="font-weight-bold">{{ $t('arvioinnin-kohde') }}</div>
+        <div class="font-weight-bold">
+          {{ $t('arvioinnin-kohde') }}
+        </div>
         <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
       </div>
       <table class="table table-striped">
         <thead>
           <tr>
-            <th width="20%">{{ $t('osaamistaso') }}</th>
+            <th width="20%">
+              {{ $t('osaamistaso') }}
+            </th>
             <th>{{ $t('kriteerit') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(ot, idx) in valittuGeneerinen.osaamistasot" :key="'ot-' + idx">
+          <tr
+            v-for="(ot, idx) in valittuGeneerinen.osaamistasot"
+            :key="'ot-' + idx"
+          >
             <td>{{ $kaanna(ot.otsikko) }}</td>
             <td>
               <ul class="pl-4">
-                <li v-for="(kriteeri, idx) in ot.kriteerit" :key="idx">
+                <li
+                  v-for="(kriteeri, idx) in ot.kriteerit"
+                  :key="idx"
+                >
                   {{ $kaanna(kriteeri) }}
                 </li>
               </ul>

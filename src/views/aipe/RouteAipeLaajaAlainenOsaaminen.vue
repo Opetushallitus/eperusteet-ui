@@ -1,24 +1,40 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
+      <h2 v-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing }">
-      <div class="mt-1" v-if="isEditing">
-        <h3>{{$t('laaja-alaisen-osaamisen-nimi')}} *</h3>
-        <ep-input v-model="data.nimi" :is-editing="true"></ep-input>
+      <div
+        v-if="isEditing"
+        class="mt-1"
+      >
+        <h3>{{ $t('laaja-alaisen-osaamisen-nimi') }} *</h3>
+        <ep-input
+          v-model="data.nimi"
+          :is-editing="true"
+        />
       </div>
       <div :class="{ 'mt-4': isEditing }">
-        <h3 v-if="isEditing">{{$t('kuvaus')}}</h3>
-        <ep-content v-model="data.kuvaus"
-                  layout="normal"
-                  :is-editable="isEditing"/>
+        <h3 v-if="isEditing">
+          {{ $t('kuvaus') }}
+        </h3>
+        <ep-content
+          v-model="data.kuvaus"
+          layout="normal"
+          :is-editable="isEditing"
+        />
       </div>
     </template>
   </EpEditointi>
-
 </template>
 
 <script setup lang="ts">

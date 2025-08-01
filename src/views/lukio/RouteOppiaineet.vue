@@ -1,44 +1,69 @@
 <template>
   <EpEditointi :store="store">
     <template #header>
-      <h3>{{$t('oppiaineet')}}</h3>
+      <h3>{{ $t('oppiaineet') }}</h3>
     </template>
     <template #muokkaa>
-      {{$t('muokkaa-jarjestysta')}}
+      {{ $t('muokkaa-jarjestysta') }}
     </template>
     <template #default="{ data, isEditing }">
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="add" @click="lisaaOppiaine" :disabled="isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-          {{ $t('uusi-oppiaine')}}
+        <EpButton
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+          variant="outline"
+          icon="add"
+          :disabled="isEditing"
+          @click="lisaaOppiaine"
+        >
+          {{ $t('uusi-oppiaine') }}
         </EpButton>
       </div>
 
-      <b-row class="border-bottom-1 m-0" v-if="data.oppiaineet.length > 0">
-        <b-col cols="5" class="font-weight-bold pb-2">{{$t('nimi')}}</b-col>
+      <b-row
+        v-if="data.oppiaineet.length > 0"
+        class="border-bottom-1 m-0"
+      >
+        <b-col
+          cols="5"
+          class="font-weight-bold pb-2"
+        >
+          {{ $t('nimi') }}
+        </b-col>
       </b-row>
 
       <VueDraggable
         v-bind="defaultDragOptions"
+        v-model="data.oppiaineet"
         tag="div"
-        v-model="data.oppiaineet">
-
-        <b-row v-for="(oppiaine, index) in data.oppiaineet" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
-          <b-col cols="5" class="d-flex">
-            <div class="order-handle mr-2" v-if="isEditing">
+      >
+        <b-row
+          v-for="(oppiaine, index) in data.oppiaineet"
+          :key="'lao'+index"
+          class="taulukko-rivi-varitys py-3 m-0"
+        >
+          <b-col
+            cols="5"
+            class="d-flex"
+          >
+            <div
+              v-if="isEditing"
+              class="order-handle mr-2"
+            >
               <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <div>
-              <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppiaine.id } }">{{ $kaanna(oppiaine.nimi) }}</router-link>
+              <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppiaine.id } }">
+                {{ $kaanna(oppiaine.nimi) }}
+              </router-link>
             </div>
           </b-col>
           <b-col cols="5">
-            <span v-if="oppiaine.muokattu">{{$sdt(oppiaine.muokattu)}}</span>
+            <span v-if="oppiaine.muokattu">{{ $sdt(oppiaine.muokattu) }}</span>
           </b-col>
         </b-row>
       </VueDraggable>
     </template>
   </EpEditointi>
-
 </template>
 
 <script setup lang="ts">

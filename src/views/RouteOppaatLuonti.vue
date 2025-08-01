@@ -1,22 +1,39 @@
 <template>
   <EpMainView>
     <b-container>
-      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel">
-
-        <template v-slot:pohja>
-
+      <EpSteps
+        :steps="steps"
+        :initial-step="0"
+        :on-save="onSave"
+        @cancel="onCancel"
+      >
+        <template #pohja>
           <div class="row">
-            <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
+            <legend class="col-form-label col-sm-2">
+              {{ $t('kayta-pohjana') }}
+            </legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
-                <b-form-radio class="p-2" v-model="tyyppi" value="oppaasta" name="tyyppi" :disabled="!oppaat || oppaat.length === 0">{{ $t('toinen-opas') }}</b-form-radio>
-                <div v-if="tyyppi === 'oppaasta'" class="ml-2">
+                <b-form-radio
+                  v-model="tyyppi"
+                  class="p-2"
+                  value="oppaasta"
+                  name="tyyppi"
+                  :disabled="!oppaat || oppaat.length === 0"
+                >
+                  {{ $t('toinen-opas') }}
+                </b-form-radio>
+                <div
+                  v-if="tyyppi === 'oppaasta'"
+                  class="ml-2"
+                >
                   <EpMultiSelect
                     v-if="oppaat"
                     v-model="data.pohja"
                     :placeholder="$t('valitse-opas')"
                     :is-editing="true"
-                    :options="oppaat">
+                    :options="oppaat"
+                  >
                     <template #singleLabel="{ option }">
                       {{ option.nimi }}
                     </template>
@@ -27,27 +44,46 @@
                   <EpSpinner v-else />
                 </div>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
-
+                <b-form-radio
+                  v-model="tyyppi"
+                  class="mt-3 p-2"
+                  value="uusi"
+                  name="tyyppi"
+                >
+                  {{ $t('luo-uusi') }}
+                </b-form-radio>
               </b-form-group>
             </div>
           </div>
         </template>
 
-        <template v-slot:tiedot>
-
-          <b-form-group :label="$t('oppaan-nimi') + ' *'" required class="pl-0">
-            <ep-input v-model="data.lokalisoituNimi" :is-editing="true" :placeholder="$t('kirjoita-oppaan-nimi')"
-                :validation="v$.data.lokalisoituNimi" />
+        <template #tiedot>
+          <b-form-group
+            :label="$t('oppaan-nimi') + ' *'"
+            required
+            class="pl-0"
+          >
+            <ep-input
+              v-model="data.lokalisoituNimi"
+              :is-editing="true"
+              :placeholder="$t('kirjoita-oppaan-nimi')"
+              :validation="v$.data.lokalisoituNimi"
+            />
           </b-form-group>
 
-          <b-form-group :label="$t('opastyoryhma') + ' *'" required class="pl-0">
-            <EpMultiSelect v-model="data.tyoryhma"
-                           v-if="tyoryhmat"
-                           :placeholder="$t('valitse-tyoryhma')"
-                           :search-identity="tyoryhmaSearchIdentity"
-                           :is-editing="true"
-                           :options="tyoryhmat">
+          <b-form-group
+            :label="$t('opastyoryhma') + ' *'"
+            required
+            class="pl-0"
+          >
+            <EpMultiSelect
+              v-if="tyoryhmat"
+              v-model="data.tyoryhma"
+              :placeholder="$t('valitse-tyoryhma')"
+              :search-identity="tyoryhmaSearchIdentity"
+              :is-editing="true"
+              :options="tyoryhmat"
+            >
               <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
@@ -58,42 +94,63 @@
             <EpSpinner v-else />
           </b-form-group>
 
-          <b-form-group :label="$t('koulutus-tutkintotyyppi')" required class="pl-0">
-
-            <div class="row" v-for="(koulutustyyppi, index) in data.koulutustyypit" :key="'koulutustyyppi'+index">
+          <b-form-group
+            :label="$t('koulutus-tutkintotyyppi')"
+            required
+            class="pl-0"
+          >
+            <div
+              v-for="(koulutustyyppi, index) in data.koulutustyypit"
+              :key="'koulutustyyppi'+index"
+              class="row"
+            >
               <koulutustyyppi-select
                 v-model="data.koulutustyypit[index]"
-                :isEditing="true"
+                :is-editing="true"
                 :koulutustyypit="koulutustyyppiOptions"
-                required class="mb-2 col-11"/>
+                required
+                class="mb-2 col-11"
+              />
               <div class="col-1">
-                <ep-button v-if="index > 0"
-                           buttonClass="p-0 pt-2 roskalaatikko"
-                           variant="link"
-                           icon="delete"
-                           @click="poistaKoulutustyyppi(index)"/>
+                <ep-button
+                  v-if="index > 0"
+                  button-class="p-0 pt-2 roskalaatikko"
+                  variant="link"
+                  icon="delete"
+                  @click="poistaKoulutustyyppi(index)"
+                />
               </div>
             </div>
-            <ep-button buttonClass="pl-0" variant="outline-primary" icon="add" @click="lisaaKoulutustyyppi">
-              {{$t('lisaa-koulutus-tutkintotyyppi')}}
+            <ep-button
+              button-class="pl-0"
+              variant="outline-primary"
+              icon="add"
+              @click="lisaaKoulutustyyppi"
+            >
+              {{ $t('lisaa-koulutus-tutkintotyyppi') }}
             </ep-button>
           </b-form-group>
 
-          <b-form-group :label="$t('peruste')" required class="pl-0">
-            <EpMultiListSelect v-model="data.perusteet"
-                           :is-editing="true"
-                           :items="perusteet"
-                           :required="true">
+          <b-form-group
+            :label="$t('peruste')"
+            required
+            class="pl-0"
+          >
+            <EpMultiListSelect
+              v-model="data.perusteet"
+              :is-editing="true"
+              :items="perusteet"
+              :required="true"
+            >
               <template #lisaaTeksti>
-                {{$t('lisaa-peruste')}}
+                {{ $t('lisaa-peruste') }}
               </template>
             </EpMultiListSelect>
           </b-form-group>
-
         </template>
 
         <template #luo>
-          {{$t('luo-opas')}}
+          {{ $t('luo-opas') }}
         </template>
       </EpSteps>
     </b-container>
@@ -160,7 +217,7 @@ watch(tyyppi, () => {
 const rules = {
   data: {
     lokalisoituNimi: requiredOneLang(),
-  }
+  },
 };
 
 const v$ = useVuelidate(rules, { data });

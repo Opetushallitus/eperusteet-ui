@@ -2,27 +2,33 @@
   <div class="mt-5">
     <div class="d-flex align-items-sm-center justify-content-sm-between flex-sm-row flex-column mb-1">
       <div class="d-flex">
-        <h2 class="m-0">{{ $t('arviointiasteikot') }}</h2>
-        <EpInfoPopover class="ml-3">{{ $t('arviointiasteikot-muokkaus-huomio-teksti') }}</EpInfoPopover>
+        <h2 class="m-0">
+          {{ $t('arviointiasteikot') }}
+        </h2>
+        <EpInfoPopover class="ml-3">
+          {{ $t('arviointiasteikot-muokkaus-huomio-teksti') }}
+        </EpInfoPopover>
       </div>
       <div class="mt-sm-0 mt-3">
         <div>
           <ep-button
             v-if="!isEditing"
+            v-oikeustarkastelu="{oikeus:'hallinta'}"
             variant="link"
             icon="edit"
-            @click="toggleEdit()"
             class="mt-sm-0 mt-3"
-            v-oikeustarkastelu="{oikeus:'hallinta'}">
+            @click="toggleEdit()"
+          >
             {{ $t('muokkaa') }}
           </ep-button>
           <ep-button
             v-if="!isEditing"
+            v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
             variant="link"
             icon="add"
-            @click="lisaaArviointiasteikko()"
             class="mt-sm-0 mt-3"
-            v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+            @click="lisaaArviointiasteikko()"
+          >
             {{ $t('lisaa-uusi') }}
           </ep-button>
         </div>
@@ -30,15 +36,17 @@
           <ep-button
             v-if="isEditing"
             variant="link"
-            @click="toggleEdit()">
-          {{ $t('peruuta') }}
+            @click="toggleEdit()"
+          >
+            {{ $t('peruuta') }}
           </ep-button>
           <ep-button
             v-if="isEditing"
             class="ml-2"
             variant="primary"
+            :show-spinner="isSaving"
             @click="saveArviointiAsteikko()"
-            :show-spinner="isSaving">
+          >
             {{ $t('tallenna') }}
           </ep-button>
         </div>
@@ -46,16 +54,21 @@
     </div>
     <div class="taso-wrapper">
       <template v-if="arviointiasteikot">
-        <div class="asteikko mt-4" v-for="(asteikko, idx) in arviointiasteikot" :key="asteikko.id">
+        <div
+          v-for="(asteikko, idx) in arviointiasteikot"
+          :key="asteikko.id"
+          class="asteikko mt-4"
+        >
           <span class="text-nowrap">
             <div class="d-flex align-text-top justify-content-between">
-              <h3>{{$t('arviointiasteikko') + ' ' + (idx+1)}}</h3>
+              <h3>{{ $t('arviointiasteikko') + ' ' + (idx+1) }}</h3>
               <ep-button
                 v-if="isEditing"
-                @click="poistaArviointiasteikko(asteikko)"
+                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
                 variant="link"
                 icon="delete"
-                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+                @click="poistaArviointiasteikko(asteikko)"
+              >
                 {{ $t('poista-arviointiasteikko') }}
               </ep-button>
             </div>
@@ -65,33 +78,44 @@
                 v-for="(taso, index) in asteikko.osaamistasot"
                 :key="taso.id"
                 class="taso py-2 text-wrap"
-                :class="{ 'pl-3': !isEditing, 'is-editing': isEditing }">
+                :class="{ 'pl-3': !isEditing, 'is-editing': isEditing }"
+              >
                 <template v-if="!isEditing">
                   {{ $kaanna(taso.otsikko) }}
                 </template>
-                <div class="d-flex w-100 align-items-end" v-else>
+                <div
+                  v-else
+                  class="d-flex w-100 align-items-end"
+                >
                   <b-form-group
                     class="w-50"
-                    :label="$t('osaamistaso') + ' ' + (index + 1)">
+                    :label="$t('osaamistaso') + ' ' + (index + 1)"
+                  >
                     <ep-input
-                      :name="$t('osaamistaso')"
                       v-model="taso.otsikko"
-                      :is-editing="true"/>
+                      :name="$t('osaamistaso')"
+                      :is-editing="true"
+                    />
                   </b-form-group>
 
                   <b-form-group class="w-40">
                     <ep-koodisto-select
-                      :store="koodisto"
                       v-model="taso.koodi"
+                      :store="koodisto"
                       :is-editing="isEditing"
-                      :naytaArvo="true">
+                      :nayta-arvo="true"
+                    >
                       <template #default="{ open }">
                         <b-input-group>
                           <b-form-input
                             :value="taso.koodi ? $kaanna(taso.koodi.nimi) : ''"
-                            disabled></b-form-input>
+                            disabled
+                          />
                           <b-input-group-append>
-                            <b-button @click="open" variant="primary">
+                            <b-button
+                              variant="primary"
+                              @click="open"
+                            >
                               {{ $t('hae-koodistosta') }}
                             </b-button>
                           </b-input-group-append>
@@ -101,19 +125,23 @@
                   </b-form-group>
 
                   <b-form-group>
-                    <div class="default-icon clickable mb-2 ml-4"
-                         @click="poistaOsaamistaso(asteikko, taso)"
-                         v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+                    <div
+                      v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
+                      class="default-icon clickable mb-2 ml-4"
+                      @click="poistaOsaamistaso(asteikko, taso)"
+                    >
                       <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
                     </div>
                   </b-form-group>
                 </div>
               </div>
-              <ep-button v-if="isEditing"
-                         variant="outline"
-                         icon="add"
-                         @click="lisaaOsaamistaso(asteikko)"
-                         v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}">
+              <ep-button
+                v-if="isEditing"
+                v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
+                variant="outline"
+                icon="add"
+                @click="lisaaOsaamistaso(asteikko)"
+              >
                 {{ $t('lisaa-osaamistaso') }}
               </ep-button>
             </div>

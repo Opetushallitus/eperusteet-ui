@@ -1,27 +1,91 @@
 <template>
   <div>
     <div v-if="isEditing">
-      <b-form-group >
+      <b-form-group>
         <template #label>
           <div class="d-flex justify-content-between">
-            <div>{{$t('osa-alueen-nimi')}}</div>
-            <slot name="poisto"></slot>
+            <div>{{ $t('osa-alueen-nimi') }}</div>
+            <slot name="poisto" />
           </div>
         </template>
-        <ep-input v-model="osaAlue.nimi" :is-editing="isEditing"/>
+        <ep-input
+          v-model="osaAlue.nimi"
+          :is-editing="isEditing"
+        />
       </b-form-group>
 
-      <hr/>
+      <hr>
 
-      <b-form-group v-for="(tasokuvaus, index) in osaAlue.tasokuvaukset" :key="'tasokuvaus' + index" :label="$t('osa-alue-otsiko-' + tasokuvaus.taso.toLowerCase())">
+      <b-form-group
+        v-for="(tasokuvaus, index) in osaAlue.tasokuvaukset"
+        :key="'tasokuvaus' + index"
+        :label="$t('osa-alue-otsiko-' + tasokuvaus.taso.toLowerCase())"
+      >
         <VueDraggable
-            v-bind="defaultDragOptions"
-            tag="div"
-            v-model="tasokuvaus.kuvaukset">
+          v-bind="defaultDragOptions"
+          v-model="tasokuvaus.kuvaukset"
+          tag="div"
+        >
+          <b-row
+            v-for="(kuvaus, kuvausIndex) in tasokuvaus.kuvaukset"
+            :key="'kuvaus'+kuvausIndex"
+            class="pb-2"
+          >
+            <b-col cols="11">
+              <ep-input
+                v-model="kuvaus[sisaltokieli]"
+                :is-editing="isEditing"
+                type="string"
+                class="flex-grow-1"
+              >
+                <template #left>
+                  <div class="order-handle m-2">
+                    <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                  </div>
+                </template>
+              </ep-input>
+            </b-col>
+            <b-col cols="1">
+              <div
+                class="default-icon clickable mt-2"
+                @click="poistaKuvaus('kuvaukset', kuvaus, tasokuvaus.taso)"
+              >
+                <EpMaterialIcon>delete</EpMaterialIcon>
+              </div>
+            </b-col>
+          </b-row>
+        </VueDraggable>
 
-            <b-row v-for="(kuvaus, kuvausIndex) in tasokuvaus.kuvaukset" :key="'kuvaus'+kuvausIndex" class="pb-2">
+        <ep-button
+          variant="outline"
+          icon="add"
+          class="mt-2"
+          @click="lisaaKuvaus('kuvaukset', tasokuvaus.taso)"
+        >
+          {{ $t('lisaa-kuvaus') }}
+        </ep-button>
+
+        <template v-if="tasokuvaus.taso === 'VUOSILUOKKA_12' || tasokuvaus.taso === 'VUOSILUOKKA_3456' || tasokuvaus.taso === 'VUOSILUOKKA_789'">
+          <div class="mt-3 mb-2">
+            {{ $t('edistynyt-osaaminen') }}
+          </div>
+          <VueDraggable
+            v-bind="defaultDragOptions"
+            v-model="tasokuvaus.edistynytOsaaminenKuvaukset"
+            tag="div"
+          >
+            <b-row
+              v-for="(kuvaus, kuvausIndex) in tasokuvaus.edistynytOsaaminenKuvaukset"
+              :key="'kuvaus'+kuvausIndex"
+              class="pb-2"
+            >
               <b-col cols="11">
-                <ep-input v-model="kuvaus[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
+                <ep-input
+                  v-model="kuvaus[sisaltokieli]"
+                  :is-editing="isEditing"
+                  type="string"
+                  class="flex-grow-1"
+                >
                   <template #left>
                     <div class="order-handle m-2">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -30,74 +94,74 @@
                 </ep-input>
               </b-col>
               <b-col cols="1">
-                <div class="default-icon clickable mt-2" @click="poistaKuvaus('kuvaukset', kuvaus, tasokuvaus.taso)">
+                <div
+                  class="default-icon clickable mt-2"
+                  @click="poistaKuvaus('edistynytOsaaminenKuvaukset', kuvaus, tasokuvaus.taso)"
+                >
                   <EpMaterialIcon>delete</EpMaterialIcon>
                 </div>
               </b-col>
             </b-row>
-
           </VueDraggable>
 
-          <ep-button @click="lisaaKuvaus('kuvaukset', tasokuvaus.taso)" variant="outline" icon="add" class="mt-2">
+          <ep-button
+            variant="outline"
+            icon="add"
+            class="mt-1"
+            @click="lisaaKuvaus('edistynytOsaaminenKuvaukset', tasokuvaus.taso)"
+          >
             {{ $t('lisaa-kuvaus') }}
           </ep-button>
+        </template>
 
-          <template v-if="tasokuvaus.taso === 'VUOSILUOKKA_12' || tasokuvaus.taso === 'VUOSILUOKKA_3456' || tasokuvaus.taso === 'VUOSILUOKKA_789'">
-            <div class="mt-3 mb-2">{{$t('edistynyt-osaaminen')}}</div>
-            <VueDraggable
-              v-bind="defaultDragOptions"
-              tag="div"
-              v-model="tasokuvaus.edistynytOsaaminenKuvaukset">
-
-              <b-row v-for="(kuvaus, kuvausIndex) in tasokuvaus.edistynytOsaaminenKuvaukset" :key="'kuvaus'+kuvausIndex" class="pb-2">
-                <b-col cols="11">
-                  <ep-input v-model="kuvaus[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
-                    <template #left>
-                      <div class="order-handle m-2">
-                        <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                      </div>
-                    </template>
-                  </ep-input>
-                </b-col>
-                <b-col cols="1">
-                  <div class="default-icon clickable mt-2" @click="poistaKuvaus('edistynytOsaaminenKuvaukset', kuvaus, tasokuvaus.taso)">
-                    <EpMaterialIcon>delete</EpMaterialIcon>
-                  </div>
-                </b-col>
-              </b-row>
-            </VueDraggable>
-
-            <ep-button @click="lisaaKuvaus('edistynytOsaaminenKuvaukset', tasokuvaus.taso)" variant="outline" icon="add" class="mt-1">
-              {{ $t('lisaa-kuvaus') }}
-            </ep-button>
-          </template>
-
-        <hr/>
+        <hr>
       </b-form-group>
-
     </div>
 
     <div v-else>
       <h3>{{ $kaanna(osaAlue.nimi) }}</h3>
 
-      <div v-for="(tasokuvaus, index) in osaAlue.tasokuvaukset" :key="'tasokuvaus' + index">
-        <b-form-group class="mt-3" v-if="(tasokuvaus.kuvaukset && tasokuvaus.kuvaukset.length > 0) || (tasokuvaus.edistynytOsaaminenKuvaukset && tasokuvaus.edistynytOsaaminenKuvaukset.length > 0)" :label="$t('osa-alue-otsiko-' + tasokuvaus.taso.toLowerCase())">
-          <ul v-if="tasokuvaus.kuvaukset && tasokuvaus.kuvaukset.length > 0" class="mb-4">
-            <li v-for="(kuvaus, kuvausIndex) in tasokuvaus.kuvaukset" :key="'kuvaus' + index + kuvausIndex">{{$kaanna(kuvaus)}}</li>
+      <div
+        v-for="(tasokuvaus, index) in osaAlue.tasokuvaukset"
+        :key="'tasokuvaus' + index"
+      >
+        <b-form-group
+          v-if="(tasokuvaus.kuvaukset && tasokuvaus.kuvaukset.length > 0) || (tasokuvaus.edistynytOsaaminenKuvaukset && tasokuvaus.edistynytOsaaminenKuvaukset.length > 0)"
+          class="mt-3"
+          :label="$t('osa-alue-otsiko-' + tasokuvaus.taso.toLowerCase())"
+        >
+          <ul
+            v-if="tasokuvaus.kuvaukset && tasokuvaus.kuvaukset.length > 0"
+            class="mb-4"
+          >
+            <li
+              v-for="(kuvaus, kuvausIndex) in tasokuvaus.kuvaukset"
+              :key="'kuvaus' + index + kuvausIndex"
+            >
+              {{ $kaanna(kuvaus) }}
+            </li>
           </ul>
 
-          <div v-if="tasokuvaus.edistynytOsaaminenKuvaukset && tasokuvaus.edistynytOsaaminenKuvaukset.length > 0" class="mb-3">
-            <div class="ml-3 mb-2">{{$t('edistynyt-osaaminen')}}</div>
+          <div
+            v-if="tasokuvaus.edistynytOsaaminenKuvaukset && tasokuvaus.edistynytOsaaminenKuvaukset.length > 0"
+            class="mb-3"
+          >
+            <div class="ml-3 mb-2">
+              {{ $t('edistynyt-osaaminen') }}
+            </div>
             <ul>
-              <li v-for="(edistynytKuvaus, kuvausIndex) in tasokuvaus.edistynytOsaaminenKuvaukset" :key="'edistynytkuvaus' + index + kuvausIndex">{{$kaanna(edistynytKuvaus)}}</li>
+              <li
+                v-for="(edistynytKuvaus, kuvausIndex) in tasokuvaus.edistynytOsaaminenKuvaukset"
+                :key="'edistynytkuvaus' + index + kuvausIndex"
+              >
+                {{ $kaanna(edistynytKuvaus) }}
+              </li>
             </ul>
           </div>
         </b-form-group>
       </div>
     </div>
-
   </div>
-
 </template>
 
 <script setup lang="ts">

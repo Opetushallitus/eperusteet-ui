@@ -1,19 +1,39 @@
 <template>
   <div>
-    <ep-button v-if="isEditing" icon="edit" @click="avaa" variant="link" class="muokkaa mb-3">
-      {{$t('muokkaa-sisaltoalueita')}}
+    <ep-button
+      v-if="isEditing"
+      icon="edit"
+      variant="link"
+      class="muokkaa mb-3"
+      @click="avaa"
+    >
+      {{ $t('muokkaa-sisaltoalueita') }}
     </ep-button>
 
-    <ep-content layout="normal" v-if="model.sisaltoalueinfo && model.sisaltoalueinfo.teksti" v-model="model.sisaltoalueinfo.teksti" :is-editable="false"> </ep-content>
-    <div v-for="(sisaltoalue, index) in model.sisaltoalueet" :key="'sisaltoalue' + index" class="mt-4">
-      <h4>{{ $kaanna(sisaltoalue.nimi)}}</h4>
-      <ep-content layout="normal" v-if="sisaltoalue.kuvaus" v-model="sisaltoalue.kuvaus" :is-editable="false"> </ep-content>
+    <ep-content
+      v-if="model.sisaltoalueinfo && model.sisaltoalueinfo.teksti"
+      v-model="model.sisaltoalueinfo.teksti"
+      layout="normal"
+      :is-editable="false"
+    />
+    <div
+      v-for="(sisaltoalue, index) in model.sisaltoalueet"
+      :key="'sisaltoalue' + index"
+      class="mt-4"
+    >
+      <h4>{{ $kaanna(sisaltoalue.nimi) }}</h4>
+      <ep-content
+        v-if="sisaltoalue.kuvaus"
+        v-model="sisaltoalue.kuvaus"
+        layout="normal"
+        :is-editable="false"
+      />
     </div>
 
     <b-modal
       ref="EpSisaltoalueetEditModal"
-      size="xl">
-
+      size="xl"
+    >
       <template #modal-header>
         <div class="d-flex justify-content-between w-100">
           <div>{{ title }}</div>
@@ -21,55 +41,101 @@
         </div>
       </template>
 
-      <h4>{{$t('sisaltoalueen-otsikko')}}</h4>
-      <ep-input v-model="model.sisaltoalueinfo.otsikko" :is-editing="true"></ep-input>
+      <h4>{{ $t('sisaltoalueen-otsikko') }}</h4>
+      <ep-input
+        v-model="model.sisaltoalueinfo.otsikko"
+        :is-editing="true"
+      />
 
-      <h4 class="mt-4">{{$t('sisaltoalueen-kuvaus')}}</h4>
-      <ep-content layout="normal" v-model="model.sisaltoalueinfo.teksti" :is-editable="true"> </ep-content>
+      <h4 class="mt-4">
+        {{ $t('sisaltoalueen-kuvaus') }}
+      </h4>
+      <ep-content
+        v-model="model.sisaltoalueinfo.teksti"
+        layout="normal"
+        :is-editable="true"
+      />
 
       <VueDraggable
         v-bind="sisaltoalueetDragOptions"
+        v-model="model.sisaltoalueet"
         tag="div"
-        v-model="model.sisaltoalueet">
-
-        <div v-for="(sisaltoalue, index) in model.sisaltoalueet" :key="'sisaltoalue' + index" class="mt-4">
-          <div class="d-flex" >
+      >
+        <div
+          v-for="(sisaltoalue, index) in model.sisaltoalueet"
+          :key="'sisaltoalue' + index"
+          class="mt-4"
+        >
+          <div class="d-flex">
             <div class="order-handle mr-3">
               <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <h4>{{ $t('sisaltoalueen-nimi') }}</h4>
           </div>
           <div class="ml-4">
-            <ep-input v-model="sisaltoalue.nimi" :is-editing="true"></ep-input>
+            <ep-input
+              v-model="sisaltoalue.nimi"
+              :is-editing="true"
+            />
 
-            <h4 class="mt-4">{{ $t('sisaltoalueen-kuvaus') }}</h4>
-            <ep-content layout="normal" v-model="sisaltoalue.kuvaus" :is-editable="true"> </ep-content>
+            <h4 class="mt-4">
+              {{ $t('sisaltoalueen-kuvaus') }}
+            </h4>
+            <ep-content
+              v-model="sisaltoalue.kuvaus"
+              layout="normal"
+              :is-editable="true"
+            />
           </div>
 
           <div class="d-flex justify-content-between mt-1 ml-3">
-            <ep-button variant="outline-primary" icon="add" v-if="model.sisaltoalueet && index+1 === model.sisaltoalueet.length" @click="lisaaSisaltoalue()">
+            <ep-button
+              v-if="model.sisaltoalueet && index+1 === model.sisaltoalueet.length"
+              variant="outline-primary"
+              icon="add"
+              @click="lisaaSisaltoalue()"
+            >
               {{ $t('lisaa-sisaltoalue') }}
             </ep-button>
-            <div v-else/>
+            <div v-else />
 
-            <ep-button variant="link" icon="delete" @click="poistaSisaltoalue(sisaltoalue)">
+            <ep-button
+              variant="link"
+              icon="delete"
+              @click="poistaSisaltoalue(sisaltoalue)"
+            >
               {{ $t('poista-sisaltoalue') }}
             </ep-button>
           </div>
         </div>
       </VueDraggable>
 
-      <ep-button variant="outline-primary" icon="add" v-if="model.sisaltoalueet && model.sisaltoalueet.length === 0" @click="lisaaSisaltoalue()" class="mt-3">
+      <ep-button
+        v-if="model.sisaltoalueet && model.sisaltoalueet.length === 0"
+        variant="outline-primary"
+        icon="add"
+        class="mt-3"
+        @click="lisaaSisaltoalue()"
+      >
         {{ $t('lisaa-sisaltoalue') }}
       </ep-button>
 
       <template #modal-footer>
         <div>
-          <ep-button @click="peruuta" variant="link">{{ $t('peruuta')}}</ep-button>
-          <ep-button :showSpinner="tallennetaan" @click="tallenna">{{ $t('tallenna')}}</ep-button>
+          <ep-button
+            variant="link"
+            @click="peruuta"
+          >
+            {{ $t('peruuta') }}
+          </ep-button>
+          <ep-button
+            :show-spinner="tallennetaan"
+            @click="tallenna"
+          >
+            {{ $t('tallenna') }}
+          </ep-button>
         </div>
       </template>
-
     </b-modal>
   </div>
 </template>

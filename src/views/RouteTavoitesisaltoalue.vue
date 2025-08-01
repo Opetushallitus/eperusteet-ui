@@ -1,21 +1,44 @@
 <template>
-  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
+  <EpEditointi
+    v-if="store"
+    :store="store"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2
+        v-if="data.nimiKoodi"
+        class="m-0"
+      >
+        {{ $kaanna(data.nimiKoodi.nimi) }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing }">
-
-      <b-row v-if="isEditing" class="mb-4">
+    <template #default="{ data, isEditing }">
+      <b-row
+        v-if="isEditing"
+        class="mb-4"
+      >
         <b-col lg="8">
-          <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
-            <ep-koodisto-select :store="tavoitesisaltoalueotsikkoKoodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
+          <b-form-group
+            :label="$t('otsikko') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-koodisto-select
+              v-model="data.nimiKoodi"
+              :store="tavoitesisaltoalueotsikkoKoodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -29,24 +52,34 @@
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <template v-if="isEditing" #label>
-              <div>{{$t('kappaleen-teksti')}}</div>
+            <template
+              v-if="isEditing"
+              #label
+            >
+              <div>{{ $t('kappaleen-teksti') }}</div>
             </template>
-            <ep-content v-model="data.teksti"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+            <ep-content
+              v-model="data.teksti"
+              layout="normal"
+              :is-editable="isEditing"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
 
-          <hr/>
+          <hr>
         </b-col>
       </b-row>
 
-      <h3 class="mb-4">{{$t('tavoitteet-ja-keskeiset-sisaltoalueet')}}</h3>
+      <h3 class="mb-4">
+        {{ $t('tavoitteet-ja-keskeiset-sisaltoalueet') }}
+      </h3>
       <b-row>
         <b-col lg="8">
-          <EpTavoitesisaltoalueTavoitealueet v-model="data.tavoitealueet" :isEditing="isEditing"/>
+          <EpTavoitesisaltoalueTavoitealueet
+            v-model="data.tavoitealueet"
+            :is-editing="isEditing"
+          />
         </b-col>
       </b-row>
     </template>

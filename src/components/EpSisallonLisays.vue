@@ -1,64 +1,82 @@
 <template>
   <div class="mt-2">
     <ep-tekstikappale-lisays
+      v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
       :tallenna="tallennaUusiTekstikappale"
       :tekstikappaleet="perusteenOsat"
       :paatasovalinta="true"
-      :osaamisalat="osaamisalat"
-      v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-      <template v-slot:default="{tekstikappale}">
+    >
+      <template #default="{tekstikappale}">
         <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
         {{ $kaanna(tekstikappale.label) }}
       </template>
     </ep-tekstikappale-lisays>
 
     <template v-if="lisasisaltoLisays.length > 0">
-      <div v-for="(lisasisalto, index) in lisasisaltoLisays" :key="'lisasisalto'+index">
-
-        <b-dropdown v-if="lisasisalto.groupedSisalto && lisasisalto.groupedSisalto.length > 0"
-                    variant="link"
-                    class="lisasisalto-dropdown mt-2"
-                    toggle-class="text-decoration-none"
-                    no-caret>
-          <template v-slot:button-content>
-            <ep-button variant="link" buttonClass="text-decoration-none">
-              <EpMaterialIcon :color="'inherit'" :background="'inherit'" size="18px">add</EpMaterialIcon>
+      <div
+        v-for="(lisasisalto, index) in lisasisaltoLisays"
+        :key="'lisasisalto'+index"
+      >
+        <b-dropdown
+          v-if="lisasisalto.groupedSisalto && lisasisalto.groupedSisalto.length > 0"
+          variant="link"
+          class="lisasisalto-dropdown mt-2"
+          toggle-class="text-decoration-none"
+          no-caret
+        >
+          <template #button-content>
+            <ep-button
+              variant="link"
+              button-class="text-decoration-none"
+            >
+              <EpMaterialIcon
+                :color="'inherit'"
+                :background="'inherit'"
+                size="18px"
+              >
+                add
+              </EpMaterialIcon>
               {{ $t(lisasisalto.groupedLinkkiteksti) }}
             </ep-button>
           </template>
 
-          <div v-for="(groupedLisasisalto, index) in lisasisalto.groupedSisalto" :key="'groupedLisasisalto'+index">
-
-            <hr v-if="index > 0" class="mt-2 mb-2"/>
+          <div
+            v-for="(groupedLisasisalto, index) in lisasisalto.groupedSisalto"
+            :key="'groupedLisasisalto'+index"
+          >
+            <hr
+              v-if="index > 0"
+              class="mt-2 mb-2"
+            >
 
             <ep-tekstikappale-lisays
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
               :tallenna="groupedLisasisalto.save"
               :tekstikappaleet="perusteenOsat"
               :paatasovalinta="true"
-              :otsikkoRequired="false"
-              :modalId="'groupedLisasisaltoLisays'+index"
-              v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-              <template v-slot:lisays-btn-icon>
-                <span/>
+              :otsikko-required="false"
+              :modal-id="'groupedLisasisaltoLisays'+index"
+            >
+              <template #lisays-btn-icon>
+                <span />
               </template>
-              <template v-slot:lisays-btn-text>
+              <template #lisays-btn-text>
                 {{ $t(groupedLisasisalto.label['uusi']) }}
               </template>
-              <template v-slot:modal-title>
+              <template #modal-title>
                 {{ $t(groupedLisasisalto.label['uusi']) }}
               </template>
-              <template v-slot:footer-lisays-btn-text>
+              <template #footer-lisays-btn-text>
                 {{ $t(groupedLisasisalto.label['lisaa']) }}
               </template>
-              <template v-slot:header>
+              <template #header>
                 {{ $t(groupedLisasisalto.label['sijainti']) }}
               </template>
-              <template v-slot:default="{tekstikappale}">
+              <template #default="{tekstikappale}">
                 <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
                 {{ $kaanna(tekstikappale.label) }}
               </template>
             </ep-tekstikappale-lisays>
-
           </div>
         </b-dropdown>
 
@@ -66,42 +84,48 @@
           v-else-if="lisasisalto.call"
           v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           variant="link"
-          buttonClass="text-decoration-none"
+          button-class="text-decoration-none"
+          :show-spinner="loading"
           @click="makeCall(lisasisalto.call)"
-          :showSpinner="loading">
-          <EpMaterialIcon :color="'inherit'" :background="'inherit'" size="18px">add</EpMaterialIcon>
+        >
+          <EpMaterialIcon
+            :color="'inherit'"
+            :background="'inherit'"
+            size="18px"
+          >
+            add
+          </EpMaterialIcon>
           {{ $t(lisasisalto.label['uusi']) }}
         </ep-button>
 
         <ep-tekstikappale-lisays
           v-else
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           :tallenna="lisasisalto.save"
           :tekstikappaleet="perusteenOsat"
           :paatasovalinta="true"
-          :otsikkoRequired="false"
-          :modalId="'lisasisaltoLisays'+index"
-          v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-          <template v-slot:lisays-btn-text>
+          :otsikko-required="false"
+          :modal-id="'lisasisaltoLisays'+index"
+        >
+          <template #lisays-btn-text>
             {{ $t(lisasisalto.label['uusi']) }}
           </template>
-          <template v-slot:modal-title>
+          <template #modal-title>
             {{ $t(lisasisalto.label['uusi']) }}
           </template>
-          <template v-slot:footer-lisays-btn-text>
+          <template #footer-lisays-btn-text>
             {{ $t(lisasisalto.label['lisaa']) }}
           </template>
-          <template v-slot:header>
+          <template #header>
             {{ $t(lisasisalto.label['sijainti']) }}
           </template>
-          <template v-slot:default="{tekstikappale}">
+          <template #default="{tekstikappale}">
             <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
             {{ $kaanna(tekstikappale.label) }}
           </template>
         </ep-tekstikappale-lisays>
       </div>
-
     </template>
-
   </div>
 </template>
 

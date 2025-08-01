@@ -1,148 +1,196 @@
 <template>
-    <ep-spinner v-if="!toteutussuunnitelmat" />
-    <div v-else>
-
-      <div class="row">
-        <div class="col-xl-3 col-md-6 col-sm-12">
-          <ep-form-content name="nimi">
-            <ep-search v-model="query" :placeholder="$t('etsi-toteutussuunnitelmia')"/>
-          </ep-form-content>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-sm-12">
-          <ep-form-content name="koulutustyyppi">
-            <ep-multi-select :multiple="true"
-              id="koulutustyyppiFilter"
-              :is-editing="true"
-              :options="koulutustyyppiItems"
-              v-model="valitutKoulutustyypit"
-              :placeholder="$t('kaikki')"
-              track-by="value"
-              label="text">
-            </ep-multi-select>
-          </ep-form-content>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-sm-12">
-          <ep-form-content name="tila">
-            <ep-multi-select :multiple="true"
-              id="tilaFilter"
-              :is-editing="true"
-              :options="tilaItems"
-              v-model="valitutTilat"
-              :placeholder="$t('kaikki')"
-              track-by="value"
-              label="text">
-            </ep-multi-select>
-          </ep-form-content>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-sm-12">
-          <ep-form-content name="voimassaolo">
-            <ep-multi-select :multiple="true"
-              id="voimassaoloFilter"
-              :is-editing="true"
-              :options="voimassaoloItems"
-              v-model="valitutVoimassaolot"
-              :placeholder="$t('kaikki')"
-              track-by="value"
-              label="text">
-            </ep-multi-select>
-          </ep-form-content>
-        </div>
-
-        <EpTilastoAikavaliVertailu class="col-12" v-model="aikavali"/>
-
-        <div class="col-xl-6 col-md-6 col-sm-12">
-          <ep-form-content name="peruste">
-            <ep-multi-select :multiple="true"
-              id="perusteFilter"
-              :is-editing="true"
-              :options="perusteItems"
-              v-model="valitutPerusteet"
-              :placeholder="$t('kaikki')"
-              track-by="value"
-              label="text">
-            </ep-multi-select>
-          </ep-form-content>
-        </div>
-
-        <div class="col-xl-6 col-md-6 col-sm-12">
-          <ep-form-content name="koulutustoimija">
-            <ep-multi-select :multiple="true"
-              id="koulutustoimijaFilter"
-              :is-editing="true"
-              :options="koulutustoimijaItems"
-              v-model="valitutKoulutustoimijat"
-              :placeholder="$t('kaikki')"
-              track-by="value"
-              label="text">
-            </ep-multi-select>
-          </ep-form-content>
-        </div>
+  <ep-spinner v-if="!toteutussuunnitelmat" />
+  <div v-else>
+    <div class="row">
+      <div class="col-xl-3 col-md-6 col-sm-12">
+        <ep-form-content name="nimi">
+          <ep-search
+            v-model="query"
+            :placeholder="$t('etsi-toteutussuunnitelmia')"
+          />
+        </ep-form-content>
       </div>
 
-      <h2 class="mt-5">{{$t('toteutussuunnitelmien-lukumaarat')}} </h2>
-
-      <div class="row">
-        <div class="col-xl-4 col-md-6 col-sm-12 tilastotyyppi" v-for="(tilastotieto,i) in statistiikkaData" :key="i">
-          <div class="otsake">{{$t(tilastotieto.otsikko)}}</div>
-          <apexchart type="donut" :options="tilastotieto.graafiAvaimet" :series="tilastotieto.graafiData" v-if="toteutussuunnitelmatFiltered.length > 0"/>
-          <apexchart type="donut" :options="tyhjaGraafiOptions" :series="tyhjaGraafiData" v-else/>
-        </div>
+      <div class="col-xl-3 col-md-6 col-sm-12">
+        <ep-form-content name="koulutustyyppi">
+          <ep-multi-select
+            id="koulutustyyppiFilter"
+            v-model="valitutKoulutustyypit"
+            :multiple="true"
+            :is-editing="true"
+            :options="koulutustyyppiItems"
+            :placeholder="$t('kaikki')"
+            track-by="value"
+            label="text"
+          />
+        </ep-form-content>
       </div>
 
-      <h2 class="mt-5">
-        <span>{{$t('toteutussuunnitelmat')}} {{toteutussuunnitelmatFiltered.length}} {{$t('kpl')}}</span>
-        <EpButton class="ml-5" variant="link" @click="downloadTiedosto('csv')" noPadding>Lataa csv</EpButton>
-        <EpButton variant="link" @click="downloadTiedosto('xlsx')" noPadding>Lataa xlsx</EpButton>
-      </h2>
+      <div class="col-xl-3 col-md-6 col-sm-12">
+        <ep-form-content name="tila">
+          <ep-multi-select
+            id="tilaFilter"
+            v-model="valitutTilat"
+            :multiple="true"
+            :is-editing="true"
+            :options="tilaItems"
+            :placeholder="$t('kaikki')"
+            track-by="value"
+            label="text"
+          />
+        </ep-form-content>
+      </div>
 
-      <b-table responsive
-                borderless
-                striped
-                fixed
-                :items="toteutussuunnitelmatFiltered"
-                :fields="toteutussuunnitelmaFields"
-                :current-page="opsPage"
-                :per-page="perPage">
-        <template v-slot:cell(nimi)="{item, value}">
-          <template v-if="item">
-            <a :href="item.url" rel="noopener noreferrer" target="_blank">{{ value }}</a>
-          </template>
-        </template>
-      </b-table>
+      <div class="col-xl-3 col-md-6 col-sm-12">
+        <ep-form-content name="voimassaolo">
+          <ep-multi-select
+            id="voimassaoloFilter"
+            v-model="valitutVoimassaolot"
+            :multiple="true"
+            :is-editing="true"
+            :options="voimassaoloItems"
+            :placeholder="$t('kaikki')"
+            track-by="value"
+            label="text"
+          />
+        </ep-form-content>
+      </div>
 
-      <b-pagination
-        v-model="opsPage"
-        :total-rows="toteutussuunnitelmatFiltered.length"
-        :per-page="perPage"
-        aria-controls="opetussuunnitelmat"
-        align="center">
-      </b-pagination>
+      <EpTilastoAikavaliVertailu
+        v-model="aikavali"
+        class="col-12"
+      />
 
-      <h2 class="mt-5">{{$t('koulutustoimijat')}} {{koulutustoimijatFiltered.length}} {{$t('kpl')}}</h2>
+      <div class="col-xl-6 col-md-6 col-sm-12">
+        <ep-form-content name="peruste">
+          <ep-multi-select
+            id="perusteFilter"
+            v-model="valitutPerusteet"
+            :multiple="true"
+            :is-editing="true"
+            :options="perusteItems"
+            :placeholder="$t('kaikki')"
+            track-by="value"
+            label="text"
+          />
+        </ep-form-content>
+      </div>
 
-      <b-table responsive
-                borderless
-                striped
-                fixed
-                :items="koulutustoimijatFiltered"
-                :fields="koulutustoimijaFields"
-                :current-page="ktPage"
-                :per-page="perPage">
-      </b-table>
-
-      <b-pagination
-        v-model="ktPage"
-        :total-rows="koulutustoimijatFiltered.length"
-        :per-page="perPage"
-        aria-controls="opetussuunnitelmat"
-        align="center">
-      </b-pagination>
-
+      <div class="col-xl-6 col-md-6 col-sm-12">
+        <ep-form-content name="koulutustoimija">
+          <ep-multi-select
+            id="koulutustoimijaFilter"
+            v-model="valitutKoulutustoimijat"
+            :multiple="true"
+            :is-editing="true"
+            :options="koulutustoimijaItems"
+            :placeholder="$t('kaikki')"
+            track-by="value"
+            label="text"
+          />
+        </ep-form-content>
+      </div>
     </div>
 
+    <h2 class="mt-5">
+      {{ $t('toteutussuunnitelmien-lukumaarat') }}
+    </h2>
+
+    <div class="row">
+      <div
+        v-for="(tilastotieto,i) in statistiikkaData"
+        :key="i"
+        class="col-xl-4 col-md-6 col-sm-12 tilastotyyppi"
+      >
+        <div class="otsake">
+          {{ $t(tilastotieto.otsikko) }}
+        </div>
+        <apexchart
+          v-if="toteutussuunnitelmatFiltered.length > 0"
+          type="donut"
+          :options="tilastotieto.graafiAvaimet"
+          :series="tilastotieto.graafiData"
+        />
+        <apexchart
+          v-else
+          type="donut"
+          :options="tyhjaGraafiOptions"
+          :series="tyhjaGraafiData"
+        />
+      </div>
+    </div>
+
+    <h2 class="mt-5">
+      <span>{{ $t('toteutussuunnitelmat') }} {{ toteutussuunnitelmatFiltered.length }} {{ $t('kpl') }}</span>
+      <EpButton
+        class="ml-5"
+        variant="link"
+        no-padding
+        @click="downloadTiedosto('csv')"
+      >
+        Lataa csv
+      </EpButton>
+      <EpButton
+        variant="link"
+        no-padding
+        @click="downloadTiedosto('xlsx')"
+      >
+        Lataa xlsx
+      </EpButton>
+    </h2>
+
+    <b-table
+      responsive
+      borderless
+      striped
+      fixed
+      :items="toteutussuunnitelmatFiltered"
+      :fields="toteutussuunnitelmaFields"
+      :current-page="opsPage"
+      :per-page="perPage"
+    >
+      <template #cell(nimi)="{item, value}">
+        <template v-if="item">
+          <a
+            :href="item.url"
+            rel="noopener noreferrer"
+            target="_blank"
+          >{{ value }}</a>
+        </template>
+      </template>
+    </b-table>
+
+    <b-pagination
+      v-model="opsPage"
+      :total-rows="toteutussuunnitelmatFiltered.length"
+      :per-page="perPage"
+      aria-controls="opetussuunnitelmat"
+      align="center"
+    />
+
+    <h2 class="mt-5">
+      {{ $t('koulutustoimijat') }} {{ koulutustoimijatFiltered.length }} {{ $t('kpl') }}
+    </h2>
+
+    <b-table
+      responsive
+      borderless
+      striped
+      fixed
+      :items="koulutustoimijatFiltered"
+      :fields="koulutustoimijaFields"
+      :current-page="ktPage"
+      :per-page="perPage"
+    />
+
+    <b-pagination
+      v-model="ktPage"
+      :total-rows="koulutustoimijatFiltered.length"
+      :per-page="perPage"
+      aria-controls="opetussuunnitelmat"
+      align="center"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -244,8 +292,8 @@ function aikavertailu(toteutussuunnitelma: Toteutussuunnitelma) {
     return false;
   }
 
-  return toteutussuunnitelma[aikavaliValue.value] >= aikavaliAlkuVrt.value &&
-         toteutussuunnitelma[aikavaliValue.value] <= aikavaliLoppuVrt.value;
+  return toteutussuunnitelma[aikavaliValue.value] >= aikavaliAlkuVrt.value
+         && toteutussuunnitelma[aikavaliValue.value] <= aikavaliLoppuVrt.value;
 }
 
 function toteutussuunnitelmaVoimassaolo(toteutussuunnitelma: Toteutussuunnitelma) {

@@ -1,57 +1,105 @@
 <template>
   <div class="minfull p-0 m-0">
-    <Teleport defer to="#headerExtension">
+    <Teleport
+      defer
+      to="#headerExtension"
+    >
       <div class="portal-menu d-flex">
         <div class="upper-left">
           <EpValidPopover
             :validoitava="peruste"
             :validoinnit="validoinnit"
-            :julkaisemattomiaMuutoksia="julkaisemattomiaMuutoksia"
+            :julkaisemattomia-muutoksia="julkaisemattomiaMuutoksia"
             :julkaistava="!isPohja"
             :is-validating="isValidating"
+            tyyppi="peruste"
+            :julkaisu-route="julkaisuRoute"
             @aseta-valmiiksi="asetaPohjaValmiiksi"
             @palauta="palauta"
             @validoi="validoi"
-            tyyppi="peruste"
-            :julkaisu-route="julkaisuRoute"/>
-
+          />
         </div>
         <div class="flex-grow-1 align-self-center">
-          <div class="mb-5 p-2" v-if="peruste && projekti">
+          <div
+            v-if="peruste && projekti"
+            class="mb-5 p-2"
+          >
             <h1>
-              <span>{{nimi}}</span>
+              <span>{{ nimi }}</span>
             </h1>
-            <div class="diaarinumero mt-2" v-if="showNavigation">
+            <div
+              v-if="showNavigation"
+              class="diaarinumero mt-2"
+            >
               <span v-if="peruste.koulutustyyppi">{{ $t(peruste.koulutustyyppi) }}<span class="mx-2">|</span></span>
               <span v-if="peruste.diaarinumero">{{ peruste.diaarinumero }}<span class="mx-2">|</span></span>
 
-              <b-dropdown class="asetukset" size="sm" no-caret variant="transparent">
+              <b-dropdown
+                class="asetukset"
+                size="sm"
+                no-caret
+                variant="transparent"
+              >
                 <template #button-content>
-                  <EpSpinner v-if="hallintaLoading" color="white"/>
+                  <EpSpinner
+                    v-if="hallintaLoading"
+                    color="white"
+                  />
                   <template v-else>
-                    <span>{{$t('lisatoiminnot')}}</span>
-                    <EpMaterialIcon icon-shape="outlined" class="hallinta" size="22px">expand_more</EpMaterialIcon>
+                    <span>{{ $t('lisatoiminnot') }}</span>
+                    <EpMaterialIcon
+                      icon-shape="outlined"
+                      class="hallinta"
+                      size="22px"
+                    >
+                      expand_more
+                    </EpMaterialIcon>
                   </template>
                 </template>
 
-                <div v-for="(ratasvalinta, index) in ratasvalintaFiltered" :key="'ratasvalinta'+index">
-                  <hr v-if="ratasvalinta.separator && index !== (ratasvalintaFiltered.length - 1)" class="mt-2 mb-2" />
+                <div
+                  v-for="(ratasvalinta, index) in ratasvalintaFiltered"
+                  :key="'ratasvalinta'+index"
+                >
+                  <hr
+                    v-if="ratasvalinta.separator && index !== (ratasvalintaFiltered.length - 1)"
+                    class="mt-2 mb-2"
+                  >
 
-                  <b-dropdown-item v-if="ratasvalinta.route" :to="{ name: ratasvalinta.route }" :disabled="ratasvalinta.disabled">
-                    <EpMaterialIcon icon-shape="outlined">{{ ratasvalinta.icon }}</EpMaterialIcon>
+                  <b-dropdown-item
+                    v-if="ratasvalinta.route"
+                    :to="{ name: ratasvalinta.route }"
+                    :disabled="ratasvalinta.disabled"
+                  >
+                    <EpMaterialIcon icon-shape="outlined">
+                      {{ ratasvalinta.icon }}
+                    </EpMaterialIcon>
                     <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
                   </b-dropdown-item>
 
                   <b-dropdown-item
                     v-if="ratasvalinta.click"
-                    @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)"
+                    v-oikeustarkastelu="ratasvalinta.meta.oikeus()"
                     :disabled="ratasvalinta.disabled"
-                    v-oikeustarkastelu="ratasvalinta.meta.oikeus()">
-                    <div class="d-flex" :class="{'validointi-virhe': ratasvalinta.meta.validointi && validointiVirheet.length > 0}">
-                      <EpMaterialIcon icon-shape="outlined" v-if="ratasvalinta.icon">{{ ratasvalinta.icon }}</EpMaterialIcon>
+                    @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)"
+                  >
+                    <div
+                      class="d-flex"
+                      :class="{'validointi-virhe': ratasvalinta.meta.validointi && validointiVirheet.length > 0}"
+                    >
+                      <EpMaterialIcon
+                        v-if="ratasvalinta.icon"
+                        icon-shape="outlined"
+                      >
+                        {{ ratasvalinta.icon }}
+                      </EpMaterialIcon>
                       <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
-                      <EpInfoPopover v-if="ratasvalinta.infopopovertext" class="ml-2" :unique-id="'ratasinfopopover-' + index">
-                        {{ $t(ratasvalinta.infopopovertext)}}
+                      <EpInfoPopover
+                        v-if="ratasvalinta.infopopovertext"
+                        class="ml-2"
+                        :unique-id="'ratasinfopopover-' + index"
+                      >
+                        {{ $t(ratasvalinta.infopopovertext) }}
                       </EpInfoPopover>
                     </div>
                   </b-dropdown-item>
@@ -70,11 +118,17 @@
             <EpSearch v-model="query" />
           </div>
           <div class="navigation">
-            <EpTreeNavibar :store="naviStore" :query="query">
+            <EpTreeNavibar
+              :store="naviStore"
+              :query="query"
+            >
               <template #header>
                 <div class="heading">
                   <div class="menu-item">
-                    <router-link :to="{ name: yleisnakymaRoute }" exact>
+                    <router-link
+                      :to="{ name: yleisnakymaRoute }"
+                      exact
+                    >
                       {{ $t('yleisnakyma') }}
                     </router-link>
                   </div>
@@ -127,7 +181,12 @@
                     <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-tekstikappale') }}
                   </router-link>
-                  <EpMaterialIcon v-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}" size="16px">attach_file</EpMaterialIcon>
+                  <EpMaterialIcon
+                    v-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}"
+                    size="16px"
+                  >
+                    attach_file
+                  </EpMaterialIcon>
                 </div>
               </template>
 
@@ -260,16 +319,19 @@
               <template #oppiaine="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: item.id } }">
-                    {{ $kaanna(item.label) || $t('nimeton-oppiaine') }} <span v-if="item.koodi">({{item.koodi}})</span>
+                    {{ $kaanna(item.label) || $t('nimeton-oppiaine') }} <span v-if="item.koodi">({{ item.koodi }})</span>
                   </router-link>
                 </div>
               </template>
 
               <template #moduuli="{ item }">
                 <div class="menu-item">
-                  <ep-color-indicator :kind="item.meta.pakollinen ? 'pakollinen' : 'valinnainen'" class="mr-1"/>
+                  <ep-color-indicator
+                    :kind="item.meta.pakollinen ? 'pakollinen' : 'valinnainen'"
+                    class="mr-1"
+                  />
                   <router-link :to="{ name: 'moduuli', params: { oppiaineId: item.meta.oppiaineId, moduuliId: item.id } }">
-                    {{ $kaanna(item.label) || $t('nimeton-moduuli') }} <span v-if="item.koodi">({{item.koodi}})</span>
+                    {{ $kaanna(item.label) || $t('nimeton-moduuli') }} <span v-if="item.koodi">({{ item.koodi }})</span>
                   </router-link>
                 </div>
               </template>
@@ -389,22 +451,31 @@
               </template>
 
               <template #new>
-                <EpSisallonLisays :perusteStore="perusteStore" :naviStore="naviStore" />
+                <EpSisallonLisays
+                  :peruste-store="perusteStore"
+                  :navi-store="naviStore"
+                />
               </template>
             </EpTreeNavibar>
           </div>
         </template>
 
-        <template #view v-if="peruste && projekti">
+        <template
+          v-if="peruste && projekti"
+          #view
+        >
           <router-view />
         </template>
 
         <template #bottom>
-          <div class="menu-item bottom-menu-item" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+          <div
+            v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+            class="menu-item bottom-menu-item"
+          >
             <router-link :to="jarjestaRoute">
               <span class="text-nowrap">
                 <EpMaterialIcon class="order-icon">reorder</EpMaterialIcon>
-                <a class="btn btn-link btn-link-nav">{{$t('muokkaa-jarjestysta')}}</a>
+                <a class="btn btn-link btn-link-nav">{{ $t('muokkaa-jarjestysta') }}</a>
               </span>
             </router-link>
           </div>
@@ -741,7 +812,7 @@ const asetaPohjaValmiiksi = async () => {
       title: 'aseta-pohja-valmiiksi',
       confirm: 'pohja-valmis-varmistus',
       okTitle: 'aseta-valmiiksi',
-    }
+    },
   );
 
   await props.perusteStore.updateCurrent();

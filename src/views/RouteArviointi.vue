@@ -1,11 +1,17 @@
 <template>
   <EpMainView>
     <template #icon>
-      <EpIcon class="float-right" icon="groups" background-color="#82D4FF" />
+      <EpIcon
+        class="float-right"
+        icon="groups"
+        background-color="#82D4FF"
+      />
     </template>
 
     <b-container>
-      <h1 class="mb-4">{{ $t('arviointi') }}</h1>
+      <h1 class="mb-4">
+        {{ $t('arviointi') }}
+      </h1>
 
       <b-nav tabs>
         <b-nav-item to="geneerinen">

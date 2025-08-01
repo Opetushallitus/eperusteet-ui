@@ -91,7 +91,7 @@ Vue.use(VueScrollTo, {
   duration: 1000,
 });
 Vue.use(VueApexCharts);
-Vue.component('apexchart', VueApexCharts);
+Vue.component('Apexchart', VueApexCharts);
 
 app.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
 app.use(TekstikappaleStore, {

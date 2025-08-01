@@ -2,24 +2,35 @@
   <div class="row">
     <div class="col-xl-3 col-md-3 col-sm-12">
       <ep-form-content name="aikavertailu">
-        <ep-multi-select :multiple="false"
+        <ep-multi-select
           id="tilaFilter"
+          v-model="model.tyyppi"
+          :multiple="false"
           :is-editing="true"
           :options="aikavaliItems"
-          v-model="model.tyyppi"
           :placeholder="$t('valitse')"
           track-by="value"
-          label="text">
-        </ep-multi-select>
+          label="text"
+        />
       </ep-form-content>
     </div>
 
     <div class="col-xl-9 col-md-9 col-sm-12">
       <ep-form-content name="aikavali">
-        <div class="d-flex align-items-center" :class="{'disabled-events' : !model.tyyppi}">
-          <ep-datepicker v-model="model.aikavaliAlku" :is-editing="true" />
+        <div
+          class="d-flex align-items-center"
+          :class="{'disabled-events' : !model.tyyppi}"
+        >
+          <ep-datepicker
+            v-model="model.aikavaliAlku"
+            :is-editing="true"
+          />
           <span class="mx-2">-</span>
-          <ep-datepicker v-model="model.aikavaliLoppu" :is-editing="true" endOfDay/>
+          <ep-datepicker
+            v-model="model.aikavaliLoppu"
+            :is-editing="true"
+            end-of-day
+          />
         </div>
       </ep-form-content>
     </div>

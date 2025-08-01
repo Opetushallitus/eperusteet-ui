@@ -5,20 +5,27 @@
     <template v-else>
       <ep-form-content name="aikavali">
         <div class="d-flex align-items-center">
-          <ep-datepicker v-model="alkupvm" :is-editing="true" />
+          <ep-datepicker
+            v-model="alkupvm"
+            :is-editing="true"
+          />
           <span class="mx-2">-</span>
-          <ep-datepicker v-model="loppupvm" :is-editing="true" endOfDay/>
+          <ep-datepicker
+            v-model="loppupvm"
+            :is-editing="true"
+            end-of-day
+          />
         </div>
       </ep-form-content>
 
-      <div>{{$t('suunnitelmien-lukumaarat-selite')}}</div>
+      <div>{{ $t('suunnitelmien-lukumaarat-selite') }}</div>
 
       <b-table
         borderless
         :items="lukumaarat"
         :fields="fields"
-        :tbody-tr-class="rowClass">
-      </b-table>
+        :tbody-tr-class="rowClass"
+      />
     </template>
   </div>
 </template>

@@ -1,17 +1,38 @@
 <template>
   <div v-if="isEditable">
-    <div v-for="(bullet, idx) in state" :key="idx" class="d-flex mb-1">
+    <div
+      v-for="(bullet, idx) in state"
+      :key="idx"
+      class="d-flex mb-1"
+    >
       <div class="flex-grow-1">
-        <ep-input :model-value="bullet" @update:model-value="onInput($event, idx)" :is-editing="true" />
+        <ep-input
+          :model-value="bullet"
+          :is-editing="true"
+          @update:model-value="onInput($event, idx)"
+        />
       </div>
-      <div class="flex-shrink-1" v-if="allowStructureChange">
-        <b-button variant="link" @click="remove(idx)">
+      <div
+        v-if="allowStructureChange"
+        class="flex-shrink-1"
+      >
+        <b-button
+          variant="link"
+          @click="remove(idx)"
+        >
           <EpMaterialIcon>delete</EpMaterialIcon>
         </b-button>
       </div>
     </div>
-    <div class="mt-2" v-if="allowStructureChange">
-      <ep-button variant="outline-primary" icon="add" @click="add">
+    <div
+      v-if="allowStructureChange"
+      class="mt-2"
+    >
+      <ep-button
+        variant="outline-primary"
+        icon="add"
+        @click="add"
+      >
         <slot name="add">
           {{ $t('lisaa') }}
         </slot>
@@ -20,7 +41,10 @@
   </div>
   <div v-else>
     <ul>
-      <li v-for="(bullet, idx) in modelValue" :key="idx">
+      <li
+        v-for="(bullet, idx) in modelValue"
+        :key="idx"
+      >
         {{ $kaanna(bullet) }}
       </li>
     </ul>

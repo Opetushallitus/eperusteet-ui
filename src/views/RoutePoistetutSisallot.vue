@@ -1,20 +1,33 @@
 <template>
   <div class="poistetut">
     <div class="ylapaneeli d-flex align-items-center">
-      <h2 class="otsikko">{{ $t('poistetut') }}</h2>
+      <h2 class="otsikko">
+        {{ $t('poistetut') }}
+      </h2>
     </div>
     <div class="sisalto">
       <EpSpinner v-if="!poistetut" />
-      <b-tabs content-class="mt-4" v-model="tabIndex">
-        <b-tab v-for="(tab, index) in tabs" :key="'tab'+index" :title="$t(tab.otsikko)">
+      <b-tabs
+        v-model="tabIndex"
+        content-class="mt-4"
+      >
+        <b-tab
+          v-for="(tab, index) in tabs"
+          :key="'tab'+index"
+          :title="$t(tab.otsikko)"
+        >
           <ep-spinner v-if="!poistetut" />
-          <poistetut-haku-table v-else
-                                :poistetut="tab.poistetut"
-                                @palauta="palauta" />
+          <poistetut-haku-table
+            v-else
+            :poistetut="tab.poistetut"
+            @palauta="palauta"
+          />
         </b-tab>
       </b-tabs>
 
-      <div v-if="poistetut && poistetut.length === 0 ">{{$t('ei-poistettuja-sisaltoja')}}</div>
+      <div v-if="poistetut && poistetut.length === 0 ">
+        {{ $t('ei-poistettuja-sisaltoja') }}
+      </div>
     </div>
   </div>
 </template>

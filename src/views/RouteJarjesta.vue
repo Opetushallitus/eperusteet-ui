@@ -1,49 +1,68 @@
 <template>
   <ep-spinner v-if="!store" />
-  <EpEditointi v-else :store="store">
+  <EpEditointi
+    v-else
+    :store="store"
+  >
     <template #header>
       <h2>{{ $t('muokkaa-jarjestysta') }}</h2>
     </template>
     <template #default="{ data, isEditing }">
       <b-tabs content-class="mt-3">
-        <b-tab :title="$t('tutkinnon-osat')" v-if="data.tutkinnonOsat">
+        <b-tab
+          v-if="data.tutkinnonOsat"
+          :title="$t('tutkinnon-osat')"
+        >
           <EpJarjesta
             v-model="data.tutkinnonOsat"
             group="sisaltoJarjestysGroup"
-            :is-editable="isEditing">
-          <template #default="{ node }">
-            <span>
-              {{ $kaanna(node.nimi) }}
-            </span>
-          </template>
+            :is-editable="isEditing"
+          >
+            <template #default="{ node }">
+              <span>
+                {{ $kaanna(node.nimi) }}
+              </span>
+            </template>
           </EpJarjesta>
         </b-tab>
-        <b-tab :title="$t('tekstikappaleet')" v-if="data.tekstit">
+        <b-tab
+          v-if="data.tekstit"
+          :title="$t('tekstikappaleet')"
+        >
           <EpJarjesta
             v-model="data.tekstit.lapset"
-            childField="lapset"
+            child-field="lapset"
             group="sisaltoJarjestysGroup"
-            :is-editable="isEditing">
+            :is-editable="isEditing"
+          >
             <template #default="{ node }">
               <span>
                 {{ $kaanna(node.perusteenOsa.nimi) }}
               </span>
-              <EpMaterialIcon v-if="node.perusteenOsa.liite"
-                              v-b-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}"
-                              size="18px">attach_file</EpMaterialIcon>
+              <EpMaterialIcon
+                v-if="node.perusteenOsa.liite"
+                v-b-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}"
+                size="18px"
+              >
+                attach_file
+              </EpMaterialIcon>
             </template>
           </EpJarjesta>
         </b-tab>
-        <b-tab :title="$t('vaiheet')" v-if="data.vaiheet">
+        <b-tab
+          v-if="data.vaiheet"
+          :title="$t('vaiheet')"
+        >
           <EpJarjesta
             v-model="data.vaiheet.vaiheet"
             group="sisaltoJarjestysGroup"
-            :is-editable="isEditing">
-          <template #default="{ node }">
-            <span>
-              {{ $kaanna(node.nimi) }}
-            </span>
-          </template>
+            :is-editable="isEditing"
+          >
+            <template #default="{ node }">
+              <span>
+                {{ $kaanna(node.nimi) }}
+              </span>
+            </template>
           </EpJarjesta>
         </b-tab>
       </b-tabs>

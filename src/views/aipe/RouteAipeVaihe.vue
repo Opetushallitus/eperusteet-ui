@@ -1,52 +1,102 @@
 <template>
-  <EpEditointi :store="store" :versionumero="versionumero">
+  <EpEditointi
+    :store="store"
+    :versionumero="versionumero"
+  >
     <template #header="{ data }">
-      <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
+      <h2 v-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing }">
       <div class="col-11 pl-0">
-
-        <div class="mt-1" v-if="isEditing">
-          <h3>{{$t('vaiheen-nimi')}} *</h3>
-          <ep-input v-model="data.nimi" :is-editing="true"></ep-input>
+        <div
+          v-if="isEditing"
+          class="mt-1"
+        >
+          <h3>{{ $t('vaiheen-nimi') }} *</h3>
+          <ep-input
+            v-model="data.nimi"
+            :is-editing="true"
+          />
         </div>
 
-        <hr v-if="isEditing" class="mt-5"/>
+        <hr
+          v-if="isEditing"
+          class="mt-5"
+        >
 
-        <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava']" />
+        <EpSisaltoTekstikappaleet
+          v-model="storeData"
+          :is-editing="isEditing"
+          :sisalto-avaimet="['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava']"
+        />
 
         <template v-if="vaiheId">
           <b-form-group :label="$t('oppiaineet')">
             <VueDraggable
               v-bind="oppiaineetDragOptions"
+              v-model="data.oppiaineet"
               tag="div"
-              v-model="data.oppiaineet">
-                <div class="oppiaine p-3 d-flex" v-for="oppiaine in data.oppiaineet" :key="'oppiaine'+oppiaine.id">
-                  <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                  <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppiaine.id } }">{{ $kaanna(oppiaine.nimi) || $t('nimeton-oppiaine') }}</router-link>
-                </div>
+            >
+              <div
+                v-for="oppiaine in data.oppiaineet"
+                :key="'oppiaine'+oppiaine.id"
+                class="oppiaine p-3 d-flex"
+              >
+                <EpMaterialIcon
+                  v-if="isEditing"
+                  class="order-handle mr-2"
+                >
+                  drag_indicator
+                </EpMaterialIcon>
+                <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppiaine.id } }">
+                  {{ $kaanna(oppiaine.nimi) || $t('nimeton-oppiaine') }}
+                </router-link>
+              </div>
             </VueDraggable>
           </b-form-group>
 
-          <ep-button variant="outline-primary" icon="add" @click="lisaaOppiaine" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+          <ep-button
+            v-if="!isEditing"
+            v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+            variant="outline-primary"
+            icon="add"
+            @click="lisaaOppiaine"
+          >
             {{ $t('lisaa-oppiaine') }}
           </ep-button>
 
-          <hr/>
+          <hr>
         </template>
 
-        <b-form-group class="mt-4" :label="$t('opetuksen-tavoitealueet')">
+        <b-form-group
+          class="mt-4"
+          :label="$t('opetuksen-tavoitealueet')"
+        >
           <div v-if="isEditing">
             <VueDraggable
               v-bind="defaultDragOptions"
+              v-model="data.opetuksenKohdealueet"
               tag="div"
-              v-model="data.opetuksenKohdealueet">
-
-              <b-row v-for="(kohdealue, index) in data.opetuksenKohdealueet" :key="'tavoite'+index" class="pb-2">
+            >
+              <b-row
+                v-for="(kohdealue, index) in data.opetuksenKohdealueet"
+                :key="'tavoite'+index"
+                class="pb-2"
+              >
                 <b-col cols="11">
-                  <ep-input v-model="kohdealue.nimi" :is-editing="isEditing">
+                  <ep-input
+                    v-model="kohdealue.nimi"
+                    :is-editing="isEditing"
+                  >
                     <template #left>
                       <div class="order-handle m-2">
                         <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -54,23 +104,37 @@
                     </template>
                   </ep-input>
                 </b-col>
-                <b-col cols="1" v-if="isEditing">
-                  <div class="default-icon clickable mt-2" @click="poistaKohdealue(kohdealue)">
+                <b-col
+                  v-if="isEditing"
+                  cols="1"
+                >
+                  <div
+                    class="default-icon clickable mt-2"
+                    @click="poistaKohdealue(kohdealue)"
+                  >
                     <EpMaterialIcon>delete</EpMaterialIcon>
                   </div>
                 </b-col>
               </b-row>
             </VueDraggable>
 
-            <ep-button variant="outline" icon="add" @click="lisaaKohdealue" v-if="isEditing">
+            <ep-button
+              v-if="isEditing"
+              variant="outline"
+              icon="add"
+              @click="lisaaKohdealue"
+            >
               {{ $t('lisaa-tavoitealue') }}
             </ep-button>
           </div>
 
           <div v-else>
             <ul>
-              <li v-for="(kohdealue, index) in data.opetuksenKohdealueet" :key="'tavoite'+index">
-                {{$kaanna(kohdealue.nimi)}}
+              <li
+                v-for="(kohdealue, index) in data.opetuksenKohdealueet"
+                :key="'tavoite'+index"
+              >
+                {{ $kaanna(kohdealue.nimi) }}
               </li>
             </ul>
           </div>

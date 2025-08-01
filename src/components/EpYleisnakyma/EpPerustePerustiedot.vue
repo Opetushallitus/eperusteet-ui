@@ -1,61 +1,94 @@
 <template>
-
   <div class="perustiedot-content">
     <router-link :to="{ name: 'projektinTiedot'}">
-      <h3>{{$t('projektin-tiedot')}}</h3>
+      <h3>{{ $t('projektin-tiedot') }}</h3>
     </router-link>
 
     <div class="row">
       <div class="col-12">
-        <ep-perustieto-data icon="info" :topic="$t('projektin-kuvaus')" class="w-100">
-          <div v-html="$kaanna(projektinKuvaus)"></div>
+        <ep-perustieto-data
+          icon="info"
+          :topic="$t('projektin-kuvaus')"
+          class="w-100"
+        >
+          <div v-html="$kaanna(projektinKuvaus)" />
         </ep-perustieto-data>
       </div>
     </div>
 
     <div class="row">
       <div class="col-5">
-        <ep-perustieto-data icon="comment" :topic="$t('yhteyshenkilo')">
-          {{yhteyshenkilo}}
+        <ep-perustieto-data
+          icon="comment"
+          :topic="$t('yhteyshenkilo')"
+        >
+          {{ yhteyshenkilo }}
         </ep-perustieto-data>
       </div>
       <div class="col-7">
-        <ep-perustieto-data icon="language" :topic="$t('julkaisukielet')">
-          {{julkaisukielet}}
+        <ep-perustieto-data
+          icon="language"
+          :topic="$t('julkaisukielet')"
+        >
+          {{ julkaisukielet }}
         </ep-perustieto-data>
       </div>
     </div>
 
     <div class="row">
       <div class="col-5">
-        <ep-perustieto-data icon="calendar_today" :topic="$t('luotu')">
-          {{$sdt(peruste.luotu)}}
+        <ep-perustieto-data
+          icon="calendar_today"
+          :topic="$t('luotu')"
+        >
+          {{ $sdt(peruste.luotu) }}
         </ep-perustieto-data>
       </div>
       <div class="col-7">
-        <ep-perustieto-data icon="calendar_today" :topic="$t('julkaistu')">
-          {{$sdt(peruste.viimeisinJulkaisuAika)}}
+        <ep-perustieto-data
+          icon="calendar_today"
+          :topic="$t('julkaistu')"
+        >
+          {{ $sdt(peruste.viimeisinJulkaisuAika) }}
         </ep-perustieto-data>
       </div>
     </div>
 
     <div class="row">
       <div class="col-5">
-        <ep-perustieto-data icon="groups" :topic="$t('tyoryhma')" class="w-60" v-if="virkailijat">
-          <p v-for="virkailija in virkailijat" :key="virkailija.oid" class="mb-1">
+        <ep-perustieto-data
+          v-if="virkailijat"
+          icon="groups"
+          :topic="$t('tyoryhma')"
+          class="w-60"
+        >
+          <p
+            v-for="virkailija in virkailijat"
+            :key="virkailija.oid"
+            class="mb-1"
+          >
             {{ virkailija.esitysnimi }}
           </p>
-          <ep-button v-if="!naytaLisaaTyoryhmaa && virkailijat && virkailijat.length > tyoryhmaAlkuMaara" @click="naytaLisaaTyoryhmaa = true" variant="link" buttonClass="pl-0 mt-2">
-            {{$t('nayta-lisaa')}}
+          <ep-button
+            v-if="!naytaLisaaTyoryhmaa && virkailijat && virkailijat.length > tyoryhmaAlkuMaara"
+            variant="link"
+            button-class="pl-0 mt-2"
+            @click="naytaLisaaTyoryhmaa = true"
+          >
+            {{ $t('nayta-lisaa') }}
           </ep-button>
-      </ep-perustieto-data>
+        </ep-perustieto-data>
       </div>
       <div class="col-7">
         <EpPerustietoData icon="visibility">
-          <template #header>{{ $t('esikatsele-perustetta')}}</template>
-          <template v-if="!projekti.esikatseltavissa">{{ $t('et-ole-sallinut-esikatselua') }}</template>
+          <template #header>
+            {{ $t('esikatsele-perustetta') }}
+          </template>
+          <template v-if="!projekti.esikatseltavissa">
+            {{ $t('et-ole-sallinut-esikatselua') }}
+          </template>
           <template v-else>
-            <ep-external-link :url="esikatseluUrl"></ep-external-link>
+            <ep-external-link :url="esikatseluUrl" />
           </template>
         </EpPerustietoData>
       </div>

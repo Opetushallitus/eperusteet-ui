@@ -3,40 +3,101 @@
     <ep-spinner v-if="!termit" />
     <div v-else>
       <div class="d-flex justify-content-between">
-        <ep-search class="mb-3" v-model="query" :placeholder="$t('etsi')"></ep-search>
-        <ep-button variant="outline" @click="avaaMuokkausModal()" icon="add" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-kasite') }}</ep-button>
+        <ep-search
+          v-model="query"
+          class="mb-3"
+          :placeholder="$t('etsi')"
+        />
+        <ep-button
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+          variant="outline"
+          icon="add"
+          @click="avaaMuokkausModal()"
+        >
+          {{ $t('lisaa-kasite') }}
+        </ep-button>
       </div>
-      <div class="kasitelista m-3" v-if="termit.length > 0">
-        <div class="row align-items-start" :class="{open: !termi.closed}" v-for="(termi, idx) in termitFiltered" :key="idx">
-          <div class="col col-3 font-weight-bold pl-3" v-html="$kaanna(termi.termi)" />
+      <div
+        v-if="termit.length > 0"
+        class="kasitelista m-3"
+      >
+        <div
+          v-for="(termi, idx) in termitFiltered"
+          :key="idx"
+          class="row align-items-start"
+          :class="{open: !termi.closed}"
+        >
+          <div
+            class="col col-3 font-weight-bold pl-3"
+            v-html="$kaanna(termi.termi)"
+          />
           <div class="col col-6 pl-3">
-            <ep-content :value="termi.selitys" layout="normal"></ep-content>
+            <ep-content
+              :value="termi.selitys"
+              layout="normal"
+            />
           </div>
           <div class="col col-3 text-right toiminnot">
-            <button class="btn btn-link" @click="avaaPoistoModal(termi)">
+            <button
+              class="btn btn-link"
+              @click="avaaPoistoModal(termi)"
+            >
               <EpMaterialIcon>delete</EpMaterialIcon>
             </button>
-            <button class="btn btn-link" @click="avaaMuokkausModal(termi)">
+            <button
+              class="btn btn-link"
+              @click="avaaMuokkausModal(termi)"
+            >
               <EpMaterialIcon>edit</EpMaterialIcon>
             </button>
-            <button class="btn btn-link" @click="toggleTermi(termi)">
-              <EpMaterialIcon v-if="termi.closed">expand_more</EpMaterialIcon>
-              <EpMaterialIcon v-else>expand_less</EpMaterialIcon>
+            <button
+              class="btn btn-link"
+              @click="toggleTermi(termi)"
+            >
+              <EpMaterialIcon v-if="termi.closed">
+                expand_more
+              </EpMaterialIcon>
+              <EpMaterialIcon v-else>
+                expand_less
+              </EpMaterialIcon>
             </button>
           </div>
         </div>
       </div>
 
-      <div v-else>{{$t('ei-termeja')}}</div>
+      <div v-else>
+        {{ $t('ei-termeja') }}
+      </div>
     </div>
 
-    <b-modal class="backdrop" id="kasitteenPoistoModal" ref="kasitteenPoistoModal" @ok="poistaKasite" :lazy="true" size="lg">
+    <b-modal
+      id="kasitteenPoistoModal"
+      ref="kasitteenPoistoModal"
+      class="backdrop"
+      :lazy="true"
+      size="lg"
+      @ok="poistaKasite"
+    >
       <span class="mr-2">{{ $t('haluatko-poistaa-kasitteen') }}</span>
-      <template #modal-cancel>{{ $t('peruuta') }}</template>
-      <template #modal-ok>{{ $t('poista') }}</template>
+      <template #modal-cancel>
+        {{ $t('peruuta') }}
+      </template>
+      <template #modal-ok>
+        {{ $t('poista') }}
+      </template>
     </b-modal>
 
-    <b-modal class="backdrop" id="kasitteenLuontiModal" ref="kasitteenLuontiModal" @ok="tallennaKasite" :no-close-on-backdrop="true" :no-enforce-focus="true" :lazy="true" :ok-disabled="validation.$invalid" size="lg">
+    <b-modal
+      id="kasitteenLuontiModal"
+      ref="kasitteenLuontiModal"
+      class="backdrop"
+      :no-close-on-backdrop="true"
+      :no-enforce-focus="true"
+      :lazy="true"
+      :ok-disabled="validation.$invalid"
+      size="lg"
+      @ok="tallennaKasite"
+    >
       <template #modal-header>
         <div class="row w-100">
           <div class="col">
@@ -49,18 +110,36 @@
       </template>
 
       <ep-form-content name="kasite-termi">
-        <ep-input v-model="kasite.termi" type="localized" help="kasite-termi-ohje" :validation="validation.termi" :is-editing="true"></ep-input>
+        <ep-input
+          v-model="kasite.termi"
+          type="localized"
+          help="kasite-termi-ohje"
+          :validation="validation.termi"
+          :is-editing="true"
+        />
       </ep-form-content>
       <ep-form-content name="kasite-selitys">
-        <ep-content v-model="kasite.selitys" help="kasite-selitys-ohje" :validation="validation.selitys" :is-editable="true" layout="normal"></ep-content>
+        <ep-content
+          v-model="kasite.selitys"
+          help="kasite-selitys-ohje"
+          :validation="validation.selitys"
+          :is-editable="true"
+          layout="normal"
+        />
       </ep-form-content>
 
       <ep-form-content name="alaviitteessa">
-        <ep-toggle v-model="kasite.alaviite">{{ $t('nayta-alaviitteessa') }}</ep-toggle>
+        <ep-toggle v-model="kasite.alaviite">
+          {{ $t('nayta-alaviitteessa') }}
+        </ep-toggle>
       </ep-form-content>
 
-      <template #modal-cancel>{{ $t('peruuta') }}</template>
-      <template #modal-ok>{{ kasite.id ? $t('tallenna') : $t('lisaa-kasite') }}</template>
+      <template #modal-cancel>
+        {{ $t('peruuta') }}
+      </template>
+      <template #modal-ok>
+        {{ kasite.id ? $t('tallenna') : $t('lisaa-kasite') }}
+      </template>
     </b-modal>
   </ep-sub-view>
 </template>

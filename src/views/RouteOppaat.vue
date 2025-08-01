@@ -1,11 +1,13 @@
 <template>
   <EpMainView>
-    <EpPerusteprojektiListaus :provider="perusteOppaatStore"
-                              :edit-route="'opas'"
-                              :new-route="{ name: 'opasLuonti' }"
-                              :fieldKeys="['nimi','koulutustyyppi','tila','luotu', 'globalVersion.aikaleima']"
-                              :filters="['koulutustyyppi', 'peruste', 'tila']"
-                              :showCards="!$isAdmin() && !$hasOphCrud()">
+    <EpPerusteprojektiListaus
+      :provider="perusteOppaatStore"
+      :edit-route="'opas'"
+      :new-route="{ name: 'opasLuonti' }"
+      :field-keys="['nimi','koulutustyyppi','tila','luotu', 'globalVersion.aikaleima']"
+      :filters="['koulutustyyppi', 'peruste', 'tila']"
+      :show-cards="!$isAdmin() && !$hasOphCrud()"
+    >
       <template #upperheader>
         <h2>{{ $t('Oppaasi') }}</h2>
       </template>
@@ -13,35 +15,61 @@
         <h2>{{ $t('julkaistut-oppaat') }}</h2>
       </template>
       <template #cardsEmpty>
-        <h3>{{ $t('ei-oppaita')}}</h3>
+        <h3>{{ $t('ei-oppaita') }}</h3>
       </template>
-      <template v-slot:lowerheader>
+      <template #lowerheader>
         <div class="d-flex">
-          <h2 class="pt-2 flex-grow-1">{{ $t('oppaat') }}</h2>
+          <h2 class="pt-2 flex-grow-1">
+            {{ $t('oppaat') }}
+          </h2>
           <router-link :to="{ name: 'opasLuonti' }">
-            <ep-button class="m-0 p-0" variant="outline" icon="add">{{$t('lisaa-opas')}}</ep-button>
+            <ep-button
+              class="m-0 p-0"
+              variant="outline"
+              icon="add"
+            >
+              {{ $t('lisaa-opas') }}
+            </ep-button>
           </router-link>
         </div>
       </template>
       <template #nimiotsikko>
-        {{$t('oppaan-nimi')}}
+        {{ $t('oppaan-nimi') }}
       </template>
       <template #koulutustyyppisarake="{ perusteProjekti }">
-        <span class="text-nowrap koulutustyypit" v-if="ensimmainenKoulutustyyppi(perusteProjekti)">
-          <EpColorIndicator :size="10" :kind="ensimmainenKoulutustyyppi(perusteProjekti)" />
+        <span
+          v-if="ensimmainenKoulutustyyppi(perusteProjekti)"
+          class="text-nowrap koulutustyypit"
+        >
+          <EpColorIndicator
+            :size="10"
+            :kind="ensimmainenKoulutustyyppi(perusteProjekti)"
+          />
           <span class="ml-1">
             {{ $t(ensimmainenKoulutustyyppi(perusteProjekti)) }}
           </span>
-          <span :id="'koulutustyypit'+perusteProjekti.id" class="lukumaara" v-if="koulutustyypit(perusteProjekti) && koulutustyypit(perusteProjekti).length > 1">
-            +{{koulutustyypit(perusteProjekti).length -1}}
+          <span
+            v-if="koulutustyypit(perusteProjekti) && koulutustyypit(perusteProjekti).length > 1"
+            :id="'koulutustyypit'+perusteProjekti.id"
+            class="lukumaara"
+          >
+            +{{ koulutustyypit(perusteProjekti).length -1 }}
             <b-popover
               triggers="hover click focus"
               :target="'koulutustyypit'+perusteProjekti.id"
-              placement="bottomright">
-              <h3>{{$t('koulutustyypit')}}</h3>
-              <ep-julki-lista :tiedot="koulutustyypit(perusteProjekti)" listausTyyppi="sivutus" tietoMaara="5">
+              placement="bottomright"
+            >
+              <h3>{{ $t('koulutustyypit') }}</h3>
+              <ep-julki-lista
+                :tiedot="koulutustyypit(perusteProjekti)"
+                listaus-tyyppi="sivutus"
+                tieto-maara="5"
+              >
                 <template #otsikko="{ item }">
-                  <EpColorIndicator :size="10" :kind="item.otsikko" />
+                  <EpColorIndicator
+                    :size="10"
+                    :kind="item.otsikko"
+                  />
                   <span class="ml-1">
                     {{ $t(item.otsikko) }}
                   </span>

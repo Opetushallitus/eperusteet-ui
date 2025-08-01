@@ -1,46 +1,80 @@
 <template>
   <div>
-    <EpSisaltoTekstikappaleet v-model="model" :isEditing="isEditing" :sisaltoAvaimet="['tehtava', 'ohjaus', 'tyotavat', 'arviointi']" />
+    <EpSisaltoTekstikappaleet
+      v-model="model"
+      :is-editing="isEditing"
+      :sisalto-avaimet="['tehtava', 'ohjaus', 'tyotavat', 'arviointi']"
+    />
 
     <b-form-group class="mt-4 pt-3">
-      <template v-slot:label>
-        <h4 class="mb-0" v-if="model.sisaltoalueinfo">
-          <span v-if="model.sisaltoalueinfo.otsikko">{{$kaanna(model.sisaltoalueinfo.otsikko)}}</span>
-          <span v-else>{{$t('sisaltoalueet-vuosiluokilla-' + vuosiluokat)}}</span>
+      <template #label>
+        <h4
+          v-if="model.sisaltoalueinfo"
+          class="mb-0"
+        >
+          <span v-if="model.sisaltoalueinfo.otsikko">{{ $kaanna(model.sisaltoalueinfo.otsikko) }}</span>
+          <span v-else>{{ $t('sisaltoalueet-vuosiluokilla-' + vuosiluokat) }}</span>
         </h4>
       </template>
-      <EpSisaltoalueetEditModal v-model="model" :vuosiluokat="vuosiluokat" :isEditing="isEditing" :perusteId="perusteId" :oppiaineId="oppiaineId"/>
+      <EpSisaltoalueetEditModal
+        v-model="model"
+        :vuosiluokat="vuosiluokat"
+        :is-editing="isEditing"
+        :peruste-id="perusteId"
+        :oppiaine-id="oppiaineId"
+      />
     </b-form-group>
 
-    <hr class="mt-4"/>
+    <hr class="mt-4">
 
-    <b-form-group :label="$t('opetuksen-tavoitteet-vuosiluokilla-' + vuosiluokat)" class="mt-4 pt-3">
+    <b-form-group
+      :label="$t('opetuksen-tavoitteet-vuosiluokilla-' + vuosiluokat)"
+      class="mt-4 pt-3"
+    >
       <VueDraggable
         v-bind="tavoitteetDragOptions"
+        v-model="model.tavoitteet"
         tag="div"
-        v-model="model.tavoitteet">
+      >
         <EpCollapse
           v-for="(tavoite, tavoiteIndex) in model.tavoitteet"
           :key="'tavoite'+tavoiteIndex"
           class="tavoite p-3 mb-4 w-100"
-          :borderBottom="false"
-          :usePadding="false">
-
+          :border-bottom="false"
+          :use-padding="false"
+        >
           <template #header>
             <div class="d-flex">
-              <div class="order-handle mr-3" v-if="isEditing">
-                <EpMaterialIcon v-if="isEditing">drag_indicator</EpMaterialIcon>
+              <div
+                v-if="isEditing"
+                class="order-handle mr-3"
+              >
+                <EpMaterialIcon v-if="isEditing">
+                  drag_indicator
+                </EpMaterialIcon>
               </div>
-              <h4 class="mb-0" v-html="$kaanna(tavoite.tavoite)"></h4>
+              <h4
+                class="mb-0"
+                v-html="$kaanna(tavoite.tavoite)"
+              />
             </div>
           </template>
 
-          <EpOppiaineenTavoite v-model="model.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="vlkSupportData" @poista="poistaTavoite(tavoite)"/>
-
+          <EpOppiaineenTavoite
+            v-model="model.tavoitteet[tavoiteIndex]"
+            :is-editing="isEditing"
+            :support-data="vlkSupportData"
+            @poista="poistaTavoite(tavoite)"
+          />
         </EpCollapse>
       </VueDraggable>
 
-      <ep-button @click="lisaaTavoite" variant="outline" icon="add" v-if="isEditing">
+      <ep-button
+        v-if="isEditing"
+        variant="outline"
+        icon="add"
+        @click="lisaaTavoite"
+      >
         {{ $t('lisaa-tavoite') }}
       </ep-button>
     </b-form-group>

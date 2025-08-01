@@ -1,50 +1,69 @@
 <template>
   <div>
-    <b-modal ref="tutkinnonosaTuontiModal"
-            id="tuotutkinnonosa"
-            size="xl"
-            centered
-            @close="close">
-      <template v-slot:modal-title>
+    <b-modal
+      id="tuotutkinnonosa"
+      ref="tutkinnonosaTuontiModal"
+      size="xl"
+      centered
+      @close="close"
+    >
+      <template #modal-title>
         {{ $t('tuo-tutkinnon-osa') }}
       </template>
 
       <div class="d-flex">
-        <b-form-group class="w-50" :label="$t('tutkinnon-osan-nimi')">
-          <ep-search v-model="tutkinnonosaQuery.nimi" :placeholder="$t('etsi-tutkinnon-osaa')"/>
-          <ep-toggle v-model="tutkinnonosaQuery.vanhentuneet" :isSWitch="false" class="mt-2">
-            {{$t('nayta-myos-vanhentuneet')}}
+        <b-form-group
+          class="w-50"
+          :label="$t('tutkinnon-osan-nimi')"
+        >
+          <ep-search
+            v-model="tutkinnonosaQuery.nimi"
+            :placeholder="$t('etsi-tutkinnon-osaa')"
+          />
+          <ep-toggle
+            v-model="tutkinnonosaQuery.vanhentuneet"
+            :is-s-witch="false"
+            class="mt-2"
+          >
+            {{ $t('nayta-myos-vanhentuneet') }}
           </ep-toggle>
         </b-form-group>
 
         <b-form-group class="ml-auto w-50">
           <template #label>
             <div class="d-flex">
-              <div>{{$t('tutkinto')}}</div>
+              <div>{{ $t('tutkinto') }}</div>
               <ep-spinner v-if="perusteetLoading" />
             </div>
           </template>
           <EpMultiSelect
-            class="flex-grow-1"
             v-model="tutkinnonosaQuery.peruste"
+            class="flex-grow-1"
             :placeholder="!perusteetLoading ? $t('kirjoita-tutkinnon-nimi') : $t('valitse')"
             :is-editing="true"
             :options="perusteet ? perusteet : []"
+            :internal-search="false"
+            :clear-on-select="false"
             @search="perusteSearch"
-            :internalSearch="false"
-            :clearOnSelect="false">
-            <template #noResult><div v-if="perusteet && perusteet.length === 0">{{ $t('ei-hakutuloksia') }}</div><div v-else/></template>
-            <template #noOptions><div></div></template>
+          >
+            <template #noResult>
+              <div v-if="perusteet && perusteet.length === 0">
+                {{ $t('ei-hakutuloksia') }}
+              </div><div v-else />
+            </template>
+            <template #noOptions>
+              <div />
+            </template>
             <template #singleLabel="{ option }">
               {{ $kaanna(option.nimi) }}
               <span v-if="option.voimassaoloAlkaa">
-                ({{$t('voimassa')}} {{$sd(option.voimassaoloAlkaa)}} - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                ({{ $t('voimassa') }} {{ $sd(option.voimassaoloAlkaa) }} - <span v-if="option.voimassaoloLoppuu">{{ $sd(option.voimassaoloLoppuu) }}</span>)
               </span>
             </template>
             <template #option="{ option }">
               {{ $kaanna(option.nimi) }}
               <span v-if="option.voimassaoloAlkaa">
-                ({{$t('voimassa')}} {{$sd(option.voimassaoloAlkaa)}} - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                ({{ $t('voimassa') }} {{ $sd(option.voimassaoloAlkaa) }} - <span v-if="option.voimassaoloLoppuu">{{ $sd(option.voimassaoloLoppuu) }}</span>)
               </span>
             </template>
           </EpMultiSelect>
@@ -58,62 +77,103 @@
           responsive
           striped
           :items="tutkinnonosatWithSelected"
-          :fields="tutkinnonosatFields">
-          <template v-slot:cell(nimi)="{ item }">
-            <div class="selectable" @click="selectRow(item)">
-              <EpMaterialIcon v-if="item.selected" class="checked mr-2">check_box</EpMaterialIcon>
-              <EpMaterialIcon v-else class="checked mr-2">check_box_outline_blank</EpMaterialIcon>
-              <span>{{$kaanna(item.nimi)}}</span>
-              <span v-if="item.tutkinnonOsa.koodiArvo">({{item.tutkinnonOsa.koodiArvo}})</span>
+          :fields="tutkinnonosatFields"
+        >
+          <template #cell(nimi)="{ item }">
+            <div
+              class="selectable"
+              @click="selectRow(item)"
+            >
+              <EpMaterialIcon
+                v-if="item.selected"
+                class="checked mr-2"
+              >
+                check_box
+              </EpMaterialIcon>
+              <EpMaterialIcon
+                v-else
+                class="checked mr-2"
+              >
+                check_box_outline_blank
+              </EpMaterialIcon>
+              <span>{{ $kaanna(item.nimi) }}</span>
+              <span v-if="item.tutkinnonOsa.koodiArvo">({{ item.tutkinnonOsa.koodiArvo }})</span>
             </div>
           </template>
-          <template v-slot:cell(peruste)="{ item, value }">
-
-            <b-button variant="link" :id="'peruste-popover-'+item.id">
-              {{$t('kaytossa')}}
+          <template #cell(peruste)="{ item, value }">
+            <b-button
+              :id="'peruste-popover-'+item.id"
+              variant="link"
+            >
+              {{ $t('kaytossa') }}
             </b-button>
 
-            <b-popover :target="'peruste-popover-'+item.id" triggers="hover click">
-              <template #title>{{$t('kaytossa-tutkinnossa')}}</template>
-              {{value}}
+            <b-popover
+              :target="'peruste-popover-'+item.id"
+              triggers="hover click"
+            >
+              <template #title>
+                {{ $t('kaytossa-tutkinnossa') }}
+              </template>
+              {{ value }}
             </b-popover>
-
           </template>
         </b-table>
-        <b-pagination v-if="totalRows > sisaltoSivuKoko"
-            v-model="page"
-            :total-rows="totalRows"
-            :per-page="sisaltoSivuKoko"
-            align="center"
-            aria-controls="tuo-tutkinnon-osa"></b-pagination>
+        <b-pagination
+          v-if="totalRows > sisaltoSivuKoko"
+          v-model="page"
+          :total-rows="totalRows"
+          :per-page="sisaltoSivuKoko"
+          align="center"
+          aria-controls="tuo-tutkinnon-osa"
+        />
       </div>
       <div v-else>
-        {{$t('ei-hakutuloksia')}}
+        {{ $t('ei-hakutuloksia') }}
       </div>
 
       <div v-if="selectedTutkinnonosat.length > 0">
-        <h3>{{$t('valittu')}} {{selectedTutkinnonosat.length}} {{$t('kpl')}}</h3>
+        <h3>{{ $t('valittu') }} {{ selectedTutkinnonosat.length }} {{ $t('kpl') }}</h3>
         <b-table
           responsive
           striped
           :items="tutkinnonosatWithSalliMuokattavaksi"
-          :fields="valittuFields">
-
-          <template v-slot:cell(salli-muokkaus)="{ item }">
-            <div class="selectable" @click="selectSalliMuokkausRow(item)">
-              <EpMaterialIcon v-if="item.kopioiMuokattavaksi" class="checked mr-2">check_box</EpMaterialIcon>
-              <EpMaterialIcon v-else class="checked mr-2">check_box_outline_blank</EpMaterialIcon>
-              <span>{{$t('kylla')}}</span>
+          :fields="valittuFields"
+        >
+          <template #cell(salli-muokkaus)="{ item }">
+            <div
+              class="selectable"
+              @click="selectSalliMuokkausRow(item)"
+            >
+              <EpMaterialIcon
+                v-if="item.kopioiMuokattavaksi"
+                class="checked mr-2"
+              >
+                check_box
+              </EpMaterialIcon>
+              <EpMaterialIcon
+                v-else
+                class="checked mr-2"
+              >
+                check_box_outline_blank
+              </EpMaterialIcon>
+              <span>{{ $t('kylla') }}</span>
             </div>
           </template>
-
         </b-table>
       </div>
 
       <template #modal-footer>
         <div>
-          <ep-button @click="close" variant="link">{{ $t('peruuta')}}</ep-button>
-          <ep-button @click="save">{{ $t('tuo-valitut-tutkinnon-osat')}}</ep-button>
+          <ep-button
+            variant="link"
+            @click="close"
+          >
+            {{ $t('peruuta') }}
+          </ep-button>
+          <ep-button @click="save">
+            {{ $t('tuo-valitut-tutkinnon-osat') }}
+          </ep-button>
         </div>
       </template>
     </b-modal>

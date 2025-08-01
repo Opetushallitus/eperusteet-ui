@@ -1,16 +1,37 @@
 <template>
-  <EpEditointi v-if="editointiStore" :store="editointiStore" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 class="m-0" v-if="data.nimi" >{{ $kaanna(data.nimi) }}</h2>
-      <h2 class="m-0" v-else >{{ $t('nimeton-opinto') }}</h2>
+  <EpEditointi
+    v-if="editointiStore"
+    :store="editointiStore"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2
+        v-if="data.nimi"
+        class="m-0"
+      >
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="m-0"
+      >
+        {{ $t('nimeton-opinto') }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing }">
-
-      <b-row v-if="isEditing" class="mb-4">
+    <template #default="{ data, isEditing }">
+      <b-row
+        v-if="isEditing"
+        class="mb-4"
+      >
         <b-col lg="8">
-          <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
-            <ep-input v-model="data.nimi" :is-editing="isEditing">
-            </ep-input>
+          <b-form-group
+            :label="$t('otsikko') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-input
+              v-model="data.nimi"
+              :is-editing="isEditing"
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -18,55 +39,73 @@
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <template v-if="isEditing" #label>
-              <div>{{$t('kappaleen-teksti')}}</div>
+            <template
+              v-if="isEditing"
+              #label
+            >
+              <div>{{ $t('kappaleen-teksti') }}</div>
             </template>
-            <ep-content v-model="data.yleiskuvaus"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+            <ep-content
+              v-model="data.yleiskuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
         </b-col>
       </b-row>
 
-      <b-row v-if="data.osaamisAlueet.length > 0" class="mt-4">
+      <b-row
+        v-if="data.osaamisAlueet.length > 0"
+        class="mt-4"
+      >
         <b-col lg="8">
-          <div v-for="(osaamisalue, index) in data.osaamisAlueet"
-               :key="index+'kotoLaajaAlainenOsaaminen'">
+          <div
+            v-for="(osaamisalue, index) in data.osaamisAlueet"
+            :key="index+'kotoLaajaAlainenOsaaminen'"
+          >
             <div class="mt-4">
-                <span>
-                  <h3 class="d-inline">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
-                  <b-button variant="link"
-                            @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)"
-                            v-if="isEditing">
-                    <EpMaterialIcon>delete</EpMaterialIcon>
-                    {{ $t('poista') }}
-                  </b-button>
-                </span>
+              <span>
+                <h3 class="d-inline">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
+                <b-button
+                  v-if="isEditing"
+                  variant="link"
+                  @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)"
+                >
+                  <EpMaterialIcon>delete</EpMaterialIcon>
+                  {{ $t('poista') }}
+                </b-button>
+              </span>
             </div>
             <ep-content
-              layout="normal"
               v-model="osaamisalue.kuvaus"
-              :is-editable="isEditing"></ep-content>
+              layout="normal"
+              :is-editable="isEditing"
+            />
           </div>
         </b-col>
       </b-row>
 
       <b-row class="mt-4">
         <b-col lg="8">
-          <b-dropdown v-if="isEditing" :text="$t('lisaa-laaja-alainen-osaaminen')" variant="primary" class="mb-4">
+          <b-dropdown
+            v-if="isEditing"
+            :text="$t('lisaa-laaja-alainen-osaaminen')"
+            variant="primary"
+            class="mb-4"
+          >
             <b-dropdown-item-button
               v-for="(laajaAlainenKoodi, index) in laajaAlaisetKoodit"
-              @click="addLaajaAlainenOsaaminen(laajaAlainenKoodi)"
               :key="index+'addlaaja'"
-              :disabled="laajaAlainenKoodi.isAlreadySelected">
+              :disabled="laajaAlainenKoodi.isAlreadySelected"
+              @click="addLaajaAlainenOsaaminen(laajaAlainenKoodi)"
+            >
               {{ laajaAlainenKoodi.arvo + '. ' + $kaanna(laajaAlainenKoodi.nimi) }}
             </b-dropdown-item-button>
           </b-dropdown>
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
   <EpSpinner v-else />

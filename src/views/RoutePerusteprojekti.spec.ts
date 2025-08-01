@@ -8,8 +8,8 @@ import { vi } from 'vitest';
 vi.mock('vue-router', () => ({
   useRoute: vi.fn(() => ({
     params: {
-      projektiId: '123'
-    }
+      projektiId: '123',
+    },
   })),
   useRouter: vi.fn(),
 }));

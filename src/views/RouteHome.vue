@@ -1,6 +1,9 @@
 <template>
   <div>
-    <Teleport defer to="#headerExtension">
+    <Teleport
+      defer
+      to="#headerExtension"
+    >
       <div class="container">
         <div class="container-fluid">
           <div class="row no-gutters">
@@ -15,16 +18,25 @@
 
     <div class="container tile-container">
       <div class="d-flex flex-row flex-wrap justify-content-center">
-        <TilePerusteprojektit v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
-        <TilePohjat v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileTiedotteet :tiedotteetStore="tiedotteetStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
-        <TileOppaat :perusteOppaatStore="perusteOppaatStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
-        <TileMaaraysKokoelma v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet_maarays'}"/>
-        <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
+        <TilePerusteprojektit v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}" />
+        <TilePohjat v-oikeustarkastelu="{oikeus:'hallinta'}" />
+        <TileTiedotteet
+          v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"
+          :tiedotteet-store="tiedotteetStore"
+        />
+        <TileOppaat
+          v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"
+          :peruste-oppaat-store="perusteOppaatStore"
+        />
+        <TileMaaraysKokoelma v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet_maarays'}" />
+        <TileDigitaalinenOsaaminen
+          v-if="$hasOphCrud()"
+          :digitaaliset-osaamiset-store="digitaalisetOsaamisetStore"
+        />
         <TileOsaamismerkit v-if="$hasOphCrud()" />
-        <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileYllapito v-if="$isAdmin()"/>
+        <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}" />
+        <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}" />
+        <TileYllapito v-if="$isAdmin()" />
       </div>
     </div>
   </div>

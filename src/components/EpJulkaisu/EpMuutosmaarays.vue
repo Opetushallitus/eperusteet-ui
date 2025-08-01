@@ -1,71 +1,139 @@
 <template>
   <EpSpinner v-if="!asiasanat || !maarayksetNimella" />
   <div v-else>
-
     <EpInfoBanner class="mb-3">
-      {{$t('lisaa-muutosmaarayksen-kieliversiot-samaan-muutosmaaraykseen')}}
+      {{ $t('lisaa-muutosmaarayksen-kieliversiot-samaan-muutosmaaraykseen') }}
     </EpInfoBanner>
 
-    <b-tabs class="mb-3" v-model="tabindex">
-      <b-tab v-for="kieli in kielet" :key='"kieli"+kieli' :title="$t('translatiivi-' + kieli)"/>
+    <b-tabs
+      v-model="tabindex"
+      class="mb-3"
+    >
+      <b-tab
+        v-for="kieli in kielet"
+        :key="&quot;kieli&quot;+kieli"
+        :title="$t('translatiivi-' + kieli)"
+      />
     </b-tabs>
 
     <b-form-group>
       <template #label>
         <div class="d-flex">
-          <span>{{$t('lataa-uusi-muutosmaarays') + isRequired}}</span>
-          <EpInfoPopover class="ml-2" unique-id="11">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+          <span>{{ $t('lataa-uusi-muutosmaarays') + isRequired }}</span>
+          <EpInfoPopover
+            class="ml-2"
+            unique-id="11"
+          >
+            {{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}
+          </EpInfoPopover>
         </div>
       </template>
-      <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
+      <EpMaaraysLiitteet
+        v-model="model.liitteet[kieli].liitteet"
+        :is-editing="isEditing"
+        :tyyppi="MAARAYSDOKUMENTTI"
+        yksittainen
+      />
     </b-form-group>
 
-    <b-form-group :label="$t('muutosmaarayksen-nimi') + isRequired" class="mt-4 w-40">
-      <ep-input v-model="model.nimi" :isEditing="isEditing"/>
+    <b-form-group
+      :label="$t('muutosmaarayksen-nimi') + isRequired"
+      class="mt-4 w-40"
+    >
+      <ep-input
+        v-model="model.nimi"
+        :is-editing="isEditing"
+      />
     </b-form-group>
 
-    <b-form-group :label="$t('asiasana')" class="mt-4">
-      <EpMaaraysAsiasanat v-model="model.asiasanat[kieli].asiasana" :asiasanat="kielenAsiasanat" :isEditing="isEditing"/>
+    <b-form-group
+      :label="$t('asiasana')"
+      class="mt-4"
+    >
+      <EpMaaraysAsiasanat
+        v-model="model.asiasanat[kieli].asiasana"
+        :asiasanat="kielenAsiasanat"
+        :is-editing="isEditing"
+      />
     </b-form-group>
 
-    <b-form-group :label="$t('kuvaus')" class="mt-4">
-      <ep-content v-model="model.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
+    <b-form-group
+      :label="$t('kuvaus')"
+      class="mt-4"
+    >
+      <ep-content
+        v-model="model.kuvaus"
+        layout="simplified_w_links"
+        :is-editable="isEditing"
+      />
     </b-form-group>
 
     <b-form-group class="mt-4">
       <template #label>
         <div class="d-flex">
-          <span>{{$t('liitteet') + ' (pdf)'}}</span>
-          <EpInfoPopover class="ml-2" unique-id="12">{{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}</EpInfoPopover>
+          <span>{{ $t('liitteet') + ' (pdf)' }}</span>
+          <EpInfoPopover
+            class="ml-2"
+            unique-id="12"
+          >
+            {{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}
+          </EpInfoPopover>
         </div>
       </template>
-      <EpMaaraysLiitteet v-model="model.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
+      <EpMaaraysLiitteet
+        v-model="model.liitteet[kieli].liitteet"
+        :is-editing="isEditing"
+        :tyyppi="LIITE"
+        nimisyote
+      />
     </b-form-group>
 
-    <hr class="my-4"/>
+    <hr class="my-4">
 
-    <h3>{{$t('muutosmaarayksen-kieliversioiden-yhteiset-tiedot')}}</h3>
+    <h3>{{ $t('muutosmaarayksen-kieliversioiden-yhteiset-tiedot') }}</h3>
 
-    <b-form-group :label="$t('muutosmaarays-astuu-voimaan') + isRequired" class="mt-4 d-flex">
-      <ep-datepicker v-model="model.voimassaoloAlkaa" :isEditing="isEditing" />
+    <b-form-group
+      :label="$t('muutosmaarays-astuu-voimaan') + isRequired"
+      class="mt-4 d-flex"
+    >
+      <ep-datepicker
+        v-model="model.voimassaoloAlkaa"
+        :is-editing="isEditing"
+      />
     </b-form-group>
 
-    <b-form-group :label="$t('muutosmaarayksen-diaarinumero') + isRequired" class="mt-4 w-40">
-      <ep-input v-model="model.diaarinumero" :isEditing="isEditing" type="string"/>
+    <b-form-group
+      :label="$t('muutosmaarayksen-diaarinumero') + isRequired"
+      class="mt-4 w-40"
+    >
+      <ep-input
+        v-model="model.diaarinumero"
+        :is-editing="isEditing"
+        type="string"
+      />
     </b-form-group>
 
-    <b-form-group :label="$t('maarays-annettu') + isRequired" class="mt-4 d-flex">
-      <ep-datepicker v-model="model.maarayspvm" :isEditing="isEditing" />
+    <b-form-group
+      :label="$t('maarays-annettu') + isRequired"
+      class="mt-4 d-flex"
+    >
+      <ep-datepicker
+        v-model="model.maarayspvm"
+        :is-editing="isEditing"
+      />
     </b-form-group>
 
-    <b-form-group :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired" class="mt-4">
+    <b-form-group
+      :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired"
+      class="mt-4"
+    >
       <EpMaaraysLiittyyMuuttaaValinta
-      v-model="model"
-      :isEditing="isEditing"
-      :maarayksetNimella="maarayksetNimella"
-      :disabloidutValinnat="disabloidutMuuttaaValinnat"/>
+        v-model="model"
+        :is-editing="isEditing"
+        :maaraykset-nimella="maarayksetNimella"
+        :disabloidut-valinnat="disabloidutMuuttaaValinnat"
+      />
     </b-form-group>
-
   </div>
 </template>
 
