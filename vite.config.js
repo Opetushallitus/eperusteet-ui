@@ -25,6 +25,14 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env.BUILD': JSON.stringify(env.BUILD), // Define the BUILD environment variable
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          quietDeps: true,
+          silenceDeprecations: ['legacy-js-api', 'import'],
+        },
+      },
+    },
     resolve: {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {

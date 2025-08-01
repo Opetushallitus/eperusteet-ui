@@ -2,35 +2,45 @@
   <b-modal
     ref="tutkinnonosatModal"
     size="xl"
-    :cancelTitle="$t('peruuta')">
-
+    :cancel-title="$t('peruuta')"
+  >
     <template #modal-header>
-      <h2 >{{ $t('liita-tutkinnon-osia-ryhmaan') }}</h2>
+      <h2>{{ $t('liita-tutkinnon-osia-ryhmaan') }}</h2>
     </template>
 
     <template #modal-footer>
       <div class="d-flex justify-content-end w-100">
-        <ep-button @click="cancel" variant="link">
-          {{$t('peruuta')}}
+        <ep-button
+          variant="link"
+          @click="cancel"
+        >
+          {{ $t('peruuta') }}
         </ep-button>
         <ep-button @click="save">
-          {{$t('liita-valitut-tutkinnon-osat')}}
+          {{ $t('liita-valitut-tutkinnon-osat') }}
         </ep-button>
       </div>
     </template>
 
     <template #default>
-
-      <ep-search v-model="queryTutkinnonOsa" :placeholder="$t('etsi-tutkinnon-osaa')" />
+      <ep-search
+        v-model="queryTutkinnonOsa"
+        :placeholder="$t('etsi-tutkinnon-osaa')"
+      />
       <div class="ml-1 mt-1">
-        <ep-toggle v-model="showUnusedTutkinnonOsat" :isSWitch="false">
+        <ep-toggle
+          v-model="showUnusedTutkinnonOsat"
+          :is-s-witch="false"
+        >
           <span class="noselect">
             {{ $t('nayta-kayttamattomat') }}
           </span>
         </ep-toggle>
       </div>
 
-      <div class="font-weight-600 mt-4">{{$t('valittu')}} {{selected.length}} {{$t('kpl')}}</div>
+      <div class="font-weight-600 mt-4">
+        {{ $t('valittu') }} {{ selected.length }} {{ $t('kpl') }}
+      </div>
       <b-table
         striped
         responsive
@@ -42,22 +52,33 @@
         :items="items"
         :fields="fields"
         :selectable="true"
-        @row-selected="onRowSelected"
         select-mode="single"
-        selected-variant=''>
-
-        <template v-slot:cell(nimi)="{ item }">
-          <EpMaterialIcon v-if="item.selected" class="checked mr-2">check_box</EpMaterialIcon>
-          <EpMaterialIcon v-else class="checked mr-2">check_box_outline_blank</EpMaterialIcon>
+        selected-variant=""
+        @row-selected="onRowSelected"
+      >
+        <template #cell(nimi)="{ item }">
+          <EpMaterialIcon
+            v-if="item.selected"
+            class="checked mr-2"
+          >
+            check_box
+          </EpMaterialIcon>
+          <EpMaterialIcon
+            v-else
+            class="checked mr-2"
+          >
+            check_box_outline_blank
+          </EpMaterialIcon>
           {{ $kaanna(item.nimi) }}
         </template>
       </b-table>
       <b-pagination
-          v-model="sivu"
-          :total-rows="items.length"
-          :per-page="10"
-          aria-controls="tutkinnonosat"
-          align="center" />
+        v-model="sivu"
+        :total-rows="items.length"
+        :per-page="10"
+        aria-controls="tutkinnonosat"
+        align="center"
+      />
     </template>
   </b-modal>
 </template>

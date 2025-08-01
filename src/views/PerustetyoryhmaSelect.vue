@@ -1,12 +1,14 @@
 <template>
   <div>
     <div v-if="tyoryhmat && tyoryhmat.length > 0">
-      <EpMultiSelect v-model="inner"
-                     v-if="isEditing"
-                     :placeholder="$t('valitse-tyoryhma')"
-                     :search-identity="tyoryhmaSearchIdentity"
-                     :options="tyoryhmat"
-                     :clear-on-select="true">
+      <EpMultiSelect
+        v-if="isEditing"
+        v-model="inner"
+        :placeholder="$t('valitse-tyoryhma')"
+        :search-identity="tyoryhmaSearchIdentity"
+        :options="tyoryhmat"
+        :clear-on-select="true"
+      >
         <template #singleLabel="{ option }">
           {{ $kaanna(option.nimi) }}
         </template>
@@ -18,7 +20,10 @@
         {{ $kaanna(inner.nimi) }}
       </div>
     </div>
-    <EpSpinner v-else :small="true"/>
+    <EpSpinner
+      v-else
+      :small="true"
+    />
   </div>
 </template>
 

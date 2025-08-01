@@ -1,11 +1,22 @@
 <template>
-  <div class="home-container minfull" sticky-container>
+  <div
+    class="home-container minfull"
+    sticky-container
+  >
     <EpTestiymparisto />
 
     <div class="view-container">
-      <div class="header" ref="header">
-        <EpNavbar :kayttaja="kayttaja" :sovellusOikeudet="sovellusOikeudet" :logoutHref="logoutHref" :sticky="routeStickyNavi"/>
-        <div id="headerExtension"/>
+      <div
+        ref="header"
+        class="header"
+      >
+        <EpNavbar
+          :kayttaja="kayttaja"
+          :sovellus-oikeudet="sovellusOikeudet"
+          :logout-href="logoutHref"
+          :sticky="routeStickyNavi"
+        />
+        <div id="headerExtension" />
       </div>
       <RouterView />
     </div>

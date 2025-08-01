@@ -1,22 +1,44 @@
 <template>
   <div>
-    <EpToggle v-model="liittyyMuutosmaarays" :isSWitch="false">
-      {{$t('julkaisuun-liittyy-muutosmaarays')}}
+    <EpToggle
+      v-model="liittyyMuutosmaarays"
+      :is-s-witch="false"
+    >
+      {{ $t('julkaisuun-liittyy-muutosmaarays') }}
     </EpToggle>
 
-    <b-form-group class="mt-4" :label="$t('muutosmaarays')" v-if="liittyyMuutosmaarays">
-      <div class="ei-muutosmaarayksia p-3" v-if="muutosmaaraykset && muutosmaaraykset.length === 0">
+    <b-form-group
+      v-if="liittyyMuutosmaarays"
+      class="mt-4"
+      :label="$t('muutosmaarays')"
+    >
+      <div
+        v-if="muutosmaaraykset && muutosmaaraykset.length === 0"
+        class="ei-muutosmaarayksia p-3"
+      >
         <EpMaterialIcon>info</EpMaterialIcon>
-        {{$t('muutosmaarayksia-ei-loytynyt')}} {{$t('voit-lisata-muutosmaarayksia')}}
-        <router-link :to="{name: 'perusteenTiedot'}">{{$t('perusteen-tiedoista')}}</router-link>
+        {{ $t('muutosmaarayksia-ei-loytynyt') }} {{ $t('voit-lisata-muutosmaarayksia') }}
+        <router-link :to="{name: 'perusteenTiedot'}">
+          {{ $t('perusteen-tiedoista') }}
+        </router-link>
       </div>
 
       <ep-multi-select
         v-if="muutosmaaraykset && muutosmaaraykset.length > 0"
-        class="w-50" v-model="julkaisu.muutosmaarays" :options="muutosmaaraykset" track-by="id">
-        <template v-slot:singleLabel="{ option }">{{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )</template>
-        <template v-slot:option="{ option }">{{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )</template>
-        <template v-slot:tag="{ option }">{{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )</template>
+        v-model="julkaisu.muutosmaarays"
+        class="w-50"
+        :options="muutosmaaraykset"
+        track-by="id"
+      >
+        <template #singleLabel="{ option }">
+          {{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )
+        </template>
+        <template #option="{ option }">
+          {{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )
+        </template>
+        <template #tag="{ option }">
+          {{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )
+        </template>
       </ep-multi-select>
     </b-form-group>
   </div>

@@ -1,35 +1,53 @@
 <template>
   <div v-if="!isInitializing && store">
     <EpEditointi :store="store">
-      <template v-slot:header>
-        <h2 class="m-0">{{ $t('oppaan-tiedot') }}</h2>
+      <template #header>
+        <h2 class="m-0">
+          {{ $t('oppaan-tiedot') }}
+        </h2>
       </template>
-      <template v-slot:default="{ data, isEditing, validation }">
+      <template #default="{ data, isEditing, validation }">
         <h3>{{ $t('perustiedot') }}</h3>
         <b-container fluid>
           <b-row no-gutters>
             <b-col lg="6">
               <b-form-group :label="$t('oppaan-nimi')+'*'">
-                <ep-input v-model="data.peruste.nimi"
-                          type="localized"
-                          :is-editing="isEditing"
-                          :validation="validation.peruste.nimi"></ep-input>
+                <ep-input
+                  v-model="data.peruste.nimi"
+                  type="localized"
+                  :is-editing="isEditing"
+                  :validation="validation.peruste.nimi"
+                />
               </b-form-group>
             </b-col>
             <b-col lg="6">
               <b-form-group :label="$t('opastyoryhma')+'*'">
-                <perustetyoryhma-select v-model="data.ryhmaOid"
-                                        :ulkopuoliset-store="ulkopuolisetStore"
-                                        :is-editing="isEditing" />
+                <perustetyoryhma-select
+                  v-model="data.ryhmaOid"
+                  :ulkopuoliset-store="ulkopuolisetStore"
+                  :is-editing="isEditing"
+                />
               </b-form-group>
             </b-col>
           </b-row>
 
-          <b-row no-gutters class="mt-4" v-if="oppaanTyyppiTietoaPalvelusta || isEditing">
+          <b-row
+            v-if="oppaanTyyppiTietoaPalvelusta || isEditing"
+            no-gutters
+            class="mt-4"
+          >
             <b-col lg="6">
               <b-form-group :label="$t('sisallonhallinta')">
-                <b-form-checkbox-group v-if="isEditing" v-model="oppaanTyyppi" stacked>
-                  <b-form-checkbox v-for="tyyppi in oppaanTyypit" :key="tyyppi" :value="tyyppi">
+                <b-form-checkbox-group
+                  v-if="isEditing"
+                  v-model="oppaanTyyppi"
+                  stacked
+                >
+                  <b-form-checkbox
+                    v-for="tyyppi in oppaanTyypit"
+                    :key="tyyppi"
+                    :value="tyyppi"
+                  >
                     {{ $t('oppaan-tyyppi-' + tyyppi) }}
                   </b-form-checkbox>
                 </b-form-checkbox-group>
@@ -38,95 +56,177 @@
                 </div>
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="oppaanTyyppiTietoaPalvelusta">
+            <b-col
+              v-if="oppaanTyyppiTietoaPalvelusta"
+              lg="6"
+            >
               <b-form-group :label="$t('tietoa-palvelusta-etusivu-teksti')">
-                <ep-content v-model="data.peruste.tietoapalvelustaKuvaus" layout="simplified" :is-editable="isEditing"/>
+                <ep-content
+                  v-model="data.peruste.tietoapalvelustaKuvaus"
+                  layout="simplified"
+                  :is-editable="isEditing"
+                />
               </b-form-group>
             </b-col>
           </b-row>
 
-          <b-row no-gutters class="mt-4">
-             <b-col lg="6">
-              <b-form-group :label="$t('koulutustyyppi')" class="pr-5">
-                <EpMultiListSelect v-model="data.peruste.oppaanKoulutustyypit"
-                           :is-editing="isEditing"
-                           :items="koulutustyypit"
-                           :required="false">
+          <b-row
+            no-gutters
+            class="mt-4"
+          >
+            <b-col lg="6">
+              <b-form-group
+                :label="$t('koulutustyyppi')"
+                class="pr-5"
+              >
+                <EpMultiListSelect
+                  v-model="data.peruste.oppaanKoulutustyypit"
+                  :is-editing="isEditing"
+                  :items="koulutustyypit"
+                  :required="false"
+                >
                   <template #singleLabel="{ option }">
                     <span class="text-nowrap">
-                      <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
+                      <EpColorIndicator
+                        :size="10"
+                        :kind="ktToRyhma(option.value)"
+                      />
                       <span class="ml-2">{{ option.text }}</span>
                     </span>
                   </template>
                   <template #option="{ option }">
                     <span class="text-nowrap">
-                      <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
+                      <EpColorIndicator
+                        :size="10"
+                        :kind="ktToRyhma(option.value)"
+                      />
                       <span class="ml-2">{{ option.text }}</span>
                     </span>
                   </template>
                   <template #lisaaTeksti>
-                    {{$t('lisaa-koulutus-tutkintotyyppi')}}
+                    {{ $t('lisaa-koulutus-tutkintotyyppi') }}
                   </template>
                 </EpMultiListSelect>
-                <span class="asettamatta" v-if="!isEditing && (!data.peruste.oppaanKoulutustyypit || data.peruste.oppaanKoulutustyypit.length === 0)">{{$t('ei-asetettu')}}</span>
+                <span
+                  v-if="!isEditing && (!data.peruste.oppaanKoulutustyypit || data.peruste.oppaanKoulutustyypit.length === 0)"
+                  class="asettamatta"
+                >{{ $t('ei-asetettu') }}</span>
               </b-form-group>
-             </b-col>
+            </b-col>
 
-             <b-col lg="6">
-              <b-form-group :label="$t('peruste')" class="pr-5">
-                <EpMultiListSelect v-model="data.peruste.oppaanPerusteet"
-                           :is-editing="isEditing"
-                           :items="perusteet"
-                           :required="false">
+            <b-col lg="6">
+              <b-form-group
+                :label="$t('peruste')"
+                class="pr-5"
+              >
+                <EpMultiListSelect
+                  v-model="data.peruste.oppaanPerusteet"
+                  :is-editing="isEditing"
+                  :items="perusteet"
+                  :required="false"
+                >
                   <template #lisaaTeksti>
-                    {{$t('lisaa-peruste')}}
+                    {{ $t('lisaa-peruste') }}
                   </template>
                 </EpMultiListSelect>
-                <span class="asettamatta" v-if="!isEditing && (!data.peruste.oppaanPerusteet || data.peruste.oppaanPerusteet.length === 0)">{{$t('ei-asetettu')}}</span>
+                <span
+                  v-if="!isEditing && (!data.peruste.oppaanPerusteet || data.peruste.oppaanPerusteet.length === 0)"
+                  class="asettamatta"
+                >{{ $t('ei-asetettu') }}</span>
               </b-form-group>
-             </b-col>
+            </b-col>
           </b-row>
 
-          <b-row no-gutters class="mt-4">
+          <b-row
+            no-gutters
+            class="mt-4"
+          >
             <b-col lg="6">
               <b-form-group :label="$t('oppaan-kielet')">
-                <b-form-checkbox-group v-if="isEditing" v-model="data.peruste.kielet" stacked>
-                  <b-form-checkbox v-for="kieli in kielet" :key="kieli" :value="kieli">
+                <b-form-checkbox-group
+                  v-if="isEditing"
+                  v-model="data.peruste.kielet"
+                  stacked
+                >
+                  <b-form-checkbox
+                    v-for="kieli in kielet"
+                    :key="kieli"
+                    :value="kieli"
+                  >
                     {{ $t(kieli) }}
                   </b-form-checkbox>
                 </b-form-checkbox-group>
-                <div v-else class="text-nowrap">
-                  <span v-for="(kieli, idx) in data.peruste.kielet" :key="kieli" :value="kieli">
-                    {{ $t(kieli) }}<span class="mr-0" v-if="idx < data.peruste.kielet.length - 1">,</span>
+                <div
+                  v-else
+                  class="text-nowrap"
+                >
+                  <span
+                    v-for="(kieli, idx) in data.peruste.kielet"
+                    :key="kieli"
+                    :value="kieli"
+                  >
+                    {{ $t(kieli) }}<span
+                      v-if="idx < data.peruste.kielet.length - 1"
+                      class="mr-0"
+                    >,</span>
                   </span>
-                  <span class="asettamatta" v-if="!isEditing && (!data.peruste.kielet || data.peruste.kielet.length === 0)">{{$t('ei-asetettu')}}</span>
+                  <span
+                    v-if="!isEditing && (!data.peruste.kielet || data.peruste.kielet.length === 0)"
+                    class="asettamatta"
+                  >{{ $t('ei-asetettu') }}</span>
                 </div>
               </b-form-group>
             </b-col>
 
-            <b-col lg="6" v-if="!oppaanTyyppiTietoaPalvelusta">
+            <b-col
+              v-if="!oppaanTyyppiTietoaPalvelusta"
+              lg="6"
+            >
               <b-form-group :label="$t('voimassaolo')">
-              <div class="asettamatta" v-if="!data.peruste.voimassaoloAlkaa && !data.peruste.voimassaoloLoppuu && !isEditing">
-                {{$t('ei-asetettu')}}
-              </div>
-              <div v-else class="d-flex align-items-center">
-                <ep-datepicker v-model="data.peruste.voimassaoloAlkaa" :is-editing="isEditing"/>
-                <div class="ml-2 mr-2">-</div>
-                <ep-datepicker v-model="data.peruste.voimassaoloLoppuu" :is-editing="isEditing"/>
-              </div>
-            </b-form-group>
+                <div
+                  v-if="!data.peruste.voimassaoloAlkaa && !data.peruste.voimassaoloLoppuu && !isEditing"
+                  class="asettamatta"
+                >
+                  {{ $t('ei-asetettu') }}
+                </div>
+                <div
+                  v-else
+                  class="d-flex align-items-center"
+                >
+                  <ep-datepicker
+                    v-model="data.peruste.voimassaoloAlkaa"
+                    :is-editing="isEditing"
+                  />
+                  <div class="ml-2 mr-2">
+                    -
+                  </div>
+                  <ep-datepicker
+                    v-model="data.peruste.voimassaoloLoppuu"
+                    :is-editing="isEditing"
+                  />
+                </div>
+              </b-form-group>
             </b-col>
           </b-row>
 
           <b-row>
             <b-col>
-              <EpEsikatselu opas v-model="storeData" :is-editing="isEditing" />
+              <EpEsikatselu
+                v-model="storeData"
+                opas
+                :is-editing="isEditing"
+              />
             </b-col>
           </b-row>
           <b-row>
             <b-col v-if="!isEditing">
               <b-form-group :label="$t('oppaan-lataus')">
-                <ep-button variant="primary" @click="lataa">{{ $t('lataa-opas-json') }}</ep-button>
+                <ep-button
+                  variant="primary"
+                  @click="lataa"
+                >
+                  {{ $t('lataa-opas-json') }}
+                </ep-button>
               </b-form-group>
             </b-col>
           </b-row>
@@ -135,115 +235,124 @@
         <b-container fluid>
           <b-row no-gutters>
             <b-col lg="8">
-              <h3 class="mt-5">{{ $t('oppaan-liittaminen-perusteen-sisaltoihin') }}</h3>
-              <div class="mb-4">{{ $t('oppaan-liittaminen-perusteen-sisaltoihin-kuvaus') }}</div>
+              <h3 class="mt-5">
+                {{ $t('oppaan-liittaminen-perusteen-sisaltoihin') }}
+              </h3>
+              <div class="mb-4">
+                {{ $t('oppaan-liittaminen-perusteen-sisaltoihin-kuvaus') }}
+              </div>
             </b-col>
           </b-row>
         </b-container>
 
         <b-container fluid>
           <template v-if="isEditing || (tutkinnonosaKoodit.length > 0 || osaamisalaKoodit.length > 0)">
-            <h4>{{$t('ammatillinen-koulutus')}}</h4>
-              <b-row no-gutters>
-                <b-col lg="8">
-                  <div class="koodiryhma">
-                    <EpKoodistoSelectTable
-                      v-if="isEditing || tutkinnonosaKoodit.length > 0"
-                      class="mb-4"
-                      :store="tutkinnonOsatKoodisto"
-                      :isEditing="isEditing"
-                      v-model="tutkinnonosaKoodit"
-                      @remove="removeOppaanKoodi">
-                      <template #header>
-                        <h4>{{$t('tutkinnonosat')}}</h4>
-                      </template>
-                      <template #button-text>
-                        <span>{{$t('lisaa-tutkinnon-osa')}}</span>
-                      </template>
-                    </EpKoodistoSelectTable>
-                    <EpKoodistoSelectTable
-                      v-if="isEditing || osaamisalaKoodit.length > 0"
-                      :store="osaamisalaKoodisto"
-                      :isEditing="isEditing"
-                      v-model="osaamisalaKoodit"
-                      @remove="removeOppaanKoodi">
-                      <template #header>
-                        <h4>{{$t('osaamisalat')}}</h4>
-                      </template>
-                      <template #button-text>
-                        <span>{{$t('lisaa-osaamisala')}}</span>
-                      </template>
-                    </EpKoodistoSelectTable>
-                  </div>
-                </b-col>
-              </b-row>
+            <h4>{{ $t('ammatillinen-koulutus') }}</h4>
+            <b-row no-gutters>
+              <b-col lg="8">
+                <div class="koodiryhma">
+                  <EpKoodistoSelectTable
+                    v-if="isEditing || tutkinnonosaKoodit.length > 0"
+                    v-model="tutkinnonosaKoodit"
+                    class="mb-4"
+                    :store="tutkinnonOsatKoodisto"
+                    :is-editing="isEditing"
+                    @remove="removeOppaanKoodi"
+                  >
+                    <template #header>
+                      <h4>{{ $t('tutkinnonosat') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-tutkinnon-osa') }}</span>
+                    </template>
+                  </EpKoodistoSelectTable>
+                  <EpKoodistoSelectTable
+                    v-if="isEditing || osaamisalaKoodit.length > 0"
+                    v-model="osaamisalaKoodit"
+                    :store="osaamisalaKoodisto"
+                    :is-editing="isEditing"
+                    @remove="removeOppaanKoodi"
+                  >
+                    <template #header>
+                      <h4>{{ $t('osaamisalat') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-osaamisala') }}</span>
+                    </template>
+                  </EpKoodistoSelectTable>
+                </div>
+              </b-col>
+            </b-row>
           </template>
 
           <template v-if="isEditing || oppiaineKoodit.length > 0">
-            <h4>{{$t('lukiokoulutus')}}</h4>
+            <h4>{{ $t('lukiokoulutus') }}</h4>
 
             <b-row no-gutters>
               <b-col lg="8">
                 <div class="koodiryhma">
-                <EpKoodistoSelectTable
-                  :store="oppiaineKoodisto"
-                  :isEditing="isEditing"
-                  v-model="oppiaineKoodit"
-                  @remove="removeOppaanKoodi"
-                  :showKoodiArvo="false">
-                  <template #header>
-                    <h4>{{$t('oppiaineet')}}</h4>
-                  </template>
-                  <template #button-text>
-                    <span>{{$t('lisaa-oppiaine')}}</span>
-                  </template>
-                </EpKoodistoSelectTable>
+                  <EpKoodistoSelectTable
+                    v-model="oppiaineKoodit"
+                    :store="oppiaineKoodisto"
+                    :is-editing="isEditing"
+                    :show-koodi-arvo="false"
+                    @remove="removeOppaanKoodi"
+                  >
+                    <template #header>
+                      <h4>{{ $t('oppiaineet') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-oppiaine') }}</span>
+                    </template>
+                  </EpKoodistoSelectTable>
                 </div>
               </b-col>
             </b-row>
           </template>
 
           <template v-if="isEditing || opintokokonaisuusKoodit.length > 0">
-            <h4>{{$t('vapaa-sivistystyo')}}</h4>
+            <h4>{{ $t('vapaa-sivistystyo') }}</h4>
 
             <b-row no-gutters>
               <b-col lg="8">
                 <div class="koodiryhma">
-                <EpKoodistoSelectTable
-                  :store="opintokokonaisuusKoodisto"
-                  :isEditing="isEditing"
-                  v-model="opintokokonaisuusKoodit"
-                  @remove="removeOppaanKoodi"
-                  :showKoodiArvo="false">
-                  <template #header>
-                    <h4>{{$t('opintokokonaisuudet')}}</h4>
-                  </template>
-                  <template #button-text>
-                    <span>{{$t('lisaa-opintokokonaisuus')}}</span>
-                  </template>
-                </EpKoodistoSelectTable>
+                  <EpKoodistoSelectTable
+                    v-model="opintokokonaisuusKoodit"
+                    :store="opintokokonaisuusKoodisto"
+                    :is-editing="isEditing"
+                    :show-koodi-arvo="false"
+                    @remove="removeOppaanKoodi"
+                  >
+                    <template #header>
+                      <h4>{{ $t('opintokokonaisuudet') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-opintokokonaisuus') }}</span>
+                    </template>
+                  </EpKoodistoSelectTable>
                 </div>
               </b-col>
             </b-row>
           </template>
 
           <template v-if="isEditing || koulutuksenosaKoodit.length > 0">
-            <h4>{{$t('tutkintokoulutukseen-valmentava-koulutus')}}</h4>
+            <h4>{{ $t('tutkintokoulutukseen-valmentava-koulutus') }}</h4>
 
             <b-row no-gutters>
               <b-col lg="8">
                 <div class="koodiryhma">
                   <EpKoodistoSelectTable
-                    :store="koulutuksenosaKoodisto"
-                    :isEditing="isEditing"
                     v-model="koulutuksenosaKoodit"
+                    :store="koulutuksenosaKoodisto"
+                    :is-editing="isEditing"
+                    :show-koodi-arvo="false"
                     @remove="removeOppaanKoodi"
-                    :showKoodiArvo="false">
+                  >
                     <template #header>
-                      <h4>{{$t('koulutuksenosat')}}</h4>
+                      <h4>{{ $t('koulutuksenosat') }}</h4>
                     </template>
                     <template #button-text>
-                      <span>{{$t('lisaa-koulutuksenosa')}}</span>
+                      <span>{{ $t('lisaa-koulutuksenosa') }}</span>
                     </template>
                   </EpKoodistoSelectTable>
                 </div>
@@ -251,7 +360,6 @@
             </b-row>
           </template>
         </b-container>
-
       </template>
     </EpEditointi>
   </div>

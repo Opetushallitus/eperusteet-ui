@@ -6,21 +6,27 @@
           <h1>{{ $t('osaamismerkit') }}</h1>
           <div class="d-flex">
             <router-link :to="{ name: 'osaamismerkkikategoriat' }">
-              <EpButton class="m-0 p-0"
-                        variant="link"
-                        icon="edit">
-                {{$t('teemojen-hallinta')}}
+              <EpButton
+                class="m-0 p-0"
+                variant="link"
+                icon="edit"
+              >
+                {{ $t('teemojen-hallinta') }}
               </EpButton>
             </router-link>
-            <EpButton class="m-0 p-0"
-                      variant="outlined"
-                      icon="add"
-                      @click="avaaOsaamismerkkiModal">
-              {{$t('lisaa-osaamismerkki')}}
+            <EpButton
+              class="m-0 p-0"
+              variant="outlined"
+              icon="add"
+              @click="avaaOsaamismerkkiModal"
+            >
+              {{ $t('lisaa-osaamismerkki') }}
             </EpButton>
           </div>
         </div>
-        <div class="mb-1">{{$t('osaamismerkit-kuvaus')}}</div>
+        <div class="mb-1">
+          {{ $t('osaamismerkit-kuvaus') }}
+        </div>
       </template>
 
       <div class="row align-items-end">
@@ -31,21 +37,24 @@
         </div>
         <div class="col-3">
           <EpFormContent name="teema">
-            <EpMultiSelect v-model="kategoria"
-                           :is-editing="true"
-                           :options="osaamismerkkiKategoriaOptions"
-                           :placeholder="$t('kaikki')"
-                           track-by="value"
-                           label="text">
-            </EpMultiSelect>
+            <EpMultiSelect
+              v-model="kategoria"
+              :is-editing="true"
+              :options="osaamismerkkiKategoriaOptions"
+              :placeholder="$t('kaikki')"
+              track-by="value"
+              label="text"
+            />
           </EpFormContent>
         </div>
         <div class="col-3">
           <EpFormContent name="voimassaolo">
-            <EpMultiSelect v-model="voimassaolo"
-                           :is-editing="false"
-                           :options="osaamismerkkiVoimassaolot"
-                           :placeholder="$t('kaikki')">
+            <EpMultiSelect
+              v-model="voimassaolo"
+              :is-editing="false"
+              :options="osaamismerkkiVoimassaolot"
+              :placeholder="$t('kaikki')"
+            >
               <template #singleLabel="{ option }">
                 {{ $t('ajoitus-' + option.toLowerCase()) }}
               </template>
@@ -59,9 +68,12 @@
 
       <div class="row align-items-end">
         <div class="col-4">
-          <EpToggleGroup v-model="tila" :items="osaamismerkkiTilat">
+          <EpToggleGroup
+            v-model="tila"
+            :items="osaamismerkkiTilat"
+          >
             <template #default="{item}">
-              <span>{{$t('tila-' + item.toLowerCase())}}</span>
+              <span>{{ $t('tila-' + item.toLowerCase()) }}</span>
             </template>
           </EpToggleGroup>
         </div>
@@ -69,32 +81,41 @@
 
       <EpSpinner v-if="!osaamismerkitPage" />
       <div v-else-if="totalRows > 0">
-        <b-table responsive
-                 borderless
-                 striped
-                 fixed
-                 hover
-                 no-local-sorting
-                 :items="osaamismerkitFiltered"
-                 :fields="tableFields"
-                 :per-page="perPage"
-                 @row-clicked="avaaOsaamismerkkiModal"/>
+        <b-table
+          responsive
+          borderless
+          striped
+          fixed
+          hover
+          no-local-sorting
+          :items="osaamismerkitFiltered"
+          :fields="tableFields"
+          :per-page="perPage"
+          @row-clicked="avaaOsaamismerkkiModal"
+        />
 
-        <b-pagination v-model="page"
-                      :total-rows="totalRows"
-                      :per-page="perPage"
-                      aria-controls="tiedotteet"
-                      align="center">
-        </b-pagination>
+        <b-pagination
+          v-model="page"
+          :total-rows="totalRows"
+          :per-page="perPage"
+          aria-controls="tiedotteet"
+          align="center"
+        />
       </div>
-      <div v-else class="m-2 alert alert-info">
+      <div
+        v-else
+        class="m-2 alert alert-info"
+      >
         {{ $t('ei-hakutuloksia') }}
       </div>
 
-      <EpOsaamismerkkiModal ref="osaamismerkkiModal" :store="props.osaamismerkitStore"/>
+      <EpOsaamismerkkiModal
+        ref="osaamismerkkiModal"
+        :store="props.osaamismerkitStore"
+      />
     </EpMainView>
   </div>
-  <router-view v-else/>
+  <router-view v-else />
 </template>
 
 <script setup lang="ts">
@@ -154,7 +175,7 @@ const page = computed({
   get: () => osaamismerkitPage.value!.sivu + 1,
   set: (value: number) => {
     sivu.value = value - 1;
-  }
+  },
 });
 
 const osaamismerkitFiltered = computed(() => props.osaamismerkitStore.osaamismerkit.value);

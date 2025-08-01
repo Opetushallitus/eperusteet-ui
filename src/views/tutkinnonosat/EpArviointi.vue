@@ -2,77 +2,144 @@
   <b-form-group>
     <template #label>
       <div>
-        <div v-if="isEditing" class="mb-2">{{$t('ammattitaitovaatimus-tekemisena')}}</div>
-        <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
+        <div
+          v-if="isEditing"
+          class="mb-2"
+        >
+          {{ $t('ammattitaitovaatimus-tekemisena') }}
+        </div>
+        <EpInput
+          v-model="arvioinninKohdeAlue.otsikko"
+          :is-editing="isEditing"
+          :class="{'mb-3': isEditing }"
+        />
       </div>
     </template>
-    <VueDraggable v-bind="defaultDragOptions"
-               tag="div"
-               v-model="arvioinninKohdeAlue.arvioinninKohteet">
-      <div class="ml-3 mt-2 d-flex" v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
-        <div v-if="isEditing" class="order-handle">
+    <VueDraggable
+      v-bind="defaultDragOptions"
+      v-model="arvioinninKohdeAlue.arvioinninKohteet"
+      tag="div"
+    >
+      <div
+        v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet"
+        :key="'arvioinninKohde' + arvindex"
+        class="ml-3 mt-2 d-flex"
+      >
+        <div
+          v-if="isEditing"
+          class="order-handle"
+        >
           <EpMaterialIcon>drag_indicator</EpMaterialIcon>
         </div>
         <div class="w-100">
           <div class="mb-2">
-            <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)">
-              <span v-if="isEditing">{{$t('ryhmittelyotsikko-vapaaehtoinen')}}</span>
-              <span v-if="!isEditing">{{$t('ryhmittelyotsikko')}}</span>
+            <div
+              v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)"
+              class="mb-1 font-weight-600"
+            >
+              <span v-if="isEditing">{{ $t('ryhmittelyotsikko-vapaaehtoinen') }}</span>
+              <span v-if="!isEditing">{{ $t('ryhmittelyotsikko') }}</span>
             </div>
-            <EpInput :isEditing="isEditing" v-model="arvioinninKohde.otsikko" />
+            <EpInput
+              v-model="arvioinninKohde.otsikko"
+              :is-editing="isEditing"
+            />
           </div>
           <div class="mb-3">
-            <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.selite)">{{$t('arvioinnin-kohde')}}</div>
-            <EpInput :isEditing="isEditing" v-model="arvioinninKohde.selite" />
+            <div
+              v-if="isEditing || !!$kaanna(arvioinninKohde.selite)"
+              class="mb-1 font-weight-600"
+            >
+              {{ $t('arvioinnin-kohde') }}
+            </div>
+            <EpInput
+              v-model="arvioinninKohde.selite"
+              :is-editing="isEditing"
+            />
           </div>
 
           <template v-if="!arvioinninKohde._arviointiAsteikko">
-            <div class="font-weight-600">{{$t('arviointi-asteikon-valinta')}}</div>
-            <b-form-radio-group v-model="arvioinninKohde._arviointiAsteikko" stacked @input="arviointiVaihdos(arvioinninKohde)" class="mt-2">
+            <div class="font-weight-600">
+              {{ $t('arviointi-asteikon-valinta') }}
+            </div>
+            <b-form-radio-group
+              v-model="arvioinninKohde._arviointiAsteikko"
+              stacked
+              class="mt-2"
+              @input="arviointiVaihdos(arvioinninKohde)"
+            >
               <b-form-radio
-                class="mt-2"
                 v-for="arviointiasteikko in arviointiasteikot"
+                :key="'arviointiasteikko-' + arviointiasteikko.id"
+                class="mt-2"
                 name="arviointiasteikko"
                 :value="arviointiasteikko.id"
-                :key="'arviointiasteikko-' + arviointiasteikko.id">
-
-              <span v-for="(osaamistaso, index) in arviointiasteikko.osaamistasot" :key="'osaamistaso' + osaamistaso.id">
-                <span v-if="index > 0"> / </span>
-                {{$kaanna(osaamistaso.otsikko)}}
-              </span>
-
+              >
+                <span
+                  v-for="(osaamistaso, index) in arviointiasteikko.osaamistasot"
+                  :key="'osaamistaso' + osaamistaso.id"
+                >
+                  <span v-if="index > 0"> / </span>
+                  {{ $kaanna(osaamistaso.otsikko) }}
+                </span>
               </b-form-radio>
             </b-form-radio-group>
           </template>
 
           <template v-else>
             <OsaamistasonKriteeri
-              class="mb-3 ml-0 p-1 taulukko-rivi-varitys"
               v-for="(osaamistasonkriteeri, osaamistasoIndex) in arvioinninKohde.osaamistasonKriteerit"
               :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso"
               v-model="arvioinninKohde.osaamistasonKriteerit[osaamistasoIndex]"
-              :isEditing="isEditing"
+              class="mb-3 ml-0 p-1 taulukko-rivi-varitys"
+              :is-editing="isEditing"
               :arviointiasteikko="arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko]"
             />
           </template>
 
-          <div class="d-flex mb-2 mt-4" :class="{'justify-content-end' : !arvioinninKohde._arviointiAsteikko, 'justify-content-between': arvioinninKohde._arviointiAsteikko}">
-            <EpButton v-if="isEditing && arvioinninKohde._arviointiAsteikko" variant="link" icon="refresh" @click="poistaArviointiasteikko(arvioinninKohde)">
-              {{$t('vaihda-arviointiasteikko')}}
+          <div
+            class="d-flex mb-2 mt-4"
+            :class="{'justify-content-end' : !arvioinninKohde._arviointiAsteikko, 'justify-content-between': arvioinninKohde._arviointiAsteikko}"
+          >
+            <EpButton
+              v-if="isEditing && arvioinninKohde._arviointiAsteikko"
+              variant="link"
+              icon="refresh"
+              @click="poistaArviointiasteikko(arvioinninKohde)"
+            >
+              {{ $t('vaihda-arviointiasteikko') }}
             </EpButton>
 
-            <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohde(arvioinninKohde)">
-              {{$t('poista-ryhmittelyotsikko')}}
+            <EpButton
+              v-if="isEditing"
+              variant="link"
+              icon="delete"
+              @click="poistaArvioinninKohde(arvioinninKohde)"
+            >
+              {{ $t('poista-ryhmittelyotsikko') }}
             </EpButton>
           </div>
 
-          <hr v-if="arvindex < arvioinninKohdeAlue.arvioinninKohteet.length - 1" class="mb-2"/>
+          <hr
+            v-if="arvindex < arvioinninKohdeAlue.arvioinninKohteet.length - 1"
+            class="mb-2"
+          >
         </div>
       </div>
     </VueDraggable>
-    <hr v-if="isEditing" class="mb-2"/>
+    <hr
+      v-if="isEditing"
+      class="mb-2"
+    >
     <div class="d-flex justify-content-between">
-      <EpButton v-if="isEditing" variant="outline" icon="add" @click="lisaaArvionninkohde">{{$t('lisaa-ryhmittelyotsikko')}}</EpButton>
+      <EpButton
+        v-if="isEditing"
+        variant="outline"
+        icon="add"
+        @click="lisaaArvionninkohde"
+      >
+        {{ $t('lisaa-ryhmittelyotsikko') }}
+      </EpButton>
       <slot name="poisto" />
     </div>
   </b-form-group>

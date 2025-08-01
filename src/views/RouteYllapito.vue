@@ -14,55 +14,120 @@
           show-empty
           :empty-text="$t('ei-sisaltoa')"
           :items="yllapitoTiedot"
-          :fields="fields">
-
-          <template v-slot:cell(kuvaus)="data">
-            <ep-input v-model="data.item.kuvaus"/>
+          :fields="fields"
+        >
+          <template #cell(kuvaus)="data">
+            <ep-input v-model="data.item.kuvaus" />
           </template>
 
-          <template v-slot:cell(key)="data">
-            <ep-input v-model="data.item.key" :is-editing="false" />
+          <template #cell(key)="data">
+            <ep-input
+              v-model="data.item.key"
+              :is-editing="false"
+            />
           </template>
 
-          <template v-slot:cell(value)="data">
-            <ep-toggle v-model="data.item.value" :is-editing="isEditing" v-if="isBoolean(data.item.value)"/>
-            <ep-input type="string" v-model="data.item.value" :is-editing="isEditing" v-else/>
+          <template #cell(value)="data">
+            <ep-toggle
+              v-if="isBoolean(data.item.value)"
+              v-model="data.item.value"
+              :is-editing="isEditing"
+            />
+            <ep-input
+              v-else
+              v-model="data.item.value"
+              type="string"
+              :is-editing="isEditing"
+            />
           </template>
-
         </b-table>
       </div>
       <div v-if="!isEditing">
-        <ep-button variant="primary ml-2" @click="onEdit()">{{ $t('muokkaa') }}</ep-button>
+        <ep-button
+          variant="primary ml-2"
+          @click="onEdit()"
+        >
+          {{ $t('muokkaa') }}
+        </ep-button>
       </div>
-      <div v-else class="d-flex justify-content-between">
+      <div
+        v-else
+        class="d-flex justify-content-between"
+      >
         <div>
-          <ep-button class="ml-2" variant="primary" @click="onSave()" :disabled="v$.$invalid">{{ $t('tallenna') }}</ep-button>
+          <ep-button
+            class="ml-2"
+            variant="primary"
+            :disabled="v$.$invalid"
+            @click="onSave()"
+          >
+            {{ $t('tallenna') }}
+          </ep-button>
         </div>
       </div>
-      <hr class="my-4"/>
+      <hr class="my-4">
     </template>
 
-    <h2 class="mt-5">{{ $t('julkisivun-perusteiden-jarjestys') }}</h2>
-    <EpButton @click="muokkaaPerusteidenJarjestysta" v-if="!isEditingPerusteJarjestys">{{ $t('muokkaa')}}</EpButton>
-    <EpButton @click="peruuta" v-if="isEditingPerusteJarjestys" link>{{ $t('peruuta')}}</EpButton>
-    <EpButton @click="tallenna" v-if="isEditingPerusteJarjestys">{{ $t('tallenna')}}</EpButton>
-    <EpSpinner v-if="!julkisivunPerusteetRyhmiteltyna"/>
-    <div v-for="perusteRyhma in julkisivunPerusteetRyhmiteltyna" :key="perusteRyhma.ryhma">
-      <h3 class="mt-4">{{ $t(perusteRyhma.ryhma) }}</h3>
-      <EpBalloonList v-model="perusteRyhma.perusteet" :isEditing="isEditingPerusteJarjestys" sortable>
-        <template v-slot:default="{ item }">
+    <h2 class="mt-5">
+      {{ $t('julkisivun-perusteiden-jarjestys') }}
+    </h2>
+    <EpButton
+      v-if="!isEditingPerusteJarjestys"
+      @click="muokkaaPerusteidenJarjestysta"
+    >
+      {{ $t('muokkaa') }}
+    </EpButton>
+    <EpButton
+      v-if="isEditingPerusteJarjestys"
+      link
+      @click="peruuta"
+    >
+      {{ $t('peruuta') }}
+    </EpButton>
+    <EpButton
+      v-if="isEditingPerusteJarjestys"
+      @click="tallenna"
+    >
+      {{ $t('tallenna') }}
+    </EpButton>
+    <EpSpinner v-if="!julkisivunPerusteetRyhmiteltyna" />
+    <div
+      v-for="perusteRyhma in julkisivunPerusteetRyhmiteltyna"
+      :key="perusteRyhma.ryhma"
+    >
+      <h3 class="mt-4">
+        {{ $t(perusteRyhma.ryhma) }}
+      </h3>
+      <EpBalloonList
+        v-model="perusteRyhma.perusteet"
+        :is-editing="isEditingPerusteJarjestys"
+        sortable
+      >
+        <template #default="{ item }">
           <div class="d-flex w-100 justify-content-between">
             <div>{{ $kaanna(item.nimi) }}</div>
-            <EpToggle v-model="item.piilotaJulkisivulta" :isEditing="isEditingPerusteJarjestys"> {{ $t('piilota-julkisivulta') }}</EpToggle>
+            <EpToggle
+              v-model="item.piilotaJulkisivulta"
+              :is-editing="isEditingPerusteJarjestys"
+            >
+              {{ $t('piilota-julkisivulta') }}
+            </EpToggle>
           </div>
         </template>
       </EpBalloonList>
     </div>
 
-    <hr/>
+    <hr>
 
-    <h2 class="mb-5">{{ $t('muut-toimenpiteet') }}</h2>
-    <EpButton @click="amosaaKoulutustoimijaPaivitys()" :showSpinner="amosaaKtPaivitysLoading">{{$t('paivita-amosaa-koulutustoimijat')}}</EpButton>
+    <h2 class="mb-5">
+      {{ $t('muut-toimenpiteet') }}
+    </h2>
+    <EpButton
+      :show-spinner="amosaaKtPaivitysLoading"
+      @click="amosaaKoulutustoimijaPaivitys()"
+    >
+      {{ $t('paivita-amosaa-koulutustoimijat') }}
+    </EpButton>
   </ep-main-view>
 </template>
 

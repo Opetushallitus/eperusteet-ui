@@ -1,22 +1,39 @@
 <template>
   <EpMainView>
     <b-container>
-      <EpSteps :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel">
-
-        <template v-slot:pohja>
-
+      <EpSteps
+        :steps="steps"
+        :initial-step="0"
+        :on-save="onSave"
+        @cancel="onCancel"
+      >
+        <template #pohja>
           <div class="row">
-            <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
+            <legend class="col-form-label col-sm-2">
+              {{ $t('kayta-pohjana') }}
+            </legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
-                <b-form-radio class="p-2" v-model="tyyppi" value="pohjasta" name="tyyppi" :disabled="!pohjat || pohjat.length === 0">{{ $t('toista-pohjaa') }}</b-form-radio>
-                <div v-if="tyyppi === 'pohjasta'" class="ml-2">
+                <b-form-radio
+                  v-model="tyyppi"
+                  class="p-2"
+                  value="pohjasta"
+                  name="tyyppi"
+                  :disabled="!pohjat || pohjat.length === 0"
+                >
+                  {{ $t('toista-pohjaa') }}
+                </b-form-radio>
+                <div
+                  v-if="tyyppi === 'pohjasta'"
+                  class="ml-2"
+                >
                   <EpMultiSelect
                     v-if="pohjat"
                     v-model="data.pohja"
                     :placeholder="$t('valitse-pohja')"
                     :is-editing="true"
-                    :options="pohjat">
+                    :options="pohjat"
+                  >
                     <template #singleLabel="{ option }">
                       {{ option.nimi }}
                     </template>
@@ -27,27 +44,46 @@
                   <EpSpinner v-else />
                 </div>
 
-                <b-form-radio class="mt-3 p-2" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi-perustepohja') }}</b-form-radio>
-
+                <b-form-radio
+                  v-model="tyyppi"
+                  class="mt-3 p-2"
+                  value="uusi"
+                  name="tyyppi"
+                >
+                  {{ $t('luo-uusi-perustepohja') }}
+                </b-form-radio>
               </b-form-group>
             </div>
           </div>
         </template>
 
-        <template v-slot:tiedot>
-
-          <b-form-group :label="$t('projektin-nimi-label') + ' *'" required class="pl-0">
-            <ep-input v-model="data.nimi" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')"
-                :validation="$v.data.nimi" />
+        <template #tiedot>
+          <b-form-group
+            :label="$t('projektin-nimi-label') + ' *'"
+            required
+            class="pl-0"
+          >
+            <ep-input
+              v-model="data.nimi"
+              :is-editing="true"
+              :placeholder="$t('kirjoita-projektin-nimi')"
+              :validation="$v.data.nimi"
+            />
           </b-form-group>
 
-          <b-form-group :label="$t('perustetyoryhma')" required class="pl-0">
-            <EpMultiSelect v-model="data.tyoryhma"
-                           v-if="tyoryhmat"
-                           :placeholder="$t('valitse')"
-                           :search-identity="tyoryhmaSearchIdentity"
-                           :is-editing="true"
-                           :options="tyoryhmat">
+          <b-form-group
+            :label="$t('perustetyoryhma')"
+            required
+            class="pl-0"
+          >
+            <EpMultiSelect
+              v-if="tyoryhmat"
+              v-model="data.tyoryhma"
+              :placeholder="$t('valitse')"
+              :search-identity="tyoryhmaSearchIdentity"
+              :is-editing="true"
+              :options="tyoryhmat"
+            >
               <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
@@ -58,14 +94,21 @@
             <EpSpinner v-else />
           </b-form-group>
 
-          <b-form-group :label="$t('koulutus-tutkintotyyppi') + ' *'" required>
-            <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"/>
+          <b-form-group
+            :label="$t('koulutus-tutkintotyyppi') + ' *'"
+            required
+          >
+            <koulutustyyppi-select
+              v-model="data.koulutustyyppi"
+              :is-editing="true"
+              required
+              :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
+            />
           </b-form-group>
-
         </template>
 
         <template #luo>
-          {{$t('luo-perustepohja')}}
+          {{ $t('luo-perustepohja') }}
         </template>
       </EpSteps>
     </b-container>

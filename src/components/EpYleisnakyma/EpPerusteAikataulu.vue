@@ -1,32 +1,35 @@
 <template>
   <div class="content">
-
     <div class="d-flex justify-content-between">
-      <h3>{{$t('aikataulu')}}</h3>
-      <ep-aikataulu-modal :aikataulut="aikataulut" @tallenna="tallenna" :julkinen-valinta="isAmmatillinen" :pakollisetTapahtumat="['tavoite']">
+      <h3>{{ $t('aikataulu') }}</h3>
+      <ep-aikataulu-modal
+        :aikataulut="aikataulut"
+        :julkinen-valinta="isAmmatillinen"
+        :pakolliset-tapahtumat="['tavoite']"
+        @tallenna="tallenna"
+      >
         <template #aikataululistaus-julkaisu-header>
           <label>
-            {{$t('peruste-astuu-voimaan')}}
+            {{ $t('peruste-astuu-voimaan') }}
           </label>
         </template>
         <template #luomispaiva-topic>
-          <span v-html="$t('projektin-luomispaiva')"></span>
+          <span v-html="$t('projektin-luomispaiva')" />
         </template>
         <template #julkaisupaiva-topic>
-          <span v-html="$t('peruste-astuu-voimaan')"></span>
+          <span v-html="$t('peruste-astuu-voimaan')" />
         </template>
       </ep-aikataulu-modal>
     </div>
 
     <ep-aikataulu :aikataulut="aikataulut">
       <template #luomispaiva-topic>
-        <span v-html="$t('projektin-luomispaiva')"></span>
+        <span v-html="$t('projektin-luomispaiva')" />
       </template>
       <template #julkaisupaiva-topic>
-        <span v-html="$t('peruste-astuu-voimaan')"></span>
+        <span v-html="$t('peruste-astuu-voimaan')" />
       </template>
     </ep-aikataulu>
-
   </div>
 </template>
 

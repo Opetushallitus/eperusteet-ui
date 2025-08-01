@@ -1,6 +1,8 @@
 <template>
-  <EpHomeTile icon="emoji_events"
-              :route="{ name: 'osaamismerkit' }">
+  <EpHomeTile
+    icon="emoji_events"
+    :route="{ name: 'osaamismerkit' }"
+  >
     <template #header>
       <span>{{ $t('tile-osaamismerkit') }}</span>
     </template>

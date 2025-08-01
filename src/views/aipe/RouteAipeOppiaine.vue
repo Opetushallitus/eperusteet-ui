@@ -1,23 +1,47 @@
 <template>
-  <EpEditointi :store="store" :versionumero="versionumero">
+  <EpEditointi
+    :store="store"
+    :versionumero="versionumero"
+  >
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton-oppiaine') }}</h2>
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton-oppiaine') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing, supportData }">
       <b-row>
-        <b-col cols="8" v-if="isEditing">
+        <b-col
+          v-if="isEditing"
+          cols="8"
+        >
           <b-form-group :label="$t('oppiaineen-nimi')">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -38,77 +62,137 @@
 
       <b-row>
         <b-col cols="11">
-          <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['tehtava', 'tyotavat', 'ohjaus', 'arviointi', 'sisaltoalueinfo']" />
+          <EpSisaltoTekstikappaleet
+            v-model="storeData"
+            :is-editing="isEditing"
+            :sisalto-avaimet="['tehtava', 'tyotavat', 'ohjaus', 'arviointi', 'sisaltoalueinfo']"
+          />
 
           <template v-if="!data['_oppiaine'] && oppiaineId && (!data.kurssit || data.kurssit.length == 0)">
             <b-form-group :label="$t('oppimaarat')">
               <VueDraggable
                 v-bind="oppiaineetDragOptions"
+                v-model="data.oppimaarat"
                 tag="div"
-                v-model="data.oppimaarat">
-                  <div class="listaus p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                    <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                  </div>
+              >
+                <div
+                  v-for="oppimaara in data.oppimaarat"
+                  :key="'oppimaara'+oppimaara.id"
+                  class="listaus p-3 d-flex"
+                >
+                  <EpMaterialIcon
+                    v-if="isEditing"
+                    class="order-handle mr-2"
+                  >
+                    drag_indicator
+                  </EpMaterialIcon>
+                  <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppimaara.id } }">
+                    {{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}
+                  </router-link>
+                </div>
               </VueDraggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              variant="outline-primary"
+              icon="add"
+              @click="lisaaOppimaara"
+            >
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>
 
           <template v-if="oppiaineId && (!data.oppimaarat || data.oppimaarat.length == 0)">
-            <b-form-group :label="$t('kurssit')" class="mt-4">
+            <b-form-group
+              :label="$t('kurssit')"
+              class="mt-4"
+            >
               <VueDraggable
                 v-bind="kurssitDragOptions"
+                v-model="data.kurssit"
                 tag="div"
-                v-model="data.kurssit">
-                  <div class="listaus p-3 d-flex" v-for="kurssi in data.kurssit" :key="'kurssi'+kurssi.id">
-                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                    <router-link :to="{ name: 'aipekurssi', params: { kurssiId: kurssi.id } }">{{ $kaanna(kurssi.nimi) || $t('nimeton-kurssi') }}</router-link>
-                  </div>
+              >
+                <div
+                  v-for="kurssi in data.kurssit"
+                  :key="'kurssi'+kurssi.id"
+                  class="listaus p-3 d-flex"
+                >
+                  <EpMaterialIcon
+                    v-if="isEditing"
+                    class="order-handle mr-2"
+                  >
+                    drag_indicator
+                  </EpMaterialIcon>
+                  <router-link :to="{ name: 'aipekurssi', params: { kurssiId: kurssi.id } }">
+                    {{ $kaanna(kurssi.nimi) || $t('nimeton-kurssi') }}
+                  </router-link>
+                </div>
               </VueDraggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="add" @click="lisaaKurssi" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              variant="outline-primary"
+              icon="add"
+              @click="lisaaKurssi"
+            >
               {{ $t('lisaa-kurssi') }}
             </ep-button>
           </template>
 
-          <b-form-group :label="$t('opetuksen-tavoitteet')" class="mt-4 pt-3">
+          <b-form-group
+            :label="$t('opetuksen-tavoitteet')"
+            class="mt-4 pt-3"
+          >
             <VueDraggable
               v-bind="tavoitteetDragOptions"
+              v-model="data.tavoitteet"
               tag="div"
-              v-model="data.tavoitteet">
+            >
+              <EpCollapse
+                v-for="(tavoite, tavoiteIndex) in data.tavoitteet"
+                :key="'tavoite'+tavoiteIndex"
+                class="tavoite p-3 mb-4 w-100"
+                :border-bottom="false"
+                :use-padding="false"
+              >
+                <template #header>
+                  <div class="d-flex">
+                    <EpMaterialIcon
+                      v-if="isEditing"
+                      class="order-handle mr-3"
+                    >
+                      drag_indicator
+                    </EpMaterialIcon>
+                    <h4 class="mb-0">
+                      {{ $kaanna(tavoite.tavoite) }}
+                    </h4>
+                  </div>
+                </template>
 
-                <EpCollapse
-                  v-for="(tavoite, tavoiteIndex) in data.tavoitteet"
-                  :key="'tavoite'+tavoiteIndex"
-                  class="tavoite p-3 mb-4 w-100"
-                  :borderBottom="false"
-                  :usePadding="false">
-
-                  <template #header>
-                    <div class="d-flex">
-                      <EpMaterialIcon v-if="isEditing" class="order-handle mr-3">drag_indicator</EpMaterialIcon>
-                      <h4 class="mb-0">{{$kaanna(tavoite.tavoite)}}</h4>
-                    </div>
-                  </template>
-
-                  <EpOppiaineenTavoite v-model="data.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="supportData" @poista="poistaTavoite(tavoite)"/>
-
-                </EpCollapse>
+                <EpOppiaineenTavoite
+                  v-model="data.tavoitteet[tavoiteIndex]"
+                  :is-editing="isEditing"
+                  :support-data="supportData"
+                  @poista="poistaTavoite(tavoite)"
+                />
+              </EpCollapse>
             </VueDraggable>
 
-            <ep-button @click="lisaaTavoite" variant="outline" icon="add" v-if="isEditing">
+            <ep-button
+              v-if="isEditing"
+              variant="outline"
+              icon="add"
+              @click="lisaaTavoite"
+            >
               {{ $t('lisaa-tavoite') }}
             </ep-button>
           </b-form-group>
-
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
 </template>

@@ -1,23 +1,45 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton-moduuli') }}</h2>
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton-moduuli') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing }">
       <b-row>
-        <b-col cols="8" v-if="isEditing" class="mb-3">
+        <b-col
+          v-if="isEditing"
+          cols="8"
+          class="mb-3"
+        >
           <b-form-group :label="$t('moduulin-nimi')">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -35,100 +57,188 @@
           </b-form-group>
         </b-col>
 
-        <b-col :cols="isEditing ? 12 : 3" class="mb-3">
+        <b-col
+          :cols="isEditing ? 12 : 3"
+          class="mb-3"
+        >
           <b-form-group>
             <template #label>
               <div class="d-flex">
-                <div>{{$t('tyyppi')}}</div>
-                <EpInfoPopover v-if="isEditing" class="ml-2">
-                  {{$t('ohje-moduuli-pakollinen')}}
+                <div>{{ $t('tyyppi') }}</div>
+                <EpInfoPopover
+                  v-if="isEditing"
+                  class="ml-2"
+                >
+                  {{ $t('ohje-moduuli-pakollinen') }}
                 </EpInfoPopover>
               </div>
             </template>
-            <b-form-radio-group stacked v-model="data.pakollinen" v-if="isEditing">
-              <b-form-radio :value="false">{{$t('valinnainen')}}</b-form-radio>
-              <b-form-radio :value="true">{{$t('pakollinen')}}</b-form-radio>
+            <b-form-radio-group
+              v-if="isEditing"
+              v-model="data.pakollinen"
+              stacked
+            >
+              <b-form-radio :value="false">
+                {{ $t('valinnainen') }}
+              </b-form-radio>
+              <b-form-radio :value="true">
+                {{ $t('pakollinen') }}
+              </b-form-radio>
             </b-form-radio-group>
-            <div v-else-if="data.pakollinen">{{$t('pakollinen')}}</div>
-            <div v-else-if="!data.pakollinen">{{$t('valinnainen')}}</div>
+            <div v-else-if="data.pakollinen">
+              {{ $t('pakollinen') }}
+            </div>
+            <div v-else-if="!data.pakollinen">
+              {{ $t('valinnainen') }}
+            </div>
           </b-form-group>
         </b-col>
 
-        <b-col cols="2" class="mb-3">
+        <b-col
+          cols="2"
+          class="mb-3"
+        >
           <b-form-group>
-            <template #label>{{$t('laajuus')}}</template>
+            <template #label>
+              {{ $t('laajuus') }}
+            </template>
             <div class="d-flex align-items-center">
-              <ep-input type="number" v-model="data.laajuus" :isEditing="isEditing"/>
-              <div class="ml-2">{{$t('opintopiste')}}</div>
+              <ep-input
+                v-model="data.laajuus"
+                type="number"
+                :is-editing="isEditing"
+              />
+              <div class="ml-2">
+                {{ $t('opintopiste') }}
+              </div>
             </div>
           </b-form-group>
         </b-col>
       </b-row>
 
       <b-form-group>
-        <template #label v-if="isEditing">{{$t('moduulin-kuvaus')}}</template>
-        <ep-content layout="normal" v-model="data.kuvaus" :is-editable="isEditing"/>
+        <template
+          v-if="isEditing"
+          #label
+        >
+          {{ $t('moduulin-kuvaus') }}
+        </template>
+        <ep-content
+          v-model="data.kuvaus"
+          layout="normal"
+          :is-editable="isEditing"
+        />
       </b-form-group>
 
-      <hr/>
+      <hr>
 
-      <EpCollapse class="mt-4" :collapsable="!isEditing" :usePadding="false">
-        <template #header><h4>{{$t('yleiset-tavoitteet')}}</h4></template>
+      <EpCollapse
+        class="mt-4"
+        :collapsable="!isEditing"
+        :use-padding="false"
+      >
+        <template #header>
+          <h4>{{ $t('yleiset-tavoitteet') }}</h4>
+        </template>
 
         <template v-if="isEditing">
           <div class="row">
             <div class="col-11">
-              <div class="mb-2 font-weight-bold">{{$t('kohde')}}</div>
-              <ep-input v-model="data.tavoitteet.kohde" :isEditing="true" />
+              <div class="mb-2 font-weight-bold">
+                {{ $t('kohde') }}
+              </div>
+              <ep-input
+                v-model="data.tavoitteet.kohde"
+                :is-editing="true"
+              />
             </div>
           </div>
 
-          <div class="mb-2 mt-3 font-weight-bold">{{$t('tavoitteet')}}</div>
-          <VueDraggable v-bind="tavoitteetDragOptions"
-                     tag="div"
-                     v-model="data.tavoitteet.tavoitteet">
-            <div class="row mb-2" v-for="(tavoite, tavoiteindex) in data.tavoitteet.tavoitteet" :key="'tavoitteet' +tavoiteindex">
+          <div class="mb-2 mt-3 font-weight-bold">
+            {{ $t('tavoitteet') }}
+          </div>
+          <VueDraggable
+            v-bind="tavoitteetDragOptions"
+            v-model="data.tavoitteet.tavoitteet"
+            tag="div"
+          >
+            <div
+              v-for="(tavoite, tavoiteindex) in data.tavoitteet.tavoitteet"
+              :key="'tavoitteet' +tavoiteindex"
+              class="row mb-2"
+            >
               <div class="col-11">
-                <EpInput v-model="data.tavoitteet.tavoitteet[tavoiteindex]"
-                         :is-editing="true"
-                         class="input-wrapper">
+                <EpInput
+                  v-model="data.tavoitteet.tavoitteet[tavoiteindex]"
+                  :is-editing="true"
+                  class="input-wrapper"
+                >
                   <template #left>
                     <div class="order-handle m-2">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
                   </template>
                 </EpInput>
-                </div>
-                <div class="col-1">
-                  <div class="default-icon clickable mt-2" @click="poistaTavoite(tavoite)">
-                    <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
-                  </div>
+              </div>
+              <div class="col-1">
+                <div
+                  class="default-icon clickable mt-2"
+                  @click="poistaTavoite(tavoite)"
+                >
+                  <EpMaterialIcon icon-shape="outlined">
+                    delete
+                  </EpMaterialIcon>
                 </div>
               </div>
+            </div>
           </VueDraggable>
 
-          <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaTavoite()">{{ $t('lisaa-tavoite') }}</EpButton>
+          <EpButton
+            class="mt-2"
+            variant="outline"
+            icon="add"
+            @click="lisaaTavoite()"
+          >
+            {{ $t('lisaa-tavoite') }}
+          </EpButton>
         </template>
 
         <template v-else>
-          <div class="font-weight-bold">{{$kaanna(data.tavoitteet.kohde)}}</div>
+          <div class="font-weight-bold">
+            {{ $kaanna(data.tavoitteet.kohde) }}
+          </div>
           <ul>
-            <li v-for="tavoite in data.tavoitteet.tavoitteet" :key="'tavoite'+tavoite._id">{{$kaanna(tavoite)}}</li>
+            <li
+              v-for="tavoite in data.tavoitteet.tavoitteet"
+              :key="'tavoite'+tavoite._id"
+            >
+              {{ $kaanna(tavoite) }}
+            </li>
           </ul>
         </template>
-
       </EpCollapse>
 
-      <EpCollapse class="mt-4" :collapsable="!isEditing" :usePadding="false" :borderBottom="false">
-        <template #header><h4>{{$t('keskeiset-sisallot')}}</h4></template>
+      <EpCollapse
+        class="mt-4"
+        :collapsable="!isEditing"
+        :use-padding="false"
+        :border-bottom="false"
+      >
+        <template #header>
+          <h4>{{ $t('keskeiset-sisallot') }}</h4>
+        </template>
 
         <div v-if="isEditing">
           <VueDraggable
             v-bind="keskeisetSisallotDragOptions"
+            v-model="data.sisallot"
             tag="div"
-            v-model="data.sisallot">
-
-            <div v-for="(sisaltoalue, sisaltoIndex) in data.sisallot" :key="'sisalto'+sisaltoIndex" class="mt-4 p-2 tavoitealue editing">
+          >
+            <div
+              v-for="(sisaltoalue, sisaltoIndex) in data.sisallot"
+              :key="'sisalto'+sisaltoIndex"
+              class="mt-4 p-2 tavoitealue editing"
+            >
               <div class="d-flex">
                 <div class="order-handle m-2">
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -136,17 +246,26 @@
                 <div class="mt-2 w-100">
                   <div class="row">
                     <div class="col-11">
-                      <div class="mb-2 font-weight-bold">{{$t('kohde')}}</div>
-                      <ep-input v-model="sisaltoalue.kohde" :isEditing="true" />
+                      <div class="mb-2 font-weight-bold">
+                        {{ $t('kohde') }}
+                      </div>
+                      <ep-input
+                        v-model="sisaltoalue.kohde"
+                        :is-editing="true"
+                      />
                     </div>
                   </div>
 
-                  <div class="mt-3 mb-2 font-weight-bold">{{$t('sisallot')}}</div>
+                  <div class="mt-3 mb-2 font-weight-bold">
+                    {{ $t('sisallot') }}
+                  </div>
                   <EpTavoitealueTavoitteet v-model="sisaltoalue.sisallot">
                     <template #default="{tavoiteIndex}">
-                      <EpInput v-model="sisaltoalue.sisallot[tavoiteIndex]"
-                               :is-editing="true"
-                               class="input-wrapper">
+                      <EpInput
+                        v-model="sisaltoalue.sisallot[tavoiteIndex]"
+                        :is-editing="true"
+                        class="input-wrapper"
+                      >
                         <template #left>
                           <div class="order-handle m-2">
                             <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -158,7 +277,14 @@
                       {{ $t('lisaa-sisalto') }}
                     </template>
                     <template #footer>
-                      <EpButton icon="delete" class="mr-5" variant="link" @click="poistaSisaltoalue(sisaltoalue)">{{ $t('poista-sisaltoalue') }}</EpButton>
+                      <EpButton
+                        icon="delete"
+                        class="mr-5"
+                        variant="link"
+                        @click="poistaSisaltoalue(sisaltoalue)"
+                      >
+                        {{ $t('poista-sisaltoalue') }}
+                      </EpButton>
                     </template>
                   </EpTavoitealueTavoitteet>
                 </div>
@@ -166,15 +292,32 @@
             </div>
           </VueDraggable>
 
-          <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaSisaltoalue()">{{ $t('lisaa-sisaltoalue') }}</EpButton>
-
+          <EpButton
+            class="mt-2"
+            variant="outline"
+            icon="add"
+            @click="lisaaSisaltoalue()"
+          >
+            {{ $t('lisaa-sisaltoalue') }}
+          </EpButton>
         </div>
 
         <div v-if="!isEditing">
-          <div v-for="(sisalto, sisaltoIndex) in data.sisallot" :key="'sisalto'+sisaltoIndex" class="tavoitealue">
-            <div class="font-weight-bold">{{$kaanna(sisalto.kohde)}}</div>
+          <div
+            v-for="(sisalto, sisaltoIndex) in data.sisallot"
+            :key="'sisalto'+sisaltoIndex"
+            class="tavoitealue"
+          >
+            <div class="font-weight-bold">
+              {{ $kaanna(sisalto.kohde) }}
+            </div>
             <ul>
-              <li v-for="tavoite in sisalto.sisallot" :key="'sisalto'+tavoite._id">{{$kaanna(tavoite)}}</li>
+              <li
+                v-for="tavoite in sisalto.sisallot"
+                :key="'sisalto'+tavoite._id"
+              >
+                {{ $kaanna(tavoite) }}
+              </li>
             </ul>
           </div>
         </div>

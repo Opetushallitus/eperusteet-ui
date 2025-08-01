@@ -12,6 +12,14 @@ export default defineConfig(() => {
       vue(),
       commonjs(),
     ],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          quietDeps: true,
+          silenceDeprecations: ['legacy-js-api'],
+        },
+      },
+    },
     resolve: {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {

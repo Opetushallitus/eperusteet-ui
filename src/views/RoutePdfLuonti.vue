@@ -1,16 +1,31 @@
 <template>
   <div class="dokumentit">
     <div class="ylapaneeli d-flex align-items-center">
-        <h2 class="otsikko">{{ $t('luo-pdf') }}</h2>
+      <h2 class="otsikko">
+        {{ $t('luo-pdf') }}
+      </h2>
     </div>
     <div class="sisalto">
       <div class="mb-4">
         <h3>{{ $t('luo-ja-lataa-pdf') }}</h3>
-        <p>{{ $t(selitteenteksti)}}</p>
-        <ep-pdf-luonti :store="perusteDokumenttiStore" :pdfnimi="perusteNimi"/>
+        <p>{{ $t(selitteenteksti) }}</p>
+        <ep-pdf-luonti
+          :store="perusteDokumenttiStore"
+          :pdfnimi="perusteNimi"
+        />
 
-        <h4 v-if="kvliite" class="mt-5">{{$t('kvliite')}}</h4>
-        <ep-pdf-luonti v-if="kvliite" :store="kvliiteStore" pdfnimi="kvliite" :nayta-julkaistu="false"/>
+        <h4
+          v-if="kvliite"
+          class="mt-5"
+        >
+          {{ $t('kvliite') }}
+        </h4>
+        <ep-pdf-luonti
+          v-if="kvliite"
+          :store="kvliiteStore"
+          pdfnimi="kvliite"
+          :nayta-julkaistu="false"
+        />
       </div>
     </div>
   </div>

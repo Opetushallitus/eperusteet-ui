@@ -1,45 +1,72 @@
 <template>
   <EpEditointi :store="store">
     <template #header>
-      <h3>{{$t('laaja-alaiset-osaamiset')}}</h3>
+      <h3>{{ $t('laaja-alaiset-osaamiset') }}</h3>
     </template>
     <template #muokkaa>
-      {{$t('muokkaa-jarjestysta')}}
+      {{ $t('muokkaa-jarjestysta') }}
     </template>
     <template #default="{ data, isEditing }">
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="add" @click="lisaaLaajaAlainenOsaaminen" :disabled="isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-          {{ $t('uusi-laaja-alainen-osaaminen')}}
+        <EpButton
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+          variant="outline"
+          icon="add"
+          :disabled="isEditing"
+          @click="lisaaLaajaAlainenOsaaminen"
+        >
+          {{ $t('uusi-laaja-alainen-osaaminen') }}
         </EpButton>
       </div>
 
       <b-row class="border-bottom-1 m-0">
-        <b-col cols="5" class="font-weight-bold">{{$t('nimi')}}</b-col>
-        <b-col cols="5" class="font-weight-bold">{{$t('muokattu')}}</b-col>
+        <b-col
+          cols="5"
+          class="font-weight-bold"
+        >
+          {{ $t('nimi') }}
+        </b-col>
+        <b-col
+          cols="5"
+          class="font-weight-bold"
+        >
+          {{ $t('muokattu') }}
+        </b-col>
       </b-row>
 
       <VueDraggable
         v-bind="defaultDragOptions"
+        v-model="data.laajaAlaisetOsaamiset"
         tag="div"
-        v-model="data.laajaAlaisetOsaamiset">
-
-        <b-row v-for="(lao, index) in data.laajaAlaisetOsaamiset" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
-          <b-col cols="5" class="d-flex">
-            <div class="order-handle mr-2" v-if="isEditing">
+      >
+        <b-row
+          v-for="(lao, index) in data.laajaAlaisetOsaamiset"
+          :key="'lao'+index"
+          class="taulukko-rivi-varitys py-3 m-0"
+        >
+          <b-col
+            cols="5"
+            class="d-flex"
+          >
+            <div
+              v-if="isEditing"
+              class="order-handle mr-2"
+            >
               <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <div>
-              <router-link :to="{ name: 'aipelaajaAlainenOsaaminen', params: { laoId: lao.id } }">{{ $kaanna(lao.nimi) }}</router-link>
+              <router-link :to="{ name: 'aipelaajaAlainenOsaaminen', params: { laoId: lao.id } }">
+                {{ $kaanna(lao.nimi) }}
+              </router-link>
             </div>
           </b-col>
           <b-col cols="5">
-            <span v-if="lao.muokattu">{{$sdt(lao.muokattu)}}</span>
+            <span v-if="lao.muokattu">{{ $sdt(lao.muokattu) }}</span>
           </b-col>
         </b-row>
       </VueDraggable>
     </template>
   </EpEditointi>
-
 </template>
 
 <script setup lang="ts">

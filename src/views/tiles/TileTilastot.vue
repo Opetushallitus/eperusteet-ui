@@ -1,6 +1,8 @@
 <template>
-  <EpHomeTile icon="show_chart"
-              :route="{ name: 'tilastot' }">
+  <EpHomeTile
+    icon="show_chart"
+    :route="{ name: 'tilastot' }"
+  >
     <template #header>
       <span>{{ $t('tile-tilastot') }}</span>
     </template>

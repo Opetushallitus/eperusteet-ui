@@ -1,26 +1,45 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
         <span v-if="!isOppimaara">{{ $t('nimeton-oppiaine') }}</span>
         <span v-if="isOppimaara">{{ $t('nimeton-oppimaara') }}</span>
       </h2>
-      </template>
+    </template>
 
     <template #default="{ data, isEditing }">
       <b-row>
-        <b-col cols="8" v-if="isEditing">
+        <b-col
+          v-if="isEditing"
+          cols="8"
+        >
           <b-form-group :label="!isOppimaara ? $t('oppiaineen-nimi') : $t('oppimaaran-nimi')">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -41,16 +60,32 @@
 
       <b-row>
         <b-col cols="11">
-          <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['tehtava']" />
+          <EpSisaltoTekstikappaleet
+            v-model="storeData"
+            :is-editing="isEditing"
+            :sisalto-avaimet="['tehtava']"
+          />
 
           <b-form-group :label="$t('tavoitealueet-kaikilla-vuosiluokilla')">
-            <EpTavoitealueetEditModal v-model="storeData" :isEditing="isEditing" :perusteId="perusteId" :oppiaineId="oppiaineId"/>
+            <EpTavoitealueetEditModal
+              v-model="storeData"
+              :is-editing="isEditing"
+              :peruste-id="perusteId"
+              :oppiaine-id="oppiaineId"
+            />
           </b-form-group>
 
-          <hr/>
+          <hr>
 
-          <b-form-group class="mt-4 mb-4" :label="$t('vuosiluokat')" v-if="isEditing">
-            <EpToggleGroup v-model="valitutVuosiluokkakokonaisuudet" :items="valittavatVuosiluokkakokonaisuudet">
+          <b-form-group
+            v-if="isEditing"
+            class="mt-4 mb-4"
+            :label="$t('vuosiluokat')"
+          >
+            <EpToggleGroup
+              v-model="valitutVuosiluokkakokonaisuudet"
+              :items="valittavatVuosiluokkakokonaisuudet"
+            >
               <template #default="{ item }">
                 <div class="mb-1">
                   {{ item.nimi }}
@@ -60,40 +95,64 @@
           </b-form-group>
 
           <b-tabs v-if="valitutVuosiluokkakokonaisuudet.length > 0">
-            <b-tab :title="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].nimi" v-for="(vlk, index) in data.vuosiluokkakokonaisuudet" :key="'vlk' + index">
+            <b-tab
+              v-for="(vlk, index) in data.vuosiluokkakokonaisuudet"
+              :key="'vlk' + index"
+              :title="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].nimi"
+            >
               <EpOppiaineenVuosiluokkakokonaisuus
                 v-model="data.vuosiluokkakokonaisuudet[index]"
-                :isEditing="isEditing"
+                :is-editing="isEditing"
                 :vuosiluokat="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].vuosiluokat"
-                :supportData="vlkSupportData"
-                :perusteId="perusteId"
-                :oppiaineId="oppiaineId"/>
+                :support-data="vlkSupportData"
+                :peruste-id="perusteId"
+                :oppiaine-id="oppiaineId"
+              />
             </b-tab>
 
-            <hr/>
+            <hr>
           </b-tabs>
 
           <template v-if="!isOppimaara">
-            <b-form-group :label="$t('oppimaarat')" v-if="!isEditing || (data.oppimaarat && data.oppimaarat.length > 0)">
+            <b-form-group
+              v-if="!isEditing || (data.oppimaarat && data.oppimaarat.length > 0)"
+              :label="$t('oppimaarat')"
+            >
               <VueDraggable
                 v-bind="oppiaineetDragOptions"
+                v-model="data.oppimaarat"
                 tag="div"
-                v-model="data.oppimaarat">
-                  <div class="taulukko-rivi-varitys p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                    <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                  </div>
+              >
+                <div
+                  v-for="oppimaara in data.oppimaarat"
+                  :key="'oppimaara'+oppimaara.id"
+                  class="taulukko-rivi-varitys p-3 d-flex"
+                >
+                  <EpMaterialIcon
+                    v-if="isEditing"
+                    class="order-handle mr-2"
+                  >
+                    drag_indicator
+                  </EpMaterialIcon>
+                  <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">
+                    {{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}
+                  </router-link>
+                </div>
               </VueDraggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              variant="outline-primary"
+              icon="add"
+              @click="lisaaOppimaara"
+            >
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>
-
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
 </template>
@@ -224,7 +283,7 @@ watch(vuosiluokkakokonaisuudet, (newValue) => {
   if (newValue) {
     valitutVuosiluokkakokonaisuudet.value = _.filter(
       valittavatVuosiluokkakokonaisuudet.value,
-      valittavaVlk => !!_.find(newValue, vlk => vlk._vuosiluokkaKokonaisuus === _.toString(valittavaVlk.id))
+      valittavaVlk => !!_.find(newValue, vlk => vlk._vuosiluokkaKokonaisuus === _.toString(valittavaVlk.id)),
     );
   }
 }, { immediate: true });

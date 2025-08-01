@@ -1,13 +1,28 @@
 <template>
-  <EpHomeTile icon="description" :route="{ name: 'tiedotteet' }" :count="uudetTiedotteetCount">
+  <EpHomeTile
+    icon="description"
+    :route="{ name: 'tiedotteet' }"
+    :count="uudetTiedotteetCount"
+  >
     <template #header>
       <span>{{ $t('tiedotteet') }}</span>
     </template>
     <template #content>
       <div v-if="tiedotteet.length > 0">
-        <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
-          <div class="col-2">{{$sd(tiedote.muokattu)}}</div>
-          <div class="col-8 otsikko" :class="{'font-weight-bold': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}}</div>
+        <div
+          v-for="(tiedote, index) in viimeisimmatTiedotteet"
+          :key="index"
+          class="row justify-content-center text-left"
+        >
+          <div class="col-2">
+            {{ $sd(tiedote.muokattu) }}
+          </div>
+          <div
+            class="col-8 otsikko"
+            :class="{'font-weight-bold': tiedote.uusi}"
+          >
+            {{ $kaanna(tiedote.otsikko) }}
+          </div>
         </div>
       </div>
       <div v-else-if="tiedotteet.length === 0">

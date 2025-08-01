@@ -1,21 +1,41 @@
 <template>
-  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
+  <EpEditointi
+    v-if="store"
+    :store="store"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2
+        v-if="data.nimiKoodi"
+        class="m-0"
+      >
+        {{ $kaanna(data.nimiKoodi.nimi) }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing, validation }">
-
+    <template #default="{ data, isEditing, validation }">
       <b-row>
         <b-col md="8">
-          <b-form-group :label="$t('opintokokonaisuuden-nimi') + (isEditing ? ' *' : '')" required>
-            <ep-koodisto-select :store="koodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
+          <b-form-group
+            :label="$t('opintokokonaisuuden-nimi') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-koodisto-select
+              v-model="data.nimiKoodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -26,9 +46,15 @@
         </b-col>
 
         <b-col md="2">
-          <b-form-group :label="$t('minimilaajuus')" required>
-            <ep-laajuus-input v-model="data.minimilaajuus" :is-editing="isEditing">
-              {{$t('opintopiste')}}
+          <b-form-group
+            :label="$t('minimilaajuus')"
+            required
+          >
+            <ep-laajuus-input
+              v-model="data.minimilaajuus"
+              :is-editing="isEditing"
+            >
+              {{ $t('opintopiste') }}
             </ep-laajuus-input>
           </b-form-group>
         </b-col>
@@ -36,40 +62,65 @@
 
       <b-row>
         <b-col md="8">
-          <b-form-group :label="$t('kuvaus')  + (isEditing ? ' *' : '')" required>
-            <ep-content v-model="data.kuvaus"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :validation="validation.kuvaus"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+          <b-form-group
+            :label="$t('kuvaus') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-content
+              v-model="data.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+              :validation="validation.kuvaus"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
         </b-col>
       </b-row>
 
-      <hr/>
+      <hr>
 
-      <h3>{{$t('opetuksen-tavoitteet')}}</h3>
+      <h3>{{ $t('opetuksen-tavoitteet') }}</h3>
 
       <b-row>
         <b-col md="8">
-          <b-form-group :label="$t('tavoitteiden-otsikko')  + (isEditing ? ' *' : '')" required>
-            <ep-input v-model="data.opetuksenTavoiteOtsikko" :is-editing="isEditing" :validation="validation.opetuksenTavoiteOtsikko"/>
+          <b-form-group
+            :label="$t('tavoitteiden-otsikko') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-input
+              v-model="data.opetuksenTavoiteOtsikko"
+              :is-editing="isEditing"
+              :validation="validation.opetuksenTavoiteOtsikko"
+            />
           </b-form-group>
         </b-col>
       </b-row>
 
-      <b-form-group :label="$t('tavoitteet')  + (isEditing ? ' *' : '')" required>
-
+      <b-form-group
+        :label="$t('tavoitteet') + (isEditing ? ' *' : '')"
+        required
+      >
         <div v-if="isEditing">
           <VueDraggable
             v-bind="tavoitteetOptions"
+            v-model="data.opetuksenTavoitteet"
             tag="div"
-            v-model="data.opetuksenTavoitteet">
-
-            <b-row v-for="(tavoite, index) in data.opetuksenTavoitteet" :key="'tavoite'+index" class="pb-2">
-              <b-col cols="10" lg="8">
-                <ep-input v-model="tavoite.nimi" :is-editing="isEditing" :disabled="!tavoite.uri.startsWith('temporary')">
+          >
+            <b-row
+              v-for="(tavoite, index) in data.opetuksenTavoitteet"
+              :key="'tavoite'+index"
+              class="pb-2"
+            >
+              <b-col
+                cols="10"
+                lg="8"
+              >
+                <ep-input
+                  v-model="tavoite.nimi"
+                  :is-editing="isEditing"
+                  :disabled="!tavoite.uri.startsWith('temporary')"
+                >
                   <template #left>
                     <div class="order-handle m-2">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -77,43 +128,73 @@
                   </template>
                 </ep-input>
               </b-col>
-              <b-col cols="1" v-if="isEditing">
-                <div class="default-icon clickable mt-2" @click="poista(tavoite, 'opetuksenTavoitteet')">
-                  <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
+              <b-col
+                v-if="isEditing"
+                cols="1"
+              >
+                <div
+                  class="default-icon clickable mt-2"
+                  @click="poista(tavoite, 'opetuksenTavoitteet')"
+                >
+                  <EpMaterialIcon icon-shape="outlined">
+                    delete
+                  </EpMaterialIcon>
                 </div>
               </b-col>
             </b-row>
           </VueDraggable>
 
-          <ep-button v-if="isEditing" variant="outline" icon="add" @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')">
+          <ep-button
+            v-if="isEditing"
+            variant="outline"
+            icon="add"
+            @click="lisaa('opetuksenTavoitteet', 'opintokokonaisuustavoitteet')"
+          >
             {{ $t('lisaa-tavoite') }}
           </ep-button>
         </div>
 
         <div v-else>
           <ul>
-            <li v-for="(tavoite, index) in data.opetuksenTavoitteet" :key="'tavoite'+index">
-              {{$kaanna(tavoite.nimi)}}
+            <li
+              v-for="(tavoite, index) in data.opetuksenTavoitteet"
+              :key="'tavoite'+index"
+            >
+              {{ $kaanna(tavoite.nimi) }}
             </li>
           </ul>
         </div>
       </b-form-group>
 
-      <hr/>
+      <hr>
 
-      <h3>{{$t('arviointi')}}</h3>
+      <h3>{{ $t('arviointi') }}</h3>
 
-      <b-form-group :label="$t('opiskelijan-osaamisen-arvioinnin-kohteet')  + (isEditing ? ' *' : '')" required>
-
+      <b-form-group
+        :label="$t('opiskelijan-osaamisen-arvioinnin-kohteet') + (isEditing ? ' *' : '')"
+        required
+      >
         <div v-if="isEditing">
           <VueDraggable
             v-bind="arvioinnitOptions"
+            v-model="data.arvioinnit"
             tag="div"
-            v-model="data.arvioinnit">
-
-            <b-row v-for="(arviointi, index) in data.arvioinnit" :key="'arviointi'+index" class="pb-2">
-              <b-col cols="10" lg="8">
-                <ep-input v-model="arviointi[sisaltokieli]" :is-editing="isEditing" type="string" class="flex-grow-1">
+          >
+            <b-row
+              v-for="(arviointi, index) in data.arvioinnit"
+              :key="'arviointi'+index"
+              class="pb-2"
+            >
+              <b-col
+                cols="10"
+                lg="8"
+              >
+                <ep-input
+                  v-model="arviointi[sisaltokieli]"
+                  :is-editing="isEditing"
+                  type="string"
+                  class="flex-grow-1"
+                >
                   <template #left>
                     <div class="order-handle m-2">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -121,28 +202,43 @@
                   </template>
                 </ep-input>
               </b-col>
-              <b-col cols="1" v-if="isEditing">
-                <div class="default-icon clickable mt-2" @click="poista(arviointi, 'arvioinnit')">
-                  <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
+              <b-col
+                v-if="isEditing"
+                cols="1"
+              >
+                <div
+                  class="default-icon clickable mt-2"
+                  @click="poista(arviointi, 'arvioinnit')"
+                >
+                  <EpMaterialIcon icon-shape="outlined">
+                    delete
+                  </EpMaterialIcon>
                 </div>
               </b-col>
             </b-row>
           </VueDraggable>
 
-          <ep-button v-if="isEditing" variant="outline" icon="add" @click="lisaa('arvioinnit')">
+          <ep-button
+            v-if="isEditing"
+            variant="outline"
+            icon="add"
+            @click="lisaa('arvioinnit')"
+          >
             {{ $t('lisaa-arvioinnin-kohde') }}
           </ep-button>
         </div>
 
         <div v-else>
           <ul>
-            <li v-for="(arviointi, index) in data.arvioinnit" :key="'arviointi'+index">
-              {{$kaanna(arviointi)}}
+            <li
+              v-for="(arviointi, index) in data.arvioinnit"
+              :key="'arviointi'+index"
+            >
+              {{ $kaanna(arviointi) }}
             </li>
           </ul>
         </div>
       </b-form-group>
-
     </template>
   </EpEditointi>
   <EpSpinner v-else />

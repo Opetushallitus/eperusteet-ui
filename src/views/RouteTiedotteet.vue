@@ -1,8 +1,10 @@
 <template>
   <ep-main-view>
     <template #icon>
-      <ep-icon class="float-right" icon="add">
-      </ep-icon>
+      <ep-icon
+        class="float-right"
+        icon="add"
+      />
     </template>
     <template #header>
       <div class="d-flex justify-content-between">
@@ -10,8 +12,9 @@
         <ep-tiedote-modal
           ref="eptiedotemodal"
           :perusteet="perusteet"
-          :tiedotteetStore="tiedotteetStore"
-          :oikeustarkastelu="{oikeus:'hallinta'}"/>
+          :tiedotteet-store="tiedotteetStore"
+          :oikeustarkastelu="{oikeus:'hallinta'}"
+        />
       </div>
     </template>
 
@@ -20,15 +23,19 @@
         <ep-search v-model="nimiFilter" />
       </div>
       <div class="col-6">
-        <ep-form-content name="tiedote-julkaistu" class="mb-0">
-          <ep-multi-select :multiple="true"
+        <ep-form-content
+          name="tiedote-julkaistu"
+          class="mb-0"
+        >
+          <ep-multi-select
+            v-model="valitutJulkaisupaikat"
+            :multiple="true"
             :is-editing="true"
             :options="julkaisupaikatItems"
-            v-model="valitutJulkaisupaikat"
             :placeholder="$t('kaikki')"
             track-by="value"
-            label="text">
-          </ep-multi-select>
+            label="text"
+          />
         </ep-form-content>
       </div>
     </div>
@@ -36,29 +43,30 @@
     <ep-spinner v-if="!tiedotteetPage" />
 
     <div v-else>
-      <b-table responsive
+      <b-table
+        responsive
         borderless
         striped
         fixed
         hover
         no-local-sorting
-        @sort-changed="sortingChanged"
         :sort-by.sync="sort.sortBy"
         :sort-desc.sync="sort.sortDesc"
         :items="tiedotteetFiltered"
         :fields="tableFields"
         :per-page="perPage"
-        @row-clicked="avaaTiedote"/>
+        @sort-changed="sortingChanged"
+        @row-clicked="avaaTiedote"
+      />
 
       <b-pagination
         v-model="page"
         :total-rows="totalRows"
         :per-page="perPage"
         aria-controls="tiedotteet"
-        align="center">
-      </b-pagination>
+        align="center"
+      />
     </div>
-
   </ep-main-view>
 </template>
 
@@ -149,7 +157,7 @@ const page = computed({
   },
   set(value: number) {
     sivu.value = value - 1;
-  }
+  },
 });
 
 const tiedotteetFiltered = computed(() => {

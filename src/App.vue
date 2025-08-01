@@ -1,6 +1,6 @@
 <template>
   <div class="minfull h-100">
-    <router-view v-if="mounted"/>
+    <router-view v-if="mounted" />
     <EpNotification />
   </div>
 </template>

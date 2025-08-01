@@ -1,35 +1,39 @@
 <template>
   <EpMainView container>
-    <EpPerusteprojektiListaus :provider="digitaalisetOsaamisetStore"
-                              :edit-route="'perusteprojekti'"
-                              :new-route="{ name: 'digitaalinenOsaaminenLuonti' }"
-                              :showCards="true"
-                              :vain-kortit="true">
+    <EpPerusteprojektiListaus
+      :provider="digitaalisetOsaamisetStore"
+      :edit-route="'perusteprojekti'"
+      :new-route="{ name: 'digitaalinenOsaaminenLuonti' }"
+      :show-cards="true"
+      :vain-kortit="true"
+    >
       <template #upperheader>
         <div>
           <div class="d-flex justify-content-between">
             <h2>{{ $t('digitaalinen-osaaminen') }}</h2>
             <div>
-              <EpArkistoidutModal v-if="arkistoidut && arkistoidut.length > 0"
+              <EpArkistoidutModal
+                v-if="arkistoidut && arkistoidut.length > 0"
                 :arkistoidut="arkistoidut"
-                @restore="onRestore">
+                @restore="onRestore"
+              >
                 <template #title>
                   <span>{{ $t('arkistoidut-projektit') }}</span>
                 </template>
-                <template v-slot:palauta="{ data }">
+                <template #palauta="{ data }">
                   <EpButton
+                    v-if="palautusoikeus(data.item)"
                     variant="link"
                     icon="keyboard_return"
                     @click="onRestore(data.item)"
-                    v-if="palautusoikeus(data.item)">
+                  >
                     {{ $t('palauta') }}
                   </EpButton>
                 </template>
               </EpArkistoidutModal>
-
             </div>
           </div>
-          <div>{{$t('digitaalinen-osaaminen-listaus-selite')}}</div>
+          <div>{{ $t('digitaalinen-osaaminen-listaus-selite') }}</div>
         </div>
       </template>
       <template #unpublished-header>

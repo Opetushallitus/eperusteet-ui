@@ -1,20 +1,48 @@
 <template>
   <div>
-    <b-modal ref="modal" size="lg">
+    <b-modal
+      ref="modal"
+      size="lg"
+    >
       <template #modal-header>
-        {{$t('luo-uusi-arviointi')}}
+        {{ $t('luo-uusi-arviointi') }}
       </template>
-      <template v-slot:modal-footer>
-        <ep-button variant="secondary" @click="onClose">{{ $t('peruuta') }}</ep-button>
-        <ep-button variant="primary" :disabled="!model" @click="onOk">{{ $t('luo-uusi-arviointi') }}</ep-button>
+      <template #modal-footer>
+        <ep-button
+          variant="secondary"
+          @click="onClose"
+        >
+          {{ $t('peruuta') }}
+        </ep-button>
+        <ep-button
+          variant="primary"
+          :disabled="!model"
+          @click="onOk"
+        >
+          {{ $t('luo-uusi-arviointi') }}
+        </ep-button>
       </template>
 
       <b-form-group :label="$t('arviointiasteikko')">
-        <b-form-radio-group v-model="model" @change="onInput" stacked>
-          <b-form-radio :value="asteikko.id" v-for="asteikko in asteikot" :key="asteikko.id">
+        <b-form-radio-group
+          v-model="model"
+          stacked
+          @change="onInput"
+        >
+          <b-form-radio
+            v-for="asteikko in asteikot"
+            :key="asteikko.id"
+            :value="asteikko.id"
+          >
             <span class="text-wrap">
-              <span v-for="(taso, idx) in asteikko.osaamistasot" :key="'taso-' + taso.id">
-                <span v-if="idx !== 0" class="text-muted">/</span>
+              <span
+                v-for="(taso, idx) in asteikko.osaamistasot"
+                :key="'taso-' + taso.id"
+              >
+                <span
+                  v-if="idx !== 0"
+                  class="text-muted"
+                >/</span>
                 <EpExpandText :text="$kaanna(taso.otsikko)" />
               </span>
             </span>
@@ -22,8 +50,14 @@
         </b-form-radio-group>
       </b-form-group>
     </b-modal>
-    <ep-button @click="onOpen" variant="outline" icon="add">
-      <slot name="valinta">{{ $t('valitse-arviointiasteikko') }}</slot>
+    <ep-button
+      variant="outline"
+      icon="add"
+      @click="onOpen"
+    >
+      <slot name="valinta">
+        {{ $t('valitse-arviointiasteikko') }}
+      </slot>
     </ep-button>
   </div>
 </template>

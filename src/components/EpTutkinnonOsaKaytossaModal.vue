@@ -1,36 +1,60 @@
 <template>
   <div>
-    <ep-button variant="link" @click="avaa" icon="edit">{{ $t('muokkaa') }}</ep-button>
+    <ep-button
+      variant="link"
+      icon="edit"
+      @click="avaa"
+    >
+      {{ $t('muokkaa') }}
+    </ep-button>
 
     <b-modal
       id="EpTutkinnonOsaKaytossaModal"
       :title="$t('muokkaa-tutkinnon-osaa')"
       size="lg"
-      hide-footer>
-
+      hide-footer
+    >
       <div class="mb-4">
         {{ $t('tutkinnon-osa-kaytossa-useammassa-perustessa-yla-selite') }}
       </div>
 
-      <EpButton @click="kaynnistaMuokkaus" :showSpinner="muokkausLoading">{{$t('muokkaa-tutkinnon-osaa')}}</EpButton>
+      <EpButton
+        :show-spinner="muokkausLoading"
+        @click="kaynnistaMuokkaus"
+      >
+        {{ $t('muokkaa-tutkinnon-osaa') }}
+      </EpButton>
 
-      <div class="font-weight-bold mt-4 mb-2">{{$t('perusteet-jotka-muuttuvat-kun-tutkinnon-osaa-muokataan')}}:</div>
-      <div v-for="peruste in perusteet" :key="'peruste'+peruste.id">
-        {{$kaanna(peruste.nimi)}}
+      <div class="font-weight-bold mt-4 mb-2">
+        {{ $t('perusteet-jotka-muuttuvat-kun-tutkinnon-osaa-muokataan') }}:
+      </div>
+      <div
+        v-for="peruste in perusteet"
+        :key="'peruste'+peruste.id"
+      >
+        {{ $kaanna(peruste.nimi) }}
         <span v-if="peruste.voimassaoloAlkaa || peruste.voimassaoloLoppuu">
-          (<span v-if="peruste.voimassaoloAlkaa">{{$sd(peruste.voimassaoloAlkaa)}}</span> - <span v-if="peruste.voimassaoloLoppuu">{{$sd(peruste.voimassaoloLoppuu)}}</span>)
+          (<span v-if="peruste.voimassaoloAlkaa">{{ $sd(peruste.voimassaoloAlkaa) }}</span> - <span v-if="peruste.voimassaoloLoppuu">{{ $sd(peruste.voimassaoloLoppuu) }}</span>)
         </span>
-        <span v-if="peruste.alkuperainen" class="font-italic">({{$t('tutkinnon-osa-on-luotu-tassa-perusteessa')}})</span>
+        <span
+          v-if="peruste.alkuperainen"
+          class="font-italic"
+        >({{ $t('tutkinnon-osa-on-luotu-tassa-perusteessa') }})</span>
       </div>
 
       <template v-if="!kasitellaanAlkuperaista">
-        <hr class="my-4"/>
+        <hr class="my-4">
         <div v-html="$t('tutkinnon-osa-kaytossa-useammassa-perustessa-ala-selite', {perusteNimi})" />
-        <EpButton @click="teeKopio" class="pl-0" variant="link" :showSpinner="kopiointiLoading">{{$t('kopioi-tutkinnon-osa-muokattavaksi')}}</EpButton>
+        <EpButton
+          class="pl-0"
+          variant="link"
+          :show-spinner="kopiointiLoading"
+          @click="teeKopio"
+        >
+          {{ $t('kopioi-tutkinnon-osa-muokattavaksi') }}
+        </EpButton>
       </template>
-
     </b-modal>
-
   </div>
 </template>
 

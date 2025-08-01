@@ -1,6 +1,8 @@
 <template>
-  <EpHomeTile icon="settings"
-              :route="{ name: 'yllapito' }">
+  <EpHomeTile
+    icon="settings"
+    :route="{ name: 'yllapito' }"
+  >
     <template #header>
       <span>{{ $t('tile-yllapito') }}</span>
     </template>

@@ -1,88 +1,146 @@
 <template>
-  <b-modal class="backdrop"
-           id="osaamismerkkiModal"
-           ref="osaamismerkkiModal"
-           :no-close-on-backdrop="true"
-           :no-enforce-focus="true"
-           :lazy="true"
-           size="xl"
-           :hide-footer="true">
+  <b-modal
+    id="osaamismerkkiModal"
+    ref="osaamismerkkiModal"
+    class="backdrop"
+    :no-close-on-backdrop="true"
+    :no-enforce-focus="true"
+    :lazy="true"
+    size="xl"
+    :hide-footer="true"
+  >
     <template #modal-header>
       <div class="row w-100">
         <div class="col">
-          <span v-if="osaamismerkki.id" class="mr-2">{{ $t('muokkaa-osaamismerkkia')}}</span>
-          <span v-else class="mr-2">{{ $t('lisaa-osaamismerkki')}}</span>
+          <span
+            v-if="osaamismerkki.id"
+            class="mr-2"
+          >{{ $t('muokkaa-osaamismerkkia') }}</span>
+          <span
+            v-else
+            class="mr-2"
+          >{{ $t('lisaa-osaamismerkki') }}</span>
         </div>
         <div>
-          <EpKielivalinta/>
+          <EpKielivalinta />
         </div>
-        <div class="close-btn clickable ml-3 pt-1" @click="sulje">
-          <EpMaterialIcon aria-hidden="false" :aria-label="$t('sulje')">close</EpMaterialIcon>
+        <div
+          class="close-btn clickable ml-3 pt-1"
+          @click="sulje"
+        >
+          <EpMaterialIcon
+            aria-hidden="false"
+            :aria-label="$t('sulje')"
+          >
+            close
+          </EpMaterialIcon>
         </div>
       </div>
     </template>
 
     <div class="mb-2">
-      <b-row no-gutters v-if="osaamismerkki.id">
+      <b-row
+        v-if="osaamismerkki.id"
+        no-gutters
+      >
         <b-col lg="8">
           <b-form-group :label="$t('tila')">
             <div class="d-flex">
               <b-form-checkbox v-model="isJulkinen">
                 {{ $t('naytetaan-julkisena') }}
               </b-form-checkbox>
-              <span v-if="osaamismerkki.muokattu" class="muokattu-text ml-1">{{ muokkausText + $sdt(osaamismerkki.muokattu)}}</span>
+              <span
+                v-if="osaamismerkki.muokattu"
+                class="muokattu-text ml-1"
+              >{{ muokkausText + $sdt(osaamismerkki.muokattu) }}</span>
             </div>
-            <div></div>
+            <div />
           </b-form-group>
         </b-col>
 
         <b-col lg="4">
-          <b-form-group :label="$t('koodi')" v-if="osaamismerkki.koodiUri">
+          <b-form-group
+            v-if="osaamismerkki.koodiUri"
+            :label="$t('koodi')"
+          >
             <span>{{ koodi }}</span>
           </b-form-group>
         </b-col>
       </b-row>
 
       <b-form-group :label="$t('nimi') + ' *'">
-        <EpInput v-model="osaamismerkki.nimi" :is-editing="true"/>
+        <EpInput
+          v-model="osaamismerkki.nimi"
+          :is-editing="true"
+        />
       </b-form-group>
 
       <b-form-group :label="$t('kuvaus')">
-        <EpInput v-model="osaamismerkki.kuvaus" :is-editing="true"/>
+        <EpInput
+          v-model="osaamismerkki.kuvaus"
+          :is-editing="true"
+        />
       </b-form-group>
 
       <b-form-group :label="$t('teema') + ' *'">
-        <EpMultiSelect :is-editing="true"
-                       :options="osaamismerkkiKategoriat"
-                       v-model="osaamismerkki.kategoria"
-                       :placeholder="$t('kaikki')">
-          <template v-slot:singleLabel="{ option }">{{ $kaanna(option.nimi) }}</template>
-          <template v-slot:option="{ option }">{{ $kaanna(option.nimi) }}</template>
-          <template v-slot:tag="{ option }">{{ $kaanna(option.nimi) }}</template>
+        <EpMultiSelect
+          v-model="osaamismerkki.kategoria"
+          :is-editing="true"
+          :options="osaamismerkkiKategoriat"
+          :placeholder="$t('kaikki')"
+        >
+          <template #singleLabel="{ option }">
+            {{ $kaanna(option.nimi) }}
+          </template>
+          <template #option="{ option }">
+            {{ $kaanna(option.nimi) }}
+          </template>
+          <template #tag="{ option }">
+            {{ $kaanna(option.nimi) }}
+          </template>
         </EpMultiSelect>
       </b-form-group>
 
       <b-form-group :label="$t('voimassaolo') + ' *'">
         <div class="d-flex align-items-center">
-          <EpDatepicker v-model="osaamismerkki.voimassaoloAlkaa" :is-editing="true"/>
-          <div class="ml-2 mr-2">-</div>
-          <EpDatepicker v-model="osaamismerkki.voimassaoloLoppuu" :is-editing="true"/>
+          <EpDatepicker
+            v-model="osaamismerkki.voimassaoloAlkaa"
+            :is-editing="true"
+          />
+          <div class="ml-2 mr-2">
+            -
+          </div>
+          <EpDatepicker
+            v-model="osaamismerkki.voimassaoloLoppuu"
+            :is-editing="true"
+          />
         </div>
       </b-form-group>
     </div>
 
     <b-form-group :label="$t('osaamistavoitteet') + ' *'">
-      <VueDraggable v-bind="defaultDragOptions"
-                 tag="div"
-                 v-model="osaamismerkki.osaamistavoitteet">
-        <div v-if="osaamismerkki.osaamistavoitteet?.length > 0" class="mb-1 font-italic">
+      <VueDraggable
+        v-bind="defaultDragOptions"
+        v-model="osaamismerkki.osaamistavoitteet"
+        tag="div"
+      >
+        <div
+          v-if="osaamismerkki.osaamistavoitteet?.length > 0"
+          class="mb-1 font-italic"
+        >
           <span>{{ $t('osaamismerkin-suorittaja') }}...</span>
         </div>
-        <div class="row mb-2" v-for="(tavoite, i) in osaamismerkki.osaamistavoitteet" :key="'tavoite'+i">
+        <div
+          v-for="(tavoite, i) in osaamismerkki.osaamistavoitteet"
+          :key="'tavoite'+i"
+          class="row mb-2"
+        >
           <div class="col">
-            <EpInput v-model="tavoite.osaamistavoite"
-                     :is-editing="true"
-                     class="input-wrapper">
+            <EpInput
+              v-model="tavoite.osaamistavoite"
+              :is-editing="true"
+              class="input-wrapper"
+            >
               <template #left>
                 <div class="order-handle m-2">
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -91,32 +149,46 @@
             </EpInput>
           </div>
           <div class="col-1">
-            <EpButton @click="poistaTavoite(tavoite)"
-                       variant="link"
-                       icon="delete">
-            </EpButton>
+            <EpButton
+              variant="link"
+              icon="delete"
+              @click="poistaTavoite(tavoite)"
+            />
           </div>
         </div>
       </VueDraggable>
-      <EpButton @click="lisaaTavoite"
-                 variant="outline-primary"
-                 icon="add">
+      <EpButton
+        variant="outline-primary"
+        icon="add"
+        @click="lisaaTavoite"
+      >
         {{ $t('lisaa-osaamistavoite') }}
       </EpButton>
     </b-form-group>
 
     <b-form-group :label="$t('arviointikriteerit') + ' *'">
-      <VueDraggable v-bind="defaultDragOptions"
-                 tag="div"
-                 v-model="osaamismerkki.arviointikriteerit">
-        <div v-if="osaamismerkki.arviointikriteerit?.length > 0" class="mb-1 font-italic">
+      <VueDraggable
+        v-bind="defaultDragOptions"
+        v-model="osaamismerkki.arviointikriteerit"
+        tag="div"
+      >
+        <div
+          v-if="osaamismerkki.arviointikriteerit?.length > 0"
+          class="mb-1 font-italic"
+        >
           <span>{{ $t('osaamismerkin-suorittaja') }}...</span>
         </div>
-        <div class="row mb-2" v-for="(kriteeri, i) in osaamismerkki.arviointikriteerit" :key="'kriteeri'+i">
+        <div
+          v-for="(kriteeri, i) in osaamismerkki.arviointikriteerit"
+          :key="'kriteeri'+i"
+          class="row mb-2"
+        >
           <div class="col">
-            <EpInput v-model="kriteeri.arviointikriteeri"
-                     :is-editing="true"
-                     class="input-wrapper">
+            <EpInput
+              v-model="kriteeri.arviointikriteeri"
+              :is-editing="true"
+              class="input-wrapper"
+            >
               <template #left>
                 <div class="order-handle m-2">
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -125,35 +197,44 @@
             </EpInput>
           </div>
           <div class="col-1">
-            <EpButton @click="poistaKriteeri(kriteeri)"
-                      variant="link"
-                      icon="delete">
-            </EpButton>
+            <EpButton
+              variant="link"
+              icon="delete"
+              @click="poistaKriteeri(kriteeri)"
+            />
           </div>
         </div>
       </VueDraggable>
-      <EpButton @click="lisaaKriteeri"
-                 variant="outline-primary"
-                 icon="add">
+      <EpButton
+        variant="outline-primary"
+        icon="add"
+        @click="lisaaKriteeri"
+      >
         {{ $t('lisaa-arviointikriteeri') }}
       </EpButton>
     </b-form-group>
 
     <div class="float-right">
-      <EpButton @click="sulje"
-                variant="link">
+      <EpButton
+        variant="link"
+        @click="sulje"
+      >
         {{ $t('peruuta') }}
       </EpButton>
-      <EpButton v-if="osaamismerkki.id"
-                @click="poistaOsaamismerkki"
-                :show-spinner="tallennetaan"
-                :disabled="isJulkinen">
+      <EpButton
+        v-if="osaamismerkki.id"
+        :show-spinner="tallennetaan"
+        :disabled="isJulkinen"
+        @click="poistaOsaamismerkki"
+      >
         {{ $t('poista') }}
       </EpButton>
-      <EpButton @click="tallenna"
-                class="ml-2"
-                :show-spinner="tallennetaan"
-                :disabled="invalid">
+      <EpButton
+        class="ml-2"
+        :show-spinner="tallennetaan"
+        :disabled="invalid"
+        @click="tallenna"
+      >
         {{ $t('tallenna') }}
       </EpButton>
     </div>

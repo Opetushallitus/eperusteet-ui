@@ -1,34 +1,43 @@
 <template>
   <div>
-    <div v-for="(maarays, index) in model" :key="tyyppi+index">
-
+    <div
+      v-for="(maarays, index) in model"
+      :key="tyyppi+index"
+    >
       <div class="d-flex w-100 mb-2 align-items-center">
         <EpMultiSelect
           class="w-100"
-          :modelValue="maarays"
-          @update:modelValue="asetaMaarays(index, $event)"
+          :model-value="maarays"
           :placeholder="$t('valitse-maarays')"
           :is-editing="true"
           :search-identity="nimiSearchIdentity"
-          :options="maarayksetNimella">
+          :options="maarayksetNimella"
+          @update:modelValue="asetaMaarays(index, $event)"
+        >
           <template #singleLabel="{ option }">
-            {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{option.diaarinumero}})</span>
+            {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{ option.diaarinumero }})</span>
           </template>
           <template #option="{ option }">
-            {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{option.diaarinumero}})</span>
+            {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{ option.diaarinumero }})</span>
           </template>
         </EpMultiSelect>
 
-        <div class="default-icon clickable ml-2" @click="poistaMaarays(maarays)">
+        <div
+          class="default-icon clickable ml-2"
+          @click="poistaMaarays(maarays)"
+        >
           <EpMaterialIcon>delete</EpMaterialIcon>
         </div>
       </div>
     </div>
 
-    <ep-button @click="lisaaMaarays()" variant="outline" icon="add">
+    <ep-button
+      variant="outline"
+      icon="add"
+      @click="lisaaMaarays()"
+    >
       {{ $t('lisaa-maarays') }}
     </ep-button>
-
   </div>
 </template>
 

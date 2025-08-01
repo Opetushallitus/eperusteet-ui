@@ -1,33 +1,53 @@
 <template>
   <div>
-    <table class="table" v-if="modelValue && modelValue.length > 0">
+    <table
+      v-if="modelValue && modelValue.length > 0"
+      class="table"
+    >
       <thead>
         <tr>
           <th>{{ $t('nimi') }}</th>
           <th>{{ $t('tiedosto') }}</th>
-          <th v-if="isEditing"></th>
+          <th v-if="isEditing" />
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(muutos, idx) in modelValue" :key="'muutos' + idx">
+        <tr
+          v-for="(muutos, idx) in modelValue"
+          :key="'muutos' + idx"
+        >
           <td>
-            <ep-input v-model="muutos.nimi" :is-editing="isEditing" :placeholder="(muutos.liitteet && muutos.liitteet[$slang]) ? muutos.liitteet[$slang].nimi : ''"/>
+            <ep-input
+              v-model="muutos.nimi"
+              :is-editing="isEditing"
+              :placeholder="(muutos.liitteet && muutos.liitteet[$slang]) ? muutos.liitteet[$slang].nimi : ''"
+            />
           </td>
           <td>
             <span v-if="!!muutos.liitteet && muutos.liitteet[$slang.value]">
-              {{muutos.liitteet[$slang.value].nimi}}
+              {{ muutos.liitteet[$slang.value].nimi }}
             </span>
           </td>
           <td v-if="isEditing">
             <div class="text-center">
-              <ep-button variant="link" icon="delete" @click="poista(idx)"></ep-button>
+              <ep-button
+                variant="link"
+                icon="delete"
+                @click="poista(idx)"
+              />
             </div>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <ep-button class="mt-3" @click="lisaaMuutosmaarays()" v-if="isEditing">{{ $t('lisaa-muutosmaarays') }}</ep-button>
+    <ep-button
+      v-if="isEditing"
+      class="mt-3"
+      @click="lisaaMuutosmaarays()"
+    >
+      {{ $t('lisaa-muutosmaarays') }}
+    </ep-button>
 
     <EpSpinner v-if="!muutosmaaraykset" />
     <b-table
@@ -35,23 +55,48 @@
       class="w-90 mt-3"
       :items="muutosmaaryksetSorted"
       :fields="muutosmaarayksetFields"
-      striped>
-
-      <template v-slot:cell(nimi)="{ item }">
-        <EpPdfLink v-if="item.url" :url="item.url">{{ $kaanna(item.nimi) }}</EpPdfLink>
-        <div v-else>{{ $kaanna(item.nimi) }}</div>
-      </template>
-
-      <template v-slot:cell(toiminnot)="{item}">
-        <div class="d-flex" v-if="isEditing">
-          <EpButton icon="edit" variant="link" @click="muokkaaMuutosmaarausta(item)">{{$t('muokkaa')}}</EpButton>
-          <EpButton icon="delete" variant="link" @click="poistaMuutosmaarays(item)" :showSpinner="item.poistossa">{{$t('poista')}}</EpButton>
+      striped
+    >
+      <template #cell(nimi)="{ item }">
+        <EpPdfLink
+          v-if="item.url"
+          :url="item.url"
+        >
+          {{ $kaanna(item.nimi) }}
+        </EpPdfLink>
+        <div v-else>
+          {{ $kaanna(item.nimi) }}
         </div>
       </template>
 
+      <template #cell(toiminnot)="{item}">
+        <div
+          v-if="isEditing"
+          class="d-flex"
+        >
+          <EpButton
+            icon="edit"
+            variant="link"
+            @click="muokkaaMuutosmaarausta(item)"
+          >
+            {{ $t('muokkaa') }}
+          </EpButton>
+          <EpButton
+            icon="delete"
+            variant="link"
+            :show-spinner="item.poistossa"
+            @click="poistaMuutosmaarays(item)"
+          >
+            {{ $t('poista') }}
+          </EpButton>
+        </div>
+      </template>
     </b-table>
 
-    <EpMuutosmaaraysModal ref="muutosmaaraysModal" :perusteStore="perusteStore" />
+    <EpMuutosmaaraysModal
+      ref="muutosmaaraysModal"
+      :peruste-store="perusteStore"
+    />
   </div>
 </template>
 

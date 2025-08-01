@@ -1,37 +1,51 @@
 <template>
   <div class="mt-5">
-
     <div class="mt-5 mb-5">
       <div>
         <h2>{{ $t('julkaistut-arvioinnit') }}</h2>
       </div>
-      <div class="arviointi-wrapper" v-for="(geneerinen, idx) in julkaistut" :key="idx + '-julkaistut'">
+      <div
+        v-for="(geneerinen, idx) in julkaistut"
+        :key="idx + '-julkaistut'"
+        class="arviointi-wrapper"
+      >
         <GeneerinenArviointi
           :value="geneerinen"
           :arviointi-store="arviointiStore"
-          :kayttajaStore="kayttajaStore">
-        </GeneerinenArviointi>
+          :kayttaja-store="kayttajaStore"
+        />
       </div>
     </div>
 
     <div class="mt-5">
       <div class="mt-5 mb-3 d-flex justify-content-between align-items-center">
         <div>
-          <h2 class="m-0">{{ $t('keskeneraiset-arvioinnit') }}</h2>
+          <h2 class="m-0">
+            {{ $t('keskeneraiset-arvioinnit') }}
+          </h2>
         </div>
         <div>
-          <arviointi-selector @update:modelValue="addGeneerinen" :arviointi-store="arviointiStore">
-            <template v-slot:valinta>{{$t('luo-uusi-arviointi')}}</template>
+          <arviointi-selector
+            :arviointi-store="arviointiStore"
+            @update:modelValue="addGeneerinen"
+          >
+            <template #valinta>
+              {{ $t('luo-uusi-arviointi') }}
+            </template>
           </arviointi-selector>
         </div>
       </div>
-      <div class="arviointi-wrapper" v-for="(geneerinen, idx) in keskeneraiset" :key="idx + '-keskeneraiset'">
+      <div
+        v-for="(geneerinen, idx) in keskeneraiset"
+        :key="idx + '-keskeneraiset'"
+        class="arviointi-wrapper"
+      >
         <GeneerinenArviointi
           :value="geneerinen"
           :arviointi-store="arviointiStore"
-          :kayttajaStore="kayttajaStore"
-          :editing="geneerinen.editing">
-        </GeneerinenArviointi>
+          :kayttaja-store="kayttajaStore"
+          :editing="geneerinen.editing"
+        />
       </div>
     </div>
   </div>

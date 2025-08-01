@@ -2,111 +2,158 @@
   <div>
     <div v-if="store">
       <EpEditointi :store="store">
-      <template v-slot:header="{ data }">
-        <h2 class="m-0">
-          <span>
-            {{ $kaanna(data.nimi) || $t('nimeton-osaalue') }}{{ data.laajuus ? ',' : '' }}
-          </span>
-          <span v-if="data.laajuus">
-            {{ data.laajuus }} {{ $t('OSAAMISPISTE') }}
-          </span>
-        </h2>
-      </template>
+        <template #header="{ data }">
+          <h2 class="m-0">
+            <span>
+              {{ $kaanna(data.nimi) || $t('nimeton-osaalue') }}{{ data.laajuus ? ',' : '' }}
+            </span>
+            <span v-if="data.laajuus">
+              {{ data.laajuus }} {{ $t('OSAAMISPISTE') }}
+            </span>
+          </h2>
+        </template>
 
-      <template v-slot:default="{ data, isEditing, validation }">
-        <EpSpinner v-if="!data" />
-        <div v-else>
-          <b-row>
-            <b-col md="5">
-              <b-form-group :label="$t('osaalue-nimi') + (isEditing ? ' *' : '')">
-                <ep-input v-model="data.nimi"
-                          :is-editing="isEditing"
-                          :validation="validation.nimi" />
-              </b-form-group>
-            </b-col>
+        <template #default="{ data, isEditing, validation }">
+          <EpSpinner v-if="!data" />
+          <div v-else>
+            <b-row>
+              <b-col md="5">
+                <b-form-group :label="$t('osaalue-nimi') + (isEditing ? ' *' : '')">
+                  <ep-input
+                    v-model="data.nimi"
+                    :is-editing="isEditing"
+                    :validation="validation.nimi"
+                  />
+                </b-form-group>
+              </b-col>
 
-            <b-col md="4">
-              <b-form-group :label="$t('koodi') + (isEditing ? ' *' : '')">
-                <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing">
-                  <template #default="{ open }">
-                    <b-input-group>
-                      <b-form-input
-                        :value="data.koodi ? ($kaanna(data.koodi.nimi) + ' (' + data.koodi.arvo + ')') : ''"
-                        disabled></b-form-input>
-                      <b-input-group-append>
-                        <b-button @click="open" variant="primary">
-                          {{ $t('hae-koodistosta') }}
-                        </b-button>
-                      </b-input-group-append>
-                    </b-input-group>
-                  </template>
-                </ep-koodisto-select>
-              </b-form-group>
-            </b-col>
+              <b-col md="4">
+                <b-form-group :label="$t('koodi') + (isEditing ? ' *' : '')">
+                  <ep-koodisto-select
+                    v-model="data.koodi"
+                    :store="koodisto"
+                    :is-editing="isEditing"
+                  >
+                    <template #default="{ open }">
+                      <b-input-group>
+                        <b-form-input
+                          :value="data.koodi ? ($kaanna(data.koodi.nimi) + ' (' + data.koodi.arvo + ')') : ''"
+                          disabled
+                        />
+                        <b-input-group-append>
+                          <b-button
+                            variant="primary"
+                            @click="open"
+                          >
+                            {{ $t('hae-koodistosta') }}
+                          </b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </template>
+                  </ep-koodisto-select>
+                </b-form-group>
+              </b-col>
 
-            <b-col md="3">
-              <b-form-group :label="$t('osa-alue-kieli')">
-                <ep-koodisto-select :store="kielikoodisto" v-model="data.kielikoodi" :is-editing="isEditing">
-                  <template #default="{ open }">
-                    <b-input-group>
-                      <b-form-input
-                        :value="data.kielikoodi ? ($kaanna(data.kielikoodi.nimi) + ' (' + data.kielikoodi.arvo + ')') : ''"
-                        disabled></b-form-input>
-                      <b-input-group-append>
-                        <b-button @click="open" variant="primary">
-                          {{ $t('hae-koodistosta') }}
-                        </b-button>
-                      </b-input-group-append>
-                    </b-input-group>
-                  </template>
-                </ep-koodisto-select>
-              </b-form-group>
-            </b-col>
-          </b-row>
-        </div>
-
-        <ep-collapse tyyppi="pakolliset-osaamistavoitteet" :border-bottom="false" :border-top="true">
-          <template #header>
-            <h3>{{ $t('pakolliset-osaamistavoitteet') }}</h3>
-          </template>
-          <Osaamistavoite v-model="data.pakollisetOsaamistavoitteet"
-                          :is-valinnainen="false"
-                          :is-editing="isEditing">
-          </Osaamistavoite>
-        </ep-collapse>
-
-        <ep-collapse tyyppi="valinnaiset-osaamistavoitteet" :border-bottom="false" :border-top="true" v-if="isEditing || data.valinnaisetOsaamistavoitteet">
-          <template #header>
-            <h3>{{ $t('valinnaiset-osaamistavoitteet') }}</h3>
-          </template>
-
-          <div v-if="isEditing" class="mb-3">
-            <ep-button v-if="data.valinnaisetOsaamistavoitteet" @click="poistaValinnaisetOsaamistavoitteet()" variant="link" icon="delete">
-              {{ $t('poista-valinnaiset-osaamistavoitteet') }}
-            </ep-button>
-
-            <ep-button v-else @click="lisaaValinnaisetOsaamistavoitteet()" variant="outline" icon="add">
-              {{ $t('lisaa-valinnaiset-osaamistavoitteet') }}
-            </ep-button>
+              <b-col md="3">
+                <b-form-group :label="$t('osa-alue-kieli')">
+                  <ep-koodisto-select
+                    v-model="data.kielikoodi"
+                    :store="kielikoodisto"
+                    :is-editing="isEditing"
+                  >
+                    <template #default="{ open }">
+                      <b-input-group>
+                        <b-form-input
+                          :value="data.kielikoodi ? ($kaanna(data.kielikoodi.nimi) + ' (' + data.kielikoodi.arvo + ')') : ''"
+                          disabled
+                        />
+                        <b-input-group-append>
+                          <b-button
+                            variant="primary"
+                            @click="open"
+                          >
+                            {{ $t('hae-koodistosta') }}
+                          </b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </template>
+                  </ep-koodisto-select>
+                </b-form-group>
+              </b-col>
+            </b-row>
           </div>
 
-          <Osaamistavoite v-model="data.valinnaisetOsaamistavoitteet"
-                          v-if="data.valinnaisetOsaamistavoitteet"
-                          :is-valinnainen="true"
-                          :is-editing="isEditing">
-          </Osaamistavoite>
-        </ep-collapse>
+          <ep-collapse
+            tyyppi="pakolliset-osaamistavoitteet"
+            :border-bottom="false"
+            :border-top="true"
+          >
+            <template #header>
+              <h3>{{ $t('pakolliset-osaamistavoitteet') }}</h3>
+            </template>
+            <Osaamistavoite
+              v-model="data.pakollisetOsaamistavoitteet"
+              :is-valinnainen="false"
+              :is-editing="isEditing"
+            />
+          </ep-collapse>
 
-        <ep-collapse tyyppi="arviointi" :border-bottom="false" :border-top="true">
-          <template #header>
-            <h3>{{ $t('arviointi') + (isEditing ? ' *' : '')}} </h3>
-          </template>
-          <EpGeneerinenAsteikko v-model="arviointi"
-                                :arviointi-store="arviointiStore"
-                                :is-editing="isEditing" />
-        </ep-collapse>
+          <ep-collapse
+            v-if="isEditing || data.valinnaisetOsaamistavoitteet"
+            tyyppi="valinnaiset-osaamistavoitteet"
+            :border-bottom="false"
+            :border-top="true"
+          >
+            <template #header>
+              <h3>{{ $t('valinnaiset-osaamistavoitteet') }}</h3>
+            </template>
 
-      </template>
+            <div
+              v-if="isEditing"
+              class="mb-3"
+            >
+              <ep-button
+                v-if="data.valinnaisetOsaamistavoitteet"
+                variant="link"
+                icon="delete"
+                @click="poistaValinnaisetOsaamistavoitteet()"
+              >
+                {{ $t('poista-valinnaiset-osaamistavoitteet') }}
+              </ep-button>
+
+              <ep-button
+                v-else
+                variant="outline"
+                icon="add"
+                @click="lisaaValinnaisetOsaamistavoitteet()"
+              >
+                {{ $t('lisaa-valinnaiset-osaamistavoitteet') }}
+              </ep-button>
+            </div>
+
+            <Osaamistavoite
+              v-if="data.valinnaisetOsaamistavoitteet"
+              v-model="data.valinnaisetOsaamistavoitteet"
+              :is-valinnainen="true"
+              :is-editing="isEditing"
+            />
+          </ep-collapse>
+
+          <ep-collapse
+            tyyppi="arviointi"
+            :border-bottom="false"
+            :border-top="true"
+          >
+            <template #header>
+              <h3>{{ $t('arviointi') + (isEditing ? ' *' : '') }} </h3>
+            </template>
+            <EpGeneerinenAsteikko
+              v-model="arviointi"
+              :arviointi-store="arviointiStore"
+              :is-editing="isEditing"
+            />
+          </ep-collapse>
+        </template>
       </EpEditointi>
     </div>
     <EpSpinner v-else />

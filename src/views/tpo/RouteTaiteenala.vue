@@ -1,23 +1,45 @@
 <template>
-  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
+  <EpEditointi
+    v-if="store"
+    :store="store"
+    :versionumero="versionumero"
+  >
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing }">
       <b-row v-if="isEditing">
         <b-col cols="11">
           <b-form-group :label="$t('taiteenala') + ' *'">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -29,17 +51,30 @@
       </b-row>
 
       <div class="col-11 pl-0">
-
-        <h4 class="mt-4" v-if="isEditing">{{$t('kuvaus')}} *</h4>
+        <h4
+          v-if="isEditing"
+          class="mt-4"
+        >
+          {{ $t('kuvaus') }} *
+        </h4>
         <ep-content
-          layout="normal"
           v-model="data.teksti"
+          layout="normal"
           :is-editable="isEditing"
-          :kasiteHandler="kasiteHandler"/>
+          :kasite-handler="kasiteHandler"
+        />
 
-        <hr v-if="isEditing" class="mt-5"/>
+        <hr
+          v-if="isEditing"
+          class="mt-5"
+        >
 
-        <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="sisaltoTekstiAvaimet" sisaltoTekstiOtsikkoField="nimi"/>
+        <EpSisaltoTekstikappaleet
+          v-model="storeData"
+          :is-editing="isEditing"
+          :sisalto-avaimet="sisaltoTekstiAvaimet"
+          sisalto-teksti-otsikko-field="nimi"
+        />
       </div>
     </template>
   </EpEditointi>

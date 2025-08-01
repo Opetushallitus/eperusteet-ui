@@ -14,7 +14,9 @@
           <li>{{ $t('peruste-julkaisun-vaikutukset-2') }}</li>
           <li>{{ $t('peruste-julkaisun-vaikutukset-3') }}</li>
           <li>{{ $t('peruste-julkaisun-vaikutukset-4') }}</li>
-          <li v-if="isAmmatillinen">{{ $t('peruste-julkaisun-vaikutukset-ammatillinen-1') }}</li>
+          <li v-if="isAmmatillinen">
+            {{ $t('peruste-julkaisun-vaikutukset-ammatillinen-1') }}
+          </li>
         </ul>
       </div>
     </template>
@@ -22,23 +24,45 @@
     <div>
       <h3>{{ $t('tarkistukset') }}</h3>
       <div class="validation">
-        <div v-if="!validoinnit" class="validointi-spinner">
+        <div
+          v-if="!validoinnit"
+          class="validointi-spinner"
+        >
           <EpSpinner />
           <div>{{ $t('validointi-kaynnissa') }}</div>
         </div>
         <div v-else>
-          <div v-if="isPerusteValid" class="d-flex">
-            <EpMaterialIcon class="no-errors">check_circle</EpMaterialIcon>
-            <div class="ml-2">{{$t('ei-julkaisua-estavia-virheita')}}</div>
+          <div
+            v-if="isPerusteValid"
+            class="d-flex"
+          >
+            <EpMaterialIcon class="no-errors">
+              check_circle
+            </EpMaterialIcon>
+            <div class="ml-2">
+              {{ $t('ei-julkaisua-estavia-virheita') }}
+            </div>
           </div>
-          <div v-else class="d-flex">
-            <EpMaterialIcon class="errors">info</EpMaterialIcon>
-            <div class="ml-2">{{$t('loytyi-julkaisun-estavia-virheita')}}</div>
+          <div
+            v-else
+            class="d-flex"
+          >
+            <EpMaterialIcon class="errors">
+              info
+            </EpMaterialIcon>
+            <div class="ml-2">
+              {{ $t('loytyi-julkaisun-estavia-virheita') }}
+            </div>
           </div>
 
-          <div v-for="(validointi, idx) in validoinnit" :key="'validointi'+idx">
-            <ep-collapse v-if="validointi.virheet.length > 0 || validointi.huomautukset.length > 0"
-                        :borderBottom="false">
+          <div
+            v-for="(validointi, idx) in validoinnit"
+            :key="'validointi'+idx"
+          >
+            <ep-collapse
+              v-if="validointi.virheet.length > 0 || validointi.huomautukset.length > 0"
+              :border-bottom="false"
+            >
               <template #header>
                 <h3>{{ $t('validointi-kategoria-' + validointi.kategoria) }}</h3>
               </template>
@@ -56,14 +80,17 @@
         <b-row no-gutters>
           <b-col>
             <b-form-group :label="$t(koulutustyyppiKohtaisetKaannokset.perusteennimi) + '*'">
-              <ep-input v-model="peruste.nimi"></ep-input>
+              <ep-input v-model="peruste.nimi" />
             </b-form-group>
           </b-col>
         </b-row>
         <b-row no-gutters>
           <b-col lg="6">
             <b-form-group :label="$t('diaarinumero')">
-              <ep-input v-model="peruste.diaarinumero" type="string" ></ep-input>
+              <ep-input
+                v-model="peruste.diaarinumero"
+                type="string"
+              />
             </b-form-group>
           </b-col>
           <b-col lg="6">
@@ -77,12 +104,17 @@
             <b-form-group :label="$t('voimassaolo')">
               <div class="d-flex align-items-center">
                 <ep-datepicker v-model="peruste.voimassaoloAlkaa" />
-                  <div class="ml-2 mr-2">-</div>
-                  <ep-datepicker v-model="peruste.voimassaoloLoppuu" />
+                <div class="ml-2 mr-2">
+                  -
+                </div>
+                <ep-datepicker v-model="peruste.voimassaoloLoppuu" />
               </div>
             </b-form-group>
           </b-col>
-          <b-col lg="6" v-if="peruste.koulutustyyppi">
+          <b-col
+            v-if="peruste.koulutustyyppi"
+            lg="6"
+          >
             <b-form-group :label="$t('koulutustyyppi')">
               <ep-koulutustyyppi-select :value="peruste.koulutustyyppi" />
             </b-form-group>
@@ -92,8 +124,15 @@
           <b-col lg="6">
             <b-form-group :label="$t('perusteen-kielet')">
               <div class="text-nowrap">
-                <span v-for="(kieli, idx) in peruste.kielet" :key="kieli" :value="kieli">
-                  {{ $t(kieli) }}<span class="mr-0" v-if="idx < peruste.kielet.length - 1">,</span>
+                <span
+                  v-for="(kieli, idx) in peruste.kielet"
+                  :key="kieli"
+                  :value="kieli"
+                >
+                  {{ $t(kieli) }}<span
+                    v-if="idx < peruste.kielet.length - 1"
+                    class="mr-0"
+                  >,</span>
                 </span>
               </div>
             </b-form-group>
@@ -105,39 +144,50 @@
     <template v-if="!isPohja">
       <div v-if="julkaisuMahdollinen">
         <hr class="mt-4">
-        <h3 class="mt-4">{{ $t('uusi-julkaisu') }}</h3>
+        <h3 class="mt-4">
+          {{ $t('uusi-julkaisu') }}
+        </h3>
 
         <EpInfoBanner class="mb-3">
-          {{$t('muista-lisata-julkaisun-kuvauksesta-myos-kieliversio')}}
+          {{ $t('muista-lisata-julkaisun-kuvauksesta-myos-kieliversio') }}
         </EpInfoBanner>
 
         <EpJulkaisuMuutosmaarays
           v-if="isNormaali"
-          class="mt-4"
           v-model="julkaisu"
-          :muutosmaaraykset="muutosmaaraykset"/>
+          class="mt-4"
+          :muutosmaaraykset="muutosmaaraykset"
+        />
 
         <EpJulkaisuForm
           class="mt-4"
           is-latest
           :store="perusteStore"
-          :julkaisu="julkaisu" />
+          :julkaisu="julkaisu"
+        />
 
         <b-form-group>
-          <EpJulkaisuButton :julkaise="julkaise"
-                            v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
-                            :julkaisuKesken="julkaisuKesken"
-                            :disabled="!julkaisuValid"/>
+          <EpJulkaisuButton
+            v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+            :julkaise="julkaise"
+            :julkaisu-kesken="julkaisuKesken"
+            :disabled="!julkaisuValid"
+          />
         </b-form-group>
       </div>
 
       <hr class="mt-4 mb-4">
 
-      <EpJulkaisuHistoria :store="perusteStore"
-                          :palauta="palautaJulkaisu">
+      <EpJulkaisuHistoria
+        :store="perusteStore"
+        :palauta="palautaJulkaisu"
+      >
         <template #katsele="{ julkaisu }">
-          <ep-external-link v-if="julkaisu" :url="opintopolkuKatseluUrl(julkaisu)">
-            {{$t('katsele')}}
+          <ep-external-link
+            v-if="julkaisu"
+            :url="opintopolkuKatseluUrl(julkaisu)"
+          >
+            {{ $t('katsele') }}
           </ep-external-link>
         </template>
         <template #empty>
@@ -145,7 +195,6 @@
         </template>
       </EpJulkaisuHistoria>
     </template>
-
   </div>
 </template>
 

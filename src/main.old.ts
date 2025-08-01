@@ -81,7 +81,7 @@ Vue.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
 Vue.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
 Vue.use(VueTutorial, { tutoriaaliStore });
 Vue.use(VueApexCharts);
-Vue.component('apexchart', VueApexCharts);
+Vue.component('Apexchart', VueApexCharts);
 
 Vue.use(TekstikappaleStore, {
   perusteStore: stores.perusteStore,

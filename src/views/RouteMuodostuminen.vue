@@ -1,7 +1,12 @@
 <template>
   <div>
     <ep-spinner v-if="(!store || !peruste || !tutkinnonOsatRaw)" />
-    <EpEditointi v-else :store="store" :allowSave="tarkistaTallennusLeikelauta" :allowCancel="tarkistaPeruutusLeikelauta">
+    <EpEditointi
+      v-else
+      :store="store"
+      :allow-save="tarkistaTallennusLeikelauta"
+      :allow-cancel="tarkistaPeruutusLeikelauta"
+    >
       <template #header>
         <h2>{{ $t('tutkinnon-muodostuminen') }}</h2>
       </template>
@@ -9,7 +14,11 @@
         <div>
           <div class="upper mb-3">
             <b-form-group :label="$t('rakenteen-kuvaus')">
-              <ep-content v-model="data.rakenne.kuvaus" layout="normal" :is-editable="isEditing"></ep-content>
+              <ep-content
+                v-model="data.rakenne.kuvaus"
+                layout="normal"
+                :is-editable="isEditing"
+              />
             </b-form-group>
           </div>
           <div class="lower">
@@ -20,42 +29,66 @@
                   {{ laskettuLaajuus }}
                 </span>
                 / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
-              <ep-button variant="link" icon="edit" @click="editMuodostuminen" v-if="isEditing"></ep-button>
+              <ep-button
+                v-if="isEditing"
+                variant="link"
+                icon="edit"
+                @click="editMuodostuminen"
+              />
             </h5>
             <div class="filters">
-              <ep-search v-model="query" :placeholder="$t('etsi-rakenteesta')" />
+              <ep-search
+                v-model="query"
+                :placeholder="$t('etsi-rakenteesta')"
+              />
             </div>
             <div class="tree mt-3">
               <div class="drag-area p-3 d-flex">
                 <div class="flex-grow-1">
                   <div class="d-flex actions pb-3 justify-content-between">
-                    <ep-button @click="toggleDescription" variant="link">
+                    <ep-button
+                      variant="link"
+                      @click="toggleDescription"
+                    >
                       {{ $t('nayta-ryhmien-kuvaukset') }}
                     </ep-button>
-                    <ep-button @click="addRyhma" variant="outline" icon="add" v-if="isEditing">
+                    <ep-button
+                      v-if="isEditing"
+                      variant="outline"
+                      icon="add"
+                      @click="addRyhma"
+                    >
                       {{ $t('lisaa-ryhma-rakenteeseen') }}
                     </ep-button>
                     <EpRakenneModal
-                      v-model="uusi.ryhma"
                       ref="eprakennemodalUusiRyhma"
-                      @save="addUusi(data.rakenne)"/>
+                      v-model="uusi.ryhma"
+                      @save="addUusi(data.rakenne)"
+                    />
                   </div>
                   <div class="drag-area-left mr-3">
                     <div class="d-flex align-items-center mb-1">
                       <div class="flex-shrink-1 font-weight-bold">
                         {{ $t('rakenne') }}
-                         <span class="btn-link" @click="toggleRakenne">({{$t('avaa')}} / {{$t('sulje')}})</span>
+                        <span
+                          class="btn-link"
+                          @click="toggleRakenne"
+                        >({{ $t('avaa') }} / {{ $t('sulje') }})</span>
                       </div>
-                      <div class="flex-grow-1">
+                      <div class="flex-grow-1" />
+                      <div
+                        style="width: 100px"
+                        class="text-center font-weight-bold"
+                      >
+                        {{ $t('osaamispiste') }}
                       </div>
-                      <div style="width: 100px" class="text-center font-weight-bold">
-                        {{$t('osaamispiste')}}
-                      </div>
-                      <div style="width: 80px">
-                      </div>
+                      <div style="width: 80px" />
                     </div>
                     <ep-spinner v-if="!data" />
-                    <div class="p-3 helptext text-muted text-center" v-else-if="data.rakenne.osat.length === 0">
+                    <div
+                      v-else-if="data.rakenne.osat.length === 0"
+                      class="p-3 helptext text-muted text-center"
+                    >
                       <span v-if="!isEditing">
                         {{ $t('luo-tutkinnolle-rakenne-muokkaamalla-ohje') }}
                       </span>
@@ -64,39 +97,71 @@
                       </span>
                     </div>
                     <MuodostumisNode
-                      v-model="data.rakenne.osat"
                       ref="root"
+                      v-model="data.rakenne.osat"
                       :is-editing="isEditing"
-                      :tutkinnonOsatMap="tutkinnonOsatMap"
-                      :copyToClipBoard="copy">
-                    </MuodostumisNode>
+                      :tutkinnon-osat-map="tutkinnonOsatMap"
+                      :copy-to-clip-board="copy"
+                    />
                   </div>
                 </div>
-                <div class="drag-area-right" v-if="isEditing">
+                <div
+                  v-if="isEditing"
+                  class="drag-area-right"
+                >
                   <div class="menu p-3">
-                    <h5 class="font-weight-600">{{ $t('leikelauta') }}</h5>
+                    <h5 class="font-weight-600">
+                      {{ $t('leikelauta') }}
+                    </h5>
                     <div class="mt-3">
-                      <VueDraggable v-bind="optionsLeikelauta" v-model="leikelauta" tag="div" class="leikelauta" :class="{'empty': leikelauta.length === 0}" @add="onLeikelautaAdd">
-                        <div v-for="lauta in leikelautaWithColor"
+                      <VueDraggable
+                        v-bind="optionsLeikelauta"
+                        v-model="leikelauta"
+                        tag="div"
+                        class="leikelauta"
+                        :class="{'empty': leikelauta.length === 0}"
+                        @add="onLeikelautaAdd"
+                      >
+                        <div
+                          v-for="lauta in leikelautaWithColor"
                           :key="'leikelauta' + (lauta.tunniste || lauta.uuid)"
-                          class="mb-1 d-flex justify-content-center align-items-center draggable kopioitava">
-                          <div class="colorblock" :style="{ height: '54px', background: lauta.color }"></div>
+                          class="mb-1 d-flex justify-content-center align-items-center draggable kopioitava"
+                        >
+                          <div
+                            class="colorblock"
+                            :style="{ height: '54px', background: lauta.color }"
+                          />
                           <div class="flex-grow-1 paaryhma-label pl-2 noselect">
                             {{ $kaanna(lauta.nimi) }}
-                            <div v-if="lauta.osat && lauta.osat.length > 0">({{lauta.osat.length}}
-                              <span v-if="lauta.osat.length === 1">{{$t('ryhma')}}</span>
-                              <span v-else>{{$t('ryhmaa')}}</span>)
+                            <div v-if="lauta.osat && lauta.osat.length > 0">
+                              ({{ lauta.osat.length }}
+                              <span v-if="lauta.osat.length === 1">{{ $t('ryhma') }}</span>
+                              <span v-else>{{ $t('ryhmaa') }}</span>)
                             </div>
                           </div>
                         </div>
                       </VueDraggable>
                     </div>
 
-                    <h5 class="mt-4 font-weight-600">{{ $t('paaryhmat') }}</h5>
+                    <h5 class="mt-4 font-weight-600">
+                      {{ $t('paaryhmat') }}
+                    </h5>
                     <div class="mt-3">
-                      <VueDraggable v-bind="optionsPaaryhma" :value="paaryhmat" tag="div" class="paaryhmat">
-                        <div v-for="ryhma in paaryhmat" :key="ryhma.uuid" class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable">
-                          <div class="colorblock" :style="{ height: '44px', background: colorMap[ryhma.kind] }"></div>
+                      <VueDraggable
+                        v-bind="optionsPaaryhma"
+                        :value="paaryhmat"
+                        tag="div"
+                        class="paaryhmat"
+                      >
+                        <div
+                          v-for="ryhma in paaryhmat"
+                          :key="ryhma.uuid"
+                          class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable"
+                        >
+                          <div
+                            class="colorblock"
+                            :style="{ height: '44px', background: colorMap[ryhma.kind] }"
+                          />
                           <div class="flex-grow-1 paaryhma-label pl-2 noselect">
                             {{ $t(ryhma.label) }}
                           </div>
@@ -104,23 +169,42 @@
                       </VueDraggable>
                     </div>
 
-                    <h5 class="mt-4 font-weight-600">{{ $t('tutkinnon-osat') }}</h5>
+                    <h5 class="mt-4 font-weight-600">
+                      {{ $t('tutkinnon-osat') }}
+                    </h5>
                     <div class="mt-3">
-                      <ep-search v-model="queryTutkinnonOsa" :placeholder="$t('etsi-tutkinnon-osaa')" />
+                      <ep-search
+                        v-model="queryTutkinnonOsa"
+                        :placeholder="$t('etsi-tutkinnon-osaa')"
+                      />
                       <div class="ml-1 mt-1">
-                        <ep-toggle v-model="showUnusedTutkinnonOsat" :isSWitch="false">
+                        <ep-toggle
+                          v-model="showUnusedTutkinnonOsat"
+                          :is-s-witch="false"
+                        >
                           <span class="noselect">
                             {{ $t('nayta-kayttamattomat') }}
                           </span>
                         </ep-toggle>
                       </div>
-                      <VueDraggable v-bind="optionsTutkinnonOsat" :value="tutkinnonosatPaged" tag="div">
-                        <div v-for="tosa in tutkinnonosatPaged" :key="tosa.id" class="mb-1 d-flex align-items-center p-2 pr-3 m-1 tosa draggable tosa">
-                          <div class="grip mr-2" v-if="isEditing">
+                      <VueDraggable
+                        v-bind="optionsTutkinnonOsat"
+                        :value="tutkinnonosatPaged"
+                        tag="div"
+                      >
+                        <div
+                          v-for="tosa in tutkinnonosatPaged"
+                          :key="tosa.id"
+                          class="mb-1 d-flex align-items-center p-2 pr-3 m-1 tosa draggable tosa"
+                        >
+                          <div
+                            v-if="isEditing"
+                            class="grip mr-2"
+                          >
                             <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                           </div>
                           <div class="flex-grow-1">
-                            {{ $kaanna(tosa.nimi) }} <span v-if="tosa.tutkinnonOsa.koodiArvo">({{tosa.tutkinnonOsa.koodiArvo}})</span>
+                            {{ $kaanna(tosa.nimi) }} <span v-if="tosa.tutkinnonOsa.koodiArvo">({{ tosa.tutkinnonOsa.koodiArvo }})</span>
                           </div>
                           <div class="laajuus">
                             {{ tosa.laajuus }}
@@ -133,37 +217,69 @@
                         :total-rows="tutkinnonOsat.length"
                         :per-page="sivukoot"
                         aria-controls="tutkinnonosat"
-                        align="center" />
+                        align="center"
+                      />
                     </div>
 
-                    <h5 class="mt-4 font-weight-600">{{ $t('osaamisalat') }}</h5>
+                    <h5 class="mt-4 font-weight-600">
+                      {{ $t('osaamisalat') }}
+                    </h5>
                     <div>
-                      <ep-button @click="lisaaOsaamisala" icon="add" variant="outline" class="mb-2">
+                      <ep-button
+                        icon="add"
+                        variant="outline"
+                        class="mb-2"
+                        @click="lisaaOsaamisala"
+                      >
                         {{ $t('lisaa-osaamisala') }}
                       </ep-button>
-                      <VueDraggable v-bind="optionsKoodit" :value="osaamisalatPaged" tag="div">
-                        <div v-for="(ryhma, index) in osaamisalatPaged" :key="'osaamisala' + index" class="mb-1 d-flex justify-content-center align-items-center draggable osaamisalat">
-                          <div class="colorblock" :style="{ border:'1px solid ' + colorMap['osaamisala'],  background: colorMap['osaamisala'] }">
+                      <VueDraggable
+                        v-bind="optionsKoodit"
+                        :value="osaamisalatPaged"
+                        tag="div"
+                      >
+                        <div
+                          v-for="(ryhma, index) in osaamisalatPaged"
+                          :key="'osaamisala' + index"
+                          class="mb-1 d-flex justify-content-center align-items-center draggable osaamisalat"
+                        >
+                          <div
+                            class="colorblock"
+                            :style="{ border:'1px solid ' + colorMap['osaamisala'], background: colorMap['osaamisala'] }"
+                          >
                             <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                           </div>
-                          <ep-koodisto-select :store="osaamisalaStore" v-if="isEditing" :value="index" @add="osaamisalaKoodiLisays" class="w-100">
+                          <ep-koodisto-select
+                            v-if="isEditing"
+                            :store="osaamisalaStore"
+                            :value="index"
+                            class="w-100"
+                            @add="osaamisalaKoodiLisays"
+                          >
                             <template #default="{ open }">
                               <b-input-group class="w-100 d-flex">
-                                <ep-input class="koodi-input flex-grow-1"
+                                <ep-input
                                   v-if="!ryhma.osaamisala.osaamisalakoodiUri.startsWith('temporary')"
+                                  class="koodi-input flex-grow-1"
                                   :value="$kaanna(ryhma.nimi) + ' (' + ryhma.osaamisala.osaamisalakoodiArvo + ')'"
                                   :placeholder="$kaanna(ryhma.nimi) + ' (' + ryhma.osaamisala.osaamisalakoodiArvo + ')'"
-                                  :isEditing="true"
-                                  :disabled="true"/>
-                                <ep-input class="koodi-input flex-grow-1"
+                                  :is-editing="true"
+                                  :disabled="true"
+                                />
+                                <ep-input
                                   v-else
                                   v-model="ryhma.nimi"
+                                  class="koodi-input flex-grow-1"
                                   :placeholder="$kaanna(ryhma.nimi)"
-                                  :isEditing="true"
+                                  :is-editing="true"
                                   :disabled="false"
-                                  :change="() => osaamisalaNimiChange(ryhma, index)"/>
+                                  :change="() => osaamisalaNimiChange(ryhma, index)"
+                                />
                                 <b-input-group-append>
-                                  <b-button @click="open" variant="primary">
+                                  <b-button
+                                    variant="primary"
+                                    @click="open"
+                                  >
                                     {{ $t('hae') }}
                                   </b-button>
                                 </b-input-group-append>
@@ -171,17 +287,20 @@
                             </template>
                           </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
-                            <ep-button v-if="isEditing"
-                                       :id="'poista-osaamisala-' + index"
-                                       @click="poistaOsaamisala(index)"
-                                       variant="link"
-                                       icon="delete"
-                                       :disabled="ryhma.osaamisala.rakenteessa">
-                            </ep-button>
-                            <b-popover v-if="ryhma.osaamisala.rakenteessa"
-                                       :target="'poista-osaamisala-' + index"
-                                       triggers="hover"
-                                       placement="top">
+                            <ep-button
+                              v-if="isEditing"
+                              :id="'poista-osaamisala-' + index"
+                              variant="link"
+                              icon="delete"
+                              :disabled="ryhma.osaamisala.rakenteessa"
+                              @click="poistaOsaamisala(index)"
+                            />
+                            <b-popover
+                              v-if="ryhma.osaamisala.rakenteessa"
+                              :target="'poista-osaamisala-' + index"
+                              triggers="hover"
+                              placement="top"
+                            >
                               {{ $t('ei-voi-poistaa-koska-loytyy-rakenteesta') }}
                             </b-popover>
                           </div>
@@ -193,38 +312,72 @@
                         :total-rows="osaamisalat.length"
                         :per-page="sivukoot"
                         aria-controls="osaamisalat"
-                        align="center" />
+                        align="center"
+                      />
                     </div>
 
-                    <h5 class="mt-4 font-weight-600">{{ $t('tutkintonimikkeet') }}</h5>
+                    <h5 class="mt-4 font-weight-600">
+                      {{ $t('tutkintonimikkeet') }}
+                    </h5>
                     <div>
-                      <ep-button @click="lisaaTutkintonimike" icon="add" variant="outline" class="mb-2">
+                      <ep-button
+                        icon="add"
+                        variant="outline"
+                        class="mb-2"
+                        @click="lisaaTutkintonimike"
+                      >
                         {{ $t('lisaa-tutkintonimike') }}
                       </ep-button>
 
-                      <VueDraggable v-bind="optionsKoodit" :value="tutkintonimikkeetPaged" tag="div">
-                        <div v-for="(ryhma, index) in tutkintonimikkeetPaged" :key="ryhma.tutkintonimike.uri" class="mb-1 d-flex justify-content-center align-items-center draggable tutkintonimikkeet">
-                          <div class="colorblock" :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }">
-                            <EpMaterialIcon size="20px">drag_indicator</EpMaterialIcon>
+                      <VueDraggable
+                        v-bind="optionsKoodit"
+                        :value="tutkintonimikkeetPaged"
+                        tag="div"
+                      >
+                        <div
+                          v-for="(ryhma, index) in tutkintonimikkeetPaged"
+                          :key="ryhma.tutkintonimike.uri"
+                          class="mb-1 d-flex justify-content-center align-items-center draggable tutkintonimikkeet"
+                        >
+                          <div
+                            class="colorblock"
+                            :style="{ border:'1px solid ' + colorMap['tutkintonimike'], background: colorMap['tutkintonimike'] }"
+                          >
+                            <EpMaterialIcon size="20px">
+                              drag_indicator
+                            </EpMaterialIcon>
                           </div>
-                          <ep-koodisto-select :store="tutkintonimikeStore" v-if="isEditing" :value="index" @add="tutkintonimikeKoodiLisays" class="w-100">
+                          <ep-koodisto-select
+                            v-if="isEditing"
+                            :store="tutkintonimikeStore"
+                            :value="index"
+                            class="w-100"
+                            @add="tutkintonimikeKoodiLisays"
+                          >
                             <template #default="{ open }">
                               <b-input-group class="w-100 d-flex">
-                                <ep-input class="koodi-input flex-grow-1"
+                                <ep-input
                                   v-if="!ryhma.tutkintonimike.uri.startsWith('temporary')"
+                                  class="koodi-input flex-grow-1"
                                   :value="$kaanna(ryhma.nimi) + ' (' + ryhma.tutkintonimike.arvo + ')'"
                                   :placeholder="$kaanna(ryhma.nimi) + ' (' + ryhma.tutkintonimike.arvo + ')'"
-                                  :isEditing="true"
-                                  :disabled="true"/>
-                                <ep-input class="koodi-input flex-grow-1"
+                                  :is-editing="true"
+                                  :disabled="true"
+                                />
+                                <ep-input
                                   v-else
                                   v-model="ryhma.nimi"
+                                  class="koodi-input flex-grow-1"
                                   :placeholder="$kaanna(ryhma.nimi)"
-                                  :isEditing="true"
+                                  :is-editing="true"
                                   :disabled="!ryhma.tutkintonimike.uri.startsWith('temporary')"
-                                  :change="() => tutkintonimikeNimiChange(ryhma, index)"/>
+                                  :change="() => tutkintonimikeNimiChange(ryhma, index)"
+                                />
                                 <b-input-group-append>
-                                  <b-button @click="open" variant="primary">
+                                  <b-button
+                                    variant="primary"
+                                    @click="open"
+                                  >
                                     {{ $t('hae') }}
                                   </b-button>
                                 </b-input-group-append>
@@ -232,17 +385,20 @@
                             </template>
                           </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
-                            <ep-button v-if="isEditing"
-                                       :id="'poista-tutkintonimike-' + index"
-                                       @click="poistaTutkintonimike(index)"
-                                       variant="link"
-                                       icon="delete"
-                                       :disabled="ryhma.tutkintonimike.rakenteessa">
-                            </ep-button>
-                            <b-popover v-if="ryhma.tutkintonimike.rakenteessa"
-                                       :target="'poista-tutkintonimike-' + index"
-                                       triggers="hover"
-                                       placement="top">
+                            <ep-button
+                              v-if="isEditing"
+                              :id="'poista-tutkintonimike-' + index"
+                              variant="link"
+                              icon="delete"
+                              :disabled="ryhma.tutkintonimike.rakenteessa"
+                              @click="poistaTutkintonimike(index)"
+                            />
+                            <b-popover
+                              v-if="ryhma.tutkintonimike.rakenteessa"
+                              :target="'poista-tutkintonimike-' + index"
+                              triggers="hover"
+                              placement="top"
+                            >
                               {{ $t('ei-voi-poistaa-koska-loytyy-rakenteesta') }}
                             </b-popover>
                           </div>
@@ -254,16 +410,19 @@
                         :total-rows="tutkintonimikkeet.length"
                         :per-page="sivukoot"
                         aria-controls="tutkintonimikkeet"
-                        align="center" />
+                        align="center"
+                      />
                     </div>
-
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <b-modal ref="editModal" size="lg">
+        <b-modal
+          ref="editModal"
+          size="lg"
+        >
           <template #modal-header>
             <h2>{{ $t('muokkaa') }}: {{ $kaanna({}) }}</h2>
           </template>
@@ -273,11 +432,14 @@
               <b-form-group :label="$t('laajuus')">
                 <div class="d-flex align-items-center">
                   <div>
-                    <ep-input type="number" is-editing v-model="data.rakenne.muodostumisSaanto.laajuus.minimi">
-                    </ep-input>
+                    <ep-input
+                      v-model="data.rakenne.muodostumisSaanto.laajuus.minimi"
+                      type="number"
+                      is-editing
+                    />
                   </div>
                   <div class="ml-2">
-                    {{$t('osaamispiste')}}
+                    {{ $t('osaamispiste') }}
                   </div>
                 </div>
               </b-form-group>
@@ -286,7 +448,6 @@
         </b-modal>
       </template>
     </EpEditointi>
-
   </div>
 </template>
 

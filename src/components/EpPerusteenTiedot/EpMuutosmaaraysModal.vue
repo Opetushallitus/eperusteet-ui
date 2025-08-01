@@ -1,37 +1,50 @@
 <template>
-  <b-modal class="backdrop"
-           ref="muutosmaaraysModal"
-           :no-close-on-backdrop="true"
-           :no-enforce-focus="true"
-           :lazy="true"
-           size="xl"
-           :hide-footer="true">
+  <b-modal
+    ref="muutosmaaraysModal"
+    class="backdrop"
+    :no-close-on-backdrop="true"
+    :no-enforce-focus="true"
+    :lazy="true"
+    size="xl"
+    :hide-footer="true"
+  >
     <template #modal-header>
-      <div class="mt-1">{{ otsikko }}</div>
+      <div class="mt-1">
+        {{ otsikko }}
+      </div>
     </template>
 
-    <EpMuutosmaarays class="mb-4" v-model="muutosmaarays" :isEditing="true" :asiasanat="asiasanat" :maarayksetNimella="maarayksetNimella"/>
+    <EpMuutosmaarays
+      v-model="muutosmaarays"
+      class="mb-4"
+      :is-editing="true"
+      :asiasanat="asiasanat"
+      :maaraykset-nimella="maarayksetNimella"
+    />
 
     <div class="d-flex ">
       <div class="mr-auto">
         <EpButton
           v-if="muutosmaarays && muutosmaarays.id"
-          @click="poista"
           variant="link"
           icon="delete"
-          :show-spinner="poistetaan">
+          :show-spinner="poistetaan"
+          @click="poista"
+        >
           {{ $t('poista') }}
         </EpButton>
       </div>
       <EpButton
+        variant="link"
         @click="sulje"
-        variant="link">
+      >
         {{ $t('peruuta') }}
       </EpButton>
       <EpButton
-        @click="tallenna"
         :show-spinner="tallennetaan"
-        :disabled="!valid">
+        :disabled="!valid"
+        @click="tallenna"
+      >
         {{ $t('tallenna-muutosmaarays') }}
       </EpButton>
     </div>
@@ -40,8 +53,7 @@
 
 <script setup lang="ts">
 import * as _ from 'lodash';
-import { ref, computed, useTemplateRef, getCurrentInstance } from 'vue';
-import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
+import { ref, computed, useTemplateRef } from 'vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMuutosmaarays from '@/components/EpJulkaisu/EpMuutosmaarays.vue';

@@ -1,33 +1,51 @@
 <template>
   <div>
-
     <template v-if="isEditing">
-      <EpMultiSelect v-model="model"
-                 :placeholder="$t('maarays-asiasanat-placeholder')"
-                 :tagPlaceholder="$t('maarays-asiasanat-lisays-placeholder')"
-                 :search-identity="identity"
-                 :options="valittavatAsiasanat"
-                 :maxHeight="500"
-                 :multiple="true"
-                 :closeOnSelect="false"
-                 :taggable="true"
-                 @tag="lisaaAsiasana">
-
+      <EpMultiSelect
+        v-model="model"
+        :placeholder="$t('maarays-asiasanat-placeholder')"
+        :tag-placeholder="$t('maarays-asiasanat-lisays-placeholder')"
+        :search-identity="identity"
+        :options="valittavatAsiasanat"
+        :max-height="500"
+        :multiple="true"
+        :close-on-select="false"
+        :taggable="true"
+        @tag="lisaaAsiasana"
+      >
         <template #option="{ option }">
           <span v-if="option.label">{{ option.label }}</span>
           <span v-else>{{ option }}</span>
         </template>
 
-        <template v-slot:checkbox><span/></template>
+        <template #checkbox>
+          <span />
+        </template>
 
         <template #selection="{ values }">
-          <div class="d-flex align-items-center" :class="{'mb-2': values.length > 0}">
-            <span class="multiselect__tag" v-for="value in values" :key="'value' + value">
+          <div
+            class="d-flex align-items-center"
+            :class="{'mb-2': values.length > 0}"
+          >
+            <span
+              v-for="value in values"
+              :key="'value' + value"
+              class="multiselect__tag"
+            >
               <span class="nimi">{{ value }}</span>
-              <span class="multiselect__tag-icon clickable" @click.prevent @mousedown.prevent.stop="poista(value)"/>
+              <span
+                class="multiselect__tag-icon clickable"
+                @click.prevent
+                @mousedown.prevent.stop="poista(value)"
+              />
             </span>
 
-            <span v-if="values.length > 0" class="ml-auto clickable border-right pr-2 remove-all" @click.prevent @mousedown.prevent.stop="poistaKaikki()">
+            <span
+              v-if="values.length > 0"
+              class="ml-auto clickable border-right pr-2 remove-all"
+              @click.prevent
+              @mousedown.prevent.stop="poistaKaikki()"
+            >
               <ep-material-icon>close</ep-material-icon>
             </span>
           </div>
@@ -36,9 +54,13 @@
     </template>
 
     <ul v-else>
-      <li v-for="(asiasana, index) in model" :key="'asiasana' + index">{{asiasana}}</li>
+      <li
+        v-for="(asiasana, index) in model"
+        :key="'asiasana' + index"
+      >
+        {{ asiasana }}
+      </li>
     </ul>
-
   </div>
 </template>
 

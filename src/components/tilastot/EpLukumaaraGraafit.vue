@@ -5,28 +5,67 @@
     <template v-else>
       <div class="d-flex">
         <ep-form-content name="koulutustyyppi">
-          <koulutustyyppi-select class="koulutustyyppi-select" v-model="koulutustyyppi" :isEditing="true" :koulutustyypit="koulutustyyppiValinnat"/>
+          <koulutustyyppi-select
+            v-model="koulutustyyppi"
+            class="koulutustyyppi-select"
+            :is-editing="true"
+            :koulutustyypit="koulutustyyppiValinnat"
+          />
         </ep-form-content>
-        <ep-form-content name="ajanjakso" class="ml-5">
-          <EpRadio v-model="ajanjakso" value="kuukausi">{{ $t('kuukausittain') }}</EpRadio>
-          <EpRadio v-model="ajanjakso" value="vuosi">{{ $t('vuosittain') }}</EpRadio>
+        <ep-form-content
+          name="ajanjakso"
+          class="ml-5"
+        >
+          <EpRadio
+            v-model="ajanjakso"
+            value="kuukausi"
+          >
+            {{ $t('kuukausittain') }}
+          </EpRadio>
+          <EpRadio
+            v-model="ajanjakso"
+            value="vuosi"
+          >
+            {{ $t('vuosittain') }}
+          </EpRadio>
         </ep-form-content>
-        <ep-form-content name="vuosi" class="ml-5">
-          <b-form-select v-model="vuosi" :options="vuosivalinnat" :disabled="ajanjakso === 'vuosi'"/>
+        <ep-form-content
+          name="vuosi"
+          class="ml-5"
+        >
+          <b-form-select
+            v-model="vuosi"
+            :options="vuosivalinnat"
+            :disabled="ajanjakso === 'vuosi'"
+          />
         </ep-form-content>
       </div>
 
-      <ep-form-content name="tila" class="mb-4">
-        <EpToggleGroup v-model="tila" :items="tilaValinnat">
+      <ep-form-content
+        name="tila"
+        class="mb-4"
+      >
+        <EpToggleGroup
+          v-model="tila"
+          :items="tilaValinnat"
+        >
           <template #default="{item}">
-            <span>{{$t(item)}}</span>
+            <span>{{ $t(item) }}</span>
           </template>
         </EpToggleGroup>
       </ep-form-content>
 
-      <div class="mb-2">{{$t('suunnitelmien-lukumaarat-graafi-selite')}}</div>
+      <div class="mb-2">
+        {{ $t('suunnitelmien-lukumaarat-graafi-selite') }}
+      </div>
 
-      <apexchart type="bar" :options="chartOptions" :series="chartSeries" height="500px" width="75%"/>
+      <apexchart
+        type="bar"
+        :options="chartOptions"
+        :series="chartSeries"
+        height="500px"
+        width="75%"
+      />
     </template>
   </div>
 </template>

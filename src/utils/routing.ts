@@ -169,7 +169,7 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
   }
 
   return null;
-};
+}
 
 export function nodeToRoute(node: NavigationNodeDto): Location | null {
   if (!node) {
@@ -292,7 +292,7 @@ export function nodeToRoute(node: NavigationNodeDto): Location | null {
     break;
   }
   return null;
-};
+}
 
 export class LinkkiHandler implements ILinkkiHandler {
   nodeToRoute(node: NavigationNodeDto): Location | null {

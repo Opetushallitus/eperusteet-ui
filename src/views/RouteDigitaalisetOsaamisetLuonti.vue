@@ -1,36 +1,60 @@
 <template>
   <EpMainView>
     <b-container>
-      <EpSteps ref="epsteps" :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel" @stepChange="onStepChange">
-
-        <template v-slot:pohja>
-          <div class="mb-5">{{ $t('digitaalinen-osaaminen-luonti-selite') }}</div>
+      <EpSteps
+        ref="epsteps"
+        :steps="steps"
+        :initial-step="0"
+        :on-save="onSave"
+        @cancel="onCancel"
+        @stepChange="onStepChange"
+      >
+        <template #pohja>
+          <div class="mb-5">
+            {{ $t('digitaalinen-osaaminen-luonti-selite') }}
+          </div>
 
           <div class="row">
             <div class="col-sm-10 mb-4">
-              <b-form-group class="mt-0" :label="$t('kayta-pohjana') + ' *'">
-
-                <b-form-radio v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">{{ $t('toinen-projekti') }}</b-form-radio>
+              <b-form-group
+                class="mt-0"
+                :label="$t('kayta-pohjana') + ' *'"
+              >
+                <b-form-radio
+                  v-model="tyyppi"
+                  value="perusteesta"
+                  name="tyyppi"
+                  :disabled="!perusteet || perusteet.length === 0"
+                >
+                  {{ $t('toinen-projekti') }}
+                </b-form-radio>
                 <div v-if="tyyppi === 'perusteesta'">
                   <EpMultiSelect
                     v-if="perusteet"
                     :value="data.peruste"
-                    @input="valitsePeruste($event)"
                     :placeholder="$t('valitse-peruste')"
                     :is-editing="true"
                     :search-identity="nimiSearchIdentity"
                     :options="perusteet"
-                    class="perustevalinta mb-2 mt-2">
+                    class="perustevalinta mb-2 mt-2"
+                    @input="valitsePeruste($event)"
+                  >
                     <template #singleLabel="{ option }">
                       {{ $kaanna(option.nimi) }}
-                      <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
-                        (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span>-<span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                      <span
+                        v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu"
+                        class="ml-3 voimassaolo"
+                      >
+                        (<span v-if="option.voimassaoloAlkaa">{{ $sd(option.voimassaoloAlkaa) }}</span>-<span v-if="option.voimassaoloLoppuu">{{ $sd(option.voimassaoloLoppuu) }}</span>)
                       </span>
                     </template>
                     <template #option="{ option }">
                       {{ $kaanna(option.nimi) }}
-                      <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
-                        (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span> - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                      <span
+                        v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu"
+                        class="ml-3 voimassaolo"
+                      >
+                        (<span v-if="option.voimassaoloAlkaa">{{ $sd(option.voimassaoloAlkaa) }}</span> - <span v-if="option.voimassaoloLoppuu">{{ $sd(option.voimassaoloLoppuu) }}</span>)
                       </span>
                     </template>
                   </EpMultiSelect>
@@ -38,18 +62,34 @@
                 </div>
               </b-form-group>
 
-              <b-form-radio class="mb-4" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
-              <b-form-group :label="$t('projektin-nimi') + '*'" required v-if="tyyppi">
-                <ep-input v-model="data.nimi" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')" :validation="v$.data.nimi"/>
+              <b-form-radio
+                v-model="tyyppi"
+                class="mb-4"
+                value="uusi"
+                name="tyyppi"
+              >
+                {{ $t('luo-uusi') }}
+              </b-form-radio>
+              <b-form-group
+                v-if="tyyppi"
+                :label="$t('projektin-nimi') + '*'"
+                required
+              >
+                <ep-input
+                  v-model="data.nimi"
+                  type="string"
+                  :is-editing="true"
+                  :placeholder="$t('kirjoita-projektin-nimi')"
+                  :validation="v$.data.nimi"
+                />
               </b-form-group>
             </div>
-           </div>
+          </div>
         </template>
 
-        <template v-slot:luo>
-          {{$t('luo-perusteprojekti')}}
+        <template #luo>
+          {{ $t('luo-perusteprojekti') }}
         </template>
-
       </EpSteps>
     </b-container>
   </EpMainView>

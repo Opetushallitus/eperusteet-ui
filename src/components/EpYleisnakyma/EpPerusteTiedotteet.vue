@@ -1,21 +1,48 @@
 <template>
   <div class="content">
     <div class="d-flex justify-content-between">
-      <h3 class="mb-4">{{$t('tiedotteet')}}</h3>
-      <ep-tiedote-modal ref="eptiedotemodal" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
+      <h3 class="mb-4">
+        {{ $t('tiedotteet') }}
+      </h3>
+      <ep-tiedote-modal
+        ref="eptiedotemodal"
+        :peruste="peruste"
+        :tiedotteet-store="tiedotteetStore"
+      />
     </div>
 
     <ep-spinner v-if="!tiedotteet || !peruste" />
 
     <div v-else>
-      <div v-for="(tiedote, index) in tiedotteetFiltered" :key="index" class="tiedote p-2 pl-3" @click="avaaTiedote(tiedote)">
-        <div class="otsikko" :class="{'uusi': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}} <span class="uusi" v-if="tiedote.uusi">{{$t('uusi')}}</span></div>
-        <div class="muokkausaika">{{$sdt(tiedote.muokattu)}}</div>
+      <div
+        v-for="(tiedote, index) in tiedotteetFiltered"
+        :key="index"
+        class="tiedote p-2 pl-3"
+        @click="avaaTiedote(tiedote)"
+      >
+        <div
+          class="otsikko"
+          :class="{'uusi': tiedote.uusi}"
+        >
+          {{ $kaanna(tiedote.otsikko) }} <span
+            v-if="tiedote.uusi"
+            class="uusi"
+          >{{ $t('uusi') }}</span>
+        </div>
+        <div class="muokkausaika">
+          {{ $sdt(tiedote.muokattu) }}
+        </div>
       </div>
 
       <div class="text-center">
-        <ep-button variant="link" @click="tiedoteMaara += 3" v-if="tiedoteMaara < tiedotteetSize">{{$t('katso-lisaa-tiedotteita')}}</ep-button>
-        <span v-if="tiedotteetSize === 0">{{$t('ei-tiedotteita')}}</span>
+        <ep-button
+          v-if="tiedoteMaara < tiedotteetSize"
+          variant="link"
+          @click="tiedoteMaara += 3"
+        >
+          {{ $t('katso-lisaa-tiedotteita') }}
+        </ep-button>
+        <span v-if="tiedotteetSize === 0">{{ $t('ei-tiedotteita') }}</span>
       </div>
     </div>
   </div>

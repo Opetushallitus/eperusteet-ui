@@ -1,23 +1,47 @@
 <template>
-  <EpEditointi :store="store" :versionumero="versionumero">
+  <EpEditointi
+    :store="store"
+    :versionumero="versionumero"
+  >
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton-kurssi') }}</h2>
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton-kurssi') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing, supportData }">
       <b-row>
-        <b-col cols="8" v-if="isEditing">
+        <b-col
+          v-if="isEditing"
+          cols="8"
+        >
           <b-form-group :label="$t('kurssin-nimi')">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -36,36 +60,51 @@
         </b-col>
       </b-row>
 
-      <hr/>
+      <hr>
 
       <b-row>
         <b-col cols="11">
           <b-form-group :label="$t('tavoitteisiin-liittyvat-keskeiset-sisaltoalueet')">
-            <ep-content layout="normal" v-model="data.kuvaus" :is-editable="isEditing"> </ep-content>
+            <ep-content
+              v-model="data.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
           </b-form-group>
         </b-col>
       </b-row>
 
-      <hr/>
+      <hr>
 
       <b-row>
         <b-col cols="11">
           <b-form-group :label="$t('liitetyt-tavoitteet')">
-            <b-form-checkbox-group v-if="isEditing" v-model="data.tavoitteet" stacked>
-              <b-form-checkbox v-for="tavoite in supportData.tavoitteet" :key="tavoite.id" :value="tavoite.id">
+            <b-form-checkbox-group
+              v-if="isEditing"
+              v-model="data.tavoitteet"
+              stacked
+            >
+              <b-form-checkbox
+                v-for="tavoite in supportData.tavoitteet"
+                :key="tavoite.id"
+                :value="tavoite.id"
+              >
                 {{ $kaanna(tavoite.tavoite) }}
               </b-form-checkbox>
             </b-form-checkbox-group>
 
             <template v-else>
-              <div class="listaus p-3" v-for="tavoite in tavoitteet" :key="tavoite.id">
+              <div
+                v-for="tavoite in tavoitteet"
+                :key="tavoite.id"
+                class="listaus p-3"
+              >
                 {{ $kaanna(tavoite.tavoite) }}
               </div>
             </template>
           </b-form-group>
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
 </template>

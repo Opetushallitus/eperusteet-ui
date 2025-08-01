@@ -1,21 +1,44 @@
 <template>
-  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
+  <EpEditointi
+    v-if="store"
+    :store="store"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2
+        v-if="data.nimiKoodi"
+        class="m-0"
+      >
+        {{ $kaanna(data.nimiKoodi.nimi) }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing }">
-
-      <b-row v-if="isEditing" class="mb-4">
+    <template #default="{ data, isEditing }">
+      <b-row
+        v-if="isEditing"
+        class="mb-4"
+      >
         <b-col lg="8">
-          <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
-            <ep-koodisto-select :store="laajaalainenOsaaminenKoodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
+          <b-form-group
+            :label="$t('otsikko') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-koodisto-select
+              v-model="data.nimiKoodi"
+              :store="laajaalainenOsaaminenKoodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -26,20 +49,27 @@
         </b-col>
       </b-row>
 
-      <ep-toggle v-if="isEditing" class="my-4" v-model="data.liite">{{$t('nayta-laaja-alainen-osaaminen-liitteena')}}</ep-toggle>
+      <ep-toggle
+        v-if="isEditing"
+        v-model="data.liite"
+        class="my-4"
+      >
+        {{ $t('nayta-laaja-alainen-osaaminen-liitteena') }}
+      </ep-toggle>
 
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <ep-content v-model="data.teksti"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+            <ep-content
+              v-model="data.teksti"
+              layout="normal"
+              :is-editable="isEditing"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
   <EpSpinner v-else />

@@ -1,49 +1,66 @@
 <template>
   <ep-main-view container>
-    <EpEditointi v-if="store" :store="store" :confirmRemove="false">
-      <template v-slot:customheader="{ data, isEditing, cancel, save, disabled, validation, isSaving, modify, remove, editable }">
-        <div class="d-flex justify-content-between header py-2" :class="{'editing': isEditing}">
-          <h1 class="mb-4 mr-auto">{{ $t(header) }}</h1>
+    <EpEditointi
+      v-if="store"
+      :store="store"
+      :confirm-remove="false"
+    >
+      <template #customheader="{ data, isEditing, cancel, save, disabled, validation, isSaving, modify, remove, editable }">
+        <div
+          class="d-flex justify-content-between header py-2"
+          :class="{'editing': isEditing}"
+        >
+          <h1 class="mb-4 mr-auto">
+            {{ $t(header) }}
+          </h1>
 
-          <ep-button class="ml-4"
-                      v-if="isEditing"
-                      @click="cancel()"
-                      :disabled="disabled"
-                      variant="link">
+          <ep-button
+            v-if="isEditing"
+            class="ml-4"
+            :disabled="disabled"
+            variant="link"
+            @click="cancel()"
+          >
             {{ $t('peruuta') }}
           </ep-button>
-          <ep-button class="ml-4"
-                      @click="tallenna(LUONNOS, save)"
-                      v-if="isEditing"
-                      :disabled="disabled || (validation && validation.$invalid)"
-                      variant="primary">
+          <ep-button
+            v-if="isEditing"
+            class="ml-4"
+            :disabled="disabled || (validation && validation.$invalid)"
+            variant="primary"
+            @click="tallenna(LUONNOS, save)"
+          >
             {{ $t('tallenna-luonnoksena') }}
           </ep-button>
-          <ep-button class="ml-4"
-                      @click="tallenna(JULKAISTU, save)"
-                      v-if="isEditing"
-                      :disabled="disabled || (validation && validation.$invalid)"
-                      variant="primary">
+          <ep-button
+            v-if="isEditing"
+            class="ml-4"
+            :disabled="disabled || (validation && validation.$invalid)"
+            variant="primary"
+            @click="tallenna(JULKAISTU, save)"
+          >
             {{ $t('tallenna-ja-julkaise') }}
           </ep-button>
-          <ep-button class="ml-4"
-                      v-if="!isEditing"
-                      @click="modify()"
-                      :disabled="disabled || !editable"
-                      variant="link"
-                      icon="edit"
-                      v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
-                      >
+          <ep-button
+            v-if="!isEditing"
+            v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
+            class="ml-4"
+            :disabled="disabled || !editable"
+            variant="link"
+            icon="edit"
+            @click="modify()"
+          >
             {{ $t('muokkaa') }}
           </ep-button>
-          <ep-button class="ml-4"
-                      v-if="!isEditing && data.id"
-                      @click="poista(remove)"
-                      :disabled="disabled || !editable"
-                      variant="link"
-                      icon="delete"
-                      v-oikeustarkastelu="{oikeus:'poisto', kohde: 'eperusteet_maarays'}"
-                      >
+          <ep-button
+            v-if="!isEditing && data.id"
+            v-oikeustarkastelu="{oikeus:'poisto', kohde: 'eperusteet_maarays'}"
+            class="ml-4"
+            :disabled="disabled || !editable"
+            variant="link"
+            icon="delete"
+            @click="poista(remove)"
+          >
             {{ $t('poista') }}
           </ep-button>
 
@@ -51,89 +68,183 @@
         </div>
       </template>
 
-      <template v-slot:default="{ data, isEditing, supportData }">
-
+      <template #default="{ data, isEditing, supportData }">
         <div v-if="!isEditing">
           <b-form-group :label="$t('tila')">
-            <span v-if="data.tila">{{$t(data.tila.toLowerCase())}} - {{ $t('muokannut-viimeksi')}}: </span>
+            <span v-if="data.tila">{{ $t(data.tila.toLowerCase()) }} - {{ $t('muokannut-viimeksi') }}: </span>
             <span v-if="muokkaajaNimi">{{ muokkaajaNimi }} </span>
             <span v-else>{{ data.muokkaaja }} </span>
-            <span v-if="data.muokattu">{{$sdt(data.muokattu)}}</span>
+            <span v-if="data.muokattu">{{ $sdt(data.muokattu) }}</span>
           </b-form-group>
         </div>
 
         <b-form-group class="mt-4">
           <template #label>
             <div class="d-flex">
-              <div>{{$t('tyyppi') + isRequired }}</div>
-              <EpInfoPopover class="ml-3" v-if="isEditing"><div v-html="$t('maarays-muokkaus-tyyppi-info-selite')" /></EpInfoPopover>
+              <div>{{ $t('tyyppi') + isRequired }}</div>
+              <EpInfoPopover
+                v-if="isEditing"
+                class="ml-3"
+              >
+                <div v-html="$t('maarays-muokkaus-tyyppi-info-selite')" />
+              </EpInfoPopover>
             </div>
           </template>
           <template v-if="isEditing">
-            <EpRadio v-for="tyyppi in tyypit" v-model="data.tyyppi" :value="tyyppi" :key="'tyyppivalinta_'+tyyppi">
+            <EpRadio
+              v-for="tyyppi in tyypit"
+              :key="'tyyppivalinta_'+tyyppi"
+              v-model="data.tyyppi"
+              :value="tyyppi"
+            >
               {{ $t('maarays-tyyppi-' + tyyppi.toLowerCase()) }}
             </EpRadio>
           </template>
           <div v-else>
             {{ $t('maarays-tyyppi-' + data.tyyppi.toLowerCase()) }}
-            <span v-if="data.peruste">(<router-link :to="{ name : 'perusteprojekti', params: { projektiId: data.peruste._perusteprojekti }}">{{$kaanna(data.peruste.nimi)}}</router-link>)
+            <span v-if="data.peruste">(<router-link :to="{ name : 'perusteprojekti', params: { projektiId: data.peruste._perusteprojekti }}">{{ $kaanna(data.peruste.nimi) }}</router-link>)
             </span>
           </div>
         </b-form-group>
 
-        <b-form-group :label="$t('maarayksen-nimi') + isRequired" class="mt-4">
-          <ep-input v-model="data.nimi" :is-editing="isEditing"/>
+        <b-form-group
+          :label="$t('maarayksen-nimi') + isRequired"
+          class="mt-4"
+        >
+          <ep-input
+            v-model="data.nimi"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('maarayksen-diaarinumero') + isRequired" class="mt-4">
-          <ep-input v-model="data.diaarinumero" :is-editing="isEditing" type="string"/>
+        <b-form-group
+          :label="$t('maarayksen-diaarinumero') + isRequired"
+          class="mt-4"
+        >
+          <ep-input
+            v-model="data.diaarinumero"
+            :is-editing="isEditing"
+            type="string"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('voimassaolo')" class="mt-4">
+        <b-form-group
+          :label="$t('voimassaolo')"
+          class="mt-4"
+        >
           <div class="d-flex align-items-center">
             <div>
-              <div v-if="isEditing">{{$t('alkaa')}}{{ isRequired }}</div>
-              <ep-datepicker v-model="data.voimassaoloAlkaa" :is-editing="isEditing" />
+              <div v-if="isEditing">
+                {{ $t('alkaa') }}{{ isRequired }}
+              </div>
+              <ep-datepicker
+                v-model="data.voimassaoloAlkaa"
+                :is-editing="isEditing"
+              />
             </div>
-            <div class="ml-2 mr-2" :class="{'mt-4': isEditing}">-</div>
+            <div
+              class="ml-2 mr-2"
+              :class="{'mt-4': isEditing}"
+            >
+              -
+            </div>
             <div>
-              <div v-if="isEditing">{{$t('paattyy')}}</div>
-              <ep-datepicker v-model="data.voimassaoloLoppuu" :is-editing="isEditing" v-if="data.voimassaoloLoppuu || isEditing"/>
+              <div v-if="isEditing">
+                {{ $t('paattyy') }}
+              </div>
+              <ep-datepicker
+                v-if="data.voimassaoloLoppuu || isEditing"
+                v-model="data.voimassaoloLoppuu"
+                :is-editing="isEditing"
+              />
             </div>
           </div>
         </b-form-group>
 
-        <b-form-group :label="$t('maarayksen-paatospaivamaara') + isRequired" class="mt-4 d-flex">
-          <ep-datepicker v-model="data.maarayspvm" :is-editing="isEditing" />
+        <b-form-group
+          :label="$t('maarayksen-paatospaivamaara') + isRequired"
+          class="mt-4 d-flex"
+        >
+          <ep-datepicker
+            v-model="data.maarayspvm"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('maaraysdokumentti') + ' (pdf) ' + isRequired" class="mt-4">
+        <b-form-group
+          :label="$t('maaraysdokumentti') + ' (pdf) ' + isRequired"
+          class="mt-4"
+        >
           <div v-if="maarayskirje">
-            <a :href="maarayskirjeUrl" target="_blank" rel="noopener noreferrer">{{ maarayskirje.nimi }}</a>
+            <a
+              :href="maarayskirjeUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >{{ maarayskirje.nimi }}</a>
           </div>
-          <EpMaaraysLiitteet v-else v-model="data.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
+          <EpMaaraysLiitteet
+            v-else
+            v-model="data.liitteet[kieli].liitteet"
+            :is-editing="isEditing"
+            :tyyppi="MAARAYSDOKUMENTTI"
+            yksittainen
+          />
         </b-form-group>
 
-        <b-form-group :label="liittyykoToiseenMaaraykseenOtsikko" class="mt-4">
-          <EpMaaraysLiittyyMuuttaaValinta v-model="storeData" :maarayksetNimella="supportData.maarayksetNimella" :isEditing="isEditing" />
+        <b-form-group
+          :label="liittyykoToiseenMaaraykseenOtsikko"
+          class="mt-4"
+        >
+          <EpMaaraysLiittyyMuuttaaValinta
+            v-model="storeData"
+            :maaraykset-nimella="supportData.maarayksetNimella"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('koulutus-tai-tutkinto')" class="mt-4">
-          <EpMaarayskokoelmaKoulutustyyppiSelect v-model="data.koulutustyypit" :isEditing="isEditing"/>
+        <b-form-group
+          :label="$t('koulutus-tai-tutkinto')"
+          class="mt-4"
+        >
+          <EpMaarayskokoelmaKoulutustyyppiSelect
+            v-model="data.koulutustyypit"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('asiasana')" class="mt-4">
-          <EpMaaraysAsiasanat v-model="data.asiasanat[kieli].asiasana" :asiasanat="asiasanat" :isEditing="isEditing"/>
+        <b-form-group
+          :label="$t('asiasana')"
+          class="mt-4"
+        >
+          <EpMaaraysAsiasanat
+            v-model="data.asiasanat[kieli].asiasana"
+            :asiasanat="asiasanat"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('kuvaus') + isRequired" class="mt-4">
-          <ep-content v-model="data.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
+        <b-form-group
+          :label="$t('kuvaus') + isRequired"
+          class="mt-4"
+        >
+          <ep-content
+            v-model="data.kuvaus"
+            layout="simplified_w_links"
+            :is-editable="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('liitteet') + ' (pdf)'" class="mt-4 mb-5">
-          <EpMaaraysLiitteet v-model="data.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
+        <b-form-group
+          :label="$t('liitteet') + ' (pdf)'"
+          class="mt-4 mb-5"
+        >
+          <EpMaaraysLiitteet
+            v-model="data.liitteet[kieli].liitteet"
+            :is-editing="isEditing"
+            :tyyppi="LIITE"
+            nimisyote
+          />
         </b-form-group>
-
       </template>
     </EpEditointi>
   </ep-main-view>

@@ -1,33 +1,60 @@
 <template>
   <b-row>
-    <b-col cols="4">{{$kaanna(arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko)}}</b-col>
+    <b-col cols="4">
+      {{ $kaanna(arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko) }}
+    </b-col>
     <b-col class="d-flex flex-column">
       <template v-if="!isEditing">
         <ul>
-          <li v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex">
-            {{$kaanna(osaamistasonkriteeri.kriteerit[kriteeriIndex])}}
+          <li
+            v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit"
+            :key="'kriteeri'+kriteeriIndex"
+          >
+            {{ $kaanna(osaamistasonkriteeri.kriteerit[kriteeriIndex]) }}
           </li>
         </ul>
       </template>
 
       <template v-else>
-        <VueDraggable v-bind="defaultDragOptions"
-                   tag="div"
-                   v-model="osaamistasonkriteeri.kriteerit">
-          <div v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit" :key="'kriteeri'+kriteeriIndex" class="mb-2">
+        <VueDraggable
+          v-bind="defaultDragOptions"
+          v-model="osaamistasonkriteeri.kriteerit"
+          tag="div"
+        >
+          <div
+            v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit"
+            :key="'kriteeri'+kriteeriIndex"
+            class="mb-2"
+          >
             <div class="d-flex">
-              <EpInput class="w-100" :isEditing="isEditing" v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]">
+              <EpInput
+                v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]"
+                class="w-100"
+                :is-editing="isEditing"
+              >
                 <template #left>
                   <div class="order-handle m-2">
                     <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   </div>
                 </template>
               </EpInput>
-              <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaKriteeri(kriteeri)"/>
+              <EpButton
+                v-if="isEditing"
+                variant="link"
+                icon="delete"
+                @click="poistaKriteeri(kriteeri)"
+              />
             </div>
           </div>
         </VueDraggable>
-        <EpButton :paddingx="false" v-if="isEditing" class="mb-3" variant="link" icon="add" @click="lisaaKriteeri()">
+        <EpButton
+          v-if="isEditing"
+          :paddingx="false"
+          class="mb-3"
+          variant="link"
+          icon="add"
+          @click="lisaaKriteeri()"
+        >
           {{ $t('lisaa-kriteeri') }}
         </EpButton>
       </template>

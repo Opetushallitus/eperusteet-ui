@@ -1,35 +1,52 @@
 <template>
-  <router-view v-if="maaraysId"/>
+  <router-view v-if="maaraysId" />
 
-  <ep-main-view container v-else>
+  <ep-main-view
+    v-else
+    container
+  >
     <template #header>
       <div class="d-flex justify-content-between">
         <h1>{{ $t('maarayskokoelma-otsikko') }}</h1>
         <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: 'uusi' } }">
           <EpButton
+            v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
             icon="add"
             variant="outline"
-            v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
-            >{{ $t('lisaa-maarays') }}</EpButton>
+          >
+            {{ $t('lisaa-maarays') }}
+          </EpButton>
         </router-link>
       </div>
     </template>
 
     <div>
-      <div class="mb-3">{{$t('maarayskokoelma-selite')}}</div>
+      <div class="mb-3">
+        {{ $t('maarayskokoelma-selite') }}
+      </div>
 
       <div class="row ml-0 mb-2 mt-4">
-
-        <b-form-group :label="$t('hae')" class="col-4">
-          <ep-search v-model="query.nimi" :placeholder="$t('etsi-maarayksia')"/>
+        <b-form-group
+          :label="$t('hae')"
+          class="col-4"
+        >
+          <ep-search
+            v-model="query.nimi"
+            :placeholder="$t('etsi-maarayksia')"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('tyyppi')" class="col-3">
-          <EpMultiSelect v-model="query.tyyppi"
-                  :enable-empty-option="true"
-                  placeholder="kaikki"
-                  :is-editing="true"
-                  :options="tyyppiVaihtoehdot">
+        <b-form-group
+          :label="$t('tyyppi')"
+          class="col-3"
+        >
+          <EpMultiSelect
+            v-model="query.tyyppi"
+            :enable-empty-option="true"
+            placeholder="kaikki"
+            :is-editing="true"
+            :options="tyyppiVaihtoehdot"
+          >
             <template #singleLabel="{ option }">
               {{ $t('maarays-tyyppi-' + option.toLowerCase()) }}
             </template>
@@ -39,16 +56,27 @@
           </EpMultiSelect>
         </b-form-group>
 
-        <b-form-group :label="$t('koulutus-tai-tutkinto')" class="col-3">
-          <EpMaarayskokoelmaKoulutustyyppiSelect v-model="query.koulutustyyppi" :isEditing="true"/>
+        <b-form-group
+          :label="$t('koulutus-tai-tutkinto')"
+          class="col-3"
+        >
+          <EpMaarayskokoelmaKoulutustyyppiSelect
+            v-model="query.koulutustyyppi"
+            :is-editing="true"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('voimassaolo')" class="col-2">
-          <EpMultiSelect v-model="query.voimassaolo"
-                    :enable-empty-option="true"
-                    placeholder="kaikki"
-                    :is-editing="true"
-                    :options="voimassaVaihtoehdot">
+        <b-form-group
+          :label="$t('voimassaolo')"
+          class="col-2"
+        >
+          <EpMultiSelect
+            v-model="query.voimassaolo"
+            :enable-empty-option="true"
+            placeholder="kaikki"
+            :is-editing="true"
+            :options="voimassaVaihtoehdot"
+          >
             <template #singleLabel="{ option }">
               {{ $t('ajoitus-' + option.toLowerCase()) }}
             </template>
@@ -60,14 +88,24 @@
       </div>
 
       <div class="d-flex mb-4">
-        <EpToggle v-model="query.luonnos" checkbox>{{ $t('luonnos') }}</EpToggle>
-        <EpToggle v-model="query.julkaistu" checkbox>{{ $t('julkaistu') }}</EpToggle>
+        <EpToggle
+          v-model="query.luonnos"
+          checkbox
+        >
+          {{ $t('luonnos') }}
+        </EpToggle>
+        <EpToggle
+          v-model="query.julkaistu"
+          checkbox
+        >
+          {{ $t('julkaistu') }}
+        </EpToggle>
       </div>
 
       <ep-spinner v-if="!maaraykset" />
 
       <div v-else-if="maaraykset.length === 0">
-      {{$t('ei-maarayksia')}}
+        {{ $t('ei-maarayksia') }}
       </div>
 
       <b-table
@@ -82,22 +120,22 @@
         :fields="tableFields"
         :per-page="perPage"
         no-local-sorting
-        @sort-changed="sortingChanged"
         :sort-by.sync="sort.sortBy"
-        :sort-desc.sync="sort.sortDesc">
-
-      <template v-slot:cell(nimi)="{ item }">
-        <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: item.id } }">
-          {{$kaanna(item.nimi)}}
-        </router-link>
-      </template>
-
+        :sort-desc.sync="sort.sortDesc"
+        @sort-changed="sortingChanged"
+      >
+        <template #cell(nimi)="{ item }">
+          <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: item.id } }">
+            {{ $kaanna(item.nimi) }}
+          </router-link>
+        </template>
       </b-table>
 
       <ep-pagination
         v-model="sivu"
         :per-page="perPage"
-        :total-rows="maarayksetCount"/>
+        :total-rows="maarayksetCount"
+      />
     </div>
   </ep-main-view>
 </template>

@@ -1,23 +1,44 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton-oppiaine') }}</h2>
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton-oppiaine') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing }">
       <b-row>
-        <b-col cols="8" v-if="isEditing">
+        <b-col
+          v-if="isEditing"
+          cols="8"
+        >
           <b-form-group :label="$t('oppiaineen-nimi')">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -38,32 +59,62 @@
 
       <b-row>
         <b-col cols="11">
-          <hr/>
+          <hr>
 
-          <EpCollapse :collapsable="!isEditing" :usePadding="false">
-            <template #header><h4>{{$t('oppiaineen-tehtava')}}</h4></template>
-            <ep-content layout="normal" v-model="data.tehtava.kuvaus" :is-editable="isEditing"/>
+          <EpCollapse
+            :collapsable="!isEditing"
+            :use-padding="false"
+          >
+            <template #header>
+              <h4>{{ $t('oppiaineen-tehtava') }}</h4>
+            </template>
+            <ep-content
+              v-model="data.tehtava.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
           </EpCollapse>
 
-          <EpCollapse :collapsable="!isEditing" :usePadding="false">
-            <template #header><h4>{{$t('laaja-alaisen-osaamisen-osa-alueet')}}</h4></template>
-            <ep-content layout="normal" v-model="data.laajaAlaisetOsaamiset.kuvaus" :is-editable="isEditing"/>
+          <EpCollapse
+            :collapsable="!isEditing"
+            :use-padding="false"
+          >
+            <template #header>
+              <h4>{{ $t('laaja-alaisen-osaamisen-osa-alueet') }}</h4>
+            </template>
+            <ep-content
+              v-model="data.laajaAlaisetOsaamiset.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
           </EpCollapse>
 
-          <EpCollapse :collapsable="!isEditing" :usePadding="false">
-            <template #header><h4>{{$t('tavoitteet')}}</h4></template>
+          <EpCollapse
+            :collapsable="!isEditing"
+            :use-padding="false"
+          >
+            <template #header>
+              <h4>{{ $t('tavoitteet') }}</h4>
+            </template>
 
-            <h5>{{$t('tavoitteiden-kuvaus')}}</h5>
-            <ep-content layout="normal" v-model="data.tavoitteet.kuvaus" :is-editable="isEditing"/>
+            <h5>{{ $t('tavoitteiden-kuvaus') }}</h5>
+            <ep-content
+              v-model="data.tavoitteet.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
 
             <div v-if="isEditing">
-
               <VueDraggable
                 v-bind="tavoitealueDragOptions"
+                v-model="data.tavoitealueet"
                 tag="div"
-                v-model="data.tavoitealueet">
-
-                <div v-for="(tavoitealue, tavoitealueIndex) in data.tavoitteet.tavoitealueet" :key="'tavoite'+tavoitealueIndex" class="mt-4 p-2 tavoitealue editing">
+              >
+                <div
+                  v-for="(tavoitealue, tavoitealueIndex) in data.tavoitteet.tavoitealueet"
+                  :key="'tavoite'+tavoitealueIndex"
+                  class="mt-4 p-2 tavoitealue editing"
+                >
                   <div class="d-flex">
                     <div class="order-handle m-2">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
@@ -71,30 +122,50 @@
                     <div class="mt-2 w-100">
                       <div class="row">
                         <div class="col-11">
-                          <div class="font-weight-bold mb-2">{{$t('tavoitealueen-nimi')}}</div>
-                          <ep-input v-model="tavoitealue.nimi" :isEditing="true" />
+                          <div class="font-weight-bold mb-2">
+                            {{ $t('tavoitealueen-nimi') }}
+                          </div>
+                          <ep-input
+                            v-model="tavoitealue.nimi"
+                            :is-editing="true"
+                          />
 
-                          <div class="mt-3 mb-2 font-weight-bold">{{$t('kohde')}}</div>
-                          <ep-input v-model="tavoitealue.kohde" :isEditing="true" />
+                          <div class="mt-3 mb-2 font-weight-bold">
+                            {{ $t('kohde') }}
+                          </div>
+                          <ep-input
+                            v-model="tavoitealue.kohde"
+                            :is-editing="true"
+                          />
                         </div>
                       </div>
 
-                      <div class="mt-3 mb-2 font-weight-bold">{{$t('tavoitteet')}}</div>
+                      <div class="mt-3 mb-2 font-weight-bold">
+                        {{ $t('tavoitteet') }}
+                      </div>
                       <EpTavoitealueTavoitteet v-model="tavoitealue.tavoitteet">
                         <template #default="{tavoiteIndex}">
                           <EpInput
-                              v-model="tavoitealue.tavoitteet[tavoiteIndex]"
-                              :is-editing="true"
-                              class="input-wrapper">
-                              <template #left>
-                                <div class="order-handle m-2">
-                                  <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                                </div>
-                              </template>
-                            </EpInput>
+                            v-model="tavoitealue.tavoitteet[tavoiteIndex]"
+                            :is-editing="true"
+                            class="input-wrapper"
+                          >
+                            <template #left>
+                              <div class="order-handle m-2">
+                                <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                              </div>
+                            </template>
+                          </EpInput>
                         </template>
                         <template #footer>
-                          <EpButton icon="delete" class="mr-5" variant="link" @click="poistaTavoitealue(tavoitealue)">{{ $t('poista-tavoitealue') }}</EpButton>
+                          <EpButton
+                            icon="delete"
+                            class="mr-5"
+                            variant="link"
+                            @click="poistaTavoitealue(tavoitealue)"
+                          >
+                            {{ $t('poista-tavoitealue') }}
+                          </EpButton>
                         </template>
                       </EpTavoitealueTavoitteet>
                     </div>
@@ -102,70 +173,168 @@
                 </div>
               </VueDraggable>
 
-              <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaTavoitealue()">{{ $t('lisaa-tavoitealue') }}</EpButton>
-
+              <EpButton
+                class="mt-4"
+                variant="outline"
+                icon="add"
+                @click="lisaaTavoitealue()"
+              >
+                {{ $t('lisaa-tavoitealue') }}
+              </EpButton>
             </div>
 
             <div v-if="!isEditing">
-
-              <div v-for="(tavoitealue, tavoitealueIndex) in data.tavoitteet.tavoitealueet" :key="'tavoite'+tavoitealueIndex" class="tavoitealue">
-                <div class="font-weight-bold">{{$kaanna(tavoitealue.nimi)}}</div>
-                <div>{{$kaanna(tavoitealue.kohde)}}</div>
+              <div
+                v-for="(tavoitealue, tavoitealueIndex) in data.tavoitteet.tavoitealueet"
+                :key="'tavoite'+tavoitealueIndex"
+                class="tavoitealue"
+              >
+                <div class="font-weight-bold">
+                  {{ $kaanna(tavoitealue.nimi) }}
+                </div>
+                <div>{{ $kaanna(tavoitealue.kohde) }}</div>
                 <ul>
-                  <li v-for="tavoite in tavoitealue.tavoitteet" :key="'tavoite'+tavoite._id">{{$kaanna(tavoite)}}</li>
+                  <li
+                    v-for="tavoite in tavoitealue.tavoitteet"
+                    :key="'tavoite'+tavoite._id"
+                  >
+                    {{ $kaanna(tavoite) }}
+                  </li>
                 </ul>
               </div>
             </div>
           </EpCollapse>
 
-          <EpCollapse :collapsable="!isEditing" :usePadding="false">
-            <template #header><h4>{{$t('osaamisen-arviointi')}}</h4></template>
-            <ep-content layout="normal" v-model="data.arviointi.kuvaus" :is-editable="isEditing"/>
+          <EpCollapse
+            :collapsable="!isEditing"
+            :use-padding="false"
+          >
+            <template #header>
+              <h4>{{ $t('osaamisen-arviointi') }}</h4>
+            </template>
+            <ep-content
+              v-model="data.arviointi.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
           </EpCollapse>
 
-          <EpCollapse :collapsable="!isEditing" :usePadding="false">
-            <template #header><h4>{{$t('moduulit')}}</h4></template>
+          <EpCollapse
+            :collapsable="!isEditing"
+            :use-padding="false"
+          >
+            <template #header>
+              <h4>{{ $t('moduulit') }}</h4>
+            </template>
 
-            <h5>{{$t('pakollisten-moduulien-kuvaus')}}</h5>
-            <ep-content layout="normal" v-model="data.pakollisetModuulitKuvaus" :is-editable="isEditing" v-if="isEditing || data.pakollisetModuulitKuvaus"/>
+            <h5>{{ $t('pakollisten-moduulien-kuvaus') }}</h5>
+            <ep-content
+              v-if="isEditing || data.pakollisetModuulitKuvaus"
+              v-model="data.pakollisetModuulitKuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
             <template v-if="!isEditing">
               <router-link
-                v-for="(moduuli, mindex) in pakollisetModuulit" :key="'pmoduuli'+mindex"
-                :to="{ name: 'moduuli', params: { moduuliId: moduuli.id } }">
-                <EpModuuli :moduuli="moduuli" class="mb-2"/>
+                v-for="(moduuli, mindex) in pakollisetModuulit"
+                :key="'pmoduuli'+mindex"
+                :to="{ name: 'moduuli', params: { moduuliId: moduuli.id } }"
+              >
+                <EpModuuli
+                  :moduuli="moduuli"
+                  class="mb-2"
+                />
               </router-link>
             </template>
 
-            <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaModuuli(true)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-pakollinen-moduuli') }}</EpButton>
+            <EpButton
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              class="mt-4"
+              variant="outline"
+              icon="add"
+              @click="lisaaModuuli(true)"
+            >
+              {{ $t('lisaa-pakollinen-moduuli') }}
+            </EpButton>
 
-            <h5 class="mt-5">{{$t('valinnaisten-moduulien-kuvaus')}}</h5>
-            <ep-content layout="normal" v-model="data.valinnaisetModuulitKuvaus" :is-editable="isEditing" v-if="isEditing || data.pakollisetModuulitKuvaus"/>
+            <h5 class="mt-5">
+              {{ $t('valinnaisten-moduulien-kuvaus') }}
+            </h5>
+            <ep-content
+              v-if="isEditing || data.pakollisetModuulitKuvaus"
+              v-model="data.valinnaisetModuulitKuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
             <template v-if="!isEditing">
               <router-link
-                v-for="(moduuli, mindex) in valinnaisetModuulit" :key="'vmoduuli'+mindex"
-                :to="{ name: 'moduuli', params: { moduuliId: moduuli.id } }">
-                <EpModuuli :moduuli="moduuli" class="mb-2"/>
+                v-for="(moduuli, mindex) in valinnaisetModuulit"
+                :key="'vmoduuli'+mindex"
+                :to="{ name: 'moduuli', params: { moduuliId: moduuli.id } }"
+              >
+                <EpModuuli
+                  :moduuli="moduuli"
+                  class="mb-2"
+                />
               </router-link>
             </template>
-            <EpButton class="mt-4" variant="outline" icon="add" @click="lisaaModuuli(false)" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-valinnainen-moduuli') }}</EpButton>
+            <EpButton
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              class="mt-4"
+              variant="outline"
+              icon="add"
+              @click="lisaaModuuli(false)"
+            >
+              {{ $t('lisaa-valinnainen-moduuli') }}
+            </EpButton>
           </EpCollapse>
 
-          <EpCollapse :collapsable="!isEditing" :usePadding="false" :borderBottom="false" class="mt-4" v-if="!data._oppiaine || !data.id">
-            <template #header><h4>{{$t('oppimaarat')}}</h4></template>
+          <EpCollapse
+            v-if="!data._oppiaine || !data.id"
+            :collapsable="!isEditing"
+            :use-padding="false"
+            :border-bottom="false"
+            class="mt-4"
+          >
+            <template #header>
+              <h4>{{ $t('oppimaarat') }}</h4>
+            </template>
 
             <VueDraggable
               v-bind="oppiaineetDragOptions"
+              v-model="data.oppimaarat"
               tag="div"
-              v-model="data.oppimaarat">
-                <div class="listaus p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                  <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                  <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                </div>
+            >
+              <div
+                v-for="oppimaara in data.oppimaarat"
+                :key="'oppimaara'+oppimaara.id"
+                class="listaus p-3 d-flex"
+              >
+                <EpMaterialIcon
+                  v-if="isEditing"
+                  class="order-handle mr-2"
+                >
+                  drag_indicator
+                </EpMaterialIcon>
+                <router-link :to="{ name: 'lukio_oppiaine', params: { oppiaineId: oppimaara.id } }">
+                  {{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}
+                </router-link>
+              </div>
             </VueDraggable>
 
-            <EpButton class="mt-2" variant="outline" icon="add" @click="lisaaOppimaara()" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">{{ $t('lisaa-oppimaara') }}</EpButton>
+            <EpButton
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              class="mt-2"
+              variant="outline"
+              icon="add"
+              @click="lisaaOppimaara()"
+            >
+              {{ $t('lisaa-oppimaara') }}
+            </EpButton>
           </EpCollapse>
-
         </b-col>
       </b-row>
     </template>

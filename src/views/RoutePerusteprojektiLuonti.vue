@@ -1,23 +1,41 @@
 <template>
   <EpMainView>
     <b-container>
-      <EpSteps ref="epsteps" :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel" @stepChange="onStepChange">
-        <template v-slot:pohja>
+      <EpSteps
+        ref="epsteps"
+        :steps="steps"
+        :initial-step="0"
+        :on-save="onSave"
+        @cancel="onCancel"
+        @stepChange="onStepChange"
+      >
+        <template #pohja>
           <div class="row">
-            <legend class="col-form-label col-sm-2">{{ $t('kayta-pohjana') }}</legend>
+            <legend class="col-form-label col-sm-2">
+              {{ $t('kayta-pohjana') }}
+            </legend>
             <div class="col-sm-10 mb-4">
-              <EpRadio v-model="tyyppi" class="p-2" value="pohjasta" :disabled="!pohjat || pohjat.length === 0">
-                {{ $t('perustepohjaa') }} <EpSpinner v-if="!pohjat" small/>
+              <EpRadio
+                v-model="tyyppi"
+                class="p-2"
+                value="pohjasta"
+                :disabled="!pohjat || pohjat.length === 0"
+              >
+                {{ $t('perustepohjaa') }} <EpSpinner
+                  v-if="!pohjat"
+                  small
+                />
               </EpRadio>
               <div v-if="tyyppi === 'pohjasta'">
                 <EpMultiSelect
                   v-if="pohjat"
                   :model-value="data.peruste"
-                  @update:modelValue="valitsePeruste($event)"
                   :placeholder="$t('valitse-pohja')"
                   :is-editing="true"
                   :search-identity="nimiSearchIdentity"
-                  :options="pohjat">
+                  :options="pohjat"
+                  @update:modelValue="valitsePeruste($event)"
+                >
                   <template #singleLabel="{ option }">
                     {{ $kaanna(option.nimi) }}
                   </template>
@@ -27,13 +45,21 @@
                 </EpMultiSelect>
               </div>
 
-              <EpRadio v-model="tyyppi" class="mt-3 p-2" value="perusteesta" :disabled="!perusteet || perusteet.length === 0">
+              <EpRadio
+                v-model="tyyppi"
+                class="mt-3 p-2"
+                value="perusteesta"
+                :disabled="!perusteet || perusteet.length === 0"
+              >
                 <div class="d-flex">
                   <div>{{ $t('toista-perusteprojektia') }}</div>
                   <EpInfoPopover class="ml-2">
-                    {{$t('vain-ammatilliset-tutkinnot')}}
+                    {{ $t('vain-ammatilliset-tutkinnot') }}
                   </EpInfoPopover>
-                  <EpSpinner v-if="!perusteet" small/>
+                  <EpSpinner
+                    v-if="!perusteet"
+                    small
+                  />
                 </div>
               </EpRadio>
 
@@ -41,78 +67,143 @@
                 <EpMultiSelect
                   v-if="perusteet"
                   :model-value="data.peruste"
-                  @update:modelValue="valitsePeruste($event)"
                   :placeholder="$t('valitse-peruste')"
                   :is-editing="true"
                   :search-identity="nimiSearchIdentity"
                   :options="perusteet"
-                  class="perustevalinta">
+                  class="perustevalinta"
+                  @update:modelValue="valitsePeruste($event)"
+                >
                   <template #singleLabel="{ option }">
                     {{ $kaanna(option.nimi) }}
-                    <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
-                      (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span>-<span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                    <span
+                      v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu"
+                      class="ml-3 voimassaolo"
+                    >
+                      (<span v-if="option.voimassaoloAlkaa">{{ $sd(option.voimassaoloAlkaa) }}</span>-<span v-if="option.voimassaoloLoppuu">{{ $sd(option.voimassaoloLoppuu) }}</span>)
                     </span>
                   </template>
                   <template #option="{ option }">
                     {{ $kaanna(option.nimi) }}
-                    <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
-                      (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span> - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                    <span
+                      v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu"
+                      class="ml-3 voimassaolo"
+                    >
+                      (<span v-if="option.voimassaoloAlkaa">{{ $sd(option.voimassaoloAlkaa) }}</span> - <span v-if="option.voimassaoloLoppuu">{{ $sd(option.voimassaoloLoppuu) }}</span>)
                     </span>
                   </template>
                 </EpMultiSelect>
               </div>
 
-              <EpRadio v-model="tyyppi" value="uusi" class="mt-3 p-2">
+              <EpRadio
+                v-model="tyyppi"
+                value="uusi"
+                class="mt-3 p-2"
+              >
                 {{ $t('luo-uusi-ilman-pohjaa') }}
               </EpRadio>
 
               <template v-if="$isAdmin()">
-                <EpRadio v-model="tyyppi" value="tiedostosta" class="mt-3 p-2">
+                <EpRadio
+                  v-model="tyyppi"
+                  value="tiedostosta"
+                  class="mt-3 p-2"
+                >
                   {{ $t('tuo-tiedostosta') }}
                 </EpRadio>
                 <div v-if="tyyppi === 'tiedostosta'">
-                  <ep-tiedosto-lataus :fileTypes="['application/json']" v-model="data.tiedosto" />
+                  <ep-tiedosto-lataus
+                    v-model="data.tiedosto"
+                    :file-types="['application/json']"
+                  />
                 </div>
               </template>
             </div>
           </div>
         </template>
 
-        <template v-slot:tiedot>
-          <b-form-group :label="$t('projektin-nimi') + '*'" required>
-            <ep-input v-model="data.nimi" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')" :validation="$v.data.nimi"/>
+        <template #tiedot>
+          <b-form-group
+            :label="$t('projektin-nimi') + '*'"
+            required
+          >
+            <ep-input
+              v-model="data.nimi"
+              type="string"
+              :is-editing="true"
+              :placeholder="$t('kirjoita-projektin-nimi')"
+              :validation="$v.data.nimi"
+            />
           </b-form-group>
 
           <b-form-group>
             <template #label>
               <div class="d-flex">
-                <h4>{{$t('projektin-diaarinumero')}}</h4>
-                <EpInfoPopover class="ml-2">{{ $t('diaarinumeron-muoto') }}</EpInfoPopover>
+                <h4>{{ $t('projektin-diaarinumero') }}</h4>
+                <EpInfoPopover class="ml-2">
+                  {{ $t('diaarinumeron-muoto') }}
+                </EpInfoPopover>
               </div>
             </template>
-            <ep-input v-model="data.diaarinumero" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-diaarinumero')" :validation="$v.data.diaarinumero"/>
+            <ep-input
+              v-model="data.diaarinumero"
+              type="string"
+              :is-editing="true"
+              :placeholder="$t('kirjoita-projektin-diaarinumero')"
+              :validation="$v.data.diaarinumero"
+            />
           </b-form-group>
 
-          <b-form-group :label="$t('projektin-kuvaus')" required>
-            <EpRadio v-model="data.projektiKuvaus" class="ml-1" :value="kuvaus.uudistus">
+          <b-form-group
+            :label="$t('projektin-kuvaus')"
+            required
+          >
+            <EpRadio
+              v-model="data.projektiKuvaus"
+              class="ml-1"
+              :value="kuvaus.uudistus"
+            >
               {{ $t('perusteen-uudistaminen-kuvaus') }}
             </EpRadio>
-            <EpRadio v-model="data.projektiKuvaus" class="ml-1" :value="kuvaus.korjaus">
+            <EpRadio
+              v-model="data.projektiKuvaus"
+              class="ml-1"
+              :value="kuvaus.korjaus"
+            >
               {{ $t('perusteen-korjaus-kuvaus') }}
             </EpRadio>
-            <ep-input class="mt-1" v-model="data.kuvaus" type="localized" :is-editing="true" :placeholder="$t('projektin-vapaamuotoinen-kuvaus')" />
+            <ep-input
+              v-model="data.kuvaus"
+              class="mt-1"
+              type="localized"
+              :is-editing="true"
+              :placeholder="$t('projektin-vapaamuotoinen-kuvaus')"
+            />
           </b-form-group>
 
-          <b-form-group :label="$t('koulutus-tutkintotyyppi') + '*'" required>
-            <koulutustyyppi-select v-model="data.koulutustyyppi" :isEditing="true" required :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit"/>
+          <b-form-group
+            :label="$t('koulutus-tutkintotyyppi') + '*'"
+            required
+          >
+            <koulutustyyppi-select
+              v-model="data.koulutustyyppi"
+              :is-editing="true"
+              required
+              :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
+            />
           </b-form-group>
 
-          <b-form-group :label="$t('perustetyoryhma')" required>
-            <EpMultiSelect v-model="data.tyoryhma"
-                           v-if="tyoryhmat"
-                           :search-identity="nimiSearchIdentity"
-                           :is-editing="true"
-                           :options="tyoryhmat">
+          <b-form-group
+            :label="$t('perustetyoryhma')"
+            required
+          >
+            <EpMultiSelect
+              v-if="tyoryhmat"
+              v-model="data.tyoryhma"
+              :search-identity="nimiSearchIdentity"
+              :is-editing="true"
+              :options="tyoryhmat"
+            >
               <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
@@ -123,18 +214,26 @@
             <EpSpinner v-else />
           </b-form-group>
 
-          <b-form-group :label="$t('yhteyshenkilo')" required>
-            <ep-input v-model="data.yhteyshenkilo" type="string" :is-editing="true" :placeholder="$t('kirjoita-yhteyshenkilon-nimi')" />
+          <b-form-group
+            :label="$t('yhteyshenkilo')"
+            required
+          >
+            <ep-input
+              v-model="data.yhteyshenkilo"
+              type="string"
+              :is-editing="true"
+              :placeholder="$t('kirjoita-yhteyshenkilon-nimi')"
+            />
           </b-form-group>
         </template>
 
-        <template v-slot:aikataulu>
+        <template #aikataulu>
           <EpAikataulu :aikataulut="tapahtumat">
             <template #luomispaiva-topic>
-              <span v-html="$t('projektin-luomispaiva')"></span>
+              <span v-html="$t('projektin-luomispaiva')" />
             </template>
             <template #julkaisupaiva-topic>
-              <span v-html="$t('peruste-astuu-voimaan')"></span>
+              <span v-html="$t('peruste-astuu-voimaan')" />
             </template>
           </EpAikataulu>
 
@@ -142,35 +241,76 @@
             v-for="paatavoite in data.paatavoitteet"
             :key="'paatavoite'+paatavoite.tapahtuma"
             :label="$kaanna(paatavoite.tavoite)"
-            class="col-md-4 col-12">
-            <ep-datepicker v-model="paatavoite.tapahtumapaiva" class="mb-2" :isEditing="true"/>
-            <ep-toggle v-model="paatavoite.julkinen" v-if="isAmmatillinen" class="mb-2">
-              {{$t('julkinen')}}
+            class="col-md-4 col-12"
+          >
+            <ep-datepicker
+              v-model="paatavoite.tapahtumapaiva"
+              class="mb-2"
+              :is-editing="true"
+            />
+            <ep-toggle
+              v-if="isAmmatillinen"
+              v-model="paatavoite.julkinen"
+              class="mb-2"
+            >
+              {{ $t('julkinen') }}
             </ep-toggle>
           </b-form-group>
 
-          <div v-for="(tpvm, idx) in data.tavoitepaivamaarat" :key="idx" class="row p-0 m-0" >
-            <b-form-group :label="$t('tavoitteen-pvm')" class="col-md-4 col-12">
-              <ep-datepicker v-model="tpvm.tapahtumapaiva" class="mb-2" :isEditing="true"/>
-              <ep-toggle v-model="tpvm.julkinen" v-if="isAmmatillinen" class="mb-2">
-                {{$t('julkinen')}}
+          <div
+            v-for="(tpvm, idx) in data.tavoitepaivamaarat"
+            :key="idx"
+            class="row p-0 m-0"
+          >
+            <b-form-group
+              :label="$t('tavoitteen-pvm')"
+              class="col-md-4 col-12"
+            >
+              <ep-datepicker
+                v-model="tpvm.tapahtumapaiva"
+                class="mb-2"
+                :is-editing="true"
+              />
+              <ep-toggle
+                v-if="isAmmatillinen"
+                v-model="tpvm.julkinen"
+                class="mb-2"
+              >
+                {{ $t('julkinen') }}
               </ep-toggle>
             </b-form-group>
-            <b-form-group :label="$t('tavoitteen-nimi-kuvaus') + '*'" class="col-md-7 col-11">
-              <ep-input v-model="tpvm.tavoite" type="localized" :is-editing="true" :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')" />
+            <b-form-group
+              :label="$t('tavoitteen-nimi-kuvaus') + '*'"
+              class="col-md-7 col-11"
+            >
+              <ep-input
+                v-model="tpvm.tavoite"
+                type="localized"
+                :is-editing="true"
+                :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')"
+              />
             </b-form-group>
             <b-form-group class="col-1 col-sm-1 text-center">
-              <template v-slot:label><br/></template>
-              <ep-button @click="poistaTavoite(tpvm)" variant="link" icon="delete"></ep-button>
+              <template #label>
+                <br>
+              </template>
+              <ep-button
+                variant="link"
+                icon="delete"
+                @click="poistaTavoite(tpvm)"
+              />
             </b-form-group>
           </div>
-          <ep-button variant="outline" icon="add" @click="lisaaTavoite()">
+          <ep-button
+            variant="outline"
+            icon="add"
+            @click="lisaaTavoite()"
+          >
             {{ $t('lisaa-tavoite') }}
           </ep-button>
-
         </template>
 
-        <template v-slot:yhteenveto>
+        <template #yhteenveto>
           <div class="d-flex">
             <div class="tieto w-50">
               <div class="nimi">
@@ -199,11 +339,17 @@
               <div v-else-if="data.projektiKuvaus === kuvaus.uudistus">
                 {{ $t('perusteen-uudistus') }}
               </div>
-              <ep-input type="localized" :model-value="data.kuvaus" />
+              <ep-input
+                type="localized"
+                :model-value="data.kuvaus"
+              />
             </div>
             <div class="tieto w-50">
               <div>
-                <div class="mb-5" v-if="data.tyoryhma">
+                <div
+                  v-if="data.tyoryhma"
+                  class="mb-5"
+                >
                   <div class="nimi">
                     {{ $t('perustetyoryhma') }}
                   </div>
@@ -223,20 +369,19 @@
               </div>
               <EpAikataulu :aikataulut="tapahtumat">
                 <template #luomispaiva-topic>
-                  <span v-html="$t('projektin-luomispaiva')"></span>
+                  <span v-html="$t('projektin-luomispaiva')" />
                 </template>
                 <template #julkaisupaiva-topic>
-                  <span v-html="$t('peruste-astuu-voimaan')"></span>
+                  <span v-html="$t('peruste-astuu-voimaan')" />
                 </template>
               </EpAikataulu>
             </div>
           </div>
         </template>
 
-        <template v-slot:luo>
-          {{$t('luo-perusteprojekti')}}
+        <template #luo>
+          {{ $t('luo-perusteprojekti') }}
         </template>
-
       </EpSteps>
     </b-container>
   </EpMainView>

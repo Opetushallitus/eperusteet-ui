@@ -1,40 +1,76 @@
 <template>
   <div v-if="store">
-    <EpEditointi :store="store"
-                 :versionumero="versionumero"
-                 :confirmRemove="true"
-                 :postRemove="postRemove"
-                 label-remove-confirm="vahvista-tekstikappaleen-poisto">
-      <template v-slot:header="{ data }">
-        <h2 class="m-0">{{ $kaanna(data.nimi) }}</h2>
+    <EpEditointi
+      :store="store"
+      :versionumero="versionumero"
+      :confirm-remove="true"
+      :post-remove="postRemove"
+      label-remove-confirm="vahvista-tekstikappaleen-poisto"
+    >
+      <template #header="{ data }">
+        <h2 class="m-0">
+          {{ $kaanna(data.nimi) }}
+        </h2>
       </template>
-      <template v-slot:postHeader="{ data }">
+      <template #postHeader="{ data }">
         <span v-if="data.liite"><b>{{ $t('liite') }}. </b></span>
       </template>
-      <template v-slot:default="{ data, isEditing, validation }">
-        <div class="mt-1 otsikko" v-if="isEditing">
-          <div class="mb-4" v-if="osaamisalat.length > 0 || tutkintonimikkeet.length > 0">
-            <b-form-radio v-if="osaamisalat.length > 0"
-                          v-model="tekstikappaleTyyppi"
-                          value="osaamisala"
-                          name="tekstikappaleTyyppi">{{ $t('osaamisala') }}</b-form-radio>
-            <b-form-radio v-if="tutkintonimikkeet.length > 0"
-                          v-model="tekstikappaleTyyppi"
-                          value="tutkintonimike"
-                          name="tekstikappaleTyyppi">{{ $t('tutkintonimike') }}</b-form-radio>
-            <b-form-radio v-model="tekstikappaleTyyppi"
-                          value="tekstikappale"
-                          name="tekstikappaleTyyppi">{{ $t('tekstikappale') }}</b-form-radio>
+      <template #default="{ data, isEditing, validation }">
+        <div
+          v-if="isEditing"
+          class="mt-1 otsikko"
+        >
+          <div
+            v-if="osaamisalat.length > 0 || tutkintonimikkeet.length > 0"
+            class="mb-4"
+          >
+            <b-form-radio
+              v-if="osaamisalat.length > 0"
+              v-model="tekstikappaleTyyppi"
+              value="osaamisala"
+              name="tekstikappaleTyyppi"
+            >
+              {{ $t('osaamisala') }}
+            </b-form-radio>
+            <b-form-radio
+              v-if="tutkintonimikkeet.length > 0"
+              v-model="tekstikappaleTyyppi"
+              value="tutkintonimike"
+              name="tekstikappaleTyyppi"
+            >
+              {{ $t('tutkintonimike') }}
+            </b-form-radio>
+            <b-form-radio
+              v-model="tekstikappaleTyyppi"
+              value="tekstikappale"
+              name="tekstikappaleTyyppi"
+            >
+              {{ $t('tekstikappale') }}
+            </b-form-radio>
           </div>
-          <div v-if="tekstikappaleTyyppi === 'osaamisala'" class="mb-4">
+          <div
+            v-if="tekstikappaleTyyppi === 'osaamisala'"
+            class="mb-4"
+          >
             <div class="d-flex">
-              <h3>{{$t('osaamisala')}}</h3>
-              <EpMaterialIcon class="ml-2"
-                              icon-shape="outlined"
-                              v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"
-                              size="20px">info</EpMaterialIcon>
+              <h3>{{ $t('osaamisala') }}</h3>
+              <EpMaterialIcon
+                v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"
+                class="ml-2"
+                icon-shape="outlined"
+                size="20px"
+              >
+                info
+              </EpMaterialIcon>
             </div>
-            <EpMultiSelect v-model="data.osaamisala" :is-editing="true" :options="osaamisalat" :multiple="false" trackBy="uri" class="multiselect">
+            <EpMultiSelect
+              v-model="data.osaamisala"
+              :is-editing="true"
+              :options="osaamisalat"
+              :multiple="false"
+              track-by="uri"
+              class="multiselect"
+            >
               <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
@@ -44,15 +80,29 @@
             </EpMultiSelect>
           </div>
 
-          <div v-if="tekstikappaleTyyppi === 'tutkintonimike'" class="mb-4">
+          <div
+            v-if="tekstikappaleTyyppi === 'tutkintonimike'"
+            class="mb-4"
+          >
             <div class="d-flex">
-              <h3>{{$t('tutkintonimike')}}</h3>
-              <EpMaterialIcon class="ml-2"
-                              icon-shape="outlined"
-                              v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"
-                              size="20px">info</EpMaterialIcon>
+              <h3>{{ $t('tutkintonimike') }}</h3>
+              <EpMaterialIcon
+                v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"
+                class="ml-2"
+                icon-shape="outlined"
+                size="20px"
+              >
+                info
+              </EpMaterialIcon>
             </div>
-            <EpMultiSelect v-model="data.tutkintonimike" :is-editing="true" :options="tutkintonimikkeet" :multiple="false" trackBy="uri" class="multiselect">
+            <EpMultiSelect
+              v-model="data.tutkintonimike"
+              :is-editing="true"
+              :options="tutkintonimikkeet"
+              :multiple="false"
+              track-by="uri"
+              class="multiselect"
+            >
               <template #singleLabel="{ option }">
                 {{ $kaanna(option.nimi) }}
               </template>
@@ -62,11 +112,24 @@
             </EpMultiSelect>
           </div>
 
-          <div v-if="tekstikappaleTyyppi === 'tekstikappale'" class="mb-4">
-            <h3>{{$t('otsikko')}}</h3>
-            <ep-input v-model="data.nimi" :is-editing="true" :validation="validation.nimi" :disabled="!!data.osaamisala || !!data.tutkintonimike"></ep-input>
+          <div
+            v-if="tekstikappaleTyyppi === 'tekstikappale'"
+            class="mb-4"
+          >
+            <h3>{{ $t('otsikko') }}</h3>
+            <ep-input
+              v-model="data.nimi"
+              :is-editing="true"
+              :validation="validation.nimi"
+              :disabled="!!data.osaamisala || !!data.tutkintonimike"
+            />
           </div>
-          <ep-toggle class="mt-4" v-model="data.liite">{{$t('nayta-tekstikappale-liitteena')}}</ep-toggle>
+          <ep-toggle
+            v-model="data.liite"
+            class="mt-4"
+          >
+            {{ $t('nayta-tekstikappale-liitteena') }}
+          </ep-toggle>
         </div>
 
         <div :class="{ 'mt-4': isEditing }">
@@ -74,11 +137,11 @@
             v-model="data.teksti"
             layout="normal"
             :is-editable="isEditing"
-            :kasiteHandler="kasiteHandler"
-            :kuvaHandler="kuvaHandler"/>
+            :kasite-handler="kasiteHandler"
+            :kuva-handler="kuvaHandler"
+          />
         </div>
       </template>
-
     </EpEditointi>
   </div>
   <EpSpinner v-else />

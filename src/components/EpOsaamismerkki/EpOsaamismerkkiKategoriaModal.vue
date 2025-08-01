@@ -1,68 +1,109 @@
 <template>
-  <b-modal class="backdrop"
-           id="osaamismerkkiKategoriaModal"
-           ref="osaamismerkkiKategoriaModal"
-           :no-close-on-backdrop="true"
-           :no-enforce-focus="true"
-           :lazy="true"
-           size="xl"
-           :hide-footer="true">
+  <b-modal
+    id="osaamismerkkiKategoriaModal"
+    ref="osaamismerkkiKategoriaModal"
+    class="backdrop"
+    :no-close-on-backdrop="true"
+    :no-enforce-focus="true"
+    :lazy="true"
+    size="xl"
+    :hide-footer="true"
+  >
     <template #modal-header>
       <div class="row w-100">
         <div class="col">
-          <span v-if="kategoria.id" class="mr-2">{{ $t('muokkaa-teemaa')}}</span>
-          <span v-else class="mr-2">{{ $t('lisaa-teema')}}</span>
+          <span
+            v-if="kategoria.id"
+            class="mr-2"
+          >{{ $t('muokkaa-teemaa') }}</span>
+          <span
+            v-else
+            class="mr-2"
+          >{{ $t('lisaa-teema') }}</span>
         </div>
         <div>
-          <EpKielivalinta/>
+          <EpKielivalinta />
         </div>
-        <div class="close-btn clickable ml-3 pt-1" @click="sulje">
-          <EpMaterialIcon aria-hidden="false" :aria-label="$t('sulje')">close</EpMaterialIcon>
+        <div
+          class="close-btn clickable ml-3 pt-1"
+          @click="sulje"
+        >
+          <EpMaterialIcon
+            aria-hidden="false"
+            :aria-label="$t('sulje')"
+          >
+            close
+          </EpMaterialIcon>
         </div>
       </div>
     </template>
 
     <div class="mb-5">
       <b-form-group :label="$t('nimi') + ' *'">
-        <EpInput v-model="kategoria.nimi" :is-editing="true"/>
+        <EpInput
+          v-model="kategoria.nimi"
+          :is-editing="true"
+        />
       </b-form-group>
       <b-form-group :label="$t('kuvaus')">
-        <EpInput v-model="kategoria.kuvaus" :is-editing="true"/>
+        <EpInput
+          v-model="kategoria.kuvaus"
+          :is-editing="true"
+        />
       </b-form-group>
       <b-form-group :label="$t('kuva') + ' *'">
-        <EpTiedostoInput v-if="!liite"
-                         v-model="kategoria.liite"
-                         @input="fileChanged"
-                         :file-types="mimeTypes">
-        </EpTiedostoInput>
+        <EpTiedostoInput
+          v-if="!liite"
+          v-model="kategoria.liite"
+          :file-types="mimeTypes"
+          @input="fileChanged"
+        />
         <div v-if="!liite">
           <span class="font-size-08">{{ imageInfoText }}</span>
         </div>
         <div>
-          <img v-if="newImagePreviewUrl" :src="newImagePreviewUrl">
-          <img v-if="liite && liite.binarydata && !newImagePreviewUrl" :src="savedImagePreviewUrl">
+          <img
+            v-if="newImagePreviewUrl"
+            :src="newImagePreviewUrl"
+          >
+          <img
+            v-if="liite && liite.binarydata && !newImagePreviewUrl"
+            :src="savedImagePreviewUrl"
+          >
         </div>
-        <div v-if="liite && liite.binarydata" class="clickable mt-2" @click="poistaKuva()">
+        <div
+          v-if="liite && liite.binarydata"
+          class="clickable mt-2"
+          @click="poistaKuva()"
+        >
           <span>{{ liite.nimi }}</span>
-          <EpMaterialIcon class="default-icon ml-2">delete</EpMaterialIcon>
+          <EpMaterialIcon class="default-icon ml-2">
+            delete
+          </EpMaterialIcon>
         </div>
       </b-form-group>
     </div>
 
     <div class="float-right">
-      <EpButton @click="sulje"
-                variant="link">
+      <EpButton
+        variant="link"
+        @click="sulje"
+      >
         {{ $t('peruuta') }}
       </EpButton>
-      <EpButton v-if="kategoria.id"
-                @click="poistaKategoria"
-                :show-spinner="tallennetaan">
+      <EpButton
+        v-if="kategoria.id"
+        :show-spinner="tallennetaan"
+        @click="poistaKategoria"
+      >
         {{ $t('poista') }}
       </EpButton>
-      <EpButton @click="tallenna"
-                class="ml-2"
-                :show-spinner="tallennetaan"
-                :disabled="invalid">
+      <EpButton
+        class="ml-2"
+        :show-spinner="tallennetaan"
+        :disabled="invalid"
+        @click="tallenna"
+      >
         {{ $t('tallenna') }}
       </EpButton>
     </div>

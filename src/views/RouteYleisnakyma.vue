@@ -3,19 +3,44 @@
     <div v-if="tyyppi === 'peruste'">
       <div class="row">
         <div class="col">
-          <ep-peruste-aikataulu class="info-box" :aikatauluStore="aikatauluStore" :peruste="peruste"/>
+          <ep-peruste-aikataulu
+            class="info-box"
+            :aikataulu-store="aikatauluStore"
+            :peruste="peruste"
+          />
         </div>
       </div>
 
       <div class="row">
         <div class="col">
-          <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
-          <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
-          <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore" v-if="isAmmatillinen"/>
-          <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore"/>
+          <ep-peruste-tiedotteet
+            class="info-box"
+            :peruste="peruste"
+            :tiedotteet-store="tiedotteetStore"
+          />
+          <ep-peruste-perustiedot
+            class="info-box"
+            :peruste="peruste"
+            :projekti="projekti"
+            :tyoryhma-store="tyoryhmaStore"
+          />
+          <ep-peruste-tutkinnon-osat
+            v-if="isAmmatillinen"
+            class="info-box"
+            :peruste="peruste"
+            :tutkinnon-osa-store="tutkinnonOsaStore"
+          />
+          <ep-peruste-rakenne
+            class="info-box"
+            :peruste-store="perusteStore"
+          />
         </div>
         <div class="col">
-          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :tyyppi="perusteTyyppi"/>
+          <EpViimeaikainenToiminta
+            class="info-box"
+            :muokkaustieto-store="muokkaustietoStore"
+            :tyyppi="perusteTyyppi"
+          />
         </div>
       </div>
     </div>
@@ -23,14 +48,22 @@
     <div v-else>
       <div class="row">
         <div class="col">
-          <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
+          <ep-opas-perustiedot
+            class="info-box"
+            :peruste="peruste"
+            :projekti="projekti"
+            :tyoryhma-store="tyoryhmaStore"
+          />
         </div>
         <div class="col">
-          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :tyyppi="perusteTyyppi"/>
+          <EpViimeaikainenToiminta
+            class="info-box"
+            :muokkaustieto-store="muokkaustietoStore"
+            :tyyppi="perusteTyyppi"
+          />
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
