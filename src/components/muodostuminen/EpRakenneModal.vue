@@ -258,7 +258,7 @@
       <div v-else>
         <b-form-group :label="$t('pakollisuus')">
           <ep-toggle
-            v-model="modelValue.pakollinen"
+            v-model="pakollinenModel"
             switch
           >
             {{ $t('tutkinnon-osa-on-pakollinen') }}
@@ -267,7 +267,7 @@
       </div>
       <b-form-group :label="$t('kuvaus')">
         <ep-content
-          v-model="modelValue.kuvaus"
+          v-model="kuvausModel"
           :is-editable="true"
           layout="normal"
         />
@@ -594,6 +594,24 @@ watch(tyyppi, (newVal, oldVal) => {
   else if (oldVal) {
     emit('update:modelValue', { ...innerModel.value, nimi: null });
   }
+});
+
+const pakollinenModel = computed({
+  get() {
+    return innerModel.value.pakollinen;
+  },
+  set(value) {
+    emit('update:modelValue', { ...innerModel.value, pakollinen: value });
+  },
+});
+
+const kuvausModel = computed({
+  get() {
+    return innerModel.value.kuvaus;
+  },
+  set(value) {
+    emit('update:modelValue', { ...innerModel.value, kuvaus: value });
+  },
 });
 
 defineExpose({

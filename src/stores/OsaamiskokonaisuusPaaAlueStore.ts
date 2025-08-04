@@ -44,8 +44,8 @@ export class OsaamiskokonaisuusPaaAlueStore extends AbstractPerusteenOsaViiteSto
     };
 
     const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
-        OsaamiskokonaisuusPaaAlueStore.config.perusteStore.perusteId.value!,
-        OsaamiskokonaisuusPaaAlueStore.config?.perusteStore.perusteSuoritustapa.value!,
+        OsaamiskokonaisuusPaaAlueStore.config.perusteStore.perusteId.value as number,
+        OsaamiskokonaisuusPaaAlueStore.config.perusteStore.perusteSuoritustapa.value as any,
         osaamiskokonaisuusId,
         perusteenOsa,
     ));

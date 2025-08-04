@@ -92,16 +92,16 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
 
     if (_.isEmpty(tekstikappaleIsa)) {
       const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
-        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value!,
-        AbstractPerusteenOsaViiteStore.config?.perusteStore.perusteSuoritustapa.value!,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value as number,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteSuoritustapa.value as any,
         perusteenOsa,
       ));
       return tallennettu.data;
     }
     else {
       const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
-        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value!,
-        AbstractPerusteenOsaViiteStore.config?.perusteStore.perusteSuoritustapa.value!,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value as number,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteSuoritustapa.value as any,
         tekstikappaleIsa.id,
         perusteenOsa,
       ));

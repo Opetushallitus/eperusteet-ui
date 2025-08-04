@@ -105,7 +105,7 @@
         class="kuvaus"
       >
         <ep-content
-          v-model="modelValue.kuvaus"
+          :model-value="modelValue.kuvaus"
           :is-editable="false"
           layout="normal"
         />
@@ -206,14 +206,7 @@ const hasChildren = computed(() => {
 });
 
 const isOpen = computed(() => {
-  if (innerModel.value.isOpen === undefined) {
-    innerModel.value = {
-      ...innerModel.value,
-      isOpen: true,
-    };
-  }
-
-  return innerModel.value.isOpen;
+  return innerModel.value.isOpen ?? true;
 });
 
 const toggleOpen = () => {
@@ -252,19 +245,27 @@ const laskettu = computed(() => {
 
 onMounted(() => {
   if (!props.modelValue.muodostumisSaanto) {
-    props.modelValue.muodostumisSaanto = {
-      laajuus: {
-        minimi: 0,
-        maksimi: null,
+    emit('update:modelValue', {
+      ...props.modelValue,
+      muodostumisSaanto: {
+        laajuus: {
+          minimi: 0,
+          maksimi: null,
+        },
       },
-    };
+    });
   }
-
-  if (!props.modelValue.muodostumisSaanto?.laajuus) {
-    props.modelValue.muodostumisSaanto.laajuus = {
-      minimi: 0,
-      maksimi: null,
-    };
+  else if (!props.modelValue.muodostumisSaanto?.laajuus) {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      muodostumisSaanto: {
+        ...props.modelValue.muodostumisSaanto,
+        laajuus: {
+          minimi: 0,
+          maksimi: null,
+        },
+      },
+    });
   }
 });
 
@@ -387,7 +388,7 @@ const toggleDescription = (toggle?) => {
 };
 
 const addUusi = (root) => {
-  const template = ryhmaTemplate(uusi.value.tyyppi);
+  const template = ryhmaTemplate(uusi.value.tyyppi || '');
   if (uusi.value) {
     root.osat = [{
       ...template,
@@ -418,19 +419,22 @@ const tutkinnonosat = computed(() => {
 });
 
 const lisaaTutkinnonosat = (tutkinnonosat) => {
-  props.modelValue.osat = [
-    ...props.modelValue.osat,
-    ..._.map(tutkinnonosat, tosa => {
-      return {
-        kuvaus: null,
-        vieras: null,
-        tunniste: null,
-        pakollinen: false,
-        erikoisuus: null,
-        _tutkinnonOsaViite: tosa._tutkinnonOsaViite,
-      };
-    }),
-  ];
+  emit('update:modelValue', {
+    ...props.modelValue,
+    osat: [
+      ...props.modelValue.osat,
+      ..._.map(tutkinnonosat, tosa => {
+        return {
+          kuvaus: null,
+          vieras: null,
+          tunniste: null,
+          pakollinen: false,
+          erikoisuus: null,
+          _tutkinnonOsaViite: tosa._tutkinnonOsaViite,
+        };
+      }),
+    ],
+  });
 };
 
 const copy = () => {

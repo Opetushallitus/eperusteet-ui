@@ -144,21 +144,18 @@
 import _ from 'lodash';
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { MaarayksetStore, MaaraysQueryDto } from '@shared/stores/maarayksetStore';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+import { MaarayksetStore } from '@shared/stores/MaarayksetStore';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { MaaraysDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 import { Murupolku } from '@shared/stores/murupolku';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
-import { pinia } from '@/stores/pinia';
 import { $kaanna, $t, $sd } from '@shared/utils/globals';
 
 interface MaaraysQuery {
@@ -173,11 +170,7 @@ interface MaaraysQuery {
   tyyppi?: any,
 }
 
-
-const props = defineProps<{
-  maarayksetStore: MaarayksetStore;
-}>();
-
+const maarayksetStore = new MaarayksetStore();
 const route = useRoute();
 const router = useRouter();
 
@@ -201,8 +194,8 @@ onMounted(async () => {
 
 const maaraysId = computed(() => route.params.maaraysId);
 
-const maaraykset = computed(() => props.maarayksetStore.maaraykset.value?.data);
-const maarayksetCount = computed(() => props.maarayksetStore.maaraykset.value?.kokonaismäärä);
+const maaraykset = computed(() => maarayksetStore.maaraykset.value?.data);
+const maarayksetCount = computed(() => maarayksetStore.maaraykset.value?.kokonaismäärä);
 
 const tyyppiVaihtoehdot = computed(() => [
   MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
@@ -288,7 +281,7 @@ watch(query, async () => {
 }, { deep: true });
 
 const fetch = _.debounce(async () => {
-  await props.maarayksetStore.fetch(
+  await maarayksetStore.fetch(
     {
       ...query.value as any,
       kieli: Kielet.getSisaltoKieli.value,

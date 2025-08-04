@@ -76,7 +76,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
       res = (await TutkinnonosatPrivate.getViiteVersio(this.tutkinnonOsaViiteId, Number(rev.numero)));
     }
     else {
-      res = await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
+      res = await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
     }
     this.projektitJoissaKaytossa = (await (Perusteenosat.getOwningProjektit((res.data as any).tutkinnonOsa.id))).data;
     this.tutkinnonOsaId = Number((res.data as any)._tutkinnonOsa);
@@ -114,7 +114,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     if (this.tutkinnonOsaViiteId) {
       const res = await TutkinnonRakenne.updateTutkinnonOsa(
         this.perusteId,
-        TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!,
+        TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value!,
         this.tutkinnonOsaViiteId,
         data);
 
@@ -128,7 +128,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     else {
       const res = await TutkinnonRakenne.addTutkinnonOsa(
         this.perusteId,
-        TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!,
+        TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value!,
         data as any);
       await EditointiStore.cancelAll();
       await TutkinnonOsaEditStore.config.perusteStore.updateNavigation();
@@ -160,7 +160,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     if (!this.tutkinnonOsaViiteId) {
       return;
     }
-    await TutkinnonRakenne.removeTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
+    await TutkinnonRakenne.removeTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
     TutkinnonOsaEditStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tutkinnonOsaViiteId,
     });
@@ -223,7 +223,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public async copy(data) {
-    await TutkinnonRakenne.kloonaaTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId!);
+    await TutkinnonRakenne.kloonaaTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value as any, this.tutkinnonOsaViiteId as number);
     return true;
   }
 

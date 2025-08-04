@@ -19,7 +19,6 @@ import { PoistetutStore } from './PoistetutStore';
 import { DigitaalisetOsaamisetStore } from './DigitaalisetOsaamisetStore';
 import { YllapitoStore } from '@/stores/YllapitoStore';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
-import { MaarayksetStore } from '@shared/stores/maarayksetStore';
 
 // Create instances of class-based stores
 const arviointiStore = new ArviointiStore(Kielet);
@@ -40,7 +39,6 @@ const oppaatStore = new OppaatStore();
 const tyoryhmaStore = new TyoryhmaStore();
 const termitStore = new TermitStore();
 const tilastotStore = new TilastotStore();
-const maarayksetStore = new MaarayksetStore();
 const poistetutStore = new PoistetutStore();
 const yllapitoStore = new YllapitoStore();
 const osaamismerkitStore = new OsaamismerkitStore();
@@ -69,5 +67,4 @@ export const stores = Object.freeze({
   poistetutStore,
   yllapitoStore,
   osaamismerkitStore,
-  maarayksetStore,
 });

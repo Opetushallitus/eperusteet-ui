@@ -66,7 +66,7 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async save(data: Matala) {
-    const res = await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.id!, data);
+    const res = await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.state.tekstikappale!.id!, data);
 
     TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
       id: this.tekstiKappaleViiteId,
@@ -84,7 +84,7 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId, TekstikappaleStore.config?.perusteStore.perusteSuoritustapa.value!, this.tekstiKappaleViiteId);
+    await Sisallot.removeSisaltoViite(this.perusteId, TekstikappaleStore.config.perusteStore.perusteSuoritustapa.value!, this.tekstiKappaleViiteId);
     TekstikappaleStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tekstiKappaleViiteId,
     });
@@ -92,7 +92,7 @@ export class TekstikappaleStore implements IEditoitava {
 
   public async lock() {
     try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.id!);
+      const res = await Perusteenosat.checkPerusteenOsaLock(this.state.tekstikappale!.id!);
       return res.data;
     }
     catch (err) {
@@ -101,12 +101,12 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.id!);
+    const res = await Perusteenosat.lockPerusteenOsa(this.state.tekstikappale!.id!);
     return res.data;
   }
 
   public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.id!);
+    await Perusteenosat.unlockPerusteenOsa(this.state.tekstikappale!.id!);
   }
 
   public async preview() {
@@ -128,13 +128,13 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async revisions() {
-    const res = await Perusteenosat.getPerusteenOsaVersiot(this.id!);
+    const res = await Perusteenosat.getPerusteenOsaVersiot(this.state.tekstikappale!.id!);
     return res.data as Revision[];
   }
 
   public async restore(rev: number) {
     await this.acquire();
-    await Perusteenosat.revertPerusteenOsaToVersio(this.id!, rev);
+    await Perusteenosat.revertPerusteenOsaToVersio(this.state.tekstikappale!.id!, rev);
     await this.release();
   }
 

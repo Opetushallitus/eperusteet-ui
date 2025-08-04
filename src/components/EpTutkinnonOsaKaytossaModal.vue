@@ -70,8 +70,8 @@ import { $t, $kaanna, $sd, $bvModal } from '@shared/utils/globals';
 const props = defineProps<{
   projektit: PerusteprojektinPerusteenosaDto[];
   alkuperainenPeruste?: PerusteInfoDto;
-  kopioi: Function;
-  muokkaa: Function;
+  kopioi: () => void;
+  muokkaa: () => void;
 }>();
 
 const route = useRoute();

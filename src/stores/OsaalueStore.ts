@@ -42,7 +42,7 @@ export class OsaalueStore implements IEditoitava {
       };
     }
     else {
-      const tutkinnonOsaViite = (await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, OsaalueStore.config?.perusteStore.perusteSuoritustapa.value!, this.tovId)).data;
+      const tutkinnonOsaViite = (await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, OsaalueStore.config.perusteStore.perusteSuoritustapa.value as any, this.tovId)).data;
       supportDataProvider(tutkinnonOsaViite);
 
       return (await OsaAlueet.getOsaAlueV2(this.tovId, Number(this.osaalueId))).data;
@@ -78,6 +78,7 @@ export class OsaalueStore implements IEditoitava {
       }
     }
     catch (err) {
+      // Ignore error when releasing lock
     }
   }
 

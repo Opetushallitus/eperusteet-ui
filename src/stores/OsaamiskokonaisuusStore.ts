@@ -33,16 +33,16 @@ export class OsaamiskokonaisuusStore extends AbstractPerusteenOsaViiteStore {
 
     if (_.isEmpty(tekstikappaleIsa)) {
       const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
-        OsaamiskokonaisuusStore.config.perusteStore.perusteId.value!,
-        OsaamiskokonaisuusStore.config?.perusteStore.perusteSuoritustapa.value!,
+        OsaamiskokonaisuusStore.config.perusteStore.perusteId.value as number,
+        OsaamiskokonaisuusStore.config.perusteStore.perusteSuoritustapa.value as any,
         perusteenOsa,
       ));
       return tallennettu.data;
     }
     else {
       const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
-        OsaamiskokonaisuusStore.config.perusteStore.perusteId.value!,
-        OsaamiskokonaisuusStore.config?.perusteStore.perusteSuoritustapa.value!,
+        OsaamiskokonaisuusStore.config.perusteStore.perusteId.value as number,
+        OsaamiskokonaisuusStore.config.perusteStore.perusteSuoritustapa.value as any,
         tekstikappaleIsa.id,
         perusteenOsa,
       ));
