@@ -175,7 +175,7 @@ const rules = computed(() => ({
   },
 }));
 
-const v$ = useVuelidate(rules, { julkaisu: julkaisu });
+const v$ = useVuelidate(rules, { julkaisu: julkaisu }, { $stopPropagation: true });
 
 const checkValidity = () => {
   emit('setInvalid', v$.value.$invalid);

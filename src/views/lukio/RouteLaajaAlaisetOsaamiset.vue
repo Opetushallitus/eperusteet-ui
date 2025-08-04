@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="store">
+  <EpEditointi v-if="store" :store="store">
     <template #header>
       <h3>{{ $t('laaja-alaisen-osaamisen-osa-alueet') }}</h3>
     </template>
@@ -158,9 +158,9 @@ const koodisto = new KoodistoSelectStore({
 
 const lisaaLaajaAlainenOsaaminen = () => {
   store.value?.setData({
-    ...store.value.data.value,
+    ...store.value.data,
     laajaAlaisetOsaamiset: [
-      ...store.value.data.value!.laajaAlaisetOsaamiset,
+      ...store.value.data.laajaAlaisetOsaamiset,
       {},
     ],
   });
@@ -168,7 +168,7 @@ const lisaaLaajaAlainenOsaaminen = () => {
 
 const poistaLaajaAlainenOsaaminen = (poistettavaLao: any) => {
   store.value?.setData({
-    ...store.value.data.value,
+    ...store.value.data,
     laajaAlaisetOsaamiset: _.filter(laajaAlaisetOsaamiset.value, lao => lao !== poistettavaLao),
   });
 };

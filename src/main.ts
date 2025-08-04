@@ -48,6 +48,7 @@ import Kaannos from '@shared/plugins/kaannos';
 import { createHead } from '@unhead/vue/client';
 import Sticky from 'vue-sticky-directive';
 import { TaiteenalaStore } from './stores/TaiteenalaStore';
+import { LukioOppiaineStore } from './stores/LukioOppiaineStore';
 
 const app = createApp(App);
 
@@ -203,6 +204,10 @@ app.use(PerusopetusOppiaineStore, {
 
 app.use(TaiteenalaStore, {
   perusteStore: stores.perusteStore,
+  router,
+});
+
+app.use(LukioOppiaineStore, {
   router,
 });
 

@@ -5,6 +5,7 @@
   >
     <EpTestiymparisto />
 
+
     <div class="view-container">
       <div
         ref="header"
@@ -43,7 +44,6 @@ import EpTestiymparisto from '@shared/components/EpTestiymparisto/EpTestiymparis
 import { baseURL } from '@shared/api/eperusteet';
 import { $t } from '@shared/utils/globals';
 
-
 const props = defineProps<{
   browserStore: BrowserStore;
   kayttajaStore: KayttajaStore;
@@ -65,13 +65,16 @@ const routeStickyNavi = computed(() => {
 });
 
 const routeName = computed(() => {
-  return route.name;
+  return route.name as string;
 });
 
 const meta = computed(() => {
   const lang = _.get(route, 'params.lang');
+  const routeKey = 'route-' + routeName.value;
+  const routeTitle = routeName.value !== 'root' && $t(routeKey) !== routeKey ? $t(routeKey) : null;
   return {
-    title: $t('eperusteet-laadinta'),
+    title: routeTitle || $t('eperusteet'),
+    titleTemplate: routeTitle ? '%s - ' + $t('eperusteet') : null,
     htmlAttrs: {
       lang: lang || 'fi',
     },

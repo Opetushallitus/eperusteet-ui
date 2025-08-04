@@ -405,16 +405,16 @@ const keskeisetSisallotDragOptions = computed(() => {
 // Methods
 function poistaSisaltoalue(poistettavaSisaltoalue) {
   store.value?.setData({
-    ...store.value.data.value,
-    sisallot: _.without(store.value.data.value.sisallot, poistettavaSisaltoalue),
+    ...store.value.data,
+    sisallot: _.without(store.value.data.sisallot, poistettavaSisaltoalue),
   });
 }
 
 function lisaaSisaltoalue() {
   store.value?.setData({
-    ...store.value.data.value,
+    ...store.value.data,
     sisallot: [
-      ...store.value.data.value.sisallot,
+      ...store.value.data.sisallot,
       {
         sisallot: [],
       },
@@ -424,21 +424,21 @@ function lisaaSisaltoalue() {
 
 function poistaTavoite(poistettavaTavoite) {
   store.value?.setData({
-    ...store.value.data.value,
+    ...store.value.data,
     tavoitteet: {
-      ...store.value.data.value.tavoitteet,
-      tavoitteet: _.filter(store.value.data.value.tavoitteet.tavoitteet, tavoite => tavoite !== poistettavaTavoite),
+      ...store.value.data.tavoitteet,
+      tavoitteet: _.filter(store.value.data.tavoitteet.tavoitteet, tavoite => tavoite !== poistettavaTavoite),
     },
   });
 }
 
 function lisaaTavoite() {
   store.value?.setData({
-    ...store.value.data.value,
+    ...store.value.data,
     tavoitteet: {
-      ...store.value.data.value.tavoitteet,
+      ...store.value.data.tavoitteet,
       tavoitteet: [
-        ...store.value.data.value.tavoitteet.tavoitteet,
+        ...store.value.data.tavoitteet.tavoitteet,
         [],
       ],
     },

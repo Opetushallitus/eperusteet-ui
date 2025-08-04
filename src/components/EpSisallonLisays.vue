@@ -515,7 +515,7 @@ const uusiVaihe = async () => {
 const uusiLukioOppiaine = async (oppiaineId?) => {
   router.push({
     name: 'lukio_oppiaine',
-    ...(oppiaineId && { params: { parentId: oppiaineId } }),
+    ...(oppiaineId && { query: { parentId: oppiaineId } }),
   });
 };
 

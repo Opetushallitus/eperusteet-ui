@@ -1,6 +1,6 @@
 <template>
   <VueDraggable
-    v-if="value"
+    v-if="modelValue"
     v-bind="options"
     v-model="model"
     tag="div"
@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, withDefaults } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import _ from 'lodash';
 import { RooliToTheme, ColorMap } from '@/components/muodostuminen/utils';
@@ -101,14 +101,19 @@ function swapped<T>(array: T[], a: number, b: number): T[] {
   return result;
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: any[];
   isEditing?: boolean;
   depth?: number;
   tutkinnonOsatMap: any;
   parentMandatory?: boolean | null;
   copyToClipBoard?: (node: any) => void;
-}>();
+}>(), {
+  parentMandatory: null,
+  depth: 0,
+  isEditing: false,
+  copyToClipBoard: () => {},
+});
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -168,6 +173,7 @@ const options = computed(() => {
     group: {
       name: 'rakennepuu',
       pull: true,
+      put: true,
     },
     disabled: !props.isEditing,
     ghostClass: 'rakenne-placeholder',

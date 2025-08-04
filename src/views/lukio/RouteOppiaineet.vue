@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="store">
+  <EpEditointi v-if="store" :store="store">
     <template #header>
       <h3>{{ $t('oppiaineet') }}</h3>
     </template>
@@ -87,7 +87,7 @@ const router = useRouter();
 const store = ref<EditointiStore | null>(null);
 
 const perusteId = computed(() => {
-  return props.perusteStore.perusteId.value;
+  return props.perusteStore.perusteId;
 });
 
 onMounted(async () => {

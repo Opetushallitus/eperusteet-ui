@@ -85,6 +85,7 @@ import { convertRouteParamsToNumbers } from '@/utils/routing';
 const props = (route: any) => {
   return {
     ...convertRouteParamsToNumbers(route.params),
+    ...convertRouteParamsToNumbers(route.query),
     ...stores,
   };
 };
@@ -638,7 +639,9 @@ window.addEventListener('beforeunload', e => {
 });
 
 router.beforeEach((to, from, next) => {
-  loader = $loading.show();
+  if (!EditointiStore.anyEditing()) {
+    loader = $loading.show();
+  }
   next();
 });
 

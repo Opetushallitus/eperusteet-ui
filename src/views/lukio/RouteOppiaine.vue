@@ -398,7 +398,6 @@ watch(() => props.oppiaineId, async () => {
     props.oppiaineId,
     props.parentId,
     props.perusteStore,
-    null,
   );
   store.value = new EditointiStore(lukioOppiaineStore);
 }, { immediate: true });
@@ -414,21 +413,21 @@ const storeData = computed({
 
 const poistaTavoitealue = (poistettavaTavoitealue) => {
   store.value?.setData({
-    ...store.value.data.value,
+    ...store.value.data,
     tavoitteet: {
-      ...store.value.data.value.tavoitteet,
-      tavoitealueet: _.filter(store.value.data.value.tavoitteet.tavoitealueet, tavoitealue => tavoitealue !== poistettavaTavoitealue),
+      ...store.value.data.tavoitteet,
+      tavoitealueet: _.filter(store.value.data.tavoitteet.tavoitealueet, tavoitealue => tavoitealue !== poistettavaTavoitealue),
     },
   });
 };
 
 const lisaaTavoitealue = () => {
   store.value?.setData({
-    ...store.value.data.value,
+    ...store.value.data,
     tavoitteet: {
-      ...store.value.data.value.tavoitteet,
+      ...store.value.data.tavoitteet,
       tavoitealueet: [
-        ...store.value.data.value.tavoitteet.tavoitealueet,
+        ...store.value.data.tavoitteet.tavoitealueet,
         {
           tavoitteet: [],
         },
@@ -464,7 +463,7 @@ const oppiaineetDragOptions = computed(() => {
 const lisaaOppimaara = () => {
   router.push({
     name: 'lukio_oppiaine',
-    params: {
+    query: {
       parentId: props.oppiaineId,
     },
   });
