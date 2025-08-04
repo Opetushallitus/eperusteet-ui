@@ -10,7 +10,7 @@ export class PerusteEditStore implements IEditoitava {
     private projektiId: number,
     private perusteId: number,
     private perusteStore: PerusteStore,
-    private postSave: Function,
+    private postSave: () => void,
   ) {
   }
 

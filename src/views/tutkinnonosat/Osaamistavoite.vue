@@ -34,10 +34,10 @@ import { $t } from '@shared/utils/globals';
 import _ from 'lodash';
 
 const props = defineProps<{
-  modelValue: Object;
+  modelValue: object;
   isValinnainen: boolean;
   isEditing?: boolean;
-  validation?: Object;
+  validation?: object;
 }>();
 
 const emit = defineEmits(['update:modelValue']);

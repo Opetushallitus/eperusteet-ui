@@ -1,11 +1,11 @@
-import { Location } from 'vue-router';
+import { RouteLocationNormalized, RouteLocationRaw } from 'vue-router';
 import { NavigationNodeDto } from '@shared/tyypit';
 import * as _ from 'lodash';
 import { ILinkkiHandler } from '@shared/components/EpContent/LinkkiHandler';
 
 const ignoredRouteNames = ['kasitteet', 'opasKasitteet', 'poistetut', 'opas', 'oppaanTiedot', 'julkaise', 'perusteprojekti', 'perusteenTiedot'];
 
-export function routeToNode(route: Location): NavigationNodeDto | null {
+export function routeToNode(route: RouteLocationNormalized): NavigationNodeDto | null {
   if (!route || _.includes(ignoredRouteNames, route.name)) {
     return null;
   }
@@ -14,7 +14,7 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
   case 'tekstikappale':
     return {
       type: 'viite',
-      id: Number(route.params?.tekstiKappaleId!),
+      id: Number(route.params.tekstiKappaleId),
     };
   case 'muodostuminen':
     return {
@@ -23,12 +23,12 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
   case 'osaalue':
     return {
       type: 'osaalue',
-      id: Number(route.params?.osaalueId!),
+      id: Number(route.params.osaalueId),
     };
   case 'tutkinnonosa':
     return {
       type: 'tutkinnonosaviite',
-      id: Number(route.params?.tutkinnonOsaId!),
+      id: Number(route.params.tutkinnonOsaId),
     };
   case 'kvliite':
     return {
@@ -41,42 +41,42 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
   case 'opintokokonaisuus':
     return {
       type: 'opintokokonaisuus',
-      id: Number(route.params?.opintokokonaisuusId!),
+      id: Number(route.params.opintokokonaisuusId),
     };
   case 'koulutuksenosa':
     return {
       type: 'koulutuksenosa',
-      id: Number(route.params?.koulutuksenosaId!),
+      id: Number(route.params.koulutuksenosaId),
     };
   case 'laajaalainenosaaminen':
     return {
       type: 'laajaalainenosaaminen',
-      id: Number(route.params?.laajaalainenosaaminenId!),
+      id: Number(route.params.laajaalainenosaaminenId),
     };
   case 'tavoitesisaltoalue':
     return {
       type: 'tavoitesisaltoalue',
-      id: Number(route.params?.tavoitesisaltoalueId!),
+      id: Number(route.params.tavoitesisaltoalueId),
     };
   case 'koto_kielitaitotaso':
     return {
       type: 'koto_kielitaitotaso',
-      id: Number(route.params?.kotokielitaitotasoId!),
+      id: Number(route.params.kotokielitaitotasoId),
     };
   case 'koto_opinto':
     return {
       type: 'koto_opinto',
-      id: Number(route.params?.kotoOpintoId!),
+      id: Number(route.params.kotoOpintoId),
     };
   case 'koto_laajaalainenosaaminen':
     return {
       type: 'koto_laajaalainenosaaminen',
-      id: Number(route.params?.kotoLaajaalainenOsaaminenId!),
+      id: Number(route.params.kotoLaajaalainenOsaaminenId),
     };
   case 'aipelaajaAlainenOsaaminen':
     return {
       type: 'aipe_laajaalainenosaaminen',
-      id: Number(route.params?.laoId!),
+      id: Number(route.params.laoId),
     };
   case 'aipeLaajaAlaisetOsaamiset':
     return {
@@ -85,38 +85,38 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
   case 'aipevaihe':
     return {
       type: 'aipevaihe',
-      id: Number(route.params?.vaiheId!),
+      id: Number(route.params.vaiheId),
     };
   case 'aipeoppiaine':
-    if (route.params?.oppiaineId) {
+    if (route.params.oppiaineId) {
       return {
         type: 'aipeoppiaine',
-        id: Number(route.params?.oppiaineId!),
+        id: Number(route.params.oppiaineId),
       };
     }
     return {
       type: 'aipevaihe',
-      id: Number(route.params?.vaiheId!),
+      id: Number(route.params.vaiheId),
     };
   case 'aipekurssi':
     return {
       type: 'aipekurssi',
-      id: Number(route.params?.kurssiId!),
+      id: Number(route.params.kurssiId),
     };
   case 'taiteenala':
     return {
       type: 'taiteenala',
-      id: Number(route.params?.taiteenalaId!),
+      id: Number(route.params.taiteenalaId),
     };
   case 'lukio_oppiaine':
     return {
       type: 'oppiaine',
-      id: Number(route.params?.oppiaineId!),
+      id: Number(route.params.oppiaineId),
     };
   case 'moduuli':
     return {
       type: 'moduuli',
-      id: Number(route.params?.moduuliId!),
+      id: Number(route.params.moduuliId),
     };
   case 'lukio_oppiaineet':
     return {
@@ -129,17 +129,17 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
   case 'osaamiskokonaisuus':
     return {
       type: 'osaamiskokonaisuus',
-      id: Number(route.params?.osaamiskokonaisuusId),
+      id: Number(route.params.osaamiskokonaisuusId),
     };
   case 'osaamiskokonaisuus_paa_alue':
     return {
       type: 'osaamiskokonaisuus_paa_alue',
-      id: Number(route.params?.osaamiskokonaisuusPaaAlueId),
+      id: Number(route.params.osaamiskokonaisuusPaaAlueId),
     };
   case 'perusopetusoppiaine':
     return {
       type: 'perusopetusoppiaine',
-      id: Number(route.params?.oppiaineId!),
+      id: Number(route.params.oppiaineId),
     };
   case 'perusopetusOppiaineet':
     return {
@@ -156,12 +156,12 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
   case 'perusopetusLaajaAlainenOsaaminen':
     return {
       type: 'perusopetuslaajaalainenosaaminen',
-      id: Number(route.params?.laoId!),
+      id: Number(route.params.laoId),
     };
   case 'perusopetusVuosiluokkakokonaisuus':
     return {
       type: 'vuosiluokkakokonaisuus',
-      id: Number(route.params?.vlkId!),
+      id: Number(route.params.vlkId),
     };
   default:
     console.error('Unknown route', route.name, route);
@@ -171,7 +171,7 @@ export function routeToNode(route: Location): NavigationNodeDto | null {
   return null;
 }
 
-export function nodeToRoute(node: NavigationNodeDto): Location | null {
+export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
   if (!node) {
     return null;
   }
@@ -275,6 +275,89 @@ export function nodeToRoute(node: NavigationNodeDto): Location | null {
         oppiaineId: _.toString(node.id),
       },
     };
+  case 'aipe_laajaalainenosaaminen':
+    return {
+      name: 'aipelaajaAlainenOsaaminen',
+      params: {
+        laoId: _.toString(node.id),
+      },
+    };
+  case 'aipevaihe':
+    return {
+      name: 'aipevaihe',
+      params: {
+        vaiheId: _.toString(node.id),
+      },
+    };
+  case 'aipeoppiaine':
+    return {
+      name: 'aipeoppiaine',
+      params: {
+        oppiaineId: _.toString(node.id),
+      },
+    };
+  case 'aipekurssi':
+    return {
+      name: 'aipekurssi',
+      params: {
+        kurssiId: _.toString(node.id),
+      },
+    };
+  case 'taiteenala':
+    return {
+      name: 'taiteenala',
+      params: {
+        taiteenalaId: _.toString(node.id),
+      },
+    };
+  case 'oppiaine':
+    return {
+      name: 'lukio_oppiaine',
+      params: {
+        oppiaineId: _.toString(node.id),
+      },
+    };
+  case 'moduuli':
+    return {
+      name: 'moduuli',
+      params: {
+        moduuliId: _.toString(node.id),
+      },
+    };
+  case 'lukio_oppiaineet':
+    return {
+      name: 'lukio_oppiaineet',
+    };
+  case 'lukio_laajaAlaisetOsaamiset':
+    return {
+      name: 'lukio_laajaAlaisetOsaamiset',
+    };
+  case 'perusopetusOppiaineet':
+    return {
+      name: 'perusopetusOppiaineet',
+    };
+  case 'perusopetusLaajaAlaisetOsaamiset':
+    return {
+      name: 'perusopetusLaajaAlaisetOsaamiset',
+    };
+  case 'perusopetusVuosiluokkakokonaisuudet':
+    return {
+      name: 'perusopetusVuosiluokkakokonaisuudet',
+    };
+  case 'perusopetuslaajaalainenosaaminen':
+    return {
+      name: 'perusopetusLaajaAlainenOsaaminen',
+      params: {
+        laoId: _.toString(node.id),
+      },
+    };
+  case 'vuosiluokkakokonaisuus':
+    return {
+      name: 'perusopetusVuosiluokkakokonaisuus',
+      params: {
+        vlkId: _.toString(node.id),
+      },
+    };
   case 'kvliite':
     return {
       name: 'kvliite',
@@ -295,7 +378,7 @@ export function nodeToRoute(node: NavigationNodeDto): Location | null {
 }
 
 export class LinkkiHandler implements ILinkkiHandler {
-  nodeToRoute(node: NavigationNodeDto): Location | null {
+  nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
     return nodeToRoute(node);
   }
 }

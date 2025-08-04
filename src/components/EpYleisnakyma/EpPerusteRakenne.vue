@@ -75,15 +75,15 @@ const tekstikappaleita = computed(() => {
 });
 
 const hasLisasisalto = computed(() => {
-  return !!_.get(koulutustyyppiLisasisalto, peruste.value?.koulutustyyppi!);
+  return !!_.get(koulutustyyppiLisasisalto, peruste.value?.koulutustyyppi || '');
 });
 
 const lisasisaltoOtsikko = computed(() => {
-  return koulutustyyppiLisasisalto[peruste.value?.koulutustyyppi!]['otsikko'];
+  return koulutustyyppiLisasisalto[peruste.value?.koulutustyyppi || '']?.['otsikko'];
 });
 
 const lisasisaltoMaara = computed(() => {
-  return _.size(_.filter(sisaltoFlat.value, sisalto => sisalto.type === koulutustyyppiLisasisalto[peruste.value?.koulutustyyppi!]['tietue']));
+  return _.size(_.filter(sisaltoFlat.value, sisalto => sisalto.type === koulutustyyppiLisasisalto[peruste.value?.koulutustyyppi || '']?.['tietue']));
 });
 </script>
 

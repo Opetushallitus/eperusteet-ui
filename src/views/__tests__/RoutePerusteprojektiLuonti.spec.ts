@@ -61,7 +61,7 @@ describe('RoutePohjatLuonti component', () => {
       });
   }
 
-  test.only('Renders first step text', async () => {
+  test('Renders first step text', async () => {
     const wrapper = mountWrapper({});
 
     expect(wrapper.find('.steps').text()).toContain('pohjan-valinta');
@@ -80,7 +80,7 @@ describe('RoutePohjatLuonti component', () => {
       .text()).toContain('tuo-tiedostosta');
   });
 
-  test.only('Projektin luonti canceled', async () => {
+  test('Projektin luonti canceled', async () => {
     let currentRoute;
     const wrapper = mountWrapper({}, {});
 

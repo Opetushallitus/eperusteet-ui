@@ -33,7 +33,7 @@ export class MuodostuminenStore implements IEditoitava {
     let peruste = {} as any;
     [peruste, data] = _.map(await (Promise.all([
       Perusteet.getPerusteenTiedot(this.perusteId),
-      TutkinnonRakenne.getRakenne(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!),
+      TutkinnonRakenne.getRakenne(this.perusteId, MuodostuminenStore.config.perusteStore.perusteSuoritustapa.value as any),
     ])), 'data');
     return {
       rakenne: {
@@ -57,7 +57,7 @@ export class MuodostuminenStore implements IEditoitava {
 
     await Perusteet.updateOsaamisalat(this.perusteId, data.osaamisalat);
     await Perusteet.updateTutkintonimikkeet(this.perusteId, data.tutkintonimikkeet);
-    await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!, rakenne as any);
+    await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, MuodostuminenStore.config.perusteStore.perusteSuoritustapa.value as any, rakenne as any);
   }
 
   public readonly validator = computed(() => {
@@ -77,7 +77,7 @@ export class MuodostuminenStore implements IEditoitava {
 
   public async lock() {
     try {
-      const res = await Api.get(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`);
+      const res = await Api.get(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config.perusteStore.perusteSuoritustapa.value as any}/rakenne/lukko`);
       return res.data;
     }
     catch (err) {
@@ -86,15 +86,15 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async acquire() {
-    const res = await Api.post(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`, {
+    const res = await Api.post(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config.perusteStore.perusteSuoritustapa.value as any}/rakenne/lukko`, {
       osanId: this.perusteId,
-      suoritustapa: MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!,
+      suoritustapa: MuodostuminenStore.config.perusteStore.perusteSuoritustapa.value as any,
     });
     return res.data;
   }
 
   public async release() {
-    await Api.delete(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!}/rakenne/lukko`);
+    await Api.delete(`/api/perusteet/${this.perusteId}/suoritustavat/${MuodostuminenStore.config.perusteStore.perusteSuoritustapa.value as any}/rakenne/lukko`);
   }
 
   public async preview() {
@@ -109,12 +109,12 @@ export class MuodostuminenStore implements IEditoitava {
   }
 
   public async revisions() {
-    const res = await TutkinnonRakenne.getRakenneVersiot(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!);
+    const res = await TutkinnonRakenne.getRakenneVersiot(this.perusteId, MuodostuminenStore.config.perusteStore.perusteSuoritustapa.value as any);
     return res.data as any;
   }
 
   public async restore(rev: number) {
-    await TutkinnonRakenne.revertRakenneVersio(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value!, rev);
+    await TutkinnonRakenne.revertRakenneVersio(this.perusteId, MuodostuminenStore.config?.perusteStore.perusteSuoritustapa.value as any, rev);
   }
 
   public async validate() {
