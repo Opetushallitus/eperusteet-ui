@@ -189,8 +189,12 @@ const eprakennemodalNew = useTemplateRef('eprakennemodalNew');
 const tutkinnonosatModal = useTemplateRef('tutkinnonosatModal');
 
 watch(() => props.pakollinen, () => {
+  pakollinenChanged();
+});
+
+const pakollinenChanged = () => {
   innerModel.value = { ...innerModel.value, pakollinen: props.pakollinen };
-}, { immediate: true });
+};
 
 const innerModel = computed({
   get() {
@@ -244,6 +248,8 @@ const laskettu = computed(() => {
 });
 
 onMounted(() => {
+  pakollinenChanged();
+
   if (!props.modelValue.muodostumisSaanto) {
     emit('update:modelValue', {
       ...props.modelValue,
@@ -462,6 +468,7 @@ defineExpose({
 
   .nimi {
     font-weight: 600;
+    user-select: none;
   }
 }
 

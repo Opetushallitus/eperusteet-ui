@@ -16,10 +16,6 @@
   },
   "dependencies": {
     "@kyvg/vue3-notification": "^3.4.1",
-    "@tiptap/extension-underline": "^2.25.0",
-    "@tiptap/pm": "^2.25.0",
-    "@tiptap/starter-kit": "^2.25.0",
-    "@tiptap/vue-3": "^2.25.0",
     "@types/lodash": "4.14.202",
     "@types/qs": "^6.9.1",
     "@types/uuid": "^7.0.0",

@@ -35,6 +35,7 @@ export class DokumenttiStore {
 
   @Debounced(2000)
   async getDokumenttiTila() {
+    console.log('getDokumenttiTila');
     if (!this.state.dokumentti) {
       this.state.dokumentti = (await Dokumentit.getLatestDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value, this.suoritustapa, this.version)).data;
     }
@@ -59,7 +60,9 @@ export class DokumenttiStore {
   }
 
   async getJulkaistuDokumentti() {
+    console.log('getJulkaistuDokumentti', this.state.dokumenttiJulkaisu);
     if (!this.state.dokumenttiJulkaisu || _.kebabCase(this.state.dokumenttiJulkaisu?.tila) === _.kebabCase(DokumenttiDtoTilaEnum.EPAONNISTUI)) {
+      console.log('getJulkaistuDokumentti2');
       this.state.dokumenttiJulkaisu = (await Dokumentit.getJulkaistuDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value)).data;
       if (this.state.dokumenttiJulkaisu?.id) {
         this.state.dokumenttiJulkaisuHref = baseURL + DokumentitParams.getDokumentti(_.toString(this.state.dokumenttiJulkaisu.id)).url;

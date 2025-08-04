@@ -23,7 +23,7 @@
               {{ $t('koulutustyyppi-info') }}
             </p>
             <template v-if="isEditing">
-              <b-form-radio
+              <EpRadio
                 v-for="type in koulutusOsanKoulutustyypit"
                 :key="type"
                 v-model="data.koulutusOsanKoulutustyyppi"
@@ -33,7 +33,7 @@
                 :validation="validation.koulutusOsanKoulutustyyppi"
               >
                 {{ $t(type) }}
-              </b-form-radio>
+              </EpRadio>
             </template>
             <template v-else>
               {{ $t(data.koulutusOsanKoulutustyyppi) }}
@@ -89,15 +89,6 @@
                 </div>
               </template>
             </EpKoodistoSelect>
-            <EpInput
-              ref="inputNimi"
-              class="sr-only"
-              aria-hidden="true"
-              :value="data.nimi"
-              :is-editing="isEditing"
-              :validation="validation.nimi"
-              @input="data.nimi = setNimiValue(data.nimiKoodi)"
-            />
           </b-form-group>
         </b-col>
         <b-col md="4">
@@ -142,7 +133,7 @@
             required
           >
             <template v-if="isEditing">
-              <b-form-radio
+              <EpRadio
                 v-for="type in koulutusOsanTyypit"
                 :key="type"
                 v-model="data.koulutusOsanTyyppi"
@@ -152,7 +143,7 @@
                 :validation="validation.koulutusOsanTyyppi"
               >
                 {{ $t(type) }}
-              </b-form-radio>
+              </EpRadio>
             </template>
             <template v-else>
               {{ $t(data.koulutusOsanTyyppi) }}
@@ -322,10 +313,6 @@
       </b-row>
     </template>
   </EpEditointi>
-  <EpSpinner
-    v-else
-    class="my-3"
-  />
 </template>
 
 <script setup lang="ts">
@@ -352,6 +339,7 @@ import {
 } from '@shared/api/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -359,8 +347,6 @@ const props = defineProps<{
 
 const route = useRoute();
 const store = ref<EditointiStore | null>(null);
-const tempNimiValue = ref(null);
-const inputNimi =  useTemplateRef('inputNimi');
 
 const perusteId = computed(() => {
   return props.perusteStore.perusteId.value;
@@ -436,16 +422,15 @@ const fetch = async () => {
     versionumero.value,
   );
   store.value = new EditointiStore(tkstore);
-  tempNimiValue.value = null;
 };
 
 const onAddListItem = (array: string): void => {
   if (!store.value) return;
 
   store.value.setData({
-    ...store.value.data.value,
+    ...store.value.data,
     [array]: [
-      ..._.get(store.value.data.value, array),
+      ..._.get(store.value.data, array),
       {},
     ],
   });
@@ -455,19 +440,28 @@ const onRemoveListItem = (rowToRemove: any, array: string) => {
   if (!store.value) return;
 
   store.value.setData({
-    ...store.value.data.value,
-    [array]: _.filter(_.get(store.value.data.value, array), rivi => rivi !== rowToRemove),
+    ...store.value.data,
+    [array]: _.filter(_.get(store.value.data, array), rivi => rivi !== rowToRemove),
   });
 };
 
-const onNimiKoodiAdd = () => {
-  if (!inputNimi.value) return;
+const storeData = computed({
+  get() {
+    return store.value?.data;
+  },
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 
-  // possible broken
-  (inputNimi.value.$el.querySelector('input') as HTMLInputElement)?.dispatchEvent(new Event('input'));
+const onNimiKoodiAdd = () => {
+  storeData.value = {
+    ...storeData.value,
+    nimi: getNimiValueFromNimiKooodi(storeData.value.nimiKoodi),
+  };
 };
 
-const setNimiValue = (nimiKoodi: any) => {
+const getNimiValueFromNimiKooodi = (nimiKoodi: any) => {
   if (!nimiKoodi?.nimi) return {};
 
   const julkaisukielet = props.perusteStore.julkaisukielet.value;

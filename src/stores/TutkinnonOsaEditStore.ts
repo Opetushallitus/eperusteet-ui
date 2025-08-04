@@ -8,6 +8,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { Kielet } from '@shared/stores/kieli';
 import { App } from 'vue';
 import { Router } from 'vue-router';
+import { $t } from '@shared/utils/globals';
 
 export function notNull() {
   return {
@@ -33,7 +34,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     private readonly perusteId: number,
     // Jos undefined, luodaan uusi
     private readonly tutkinnonOsaViiteId?: any,
-    private readonly el?: any,
     public versionumero?: number,
   ) {
     if (!TutkinnonOsaEditStore.config?.perusteStore) {
@@ -57,7 +57,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
           tyyppi: 'normaali',
           osanTyyppi: 'tutkinnonosa',
           ammattitaitovaatimukset2019: {
-            kohde: { [Kielet.getSisaltoKieli.value]: this.el.$t('opiskelija') },
+            kohde: { [Kielet.getSisaltoKieli.value]: $t('opiskelija') },
             vaatimukset: [],
             kohdealueet: [],
           },
@@ -150,11 +150,11 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     // Noop
   }
 
-  public readonly validator = computed(() => {
-    return {
-      tutkinnonOsa: {},
-    };
-  });
+  // public readonly validator = computed(() => {
+  //   return {
+  //     tutkinnonOsa: {},
+  //   };
+  // });
 
   public async remove() {
     if (!this.tutkinnonOsaViiteId) {

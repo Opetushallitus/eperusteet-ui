@@ -262,10 +262,6 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { VueDraggable } from 'vue-draggable-plus';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { TermitStore } from '@/stores/TermitStore';
-import { KuvaStore } from '@/stores/KuvaStore';
-import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { generateTemporaryKoodiUri } from '@shared/utils/koodi';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
@@ -344,9 +340,9 @@ const fetch = async () => {
 
 const lisaa = (array: string, koodisto?: string) => {
   store.value?.setData({
-    ...store.value?.data.value,
+    ...store.value?.data,
     [array]: [
-      ..._.get(store.value?.data.value, array),
+      ..._.get(store.value?.data, array),
       {
         ...(koodisto && { uri: generateTemporaryKoodiUri(koodisto) }),
       },
@@ -356,8 +352,8 @@ const lisaa = (array: string, koodisto?: string) => {
 
 const poista = (poistettavaRivi: any, array: string) => {
   store.value?.setData({
-    ...store.value?.data.value,
-    [array]: _.filter(_.get(store.value?.data.value, array), rivi => rivi !== poistettavaRivi),
+    ...store.value?.data,
+    [array]: _.filter(_.get(store.value?.data, array), rivi => rivi !== poistettavaRivi),
   });
 };
 

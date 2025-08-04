@@ -525,30 +525,24 @@
 
                     <div v-if="isEditing">
                       <div class="mb-4">
-                        <b-form-radio-group
+                        <EpRadio
                           v-model="data.poikkeamismaaraysTyyppi"
-                          stacked
-                          class="mb-2"
-                        >
-                          <b-form-radio
-                            value="ei_tarvita_ohjetta"
-                            name="poikkeamismaaraysTyyppi"
-                          >
-                            {{ $t('voi-kayttaa-tutkintoviennissa') }}
-                          </b-form-radio>
-                          <b-form-radio
-                            value="ei_voi_poiketa"
-                            name="poikkeamismaaraysTyyppi"
-                          >
-                            {{ $t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa') }}
-                          </b-form-radio>
-                          <b-form-radio
-                            value="koulutusvientiliite"
-                            name="poikkeamismaaraysTyyppi"
-                          >
-                            {{ $t('maarays-tutkinnon-perusteista-poikkeamiseen-tutkintoviennissa') }}
-                          </b-form-radio>
-                        </b-form-radio-group>
+                          value="ei_tarvita_ohjetta"
+                          name="poikkeamismaaraysTyyppi"
+                          :label="$t('voi-kayttaa-tutkintoviennissa')"
+                        />
+                        <EpRadio
+                          v-model="data.poikkeamismaaraysTyyppi"
+                          value="ei_voi_poiketa"
+                          name="poikkeamismaaraysTyyppi"
+                          :label="$t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa')"
+                        />
+                        <EpRadio
+                          v-model="data.poikkeamismaaraysTyyppi"
+                          value="koulutusvientiliite"
+                          name="poikkeamismaaraysTyyppi"
+                          :label="$t('maarays-tutkinnon-perusteista-poikkeamiseen-tutkintoviennissa')"
+                        />
 
                         <EpButton
                           v-if="data.poikkeamismaaraysTyyppi"
@@ -747,6 +741,7 @@ import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { $t, $kaanna, $success, $fail, $slang, $sdt, $isAdmin } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 

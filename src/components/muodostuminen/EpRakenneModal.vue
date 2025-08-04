@@ -44,62 +44,62 @@
     <template #default>
       <div v-if="isRyhma">
         <b-form-group :label="$t('ryhma') + ' *'">
-          <b-form-radio
+          <EpRadio
             v-model="tyyppi"
             class="ml-1"
             value="osaamisala"
             name="tyyppi"
           >
             {{ $t('osaamisala') }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="tyyppi"
             class="ml-1"
             value="tutkintonimike"
             name="tyyppi"
           >
             {{ $t('tutkintonimike') }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="tyyppi"
             class="ml-1 mt-2"
             value="rakenne-moduuli-pakollinen"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-pakollinen') }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="tyyppi"
             class="ml-1"
             value="rakenne-moduuli-valinnainen"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-valinnainen') }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="tyyppi"
             class="ml-1"
             value="rakenne-moduuli-ammatilliset"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-ammatilliset') }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="tyyppi"
             class="ml-1"
             value="rakenne-moduuli-yhteiset"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-yhteiset') }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="tyyppi"
             class="ml-1 mt-2"
             value="rakenne-moduuli-paikalliset"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-paikalliset') }}
-          </b-form-radio>
+          </EpRadio>
         </b-form-group>
 
         <b-form-group
@@ -116,7 +116,7 @@
             >{{ $t('tutkinnon-muodostumisen') }} </a>
             <span>{{ $t('nakymasta') }}</span>
           </div>
-          <b-form-radio
+          <EpRadio
             v-for="(osaamisala, index) in selectableOsaamisalat"
             :key="&quot;osaamisala&quot;+index"
             v-model="innerModel.osaamisala"
@@ -125,7 +125,7 @@
             name="osaamisalaValinta"
           >
             {{ $kaanna(osaamisala.nimi) }}
-          </b-form-radio>
+          </EpRadio>
         </b-form-group>
 
         <b-form-group
@@ -142,7 +142,7 @@
             >{{ $t('tutkinnon-muodostumisen') }} </a>
             <span>{{ $t('nakymasta') }}</span>
           </div>
-          <b-form-radio
+          <EpRadio
             v-for="(tutkintonimike, index) in selectableTutkintonimikkeet"
             :key="&quot;tutkintonimike&quot;+index"
             v-model="innerModel.tutkintonimike"
@@ -151,53 +151,53 @@
             name="tutkintonimikeValinta"
           >
             {{ $kaanna(tutkintonimike.nimi) }}
-          </b-form-radio>
+          </EpRadio>
         </b-form-group>
 
         <b-form-group
           v-if="tyyppi ==='rakenne-moduuli-paikalliset'"
           :label="$t('nimi') + ' *'"
         >
-          <b-form-radio
+          <EpRadio
             v-model="nimiValinta"
             class="ml-1"
             value="paikallinen"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['paikallinen']) }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="nimiValinta"
             class="ml-1"
             value="tutkinnonosato"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['tutkinnonosato']) }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="nimiValinta"
             class="ml-1"
             value="korkeakoulu"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['korkeakoulu']) }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="nimiValinta"
             class="ml-1"
             value="yhteinen"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['yhteinen']) }}
-          </b-form-radio>
-          <b-form-radio
+          </EpRadio>
+          <EpRadio
             v-model="nimiValinta"
             class="ml-1"
             value="muu"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['muu']) }}
-          </b-form-radio>
+          </EpRadio>
 
           <ep-input
             v-if="nimiValinta === 'muu' || tyyppi !=='rakenne-moduuli-paikalliset'"
@@ -284,9 +284,10 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
 import { Kieli } from '@shared/tyypit';
 import { Kielet } from '@shared/stores/kieli';
-import { ref, computed, watch, inject, useTemplateRef } from 'vue';
+import { ref, computed, watch, inject, useTemplateRef, unref } from 'vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps({
   modelValue: {
@@ -310,7 +311,7 @@ const nimiValinta = ref(null);
 const tyyppi = ref(null);
 const tempModel = ref(null);
 const oldMaksimi = ref(1);
-const rakenneModal = useTemplateRef('rakenneModal');
+const rakenneModal = ref(null);
 
 const osaamisalat = inject('osaamisalat', []);
 const tutkintonimikkeet = inject('tutkintonimikkeet', []);
@@ -412,24 +413,25 @@ const selectableTutkintonimikkeet = computed(() => {
 });
 
 const invalid = computed(() => {
-  if (tosa.value) {
+  if (unref(tosa)) {
     return false;
   }
 
-  if (tyyppi.value === 'osaamisala') {
-    return !innerModel.value.osaamisala?.osaamisalakoodiUri;
+  if (unref(tyyppi) === 'osaamisala') {
+    return !unref(innerModel).osaamisala?.osaamisalakoodiUri;
   }
-  else if (tyyppi.value === 'tutkintonimike') {
-    return !innerModel.value.tutkintonimike?.uri;
+  else if (unref(tyyppi) === 'tutkintonimike') {
+    return !unref(innerModel).tutkintonimike?.uri;
   }
 
-  if (innerModel.value.nimi) {
-    return _.isEmpty(innerModel.value.nimi[Kielet.getSisaltoKieli.value]) || tyyppi.value === null;
+  if (unref(innerModel).nimi) {
+    return _.isEmpty(unref(innerModel).nimi[Kielet.getSisaltoKieli.value]) || unref(tyyppi) === null;
   }
   return true;
 });
 
 const getNimi = (key) => {
+  console.log('getNimi', key);
   return {
     fi: $t(key, {}, { locale: Kieli.fi }),
     sv: $t(key, {}, { locale: Kieli.sv }),
@@ -554,7 +556,9 @@ watch(nimiValinta, (newVal, oldVal) => {
 });
 
 const nimiChanged = (newVal, oldVal) => {
-  if (!newVal || !oldVal) {
+  console.log('nimiChanged', newVal, oldVal);
+  console.log('innerModel', innerModel.value);
+  if (!newVal && !oldVal) {
     return;
   }
 
@@ -569,7 +573,8 @@ const nimiChanged = (newVal, oldVal) => {
 };
 
 watch(tyyppi, (newVal, oldVal) => {
-  if (!newVal || !oldVal) {
+  console.log('tyyppi', newVal, oldVal);
+  if (!newVal && !oldVal) {
     return;
   }
 
@@ -582,6 +587,7 @@ watch(tyyppi, (newVal, oldVal) => {
   }
 
   if (tyyppi.value && tyyppi.value !== 'rakenne-moduuli-paikalliset') {
+    console.log('tyyppi.value', tyyppi.value);
     emit('update:modelValue', {
       ...innerModel.value,
       nimi: getNimi(tyyppi.value),

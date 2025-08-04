@@ -4,14 +4,24 @@ import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
 import { computed } from 'vue';
 import { required } from 'vuelidate/lib/validators';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+
+interface LukioOppiaineStoreConfig {
+  router: Router;
+}
 
 export class LukioOppiaineStore implements IEditoitava {
+  private static config: LukioOppiaineStoreConfig;
+
+  public static install(app: App, config: LukioOppiaineStoreConfig) {
+    LukioOppiaineStore.config = config;
+  }
   constructor(
     private perusteId: number,
     private oppiaineId: number | null,
     private parentId: number | null,
     private perusteStore: PerusteStore,
-    private el: any,
   ) {
   }
 
@@ -73,7 +83,7 @@ export class LukioOppiaineStore implements IEditoitava {
 
       await this.perusteStore.updateNavigation();
       await EditointiStore.cancelAll();
-      this.el.$router.push({ name: 'lukio_oppiaine', params: { oppiaineId: oppiaine.id } });
+      LukioOppiaineStore.config.router.push({ name: 'lukio_oppiaine', params: { oppiaineId: oppiaine.id } });
     }
   }
 
@@ -81,7 +91,7 @@ export class LukioOppiaineStore implements IEditoitava {
     if (this.oppiaineId) {
       await Lops2019.deleteOppiaine(this.perusteId, this.oppiaineId);
       await this.perusteStore.updateNavigation();
-      this.el.$router.push({ name: 'perusteprojekti', params: { projektiId: this.perusteStore.projektiId.value } });
+      LukioOppiaineStore.config.router.push({ name: 'perusteprojekti', params: { projektiId: this.perusteStore.projektiId.value } });
     }
   }
 

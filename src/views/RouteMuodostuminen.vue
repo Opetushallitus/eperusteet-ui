@@ -149,7 +149,7 @@
                     <div class="mt-3">
                       <VueDraggable
                         v-bind="optionsPaaryhma"
-                        :value="paaryhmat"
+                        :model-value="paaryhmat"
                         tag="div"
                         class="paaryhmat"
                       >
@@ -189,7 +189,7 @@
                       </div>
                       <VueDraggable
                         v-bind="optionsTutkinnonOsat"
-                        :value="tutkinnonosatPaged"
+                        :model-value="tutkinnonosatPaged"
                         tag="div"
                       >
                         <div
@@ -235,7 +235,7 @@
                       </ep-button>
                       <VueDraggable
                         v-bind="optionsKoodit"
-                        :value="osaamisalatPaged"
+                        :model-value="osaamisalatPaged"
                         tag="div"
                       >
                         <div
@@ -331,7 +331,7 @@
 
                       <VueDraggable
                         v-bind="optionsKoodit"
-                        :value="tutkintonimikkeetPaged"
+                        :model-value="tutkintonimikkeetPaged"
                         tag="div"
                       >
                         <div
@@ -487,6 +487,7 @@ import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { inject } from 'vue';
 import { $bvModal, $kaanna, $filterBy } from '@shared/utils/globals';
+import { unref } from 'vue';
 
 const props = defineProps<{
   browserStore: BrowserStore;
@@ -638,7 +639,7 @@ const optionsKoodit = computed(() => {
     disabled: !isEditing.value,
     group: {
       name: 'rakennepuu',
-      pull: 'clone',
+      pull: 'clone' as const,
       put: false,
     },
     clone(original) {
@@ -658,7 +659,7 @@ const optionsTutkinnonOsat = computed(() => {
     disabled: !isEditing.value,
     group: {
       name: 'rakennepuu',
-      pull: 'clone',
+      pull: 'clone' as const,
       put: false,
     },
     clone(original) {
@@ -684,8 +685,7 @@ const optionsPaaryhma = computed(() => {
     disabled: !isEditing.value,
     group: {
       name: 'rakennepuu',
-      pull: 'clone',
-      put: false,
+      pull: 'clone' as const,
     },
     clone(original) {
       if (original.create) {
@@ -747,7 +747,7 @@ const tutkinnonOsat = computed(() => {
 });
 
 const tutkintonimikkeet = computed(() => {
-  return _.map(store.value?.data?.value?.tutkintonimikkeet, tutkintonimike => {
+  return _.map(store.value?.data?.tutkintonimikkeet, tutkintonimike => {
     return {
       ...ryhmaTemplate('tutkintonimike'),
       nimi: tutkintonimike.nimi,
@@ -766,7 +766,7 @@ const rakenteenOsat = computed(() => {
 });
 
 const osaamisalat = computed(() => {
-  return _.map(store.value?.data?.value?.osaamisalat, osaamisala => {
+  return _.map(store.value?.data?.osaamisalat, osaamisala => {
     return {
       ...ryhmaTemplate('osaamisala'),
       nimi: osaamisala.nimi,
@@ -781,19 +781,19 @@ const osaamisalat = computed(() => {
 });
 
 const osaamisalatPaged = computed(() => {
-  return pageSliced(osaamisalat.value, osaamisalatSivu.value);
+  return pageSliced(unref(osaamisalat), unref(osaamisalatSivu));
 });
 
 const tutkintonimikkeetPaged = computed(() => {
-  return pageSliced(tutkintonimikkeet.value, tutkintonimikkeetSivu.value);
+  return pageSliced(unref(tutkintonimikkeet), unref(tutkintonimikkeetSivu));
 });
 
 const tutkinnonosatPaged = computed(() => {
-  return pageSliced(tutkinnonOsat.value, tutkinnonosatSivu.value);
+  return pageSliced(unref(tutkinnonOsat), unref(tutkinnonosatSivu));
 });
 
 const leikelautaWithColor = computed(() => {
-  return _.map(leikelauta.value, lauta => {
+  return _.map(unref(leikelauta), lauta => {
     return {
       ...lauta,
       color: rakenneNodecolor(lauta, false),
@@ -866,8 +866,8 @@ function tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex) {
 function tutkintonimikeNimiChange(ryhma, tutkintonimikeIndex) {
   store.value?.setData(
     {
-      ...store.value.data.value,
-      tutkintonimikkeet: _.map(store.value.data.value.tutkintonimikkeet,
+      ...store.value.data,
+      tutkintonimikkeet: _.map(store.value.data.tutkintonimikkeet,
         (tutkintonimike, index) => index === tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex) ? { ...tutkintonimike, nimi: ryhma.nimi } : tutkintonimike),
     });
 }
@@ -875,9 +875,9 @@ function tutkintonimikeNimiChange(ryhma, tutkintonimikeIndex) {
 function lisaaTutkintonimike() {
   store.value?.setData(
     {
-      ...store.value.data.value,
+      ...store.value.data,
       tutkintonimikkeet: [
-        ...store.value.data.value.tutkintonimikkeet,
+        ...store.value.data.tutkintonimikkeet,
         {
           nimi: {},
           tutkintonimikeUri: 'temporary_tutkintonimikkeet_' + genUuid(),
@@ -889,8 +889,8 @@ function lisaaTutkintonimike() {
 function tutkintonimikeKoodiLisays(koodi, tutkintonimikeIndex) {
   store.value?.setData(
     {
-      ...store.value.data.value,
-      tutkintonimikkeet: _.map(store.value.data.value.tutkintonimikkeet,
+      ...store.value.data,
+      tutkintonimikkeet: _.map(store.value.data.tutkintonimikkeet,
         (tutkintonimike, index) => index === tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)
           ? {
             nimi: koodi.nimi,
@@ -904,24 +904,28 @@ function tutkintonimikeKoodiLisays(koodi, tutkintonimikeIndex) {
 function osaamisalaNimiChange(ryhma, osaamisalaIndex) {
   store.value?.setData(
     {
-      ...store.value.data.value,
-      osaamisalat: _.map(store.value.data.value.osaamisalat,
+      ...store.value.data,
+      osaamisalat: _.map(store.value.data.osaamisalat,
         (osaamisala, index) => index === osaamisalaSivutettuIndeksi(osaamisalaIndex) ? { ...osaamisala, nimi: ryhma.nimi } : osaamisala),
     });
 }
 
 function lisaaOsaamisala() {
+  console.log('lisaaOsaamisala');
+  console.log('store.value', store.value);
   store.value?.setData(
     {
-      ...store.value.data.value,
+      ...store.value.data,
       osaamisalat: [
-        ...store.value.data.value.osaamisalat,
+        ...store.value.data.osaamisalat,
         {
           nimi: {},
           uri: 'temporary_osaamisala_' + genUuid(),
         },
       ],
     });
+
+  console.log('store.value', store.value);
 }
 
 function osaamisalaSivutettuIndeksi(osaamisalaIndex) {
@@ -931,8 +935,8 @@ function osaamisalaSivutettuIndeksi(osaamisalaIndex) {
 function osaamisalaKoodiLisays(koodi, osaamisalaIndex) {
   store.value?.setData(
     {
-      ...store.value.data.value,
-      osaamisalat: _.map(store.value.data.value.osaamisalat,
+      ...store.value.data,
+      osaamisalat: _.map(store.value.data.osaamisalat,
         (osaamisala, index) => index === osaamisalaSivutettuIndeksi(osaamisalaIndex) ? koodi : osaamisala),
     });
 }
@@ -940,16 +944,16 @@ function osaamisalaKoodiLisays(koodi, osaamisalaIndex) {
 function poistaOsaamisala(osaamisalaIndex) {
   store.value?.setData(
     {
-      ...store.value.data.value,
-      osaamisalat: _.filter(store.value.data.value.osaamisalat, (osaamisala, index) => index !== osaamisalaSivutettuIndeksi(osaamisalaIndex)),
+      ...store.value.data,
+      osaamisalat: _.filter(store.value.data.osaamisalat, (osaamisala, index) => index !== osaamisalaSivutettuIndeksi(osaamisalaIndex)),
     });
 }
 
 function poistaTutkintonimike(tutkintonimikeIndex) {
   store.value?.setData(
     {
-      ...store.value.data.value,
-      tutkintonimikkeet: _.filter(store.value.data.value.tutkintonimikkeet, (tutkintonimike, index) => index !== tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)),
+      ...store.value.data,
+      tutkintonimikkeet: _.filter(store.value.data.tutkintonimikkeet, (tutkintonimike, index) => index !== tutkintonimikeSivutettuIndeksi(tutkintonimikeIndex)),
     });
 }
 
@@ -965,10 +969,10 @@ function toggleRakenne() {
   naytaRakenne.value = !naytaRakenne.value;
   store.value?.setData(
     {
-      ...store.value.data.value,
+      ...store.value.data,
       rakenne: {
-        ...store.value.data.value.rakenne,
-        osat: _.map(store.value.data.value.rakenne.osat, osa => toggleOsa(osa, naytaRakenne.value)),
+        ...store.value.data.rakenne,
+        osat: _.map(store.value.data.rakenne.osat, osa => toggleOsa(osa, naytaRakenne.value)),
       },
     });
 }
@@ -1112,7 +1116,7 @@ provide('osaamisalat', osaamisalat);
 
 .draggable, :deep(.draggable) {
   cursor: grab;
-  user-select: none !important;
+  user-select: none;
 
   &.paaryhma, &.kopioitava {
     .colorblock {

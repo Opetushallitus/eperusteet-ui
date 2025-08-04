@@ -24,29 +24,29 @@
             v-if="osaamisalat.length > 0 || tutkintonimikkeet.length > 0"
             class="mb-4"
           >
-            <b-form-radio
+            <EpRadio
               v-if="osaamisalat.length > 0"
               v-model="tekstikappaleTyyppi"
               value="osaamisala"
               name="tekstikappaleTyyppi"
             >
-              {{ $t('osaamisala') }}
-            </b-form-radio>
-            <b-form-radio
+            {{ $t('osaamisala') }}
+            </EpRadio>
+            <EpRadio
               v-if="tutkintonimikkeet.length > 0"
               v-model="tekstikappaleTyyppi"
               value="tutkintonimike"
               name="tekstikappaleTyyppi"
             >
-              {{ $t('tutkintonimike') }}
-            </b-form-radio>
-            <b-form-radio
+            {{ $t('tutkintonimike') }}
+            </EpRadio>
+            <EpRadio
               v-model="tekstikappaleTyyppi"
               value="tekstikappale"
               name="tekstikappaleTyyppi"
             >
               {{ $t('tekstikappale') }}
-            </b-form-radio>
+            </EpRadio>
           </div>
           <div
             v-if="tekstikappaleTyyppi === 'osaamisala'"
@@ -167,6 +167,7 @@ import { KuvaStore } from '@/stores/KuvaStore';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 interface koodistoryhma {
   ryhma: string;
@@ -189,11 +190,11 @@ const perusteId = computed(() => props.perusteStore.perusteId.value);
 const versionumero = computed(() => _.toNumber(route.query.versionumero) || undefined);
 
 const osaamisalat = computed(() => {
-  return props.perusteStore.peruste?.osaamisalat || [];
+  return props.perusteStore.peruste?.value?.osaamisalat || [];
 });
 
 const tutkintonimikkeet = computed(() => {
-  return _.map(props.perusteStore.peruste?.tutkintonimikkeet, tutkintonimike => {
+  return _.map(props.perusteStore.peruste?.value?.tutkintonimikkeet, tutkintonimike => {
     return {
       nimi: tutkintonimike.nimi,
       uri: tutkintonimike.tutkintonimikeUri,
@@ -226,37 +227,6 @@ const postRemove = computed(() => {
       name: 'poistetutsisallot',
     });
   };
-});
-
-const fields = computed(() => {
-  let baseFields = [{
-    key: 'nimi',
-    label: $t('nimi'),
-    sortable: true,
-    formatter: (value, key, item) => {
-      return $kaanna(item.nimi);
-    },
-  }, {
-    key: 'arvo',
-    sortable: true,
-    label: $t('koodi'),
-    thStyle: 'width: 10%',
-  }];
-
-  if (store.value?.isEditing) {
-    return [
-      ...baseFields,
-      {
-        key: 'delete',
-        label: '',
-        sortable: false,
-        thClass: 'border-0',
-        thStyle: 'width: 1%',
-      },
-    ];
-  }
-
-  return baseFields;
 });
 
 const koodiNimikeChange = (val, oldVal) => {

@@ -160,10 +160,10 @@
         />
 
         <EpJulkaisuForm
+          v-model="julkaisu"
           class="mt-4"
           is-latest
           :store="perusteStore"
-          :julkaisu="julkaisu"
         />
 
         <b-form-group>
@@ -346,7 +346,7 @@ const rules = computed(() => {
   };
 });
 
-const v$ = useVuelidate(rules, { julkaisu });
+const v$ = useVuelidate(rules, { julkaisu }, { $stopPropagation: true });
 
 const julkaisuValid = computed(() => {
   return !v$.value.$invalid;
