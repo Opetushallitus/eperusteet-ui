@@ -94,12 +94,10 @@
           @row-clicked="avaaOsaamismerkkiModal"
         />
 
-        <b-pagination
+        <EpPagination
           v-model="page"
           :total-rows="totalRows"
           :per-page="perPage"
-          aria-controls="tiedotteet"
-          align="center"
         />
       </div>
       <div
@@ -136,6 +134,7 @@ import { Murupolku } from '@shared/stores/murupolku';
 import { Kielet } from '@shared/stores/kieli';
 import { $kaanna, $t, $sdt, $sd, $fail } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
 const props = defineProps({
   osaamismerkitStore: {

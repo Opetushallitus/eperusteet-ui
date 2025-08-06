@@ -154,7 +154,7 @@ import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import { OppiaineenVuosiluokkaKokonaisuusDto } from '@shared/api/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $kaanna, $t, $fail } from '@shared/utils/globals';
-import { useTemplateRef } from 'vue';
+import { useTemplateRef, unref } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -225,10 +225,11 @@ const sulje = () => {
 const tallenna = async () => {
   tallennetaan.value = true;
   try {
-    model.value = await PerusopetusOppiaineStore.updateOppiaineenVuosiluokkakokonaisuus(props.perusteId, props.oppiaineId, model.value);
+    model.value = await PerusopetusOppiaineStore.updateOppiaineenVuosiluokkakokonaisuus(props.perusteId, props.oppiaineId, unref(model));
     sulje();
   }
   catch (e) {
+    console.error(e);
     $fail($t('virhe-palvelu-virhe') as string);
   }
   finally {

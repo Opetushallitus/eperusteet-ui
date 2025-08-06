@@ -110,7 +110,6 @@ const poistaLiite = (liite) => {
 };
 
 const lisaaLiite = (liite) => {
-  console.log(liite);
   model.value = [
     ...model.value,
     {

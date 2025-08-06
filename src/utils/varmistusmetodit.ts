@@ -1,146 +1,148 @@
 import { Julkaisut, Perusteprojektit, Maintenance } from '@shared/api/eperusteet';
+import { $bvModal, $t, $success, $fail } from '@shared/utils/globals';
 import * as _ from 'lodash';
+import { h } from 'vue';
 
-export async function vaihdaPerusteTilaConfirm(el, meta) {
-  const vaihdaTila = await el.$bvModal.msgBoxConfirm(el.$t(meta.confirm) as any, {
-    title: el.$t(meta.title),
+export async function vaihdaPerusteTilaConfirm({ meta, route, router }) {
+  const vaihdaTila = await $bvModal.msgBoxConfirm($t(meta.confirm) as any, {
+    title: $t(meta.title),
     okVariant: 'primary',
-    okTitle: el.$t(meta.okTitle ? meta.okTitle : 'kylla') as any,
+    okTitle: $t(meta.okTitle ? meta.okTitle : 'kylla') as any,
     cancelVariant: 'link',
-    cancelTitle: el.$t('peruuta') as any,
+    cancelTitle: $t('peruuta') as any,
     centered: true,
   });
 
   if (vaihdaTila) {
     try {
-      await Perusteprojektit.updatePerusteprojektiTila(meta.projektiId ? meta.projektiId : el.$route.params.projektiId, meta.tila);
-      el.$success(el.$t('tilan-vaihto-' + meta.tila + '-onnistui'));
+      await Perusteprojektit.updatePerusteprojektiTila(meta.projektiId ? meta.projektiId : route.params.projektiId, meta.tila);
+      $success($t('tilan-vaihto-' + meta.tila + '-onnistui'));
     }
     catch (e) {
-      el.$fail(el.$t('tilan-vaihto-' + meta.tila + '-epaonnistui'));
+      $fail($t('tilan-vaihto-' + meta.tila + '-epaonnistui'));
     }
     if (meta.reroute) {
-      el.$router.push({
+      router.push({
         name: meta.reroute(),
       });
     }
   }
 }
 
-export async function asetaValmiiksi(el) {
-  const asetaValmiiksi = await el.$bvModal.msgBoxConfirm(el.$t('peruste-valmis-varmistus') as any, {
-    title: el.$t('aseta-peruste-valmiiksi') as any,
+export async function asetaValmiiksi({ route }) {
+  const asetaValmiiksi = await $bvModal.msgBoxConfirm($t('peruste-valmis-varmistus') as any, {
+    title: $t('aseta-peruste-valmiiksi') as any,
     okVariant: 'primary',
-    okTitle: el.$t('aseta-valmiiksi') as any,
+    okTitle: $t('aseta-valmiiksi') as any,
     cancelVariant: 'link',
-    cancelTitle: el.$t('peruuta') as any,
-    centered: el,
+    cancelTitle: $t('peruuta') as any,
   });
 
   if (asetaValmiiksi) {
     try {
-      await Perusteprojektit.updateProjektiTilaOnly(_.toNumber(el.$route.params.projektiId), 'valmis');
-      el.$success(el.$t('tilan-vaihto-valmis-onnistui') as string);
+      await Perusteprojektit.updateProjektiTilaOnly(_.toNumber(route.params.projektiId), 'valmis');
+      $success($t('tilan-vaihto-valmis-onnistui') as string);
     }
     catch (e) {
-      el.$fail(el.$t('tilan-vaihto-valmis-epaonnistui') as string);
+      $fail($t('tilan-vaihto-valmis-epaonnistui') as string);
     }
   }
 }
 
-export async function avaaPeruste(el) {
-  const avaa = await el.$bvModal.msgBoxConfirm(el.$t('peruste-avaus-varmistus') as any, {
-    title: el.$t('avaa-peruste') as any,
+export async function avaaPeruste({ route }) {
+  const avaa = await $bvModal.msgBoxConfirm($t('peruste-avaus-varmistus') as any, {
+    title: $t('avaa-peruste') as any,
     okVariant: 'primary',
-    okTitle: el.$t('avaa') as any,
+    okTitle: $t('avaa') as any,
     cancelVariant: 'link',
-    cancelTitle: el.$t('peruuta') as any,
-    centered: el,
+    cancelTitle: $t('peruuta') as any,
+    centered: true,
   });
 
   if (avaa) {
     try {
-      await Perusteprojektit.avaaPerusteProjekti(_.toNumber(el.$route.params.projektiId));
-      el.$success(el.$t('tilan-vaihto-onnistui') as string);
+      await Perusteprojektit.avaaPerusteProjekti(_.toNumber(route.params.projektiId));
+      $success($t('tilan-vaihto-onnistui') as string);
     }
     catch (e) {
-      el.$fail(el.$t('tilan-vaihto-epaonnistui') as string);
+      $fail($t('tilan-vaihto-epaonnistui') as string);
     }
   }
 }
 
-export async function kooditaPeruste(el, meta) {
-  const avaa = await el.$bvModal.msgBoxConfirm(el.$t('peruste-kooditus-varmistus') as any, {
-    title: el.$t('koodita-peruste') as any,
+export async function kooditaPeruste({ meta }) {
+  const avaa = await $bvModal.msgBoxConfirm($t('peruste-kooditus-varmistus') as any, {
+    title: $t('koodita-peruste') as any,
     okVariant: 'primary',
-    okTitle: el.$t('koodita') as any,
+    okTitle: $t('koodita') as any,
     cancelVariant: 'link',
-    cancelTitle: el.$t('peruuta') as any,
+    cancelTitle: $t('peruuta') as any,
     centered: true,
   });
 
   if (avaa) {
     try {
       await Julkaisut.kooditaPeruste(meta.getPerusteId());
-      el.$success(el.$t('kooditus-onnistui') as string);
+      $success($t('kooditus-onnistui') as string);
     }
     catch (e) {
-      el.$fail(el.$t('kooditus-epaonnistui') as string);
+      $fail($t('kooditus-epaonnistui') as string);
     }
   }
 }
 
-export async function nollaaJulkaisuTila(el, meta) {
-  const avaa = await el.$bvModal.msgBoxConfirm(el.$t('nollaa-julkaisu-tila-varmistus') as any, {
-    title: el.$t('nollaa-julkaisu-tila') as any,
+export async function nollaaJulkaisuTila({ meta }) {
+  const avaa = await $bvModal.msgBoxConfirm($t('nollaa-julkaisu-tila-varmistus') as any, {
+    title: $t('nollaa-julkaisu-tila') as any,
     okVariant: 'primary',
-    okTitle: el.$t('ok') as any,
+    okTitle: $t('ok') as any,
     cancelVariant: 'link',
-    cancelTitle: el.$t('peruuta') as any,
+    cancelTitle: $t('peruuta') as any,
     centered: true,
   });
 
   if (avaa) {
     try {
       await Julkaisut.nollaaJulkaisuTila(meta.getPerusteId());
-      el.$success(el.$t('nollaus-onnistui') as string);
+      $success($t('nollaus-onnistui') as string);
     }
     catch (e) {
-      el.$fail(el.$t('nollaus-epaonnistui') as string);
+      $fail($t('nollaus-epaonnistui') as string);
     }
   }
 }
 
-export async function pakotaJulkaisu(el, meta) {
-  const vahvistusSisalto = el.$createElement('div', {},
+export async function pakotaJulkaisu({ meta }) {
+  const vahvistusSisalto = h('div', {},
     [
-      el.$createElement('div', el.$t('pakota-julkaisu-varmistus') as string),
+      h('div', $t('pakota-julkaisu-varmistus') as string),
       ...(meta.validointiVirheet?.length > 0
         ? [
-          el.$createElement('br', ''),
-          el.$createElement('div', el.$t('julkaisun-estavat-virheet') as string),
+          h('br', ''),
+          h('div', $t('julkaisun-estavat-virheet') as string),
           _.map(meta.validointiVirheet, (virhe) => {
-            return el.$createElement('div', ' - ' + el.$t(virhe.kuvaus) as string);
+            return h('div', ' - ' + $t(virhe.kuvaus) as string);
           })] : []),
     ],
   ).children;
 
-  const pakota = await el.$bvModal.msgBoxConfirm(vahvistusSisalto as any, {
-    title: el.$t('pakota-julkaisu') as any,
+  const pakota = await $bvModal.msgBoxConfirm(vahvistusSisalto as any, {
+    title: $t('pakota-julkaisu') as any,
     okVariant: 'primary',
-    okTitle: el.$t('ok') as any,
+    okTitle: $t('ok') as any,
     cancelVariant: 'link',
-    cancelTitle: el.$t('peruuta') as any,
+    cancelTitle: $t('peruuta') as any,
     centered: true,
   });
 
   if (pakota) {
     try {
-      await Maintenance.teeMaintenanceJulkaisu(meta.getPerusteId(), el.$t('pakotettu-julkaisu-tiedote') as string);
-      el.$success(el.$t('julkaisu-pakotettu') as string);
+      await Maintenance.teeMaintenanceJulkaisu(meta.getPerusteId(), $t('pakotettu-julkaisu-tiedote') as string);
+      $success($t('julkaisu-pakotettu') as string);
     }
     catch (e) {
-      el.$fail(el.$t('julkaisu-pakotettu-epaonnistui') as string);
+      console.error(e);
+      $fail($t('julkaisu-pakotettu-epaonnistui') as string);
     }
   }
 }

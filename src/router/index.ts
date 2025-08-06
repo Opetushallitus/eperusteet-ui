@@ -706,7 +706,8 @@ router.beforeEach(async (to, from, next) => {
       stores.tyoryhmaStore?.clear();
       await stores.kayttajaStore?.setPerusteprojekti(projektiIdNumber);
       await stores.perusteStore?.init(projektiIdNumber);
-      await stores.perusteStore?.blockUntilInitialized();
+      // await stores.perusteStore?.blockUntilInitialized();
+      await stores.termitStore.init(stores.perusteStore.peruste.value?.id);
     }
     catch (err) {
       console.error(err);

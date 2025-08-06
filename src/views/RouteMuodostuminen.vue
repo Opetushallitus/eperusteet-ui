@@ -911,8 +911,6 @@ function osaamisalaNimiChange(ryhma, osaamisalaIndex) {
 }
 
 function lisaaOsaamisala() {
-  console.log('lisaaOsaamisala');
-  console.log('store.value', store.value);
   store.value?.setData(
     {
       ...store.value.data,
@@ -924,8 +922,6 @@ function lisaaOsaamisala() {
         },
       ],
     });
-
-  console.log('store.value', store.value);
 }
 
 function osaamisalaSivutettuIndeksi(osaamisalaIndex) {

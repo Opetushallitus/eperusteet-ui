@@ -88,8 +88,8 @@ const perusteId = computed(() => {
 });
 
 const laajaAlaisetOsaamiset = computed(() => {
-  if (store.value?.laajaAlaisetOsaamiset.value) {
-    return _.sortBy(store.value?.laajaAlaisetOsaamiset.value, 'id');
+  if (store.value?.laajaAlaisetOsaamiset) {
+    return _.sortBy(store.value?.laajaAlaisetOsaamiset, 'id');
   }
   return [];
 });

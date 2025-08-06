@@ -550,6 +550,7 @@ const props = withDefaults(defineProps<{
   muokkaustietoStore: MuokkaustietoStore;
   aikatauluStore: AikatauluStore;
   tyoryhmaStore: TyoryhmaStore;
+  termitStore: TermitStore;
   ratasvalinnat: any[];
   palautusMeta: any;
   julkaisuRoute?: any;
@@ -560,6 +561,7 @@ const props = withDefaults(defineProps<{
 });
 
 const route = useRoute();
+const router = useRouter();
 const naviStore = ref<EpTreeNavibarStore | null>(null);
 const isValidating = ref(false);
 const query = ref('');
@@ -635,8 +637,8 @@ const navigation = computed(() => props.perusteStore.navigation.value);
 
 provide('navigation', computed(() => props.perusteStore.navigation.value));
 provide('linkkiHandler', computed(() => new LinkkiHandler()));
-provide('kuvaHandler', computed(() => createKuvaHandler(new KuvaStore(props.perusteStore.perusteId.value!))));
-provide('kasiteHandler', computed(() => createKasiteHandler(new TermitStore(props.perusteStore.perusteId.value!))));
+provide('kuvaHandler', createKuvaHandler(new KuvaStore(props.perusteStore.perusteId.value!)));
+provide('kasiteHandler', createKasiteHandler(props.termitStore));
 
 const nimi = computed(() => {
   return $kaanna(peruste.value?.nimi as any) || projekti.value?.nimi;
@@ -720,13 +722,17 @@ const validointiVirheet = computed(() => {
 
 const ratasClick = async (clickFn, meta) => {
   hallintaLoading.value = true;
-  await clickFn({
-    perusteStore: props.perusteStore,
-    route,
-  }, {
-    ...meta,
-    ...(meta.validointi && { validointiVirheet: validointiVirheet.value.slice(0, 3) }),
-  });
+  await clickFn(
+    {
+      perusteStore: props.perusteStore,
+      route,
+      router,
+      meta: {
+        ...meta,
+        ...(meta.validointi && { validointiVirheet: validointiVirheet.value.slice(0, 3) }),
+      },
+    },
+  );
 
   if (meta.callback) {
     await meta.callback();
@@ -790,13 +796,11 @@ const julkaisemattomiaMuutoksia = computed(() => {
 });
 
 const palauta = async () => {
-  await vaihdaPerusteTilaConfirm(
-    {
-      perusteStore: props.perusteStore,
-      $success: () => {},
-    },
-    props.palautusMeta,
-  );
+  await vaihdaPerusteTilaConfirm({
+    meta: props.palautusMeta,
+    route,
+    router,
+  });
 
   await props.perusteStore.updateCurrent();
 };
@@ -804,14 +808,14 @@ const palauta = async () => {
 const asetaPohjaValmiiksi = async () => {
   await vaihdaPerusteTilaConfirm(
     {
-      perusteStore: props.perusteStore,
-      $success: () => {},
-    },
-    {
-      tila: 'valmis',
-      title: 'aseta-pohja-valmiiksi',
-      confirm: 'pohja-valmis-varmistus',
-      okTitle: 'aseta-valmiiksi',
+      meta: {
+        tila: 'valmis',
+        title: 'aseta-pohja-valmiiksi',
+        confirm: 'pohja-valmis-varmistus',
+        okTitle: 'aseta-valmiiksi',
+      },
+      route,
+      router,
     },
   );
 

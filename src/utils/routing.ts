@@ -163,6 +163,8 @@ export function routeToNode(route: RouteLocationNormalized): NavigationNodeDto |
       type: 'vuosiluokkakokonaisuus',
       id: Number(route.params.vlkId),
     };
+  case 'peruste-yleisnakyma':
+    return null;
   default:
     console.error('Unknown route', route.name, route);
     break;

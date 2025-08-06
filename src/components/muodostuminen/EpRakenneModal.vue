@@ -431,7 +431,6 @@ const invalid = computed(() => {
 });
 
 const getNimi = (key) => {
-  console.log('getNimi', key);
   return {
     fi: $t(key, {}, { locale: Kieli.fi }),
     sv: $t(key, {}, { locale: Kieli.sv }),
@@ -556,8 +555,6 @@ watch(nimiValinta, (newVal, oldVal) => {
 });
 
 const nimiChanged = (newVal, oldVal) => {
-  console.log('nimiChanged', newVal, oldVal);
-  console.log('innerModel', innerModel.value);
   if (!newVal && !oldVal) {
     return;
   }
@@ -573,7 +570,6 @@ const nimiChanged = (newVal, oldVal) => {
 };
 
 watch(tyyppi, (newVal, oldVal) => {
-  console.log('tyyppi', newVal, oldVal);
   if (!newVal && !oldVal) {
     return;
   }
@@ -587,7 +583,6 @@ watch(tyyppi, (newVal, oldVal) => {
   }
 
   if (tyyppi.value && tyyppi.value !== 'rakenne-moduuli-paikalliset') {
-    console.log('tyyppi.value', tyyppi.value);
     emit('update:modelValue', {
       ...innerModel.value,
       nimi: getNimi(tyyppi.value),

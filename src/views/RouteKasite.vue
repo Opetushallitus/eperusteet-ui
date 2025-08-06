@@ -22,8 +22,8 @@
         class="kasitelista m-3"
       >
         <div
-          v-for="(termi, idx) in termitFiltered"
-          :key="idx"
+          v-for="(termi) in termitFiltered"
+          :key="'termi-' + termi.id"
           class="row align-items-start"
           :class="{open: !termi.closed}"
         >
@@ -33,7 +33,7 @@
           />
           <div class="col col-6 pl-3">
             <ep-content
-              :value="termi.selitys"
+              :model-value="termi.selitys"
               layout="normal"
             />
           </div>
@@ -164,11 +164,13 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $success, $fail } from '@shared/utils/globals';
+import { PerusteStore } from '@/stores/PerusteStore';
+import { nextTick } from 'vue';
 
 
 const props = defineProps<{
   termitStore: TermitStore;
-  perusteId?: number;
+  perusteStore: PerusteStore;
 }>();
 
 const kasitteenPoistoModal = useTemplateRef('kasitteenPoistoModal');
@@ -178,14 +180,12 @@ const query = ref('');
 const kasite = ref<TermiDto>({});
 const toggled = ref<number[]>([]);
 
-const validator = computed(() => {
-  return kasiteValidator([
-    Kielet.getSisaltoKieli.value,
-  ]);
-});
-
 const rules = computed(() => ({
-  kasite: validator.value,
+  kasite: {
+    ...kasiteValidator([
+      Kielet.getSisaltoKieli.value,
+    ]),
+  },
 }));
 
 const v$ = useVuelidate(rules, { kasite });
@@ -193,6 +193,10 @@ const validation = computed(() => v$.value.kasite);
 
 const termit = computed(() => {
   return props.termitStore.termit.value;
+});
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
 });
 
 const termitToggled = computed(() => {
@@ -209,8 +213,8 @@ const termitFiltered = computed(() => {
 });
 
 const onProjektiChange = async () => {
-  if (props.perusteId) {
-    props.termitStore.init(props.perusteId);
+  if (perusteId.value) {
+    props.termitStore.init(perusteId.value);
   }
 };
 
@@ -223,13 +227,13 @@ const toggleTermi = (termi: any) => {
   }
 };
 
-const avaaMuokkausModal = (kasite?: TermiDto) => {
-  if (!kasite) {
-    kasite.value = {};
-  }
-  else {
-    kasite.value = _.cloneDeep(kasite);
-  }
+const avaaMuokkausModal = (termi?: TermiDto) => {
+  // if (!termi) {
+  //   kasite.value = {};
+  // }
+  // else {
+  //   kasite.value = _.cloneDeep(termi);
+  // }
   (kasitteenLuontiModal.value as any).show();
 };
 
@@ -240,7 +244,7 @@ const avaaPoistoModal = (kasiteItem: any) => {
 
 const poistaKasite = async () => {
   try {
-    await props.termitStore.delete(props.perusteId!, kasite.value);
+    await props.termitStore.delete(perusteId.value!, kasite.value);
     $success($t('kasite-poistettu') as string);
   }
   catch (err) {
@@ -250,10 +254,12 @@ const poistaKasite = async () => {
 
 const tallennaKasite = async () => {
   try {
-    await props.termitStore.save(props.perusteId!, kasite.value);
+    await props.termitStore.save(perusteId.value!, kasite.value);
+    await nextTick();
     $success($t('kasite-tallennettu') as string);
   }
   catch (err) {
+    console.error(err);
     $fail($t('kasite-tallennus-epaonnistui') as string);
   }
 };
@@ -264,7 +270,7 @@ onMounted(async () => {
 });
 
 // Watch for changes in perusteId
-watch(() => props.perusteId, async () => {
+watch(() => perusteId.value, async () => {
   await onProjektiChange();
 });
 </script>
@@ -290,6 +296,10 @@ watch(() => props.perusteId, async () => {
 
       .btn {
         color: $black;
+      }
+
+      :deep(.btn-link:focus, .btn-link:active) {
+        outline: none !important;
       }
     }
 

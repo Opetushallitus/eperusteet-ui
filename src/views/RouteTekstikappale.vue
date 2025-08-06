@@ -133,12 +133,16 @@
         </div>
 
         <div :class="{ 'mt-4': isEditing }">
-          <EpContent
+          <!-- <EpContent
             v-model="data.teksti"
             layout="normal"
             :is-editable="isEditing"
             :kasite-handler="kasiteHandler"
             :kuva-handler="kuvaHandler"
+          /> -->
+          <EpContent
+            v-model="data.teksti"
+            :is-editable="isEditing"
           />
         </div>
       </template>

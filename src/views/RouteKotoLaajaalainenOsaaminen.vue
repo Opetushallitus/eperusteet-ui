@@ -211,7 +211,7 @@ function extractNimi(koodi) {
 
 function addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
   setKoodiSelected(laajaAlainenKoodi.arvo);
-  editointiStore.value!.data.value.osaamisAlueet.push({ koodi: laajaAlainenKoodi });
+  editointiStore.value!.data.osaamisAlueet.push({ koodi: laajaAlainenKoodi });
 }
 
 function setKoodiSelected(koodiarvo) {
@@ -223,7 +223,7 @@ function setKoodiSelected(koodiarvo) {
 
 async function removeLaajaAlainenOsaaminen(index, koodiarvo) {
   if (await $vahvista($t('vahvista-poisto'), $t('poista-koto-laaja-alainen-osaamisalue'))) {
-    editointiStore.value!.data.value.osaamisAlueet.splice(index, 1);
+    editointiStore.value!.data.osaamisAlueet.splice(index, 1);
     setKoodiNotSelected(koodiarvo);
   }
 }
