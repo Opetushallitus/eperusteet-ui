@@ -180,6 +180,7 @@ import EpTavoitealueetEditModal from '@/views/perusopetus/EpTavoitealueetEditMod
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import { unref } from 'vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -269,7 +270,7 @@ const valittavatVuosiluokkakokonaisuudet = computed(() => {
 });
 
 const valittavatVuosiluokkakokonaisuudetById = computed(() => {
-  return _.keyBy(valittavatVuosiluokkakokonaisuudet.value, 'id');
+  return _.keyBy(unref(valittavatVuosiluokkakokonaisuudet), 'id');
 });
 
 const vuosiluokkakokonaisuudet = computed(() => {
@@ -335,7 +336,7 @@ const vlkChange = async () => {
 };
 
 // Handler for valitutVuosiluokkakokonaisuudet changes
-watch(valitutVuosiluokkakokonaisuudet, (valitutVlk) => {
+watch(valitutVuosiluokkakokonaisuudet, async (valitutVlk) => {
   tempVuosiluokkaChange = vuosiluokkakokonaisuudet.value;
 
   _.forEach(valitutVlk, valittuVlk => {
@@ -351,7 +352,9 @@ watch(valitutVuosiluokkakokonaisuudet, (valitutVlk) => {
             tavoitteet: [],
             sisaltoalueet: [],
           },
-        ], vlk => valittavatVuosiluokkakokonaisuudetById.value[vlk._vuosiluokkaKokonaisuus].nimi),
+        ], vlk => {
+          return valittavatVuosiluokkakokonaisuudetById.value[vlk._vuosiluokkaKokonaisuus].nimi;
+        }),
       });
     }
   });
@@ -364,6 +367,8 @@ watch(valitutVuosiluokkakokonaisuudet, (valitutVlk) => {
       });
     }
   });
+
+  await vlkChange();
 });
 
 const vlkSupportData = computed(() => {

@@ -46,9 +46,12 @@
         <b-col lg="8">
           <b-form-group :label="$t('tila')">
             <div class="d-flex">
-              <b-form-checkbox v-model="isJulkinen">
+              <EpToggle
+                v-model="isJulkinen"
+                checkbox
+              >
                 {{ $t('naytetaan-julkisena') }}
-              </b-form-checkbox>
+              </EpToggle>
               <span
                 v-if="osaamismerkki.muokattu"
                 class="muokattu-text ml-1"
@@ -258,6 +261,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { notNull, requiredLokalisoituTeksti } from '@shared/validators/required';
 import { required } from 'vuelidate/lib/validators';
 import { $t, $kaanna, $sdt, $success, $fail } from '@shared/utils/globals';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 
 const props = defineProps<{
   store: OsaamismerkitStore;

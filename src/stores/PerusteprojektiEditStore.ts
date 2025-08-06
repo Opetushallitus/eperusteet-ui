@@ -19,10 +19,9 @@ export class PerusteprojektiEditStore implements IEditoitava {
 
   async load() {
     const res = await Perusteprojektit.getPerusteprojekti(this.projektiId);
-
     return {
       ...res.data,
-      peruste: this.perusteStore.peruste.value,
+      peruste: this.perusteStore.peruste,
     };
   }
 

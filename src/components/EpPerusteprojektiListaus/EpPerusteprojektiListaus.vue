@@ -303,6 +303,7 @@ import { $t, $sd, $kaanna, $hasOphCrud, $fail } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 import { hasSlotContent } from '@shared/utils/vue-utils';
 import { useSlots } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -327,6 +328,8 @@ const isLoading = ref(false);
 const sort = ref<{ sortBy?: string; sortDesc?: boolean }>({});
 const perusteet = ref<PerusteKevytDto[]>([]);
 const slots = useSlots();
+const route = useRoute();
+const router = useRouter();
 
 const query = ref<PerusteprojektiQuery>({
   sivu: 0,
@@ -563,12 +566,15 @@ const filtersInclude = (filter) => {
 
 const restore = async (item) => {
   await vaihdaPerusteTilaConfirm(
-    this,
     {
-      title: 'palauta-peruste',
-      confirm: 'palauta-peruste-vahvistus',
-      tila: 'laadinta',
-      projektiId: item.id,
+      meta: {
+        title: 'palauta-peruste',
+        confirm: 'palauta-peruste-vahvistus',
+        tila: 'laadinta',
+        projektiId: item.id,
+      },
+      route,
+      router,
     },
   );
   await onQueryChange(query.value);

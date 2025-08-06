@@ -73,18 +73,20 @@
                 </EpInfoPopover>
               </div>
             </template>
-            <b-form-radio-group
-              v-if="isEditing"
-              v-model="data.pakollinen"
-              stacked
-            >
-              <b-form-radio :value="false">
-                {{ $t('valinnainen') }}
-              </b-form-radio>
-              <b-form-radio :value="true">
-                {{ $t('pakollinen') }}
-              </b-form-radio>
-            </b-form-radio-group>
+            <template v-if="isEditing">
+              <EpRadio
+                v-model="data.pakollinen"
+                :value="true"
+                :label="$t('pakollinen')"
+                name="moduulipakollinen"
+              />
+              <EpRadio
+                v-model="data.pakollinen"
+                :value="false"
+                :label="$t('valinnainen')"
+                name="moduulipakollinen"
+              />
+            </template>
             <div v-else-if="data.pakollinen">
               {{ $t('pakollinen') }}
             </div>
@@ -347,6 +349,7 @@ import EpTavoitealueTavoitteet from '@shared/components/EpTavoitesisaltoalue/EpT
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $kaanna } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;

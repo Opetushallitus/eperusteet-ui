@@ -9,6 +9,7 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
 import { isKoulutustyyppiSupported } from '@/utils/perusteet';
 import { $fail, $t } from '@shared/utils/globals';
+import { unref } from 'vue';
 
 export class PerusteStore implements IEditoitava {
   private blocklist = [] as (() => void)[];
@@ -17,7 +18,6 @@ export class PerusteStore implements IEditoitava {
     projekti: null as PerusteprojektiDto | null,
     peruste: null as PerusteDto | null,
     navigation: null as NavigationNodeDto | null,
-    perusteId: null as number | null,
     isInitialized: false,
     julkaisut: null as JulkaisuBaseDto[] | null,
     initializing: false,
@@ -32,9 +32,8 @@ export class PerusteStore implements IEditoitava {
   public readonly projekti = computed(() => this.state.projekti);
   public readonly peruste = computed(() => this.state.peruste);
   public readonly suoritustavat = computed(() => _.map(this.state.peruste?.suoritustavat, suoritustapa => _.toString(suoritustapa.suoritustapakoodi)) as string[]);
-  public readonly perusteId = computed(() => this.state.perusteId);
+  public readonly perusteId = computed(() => this.state.peruste?.id);
   public readonly projektiId = computed(() => this.state.projekti?.id);
-  public readonly tutkinnonOsat = computed(() => this.state.perusteId);
   public readonly julkaisukielet = computed(() => (this.state.peruste?.kielet || []) as unknown as Kieli[]);
   public readonly validoinnit = computed(() => this.state.validoinnit);
   public readonly isAmmatillinen = computed(() => isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi));
@@ -42,12 +41,12 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisut = computed(() => this.state.julkaisut);
   public readonly isPohja = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.POHJA));
   public readonly isNormaali = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.NORMAALI));
-  public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.peruste.value?.koulutustyyppi));
-  public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.peruste.value?.koulutustyyppi));
+  public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.state.peruste?.koulutustyyppi));
+  public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.state.peruste?.koulutustyyppi));
   public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
-  public readonly isJulkaistu = computed(() => (_.size(this.julkaisut.value) > 0 || this.peruste.value?.tila === PerusteDtoTilaEnum.VALMIS) && _.toLower(this.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
+  public readonly isJulkaistu = computed(() => (_.size(this.state.julkaisut) > 0 || this.state.peruste?.tila === PerusteDtoTilaEnum.VALMIS) && _.toLower(this.state.peruste?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
   public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
-  public readonly arkistointiReroute = computed(() => _.toLower(this.peruste.value?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : this.isPohja.value ? 'pohjat' : 'perusteprojektit');
+  public readonly arkistointiReroute = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : unref(this.isPohja) ? 'pohjat' : 'perusteprojektit');
   public readonly muutosmaaraykset = computed(() => this.state.muutosmaaraykset ? _.reverse(_.sortBy(this.state.muutosmaaraykset, 'voimassaoloAlkaa')) : null);
   public readonly isInitialized = computed(() => this.state.isInitialized);
   public readonly maarays = computed(() => this.state.maarays);
@@ -61,11 +60,11 @@ export class PerusteStore implements IEditoitava {
   });
 
   public readonly perusteSuoritustapa = computed(() => {
-    if (this.isOpas.value) {
+    if (unref(this.isOpas)) {
       return 'OPAS';
     }
-    else if (perusteenSuoritustapa(this.peruste.value)) {
-      return perusteenSuoritustapa(this.peruste.value);
+    else if (perusteenSuoritustapa(this.state.peruste)) {
+      return perusteenSuoritustapa(this.state.peruste);
     }
     else {
       return 'REFORMI';
@@ -77,7 +76,7 @@ export class PerusteStore implements IEditoitava {
       return null;
     }
 
-    if (isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi) && !this.isOpas.value) {
+    if (isAmmatillinenKoulutustyyppi(this.state.peruste?.koulutustyyppi) && !unref(this.isOpas)) {
       return {
         ...this.state.navigation,
         children: [
@@ -95,7 +94,7 @@ export class PerusteStore implements IEditoitava {
   public async updateValidointi() {
     if (this.state.projekti?.id) {
       this.state.validoinnit = null;
-      if (_.toLower(this.peruste.value?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
+      if (_.toLower(this.state.peruste?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU)) {
         try {
           const res = await Perusteprojektit.getPerusteprojektiValidointi(this.state.projekti!.id!);
           this.state.validoinnit = res.data;
@@ -121,7 +120,7 @@ export class PerusteStore implements IEditoitava {
   }
 
   async init(projektiId: number) {
-    if (this.state.initializing || (this.state.isInitialized && projektiId === this.projektiId.value)) {
+    if (this.state.initializing || (this.state.isInitialized && projektiId === unref(this.projektiId))) {
       return;
     }
 
@@ -135,7 +134,6 @@ export class PerusteStore implements IEditoitava {
       Murupolku.tyhjenna();
       this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
       const perusteId = Number((this.state.projekti as any)._peruste);
-      this.state.perusteId = perusteId;
 
       [
         this.state.peruste,
@@ -159,17 +157,17 @@ export class PerusteStore implements IEditoitava {
   }
 
   async updateCurrent() {
-    this.state.projekti = (await Perusteprojektit.getPerusteprojekti(this.projekti.value!.id!)).data;
-    this.state.peruste = (await Perusteet.getPerusteenTiedot(this.peruste.value!.id!)).data;
+    this.state.projekti = (await Perusteprojektit.getPerusteprojekti(this.state.projekti!.id!)).data;
+    this.state.peruste = (await Perusteet.getPerusteenTiedot(this.state.peruste!.id!)).data;
 
     await this.updateValidointi();
   }
 
   public async updateNavigation() {
-    if (!this.state.perusteId) {
+    if (!unref(this.perusteId)) {
       return;
     }
-    const res = await Perusteet.getNavigation(this.state.perusteId);
+    const res = await Perusteet.getNavigation(unref(this.perusteId)!);
     this.state.navigation = res.data;
   }
 
@@ -251,7 +249,7 @@ export class PerusteStore implements IEditoitava {
   }
 
   async fetchJulkaisut() {
-    this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
+    this.state.julkaisut = (await Julkaisut.getJulkaisut(unref(this.perusteId)!)).data;
     if (_.includes(_.map(this.state.julkaisut, 'tila'), JulkaisuBaseDtoTilaEnum.KESKEN)) {
       await this.fetchViimeisinJulkaisuTila();
       await this.pollTila();
@@ -259,12 +257,12 @@ export class PerusteStore implements IEditoitava {
   }
 
   async fetchViimeisinJulkaisuTila() {
-    this.state.viimeisinJulkaisuTila = (await Julkaisut.viimeisinJulkaisuTila(this.state.perusteId!)).data;
+    this.state.viimeisinJulkaisuTila = (await Julkaisut.viimeisinJulkaisuTila(unref(this.perusteId)!)).data;
 
     if (this.state.viimeisinJulkaisuTila !== JulkaisuBaseDtoTilaEnum.KESKEN) {
       clearInterval(this.state.tilaPolling);
       this.state.tilaPolling = null;
-      this.state.julkaisut = (await Julkaisut.getJulkaisut(this.state.perusteId!)).data;
+      this.state.julkaisut = (await Julkaisut.getJulkaisut(unref(this.perusteId)!)).data;
       await this.updateCurrent();
     }
   }
@@ -287,13 +285,13 @@ export class PerusteStore implements IEditoitava {
 
   public async fetchJulkaisemattomiaMuutoksia() {
     this.state.julkaisemattomiaMuutoksia = null;
-    this.state.julkaisemattomiaMuutoksia = (await Julkaisut.julkaisemattomiaMuutoksia(this.state.perusteId!)).data;
+    this.state.julkaisemattomiaMuutoksia = (await Julkaisut.julkaisemattomiaMuutoksia(unref(this.perusteId)!)).data;
   }
 
   public async fetchMaaraykset() {
     this.state.muutosmaaraykset = null;
     this.state.maarays = null;
-    this.state.muutosmaaraykset = (await Maaraykset.getPerusteenMuutosmaaraykset(this.state.perusteId!)).data;
+    this.state.muutosmaaraykset = (await Maaraykset.getPerusteenMuutosmaaraykset(unref(this.perusteId)!)).data;
     this.state.maarays = (await Maaraykset.getMaaraysPerusteella(Number((this.state.projekti as any)._peruste))).data;
   }
 
@@ -314,7 +312,7 @@ export class PerusteStore implements IEditoitava {
   }
 
   public async poistaMuutosmaarays(poistettavaMuutosmaarays) {
-    await Maaraykset.deleteMaarays(poistettavaMuutosmaarays.id, this.perusteId.value!);
+    await Maaraykset.deleteMaarays(poistettavaMuutosmaarays.id, unref(this.perusteId)!);
     this.state.muutosmaaraykset = _.reject(this.state.muutosmaaraykset, muutosmaarays => muutosmaarays.id === poistettavaMuutosmaarays.id);
   }
 
