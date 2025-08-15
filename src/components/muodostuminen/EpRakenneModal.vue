@@ -47,7 +47,7 @@
           <EpRadio
             v-model="tyyppi"
             class="ml-1"
-            value="osaamisala"
+            :value="'osaamisala'"
             name="tyyppi"
           >
             {{ $t('osaamisala') }}
@@ -55,7 +55,7 @@
           <EpRadio
             v-model="tyyppi"
             class="ml-1"
-            value="tutkintonimike"
+            :value="'tutkintonimike'"
             name="tyyppi"
           >
             {{ $t('tutkintonimike') }}
@@ -63,7 +63,7 @@
           <EpRadio
             v-model="tyyppi"
             class="ml-1 mt-2"
-            value="rakenne-moduuli-pakollinen"
+            :value="'rakenne-moduuli-pakollinen'"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-pakollinen') }}
@@ -71,7 +71,7 @@
           <EpRadio
             v-model="tyyppi"
             class="ml-1"
-            value="rakenne-moduuli-valinnainen"
+            :value="'rakenne-moduuli-valinnainen'"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-valinnainen') }}
@@ -79,7 +79,7 @@
           <EpRadio
             v-model="tyyppi"
             class="ml-1"
-            value="rakenne-moduuli-ammatilliset"
+            :value="'rakenne-moduuli-ammatilliset'"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-ammatilliset') }}
@@ -87,7 +87,7 @@
           <EpRadio
             v-model="tyyppi"
             class="ml-1"
-            value="rakenne-moduuli-yhteiset"
+            :value="'rakenne-moduuli-yhteiset'"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-yhteiset') }}
@@ -95,7 +95,7 @@
           <EpRadio
             v-model="tyyppi"
             class="ml-1 mt-2"
-            value="rakenne-moduuli-paikalliset"
+            :value="'rakenne-moduuli-paikalliset'"
             name="tyyppi"
           >
             {{ $t('rakenne-moduuli-paikalliset') }}
@@ -111,14 +111,14 @@
             <span v-else>{{ $t('valitse-osaamisala') }} </span>
             <span>{{ $t('uusia-osaamisaloja-voit-luoda') }} </span>
             <a
-              class="btn-link"
+              class="btn-link px-1"
               @click="cancel()"
             >{{ $t('tutkinnon-muodostumisen') }} </a>
             <span>{{ $t('nakymasta') }}</span>
           </div>
           <EpRadio
             v-for="(osaamisala, index) in selectableOsaamisalat"
-            :key="&quot;osaamisala&quot;+index"
+            :key="'osaamisala'+index"
             v-model="innerModel.osaamisala"
             class="ml-1"
             :value="osaamisala"
@@ -137,14 +137,14 @@
             <span v-else>{{ $t('valitse-tutkintonimike') }} </span>
             <span>{{ $t('uusia-tutkintonimikkeita-voit-luoda') }} </span>
             <a
-              class="btn-link"
+              class="btn-link px-1"
               @click="cancel()"
             >{{ $t('tutkinnon-muodostumisen') }} </a>
             <span>{{ $t('nakymasta') }}</span>
           </div>
           <EpRadio
             v-for="(tutkintonimike, index) in selectableTutkintonimikkeet"
-            :key="&quot;tutkintonimike&quot;+index"
+            :key="'tutkintonimike'+index"
             v-model="innerModel.tutkintonimike"
             class="ml-1"
             :value="tutkintonimike"
@@ -161,7 +161,7 @@
           <EpRadio
             v-model="nimiValinta"
             class="ml-1"
-            value="paikallinen"
+            :value="'paikallinen'"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['paikallinen']) }}
@@ -169,7 +169,7 @@
           <EpRadio
             v-model="nimiValinta"
             class="ml-1"
-            value="tutkinnonosato"
+            :value="'tutkinnonosato'"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['tutkinnonosato']) }}
@@ -177,7 +177,7 @@
           <EpRadio
             v-model="nimiValinta"
             class="ml-1"
-            value="korkeakoulu"
+            :value="'korkeakoulu'"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['korkeakoulu']) }}
@@ -185,7 +185,7 @@
           <EpRadio
             v-model="nimiValinta"
             class="ml-1"
-            value="yhteinen"
+            :value="'yhteinen'"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['yhteinen']) }}
@@ -193,7 +193,7 @@
           <EpRadio
             v-model="nimiValinta"
             class="ml-1"
-            value="muu"
+            :value="'muu'"
             name="nimiValinta"
           >
             {{ $t(nimiValintaTekstit['muu']) }}
@@ -307,14 +307,16 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'save', 'remove']);
 
-const nimiValinta = ref(null);
-const tyyppi = ref(null);
-const tempModel = ref(null);
+const nimiValinta = ref<'paikallinen' | 'tutkinnonosato' | 'korkeakoulu' | 'yhteinen' | 'muu' | null>(null);
+const tyyppi = ref<'osaamisala' | 'tutkintonimike' | 'rakenne-moduuli-pakollinen' | 'rakenne-moduuli-valinnainen' | 'rakenne-moduuli-ammatilliset' | 'rakenne-moduuli-yhteiset' | 'rakenne-moduuli-paikalliset' | null>(null);
+const tempModel = ref<any>(null);
 const oldMaksimi = ref(1);
 const rakenneModal = ref(null);
 
-const osaamisalat = inject('osaamisalat', []);
-const tutkintonimikkeet = inject('tutkintonimikkeet', []);
+const osaamisalat = inject('osaamisalat', ref([]));
+const tutkintonimikkeet = inject('tutkintonimikkeet', ref([]));
+
+
 
 const tyyppiRoolit = {
   'rakenne-moduuli-pakollinen': 'määritelty',
@@ -393,7 +395,7 @@ const nimi = computed(() => {
 });
 
 const selectableOsaamisalat = computed(() => {
-  return _.map(osaamisalat, osaamisala => {
+  return _.map(osaamisalat.value, osaamisala => {
     return {
       nimi: osaamisala.nimi,
       osaamisalakoodiArvo: osaamisala.osaamisala.osaamisalakoodiArvo,
@@ -403,7 +405,7 @@ const selectableOsaamisalat = computed(() => {
 });
 
 const selectableTutkintonimikkeet = computed(() => {
-  return _.map(tutkintonimikkeet, tutkintonimike => {
+  return _.map(tutkintonimikkeet.value, tutkintonimike => {
     return {
       nimi: tutkintonimike.nimi,
       arvo: tutkintonimike.tutkintonimike.arvo,
@@ -441,8 +443,8 @@ const getNimi = (key) => {
 const setDefaultNimi = () => {
   if (tyyppi.value === 'rakenne-moduuli-paikalliset') {
     for (const nimiteksti of _.keys(nimiValintaTekstit.value)) {
-      if (props.modelValue?.nimi?.fi === $t(nimiValintaTekstit.value[nimiteksti], 'fi')) {
-        nimiValinta.value = nimiteksti;
+      if (props.modelValue?.nimi?.fi === $t(nimiValintaTekstit.value[nimiteksti], {}, { locale: 'fi' })) {
+        nimiValinta.value = nimiteksti as any;
       }
     }
 
@@ -460,7 +462,7 @@ const show = (isNew) => {
     innerModel.value.osaamisala = null;
   }
   else {
-    tyyppi.value = defaultTyyppi.value;
+    tyyppi.value = defaultTyyppi.value as any;
   }
 
   if (tyyppi.value !== 'rakenne-moduuli-paikalliset') {
@@ -470,12 +472,22 @@ const show = (isNew) => {
   tempModel.value = _.cloneDeep(innerModel.value);
   setDefaultNimi();
 
+  console.log('DEBUG show() - innerModel.value:', innerModel.value);
+  console.log('DEBUG show() - osaamisala:', innerModel.value.osaamisala);
+  console.log('DEBUG show() - tutkintonimike:', innerModel.value.tutkintonimike);
+  console.log('DEBUG show() - selectableOsaamisalat:', selectableOsaamisalat.value);
+  console.log('DEBUG show() - selectableTutkintonimikkeet:', selectableTutkintonimikkeet.value);
+
   emit('update:modelValue',
     {
       ...innerModel.value,
       ...(innerModel.value.tutkintonimike
         && {
           tutkintonimike: _.find(selectableTutkintonimikkeet.value, tutkintonimike => innerModel.value.tutkintonimike.uri === tutkintonimike.uri),
+        }),
+      ...(innerModel.value.osaamisala
+        && {
+          osaamisala: _.find(selectableOsaamisalat.value, osaamisala => innerModel.value.osaamisala.osaamisalakoodiUri === osaamisala.osaamisalakoodiUri),
         }),
       ...((!innerModel.value.muodostumisSaanto || innerModel.value.muodostumisSaanto === null)
         && {
@@ -494,14 +506,14 @@ const save = () => {
     innerModel.value = {
       ...innerModel.value,
       rooli: 'osaamisala',
-      nimi: _.get(_.find(osaamisalat, osaamisala => osaamisala.osaamisala.osaamisalakoodiUri === innerModel.value.osaamisala.osaamisalakoodiUri), 'nimi'),
+      nimi: _.get(_.find(osaamisalat.value, osaamisala => osaamisala.osaamisala.osaamisalakoodiUri === innerModel.value.osaamisala.osaamisalakoodiUri), 'nimi'),
     };
   }
   else if (tyyppi.value === 'tutkintonimike') {
     innerModel.value = {
       ...innerModel.value,
       rooli: 'tutkintonimike',
-      nimi: _.get(_.find(tutkintonimikkeet, tutkintonimike => tutkintonimike.tutkintonimike.uri === innerModel.value.tutkintonimike.uri), 'nimi'),
+      nimi: _.get(_.find(tutkintonimikkeet.value, tutkintonimike => tutkintonimike.tutkintonimike.uri === innerModel.value.tutkintonimike.uri), 'nimi'),
     };
   }
   else if (isRyhma.value && tyyppi.value && tyyppiRoolit[tyyppi.value]) {

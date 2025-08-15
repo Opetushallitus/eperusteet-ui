@@ -8,6 +8,7 @@
       </template>
 
       <template #default="{ data, isEditing, validation }">
+
         <b-tabs>
           <b-tab :title="$t('perustiedot')">
             <b-container

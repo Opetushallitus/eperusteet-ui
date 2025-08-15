@@ -6,7 +6,6 @@ import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';
 import RouteHome from '@/views/RouteHome.vue';
 import RouteJarjesta from '@/views/RouteJarjesta.vue';
 import RouteJulkaise from '@/views/RouteJulkaise.vue';
-import RouteKaannokset from '@/views/RouteKaannokset.vue';
 import RouteKasite from '@/views/RouteKasite.vue';
 import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
 import RouteKvliite from '@/views/RouteKvliite.vue';
@@ -78,9 +77,6 @@ import { loadingOptions } from '@/utils/loading';
 import { $bvModal } from '@shared/utils/globals';
 import { convertRouteParamsToNumbers } from '@/utils/routing';
 
-// Vue.use(VueMeta, {
-//   refreshOnceOnNavigation: true,
-// });
 
 const props = (route: any) => {
   return {
@@ -635,6 +631,19 @@ window.addEventListener('beforeunload', e => {
     e.preventDefault();
     // Vanhemmat selainversiot vaativat erillisen varmistustekstin
     e.returnValue = Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti');
+  }
+});
+
+router.beforeEach((to, from, next) => {
+  const hash = window.location.hash;
+
+  if (hash.includes('%2F')) {
+    const decoded = decodeURIComponent(hash).replace('//', '/');
+    window.location.replace(window.location.pathname + window.location.search + decoded);
+    window.location.reload();
+  }
+  else {
+    next();
   }
 });
 
