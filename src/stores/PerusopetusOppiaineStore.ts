@@ -3,7 +3,7 @@ import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/compone
 import { computed } from 'vue';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { App } from 'vue';
 import { Router } from 'vue-router';
 

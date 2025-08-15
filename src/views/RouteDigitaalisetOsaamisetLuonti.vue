@@ -7,7 +7,7 @@
         :initial-step="0"
         :on-save="onSave"
         @cancel="onCancel"
-        @stepChange="onStepChange"
+        @step-change="onStepChange"
       >
         <template #pohja>
           <div class="mb-5">
@@ -20,14 +20,15 @@
                 class="mt-0"
                 :label="$t('kayta-pohjana') + ' *'"
               >
-                <b-form-radio
+                <EpRadio
                   v-model="tyyppi"
                   value="perusteesta"
                   name="tyyppi"
                   :disabled="!perusteet || perusteet.length === 0"
                 >
                   {{ $t('toinen-projekti') }}
-                </b-form-radio>
+                </EpRadio>
+
                 <div v-if="tyyppi === 'perusteesta'">
                   <EpMultiSelect
                     v-if="perusteet"
@@ -62,14 +63,14 @@
                 </div>
               </b-form-group>
 
-              <b-form-radio
+              <EpRadio
                 v-model="tyyppi"
                 class="mb-4"
                 value="uusi"
                 name="tyyppi"
               >
                 {{ $t('luo-uusi') }}
-              </b-form-radio>
+              </EpRadio>
               <b-form-group
                 v-if="tyyppi"
                 :label="$t('projektin-nimi') + '*'"
@@ -109,6 +110,7 @@ import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import * as _ from 'lodash';
 import { notNull } from '@shared/validators/required';
 import { $t, $kaanna, $sd } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 
 const props = defineProps<{

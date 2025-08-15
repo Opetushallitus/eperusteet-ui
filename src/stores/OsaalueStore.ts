@@ -5,7 +5,7 @@ import { TutkinnonOsaViiteDto, OsaAlueet, TutkinnonRakenne } from '@shared/api/e
 import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { translated, requiredOneLang } from '@shared/validators/required';
 import { App } from 'vue';
 

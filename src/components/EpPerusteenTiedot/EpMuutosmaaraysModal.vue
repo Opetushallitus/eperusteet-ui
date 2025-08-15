@@ -61,7 +61,7 @@ import { MaarayksetEditStore, requireOneLiite } from '@/stores/MaarayksetEditSto
 import { MaaraysDtoLiittyyTyyppiEnum, MaaraysDtoTilaEnum, MaaraysDtoTyyppiEnum } from '@shared/generated/eperusteet';
 import { useVuelidate } from '@vuelidate/core';
 import { requiredOneLang } from '@shared/validators/required';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { Maaraykset, MaaraysKevytDto } from '@shared/api/eperusteet';
 import { $t, $success, $fail, $bvModal } from '@shared/utils/globals';
 

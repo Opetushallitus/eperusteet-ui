@@ -37,7 +37,7 @@
     "eperusteet-frontend-utils/vue/src/**/*.ts",
     "eperusteet-frontend-utils/vue/src/**/*.vue",
     "tests/integration/**/*.ts",
-    "tests/integration/**/*.tsx",
+    "tests/integration/**/*.tsx", "src/registerServiceWorker.ts.old",
   ],
   "exclude": [
     "node_modules",

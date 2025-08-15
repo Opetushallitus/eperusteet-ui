@@ -1,7 +1,7 @@
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { computed } from 'vue';
 import { Liitetiedostot, Maaraykset, Perusteet } from '@shared/api/eperusteet';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf } from '@vuelidate/validators';
 import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
 

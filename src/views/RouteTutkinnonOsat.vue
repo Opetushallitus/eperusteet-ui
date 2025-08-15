@@ -1,5 +1,8 @@
 <template>
-  <EpEditointi v-if="store" :store="store">
+  <EpEditointi
+    v-if="store"
+    :store="store"
+  >
     <template #header>
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tutkinnon-osat') }}</h1>

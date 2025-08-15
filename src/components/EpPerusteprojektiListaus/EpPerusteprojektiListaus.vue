@@ -154,9 +154,8 @@
             <EpMultiSelect
               v-model="peruste"
               name="peruste"
-              :enable-empty-option="true"
+              :allow-empty="true"
               placeholder="kaikki"
-              :is-editing="true"
               :options="perusteet"
             >
               <template #singleLabel="{ option }">
@@ -174,9 +173,8 @@
             <label>{{ $t('voimassaolo') }}</label>
             <EpMultiSelect
               v-model="voimassaolo"
-              :enable-empty-option="true"
+              :allow-empty="true"
               placeholder="kaikki"
-              :is-editing="true"
               :options="vaihtoehdotVoimassaolo"
             >
               <template #singleLabel="{ option }">
@@ -216,8 +214,8 @@
             :items="items.data"
             :fields="fields"
             no-local-sorting
-            :sort-by.sync="sort.sortBy"
-            :sort-desc.sync="sort.sortDesc"
+            :sort-by="sort.sortBy"
+            :sort-desc="sort.sortDesc"
             @sort-changed="sortingChanged"
           >
             <template

@@ -5,6 +5,7 @@
       :tallenna="tallennaUusiTekstikappale"
       :tekstikappaleet="perusteenOsat"
       :paatasovalinta="true"
+      :osaamisalat="osaamisalat"
     >
       <template #default="{tekstikappale}">
         <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
@@ -387,6 +388,10 @@ const perusteTyyppiSisaltoLisays = computed(() => {
   };
 });
 
+const osaamisalat = computed(() => {
+  return peruste.value?.osaamisalat;
+});
+
 const isLisasisaltoLisays = computed(() => {
   return !!peruste.value && (!!koulutustyypinLisasisaltoLisays.value[peruste.value.koulutustyyppi!] || !!perusteTyyppiSisaltoLisays.value[peruste.value.tyyppi!]);
 });
@@ -405,9 +410,9 @@ const makeCall = async (call) => {
   }
 };
 
-const tallennaUusiTekstikappale = async (otsikko, tekstikappaleIsa) => {
+const tallennaUusiTekstikappale = async (otsikko, tekstikappaleIsa, osaamisala) => {
   const tkstore = new TekstikappaleStore(peruste.value!.id!, 0);
-  const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+  const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa, osaamisala);
   await props.perusteStore.updateNavigation();
   await router.push({
     name: tekstikappaleRoute.value,

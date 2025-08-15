@@ -109,6 +109,7 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
 import { buildPerusteEsikatseluUrl } from '@shared/utils/esikatselu';
 import { $t, $kaanna, $sdt } from '@shared/utils/globals';
+import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 
 const props = defineProps<{
   projekti: PerusteprojektiDto;

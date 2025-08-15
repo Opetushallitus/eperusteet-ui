@@ -211,7 +211,7 @@
                           </div>
                         </div>
                       </VueDraggable>
-                      <b-pagination
+                      <ep-pagination
                         v-if="tutkinnonOsat && tutkinnonOsat.length > 0"
                         v-model="tutkinnonosatSivu"
                         :total-rows="tutkinnonOsat.length"
@@ -292,11 +292,11 @@
                               :id="'poista-osaamisala-' + index"
                               variant="link"
                               icon="delete"
-                              :disabled="ryhma.osaamisala.rakenteessa"
+                              :disabled="osaamisalatRakenteessa[ryhma.osaamisala.osaamisalakoodiUri]"
                               @click="poistaOsaamisala(index)"
                             />
                             <b-popover
-                              v-if="ryhma.osaamisala.rakenteessa"
+                              v-if="osaamisalatRakenteessa[ryhma.osaamisala.osaamisalakoodiUri]"
                               :target="'poista-osaamisala-' + index"
                               triggers="hover"
                               placement="top"
@@ -306,7 +306,7 @@
                           </div>
                         </div>
                       </VueDraggable>
-                      <b-pagination
+                      <ep-pagination
                         v-if="osaamisalat && osaamisalat.length > 0"
                         v-model="osaamisalatSivu"
                         :total-rows="osaamisalat.length"
@@ -390,11 +390,11 @@
                               :id="'poista-tutkintonimike-' + index"
                               variant="link"
                               icon="delete"
-                              :disabled="ryhma.tutkintonimike.rakenteessa"
+                              :disabled="tutkintonimikkeetRakenteessa[ryhma.tutkintonimike.uri]"
                               @click="poistaTutkintonimike(index)"
                             />
                             <b-popover
-                              v-if="ryhma.tutkintonimike.rakenteessa"
+                              v-if="tutkintonimikkeetRakenteessa[ryhma.tutkintonimike.uri]"
                               :target="'poista-tutkintonimike-' + index"
                               triggers="hover"
                               placement="top"
@@ -404,7 +404,7 @@
                           </div>
                         </div>
                       </VueDraggable>
-                      <b-pagination
+                      <ep-pagination
                         v-if="tutkintonimikkeet && tutkintonimikkeet.length > 0"
                         v-model="tutkintonimikkeetSivu"
                         :total-rows="tutkintonimikkeet.length"
@@ -488,6 +488,7 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { inject } from 'vue';
 import { $bvModal, $kaanna, $filterBy } from '@shared/utils/globals';
 import { unref } from 'vue';
+import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
 const props = defineProps<{
   browserStore: BrowserStore;
@@ -664,6 +665,7 @@ const optionsTutkinnonOsat = computed(() => {
     },
     clone(original) {
       return {
+        ...original,
         kuvaus: null,
         vieras: null,
         tunniste: null,
@@ -755,10 +757,13 @@ const tutkintonimikkeet = computed(() => {
         nimi: tutkintonimike.nimi,
         uri: tutkintonimike.tutkintonimikeUri,
         arvo: tutkintonimike.tutkintonimikeArvo,
-        rakenteessa: _.some(rakenteenOsat.value, osa => osa.tutkintonimike && osa.tutkintonimike.uri === tutkintonimike.tutkintonimikeUri),
       },
     };
   });
+});
+
+const tutkintonimikkeetRakenteessa = computed(() => {
+  return _.keyBy(_.filter(rakenteenOsat.value, osa => osa.tutkintonimike && osa.tutkintonimike.uri), 'tutkintonimike.uri');
 });
 
 const rakenteenOsat = computed(() => {
@@ -774,10 +779,13 @@ const osaamisalat = computed(() => {
         nimi: osaamisala.nimi,
         'osaamisalakoodiArvo': osaamisala.arvo,
         'osaamisalakoodiUri': osaamisala.uri,
-        rakenteessa: _.some(rakenteenOsat.value, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri === osaamisala.uri),
       },
     };
   });
+});
+
+const osaamisalatRakenteessa = computed(() => {
+  return _.keyBy(_.filter(rakenteenOsat.value, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri), 'osaamisala.osaamisalakoodiUri');
 });
 
 const osaamisalatPaged = computed(() => {

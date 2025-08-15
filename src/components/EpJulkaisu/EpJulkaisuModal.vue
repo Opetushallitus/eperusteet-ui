@@ -25,11 +25,11 @@
     />
 
     <EpJulkaisuForm
+      v-model="muokattavaJulkaisu"
       class="mt-4"
       :is-latest="isLatest"
       :store="perusteStore"
-      :julkaisu="muokattavaJulkaisu"
-      @setInvalid="hasRequiredData"
+      @set-invalid="hasRequiredData"
     />
 
     <div class="float-right">
@@ -103,6 +103,7 @@ const muokkaa = (julkaisu, isLatestValue) => {
     ..._.cloneDeep(julkaisu),
     liittyyMuutosmaarays: !!julkaisu.muutosmaarays,
   };
+
   (julkaisuModal.value as any).show();
 };
 

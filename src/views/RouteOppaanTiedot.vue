@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isInitializing && store">
+  <div v-if="store">
     <EpEditointi :store="store">
       <template #header>
         <h2 class="m-0">
@@ -38,19 +38,17 @@
           >
             <b-col lg="6">
               <b-form-group :label="$t('sisallonhallinta')">
-                <b-form-checkbox-group
+                <EpToggleGroup
                   v-if="isEditing"
                   v-model="oppaanTyyppi"
+                  :items="oppaanTyypit"
                   stacked
+                  :is-editing="isEditing"
                 >
-                  <b-form-checkbox
-                    v-for="tyyppi in oppaanTyypit"
-                    :key="tyyppi"
-                    :value="tyyppi"
-                  >
-                    {{ $t('oppaan-tyyppi-' + tyyppi) }}
-                  </b-form-checkbox>
-                </b-form-checkbox-group>
+                  <template #default="{ item }">
+                    {{ $t('oppaan-tyyppi-' + item) }}
+                  </template>
+                </EpToggleGroup>
                 <div v-if="oppaanTyyppiTietoaPalvelusta && !isEditing">
                   {{ $t('oppaan-tyyppi-' + oppaanTyyppi[0]) }}
                 </div>
@@ -143,19 +141,17 @@
           >
             <b-col lg="6">
               <b-form-group :label="$t('oppaan-kielet')">
-                <b-form-checkbox-group
+                <EpToggleGroup
                   v-if="isEditing"
                   v-model="data.peruste.kielet"
+                  :items="kielet"
                   stacked
+                  :is-editing="isEditing"
                 >
-                  <b-form-checkbox
-                    v-for="kieli in kielet"
-                    :key="kieli"
-                    :value="kieli"
-                  >
-                    {{ $t(kieli) }}
-                  </b-form-checkbox>
-                </b-form-checkbox-group>
+                  <template #default="{ item }">
+                    {{ $t(item) }}
+                  </template>
+                </EpToggleGroup>
                 <div
                   v-else
                   class="text-nowrap"
@@ -209,25 +205,13 @@
             </b-col>
           </b-row>
 
-          <b-row>
+          <b-row class="mt-4">
             <b-col>
               <EpEsikatselu
                 v-model="storeData"
                 opas
                 :is-editing="isEditing"
               />
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col v-if="!isEditing">
-              <b-form-group :label="$t('oppaan-lataus')">
-                <ep-button
-                  variant="primary"
-                  @click="lataa"
-                >
-                  {{ $t('lataa-opas-json') }}
-                </ep-button>
-              </b-form-group>
             </b-col>
           </b-row>
         </b-container>
@@ -398,6 +382,7 @@ import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 import { KoulutusTyyppi } from '@/utils/perusteet';
 import { $t, $kaanna } from '@shared/utils/globals';
 import { PerusteStore } from '@/stores/PerusteStore';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 
 const props = defineProps<{
   ulkopuolisetStore: UlkopuolisetStore;
@@ -408,22 +393,20 @@ const props = defineProps<{
 const store = ref<EditointiStore | null>(null);
 const maintenanceStore = ref<MaintenanceStore | null>(null);
 
-// Use the composition function
 const {
-  isInitializing,
   projektiId,
-  perusteStore,
 } = usePerusteprojekti(props);
 
 onMounted(async () => {
   await props.perusteprojektiStore.fetchPohjaProjektit();
+  await onProjektiChange(parseInt(projektiId.value), props.perusteStore.perusteId.value!);
 });
 
 watch(projektiId, async (newValue, oldValue) => {
   if (newValue && newValue !== oldValue) {
-    await onProjektiChange(parseInt(newValue), perusteStore.perusteId.value!);
+    await onProjektiChange(parseInt(newValue), props.perusteStore.perusteId.value!);
   }
-}, { immediate: true });
+});
 
 async function onProjektiChange(projektiId: number, perusteId: number) {
   store.value = new EditointiStore(new OpasEditStore(projektiId, perusteId, props.perusteStore));
@@ -463,10 +446,6 @@ const perusteet = computed(() => {
     .sortBy(peruste => _.toLower(peruste.text))
     .value();
 });
-
-async function lataa() {
-  await maintenanceStore.value?.exportPeruste();
-}
 
 const tutkinnonOsatKoodisto = new KoodistoSelectStore({
   koodisto: 'tutkinnonosat',
@@ -625,13 +604,13 @@ function asetaOppaanKoodit(kiinnitettyKoodi) {
   if (store.value) {
     store.value.setData(
       {
-        ...store.value.data.value,
+        ...store.value.data,
         peruste: {
-          ...store.value.data.value.peruste,
+          ...store.value.data.peruste,
           oppaanSisalto: {
-            ...store.value.data.value.peruste.oppaanSisalto,
+            ...store.value.data.peruste.oppaanSisalto,
             oppaanKiinnitetytKoodit: [
-              ...store.value.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit,
+              ...store.value.data.peruste.oppaanSisalto.oppaanKiinnitetytKoodit,
               ..._.filter(kiinnitettyKoodi, koodi => !_.includes(oppaanKiinnitetytKooditUris.value, koodi.koodi.uri)),
             ],
           },
@@ -645,12 +624,12 @@ function removeOppaanKoodi(koodi) {
   if (store.value) {
     store.value.setData(
       {
-        ...store.value.data.value,
+        ...store.value.data,
         peruste: {
-          ...store.value.data.value.peruste,
+          ...store.value.data.peruste,
           oppaanSisalto: {
-            ...store.value.data.value.peruste.oppaanSisalto,
-            oppaanKiinnitetytKoodit: _.filter(store.value.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit, kiinnitettyKoodi => kiinnitettyKoodi.koodi.uri !== koodi.uri),
+            ...store.value.data.peruste.oppaanSisalto,
+            oppaanKiinnitetytKoodit: _.filter(store.value.data.peruste.oppaanSisalto.oppaanKiinnitetytKoodit, kiinnitettyKoodi => kiinnitettyKoodi.koodi.uri !== koodi.uri),
           },
         },
       },
