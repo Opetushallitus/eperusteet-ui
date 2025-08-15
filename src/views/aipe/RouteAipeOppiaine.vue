@@ -310,9 +310,9 @@ const lisaaKurssi = () => {
 const lisaaTavoite = () => {
   store.value?.setData(
     {
-      ...store.value.data.value,
+      ...store.value.data,
       tavoitteet: [
-        ...store.value.data.value.tavoitteet,
+        ...store.value.data.tavoitteet,
         {
           laajattavoitteet: [],
           arvioinninkohteet: [],
@@ -327,8 +327,8 @@ const lisaaTavoite = () => {
 const poistaTavoite = (poistettavaTavoite) => {
   store.value?.setData(
     {
-      ...store.value.data.value,
-      tavoitteet: _.reject(store.value.data.value.tavoitteet, poistettavaTavoite),
+      ...store.value.data,
+      tavoitteet: _.reject(store.value.data.tavoitteet, poistettavaTavoite),
     },
   );
 };

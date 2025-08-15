@@ -12,7 +12,7 @@
           :is-editing="true"
           :search-identity="nimiSearchIdentity"
           :options="maarayksetNimella"
-          @update:modelValue="asetaMaarays(index, $event)"
+          @update:model-value="asetaMaarays(index, $event)"
         >
           <template #singleLabel="{ option }">
             {{ $kaanna(option.nimi) }} <span v-if="option.diaarinumero">({{ option.diaarinumero }})</span>

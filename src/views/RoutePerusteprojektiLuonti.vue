@@ -7,7 +7,7 @@
         :initial-step="0"
         :on-save="onSave"
         @cancel="onCancel"
-        @stepChange="onStepChange"
+        @step-change="onStepChange"
       >
         <template #pohja>
           <div class="row">
@@ -34,7 +34,7 @@
                   :is-editing="true"
                   :search-identity="nimiSearchIdentity"
                   :options="pohjat"
-                  @update:modelValue="valitsePeruste($event)"
+                  @update:model-value="valitsePeruste($event)"
                 >
                   <template #singleLabel="{ option }">
                     {{ $kaanna(option.nimi) }}
@@ -72,7 +72,7 @@
                   :search-identity="nimiSearchIdentity"
                   :options="perusteet"
                   class="perustevalinta"
-                  @update:modelValue="valitsePeruste($event)"
+                  @update:model-value="valitsePeruste($event)"
                 >
                   <template #singleLabel="{ option }">
                     {{ $kaanna(option.nimi) }}
@@ -388,7 +388,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, defineProps, onMounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';

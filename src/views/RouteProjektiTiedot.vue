@@ -83,8 +83,6 @@
                   v-model="data.kuvaus"
                   layout="normal"
                   :is-editable="isEditing"
-                  :kasite-handler="kasiteHandler"
-                  :kuva-handler="kuvaHandler"
                 />
               </b-form-group>
             </b-col>
@@ -99,7 +97,7 @@
             </b-col>
             <b-col lg="6">
               <b-form-group
-                v-if="!isEditing"
+                v-if="!isEditing && data.peruste.tyyppi === 'normaali'"
                 :label="$t('perusteen-lataus')"
               >
                 <ep-button
@@ -126,17 +124,10 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
-import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteprojektiEditStore } from '@/stores/PerusteprojektiEditStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
-import { KuvaStore } from '@/stores/KuvaStore';
-import { TermitStore } from '@/stores/TermitStore';
-import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 import { Maintenance, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 import { $t } from '@shared/utils/globals';
@@ -144,7 +135,6 @@ import { $t } from '@shared/utils/globals';
 const props = defineProps<{
   ulkopuolisetStore: UlkopuolisetStore;
   projektiId?: number;
-  perusteId?: number;
   isInitializing?: boolean;
   perusteStore: any;
 }>();
@@ -156,14 +146,6 @@ const kuvaus = computed(() => {
     uudistus: PerusteprojektiLuontiKuvausEnum.UUDISTUS,
     korjaus: PerusteprojektiLuontiKuvausEnum.KORJAUS,
   };
-});
-
-const kasiteHandler = computed(() => {
-  return createKasiteHandler(new TermitStore(props.perusteId!));
-});
-
-const kuvaHandler = computed(() => {
-  return createKuvaHandler(new KuvaStore(props.perusteId!));
 });
 
 const storeData = computed({
@@ -179,12 +161,20 @@ const onProjektiChange = async (projektiId: number) => {
   store.value = new EditointiStore(new PerusteprojektiEditStore(projektiId, props.perusteStore));
 };
 
+const externalUrl = computed(() => {
+  if (window.location.origin.includes('localhost')) {
+    return 'http://localhost:8080/eperusteet-service/api/external/peruste/' + storeData.value.peruste.id;
+  }
+
+  return window.location.origin + '/eperusteet-service/api/external/peruste/' + storeData.value.peruste.id;
+});
+
 const exportPeruste = async () => {
-  const peruste = JSON.stringify((await Maintenance.viePerusteJson(props.perusteId!)).data);
+  const peruste = JSON.stringify((await Maintenance.viePerusteJson(storeData.value.peruste.id!)).data);
   const blob = new Blob([peruste as any], { type: 'application/json' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = 'peruste';
+  link.download = `peruste_${storeData.value.peruste.id}.json`;
   link.click();
   URL.revokeObjectURL(link.href);
 };

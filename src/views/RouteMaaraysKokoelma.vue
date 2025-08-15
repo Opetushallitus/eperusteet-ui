@@ -120,8 +120,8 @@
         :fields="tableFields"
         :per-page="perPage"
         no-local-sorting
-        :sort-by.sync="sort.sortBy"
-        :sort-desc.sync="sort.sortDesc"
+        :sort-by="sort.sortBy"
+        :sort-desc="sort.sortDesc"
         @sort-changed="sortingChanged"
       >
         <template #cell(nimi)="{ item }">

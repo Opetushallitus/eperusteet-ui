@@ -11,7 +11,6 @@ import { PerusteenOsaDto } from '@shared/generated/eperusteet';
 import { App } from 'vue';
 
 interface TekstikappaleStoreConfig {
-  // notifikaatiotStore: NotifikaatiotStore;
   perusteStore: PerusteStore;
   router: Router;
 }
@@ -68,10 +67,15 @@ export class TekstikappaleStore implements IEditoitava {
   public async save(data: Matala) {
     const res = await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.state.tekstikappale!.id!, data);
 
-    TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
-      id: this.tekstiKappaleViiteId,
-      label: (res.data as any).nimi as any,
-    });
+    if ((data as any)?.liite === (this.state.tekstikappale! as any)?.liite) {
+      TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
+        id: this.tekstiKappaleViiteId,
+        label: (res.data as any).nimi as any,
+      });
+    }
+    else {
+      await TekstikappaleStore.config!.perusteStore!.updateNavigation();
+    }
 
     return res.data;
   }
@@ -144,7 +148,7 @@ export class TekstikappaleStore implements IEditoitava {
     };
   }
 
-  public async create(otsikko, tekstikappaleIsa) {
+  public async create(otsikko, tekstikappaleIsa, osaamisala) {
     let suoritustapakoodi;
     if (_.lowerCase(TekstikappaleStore.config.perusteStore.peruste.value?.tyyppi) === _.lowerCase(PerusteDtoTyyppiEnum.OPAS)) {
       suoritustapakoodi = 'opas';
@@ -167,6 +171,7 @@ export class TekstikappaleStore implements IEditoitava {
               perusteenOsa: {
                 nimi: otsikko,
                 osanTyyppi: 'tekstikappale',
+                osaamisala,
               } as any,
             },
           ));
@@ -182,6 +187,7 @@ export class TekstikappaleStore implements IEditoitava {
             perusteenOsa: {
               nimi: otsikko,
               osanTyyppi: 'tekstikappale',
+              osaamisala,
             } as any,
           }));
 

@@ -6,7 +6,7 @@
       :file-types="['application/pdf']"
       :as-binary="true"
       :file-max-size="LIITE_MAX_KOKO"
-      @update:modelValue="lisaaLiite($event)"
+      @update:model-value="lisaaLiite($event)"
     />
 
     <div

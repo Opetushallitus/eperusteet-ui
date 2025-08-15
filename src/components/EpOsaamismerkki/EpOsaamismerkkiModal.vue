@@ -259,7 +259,7 @@ import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue
 import { Kieli } from '@shared/tyypit';
 import { useVuelidate } from '@vuelidate/core';
 import { notNull, requiredLokalisoituTeksti } from '@shared/validators/required';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { $t, $kaanna, $sdt, $success, $fail } from '@shared/utils/globals';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 

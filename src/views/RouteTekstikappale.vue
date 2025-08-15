@@ -30,15 +30,15 @@
               value="osaamisala"
               name="tekstikappaleTyyppi"
             >
-            {{ $t('osaamisala') }}
+              {{ $t('osaamisala') }}
             </EpRadio>
             <EpRadio
-              v-if="tutkintonimikkeet.length > 0"
+              v-if="data.tutkintonimike && tutkintonimikkeet.length > 0"
               v-model="tekstikappaleTyyppi"
               value="tutkintonimike"
               name="tekstikappaleTyyppi"
             >
-            {{ $t('tutkintonimike') }}
+              {{ $t('tutkintonimike') }}
             </EpRadio>
             <EpRadio
               v-model="tekstikappaleTyyppi"
@@ -133,13 +133,6 @@
         </div>
 
         <div :class="{ 'mt-4': isEditing }">
-          <!-- <EpContent
-            v-model="data.teksti"
-            layout="normal"
-            :is-editable="isEditing"
-            :kasite-handler="kasiteHandler"
-            :kuva-handler="kuvaHandler"
-          /> -->
           <EpContent
             v-model="data.teksti"
             :is-editable="isEditing"

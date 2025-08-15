@@ -2,7 +2,7 @@ import { reactive, computed, ref, watch } from 'vue';
 import { Ulkopuoliset, getPerusteprojektit, PerusteHakuDto, getAllPerusteet, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import _ from 'lodash';
 
 export class PerusteetStore implements IProjektiProvider {
@@ -39,8 +39,7 @@ export class PerusteetStore implements IProjektiProvider {
     this.state.projects = null;
   }
 
-  @Debounced(300)
-  public async updateQuery(query: PerusteQuery) {
+  public updateQuery = debounced(async (query: PerusteQuery) => {
     const res = (await getPerusteprojektit({
       ...query,
       ...this.overrides,
@@ -64,7 +63,7 @@ export class PerusteetStore implements IProjektiProvider {
     else {
       this.state.projects = res;
     }
-  }
+  });
 
   public async findPerusteet(query: PerusteQuery) {
     const res = await getAllPerusteet({

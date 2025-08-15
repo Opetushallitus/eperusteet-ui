@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { ref, computed, withDefaults } from 'vue';
+import { ref, computed } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import _ from 'lodash';
 import { RooliToTheme, ColorMap } from '@/components/muodostuminen/utils';

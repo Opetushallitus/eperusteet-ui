@@ -59,10 +59,15 @@ import EpArkistoidutModal from '@shared/components/EpArkistoidutModal/EpArkistoi
 import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
 import { DigitaalisetOsaamisetStore } from '@/stores/DigitaalisetOsaamisetStore';
 import { $t } from '@shared/utils/globals';
+import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const props = defineProps<{
   digitaalisetOsaamisetStore: DigitaalisetOsaamisetStore;
 }>();
+
+const route = useRoute();
+const router = useRouter();
 
 const haePoistetut = async () => {
   await props.digitaalisetOsaamisetStore.updateQuery({
@@ -92,12 +97,15 @@ const palautusoikeus = (perusteprojekti: any) => {
 
 const onRestore = async (perusteprojekti: any) => {
   await vaihdaPerusteTilaConfirm(
-    null, // This was 'this' in the Vue 2 version, but in Vue 3 we don't need to pass 'this'
     {
-      title: 'palauta-peruste',
-      confirm: 'palauta-peruste-vahvistus',
-      tila: 'laadinta',
-      projektiId: perusteprojekti.id,
+      meta: {
+        title: 'palauta-peruste',
+        confirm: 'palauta-peruste-vahvistus',
+        tila: 'laadinta',
+        projektiId: perusteprojekti.id,
+      },
+      route,
+      router,
     },
   );
   await haePoistetut();

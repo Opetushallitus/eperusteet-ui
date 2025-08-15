@@ -1,7 +1,7 @@
 import { computed } from 'vue';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { AbstractPerusteenOsaViiteStore } from '@/stores/AbstractPerusteenOsaViiteStore';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { requiredLokalisoituTeksti } from '@shared/validators/required';
 
 export class TaiteenalaStore extends AbstractPerusteenOsaViiteStore implements IEditoitava {

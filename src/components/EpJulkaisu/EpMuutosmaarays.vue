@@ -6,12 +6,13 @@
     </EpInfoBanner>
 
     <b-tabs
-      v-model="tabindex"
+      :value="tabindex"
       class="mb-3"
+      @input="tabindex = $event"
     >
       <b-tab
         v-for="kieli in kielet"
-        :key="&quot;kieli&quot;+kieli"
+        :key="'kieli' + kieli"
         :title="$t('translatiivi-' + kieli)"
       />
     </b-tabs>

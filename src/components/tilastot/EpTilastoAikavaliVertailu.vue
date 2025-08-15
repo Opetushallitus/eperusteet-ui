@@ -40,6 +40,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { $t } from '@shared/utils/globals';
+import EpFormContent from '@shared/components/forms/EpFormContent.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 
 export interface AikavaliVertailu {
   tyyppi?: {

@@ -141,14 +141,14 @@ const requiredKielet: Kieli[] = [Kieli.fi, Kieli.sv];
 const mimeTypes: string[] = ['image/jpeg, image/png, image/svg+xml'];
 const allowedTypes = '.jpeg .png .svg';
 
-const rules = {
+const rules = computed(() => ({
   kategoria: {
     nimi: requiredLokalisoituTeksti(requiredKielet),
     liite: {
       binarydata: notNull(),
     },
   },
-};
+}));
 
 const v$ = useVuelidate(rules, { kategoria });
 

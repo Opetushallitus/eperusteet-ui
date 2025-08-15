@@ -48,7 +48,7 @@
             v-for="(taso, idx) in data.kvliite.tasot"
             :key="idx"
           >
-            <li v-if="$t(taso.nimi)">
+            <li v-if="$kaanna(taso.nimi)">
               {{ $kaanna(taso.nimi) }}
             </li>
           </ul>
@@ -151,6 +151,7 @@ import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { PerusteStore } from '@/stores/PerusteStore';
+import EpInfoBanner from '@shared/components/EpInfoBanner/EpInfoBanner.vue';
 
 const props = defineProps<{
   kayttajaStore: KayttajaStore;

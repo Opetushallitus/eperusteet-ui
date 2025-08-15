@@ -6,7 +6,6 @@ import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';
 import RouteHome from '@/views/RouteHome.vue';
 import RouteJarjesta from '@/views/RouteJarjesta.vue';
 import RouteJulkaise from '@/views/RouteJulkaise.vue';
-import RouteKaannokset from '@/views/RouteKaannokset.vue';
 import RouteKasite from '@/views/RouteKasite.vue';
 import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
 import RouteKvliite from '@/views/RouteKvliite.vue';
@@ -78,9 +77,6 @@ import { loadingOptions } from '@/utils/loading';
 import { $bvModal } from '@shared/utils/globals';
 import { convertRouteParamsToNumbers } from '@/utils/routing';
 
-// Vue.use(VueMeta, {
-//   refreshOnceOnNavigation: true,
-// });
 
 const props = (route: any) => {
   return {
@@ -616,7 +612,7 @@ const router = createRouter({
       },
       ],
     }, {
-      path: '*',
+      path: '/:catchAll(.*)',
       redirect: (to) => {
         console.log('Unknown route', to);
         return {
@@ -639,8 +635,21 @@ window.addEventListener('beforeunload', e => {
 });
 
 router.beforeEach((to, from, next) => {
+  const hash = window.location.hash;
+
+  if (hash.includes('%2F')) {
+    const decoded = decodeURIComponent(hash).replace('//', '/');
+    window.location.replace(window.location.pathname + window.location.search + decoded);
+    window.location.reload();
+  }
+  else {
+    next();
+  }
+});
+
+router.beforeEach((to, from, next) => {
   if (!EditointiStore.anyEditing()) {
-    loader = $loading.show();
+    loaders.push($loading.show());
   }
   next();
 });
@@ -706,7 +715,6 @@ router.beforeEach(async (to, from, next) => {
       stores.tyoryhmaStore?.clear();
       await stores.kayttajaStore?.setPerusteprojekti(projektiIdNumber);
       await stores.perusteStore?.init(projektiIdNumber);
-      // await stores.perusteStore?.blockUntilInitialized();
       await stores.termitStore.init(stores.perusteStore.peruste.value?.id);
     }
     catch (err) {
@@ -719,7 +727,7 @@ router.beforeEach(async (to, from, next) => {
 });
 
 const $loading = useLoading(loadingOptions);
-let loader: any = null;
+const loaders: any[] = [];
 
 router.afterEach(() => {
   hideLoading();
@@ -727,9 +735,9 @@ router.afterEach(() => {
 });
 
 function hideLoading() {
-  if (loader !== null) {
-    (loader as any).hide();
-    loader = null;
+  if (loaders.length > 0) {
+    (loaders[loaders.length - 1] as any).hide();
+    loaders.pop();
   }
 }
 

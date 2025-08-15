@@ -296,7 +296,9 @@ const valitutVuosiluokkakokonaisuudetById = computed(() => {
 let tempVuosiluokkaChange = [];
 
 const vlkChange = async () => {
-  if (_.size(vuosiluokkakokonaisuudet.value) < _.size(tempVuosiluokkaChange)) {
+  const poistettavatVlk = _.find(tempVuosiluokkaChange, vlk => !_.includes(vuosiluokkakokonaisuudet.value, vlk));
+  if (poistettavatVlk) {
+    const edellisetVlk = tempVuosiluokkaChange;
     const varmistaPoisto = await $bvModal.msgBoxConfirm(
       $t('vuosiluokkakokonaisuuden-poisto-varmistus-teksti'), {
         title: $t('vahvista-poisto'),
@@ -308,15 +310,15 @@ const vlkChange = async () => {
     if (!varmistaPoisto) {
       store.value?.setData({
         ...storeData.value,
-        vuosiluokkakokonaisuudet: tempVuosiluokkaChange,
+        vuosiluokkakokonaisuudet: edellisetVlk,
       });
     }
 
-    _.forEach(tempVuosiluokkaChange, async vlk => {
-      if (!_.includes(vuosiluokkakokonaisuudet.value, vlk)) {
-        await PerusopetusOppiaineStore.deleteOppiaineenVuosiluokkakokonaisuus(perusteId.value, props.oppiaineId, vlk);
-      }
-    });
+    if (varmistaPoisto) {
+      await PerusopetusOppiaineStore.deleteOppiaineenVuosiluokkakokonaisuus(perusteId.value, props.oppiaineId, poistettavatVlk);
+    }
+
+    return;
   }
 
   _.forEach(vuosiluokkakokonaisuudet.value, async vlk => {

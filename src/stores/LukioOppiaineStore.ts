@@ -3,7 +3,7 @@ import { Lops2019 } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
 import { computed } from 'vue';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { App } from 'vue';
 import { Router } from 'vue-router';
 

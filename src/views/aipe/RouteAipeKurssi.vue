@@ -81,8 +81,9 @@
           <b-form-group :label="$t('liitetyt-tavoitteet')">
             <b-form-checkbox-group
               v-if="isEditing"
-              v-model="data.tavoitteet"
+              :value="data.tavoitteet"
               stacked
+              @input="data.tavoitteet = $event"
             >
               <b-form-checkbox
                 v-for="tavoite in supportData.tavoitteet"
@@ -92,7 +93,6 @@
                 {{ $kaanna(tavoite.tavoite) }}
               </b-form-checkbox>
             </b-form-checkbox-group>
-
             <template v-else>
               <div
                 v-for="tavoite in tavoitteet"
@@ -122,6 +122,7 @@ import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { AipeKurssiStore } from '@/stores/AipeKurssiStore';
 import { $kaanna, $t } from '@shared/utils/globals';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 
 const props = defineProps({
   perusteStore: {
