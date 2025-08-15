@@ -1,6 +1,6 @@
 import { reactive, computed } from 'vue';
 import { Oppaat, OpasLuontiDto, PerusteHakuDto } from '@shared/api/eperusteet';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import _ from 'lodash';
 
 export class OppaatStore {
@@ -21,9 +21,8 @@ export class OppaatStore {
     return res.data;
   }
 
-  @Debounced(300)
-  public async updateQuery() {
+  public updateQuery = debounced(async () => {
     const res = (await Oppaat.getAllOppaatKevyt(1000)).data;
     this.state.oppaat = (res as any).data as any;
-  }
+  });
 }

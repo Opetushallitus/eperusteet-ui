@@ -211,15 +211,4 @@ app.use(LukioOppiaineStore, {
   router,
 });
 
-// async function main() {
-//   registerIconColorSchemeChange();
-//   new Vue({
-//     router,
-//     i18n: Kielet.i18n,
-//     render: h => h(App),
-//   }).$mount('#app');
-// }
-
-// main();
-
 app.mount('#app');

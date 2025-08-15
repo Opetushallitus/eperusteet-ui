@@ -6,7 +6,6 @@ import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';
 import RouteHome from '@/views/RouteHome.vue';
 import RouteJarjesta from '@/views/RouteJarjesta.vue';
 import RouteJulkaise from '@/views/RouteJulkaise.vue';
-import RouteKaannokset from '@/views/RouteKaannokset.vue';
 import RouteKasite from '@/views/RouteKasite.vue';
 import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
 import RouteKvliite from '@/views/RouteKvliite.vue';
@@ -78,9 +77,6 @@ import { loadingOptions } from '@/utils/loading';
 import { $bvModal } from '@shared/utils/globals';
 import { convertRouteParamsToNumbers } from '@/utils/routing';
 
-// Vue.use(VueMeta, {
-//   refreshOnceOnNavigation: true,
-// });
 
 const props = (route: any) => {
   return {
