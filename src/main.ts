@@ -49,8 +49,11 @@ import { createHead } from '@unhead/vue/client';
 import Sticky from 'vue-sticky-directive';
 import { TaiteenalaStore } from './stores/TaiteenalaStore';
 import { LukioOppiaineStore } from './stores/LukioOppiaineStore';
+import { registerIconColorSchemeChange } from '@shared/utils/icon';
 
 const app = createApp(App);
+
+registerIconColorSchemeChange();
 
 configureCompat({
   COMPONENT_V_MODEL: false,
@@ -102,11 +105,6 @@ app.use(TekstikappaleStore, {
 app.use(Sticky);
 
 app.use(TekstiRakenneStore, {
-  perusteStore: stores.perusteStore,
-  router,
-});
-
-app.use(TutkinnonOsaEditStore, {
   perusteStore: stores.perusteStore,
   router,
 });
@@ -210,16 +208,5 @@ app.use(TaiteenalaStore, {
 app.use(LukioOppiaineStore, {
   router,
 });
-
-// async function main() {
-//   registerIconColorSchemeChange();
-//   new Vue({
-//     router,
-//     i18n: Kielet.i18n,
-//     render: h => h(App),
-//   }).$mount('#app');
-// }
-
-// main();
 
 app.mount('#app');

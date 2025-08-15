@@ -71,8 +71,8 @@
                   <b-input-group>
                     <b-form-input
                       :value="nimi"
-                      @input="nimi = $event"
                       :disabled="data.tutkinnonOsa.koodi !== null || koodiTallennus"
+                      @input="nimi = $event"
                     />
                     <b-input-group-append>
                       <b-button

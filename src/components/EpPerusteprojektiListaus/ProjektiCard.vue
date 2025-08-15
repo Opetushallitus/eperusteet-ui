@@ -1,7 +1,6 @@
 <template>
   <router-link
     :to="link"
-    tag="div"
     :class="classes"
   >
     <div
@@ -9,7 +8,7 @@
       class="p-2 pl-4 flex-shrink-1"
     >
       <EpColorIndicator
-        size="16"
+        :size="16"
         :kind="koulutustyyppi"
       />
     </div>

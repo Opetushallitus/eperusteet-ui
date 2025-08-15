@@ -1,5 +1,5 @@
 import { computed } from 'vue';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { AbstractPerusteenOsaViiteStore } from '@/stores/AbstractPerusteenOsaViiteStore';
 

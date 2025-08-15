@@ -43,6 +43,7 @@ export default defineConfig(({ mode }) => {
         '~': fileURLToPath(new URL('./node_modules', import.meta.url)),
         vue: '@vue/compat',
       },
+      dedupe: ['vue', '@vue/compat'],
     },
     server: {
       port: 9001,
@@ -59,11 +60,5 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    // test: {
-    //   globals: true, // Jest-like global functions (describe, it, expect)
-    //   environment: 'jsdom', // Simulates browser environment
-    //   exclude: [...configDefaults.exclude, 'e2e/*'],
-    //   setupFiles: './test/setup.ts',
-    // },
   };
 });

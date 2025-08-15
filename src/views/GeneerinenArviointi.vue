@@ -51,10 +51,11 @@
         <div class="kohde-otsikko">
           {{ $t('oletusvalinta') }}
         </div>
-        <b-form-checkbox
+        <EpToggle
           v-if="isEditing"
           v-model="inner.oletusvalinta"
-          switch
+          :is-editing="isEditing"
+          :is-switch="true"
         />
         <div v-else>
           {{ $t('' + inner.oletusvalinta) }}

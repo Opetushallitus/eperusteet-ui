@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { minLength, required } from 'vuelidate/lib/validators';
+import { minLength, required } from '@vuelidate/validators';
 import { allTranslations, translated } from '@shared/validators/required';
 import { AbstractPerusteenOsaViiteStore } from '@/stores/AbstractPerusteenOsaViiteStore';
 

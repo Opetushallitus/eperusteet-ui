@@ -420,7 +420,7 @@ const sisaltoalueetValinnat = computed(() => {
       };
     });
   }
-  return [];
+  return undefined;
 });
 
 const sisaltoalueet = computed(() => {

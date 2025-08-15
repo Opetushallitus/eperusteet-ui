@@ -72,6 +72,7 @@
           </b-form-group>
 
           <b-form-group
+            id="perustetyoryhma"
             :label="$t('perustetyoryhma')"
             required
             class="pl-0"
@@ -95,6 +96,7 @@
           </b-form-group>
 
           <b-form-group
+            id="koulutustutkintotyyppi"
             :label="$t('koulutus-tutkintotyyppi') + ' *'"
             required
           >

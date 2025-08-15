@@ -221,9 +221,9 @@ const postSave = async () => {
 const lisaaKohdealue = () => {
   store.value?.setData(
     {
-      ...store.value.data.value,
+      ...store.value.data,
       opetuksenKohdealueet: [
-        ...store.value.data.value.opetuksenKohdealueet,
+        ...store.value.data.opetuksenKohdealueet,
         {},
       ],
     },
@@ -233,8 +233,8 @@ const lisaaKohdealue = () => {
 const poistaKohdealue = (poistettavaKohdealue) => {
   store.value?.setData(
     {
-      ...store.value.data.value,
-      opetuksenKohdealueet: _.filter(store.value.data.value.opetuksenKohdealueet, kohdealue => kohdealue !== poistettavaKohdealue),
+      ...store.value.data,
+      opetuksenKohdealueet: _.filter(store.value.data.opetuksenKohdealueet, kohdealue => kohdealue !== poistettavaKohdealue),
     },
   );
 };

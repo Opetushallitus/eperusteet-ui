@@ -158,12 +158,14 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpDraggableCollapse from '@shared/components/EpDraggableCollapse/EpDraggableCollapse.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: any;
   sisaltoTekstiOtsikkoField?: string;
   isEditing?: boolean;
   sisaltoAvaimet: string[];
-}>();
+}>(), {
+  sisaltoTekstiOtsikkoField: 'otsikko',
+});
 
 const emit = defineEmits(['update:modelValue']);
 

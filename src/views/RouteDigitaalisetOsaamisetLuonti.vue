@@ -7,7 +7,7 @@
         :initial-step="0"
         :on-save="onSave"
         @cancel="onCancel"
-        @stepChange="onStepChange"
+        @step-change="onStepChange"
       >
         <template #pohja>
           <div class="mb-5">

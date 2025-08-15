@@ -27,7 +27,7 @@
         <div>
           <arviointi-selector
             :arviointi-store="arviointiStore"
-            @update:modelValue="addGeneerinen"
+            @update:model-value="addGeneerinen"
           >
             <template #valinta>
               {{ $t('luo-uusi-arviointi') }}

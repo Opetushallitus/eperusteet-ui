@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { AbstractPerusteenOsaViiteStore } from '@/stores/AbstractPerusteenOsaViiteStore';
 
 export class KotoKielitaitotasoStore extends AbstractPerusteenOsaViiteStore implements IEditoitava {

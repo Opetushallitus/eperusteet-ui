@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
 import { KieliStore } from '@shared/stores/kieli';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import { fail, success } from '@shared/utils/notifications';
 import { $fail, $success, $t } from '@shared/utils/globals';
 
@@ -64,10 +64,9 @@ export class ArviointiStore {
     });
   }
 
-  @Debounced(300)
-  public async filterGeneeriset(value: string) {
+  public filterGeneeriset = debounced(async (value: string) => {
     this.state.filterStr = value;
-  }
+  });
 
   public async toggleOpen(value: GeneerinenArviointiasteikkoDto, state?: boolean) {
     if (!value.id) {

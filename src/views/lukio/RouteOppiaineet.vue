@@ -1,5 +1,8 @@
 <template>
-  <EpEditointi v-if="store" :store="store">
+  <EpEditointi
+    v-if="store"
+    :store="store"
+  >
     <template #header>
       <h3>{{ $t('oppiaineet') }}</h3>
     </template>

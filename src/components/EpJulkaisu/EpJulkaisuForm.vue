@@ -136,7 +136,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { notNull } from '@shared/validators/required';
-import { requiredIf } from 'vuelidate/lib/validators';
+import { requiredIf } from '@vuelidate/validators';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t } from '@shared/utils/globals';
 
@@ -167,10 +167,10 @@ const rules = computed(() => ({
         nimi: notNull(),
         kieli: notNull(),
       },
-      required: requiredIf(() => julkaisu.muutosmaaraysVoimaan),
+      required: requiredIf(() => julkaisu.value.muutosmaaraysVoimaan),
     },
     muutosmaaraysVoimaan: {
-      required: requiredIf(() => julkaisu.liitteet.length > 0),
+      required: requiredIf(() => julkaisu.value.liitteet.length > 0),
     },
   },
 }));
@@ -208,15 +208,19 @@ const julkaisukielet = computed(() => {
 });
 
 const julkaisuLiitteet = computed(() => {
-  return julkaisu.liitteet;
+  return julkaisu.value.liitteet;
 });
 
 const isMuutosmaaraysDataRequired = computed(() => {
-  return julkaisuLiitteet.value.length > 0 || julkaisu.muutosmaaraysVoimaan;
+  return julkaisuLiitteet.value.length > 0 || julkaisu.value.muutosmaaraysVoimaan;
 });
 
 const asterisk = computed(() => {
   return isMuutosmaaraysDataRequired.value ? '*' : '';
+});
+
+const muutosmaaraysVoimaan = computed(() => {
+  return julkaisu.value.muutosmaaraysVoimaan;
 });
 
 watch(file, () => {
@@ -229,7 +233,7 @@ watch(julkaisuLiitteet, () => {
   checkValidity();
 }, { deep: true });
 
-watch(() => julkaisu.value.muutosmaaraysVoimaan, () => {
+watch(() => muutosmaaraysVoimaan.value, () => {
   checkValidity();
 });
 </script>
