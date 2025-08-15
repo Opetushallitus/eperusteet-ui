@@ -11,7 +11,6 @@ import { PerusteenOsaDto } from '@shared/generated/eperusteet';
 import { App } from 'vue';
 
 interface TekstikappaleStoreConfig {
-  // notifikaatiotStore: NotifikaatiotStore;
   perusteStore: PerusteStore;
   router: Router;
 }

@@ -292,11 +292,11 @@
                               :id="'poista-osaamisala-' + index"
                               variant="link"
                               icon="delete"
-                              :disabled="ryhma.osaamisala.rakenteessa"
+                              :disabled="osaamisalatRakenteessa[ryhma.osaamisala.osaamisalakoodiUri]"
                               @click="poistaOsaamisala(index)"
                             />
                             <b-popover
-                              v-if="ryhma.osaamisala.rakenteessa"
+                              v-if="osaamisalatRakenteessa[ryhma.osaamisala.osaamisalakoodiUri]"
                               :target="'poista-osaamisala-' + index"
                               triggers="hover"
                               placement="top"
@@ -390,11 +390,11 @@
                               :id="'poista-tutkintonimike-' + index"
                               variant="link"
                               icon="delete"
-                              :disabled="ryhma.tutkintonimike.rakenteessa"
+                              :disabled="tutkintonimikkeetRakenteessa[ryhma.tutkintonimike.uri]"
                               @click="poistaTutkintonimike(index)"
                             />
                             <b-popover
-                              v-if="ryhma.tutkintonimike.rakenteessa"
+                              v-if="tutkintonimikkeetRakenteessa[ryhma.tutkintonimike.uri]"
                               :target="'poista-tutkintonimike-' + index"
                               triggers="hover"
                               placement="top"
@@ -664,6 +664,7 @@ const optionsTutkinnonOsat = computed(() => {
     },
     clone(original) {
       return {
+        ...original,
         kuvaus: null,
         vieras: null,
         tunniste: null,
@@ -755,10 +756,13 @@ const tutkintonimikkeet = computed(() => {
         nimi: tutkintonimike.nimi,
         uri: tutkintonimike.tutkintonimikeUri,
         arvo: tutkintonimike.tutkintonimikeArvo,
-        rakenteessa: _.some(rakenteenOsat.value, osa => osa.tutkintonimike && osa.tutkintonimike.uri === tutkintonimike.tutkintonimikeUri),
       },
     };
   });
+});
+
+const tutkintonimikkeetRakenteessa = computed(() => {
+  return _.keyBy(_.filter(rakenteenOsat.value, osa => osa.tutkintonimike && osa.tutkintonimike.uri), 'tutkintonimike.uri');
 });
 
 const rakenteenOsat = computed(() => {
@@ -774,10 +778,13 @@ const osaamisalat = computed(() => {
         nimi: osaamisala.nimi,
         'osaamisalakoodiArvo': osaamisala.arvo,
         'osaamisalakoodiUri': osaamisala.uri,
-        rakenteessa: _.some(rakenteenOsat.value, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri === osaamisala.uri),
       },
     };
   });
+});
+
+const osaamisalatRakenteessa = computed(() => {
+  return _.keyBy(_.filter(rakenteenOsat.value, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri), 'osaamisala.osaamisalakoodiUri');
 });
 
 const osaamisalatPaged = computed(() => {

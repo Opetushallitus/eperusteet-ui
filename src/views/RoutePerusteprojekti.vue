@@ -636,7 +636,7 @@ const popupStyle = computed(() => {
 const navigation = computed(() => props.perusteStore.navigation.value);
 
 provide('navigation', computed(() => props.perusteStore.navigation.value));
-provide('linkkiHandler', computed(() => new LinkkiHandler()));
+provide('linkkiHandler', new LinkkiHandler());
 provide('kuvaHandler', createKuvaHandler(new KuvaStore(props.perusteStore.perusteId.value!)));
 provide('kasiteHandler', createKasiteHandler(props.termitStore));
 
