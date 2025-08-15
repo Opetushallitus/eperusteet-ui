@@ -8,6 +8,7 @@
       </template>
 
       <template #default="{ data, isEditing, validation }">
+
         <b-tabs>
           <b-tab :title="$t('perustiedot')">
             <b-container
@@ -316,7 +317,10 @@
                       </template>
                     </b-table>
                     <b-input-group v-if="isEditing">
-                      <b-form-input v-model="korvattavaDiaarinumero" />
+                      <b-form-input
+                        :value="korvattavaDiaarinumero"
+                        @input="korvattavaDiaarinumero = $event"
+                      />
                       <b-input-group-append>
                         <b-button
                           variant="primary"
@@ -1178,7 +1182,7 @@ const poistaLiite = async (item: any) => {
 };
 
 const lisaaDiaarinumero = () => {
-  const dataValue = store.value?.data?.value;
+  const dataValue = store.value?.data;
   store.value!.setData({
     ...dataValue,
     korvattavatDiaarinumerot: [
@@ -1190,7 +1194,7 @@ const lisaaDiaarinumero = () => {
 };
 
 const poistaKorvattava = (diaarinumero: string) => {
-  const dataValue = store.value?.data?.value;
+  const dataValue = store.value?.data;
   store.value!.setData({
     ...dataValue,
     korvattavatDiaarinumerot: _.reject(dataValue?.korvattavatDiaarinumerot, x => x === diaarinumero),

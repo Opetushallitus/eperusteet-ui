@@ -28,7 +28,7 @@
       class="mt-4"
       :is-latest="isLatest"
       :store="perusteStore"
-      :julkaisu="muokattavaJulkaisu"
+      v-model="muokattavaJulkaisu"
       @setInvalid="hasRequiredData"
     />
 
@@ -103,6 +103,7 @@ const muokkaa = (julkaisu, isLatestValue) => {
     ..._.cloneDeep(julkaisu),
     liittyyMuutosmaarays: !!julkaisu.muutosmaarays,
   };
+
   (julkaisuModal.value as any).show();
 };
 

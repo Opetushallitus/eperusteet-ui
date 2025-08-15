@@ -75,6 +75,7 @@
             :label="$t('perustetyoryhma')"
             required
             class="pl-0"
+            id="perustetyoryhma"
           >
             <EpMultiSelect
               v-if="tyoryhmat"
@@ -97,6 +98,7 @@
           <b-form-group
             :label="$t('koulutus-tutkintotyyppi') + ' *'"
             required
+            id="koulutustutkintotyyppi"
           >
             <koulutustyyppi-select
               v-model="data.koulutustyyppi"
