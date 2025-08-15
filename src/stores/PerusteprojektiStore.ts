@@ -2,7 +2,6 @@ import { reactive, computed, ref, watch } from 'vue';
 import { getAllPerusteetInternal, PerusteHakuInternalDto, PerusteprojektiLuontiDto, Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteet, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto, Maintenance, PerusteKevytDto } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
-import { Debounced } from '@shared/utils/delay';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import _ from 'lodash';
 

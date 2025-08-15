@@ -136,7 +136,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { notNull } from '@shared/validators/required';
-import { requiredIf } from 'vuelidate/lib/validators';
+import { requiredIf } from '@vuelidate/validators';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t } from '@shared/utils/globals';
 

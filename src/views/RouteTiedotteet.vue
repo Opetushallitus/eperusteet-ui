@@ -50,8 +50,8 @@
         fixed
         hover
         no-local-sorting
-        :sort-by.sync="sort.sortBy"
-        :sort-desc.sync="sort.sortDesc"
+        :sort-by="sort.sortBy"
+        :sort-desc="sort.sortDesc"
         :items="tiedotteetFiltered"
         :fields="tableFields"
         :per-page="perPage"
