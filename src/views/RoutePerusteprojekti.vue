@@ -506,7 +506,7 @@ export default class RoutePerusteprojekti extends PerusteprojektiRoute {
     if (this.peruste && this.peruste.nimi && !_.isEmpty(this.$kaanna(this.peruste.nimi))) {
       return {
         title: this.$kaanna(this.peruste.nimi),
-        titleTemplate: '%s - ' + this.$t('eperusteet-ops-tyokalu'),
+        titleTemplate: '%s - ' + this.$t('eperusteet-laadinta'),
       };
     }
   }
