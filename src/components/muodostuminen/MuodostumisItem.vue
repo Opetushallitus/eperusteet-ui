@@ -12,13 +12,16 @@
         {{ $kaanna(nimi) }} <span v-if="koodiArvo">({{koodiArvo}})</span>
       </div>
       <div style="width: 100px;" class="text-center">
-        <b-button variant="none" :class="{ 'text-danger': !validity.isValid }" v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu">
+        <b-button variant="none" :class="{ 'text-danger': !validity.isValid }" v-b-popover.hover="$t('laskettu-laajuus') + ': ' + (recursiveLaskettu > 0 ? recursiveLaskettu : laskettu)">
           <span v-if="laajuusMinimi > 0 || laajuusMaksimi > 0">
             {{ laajuusMinimi }}
           </span>
           <span v-if="laajuusMaksimi > 0">
             -
             {{ laajuusMaksimi }}
+          </span>
+          <span v-if="!laajuusMinimi && !laajuusMaksimi" class="disabled-text">
+             {{ laskettu }}
           </span>
         </b-button>
       </div>
@@ -157,18 +160,26 @@ export default class MuodostumisItem extends Vue {
   }
 
   get laskettu() {
+    if (this.laajuusMaksimi) {
+      return this.laajuusMaksimi;
+    }
+
+    if (this.laajuusMinimi) {
+      return this.laajuusMinimi;
+    }
+
     if (this.isRyhma) {
       return this.osanLaajuusRecursive(this.value);
     }
-    else {
-      return this.laajuusMinimi;
-    }
+
+    return undefined;
   }
 
   osanLaajuusRecursive(osa) {
     return _(osa.osat)
       .map(osa => {
-        return this.osanLaajuusRecursive(osa) + _.max([osa?.muodostumisSaanto?.laajuus?.minimi, osa?.muodostumisSaanto?.laajuus?.maksimi])
+        return osa.muodostumisSaanto?.laajuus?.minimi
+            || this.osanLaajuusRecursive(osa)
             || (osa._tutkinnonOsaViite && this.tutkinnonOsatMap[osa._tutkinnonOsaViite] && this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
             || 0;
       })
@@ -196,11 +207,15 @@ export default class MuodostumisItem extends Vue {
 
   get laajuusValidointi() {
     if (this.isRyhma) {
-      return this.laajuusMaksimi || this.laajuusMinimi;
+      return this.laajuusMaksimi || this.laajuusMinimi || this.osanLaajuusRecursive(this.value);
     }
     else {
       return 0;
     }
+  }
+
+  get recursiveLaskettu() {
+    return this.osanLaajuusRecursive(this.value);
   }
 
   get isPaikallinen() {
@@ -210,7 +225,7 @@ export default class MuodostumisItem extends Vue {
   get validity() {
     if (this.isRyhma) {
       return {
-        isValid: this.isPaikallinen || this.laskettu >= this.laajuusValidointi,
+        isValid: this.isPaikallinen || this.laskettu === this.osanLaajuusRecursive(this.value),
       };
     }
     else {

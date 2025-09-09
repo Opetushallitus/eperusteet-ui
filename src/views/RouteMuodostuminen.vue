@@ -402,9 +402,28 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
     return this.store?.data.value?.rakenne.muodostumisSaanto?.laajuus?.minimi;
   }
 
+  // get laskettuLaajuus() {
+  //   return _(this.store?.data.value?.rakenne.osat)
+  //     .map(osa => osa.muodostumisSaanto?.laajuus?.maksimi || osa.muodostumisSaanto?.laajuus?.minimi || this.tutkinnonOsatMap[osa._tutkinnonOsaViite]?.laajuus || 0)
+  //     .filter()
+  //     .sum();
+  // }
+
   get laskettuLaajuus() {
     return _(this.store?.data.value?.rakenne.osat)
-      .map(osa => osa.muodostumisSaanto?.laajuus?.maksimi || osa.muodostumisSaanto?.laajuus?.minimi || this.tutkinnonOsatMap[osa._tutkinnonOsaViite]?.laajuus || 0)
+      .map(osa => osa.muodostumisSaanto?.laajuus?.maksimi || osa.muodostumisSaanto?.laajuus?.minimi || this.osanLaajuusRecursive(osa) || 0)
+      .filter()
+      .sum();
+  }
+
+  osanLaajuusRecursive(osa) {
+    return _(osa.osat)
+      .map(osa => {
+        return osa.muodostumisSaanto?.laajuus?.minimi
+            || this.osanLaajuusRecursive(osa)
+            || (osa._tutkinnonOsaViite && this.tutkinnonOsatMap[osa._tutkinnonOsaViite] && this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
+            || 0;
+      })
       .filter()
       .sum();
   }
