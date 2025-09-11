@@ -508,6 +508,7 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
       },
       clone(original) {
         return {
+          ...original,
           kuvaus: null,
           vieras: null,
           tunniste: null,
@@ -924,8 +925,9 @@ export default class RouteMuodostuminen extends PerusteprojektiRoute {
   }
 }
 
-.draggable {
+.draggable, :deep(.draggable) {
   cursor: grab;
+  user-select: none !important;
 
   &.paaryhma, &.kopioitava {
     .colorblock {
