@@ -4,11 +4,37 @@
       :tallenna="tallennaUusiTekstikappale"
       :tekstikappaleet="perusteenOsat"
       :paatasovalinta="true"
+      :otsikkoRequired="!tekstikappaleLisatieto.osaamisala"
       v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
       <template v-slot:default="{tekstikappale}">
         <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
         {{ $kaanna(tekstikappale.label) }}
       </template>
+
+      <template #custom-content v-if="osaamisalat.length > 0 ">
+        <div class="mb-4">
+          <h3>{{ $t('tekstikappaleen-tyyppi') }}</h3>
+          <b-form-radio v-model="tekstikappaleTyyppi"
+                        value="tekstikappale"
+                        name="tekstikappaleTyyppi">{{ $t('tekstikappale') }}</b-form-radio>
+          <b-form-radio v-model="tekstikappaleTyyppi"
+                        value="osaamisala"
+                        name="tekstikappaleTyyppi">{{ $t('osaamisala') }}</b-form-radio>
+
+          <ep-select class="mb-5 mt-2 ml-4"
+                v-model="tekstikappaleLisatieto.osaamisala"
+                :items="osaamisalat"
+                :is-editing="true"
+                :enable-empty-option="true"
+                :disabled="tekstikappaleTyyppi !== 'osaamisala'"
+                :emptyOptionDisabled="true">
+            <template slot-scope="{ item }">
+              {{ $kaanna(item.nimi) }}
+            </template>
+          </ep-select>
+        </div>
+      </template>
+
     </ep-tekstikappale-lisays>
 
     <template v-if="lisasisaltoLisays.length > 0">
@@ -105,7 +131,7 @@
 </template>
 
 <script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
 import * as _ from 'lodash';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { Koulutustyyppi } from '@shared/tyypit';
@@ -126,12 +152,15 @@ import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpSelect from '@shared/components/forms/EpSelect.vue';
 
 @Component({
   components: {
     EpTekstikappaleLisays,
     EpButton,
     EpMaterialIcon,
+    EpSelect,
   },
 })
 export default class EpSisallonLisays extends Vue {
@@ -142,6 +171,8 @@ export default class EpSisallonLisays extends Vue {
   naviStore!: EpTreeNavibarStore;
 
   loading: boolean = false;
+  tekstikappaleTyyppi: 'osaamisala' | 'tekstikappale' = 'tekstikappale';
+  tekstikappaleLisatieto: any = {};
 
   get projekti() {
     return this.perusteStore.projekti.value;
@@ -211,7 +242,7 @@ export default class EpSisallonLisays extends Vue {
 
   async tallennaUusiTekstikappale(otsikko, tekstikappaleIsa) {
     const tkstore = new TekstikappaleStore(this.peruste!.id!, 0);
-    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa);
+    const tallennettu = await tkstore.create(otsikko, tekstikappaleIsa, this.tekstikappaleLisatieto);
     await this.perusteStore.updateNavigation();
     await this.$router.push({
       name: this.tekstikappaleRoute,
@@ -219,6 +250,7 @@ export default class EpSisallonLisays extends Vue {
         tekstiKappaleId: '' + tallennettu!.id,
       },
     });
+    this.tekstikappaleLisatieto = {};
   }
 
   async tallennaUusiOpintokokonaisuus(otsikko, tekstikappaleIsa) {
@@ -523,6 +555,17 @@ export default class EpSisallonLisays extends Vue {
           },
         }],
     };
+  }
+
+  get osaamisalat() {
+    return this.perusteStore.peruste.value?.osaamisalat;
+  }
+
+  @Watch('tekstikappaleTyyppi')
+  osaamisalatChange() {
+    if (this.tekstikappaleTyyppi === 'tekstikappale') {
+      this.tekstikappaleLisatieto.osaamisala = null;
+    }
   }
 }
 </script>

@@ -18,7 +18,7 @@
                           v-model="tekstikappaleTyyppi"
                           value="osaamisala"
                           name="tekstikappaleTyyppi">{{ $t('osaamisala') }}</b-form-radio>
-            <b-form-radio v-if="tutkintonimikkeet.length > 0"
+            <b-form-radio v-if="data.tutkintonimike && tutkintonimikkeet.length > 0"
                           v-model="tekstikappaleTyyppi"
                           value="tutkintonimike"
                           name="tekstikappaleTyyppi">{{ $t('tutkintonimike') }}</b-form-radio>
