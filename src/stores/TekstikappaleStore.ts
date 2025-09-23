@@ -150,7 +150,7 @@ export class TekstikappaleStore implements IEditoitava {
     };
   }
 
-  public async create(otsikko, tekstikappaleIsa, lisaTiedot) {
+  public async create(otsikko, tekstikappaleIsa, osaamisala) {
     let suoritustapakoodi;
     if (_.lowerCase(TekstikappaleStore.config.perusteStore.peruste.value?.tyyppi) === _.lowerCase(PerusteDtoTyyppiEnum.OPAS)) {
       suoritustapakoodi = 'opas';
@@ -173,7 +173,7 @@ export class TekstikappaleStore implements IEditoitava {
               perusteenOsa: {
                 nimi: otsikko,
                 osanTyyppi: 'tekstikappale',
-                ...lisaTiedot,
+                osaamisala,
               } as any,
             },
           ));
@@ -189,7 +189,7 @@ export class TekstikappaleStore implements IEditoitava {
             perusteenOsa: {
               nimi: otsikko,
               osanTyyppi: 'tekstikappale',
-              ...lisaTiedot,
+              osaamisala,
             } as any,
           }));
 
