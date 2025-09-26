@@ -226,7 +226,10 @@ export default class EpOppiaineenTavoite extends Vue {
   isEditing!: boolean;
 
   get model() {
-    return this.value;
+    return {
+      ...this.value,
+      arvioinninkohteet: _.sortBy(this.value.arvioinninkohteet, 'arvosana'),
+    };
   }
 
   set model(val) {
