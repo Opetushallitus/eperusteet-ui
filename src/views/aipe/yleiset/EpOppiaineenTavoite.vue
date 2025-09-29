@@ -226,7 +226,7 @@ export default class EpOppiaineenTavoite extends Vue {
   isEditing!: boolean;
 
   get model() {
-    return this.value
+    return this.value;
   }
 
   set model(val) {
@@ -241,7 +241,7 @@ export default class EpOppiaineenTavoite extends Vue {
     this.value = {
       ...this.value,
       arvioinninkohteet: val,
-    }
+    };
   }
 
   get kohdealue() {
