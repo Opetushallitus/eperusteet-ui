@@ -130,7 +130,7 @@
     <template v-if="isEditing">
       <b-row
         class="mt-2 mx-1 py-2 border-bottom"
-        v-for="(arvioinninkohde, index) in model.arvioinninkohteet"
+        v-for="(arvioinninkohde, index) in arvioinninkohteet"
         :key="'arvio'+index">
         <b-col cols="4">
           <ep-select v-model="arvioinninkohde.arvosana"
@@ -226,14 +226,22 @@ export default class EpOppiaineenTavoite extends Vue {
   isEditing!: boolean;
 
   get model() {
-    return {
-      ...this.value,
-      arvioinninkohteet: _.sortBy(this.value.arvioinninkohteet, 'arvosana'),
-    };
+    return this.value
   }
 
   set model(val) {
     this.$emit('input', val);
+  }
+
+  get arvioinninkohteet() {
+    return _.sortBy(this.value.arvioinninkohteet, 'arvosana');
+  }
+
+  set arvioinninkohteet(val) {
+    this.value = {
+      ...this.value,
+      arvioinninkohteet: val,
+    }
   }
 
   get kohdealue() {
