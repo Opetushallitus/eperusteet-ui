@@ -116,7 +116,7 @@ export class KayttajaStore implements IOikeusProvider {
   }
 
   private vertaaRoleOikeus(oikeus: Oikeus, kohde: RoleAppOikeus) {
-    return _.some(this.tiedot.value.oikeudet, kayttajaoikeus => kayttajaoikeus === 'ROLE_APP_' + kohde.toUpperCase() + '_' + oikeusArvoToRoleOikeus[oikeus]);
+    return _.some(this.tiedot.value.oikeudet, kayttajaoikeus => _.some(oikeusArvoToRoleOikeus[oikeus], requiredRole => kayttajaoikeus === 'ROLE_APP_' + kohde.toUpperCase() + '_' + requiredRole));
   }
 
   private vertaa(oikeus: Oikeus, kohde: OikeusKohde = 'perusteprojekti') {

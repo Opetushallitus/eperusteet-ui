@@ -1,8 +1,8 @@
 import { Koulutustyyppi } from '@shared/tyypit';
 import { AmmatillisetKoulutustyypit, koulutustyyppiRyhmaSort, koulutustyyppiSort, themes, VapaasivistystyoKoulutustyypit } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
-import { utils, writeFile } from 'xlsx';
 import moment from 'moment';
+import * as ExcelJS from 'exceljs';
 
 export function suunnitelmatTilastoksi(suunnitelmat, alkupvm, loppupvm) {
   return _.chain(suunnitelmat)
@@ -86,9 +86,40 @@ export function csvAikaleima(value) {
   return value ? moment(value).format('YYYY-MM-DD') : null;
 }
 
-export function dataTiedostoksi(tyyppi, sisaltoTyyppi, tiedostoData) {
-  const data = utils.json_to_sheet(tiedostoData);
-  const wb = utils.book_new();
-  utils.book_append_sheet(wb, data, 'Tilastot');
-  writeFile(wb, `tilastot-${sisaltoTyyppi}-${moment(new Date()).format('YYYYMMDDHHmm')}.${tyyppi}`, { bookType: tyyppi });
+export async function dataTiedostoksi(tyyppi, sisaltoTyyppi, tiedostoData) {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Tilastot');
+
+  // Add headers and data
+  if (tiedostoData.length > 0) {
+    const headers = Object.keys(tiedostoData[0]);
+    worksheet.addRow(headers);
+
+    tiedostoData.forEach(row => {
+      const values = headers.map(header => row[header]);
+      worksheet.addRow(values);
+    });
+  }
+
+  // Generate file
+  const fileName = `tilastot-${sisaltoTyyppi}-${moment(new Date()).format('YYYYMMDDHHmm')}.${tyyppi}`;
+
+  let buffer;
+  if (tyyppi === 'csv') {
+    buffer = await workbook.csv.writeBuffer();
+  }
+  else {
+    buffer = await workbook.xlsx.writeBuffer();
+  }
+
+  // Create blob and trigger download
+  const blob = new Blob([buffer], {
+    type: tyyppi === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  window.URL.revokeObjectURL(url);
 }

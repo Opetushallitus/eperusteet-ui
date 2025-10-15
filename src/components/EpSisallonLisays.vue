@@ -37,7 +37,9 @@
               >
                 add
               </EpMaterialIcon>
-              {{ $t(lisasisalto.groupedLinkkiteksti) }}
+              <span>
+                {{ $t(lisasisalto.groupedLinkkiteksti) }}
+              </span>
             </ep-button>
           </template>
 
