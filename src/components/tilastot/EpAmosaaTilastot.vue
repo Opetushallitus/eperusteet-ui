@@ -577,8 +577,8 @@ const tiedostoData = computed(() => {
   });
 });
 
-function downloadTiedosto(tyyppi: string) {
-  dataTiedostoksi(tyyppi, 'amosaa', tiedostoData.value);
+async function downloadTiedosto(tyyppi: string) {
+  await dataTiedostoksi(tyyppi, 'amosaa', tiedostoData.value);
 }
 </script>
 
