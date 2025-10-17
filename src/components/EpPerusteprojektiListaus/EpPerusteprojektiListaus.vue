@@ -147,6 +147,25 @@
             />
           </div>
           <div
+            v-if="filtersInclude('perustetyyppi')"
+            class="m-2 flex-fill"
+          >
+            <label>{{ $t('perustetyyppi') }}</label>
+            <EpMultiSelect
+              v-model="perustetyyppi"
+              :allow-empty="true"
+              placeholder="kaikki"
+              :options="perustetyyppiOptions"
+            >
+              <template #singleLabel="{ option }">
+                {{ $t('perustetyyppi-' + option.toLowerCase()) }}
+              </template>
+              <template #option="{ option }">
+                {{ $t('perustetyyppi-' + option.toLowerCase()) }}
+              </template>
+            </EpMultiSelect>
+          </div>
+          <div
             v-if="filtersInclude('peruste')"
             class="m-2 flex-fill"
           >
@@ -303,7 +322,7 @@ import { hasSlotContent } from '@shared/utils/vue-utils';
 import { useSlots } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
+export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo' | 'perustetyyppi';
 
 const props = defineProps({
   provider: { type: Object as () => IProjektiProvider, required: true },
@@ -322,6 +341,7 @@ const koulutustyyppi = ref<string | null>(null);
 const peruste = ref<PerusteKevytDto | null>(null);
 const tila = ref<string[]>(props.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU']);
 const voimassaolo = ref<string | null>(null);
+const perustetyyppi = ref<string | null>(null);
 const isLoading = ref(false);
 const sort = ref<{ sortBy?: string; sortDesc?: boolean }>({});
 const perusteet = ref<PerusteKevytDto[]>([]);
@@ -342,6 +362,7 @@ const query = ref<PerusteprojektiQuery>({
   jarjestysOrder: false,
   jarjestysTapa: 'nimi',
   perusteet: [],
+  tyyppi: undefined,
 });
 
 onMounted(async () => {
@@ -353,7 +374,7 @@ onMounted(async () => {
   }
 });
 
-watch(query, async (newQuery: PerusteQuery) => {
+watch(query.value, async (newQuery: PerusteQuery) => {
   await onQueryChange(newQuery);
 }, { deep: true });
 
@@ -417,6 +438,10 @@ watch(() => koulutustyyppi.value, (newKt: string | null) => {
   query.value.koulutustyyppi = newKt ? [newKt] : undefined;
 });
 
+watch(() => perustetyyppi.value, (newPt: string | null) => {
+  query.value.tyyppi = newPt || perustetyyppiOptions;
+});
+
 watch(() => peruste.value, (newPeruste: PerusteKevytDto | null) => {
   query.value.perusteet = newPeruste?.id ? [newPeruste.id] : [];
 });
@@ -440,6 +465,10 @@ const koulutustyyppiOptions = computed(() => {
     return [...EperusteetKoulutustyypit, 'koulutustyyppi_muu'];
   }
   return EperusteetKoulutustyypit;
+});
+
+const perustetyyppiOptions = computed(() => {
+  return ['NORMAALI', 'AMOSAA_YHTEINEN'];
 });
 
 const vaihtoehdotTilat = computed(() => {

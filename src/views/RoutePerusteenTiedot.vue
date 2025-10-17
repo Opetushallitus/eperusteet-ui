@@ -153,11 +153,16 @@
                   class="mb-4"
                 >
                   <b-form-group :label="$t('tyyppi')">
-                    <b-form-select
+                    <EpSelect
                       v-if="isEditing"
                       v-model="data.tyyppi"
-                      :options="perusteenTyypit"
-                    />
+                      :items="perusteenTyypit"
+                      :is-editing="isEditing"
+                    >
+                      <template #default="{ item }">
+                        {{ $t('perustetyyppi-' + item) }}
+                      </template>
+                    </EpSelect>
                     <div v-else>
                       {{ $t('perustetyyppi-' + data.tyyppi) }}
                     </div>
@@ -745,6 +750,7 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { $t, $kaanna, $success, $fail, $slang, $sdt, $isAdmin } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpSelect from '@shared/components/forms/EpSelect.vue';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
@@ -1080,14 +1086,11 @@ const tietoFilters = computed(() => {
 });
 
 const tyypinVaihtoSallittu = computed(() => {
-  return isAmmatillinen.value && $isAdmin() && _.includes(_.map(perusteenTyypit.value, 'value'), peruste.value.tyyppi);
+  return isAmmatillinen.value && $isAdmin() && _.includes(perusteenTyypit.value, peruste.value.tyyppi);
 });
 
 const perusteenTyypit = computed(() => {
-  return [
-    { text: $t('perustetyyppi-normaali'), value: 'normaali' },
-    { text: $t('perustetyyppi-amosaayhteinen'), value: 'amosaayhteinen' },
-  ];
+  return ['normaali', 'amosaayhteinen'];
 });
 
 const poikkeamismaaraysTyyppiText = computed(() => {

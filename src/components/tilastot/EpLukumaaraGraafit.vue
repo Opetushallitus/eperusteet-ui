@@ -31,12 +31,13 @@
         </ep-form-content>
         <ep-form-content
           name="vuosi"
-          class="ml-5"
+          class="ml-5 w-10"
         >
-          <b-form-select
+          <EpSelect
             v-model="vuosi"
-            :options="vuosivalinnat"
+            :items="vuosivalinnat"
             :disabled="ajanjakso === 'vuosi'"
+            :is-editing="true"
           />
         </ep-form-content>
       </div>
@@ -82,7 +83,7 @@ import { $t } from '@shared/utils/globals';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
-
+import EpSelect from '@shared/components/forms/EpSelect.vue';
 type Ajanjakso = 'kuukausi' | 'vuosi';
 
 const props = defineProps({
