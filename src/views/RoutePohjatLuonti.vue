@@ -14,7 +14,7 @@
             </legend>
             <div class="col-sm-10 mb-4">
               <b-form-group class="mt-0 pt-0">
-                <b-form-radio
+                <EpRadio
                   v-model="tyyppi"
                   class="p-2"
                   value="pohjasta"
@@ -22,7 +22,7 @@
                   :disabled="!pohjat || pohjat.length === 0"
                 >
                   {{ $t('toista-pohjaa') }}
-                </b-form-radio>
+                </EpRadio>
                 <div
                   v-if="tyyppi === 'pohjasta'"
                   class="ml-2"
@@ -44,14 +44,14 @@
                   <EpSpinner v-else />
                 </div>
 
-                <b-form-radio
+                <EpRadio
                   v-model="tyyppi"
                   class="mt-3 p-2"
                   value="uusi"
                   name="tyyppi"
                 >
                   {{ $t('luo-uusi-perustepohja') }}
-                </b-form-radio>
+                </EpRadio>
               </b-form-group>
             </div>
           </div>
@@ -143,6 +143,7 @@ import { Kielet } from '../../eperusteet-frontend-utils/vue/src/stores/kieli';
 import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import { EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perusteet';
 import { $t, $kaanna, $kaannaOlioTaiTeksti, $fail } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps<{
   pohjatStore: PerusteetStore;

@@ -60,10 +60,10 @@ describe('RoutePohjatLuonti component', () => {
     expect(wrapper.text()).toContain('projektin-tiedot');
 
     expect(wrapper.text()).toContain('kayta-pohjana');
-    expect(wrapper.findAll('b-form-radio')).toHaveLength(2);
-    expect(wrapper.findAll('b-form-radio').at(0)
+    expect(wrapper.findAll('.ep-radio')).toHaveLength(2);
+    expect(wrapper.findAll('.ep-radio').at(0)
       .text()).toContain('toista-pohjaa');
-    expect(wrapper.findAll('b-form-radio').at(1)
+    expect(wrapper.findAll('.ep-radio').at(1)
       .text()).toContain('uusi');
 
     expect(wrapper.text()).toContain('peruuta');

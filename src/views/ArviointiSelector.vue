@@ -24,30 +24,24 @@
       </template>
 
       <b-form-group :label="$t('arviointiasteikko')">
-        <b-form-radio-group
+        <EpRadio
+          v-for="asteikko in asteikot"
+          :key="asteikko.id"
           v-model="model"
-          stacked
-          @change="onInput"
+          :value="asteikko.id"
+          :is-editing="true"
+          @update:model-value="onInput"
         >
-          <b-form-radio
-            v-for="asteikko in asteikot"
-            :key="asteikko.id"
-            :value="asteikko.id"
-          >
-            <span class="text-wrap">
-              <span
-                v-for="(taso, idx) in asteikko.osaamistasot"
-                :key="'taso-' + taso.id"
-              >
-                <span
-                  v-if="idx !== 0"
-                  class="text-muted"
-                >/</span>
-                <EpExpandText :text="$kaanna(taso.otsikko)" />
-              </span>
+          <span class="text-wrap">
+            <span
+              v-for="(taso, idx) in asteikko.osaamistasot"
+              :key="'taso-' + taso.id"
+            >
+              <span v-if="idx !== 0"> / </span>
+              <EpExpandText :text="$kaanna(taso.otsikko)" />
             </span>
-          </b-form-radio>
-        </b-form-radio-group>
+          </span>
+        </EpRadio>
       </b-form-group>
     </b-modal>
     <ep-button
@@ -67,6 +61,7 @@ import { ref, computed, watch, useTemplateRef } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import EpExpandText from '@shared/components/EpExpandText/EpExpandText.vue';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps<{
   modelValue: number | null;

@@ -62,28 +62,22 @@
             <div class="font-weight-600">
               {{ $t('arviointi-asteikon-valinta') }}
             </div>
-            <b-form-radio-group
+            <EpRadio
+              v-for="arviointiasteikko in arviointiasteikot"
+              :key="'arviointiasteikko-' + arviointiasteikko.id"
               v-model="arvioinninKohde._arviointiAsteikko"
-              stacked
-              class="mt-2"
-              @input="arviointiVaihdos(arvioinninKohde)"
+              :value="arviointiasteikko.id"
+              :is-editing="isEditing"
+              @update:model-value="arviointiVaihdos(arvioinninKohde)"
             >
-              <b-form-radio
-                v-for="arviointiasteikko in arviointiasteikot"
-                :key="'arviointiasteikko-' + arviointiasteikko.id"
-                class="mt-2"
-                name="arviointiasteikko"
-                :value="arviointiasteikko.id"
+              <span
+                v-for="(osaamistaso, index) in arviointiasteikko.osaamistasot"
+                :key="'osaamistaso' + osaamistaso.id"
               >
-                <span
-                  v-for="(osaamistaso, index) in arviointiasteikko.osaamistasot"
-                  :key="'osaamistaso' + osaamistaso.id"
-                >
-                  <span v-if="index > 0"> / </span>
-                  {{ $kaanna(osaamistaso.otsikko) }}
-                </span>
-              </b-form-radio>
-            </b-form-radio-group>
+                <span v-if="index > 0"> / </span>
+                {{ $kaanna(osaamistaso.otsikko) }}
+              </span>
+            </EpRadio>
           </template>
 
           <template v-else>
@@ -156,6 +150,7 @@ import { Kielet } from '@shared/stores/kieli';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps<{
   modelValue: any;

@@ -1,16 +1,15 @@
 <template>
   <div>
     <b-form-group v-if="isEditing">
-      <b-form-radio-group v-model="inner">
-        <b-form-radio
-          v-for="geneerinen in geneeriset"
-          :key="'geneerinen-' + geneerinen.id"
-          name="geneerinen"
-          :value="geneerinen.id"
-        >
-          {{ $kaanna(geneerinen.nimi) }}
-        </b-form-radio>
-      </b-form-radio-group>
+      <EpRadio
+        v-for="geneerinen in geneeriset"
+        :key="'geneerinen-' + geneerinen.id"
+        v-model="inner"
+        :value="geneerinen.id"
+        :is-editing="true"
+      >
+        {{ $kaanna(geneerinen.nimi) }}
+      </EpRadio>
     </b-form-group>
     <div v-else-if="valittuGeneerinen">
       <div class="mt-3 mb-4">
@@ -61,6 +60,7 @@ import { LokalisoituTekstiDto } from '@shared/tyypit';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import _ from 'lodash';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 export interface YhdistettyOsaamistaso {
   otsikko?: LokalisoituTekstiDto;

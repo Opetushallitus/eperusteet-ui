@@ -60,18 +60,19 @@
                   <div class="text-muted mb-3">
                     {{ $t('perusteprojekti-ohje-kuvaus') }}
                   </div>
-                  <b-form-radio-group
-                    v-model="data.projektiKuvaus"
-                    stacked
-                    class="mb-3"
-                  >
-                    <b-form-radio :value="kuvaus.korjaus">
+                    <EpRadio
+                      v-model="data.projektiKuvaus"
+                      :value="kuvaus.korjaus"
+                      name="projektiKuvaus">
                       {{ $t('perusteen-korjaus') }}
-                    </b-form-radio>
-                    <b-form-radio :value="kuvaus.uudistus">
+                    </EpRadio>
+                    <EpRadio
+                      v-model="data.projektiKuvaus"
+                      :value="kuvaus.uudistus"
+                      name="projektiKuvaus"
+                    >
                       {{ $t('perusteen-uudistus') }}
-                    </b-form-radio>
-                  </b-form-radio-group>
+                    </EpRadio>
                 </div>
                 <div v-else-if="data.projektiKuvaus === kuvaus.korjaus">
                   {{ $t('perusteen-korjaus') }}
@@ -131,6 +132,7 @@ import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import { Maintenance, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperusteet';
 import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 import { $t } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps<{
   ulkopuolisetStore: UlkopuolisetStore;

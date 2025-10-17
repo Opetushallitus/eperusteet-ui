@@ -148,18 +148,18 @@
                   </b-form-group>
                 </b-col>
                 <b-col
-                  v-if="tyypinVaihtoSallittu"
+                  v-if="tyypinVaihtoSallittu && (isEditing || peruste.tyyppi === 'amosaayhteinen') "
                   lg="6"
                   class="mb-4"
                 >
                   <b-form-group :label="$t('tyyppi')">
-                    <b-form-select
+                    <EpToggle
                       v-if="isEditing"
-                      v-model="data.tyyppi"
-                      :options="perusteenTyypit"
+                      v-model="amosaaYhteinen"
+                      :label="$t('perustetyyppi-amosaa_yhteinen')"
                     />
                     <div v-else>
-                      {{ $t('perustetyyppi-' + data.tyyppi) }}
+                      {{ $t('perustetyyppi-amosaa_yhteinen') }}
                     </div>
                   </b-form-group>
                 </b-col>
@@ -745,6 +745,7 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { $t, $kaanna, $success, $fail, $slang, $sdt, $isAdmin } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 
 export type TietoFilter = 'laajuus' | 'voimassaolo' | 'diaarinumero' | 'paatospaivamaara' | 'koulutustyyppi' | 'perusteenkieli' | 'koulutusviento';
 
@@ -1080,14 +1081,20 @@ const tietoFilters = computed(() => {
 });
 
 const tyypinVaihtoSallittu = computed(() => {
-  return isAmmatillinen.value && $isAdmin() && _.includes(_.map(perusteenTyypit.value, 'value'), peruste.value.tyyppi);
+  return isAmmatillinen.value && $isAdmin() && _.includes(perusteenTyypit.value, peruste.value.tyyppi);
 });
 
 const perusteenTyypit = computed(() => {
-  return [
-    { text: $t('perustetyyppi-normaali'), value: 'normaali' },
-    { text: $t('perustetyyppi-amosaayhteinen'), value: 'amosaayhteinen' },
-  ];
+  return ['normaali', 'amosaayhteinen'];
+});
+
+const amosaaYhteinen = computed({
+  get: () => store.value.data.tyyppi === 'amosaayhteinen',
+  set: (value) => store.value.setData({
+    ...store.value!.data,
+    tyyppi: value ? 'amosaayhteinen' : 'normaali',
+
+  }),
 });
 
 const poikkeamismaaraysTyyppiText = computed(() => {

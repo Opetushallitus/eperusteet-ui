@@ -64,7 +64,7 @@
             </span>
           </div>
           <div v-if="isEditing && !data.kvliite.periytynyt">
-            <b-form-radio
+            <EpRadio
               v-for="(asteikko , idx) in data.arviointiasteikot"
               :key="idx"
               v-model="data.kvliite._arvosanaAsteikko"
@@ -76,7 +76,7 @@
               >
                 {{ $kaannaOlioTaiTeksti(taso.otsikko) }} {{ (asteikko.osaamistasot.length - 1) !== idx2 ? '/' : '' }}
               </span>
-            </b-form-radio>
+            </EpRadio>
           </div>
         </b-form-group>
 
@@ -152,6 +152,7 @@ import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpInfoBanner from '@shared/components/EpInfoBanner/EpInfoBanner.vue';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps<{
   kayttajaStore: KayttajaStore;

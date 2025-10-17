@@ -166,7 +166,7 @@ export function routeToNode(route: RouteLocationNormalized): NavigationNodeDto |
   case 'peruste-yleisnakyma':
     return null;
   default:
-    console.error('Unknown route', route.name, route);
+    console.warn('Unknown route', route.name, route);
     break;
   }
 
@@ -373,7 +373,7 @@ export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
       name: 'muodostuminen',
     };
   default:
-    console.error('Unknown node', node.type);
+    console.warn('Unknown node', node.type);
     break;
   }
   return null;

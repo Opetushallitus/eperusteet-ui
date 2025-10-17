@@ -44,7 +44,7 @@ describe('Projektilistaus', () => {
       },
     });
 
-    expect(wrapper.findAll('.oph-spinner').length).toEqual(2);
+    expect(wrapper.findAll('.oph-spinner').length).toEqual(1);
     expect(store.updateQuery).toBeCalledTimes(1);
     expect(store.updateOwnProjects).toBeCalledTimes(1);
 

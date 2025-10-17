@@ -286,7 +286,7 @@ const onOsaAlueChange = async () => {
   props.arviointiStore.fetchGeneeriset();
   await props.perusteStore.blockUntilInitialized();
   const storeInstance = new OsaalueStore(
-    Number(props.perusteStore.perusteId),
+    Number(props.perusteStore.perusteId.value),
     Number(tutkinnonOsaId.value),
     osaalueId.value as string,
     router);
@@ -295,14 +295,14 @@ const onOsaAlueChange = async () => {
 
 const poistaValinnaisetOsaamistavoitteet = () => {
   store.value!.setData({
-    ...store.value!.data.value,
+    ...store.value!.data,
     valinnaisetOsaamistavoitteet: null,
   });
 };
 
 const lisaaValinnaisetOsaamistavoitteet = () => {
   store.value!.setData({
-    ...store.value!.data.value,
+    ...store.value!.data,
     valinnaisetOsaamistavoitteet: {},
   });
 };

@@ -18,20 +18,18 @@
         <h3>{{ $t('ei-oppaita') }}</h3>
       </template>
       <template #lowerheader>
-        <div class="d-flex">
-          <h2 class="pt-2 flex-grow-1">
-            {{ $t('oppaat') }}
-          </h2>
-          <router-link :to="{ name: 'opasLuonti' }">
-            <ep-button
-              class="m-0 p-0"
-              variant="outline"
-              icon="add"
-            >
-              {{ $t('lisaa-opas') }}
-            </ep-button>
-          </router-link>
-        </div>
+        <h2 class="pt-2 flex-grow-1">
+          {{ $t('oppaat') }}
+        </h2>
+        <router-link :to="{ name: 'opasLuonti' }">
+          <ep-button
+            class="m-0 p-0"
+            variant="outline"
+            icon="add"
+          >
+            {{ $t('lisaa-opas') }}
+          </ep-button>
+        </router-link>
       </template>
       <template #nimiotsikko>
         {{ $t('oppaan-nimi') }}
