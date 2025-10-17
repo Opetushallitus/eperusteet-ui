@@ -4,6 +4,7 @@
       :provider="perusteetStore"
       :edit-route="'perusteprojekti'"
       :new-route="{ name: 'perusteprojektiLuonti' }"
+      :filters="['koulutustyyppi', 'amosaayhteinen', 'tila', 'voimassaolo']"
       :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
     >
       <template #upperheader>

@@ -601,7 +601,7 @@ const onProjektiChange = async (projektiId: number) => {
 
 const updateHead = () => {
   useHead({
-    title: $kaanna(peruste.value?.nimi),
+    title: $kaanna(peruste.value?.nimi) || projekti.value?.nimi,
     titleTemplate: '%s - ' + $t('eperusteet-laadinta'),
   });
 };

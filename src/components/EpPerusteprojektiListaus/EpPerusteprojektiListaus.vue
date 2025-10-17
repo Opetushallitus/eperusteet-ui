@@ -117,19 +117,23 @@
         class="lower"
         :class="{'mt-0': !showCards}"
       >
-        <slot name="lowerheader">
-          <h1 class="bg-danger">
-            slot: lowerheader
-          </h1>
-        </slot>
+        <div class="d-flex">
+          <slot name="lowerheader">
+            <h1 class="bg-danger">
+              slot: lowerheader
+            </h1>
+          </slot>
+          <EpSpinner v-if="isLoading" />
+        </div>
       </div>
 
       <div
         v-if="items"
         class="filters"
       >
-        <div class="d-lg-flex align-items-end">
-          <div class="mt-2 mb-2 mr-2 flex-fill">
+        <div class="row">
+          <div class="col-5">
+            <label>&nbsp;</label>
             <EpSearch
               v-model="query.nimi"
               :placeholder="$t('etsi-perusteprojektia')"
@@ -137,7 +141,7 @@
           </div>
           <div
             v-if="filtersInclude('koulutustyyppi')"
-            class="m-2 flex-fill"
+            class="col-4"
           >
             <label>{{ $t('koulutustyyppi') }}</label>
             <koulutustyyppi-select
@@ -148,7 +152,7 @@
           </div>
           <div
             v-if="filtersInclude('peruste')"
-            class="m-2 flex-fill"
+            class="col-4"
           >
             <label>{{ $t('peruste') }}</label>
             <EpMultiSelect
@@ -168,7 +172,7 @@
           </div>
           <div
             v-if="filtersInclude('voimassaolo')"
-            class="m-2 flex-fill"
+            class="col-3"
           >
             <label>{{ $t('voimassaolo') }}</label>
             <EpMultiSelect
@@ -185,15 +189,12 @@
               </template>
             </EpMultiSelect>
           </div>
-          <div class="mb-3">
-            <EpSpinner v-if="isLoading" />
-          </div>
         </div>
 
-        <div class="d-lg-flex align-items-end">
+        <div class="row my-3">
           <div
             v-if="filtersInclude('tila')"
-            class="m-2"
+            class="col-5"
           >
             <EpToggleGroup
               v-model="tila"
@@ -203,6 +204,16 @@
                 {{ $t('tila-' + (item as string).toLowerCase()) }}
               </template>
             </EpToggleGroup>
+          </div>
+
+          <div
+            v-if="filtersInclude('amosaayhteinen')"
+            class="col-4"
+          >
+            <EpToggle
+              v-model="amosaaYhteinen"
+              :label="$t('perustetyyppi-amosaa_yhteinen')"
+            />
           </div>
         </div>
 
@@ -273,7 +284,6 @@
           {{ $t('ei-hakutuloksia') }}
         </div>
       </div>
-      <EpSpinner v-else />
     </div>
   </div>
 </template>
@@ -302,8 +312,10 @@ import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 import { hasSlotContent } from '@shared/utils/vue-utils';
 import { useSlots } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
+import { reactive } from 'vue';
 
-export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
+export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo' | 'amosaayhteinen';
 
 const props = defineProps({
   provider: { type: Object as () => IProjektiProvider, required: true },
@@ -322,6 +334,7 @@ const koulutustyyppi = ref<string | null>(null);
 const peruste = ref<PerusteKevytDto | null>(null);
 const tila = ref<string[]>(props.isPohja ? ['LAADINTA', 'VALMIS'] : ['LAADINTA', 'JULKAISTU']);
 const voimassaolo = ref<string | null>(null);
+const amosaaYhteinen = ref<boolean>(false);
 const isLoading = ref(false);
 const sort = ref<{ sortBy?: string; sortDesc?: boolean }>({});
 const perusteet = ref<PerusteKevytDto[]>([]);
@@ -329,7 +342,7 @@ const slots = useSlots();
 const route = useRoute();
 const router = useRouter();
 
-const query = ref<PerusteprojektiQuery>({
+const query = reactive<PerusteprojektiQuery>({
   sivu: 0,
   sivukoko: 10,
   koulutustyyppi: undefined,
@@ -342,11 +355,12 @@ const query = ref<PerusteprojektiQuery>({
   jarjestysOrder: false,
   jarjestysTapa: 'nimi',
   perusteet: [],
+  tyyppi: ['NORMAALI'],
 });
 
 onMounted(async () => {
   props.provider.updateOwnProjects();
-  await onQueryChange(query.value);
+  await onQueryChange(query);
 
   if (filtersInclude('peruste')) {
     perusteet.value = (await Perusteet.getAllOppaidenPerusteet()).data;
@@ -355,10 +369,18 @@ onMounted(async () => {
 
 watch(query, async (newQuery: PerusteQuery) => {
   await onQueryChange(newQuery);
-}, { deep: true });
+});
+
+watch(
+  () => props.provider.projects.value,
+  () => {
+    isLoading.value = false;
+  },
+);
 
 const onQueryChange = async (newQuery: PerusteQuery) => {
   isLoading.value = true;
+
   try {
     if (!naytaVainKortit.value) {
       await props.provider.updateQuery({
@@ -369,18 +391,12 @@ const onQueryChange = async (newQuery: PerusteQuery) => {
   catch (e) {
     $fail($t('virhe-palvelu-virhe') as string);
   }
-  finally {
-    isLoading.value = false;
-  }
 };
 
 watch(() => tila.value, (newTila: string[]) => {
-  query.value = {
-    ...query.value,
-    tila: newTila.length > 0
-      ? newTila
-      : (props.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU']),
-  };
+  query.tila = newTila.length > 0
+    ? newTila
+    : (props.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU']);
 });
 
 watch(() => voimassaolo.value, (newTila: string | null) => {
@@ -393,42 +409,47 @@ watch(() => voimassaolo.value, (newTila: string | null) => {
 
   switch (newTila) {
   case 'tuleva':
-    query.value = { ...query.value, ...defaults, tuleva: true };
+    Object.assign(query, defaults, { tuleva: true });
     break;
   case 'voimassaolo':
-    query.value = { ...query.value, ...defaults, voimassaolo: true };
+    Object.assign(query, defaults, { voimassaolo: true });
     break;
   case 'siirtyma':
-    query.value = { ...query.value, ...defaults, siirtyma: true };
+    Object.assign(query, defaults, { siirtyma: true });
     break;
   case 'poistunut':
-    query.value = { ...query.value, ...defaults, poistunut: true };
+    Object.assign(query, defaults, { poistunut: true });
     break;
   default:
-    query.value = {
-      ...query.value,
-      ...defaults,
-    };
+    Object.assign(query, defaults);
     break;
   }
 });
 
 watch(() => koulutustyyppi.value, (newKt: string | null) => {
-  query.value.koulutustyyppi = newKt ? [newKt] : undefined;
+  query.koulutustyyppi = newKt ? [newKt] : undefined;
+});
+
+watch(() => amosaaYhteinen.value, () => {
+  if (amosaaYhteinen.value) {
+    query.tyyppi = ['AMOSAA_YHTEINEN'];
+  }
+  else {
+    query.tyyppi = ['NORMAALI'];
+  }
 });
 
 watch(() => peruste.value, (newPeruste: PerusteKevytDto | null) => {
-  query.value.perusteet = newPeruste?.id ? [newPeruste.id] : [];
+  query.perusteet = newPeruste?.id ? [newPeruste.id] : [];
 });
 
 const sortingChanged = (newSort) => {
   sort.value = newSort;
-  query.value = {
-    ...query.value,
+  Object.assign(query, {
     sivu: 0,
     jarjestysOrder: newSort.sortDesc,
     jarjestysTapa: newSort.sortBy,
-  };
+  });
 };
 
 const stateChangeAllowed = (rights: string[]): boolean => {
@@ -461,7 +482,7 @@ const sivu = computed({
     return (items.value?.sivu ?? 0) + 1;
   },
   set(value: number) {
-    query.value.sivu = value - 1;
+    query.sivu = value - 1;
   },
 });
 
@@ -575,7 +596,7 @@ const restore = async (item) => {
       router,
     },
   );
-  await onQueryChange(query.value);
+  await onQueryChange(query);
   await props.provider.updateOwnProjects();
 };
 
