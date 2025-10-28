@@ -3,7 +3,7 @@ import { watch, reactive, computed, ref } from 'vue';
 import { Julkaisut, NavigationNodeDto, PerusteprojektiDto, PerusteDto, Perusteprojektit, Perusteet, TilaUpdateStatus, PerusteDtoTyyppiEnum, JulkaisuBaseDto, Validointi, MaaraysDto, Maaraykset } from '@shared/api/eperusteet';
 import { Kieli } from '@shared/tyypit';
 import { Murupolku } from '@shared/stores/murupolku';
-import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isKoulutustyyppiPdfTuettu } from '@shared/utils/perusteet';
+import { isAmmatillinenKoulutustyyppi, isVapaasivistystyoKoulutustyyppi, perusteenSuoritustapa, isPerustePdfTuettu } from '@shared/utils/perusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { JulkaisuBaseDtoTilaEnum, PerusteDtoTilaEnum } from '@shared/generated/eperusteet';
@@ -41,7 +41,7 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisut = computed(() => this.state.julkaisut);
   public readonly isPohja = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.POHJA));
   public readonly isNormaali = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.NORMAALI));
-  public readonly pdfEnabled = computed(() => isKoulutustyyppiPdfTuettu(this.state.peruste?.koulutustyyppi));
+  public readonly pdfEnabled = computed(() => isPerustePdfTuettu(this.state.peruste));
   public readonly koulutustyyppiSupported = computed(() => isKoulutustyyppiSupported(this.state.peruste?.koulutustyyppi));
   public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
   public readonly isJulkaistu = computed(() => (_.size(this.state.julkaisut) > 0 || this.state.peruste?.tila === PerusteDtoTilaEnum.VALMIS) && _.toLower(this.state.peruste?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU));

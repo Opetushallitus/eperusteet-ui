@@ -17,6 +17,7 @@ import { TermitStore } from '@/stores/TermitStore';
 import { TilastotStore } from '@/stores/TilastotStore';
 import { PoistetutStore } from './PoistetutStore';
 import { DigitaalisetOsaamisetStore } from './DigitaalisetOsaamisetStore';
+import { KieliKaantajaTutkinnotStore } from './KieliKaantajaTutkinnotStore';
 import { YllapitoStore } from '@/stores/YllapitoStore';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 
@@ -29,6 +30,7 @@ const perusteetStore = new PerusteetStore();
 const perusteprojektiStore = new PerusteprojektiStore();
 const pohjatStore = new PerusteetStore({ tyyppi: ['POHJA'] } as any);
 const digitaalisetOsaamisetStore = new DigitaalisetOsaamisetStore({ tyyppi: ['DIGITAALINEN_OSAAMINEN'] } as any);
+const kieliKaantajaTutkinnotStore = new KieliKaantajaTutkinnotStore({ tyyppi: ['KIELI_KAANTAJA_TUTKINTO'] } as any);
 const ulkopuolisetStore = new UlkopuolisetStore();
 const tutkinnonOsaStore = new TutkinnonOsaStore(perusteStore);
 const muokkaustietoStore = new MuokkaustietoStore();
@@ -56,6 +58,7 @@ export const stores = Object.freeze({
   perusteStore,
   perusteetStore,
   digitaalisetOsaamisetStore,
+  kieliKaantajaTutkinnotStore,
   perusteprojektiStore,
   pohjatStore,
   tiedotteetStore,
