@@ -13,7 +13,7 @@
       />
     </div>
     <div
-      v-else-if=" tileImage"
+      v-else-if="tileImage"
       :style="style"
       class="w-100 h-100"
     />

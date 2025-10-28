@@ -372,6 +372,20 @@ export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
     return {
       name: 'muodostuminen',
     };
+  case 'kaantajataitotasoasteikko':
+    return {
+      name: 'kaantajataitotasoasteikko',
+      params: {
+        kaantajataitotasoasteikkoId: _.toString(node.id),
+      },
+    };
+  case 'kaantajataito':
+    return {
+      name: 'kaantajataito',
+      params: {
+        kaantajataitoId: _.toString(node.id),
+      },
+    };
   default:
     console.warn('Unknown node', node.type);
     break;

@@ -33,6 +33,7 @@
           v-if="$hasOphCrud()"
           :digitaaliset-osaamiset-store="digitaalisetOsaamisetStore"
         />
+        <TileKieliKaantajaTutkinto v-if="$hasOphCrud()" />
         <TileOsaamismerkit v-if="$hasOphCrud()" />
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}" />
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}" />
@@ -48,6 +49,7 @@ import TileOppaat from './tiles/TileOppaat.vue';
 import TilePerusteprojektit from './tiles/TilePerusteprojektit.vue';
 import TilePohjat from './tiles/TilePohjat.vue';
 import TileDigitaalinenOsaaminen from './tiles/TileDigitaalinenOsaaminen.vue';
+import TileKieliKaantajaTutkinto from './tiles/TileKieliKaantajaTutkinto.vue';
 import TileTiedotteet from './tiles/TileTiedotteet.vue';
 import TileArviointiasteikot from './tiles/TileArviointiasteikot.vue';
 import TileTilastot from './tiles/TileTilastot.vue';

@@ -155,10 +155,8 @@ import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
-import EpSelect from '@shared/components/forms/EpSelect.vue';
-import EpFormContent from '@shared/components/forms/EpFormContent.vue';
-import EpField from '@shared/components/forms/EpField.vue';
+import { KielikaantajanTaitoStore } from '@/stores/KielikaantajanTaitoStore';
+import { KaantajaTaitotasoasteikkoStore } from '@/stores/KaantajaTaitotasoasteikkoStore';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -387,6 +385,25 @@ const perusteTyyppiSisaltoLisays = computed(() => {
           'sijainti': 'osaamiskokonaisuuden-sijainti',
         },
       }],
+    [_.toLower(PerusteDtoTyyppiEnum.KIELIKAANTAJATUTKINTO)]: [
+      {
+        groupedSisalto: [],
+        save: tallennaUusiTaito,
+        label: {
+          'uusi': 'uusi-taito',
+          'lisaa': 'lisaa-taito',
+          'sijainti': 'taidon-sijainti',
+        },
+      },
+      {
+        groupedSisalto: [],
+        save: tallennaUusiTaitotasoasteikko,
+        label: {
+          'uusi': 'uusi-taitotasoasteikko',
+          'lisaa': 'lisaa-taitotasoasteikko',
+          'sijainti': 'taitotasoasteikon-sijainti',
+        },
+      }],
   };
 });
 
@@ -517,6 +534,20 @@ const tallennaUusiOsaamiskokonaisuus = async (otsikko, tekstikappaleIsa) => {
       osaamiskokonaisuusId: '' + tallennettu!.id,
     },
   });
+};
+
+const tallennaUusiTaito = async (otsikko, tekstikappaleIsa) => {
+  const taitoStore = new KielikaantajanTaitoStore(peruste.value!.id!, 0);
+  const tallennettu = await taitoStore.create(tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({ name: 'kaantajataito', params: { kaantajataitoId: '' + tallennettu!.id } });
+};
+
+const tallennaUusiTaitotasoasteikko = async (otsikko, tekstikappaleIsa) => {
+  const taitotasoasteikkoStore = new KaantajaTaitotasoasteikkoStore(peruste.value!.id!, 0);
+  const tallennettu = await taitotasoasteikkoStore.create(tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({ name: 'kaantajataitotasoasteikko', params: { kaantajataitotasoasteikkoId: '' + tallennettu!.id } });
 };
 
 const uusiVaihe = async () => {

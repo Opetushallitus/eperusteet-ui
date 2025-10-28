@@ -262,6 +262,24 @@
                 </div>
               </template>
 
+              <template #kaantajataito="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'kaantajataito', params: { kaantajataitoId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-taito') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template #kaantajataitotasoasteikko="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'kaantajataitotasoasteikko', params: { kaantajataitotasoasteikkoId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-taitotasoasteikko') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template #osaamiskokonaisuus_paa_alue="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'osaamiskokonaisuus_paa_alue', params: { osaamiskokonaisuusPaaAlueId: item.id } }">
