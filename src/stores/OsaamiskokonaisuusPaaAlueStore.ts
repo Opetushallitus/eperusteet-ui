@@ -1,14 +1,11 @@
 import { PerusteStore } from '@/stores/PerusteStore';
 import VueRouter from 'vue-router';
-import Vue from 'vue';
-import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
+import { computed, reactive } from 'vue';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { Matala, Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import { requiredOneLang } from '@shared/validators/required';
 import { AbstractPerusteenOsaViiteStore } from './AbstractPerusteenOsaViiteStore';
-
-Vue.use(VueCompositionApi);
 
 export class OsaamiskokonaisuusPaaAlueStore extends AbstractPerusteenOsaViiteStore {
   public readonly validator = computed(() => {
@@ -47,8 +44,8 @@ export class OsaamiskokonaisuusPaaAlueStore extends AbstractPerusteenOsaViiteSto
     };
 
     const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
-        OsaamiskokonaisuusPaaAlueStore.config.perusteStore.perusteId.value!,
-        OsaamiskokonaisuusPaaAlueStore.config?.perusteStore.perusteSuoritustapa.value!,
+        OsaamiskokonaisuusPaaAlueStore.config.perusteStore.perusteId.value as number,
+        OsaamiskokonaisuusPaaAlueStore.config.perusteStore.perusteSuoritustapa.value as any,
         osaamiskokonaisuusId,
         perusteenOsa,
     ));

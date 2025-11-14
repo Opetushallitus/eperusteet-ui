@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { Router } from 'vue-router';
+import { reactive, computed } from 'vue';
 import { Matala, Perusteenosat, Sisallot, PerusteDtoTyyppiEnum, Laaja } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
@@ -8,13 +8,11 @@ import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { requiredOneLang } from '@shared/validators/required';
 import { PerusteenOsaDto } from '@shared/generated/eperusteet';
-
-Vue.use(VueCompositionApi);
+import { App } from 'vue';
 
 interface TekstikappaleStoreConfig {
-  // notifikaatiotStore: NotifikaatiotStore;
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: Router;
 }
 
 export class TekstikappaleStore implements IEditoitava {
@@ -24,7 +22,7 @@ export class TekstikappaleStore implements IEditoitava {
 
   private static config: TekstikappaleStoreConfig;
 
-  public static install(vue: typeof Vue, config: TekstikappaleStoreConfig) {
+  public static install(app: App, config: TekstikappaleStoreConfig) {
     TekstikappaleStore.config = config;
   }
 
@@ -48,35 +46,36 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async fetch() {
-    try {
-      if (this.versionumero) {
-        const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.tekstiKappaleViiteId)).data as Revision[];
-        const rev = revisions[revisions.length - this.versionumero];
-        this.state.tekstikappale = (await Perusteenosat.getPerusteenOsaVersioByViite(this.tekstiKappaleViiteId, rev.numero)).data;
-      }
-      else {
-        this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleViiteId)).data;
-      }
+    if (this.versionumero) {
+      const revisions = (await Perusteenosat.getPerusteenOsaViiteVersiot(this.tekstiKappaleViiteId)).data as Revision[];
+      const rev = revisions[revisions.length - this.versionumero];
+      this.state.tekstikappale = (await Perusteenosat.getPerusteenOsaVersioByViite(this.tekstiKappaleViiteId, rev.numero)).data;
     }
-    catch (err) {
+    else {
+      this.state.tekstikappale = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleViiteId)).data;
     }
   }
 
   public async load() {
     await this.fetch();
     return {
-      ...this.tekstikappale.value,
-      originalNimi: (this.tekstikappale.value as any).nimi,
+      ...this.tekstikappale,
+      originalNimi: (this.tekstikappale as any).nimi,
     };
   }
 
   public async save(data: Matala) {
-    const res = await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.id.value!, data);
+    const res = await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.state.tekstikappale!.id!, data);
 
-    TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
-      id: this.tekstiKappaleViiteId,
-      label: (res.data as any).nimi as any,
-    });
+    if ((data as any)?.liite === (this.state.tekstikappale! as any)?.liite) {
+      TekstikappaleStore.config!.perusteStore!.updateNavigationEntry({
+        id: this.tekstiKappaleViiteId,
+        label: (res.data as any).nimi as any,
+      });
+    }
+    else {
+      await TekstikappaleStore.config!.perusteStore!.updateNavigation();
+    }
 
     return res.data;
   }
@@ -89,16 +88,15 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async remove() {
-    await Sisallot.removeSisaltoViite(this.perusteId, TekstikappaleStore.config?.perusteStore.perusteSuoritustapa.value!, this.tekstiKappaleViiteId);
+    await Sisallot.removeSisaltoViite(this.perusteId, TekstikappaleStore.config.perusteStore.perusteSuoritustapa.value!, this.tekstiKappaleViiteId);
     TekstikappaleStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tekstiKappaleViiteId,
     });
-    TekstikappaleStore.config.router.push({ name: 'perusteprojekti' });
   }
 
   public async lock() {
     try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.id.value!);
+      const res = await Perusteenosat.checkPerusteenOsaLock(this.state.tekstikappale!.id!);
       return res.data;
     }
     catch (err) {
@@ -107,12 +105,12 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.id.value!);
+    const res = await Perusteenosat.lockPerusteenOsa(this.state.tekstikappale!.id!);
     return res.data;
   }
 
   public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.id.value!);
+    await Perusteenosat.unlockPerusteenOsa(this.state.tekstikappale!.id!);
   }
 
   public async preview() {
@@ -134,13 +132,13 @@ export class TekstikappaleStore implements IEditoitava {
   }
 
   public async revisions() {
-    const res = await Perusteenosat.getPerusteenOsaVersiot(this.id.value!);
+    const res = await Perusteenosat.getPerusteenOsaVersiot(this.state.tekstikappale!.id!);
     return res.data as Revision[];
   }
 
   public async restore(rev: number) {
     await this.acquire();
-    await Perusteenosat.revertPerusteenOsaToVersio(this.id.value!, rev);
+    await Perusteenosat.revertPerusteenOsaToVersio(this.state.tekstikappale!.id!, rev);
     await this.release();
   }
 

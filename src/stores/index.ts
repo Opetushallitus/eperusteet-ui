@@ -10,7 +10,6 @@ import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
-import { tutoriaaliStore } from '@shared/stores/tutoriaali';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import { OppaatStore } from '@/stores/OppaatStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
@@ -20,13 +19,13 @@ import { PoistetutStore } from './PoistetutStore';
 import { DigitaalisetOsaamisetStore } from './DigitaalisetOsaamisetStore';
 import { YllapitoStore } from '@/stores/YllapitoStore';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
-import { MaarayksetStore } from '@shared/stores/MaarayksetStore';
 
+// Create instances of class-based stores
 const arviointiStore = new ArviointiStore(Kielet);
 const kayttajaStore = Kayttajat;
 const perusteOppaatStore = new PerusteetStore({ tyyppi: ['OPAS'] } as any);
 const perusteStore = new PerusteStore();
-const perusteetStore = new PerusteetStore({ tyyppi: ['NORMAALI', 'AMOSAA_YHTEINEN'] } as any);
+const perusteetStore = new PerusteetStore();
 const perusteprojektiStore = new PerusteprojektiStore();
 const pohjatStore = new PerusteetStore({ tyyppi: ['POHJA'] } as any);
 const digitaalisetOsaamisetStore = new DigitaalisetOsaamisetStore({ tyyppi: ['DIGITAALINEN_OSAAMINEN'] } as any);
@@ -40,11 +39,11 @@ const oppaatStore = new OppaatStore();
 const tyoryhmaStore = new TyoryhmaStore();
 const termitStore = new TermitStore();
 const tilastotStore = new TilastotStore();
-const maarayksetStore = new MaarayksetStore();
 const poistetutStore = new PoistetutStore();
 const yllapitoStore = new YllapitoStore();
 const osaamismerkitStore = new OsaamismerkitStore();
 
+// Export class-based stores
 export const stores = Object.freeze({
   aikatauluStore,
   arviointiStore,
@@ -61,7 +60,6 @@ export const stores = Object.freeze({
   pohjatStore,
   tiedotteetStore,
   tutkinnonOsaStore,
-  tutoriaaliStore,
   tyoryhmaStore,
   ulkopuolisetStore,
   termitStore,
@@ -69,5 +67,4 @@ export const stores = Object.freeze({
   poistetutStore,
   yllapitoStore,
   osaamismerkitStore,
-  maarayksetStore,
 });

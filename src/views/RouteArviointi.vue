@@ -1,11 +1,17 @@
 <template>
   <EpMainView>
-    <template slot="icon">
-      <EpIcon class="float-right" icon="groups" background-color="#82D4FF" />
+    <template #icon>
+      <EpIcon
+        class="float-right"
+        icon="groups"
+        background-color="#82D4FF"
+      />
     </template>
 
     <b-container>
-      <h1 class="mb-4">{{ $t('arviointi') }}</h1>
+      <h1 class="mb-4">
+        {{ $t('arviointi') }}
+      </h1>
 
       <b-nav tabs>
         <b-nav-item to="geneerinen">
@@ -20,35 +26,29 @@
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpIcon,
-  },
-})
-export default class RouteArviointi extends Vue {
-  @Prop({ required: true })
-  arviointiStore!: ArviointiStore;
+const props = defineProps<{
+  arviointiStore: ArviointiStore;
+}>();
 
-  mounted() {
-    this.arviointiStore.fetchArviointiasteikot();
-    this.arviointiStore.fetchGeneeriset();
-  }
+onMounted(() => {
+  props.arviointiStore.fetchArviointiasteikot();
+  props.arviointiStore.fetchGeneeriset();
+});
 
-  get arviointiasteikot() {
-    return this.arviointiStore.arviointiasteikot.value;
-  }
+const arviointiasteikot = computed(() => {
+  return props.arviointiStore.arviointiasteikot.value;
+});
 
-  get geneeriset() {
-    return this.arviointiStore.geneeriset.value;
-  }
-}
+const geneeriset = computed(() => {
+  return props.arviointiStore.geneeriset.value;
+});
 </script>
 
 <style lang="scss">

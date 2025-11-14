@@ -1,49 +1,66 @@
 <template>
   <ep-main-view container>
-    <EpEditointi :store="store" :confirmRemove="false">
-      <template v-slot:customheader="{ data, isEditing, cancel, save, disabled, validation, isSaving, modify, remove, editable }">
-        <div class="d-flex justify-content-between header py-2" :class="{'editing': isEditing}">
-          <h1 class="mb-4 mr-auto">{{ $t(header) }}</h1>
+    <EpEditointi
+      v-if="store"
+      :store="store"
+      :confirm-remove="false"
+    >
+      <template #customheader="{ data, isEditing, cancel, save, disabled, validation, isSaving, modify, remove, editable }">
+        <div
+          class="d-flex justify-content-between header py-2"
+          :class="{'editing': isEditing}"
+        >
+          <h1 class="mb-4 mr-auto">
+            {{ $t(header) }}
+          </h1>
 
-          <ep-button class="ml-4"
-                      v-if="isEditing"
-                      @click="cancel()"
-                      :disabled="disabled"
-                      variant="link">
+          <ep-button
+            v-if="isEditing"
+            class="ml-4"
+            :disabled="disabled"
+            variant="link"
+            @click="cancel()"
+          >
             {{ $t('peruuta') }}
           </ep-button>
-          <ep-button class="ml-4"
-                      @click="tallenna(LUONNOS, save)"
-                      v-if="isEditing"
-                      :disabled="disabled || (validation && validation.$invalid)"
-                      variant="primary">
+          <ep-button
+            v-if="isEditing"
+            class="ml-4"
+            :disabled="disabled || (validation && validation.$invalid)"
+            variant="primary"
+            @click="tallenna(LUONNOS, save)"
+          >
             {{ $t('tallenna-luonnoksena') }}
           </ep-button>
-          <ep-button class="ml-4"
-                      @click="tallenna(JULKAISTU, save)"
-                      v-if="isEditing"
-                      :disabled="disabled || (validation && validation.$invalid)"
-                      variant="primary">
+          <ep-button
+            v-if="isEditing"
+            class="ml-4"
+            :disabled="disabled || (validation && validation.$invalid)"
+            variant="primary"
+            @click="tallenna(JULKAISTU, save)"
+          >
             {{ $t('tallenna-ja-julkaise') }}
           </ep-button>
-          <ep-button class="ml-4"
-                      v-if="!isEditing"
-                      @click="modify()"
-                      :disabled="disabled || !editable"
-                      variant="link"
-                      icon="edit"
-                      v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
-                      >
+          <ep-button
+            v-if="!isEditing"
+            v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
+            class="ml-4"
+            :disabled="disabled || !editable"
+            variant="link"
+            icon="edit"
+            @click="modify()"
+          >
             {{ $t('muokkaa') }}
           </ep-button>
-          <ep-button class="ml-4"
-                      v-if="!isEditing && data.id"
-                      @click="poista(remove)"
-                      :disabled="disabled || !editable"
-                      variant="link"
-                      icon="delete"
-                      v-oikeustarkastelu="{oikeus:'poisto', kohde: 'eperusteet_maarays'}"
-                      >
+          <ep-button
+            v-if="!isEditing && data.id"
+            v-oikeustarkastelu="{oikeus:'poisto', kohde: 'eperusteet_maarays'}"
+            class="ml-4"
+            :disabled="disabled || !editable"
+            variant="link"
+            icon="delete"
+            @click="poista(remove)"
+          >
             {{ $t('poista') }}
           </ep-button>
 
@@ -51,95 +68,192 @@
         </div>
       </template>
 
-      <template v-slot:default="{ data, isEditing, supportData }">
-
+      <template #default="{ data, isEditing, supportData }">
         <div v-if="!isEditing">
           <b-form-group :label="$t('tila')">
-            <span v-if="data.tila">{{$t(data.tila.toLowerCase())}} - {{ $t('muokannut-viimeksi')}}: </span>
+            <span v-if="data.tila">{{ $t(data.tila.toLowerCase()) }} - {{ $t('muokannut-viimeksi') }}: </span>
             <span v-if="muokkaajaNimi">{{ muokkaajaNimi }} </span>
             <span v-else>{{ data.muokkaaja }} </span>
-            <span v-if="data.muokattu">{{$sdt(data.muokattu)}}</span>
+            <span v-if="data.muokattu">{{ $sdt(data.muokattu) }}</span>
           </b-form-group>
         </div>
 
         <b-form-group class="mt-4">
-          <div slot="label" class="d-flex">
-            <div>{{$t('tyyppi') + isRequired }}</div>
-            <EpInfoPopover class="ml-3" v-if="isEditing"><div v-html="$t('maarays-muokkaus-tyyppi-info-selite')" /></EpInfoPopover>
-          </div>
+          <template #label>
+            <div class="d-flex">
+              <div>{{ $t('tyyppi') + isRequired }}</div>
+              <EpInfoPopover
+                v-if="isEditing"
+                class="ml-3"
+              >
+                <div v-html="$t('maarays-muokkaus-tyyppi-info-selite')" />
+              </EpInfoPopover>
+            </div>
+          </template>
           <template v-if="isEditing">
-            <b-form-radio v-for="tyyppi in tyypit" v-model="data.tyyppi" :value="tyyppi" :key="'tyyppivalinta_'+tyyppi">
+            <EpRadio
+              v-for="tyyppi in tyypit"
+              :key="'tyyppivalinta_'+tyyppi"
+              v-model="data.tyyppi"
+              :value="tyyppi"
+            >
               {{ $t('maarays-tyyppi-' + tyyppi.toLowerCase()) }}
-            </b-form-radio>
+            </EpRadio>
           </template>
           <div v-else>
             {{ $t('maarays-tyyppi-' + data.tyyppi.toLowerCase()) }}
-            <span v-if="data.peruste">(<router-link :to="{ name : 'perusteprojekti', params: { projektiId: data.peruste._perusteprojekti }}">{{$kaanna(data.peruste.nimi)}}</router-link>)
+            <span v-if="data.peruste">(<router-link :to="{ name : 'perusteprojekti', params: { projektiId: data.peruste._perusteprojekti }}">{{ $kaanna(data.peruste.nimi) }}</router-link>)
             </span>
           </div>
         </b-form-group>
 
-        <b-form-group :label="$t('maarayksen-nimi') + isRequired" class="mt-4">
-          <ep-input v-model="data.nimi" :is-editing="isEditing"/>
+        <b-form-group
+          :label="$t('maarayksen-nimi') + isRequired"
+          class="mt-4"
+        >
+          <ep-input
+            v-model="data.nimi"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('maarayksen-diaarinumero') + isRequired" class="mt-4">
-          <ep-input v-model="data.diaarinumero" :is-editing="isEditing" type="string"/>
+        <b-form-group
+          :label="$t('maarayksen-diaarinumero') + isRequired"
+          class="mt-4"
+        >
+          <ep-input
+            v-model="data.diaarinumero"
+            :is-editing="isEditing"
+            type="string"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('voimassaolo')" class="mt-4">
+        <b-form-group
+          :label="$t('voimassaolo')"
+          class="mt-4"
+        >
           <div class="d-flex align-items-center">
             <div>
-              <div v-if="isEditing">{{$t('alkaa')}}{{ isRequired }}</div>
-              <ep-datepicker v-model="data.voimassaoloAlkaa" :is-editing="isEditing" />
+              <div v-if="isEditing">
+                {{ $t('alkaa') }}{{ isRequired }}
+              </div>
+              <ep-datepicker
+                v-model="data.voimassaoloAlkaa"
+                :is-editing="isEditing"
+              />
             </div>
-            <div class="ml-2 mr-2" :class="{'mt-4': isEditing}">-</div>
+            <div
+              class="ml-2 mr-2"
+              :class="{'mt-4': isEditing}"
+            >
+              -
+            </div>
             <div>
-              <div v-if="isEditing">{{$t('paattyy')}}</div>
-              <ep-datepicker v-model="data.voimassaoloLoppuu" :is-editing="isEditing" v-if="data.voimassaoloLoppuu || isEditing"/>
+              <div v-if="isEditing">
+                {{ $t('paattyy') }}
+              </div>
+              <ep-datepicker
+                v-if="data.voimassaoloLoppuu || isEditing"
+                v-model="data.voimassaoloLoppuu"
+                :is-editing="isEditing"
+              />
             </div>
           </div>
         </b-form-group>
 
-        <b-form-group :label="$t('maarayksen-paatospaivamaara') + isRequired" class="mt-4 d-flex">
-          <ep-datepicker v-model="data.maarayspvm" :is-editing="isEditing" />
+        <b-form-group
+          :label="$t('maarayksen-paatospaivamaara') + isRequired"
+          class="mt-4 d-flex"
+        >
+          <ep-datepicker
+            v-model="data.maarayspvm"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('maaraysdokumentti') + ' (pdf) ' + isRequired" class="mt-4">
+        <b-form-group
+          :label="$t('maaraysdokumentti') + ' (pdf) ' + isRequired"
+          class="mt-4"
+        >
           <div v-if="maarayskirje">
-            <a :href="maarayskirjeUrl" target="_blank" rel="noopener noreferrer">{{ maarayskirje.nimi }}</a>
+            <a
+              :href="maarayskirjeUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >{{ maarayskirje.nimi }}</a>
           </div>
-          <EpMaaraysLiitteet v-else v-model="data.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="MAARAYSDOKUMENTTI" yksittainen/>
+          <EpMaaraysLiitteet
+            v-else
+            v-model="data.liitteet[kieli].liitteet"
+            :is-editing="isEditing"
+            :tyyppi="MAARAYSDOKUMENTTI"
+            yksittainen
+          />
         </b-form-group>
 
-        <b-form-group :label="liittyykoToiseenMaaraykseenOtsikko" class="mt-4">
-          <EpMaaraysLiittyyMuuttaaValinta v-model="storeData" :maarayksetNimella="supportData.maarayksetNimella" :isEditing="isEditing" />
+        <b-form-group
+          :label="liittyykoToiseenMaaraykseenOtsikko"
+          class="mt-4"
+        >
+          <EpMaaraysLiittyyMuuttaaValinta
+            v-model="storeData"
+            :maaraykset-nimella="supportData.maarayksetNimella"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('koulutus-tai-tutkinto')" class="mt-4">
-          <EpMaarayskokoelmaKoulutustyyppiSelect v-model="data.koulutustyypit" :isEditing="isEditing"/>
+        <b-form-group
+          :label="$t('koulutus-tai-tutkinto')"
+          class="mt-4"
+        >
+          <EpMaarayskokoelmaKoulutustyyppiSelect
+            v-model="data.koulutustyypit"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('asiasana')" class="mt-4">
-          <EpMaaraysAsiasanat v-model="data.asiasanat[kieli].asiasana" :asiasanat="asiasanat" :isEditing="isEditing"/>
+        <b-form-group
+          :label="$t('asiasana')"
+          class="mt-4"
+        >
+          <EpMaaraysAsiasanat
+            v-model="data.asiasanat[kieli].asiasana"
+            :asiasanat="asiasanat"
+            :is-editing="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('kuvaus') + isRequired" class="mt-4">
-          <ep-content v-model="data.kuvaus" layout="simplified_w_links" :is-editable="isEditing"/>
+        <b-form-group
+          :label="$t('kuvaus') + isRequired"
+          class="mt-4"
+        >
+          <ep-content
+            v-model="data.kuvaus"
+            layout="simplified_w_links"
+            :is-editable="isEditing"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('liitteet') + ' (pdf)'" class="mt-4 mb-5">
-          <EpMaaraysLiitteet v-model="data.liitteet[kieli].liitteet" :isEditing="isEditing" :tyyppi="LIITE" nimisyote/>
+        <b-form-group
+          :label="$t('liitteet') + ' (pdf)'"
+          class="mt-4 mb-5"
+        >
+          <EpMaaraysLiitteet
+            v-model="data.liitteet[kieli].liitteet"
+            :is-editing="isEditing"
+            :tyyppi="LIITE"
+            nimisyote
+          />
         </b-form-group>
-
       </template>
     </EpEditointi>
   </ep-main-view>
 </template>
 
-<script lang="ts">
-import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue';
+import { useRoute } from 'vue-router';
+import _ from 'lodash';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import { Murupolku } from '@shared/stores/murupolku';
 import { MaaraysDtoTyyppiEnum, MaaraysDtoTilaEnum, MaaraysLiiteDtoTyyppiEnum, MaaraysDtoLiittyyTyyppiEnum, baseURL } from '@shared/api/eperusteet';
@@ -151,10 +265,6 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import { parsiEsitysnimi } from '@shared/utils/kayttaja';
-import EpTiedostoLataus from '@shared/components/EpTiedosto/EpTiedostoLataus.vue';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
-import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import { nimiSearchIdentity } from '@shared/utils/helpers';
 import EpMaaraysLiittyyMuuttaaValinta from '@/components/maaraykset/EpMaaraysLiittyyMuuttaaValinta.vue';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
 import EpMaaraysLiitteet from '@/components/maaraykset/EpMaaraysLiitteet.vue';
@@ -162,197 +272,184 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
+import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
-@Component({
-  components: {
-    EpMainView,
-    EpEditointi,
-    EpButton,
-    EpContent,
-    EpInput,
-    EpDatepicker,
-    EpTiedostoLataus,
-    EpMaterialIcon,
-    EpMultiSelect,
-    EpSpinner,
-    EpMaaraysAsiasanat,
-    EpMaaraysLiitteet,
-    EpMaaraysLiittyyMuuttaaValinta,
-    EpInfoPopover,
-    EpMaarayskokoelmaKoulutustyyppiSelect,
+const route = useRoute();
+const instance = getCurrentInstance();
+
+const store = ref<EditointiStore | null>(null);
+const LUONNOS = MaaraysDtoTilaEnum.LUONNOS;
+const JULKAISTU = MaaraysDtoTilaEnum.JULKAISTU;
+const LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
+const MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
+const EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
+const MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
+const KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
+
+const maaraysliittyy = ref<'eiliity' | 'muuttaa' | 'korvaa'>('eiliity');
+const arvioinninTyyppi = ref<'geneerinen' | 'tutkinnonosa-kohtainen' | null>(null);
+
+
+const maaraysId = computed(() => {
+  if (route.params.maaraysId === 'uusi') {
+    return route.params.maaraysId;
+  }
+
+  return _.toNumber(route.params.maaraysId);
+});
+
+onMounted(() => {
+  Murupolku.aseta('maaraysMuokkaus', $t(header.value), {
+    name: 'maaraysMuokkaus',
+  });
+});
+
+// Initialize the store when maaraysId changes
+watch(maaraysId, (newId) => {
+  const tkstore = new MaarayksetEditStore(newId);
+  store.value = new EditointiStore(tkstore as any);
+}, { immediate: true });
+
+const tyypit = computed(() => {
+  return [
+    MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
+    MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
+    MaaraysDtoTyyppiEnum.PERUSTE,
+  ];
+});
+
+const isUusi = computed(() => {
+  return maaraysId.value === 'uusi';
+});
+
+const header = computed(() => {
+  return isUusi.value ? 'lisaa-maarays' : 'maarays';
+});
+
+const storeData = computed({
+  get() {
+    return store.value?.data;
   },
-})
-export default class RouteMaaraysMuokkaus extends Vue {
-  private store: EditointiStore | null = null;
-  private LUONNOS = MaaraysDtoTilaEnum.LUONNOS;
-  private JULKAISTU = MaaraysDtoTilaEnum.JULKAISTU;
-  private LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
-  private MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
-  private EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
-  private MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
-  private KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 
-  private maaraysliittyy: 'eiliity' | 'muuttaa' | 'korvaa' = 'eiliity';
-  private nimiSearchIdentity = nimiSearchIdentity;
+const tallenna = async (tila, save) => {
+  store.value?.setData({
+    ...store.value?.data,
+    tila,
+  });
 
-  mounted() {
-    Murupolku.aseta('maaraysMuokkaus', this.$t(this.header), {
-      name: 'maaraysMuokkaus',
+  await save();
+};
+
+const isRequired = computed(() => {
+  return store.value?.isEditing ? ' *' : '';
+});
+
+const muokkaajaNimi = computed(() => {
+  return parsiEsitysnimi(store.value?.data?.muokkaajaKayttaja);
+});
+
+const liittyyTyyppi = computed(() => {
+  return store.value?.data?.liittyyTyyppi;
+});
+
+// Watch liittyyTyyppi changes
+watch(liittyyTyyppi, (newType) => {
+  if (newType !== MaaraysDtoLiittyyTyyppiEnum.MUUTTAA) {
+    store.value?.setData({
+      ...store.value?.data,
+      muutettavatMaaraykset: [],
     });
   }
 
-  @Watch('maaraysId', { immediate: true })
-  maaraysIdChange() {
-    const tkstore = new MaarayksetEditStore(this.maaraysId, this);
-    this.store = new EditointiStore(tkstore);
+  if (newType !== MaaraysDtoLiittyyTyyppiEnum.KORVAA) {
+    store.value?.setData({
+      ...store.value?.data,
+      korvattavatMaaraykset: [],
+    });
+  }
+});
+
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
+
+const liittyykoToiseenMaaraykseenOtsikko = computed(() => {
+  if (store.value?.isEditing) {
+    return $t('maarayksen-liittyminen-aiempaan-maaraykseen') + isRequired.value;
   }
 
-  get tyypit() {
-    return [
-      MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
-      MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
-      MaaraysDtoTyyppiEnum.PERUSTE,
-    ];
+  if (store.value?.data?.liittyyTyyppi === EILIITY) {
+    return $t('ei-liity-toiseen-maaraykseen');
   }
 
-  get isUusi() {
-    return this.maaraysId === 'uusi';
+  if (store.value?.data?.liittyyTyyppi === MUUTTAA) {
+    return $t('muuttaa-maaraysta');
   }
 
-  get header() {
-    return this.isUusi ? 'lisaa-maarays' : 'maarays';
+  if (store.value?.data?.liittyyTyyppi === KORVAA) {
+    return $t('korvaa-maarayksen');
   }
 
-  get maaraysId() {
-    if (this.$route.params.maaraysId === 'uusi') {
-      return this.$route.params.maaraysId;
-    }
+  return '';
+});
 
-    return _.toNumber(this.$route.params.maaraysId);
-  }
-
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-
-  async tallenna(tila, save) {
-    this.store?.setData({
-      ...this.store.data.value,
-      tila,
+const poista = async (remove) => {
+  const varmistaPoisto = await $bvModal.msgBoxConfirm(
+    $t('maarays-poisto-varmistus-teksti'), {
+      title: $t('poista-maarays'),
+      okTitle: $t('poista'),
+      cancelTitle: $t('peruuta'),
+      size: 'sm',
     });
 
-    await save();
+  if (varmistaPoisto) {
+    await remove();
+  }
+};
+
+const peruste = computed(() => {
+  return store.value?.supportData?.peruste;
+});
+
+const maarayskirje = computed(() => {
+  return peruste.value?.maarayskirje?.liitteet[kieli.value] || null;
+});
+
+const maarayskirjeUrl = computed(() => {
+  if (peruste.value && !_.find(storeData.value?.liitteet[kieli.value]?.liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI) && maarayskirje.value) {
+    return `${baseURL}/perusteet/${peruste.value.id}/liitteet/${maarayskirje.value.id}`;
+  }
+  else {
+    return null;
+  }
+});
+
+const asiasanat = computed(() => {
+  if (_.isEmpty(store.value?.supportData?.asiasanat[kieli.value])) {
+    return [];
   }
 
-  get isRequired() {
-    return this.store?.isEditing.value ? ' *' : '';
-  }
-
-  get muokkaajaNimi() {
-    return parsiEsitysnimi(this.store?.data.value?.muokkaajaKayttaja);
-  }
-
-  get liittyyTyyppi() {
-    return this.store?.data.value?.liittyyTyyppi;
-  }
-
-  @Watch('liittyyTyyppi')
-  liittyyTyyppiChange() {
-    if (this.liittyyTyyppi !== MaaraysDtoLiittyyTyyppiEnum.MUUTTAA) {
-      this.store?.setData({
-        ...this.store.data.value,
-        muutettavatMaaraykset: [],
-      });
-    }
-
-    if (this.liittyyTyyppi !== MaaraysDtoLiittyyTyyppiEnum.KORVAA) {
-      this.store?.setData({
-        ...this.store.data.value,
-        korvattavatMaaraykset: [],
-      });
-    }
-  }
-
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
-
-  get liittyykoToiseenMaaraykseenOtsikko() {
-    if (this.store?.isEditing.value) {
-      return this.$t('maarayksen-liittyminen-aiempaan-maaraykseen') + this.isRequired;
-    }
-
-    if (this.store?.data.value.liittyyTyyppi === this.EILIITY) {
-      return this.$t('ei-liity-toiseen-maaraykseen');
-    }
-
-    if (this.store?.data.value.liittyyTyyppi === this.MUUTTAA) {
-      return this.$t('muuttaa-maaraysta');
-    }
-
-    if (this.store?.data.value.liittyyTyyppi === this.KORVAA) {
-      return this.$t('korvaa-maarayksen');
-    }
-  }
-
-  async poista(remove) {
-    const varmistaPoisto = await this.$bvModal.msgBoxConfirm(
-          this.$t('maarays-poisto-varmistus-teksti') as any, {
-            title: this.$t('poista-maarays') as any,
-            okTitle: this.$t('poista') as any,
-            cancelTitle: this.$t('peruuta') as any,
-            size: 'sm',
-          });
-
-    if (varmistaPoisto) {
-      await remove();
-    }
-  }
-
-  get maarayskirje() {
-    return this.peruste?.maarayskirje?.liitteet[this.kieli] || null;
-  }
-
-  get maarayskirjeUrl() {
-    if (this.peruste && !_.find(this.storeData?.liitteet[this.kieli].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI) && this.maarayskirje) {
-      return `${baseURL}/perusteet/${this.peruste.id!}/liitteet/${this.maarayskirje.id}`;
-    }
-    else {
-      return null;
-    }
-  }
-
-  get asiasanat() {
-    if (_.isEmpty(this.store?.supportData.value.asiasanat[this.kieli])) {
-      return [];
-    }
-
-    return this.store?.supportData.value.asiasanat[this.kieli];
-  }
-
-  get peruste() {
-    return this.store?.supportData.value?.peruste;
-  }
-}
+  return store.value?.supportData?.asiasanat[kieli.value];
+});
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @import '@shared/styles/_variables.scss';
 
-  ::v-deep .editointikontrolli .sisalto {
-    padding: 0;
+:deep(.editointikontrolli .sisalto) {
+  padding: 0;
+}
+
+.header {
+  background: $white;
+
+  &.editing {
+    border-bottom: 1px solid #E7E7E7;
   }
-
-  .header {
-    background: $white;
-
-    &.editing {
-      border-bottom: 1px solid #E7E7E7;
-    }
-  }
-
+}
 </style>

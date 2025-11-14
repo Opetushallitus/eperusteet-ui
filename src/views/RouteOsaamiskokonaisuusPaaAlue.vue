@@ -1,16 +1,31 @@
 <template>
-  <EpEditointi :store="editointiStore" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else>{{ $t('nimeton-osaamiskokonaisuus_paa_alue') }}</h2>
+  <EpEditointi
+    v-if="editointiStore"
+    :store="editointiStore"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2 v-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2 v-else>
+        {{ $t('nimeton-osaamiskokonaisuus_paa_alue') }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing }">
-
-      <b-row v-if="isEditing" class="mb-4">
+    <template #default="{ data, isEditing }">
+      <b-row
+        v-if="isEditing"
+        class="mb-4"
+      >
         <b-col lg="8">
-          <b-form-group :label="$t('paa-alueen-nimi') + ' *'" required>
-            <ep-input v-model="data.nimi" :is-editing="isEditing">
-            </ep-input>
+          <b-form-group
+            :label="$t('paa-alueen-nimi') + ' *'"
+            required
+          >
+            <ep-input
+              v-model="data.nimi"
+              :is-editing="isEditing"
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -18,194 +33,217 @@
       <b-row>
         <b-col md="8">
           <b-form-group>
-            <div slot="label" v-if="isEditing">
-              {{$t('paa-alueen-kuvaus')}}
-            </div>
-            <ep-content v-model="data.kuvaus"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+            <template #label>
+              <div v-if="isEditing">
+                {{ $t('paa-alueen-kuvaus') }}
+              </div>
+            </template>
+            <ep-content
+              v-model="data.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
         </b-col>
       </b-row>
 
-      <hr/>
+      <hr>
 
       <template v-if="isEditing">
-        <h3 class="mt-4">{{$t('osa-alueet')}}</h3>
-        <draggable
+        <h3 class="mt-4">
+          {{ $t('osa-alueet') }}
+        </h3>
+        <VueDraggable
           v-bind="defaultDragOptions"
+          v-model="data.osaAlueet"
           tag="div"
-          v-model="data.osaAlueet">
-
-          <b-row v-for="(osaAlue, index) in data.osaAlueet" :key="'tavoite'+index" class="pb-2">
+        >
+          <b-row
+            v-for="(osaAlue, index) in data.osaAlueet"
+            :key="'tavoite'+index"
+            class="pb-2"
+          >
             <b-col md="8">
               <div class="d-flex">
                 <div class="order-handle mr-3">
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
-                <EpOsaAlue v-model="data.osaAlueet[index]" :isEditing="isEditing" class="w-100">
-                  <div slot="poisto">
-                    <b-button variant="link" @click.stop="poistaOsaAlue(osaAlue)">
-                      <EpMaterialIcon>delete</EpMaterialIcon>
-                      {{ $t('poista-osa-alue') }}
-                  </b-button>
-                  </div>
+                <EpOsaAlue
+                  v-model="data.osaAlueet[index]"
+                  :is-editing="isEditing"
+                  class="w-100"
+                >
+                  <template #poisto>
+                    <div>
+                      <b-button
+                        variant="link"
+                        @click.stop="poistaOsaAlue(osaAlue)"
+                      >
+                        <EpMaterialIcon>delete</EpMaterialIcon>
+                        {{ $t('poista-osa-alue') }}
+                      </b-button>
+                    </div>
+                  </template>
                 </EpOsaAlue>
               </div>
             </b-col>
           </b-row>
-        </draggable>
+        </VueDraggable>
 
-        <ep-button @click="lisaaOsaalue()" variant="outline" icon="add" class="mt-2">
+        <ep-button
+          variant="outline"
+          icon="add"
+          class="mt-2"
+          @click="lisaaOsaalue()"
+        >
           {{ $t('lisaa-osa-alue') }}
         </ep-button>
       </template>
 
       <template v-else>
-        <div v-for="(osaAlue, index) in data.osaAlueet" :key="'osa-alue' + index" class="mt-4">
-          <EpOsaAlue v-model="data.osaAlueet[index]" :isEditing="isEditing"/>
-          <hr v-if="index !== data.osaAlueet.length -1" />
+        <div
+          v-for="(osaAlue, index) in data.osaAlueet"
+          :key="'osa-alue' + index"
+          class="mt-4"
+        >
+          <EpOsaAlue
+            v-model="data.osaAlueet[index]"
+            :is-editing="isEditing"
+          />
+          <hr v-if="index !== data.osaAlueet.length -1">
         </div>
-
       </template>
-
     </template>
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
+import _ from 'lodash';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-import { TermitStore } from '@/stores/TermitStore';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpOsaAlue from '@shared/components/EpOsaamiskokonaisuus/EpOsaAlue.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    EpOsaAlue,
-    EpMaterialIcon,
-    draggable,
-  },
-})
-export default class RouteOsaamiskokonaisuusPaaAlue extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  osaamiskokonaisuusPaaAlueId: number;
+}>();
 
-  editointiStore: EditointiStore | null = null;
+const route = useRoute();
+const editointiStore = ref<EditointiStore | null>(null);
 
-  @Prop({ required: true })
-  osaamiskokonaisuusPaaAlueId!: number;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('osaamiskokonaisuusPaaAlueId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
 
-    await this.fetch();
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
+
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const store = new OsaamiskokonaisuusPaaAlueStore(
+    perusteId.value!,
+    Number(props.osaamiskokonaisuusPaaAlueId),
+    versionumero.value,
+  );
+  editointiStore.value = new EditointiStore(store);
+};
+
+// Watch for changes in osaamiskokonaisuusPaaAlueId
+watch(() => props.osaamiskokonaisuusPaaAlueId, async (id, oldId) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const store = new OsaamiskokonaisuusPaaAlueStore(this.perusteId!, Number(this.osaamiskokonaisuusPaaAlueId), this.versionumero);
-    this.editointiStore = new EditointiStore(store);
-  }
+// Watch for changes in versionumero
+watch(versionumero, async () => {
+  await fetch();
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const lisaaOsaalue = async () => {
+  if (!editointiStore.value?.data) return;
 
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
+  const currentData = editointiStore.value.data;
+  const currentOsaAlueet = currentData.osaAlueet || [];
 
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
+  editointiStore.value.setData({
+    ...currentData,
+    osaAlueet: [
+      ...currentOsaAlueet,
+      {
+        tasokuvaukset: [
+          {
+            taso: 'VARHAISKASVATUS',
+            osaamiset: [],
+          },
+          {
+            taso: 'ESIOPETUS',
+            edelleenKehittyvatOsaamiset: [],
+            osaamiset: [],
+          },
+          {
+            taso: 'VUOSILUOKKA_12',
+            edelleenKehittyvatOsaamiset: [],
+            osaamiset: [],
+            edistynytOsaaminenKuvaukset: [],
+          },
+          {
+            taso: 'VUOSILUOKKA_3456',
+            edelleenKehittyvatOsaamiset: [],
+            osaamiset: [],
+            edistynytOsaaminenKuvaukset: [],
+          },
+          {
+            taso: 'VUOSILUOKKA_789',
+            edelleenKehittyvatOsaamiset: [],
+            osaamiset: [],
+            edistynytOsaaminenKuvaukset: [],
+          },
+        ],
+      },
+    ],
+  });
+};
 
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
+const poistaOsaAlue = async (poistettavaOsaAlue: any) => {
+  if (!editointiStore.value?.data) return;
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
+  const currentData = editointiStore.value.data;
 
-  async lisaaOsaalue() {
-    this.editointiStore?.setData({
-      ...this.editointiStore.data.value,
-      osaAlueet: [
-        ...this.editointiStore.data.value.osaAlueet,
-        {
-          tasokuvaukset: [
-            {
-              taso: 'VARHAISKASVATUS',
-              osaamiset: [],
-            },
-            {
-              taso: 'ESIOPETUS',
-              edelleenKehittyvatOsaamiset: [],
-              osaamiset: [],
-            },
-            {
-              taso: 'VUOSILUOKKA_12',
-              edelleenKehittyvatOsaamiset: [],
-              osaamiset: [],
-              edistynytOsaaminenKuvaukset: [],
-            },
-            {
-              taso: 'VUOSILUOKKA_3456',
-              edelleenKehittyvatOsaamiset: [],
-              osaamiset: [],
-              edistynytOsaaminenKuvaukset: [],
-            },
-            {
-              taso: 'VUOSILUOKKA_789',
-              edelleenKehittyvatOsaamiset: [],
-              osaamiset: [],
-              edistynytOsaaminenKuvaukset: [],
-            },
-          ],
-        },
-      ],
-    });
-  }
+  editointiStore.value.setData({
+    ...currentData,
+    osaAlueet: _.filter(currentData.osaAlueet || [], osaAlue => osaAlue !== poistettavaOsaAlue),
+  });
+};
 
-  async poistaOsaAlue(poistettavaOsaAlue) {
-    this.editointiStore?.setData({
-      ...this.editointiStore.data.value,
-      osaAlueet: _.filter(this.editointiStore.data.value.osaAlueet, osaAlue => osaAlue !== poistettavaOsaAlue),
-    });
-  }
-
-  get defaultDragOptions() {
-    return {
-      animation: 300,
-      emptyInsertThreshold: 10,
-      handle: '.order-handle',
-      disabled: !this.editointiStore!.isEditing,
-      ghostClass: 'dragged',
-    };
-  }
-}
+const defaultDragOptions = computed(() => {
+  return {
+    animation: 300,
+    emptyInsertThreshold: 10,
+    handle: '.order-handle',
+    disabled: !editointiStore.value?.isEditing,
+    ghostClass: 'dragged',
+  };
+});
 </script>
 
 <style scoped lang="scss">

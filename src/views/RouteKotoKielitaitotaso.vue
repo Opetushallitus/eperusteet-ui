@@ -1,22 +1,50 @@
 <template>
-  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
-      <h2 class="m-0" v-else >{{ $t('nimeton-kielitaitotaso') }}</h2>
+  <EpEditointi
+    v-if="store"
+    :store="store"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2
+        v-if="data.nimiKoodi"
+        class="m-0"
+      >
+        {{ $kaanna(data.nimiKoodi.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="m-0"
+      >
+        {{ $t('nimeton-kielitaitotaso') }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing }">
-
-      <b-row v-if="isEditing" class="mb-4">
+    <template #default="{ data, isEditing }">
+      <b-row
+        v-if="isEditing"
+        class="mb-4"
+      >
         <b-col lg="8">
-          <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
-            <ep-koodisto-select :store="tavoitesisaltoalueotsikkoKoodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
+          <b-form-group
+            :label="$t('otsikko') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-koodisto-select
+              v-model="data.nimiKoodi"
+              :store="tavoitesisaltoalueotsikkoKoodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -30,32 +58,39 @@
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <div v-if="isEditing" slot="label">{{$t('kuvaus')}}</div>
-            <ep-content v-model="data.kuvaus"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+            <template
+              v-if="isEditing"
+              #label
+            >
+              <div>{{ $t('kuvaus') }}</div>
+            </template>
+            <ep-content
+              v-model="data.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
 
           <EpKotoTaitotasot
-            class="mt-4"
             v-model="data.taitotasot"
-            :isEditing="isEditing"
-            :kasiteHandler="kasiteHandler"
-            :kuvaHandler="kuvaHandler"
-            taitotasoTyyppi="kielitaitotaso"/>
-
+            class="mt-4"
+            :is-editing="isEditing"
+            :kasite-handler="kasiteHandler"
+            :kuva-handler="kuvaHandler"
+            taitotaso-tyyppi="kielitaitotaso"
+          />
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
@@ -72,102 +107,86 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KotoKielitaitotasoStore } from '@/stores/Koto/KotoKielitaitotasoStore';
 import EpKotoTaitotasot from '@shared/components/EpKotoTaitotasot/EpKotoTaitotasot.vue';
 import { Murupolku } from '@shared/stores/murupolku';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpSpinner,
-    EpContent,
-    EpKoodistoSelect,
-    EpKotoTaitotasot,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
+
+const route = useRoute();
+const store = ref<EditointiStore | null>(null);
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
+
+const tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
+  koodisto: 'tavoitesisaltoalueenotsikko',
+  async query(query: string, sivu = 0, koodisto: string) {
+    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    }));
+    return data as any;
   },
-})
-export default class RouteTavoitesisaltoalue extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  private store: EditointiStore | null = null;
+const kotoSisalto = computed(() => {
+  return store.value?.data?.value || null;
+});
 
-  @Watch('kotokielitaitotasoId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-    await this.fetch();
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const kotokielitaitotasoId = computed(() => {
+  return route.params.kotokielitaitotasoId;
+});
+
+
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const tkstore = new KotoKielitaitotasoStore(perusteId.value!, Number(kotokielitaitotasoId.value), versionumero.value);
+  store.value = new EditointiStore(tkstore);
+};
+
+watch(kotokielitaitotasoId, async (id: string, oldId: string) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  @Watch('kotoSisalto')
-  onDataChange(kotoSisalto) {
-    if (kotoSisalto) {
-      Murupolku.aseta('koto_kielitaitotaso', kotoSisalto.nimiKoodi ? this.$kaanna(kotoSisalto.nimiKoodi.nimi) : this.$t('nimeton-kielitaitotaso'), {
-        name: 'koto_kielitaitotaso',
-      });
-    }
+watch(kotoSisalto, (newKotoSisalto) => {
+  if (newKotoSisalto) {
+    Murupolku.aseta('koto_kielitaitotaso', newKotoSisalto.nimiKoodi ? $kaanna(newKotoSisalto.nimiKoodi.nimi) : $t('nimeton-kielitaitotaso'), {
+      name: 'koto_kielitaitotaso',
+    });
   }
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
-
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new KotoKielitaitotasoStore(this.perusteId!, Number(this.kotokielitaitotasoId), this.versionumero);
-    this.store = new EditointiStore(tkstore);
-  }
-
-  private readonly tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
-    koodisto: 'tavoitesisaltoalueenotsikko',
-    async query(query: string, sivu = 0, koodisto: string) {
-      const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      }));
-      return data as any;
-    },
-  });
-
-  get kotoSisalto() {
-    return this.store?.data?.value || null;
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get kotokielitaitotasoId() {
-    return this.$route.params.kotokielitaitotasoId;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
-}
+watch(versionumero, async () => {
+  await fetch();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
 
-  ::v-deep fieldset {
-    padding-right: 0;
-  }
-
-  ::v-deep .input-wrapper {
+  :deep(.input-wrapper) {
     flex: 1 1 0;
 
     input {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
+  }
+
+  :deep(fieldset) {
+    padding-right: 0;
   }
 </style>

@@ -3,15 +3,26 @@ import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eper
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
 import { Revision } from '@shared/tyypit';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+
+interface AipeOppiaineStoreConfig {
+  router: Router;
+}
 
 export class AipeOppiaineStore implements IEditoitava {
+  private static config: AipeOppiaineStoreConfig;
+
+  public static install(app: App, config: AipeOppiaineStoreConfig) {
+    AipeOppiaineStore.config = config;
+  }
+
   constructor(
     private perusteId: number,
     private vaiheId: number,
     private oppiaineId: number | null,
     private parentId: number | null,
     private perusteStore: PerusteStore,
-    private el: any,
     public versionumero?: number,
   ) {
   }
@@ -82,7 +93,7 @@ export class AipeOppiaineStore implements IEditoitava {
     if (newData) {
       await this.perusteStore.updateNavigation();
       await EditointiStore.cancelAll();
-      this.el.$router.push({ name: 'aipeoppiaine', params: { oppiaineId: newData.id } });
+      AipeOppiaineStore.config.router.push({ name: 'aipeoppiaine', params: { oppiaineId: newData.id } });
     }
   }
 
@@ -90,7 +101,7 @@ export class AipeOppiaineStore implements IEditoitava {
     if (this.oppiaineId) {
       await Aipeopetuksensisalto.removeAipeOppiaine(this.perusteId, this.vaiheId, this.oppiaineId);
       await this.perusteStore.updateNavigation();
-      this.el.$router.push({ name: 'aipevaihe', params: { vaiheId: this.vaiheId } });
+      AipeOppiaineStore.config.router.push({ name: 'aipevaihe', params: { vaiheId: this.vaiheId } });
     }
   }
 

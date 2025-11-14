@@ -1,17 +1,28 @@
 import { PerusopetuksenPerusteenSisalto, PerusopetusOppiaineLukko, PerusopetusOppiaineVlkLukko } from '@shared/api/eperusteet';
 import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+
+interface PerusopetusOppiaineStoreConfig {
+  router: Router;
+}
 
 export class PerusopetusOppiaineStore implements IEditoitava {
+  private static config: PerusopetusOppiaineStoreConfig;
+
+  public static install(app: App, config: PerusopetusOppiaineStoreConfig) {
+    PerusopetusOppiaineStore.config = config;
+  }
+
   constructor(
     private perusteId: number,
     private oppiaineId: number,
     private perusteStore: PerusteStore,
     private uusi: boolean,
-    private el: any,
   ) {
   }
 
@@ -44,9 +55,9 @@ export class PerusopetusOppiaineStore implements IEditoitava {
     await PerusopetuksenPerusteenSisalto.updatePerusopetusOppiaine(this.perusteId, this.oppiaineId, data);
     await this.perusteStore.updateNavigation();
 
-    if (this.el.$route.params?.uusi) {
+    if (this.uusi) {
       await EditointiStore.cancelAll();
-      this.el.$router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(this.oppiaineId) } });
+      PerusopetusOppiaineStore.config.router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(this.oppiaineId) } });
     }
   }
 
@@ -54,7 +65,7 @@ export class PerusopetusOppiaineStore implements IEditoitava {
     if (this.oppiaineId) {
       await PerusopetuksenPerusteenSisalto.deletePerusopetusOppiaine(this.perusteId, this.oppiaineId);
       await this.perusteStore.updateNavigation();
-      this.el.$router.push({ name: 'perusopetusOppiaineet' });
+      PerusopetusOppiaineStore.config.router.push({ name: 'perusopetusOppiaineet' });
     }
   }
 

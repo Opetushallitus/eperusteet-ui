@@ -1,11 +1,8 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { Dokumentit, PerusteDto, DokumenttiDto, DokumenttiDtoTilaEnum, baseURL, DokumentitParams } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import { Kielet } from '@shared/stores/kieli';
-
-Vue.use(VueCompositionApi);
 
 export class DokumenttiStore {
   private state = reactive({
@@ -36,8 +33,7 @@ export class DokumenttiStore {
     }
   }
 
-  @Debounced(2000)
-  async getDokumenttiTila() {
+  getDokumenttiTila = debounced(async () => {
     if (!this.state.dokumentti) {
       this.state.dokumentti = (await Dokumentit.getLatestDokumentti((this.peruste.id as number), Kielet.getSisaltoKieli.value, this.suoritustapa, this.version)).data;
     }
@@ -59,7 +55,7 @@ export class DokumenttiStore {
       this.state.polling = true;
       await this.getDokumenttiTila();
     }
-  }
+  }, 2000);
 
   async getJulkaistuDokumentti() {
     if (!this.state.dokumenttiJulkaisu || _.kebabCase(this.state.dokumenttiJulkaisu?.tila) === _.kebabCase(DokumenttiDtoTilaEnum.EPAONNISTUI)) {

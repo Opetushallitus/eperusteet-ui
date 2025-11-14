@@ -1,15 +1,14 @@
-import Vue from 'vue';
-import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
-import { mount, Wrapper, WrapperArray, createLocalVue, RouterLinkStub } from '@vue/test-utils';
+import { mount, RouterLinkStub } from '@vue/test-utils';
 import { PerusteQuery, PerusteprojektiKevytDto, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import EpPerusteprojektiListaus from './EpPerusteprojektiListaus.vue';
 import { IProjektiProvider } from './types';
 import { Page } from '@shared/tyypit';
-import '@shared/config/bootstrap';
-import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
-Vue.use(VueCompositionApi);
+import { reactive } from 'vue';
+import { computed } from 'vue';
+import { globalStubs } from '@shared/utils/__tests__/stubs';
+import { nextTick } from 'vue';
 
-function map<T extends Vue, R>(wrapper: WrapperArray<T>, fn: (param: Wrapper<T>) => R): R[] {
+function map<T extends Vue, R>(wrapper: any, fn: (param: any) => R): R[] {
   const result = [] as R[];
   for (let idx = 0; idx < wrapper.length; ++idx) {
     result.push(fn(wrapper.at(idx)));
@@ -18,14 +17,6 @@ function map<T extends Vue, R>(wrapper: WrapperArray<T>, fn: (param: Wrapper<T>)
 }
 
 describe('Projektilistaus', () => {
-  const localVue = createLocalVue();
-  localVue.use(Oikeustarkastelu, {
-    oikeusProvider: {
-      async hasOikeus() {
-        return true;
-      },
-    },
-  });
 
   const data = reactive({
     projects: null as Page<PerusteprojektiKevytDto[]> | null,
@@ -35,9 +26,9 @@ describe('Projektilistaus', () => {
   const store: IProjektiProvider = {
     ownProjects: computed(() => data.ownProjects),
     projects: computed(() => data.projects),
-    updateQuery: jest.fn(async (query: PerusteQuery) => {
+    updateQuery: vi.fn(async (query: PerusteQuery) => {
     }),
-    updateOwnProjects: jest.fn(async () => {
+    updateOwnProjects: vi.fn(async () => {
     }),
   };
 
@@ -48,20 +39,15 @@ describe('Projektilistaus', () => {
         newRoute: { name: 'luonti' },
         editRoute: 'asia',
       },
-      localVue,
-      mocks: {
-        $t: x => x,
-        $isAdmin: () => false,
-        $hasOphCrud: () => true,
-      },
-      stubs: {
-        RouterLink: RouterLinkStub,
+      global: {
+        ...globalStubs,
       },
     });
 
-    expect(wrapper.findAll('.oph-spinner').length).toEqual(2);
+    expect(wrapper.findAll('.oph-spinner').length).toEqual(1);
     expect(store.updateQuery).toBeCalledTimes(1);
     expect(store.updateOwnProjects).toBeCalledTimes(1);
+
     data.projects = {
       sivu: 0,
       sivukoko: 10,
@@ -86,14 +72,26 @@ describe('Projektilistaus', () => {
       },
     }];
 
-    await localVue.nextTick();
+    wrapper.setProps({
+      provider: {
+        ownProjects: computed(() => data.ownProjects),
+        projects: computed(() => data.projects),
+        updateQuery: vi.fn(async (query: PerusteQuery) => {
+        }),
+        updateOwnProjects: vi.fn(async () => {
+        }),
+      },
+    });
+
+    await nextTick();
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.findAll('.oph-spinner').length).toEqual(0);
     expect(wrapper.html()).toContain('projekti 42');
     expect(wrapper.html()).toContain('perusteprojekti');
     expect(wrapper.html()).toContain('laadinta');
     expect(wrapper.html()).toContain('valmis');
-    expect(map(wrapper.findAll(RouterLinkStub), v => v.props().to)).toEqual(expect.arrayContaining([{
+    expect(map(wrapper.findAllComponents(RouterLinkStub), v => v.props().to)).toEqual(expect.arrayContaining([{
       name: 'luonti',
     }, {
       name: 'asia',
@@ -115,14 +113,8 @@ describe('Projektilistaus', () => {
         newRoute: { name: 'luonti' },
         editRoute: 'asia',
       },
-      localVue,
-      mocks: {
-        $t: x => x,
-        $isAdmin: () => true,
-        $hasOphCrud: () => true,
-      },
-      stubs: {
-        RouterLink: RouterLinkStub,
+      global: {
+        ...globalStubs,
       },
     });
 
@@ -149,6 +141,9 @@ describe('Projektilistaus', () => {
         koulutustyyppi: 'koulutustyyppi_11',
       },
     }];
+
+    await nextTick();
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.html()).toContain('projekti 42');
     expect(wrapper.html()).toContain('oma projekti');

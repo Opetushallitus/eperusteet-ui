@@ -1,10 +1,7 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { MuokkaustietoKayttajallaDto, Muokkaustiedot } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { IMuokkaustietoProvider } from '@shared/components/EpViimeaikainenToiminta/types';
-
-Vue.use(VueCompositionApi);
 
 export class MuokkaustietoStore implements IMuokkaustietoProvider {
   private state = reactive({

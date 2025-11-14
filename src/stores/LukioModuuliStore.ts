@@ -2,17 +2,28 @@ import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/Edit
 import { Lops2019, Lops2019ModuuliDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
-import { computed } from '@vue/composition-api';
-import { required } from 'vuelidate/lib/validators';
+import { computed } from 'vue';
+import { required } from '@vuelidate/validators';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+
+interface LukioModuuliStoreConfig {
+  router: Router;
+}
 
 export class LukioModuuliStore implements IEditoitava {
+  private static config: LukioModuuliStoreConfig;
+
+  public static install(app: App, config: LukioModuuliStoreConfig) {
+    LukioModuuliStore.config = config;
+  }
+
   constructor(
     private perusteId: number,
     private oppiaineId: number,
     private moduuliId: number | null,
     private pakollinen: boolean,
     private perusteStore: PerusteStore,
-    private el: any,
   ) {
   }
 
@@ -71,7 +82,7 @@ export class LukioModuuliStore implements IEditoitava {
       }));
       await this.perusteStore.updateNavigation();
       await EditointiStore.cancelAll();
-      this.el.$router.push({
+      LukioModuuliStore.config.router.push({
         name: 'moduuli',
         params: {
           oppiaineId: oppiaine.id,
@@ -85,7 +96,7 @@ export class LukioModuuliStore implements IEditoitava {
     if (this.moduuliId) {
       await Lops2019.deleteModuuli(this.perusteId, this.oppiaineId, this.moduuliId);
       await this.perusteStore.updateNavigation();
-      this.el.$router.push({ name: 'lukio_oppiaine', params: { oppiaineId: this.oppiaineId } });
+      LukioModuuliStore.config.router.push({ name: 'lukio_oppiaine', params: { oppiaineId: this.oppiaineId } });
     }
   }
 

@@ -1,12 +1,14 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
-import VueCompositionApi, { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import { TutkinnonOsaViiteUpdateDto, TutkinnonRakenne, TutkinnonosatPrivate, Perusteenosat, PerusteDtoTilaEnum } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { Kielet } from '@shared/stores/kieli';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+import { $t } from '@shared/utils/globals';
 
 export function notNull() {
   return {
@@ -14,11 +16,9 @@ export function notNull() {
   };
 }
 
-Vue.use(VueCompositionApi);
-
 interface TutkinnonOsaEditStoreConfig {
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: Router;
 }
 
 export class TutkinnonOsaEditStore implements IEditoitava {
@@ -26,7 +26,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   private tutkinnonOsaId: number | null = null;
   private projektitJoissaKaytossa: any[] | null = null;
 
-  public static install(vue: typeof Vue, config: TutkinnonOsaEditStoreConfig) {
+  public static install(app: App, config: TutkinnonOsaEditStoreConfig) {
     TutkinnonOsaEditStore.config = config;
   }
 
@@ -34,7 +34,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     private readonly perusteId: number,
     // Jos undefined, luodaan uusi
     private readonly tutkinnonOsaViiteId?: any,
-    private readonly el?: any,
     public versionumero?: number,
   ) {
     if (!TutkinnonOsaEditStore.config?.perusteStore) {
@@ -58,7 +57,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
           tyyppi: 'normaali',
           osanTyyppi: 'tutkinnonosa',
           ammattitaitovaatimukset2019: {
-            kohde: { [Kielet.getSisaltoKieli.value]: this.el.$t('opiskelija') },
+            kohde: { [Kielet.getSisaltoKieli.value]: $t('opiskelija') },
             vaatimukset: [],
             kohdealueet: [],
           },
@@ -77,7 +76,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
       res = (await TutkinnonosatPrivate.getViiteVersio(this.tutkinnonOsaViiteId, Number(rev.numero)));
     }
     else {
-      res = await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
+      res = await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
     }
     this.projektitJoissaKaytossa = (await (Perusteenosat.getOwningProjektit((res.data as any).tutkinnonOsa.id))).data;
     this.tutkinnonOsaId = Number((res.data as any)._tutkinnonOsa);
@@ -115,7 +114,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     if (this.tutkinnonOsaViiteId) {
       const res = await TutkinnonRakenne.updateTutkinnonOsa(
         this.perusteId,
-        TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!,
+        TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value!,
         this.tutkinnonOsaViiteId,
         data);
 
@@ -129,7 +128,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     else {
       const res = await TutkinnonRakenne.addTutkinnonOsa(
         this.perusteId,
-        TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!,
+        TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value!,
         data as any);
       await EditointiStore.cancelAll();
       await TutkinnonOsaEditStore.config.perusteStore.updateNavigation();
@@ -151,17 +150,17 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     // Noop
   }
 
-  public readonly validator = computed(() => {
-    return {
-      tutkinnonOsa: {},
-    };
-  });
+  // public readonly validator = computed(() => {
+  //   return {
+  //     tutkinnonOsa: {},
+  //   };
+  // });
 
   public async remove() {
     if (!this.tutkinnonOsaViiteId) {
       return;
     }
-    await TutkinnonRakenne.removeTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
+    await TutkinnonRakenne.removeTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId);
     TutkinnonOsaEditStore.config!.perusteStore!.removeNavigationEntry({
       id: this.tutkinnonOsaViiteId,
     });
@@ -224,7 +223,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public async copy(data) {
-    await TutkinnonRakenne.kloonaaTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config?.perusteStore.perusteSuoritustapa.value!, this.tutkinnonOsaViiteId!);
+    await TutkinnonRakenne.kloonaaTutkinnonOsa(this.perusteId, TutkinnonOsaEditStore.config.perusteStore.perusteSuoritustapa.value as any, this.tutkinnonOsaViiteId as number);
     return true;
   }
 

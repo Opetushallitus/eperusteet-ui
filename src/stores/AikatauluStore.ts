@@ -1,10 +1,8 @@
 import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { Tapahtuma } from '@shared/utils/aikataulu';
 import _ from 'lodash';
 import { PerusteDto, Aikataulut } from '@shared/api/eperusteet';
-
-Vue.use(VueCompositionApi);
 
 export class AikatauluStore {
   private state = reactive({

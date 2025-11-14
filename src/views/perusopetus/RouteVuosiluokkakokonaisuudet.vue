@@ -1,99 +1,106 @@
 <template>
   <EpContentView>
-    <template v-slot:header>
+    <template #header>
       <h3 class="mb-0">
         {{ $t('vuosiluokkakokonaisuudet') }}
       </h3>
     </template>
 
-    <EpSpinner v-if="!vuosiluokkakokonaisuudet"/>
+    <EpSpinner v-if="!vuosiluokkakokonaisuudet" />
     <div v-else>
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" icon="add" @click="lisaaVuosiluokkakokonaisuus" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-          {{ $t('uusi-vuosiluokkakokonaisuus')}}
+        <EpButton
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+          variant="outline"
+          icon="add"
+          @click="lisaaVuosiluokkakokonaisuus"
+        >
+          {{ $t('uusi-vuosiluokkakokonaisuus') }}
         </EpButton>
       </div>
 
-      <b-row class="border-bottom-1 m-0 pb-2" v-if="vuosiluokkakokonaisuudet.length > 0">
-        <b-col cols="5" class="font-weight-bold">{{$t('nimi')}}</b-col>
-        <b-col cols="5" class="font-weight-bold">{{$t('muokattu')}}</b-col>
+      <b-row
+        v-if="vuosiluokkakokonaisuudet.length > 0"
+        class="border-bottom-1 m-0 pb-2"
+      >
+        <b-col
+          cols="5"
+          class="font-weight-bold"
+        >
+          {{ $t('nimi') }}
+        </b-col>
+        <b-col
+          cols="5"
+          class="font-weight-bold"
+        >
+          {{ $t('muokattu') }}
+        </b-col>
       </b-row>
 
-      <b-row v-for="(vlk, index) in vuosiluokkakokonaisuudet" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
-        <b-col cols="5" class="d-flex">
+      <b-row
+        v-for="(vlk, index) in vuosiluokkakokonaisuudet"
+        :key="'lao'+index"
+        class="taulukko-rivi-varitys py-3 m-0"
+      >
+        <b-col
+          cols="5"
+          class="d-flex"
+        >
           <div>
-            <router-link :to="{ name: 'perusopetusVuosiluokkakokonaisuus', params: { vlkId: vlk.id } }">{{ $kaanna(vlk.nimi) }}</router-link>
+            <router-link :to="{ name: 'perusopetusVuosiluokkakokonaisuus', params: { vlkId: vlk.id } }">
+              {{ $kaanna(vlk.nimi) }}
+            </router-link>
           </div>
         </b-col>
         <b-col cols="5">
-          <span v-if="vlk.muokattu">{{$sdt(vlk.muokattu)}}</span>
+          <span v-if="vlk.muokattu">{{ $sdt(vlk.muokattu) }}</span>
         </b-col>
       </b-row>
     </div>
-
   </EpContentView>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusopetusVuosiluokkakokonaisuudetStore } from '@/stores/PerusopetusVuosiluokkakokonaisuudetStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpContentView from '@shared/components/EpContentView/EpContentView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import { $kaanna, $t, $sdt } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpEditointi,
-    EpContentView,
-    EpSpinner,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteVuosiluokkakokonaisuudet extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  store: PerusopetusVuosiluokkakokonaisuudetStore | null = null;
+const router = useRouter();
+const store = ref<PerusopetusVuosiluokkakokonaisuudetStore | null>(null);
 
-  async mounted() {
-    this.store = new PerusopetusVuosiluokkakokonaisuudetStore(this.perusteId!);
-  }
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const vuosiluokkakokonaisuudet = computed(() => {
+  return store.value?.vuosiluokkakokonaisuudet;
+});
 
-  get vuosiluokkakokonaisuudet() {
-    return this.store?.vuosiluokkakokonaisuudet.value;
-  }
 
-  get fields() {
-    return [{
-      label: this.$t('nimi'),
-      key: 'nimi',
-      sortable: true,
-    }, {
-      label: this.$t('muokattu'),
-      key: 'muokattu',
-      thStyle: { width: '30%' },
-      sortable: true,
-      formatter: (value: any, key: string, item: any) => {
-        return value != null ? this.$sdt(value) : '';
-      },
-    }];
-  }
+const lisaaVuosiluokkakokonaisuus = () => {
+  router.push({
+    name: 'perusopetusVuosiluokkakokonaisuus',
+  });
+};
 
-  lisaaVuosiluokkakokonaisuus() {
-    this.$router.push({
-      name: 'perusopetusVuosiluokkakokonaisuus',
-    });
-  }
-}
+onMounted(async () => {
+  store.value = new PerusopetusVuosiluokkakokonaisuudetStore(perusteId.value!);
+});
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

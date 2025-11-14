@@ -1,18 +1,43 @@
 <template>
-  <div class="d-flex flex-column h-100 moduuli mb-3" :style="style">
+  <div
+    class="d-flex flex-column h-100 moduuli mb-3"
+    :style="style"
+  >
     <div class="d-flex align-items-center flex-grow-1 h-100">
-      <div class="pl-1" v-if="hasChildren">
-        <b-button variant="link" @click="toggleOpen">
-          <EpMaterialIcon v-if="isOpen">expand_less</EpMaterialIcon>
-          <EpMaterialIcon v-else>expand_more</EpMaterialIcon>
+      <div
+        v-if="hasChildren"
+        class="pl-1"
+      >
+        <b-button
+          variant="link"
+          @click="toggleOpen"
+        >
+          <EpMaterialIcon v-if="isOpen">
+            expand_less
+          </EpMaterialIcon>
+          <EpMaterialIcon v-else>
+            expand_more
+          </EpMaterialIcon>
         </b-button>
       </div>
       <div class="flex-grow-1 h-100 p-2 nimi">
-        <EpColorIndicator :size="10" :backgroundColor="tutkinnonOsaColor" class="ml-2 mr-2" v-if="tosa"/>
-        {{ $kaanna(nimi) }} <span v-if="koodiArvo">({{koodiArvo}})</span>
+        <EpColorIndicator
+          v-if="tosa"
+          :size="10"
+          :background-color="tutkinnonOsaColor"
+          class="ml-2 mr-2"
+        />
+        {{ $kaanna(nimi) }} <span v-if="koodiArvo">({{ koodiArvo }})</span>
       </div>
-      <div style="width: 100px;" class="text-center">
-        <b-button variant="none" :class="{ 'text-danger': !validity.isValid }" v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu">
+      <div
+        style="width: 100px;"
+        class="text-center"
+      >
+        <b-button
+          v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu"
+          variant="none"
+          :class="{ 'text-danger': !validity.isValid }"
+        >
           <span v-if="laajuusMinimi > 0 || laajuusMaksimi > 0">
             {{ laajuusMinimi }}
           </span>
@@ -22,327 +47,388 @@
           </span>
         </b-button>
       </div>
-      <div style="width: 80px" class="clearfix">
+      <div
+        style="width: 80px"
+        class="clearfix"
+      >
         <div class="float-right">
           <b-dropdown
             v-if="isEditing"
             size="lg"
             variant="link"
             toggle-class="text-decoration-none"
-            no-caret>
-            <template v-slot:button-content>
+            no-caret
+          >
+            <template #button-content>
               <EpMaterialIcon>more_horiz</EpMaterialIcon>
               <span class="sr-only">{{ $t('muokkaa-ryhmaa') }}</span>
             </template>
-            <b-dropdown-item-button @click="edit">{{ $t('muokkaa') }}</b-dropdown-item-button>
-            <b-dropdown-item-button @click="remove">{{ $t('poista') }}</b-dropdown-item-button>
+            <b-dropdown-item-button @click="edit">
+              {{ $t('muokkaa') }}
+            </b-dropdown-item-button>
+            <b-dropdown-item-button @click="remove">
+              {{ $t('poista') }}
+            </b-dropdown-item-button>
 
             <template v-if="isRyhma">
-              <b-dropdown-item-button @click="copy">{{ $t('kopioi-leikelaudalle') }}</b-dropdown-item-button>
-              <b-dropdown-divider v-if="isRyhma"></b-dropdown-divider>
+              <b-dropdown-item-button @click="copy">
+                {{ $t('kopioi-leikelaudalle') }}
+              </b-dropdown-item-button>
+              <b-dropdown-divider v-if="isRyhma" />
               <b-dropdown-text v-if="isRyhma">
-                <ep-button icon="add" variant="outline" @click="liitaTosa">{{ $t('liita-tutkinnon-osa') }}</ep-button>
-                <ep-button icon="add" variant="outline" @click="lisaaRyhma">{{ $t('lisaa-ryhma') }}</ep-button>
+                <ep-button
+                  icon="add"
+                  variant="outline"
+                  @click="liitaTosa"
+                >
+                  {{ $t('liita-tutkinnon-osa') }}
+                </ep-button>
+                <ep-button
+                  icon="add"
+                  variant="outline"
+                  @click="lisaaRyhma"
+                >
+                  {{ $t('lisaa-ryhma') }}
+                </ep-button>
               </b-dropdown-text>
             </template>
           </b-dropdown>
         </div>
       </div>
     </div>
-    <div v-if="value.kuvaus" class="text-muted kuvaus-wrapper">
-      <div v-if="showDescription" class="kuvaus">
-        <ep-content v-model="value.kuvaus" :is-editable="false" layout="normal"></ep-content>
+    <div
+      v-if="modelValue.kuvaus"
+      class="text-muted kuvaus-wrapper"
+    >
+      <div
+        v-if="showDescription"
+        class="kuvaus"
+      >
+        <ep-content
+          :model-value="modelValue.kuvaus"
+          :is-editable="false"
+          layout="normal"
+        />
       </div>
       <div class="text-center description-button">
-        <b-button variant="link" @click="toggleDescription()">
+        <b-button
+          variant="link"
+          @click="toggleDescription()"
+        >
           <EpMaterialIcon>more_horiz</EpMaterialIcon>
         </b-button>
       </div>
     </div>
-    <EpRakenneModal v-model="innerModel" ref="eprakennemodal" @remove="remove" :tutkinnonOsatMap="tutkinnonOsatMap" muokkaus/>
+    <EpRakenneModal
+      ref="eprakennemodal"
+      v-model="innerModel"
+      :tutkinnon-osat-map="tutkinnonOsatMap"
+      muokkaus
+      @remove="remove"
+    />
 
-    <EpRakenneModal v-model="uusi.ryhma" ref="eprakennemodalNew" @save="addUusi(value)"/>
+    <EpRakenneModal
+      ref="eprakennemodalNew"
+      v-model="uusi.ryhma"
+      @save="addUusi(modelValue)"
+    />
 
-    <TutkinnonosatAddModal ref="tutkinnonosatModal" :tutkinnonosat="tutkinnonosat" @save="lisaaTutkinnonosat" />
-
+    <TutkinnonosatAddModal
+      ref="tutkinnonosatModal"
+      :tutkinnonosat="tutkinnonosat"
+      @save="lisaaTutkinnonosat"
+    />
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import { ref, computed, watch, onMounted, useTemplateRef } from 'vue';
 import _ from 'lodash';
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
 import { DefaultRyhma, ryhmaTemplate } from './utils';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { ColorMap, rakenneNodecolor } from '@shared/utils/perusterakenne';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  name: 'MuodostumisItem',
-  components: {
-    EpButton,
-    EpContent,
-    EpInput,
-    EpToggle,
-    EpRakenneModal,
-    TutkinnonosatAddModal,
-    EpColorIndicator,
-    EpMaterialIcon,
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    required: true,
   },
-})
-export default class MuodostumisItem extends Vue {
-  @Prop({ required: true })
-  private value!: any;
+  isEditing: {
+    type: Boolean,
+    default: false,
+  },
+  depth: {
+    type: Number,
+    default: 0,
+  },
+  tutkinnonOsatMap: {
+    type: Object,
+    required: true,
+  },
+  pakollinen: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-  @Prop({ default: false })
-  private isEditing!: boolean;
+const emit = defineEmits(['update:modelValue', 'remove', 'copy']);
 
-  @Prop({ default: 0 })
-  private depth!: number;
+const showDescription = ref(false);
+const uusi = ref(DefaultRyhma);
 
-  @Prop({ required: true })
-  private tutkinnonOsatMap!: any;
+const eprakennemodal = useTemplateRef('eprakennemodal');
+const eprakennemodalNew = useTemplateRef('eprakennemodalNew');
+const tutkinnonosatModal = useTemplateRef('tutkinnonosatModal');
 
-  @Prop({ default: false, type: Boolean })
-  private pakollinen!: boolean;
+watch(() => props.pakollinen, () => {
+  pakollinenChanged();
+});
 
-  private showDescription = false;
-  private uusi: any | null = DefaultRyhma;
+const pakollinenChanged = () => {
+  innerModel.value = { ...innerModel.value, pakollinen: props.pakollinen };
+};
 
-  @Watch('pakollinen', { immediate: true })
-  onPakollinenChange() {
-    this.innerModel = { ...this.innerModel, pakollinen: this.pakollinen };
+const innerModel = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
+
+const hasChildren = computed(() => {
+  return props.modelValue.osat?.length > 0;
+});
+
+const isOpen = computed(() => {
+  return innerModel.value.isOpen ?? true;
+});
+
+const toggleOpen = () => {
+  innerModel.value = {
+    ...innerModel.value,
+    isOpen: !innerModel.value.isOpen,
+  };
+};
+
+const tosa = computed(() => {
+  if (!props.modelValue._tutkinnonOsaViite) {
+    return null;
   }
+  return props.tutkinnonOsatMap[props.modelValue._tutkinnonOsaViite];
+});
 
-  set innerModel(innerModel) {
-    this.$emit('input', innerModel);
+const osanLaajuusRecursive = (osa) => {
+  return _(osa.osat)
+    .map(osa => {
+      return osanLaajuusRecursive(osa) + _.max([osa?.muodostumisSaanto?.laajuus?.minimi, osa?.muodostumisSaanto?.laajuus?.maksimi])
+          || (osa._tutkinnonOsaViite && props.tutkinnonOsatMap[osa._tutkinnonOsaViite] && props.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
+          || 0;
+    })
+    .filter()
+    .sum();
+};
+
+const laskettu = computed(() => {
+  if (isRyhma.value) {
+    return osanLaajuusRecursive(props.modelValue);
   }
-
-  get innerModel() {
-    return this.value;
+  else {
+    return laajuusMinimi.value;
   }
+});
 
-  get hasChildren() {
-    return this.value.osat?.length > 0;
-  }
+onMounted(() => {
+  pakollinenChanged();
 
-  get isOpen() {
-    if (this.innerModel.isOpen === undefined) {
-      this.innerModel = {
-        ...this.innerModel,
-        isOpen: true,
-      };
-    }
-
-    return this.innerModel.isOpen;
-  }
-
-  toggleOpen() {
-    this.innerModel = {
-      ...this.innerModel,
-      isOpen: !this.innerModel.isOpen,
-    };
-  }
-
-  get tosa() {
-    if (!this.value._tutkinnonOsaViite) {
-      return null;
-    }
-    return this.tutkinnonOsatMap[this.value._tutkinnonOsaViite];
-  }
-
-  get laskettu() {
-    if (this.isRyhma) {
-      return this.osanLaajuusRecursive(this.value);
-    }
-    else {
-      return this.laajuusMinimi;
-    }
-  }
-
-  osanLaajuusRecursive(osa) {
-    return _(osa.osat)
-      .map(osa => {
-        return this.osanLaajuusRecursive(osa) + _.max([osa?.muodostumisSaanto?.laajuus?.minimi, osa?.muodostumisSaanto?.laajuus?.maksimi])
-            || (osa._tutkinnonOsaViite && this.tutkinnonOsatMap[osa._tutkinnonOsaViite] && this.tutkinnonOsatMap[osa._tutkinnonOsaViite].laajuus)
-            || 0;
-      })
-      .filter()
-      .sum();
-  }
-
-  mounted() {
-    if (!this.value.muodostumisSaanto) {
-      Vue.set(this.value, 'muodostumisSaanto', {
+  if (!props.modelValue.muodostumisSaanto) {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      muodostumisSaanto: {
         laajuus: {
           minimi: 0,
           maksimi: null,
         },
-      });
-    }
-
-    if (!this.value.muodostumisSaanto?.laajuus) {
-      Vue.set(this.value.muodostumisSaanto, 'laajuus', {
-        minimi: 0,
-        maksimi: null,
-      });
-    }
+      },
+    });
   }
-
-  get laajuusValidointi() {
-    if (this.isRyhma) {
-      return this.laajuusMaksimi || this.laajuusMinimi;
-    }
-    else {
-      return 0;
-    }
+  else if (!props.modelValue.muodostumisSaanto?.laajuus) {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      muodostumisSaanto: {
+        ...props.modelValue.muodostumisSaanto,
+        laajuus: {
+          minimi: 0,
+          maksimi: null,
+        },
+      },
+    });
   }
+});
 
-  get isPaikallinen() {
-    return this.value?.rooli === 'määrittelemätön';
+const laajuusValidointi = computed(() => {
+  if (isRyhma.value) {
+    return laajuusMaksimi.value || laajuusMinimi.value;
   }
-
-  get validity() {
-    if (this.isRyhma) {
-      return {
-        isValid: this.isPaikallinen || this.laskettu >= this.laajuusValidointi,
-      };
-    }
-    else {
-      return { isValid: true };
-    }
+  else {
+    return 0;
   }
+});
 
-  get nimi() {
-    if (this.isRyhma) {
-      return this.value.nimi;
-    }
-    else if (this.tosa) {
-      return this.tosa.nimi;
-    }
-  }
+const isPaikallinen = computed(() => {
+  return props.modelValue?.rooli === 'määrittelemätön';
+});
 
-  get koodiArvo() {
-    if (this.innerModel.tutkintonimike?.arvo) {
-      return this.innerModel.tutkintonimike?.arvo;
-    }
-
-    if (this.innerModel.tutkinnonosa?.tutkinnonOsa?.koodi?.arvo) {
-      return this.innerModel.tutkinnonosa?.tutkinnonOsa?.koodi?.arvo;
-    }
-
-    if (this.tosa?.tutkinnonOsa?.koodi?.arvo) {
-      return this.tosa?.tutkinnonOsa?.koodi?.arvo;
-    }
-
-    if (this.innerModel.osaamisala?.osaamisalakoodiArvo) {
-      return this.innerModel.osaamisala?.osaamisalakoodiArvo;
-    }
-  }
-
-  get laajuus() {
-    return this.value.muodostumisSaanto?.laajuus;
-  }
-
-  get laajuusMinimi() {
-    if (this.isRyhma) {
-      return this.laajuus?.minimi;
-    }
-    else {
-      return this.tosa?.laajuus;
-    }
-  }
-
-  get laajuusMaksimi() {
-    if (this.isRyhma) {
-      return this.laajuus?.maksimi;
-    }
-    else {
-      return null;
-    }
-  }
-
-  get style() {
+const validity = computed(() => {
+  if (isRyhma.value) {
     return {
-      'min-height': (this.isRyhma ? 52 : 42) + 'px',
-      ...(!this.tosa && { 'border-left': '9px solid ' + this.color }),
-      'border-bottom-left-radius': '4px',
-      'border-top-left-radius': '4px',
+      isValid: isPaikallinen.value || laskettu.value >= laajuusValidointi.value,
     };
   }
+  else {
+    return { isValid: true };
+  }
+});
 
-  get color() {
-    return rakenneNodecolor(this.value, this.pakollinen, this);
+const nimi = computed(() => {
+  if (isRyhma.value) {
+    return props.modelValue.nimi;
+  }
+  else if (tosa.value) {
+    return tosa.value.nimi;
+  }
+  return '';
+});
+
+const koodiArvo = computed(() => {
+  if (innerModel.value.tutkintonimike?.arvo) {
+    return innerModel.value.tutkintonimike?.arvo;
   }
 
-  get tutkinnonOsaColor() {
-    if (this.pakollinen) {
-      return ColorMap['pakollinen'];
-    }
-
-    return ColorMap['valinnainen'];
+  if (innerModel.value.tutkinnonosa?.tutkinnonOsa?.koodi?.arvo) {
+    return innerModel.value.tutkinnonosa?.tutkinnonOsa?.koodi?.arvo;
   }
 
-  get isRyhma() {
-    return !!this.value.rooli;
+  if (tosa.value?.tutkinnonOsa?.koodi?.arvo) {
+    return tosa.value?.tutkinnonOsa?.koodi?.arvo;
+  }
+
+  if (innerModel.value.osaamisala?.osaamisalakoodiArvo) {
+    return innerModel.value.osaamisala?.osaamisalakoodiArvo;
+  }
+
+  return '';
+});
+
+const laajuus = computed(() => {
+  return props.modelValue.muodostumisSaanto?.laajuus;
+});
+
+const laajuusMinimi = computed(() => {
+  if (isRyhma.value) {
+    return laajuus.value?.minimi;
+  }
+  else {
+    return tosa.value?.laajuus;
+  }
+});
+
+const laajuusMaksimi = computed(() => {
+  if (isRyhma.value) {
+    return laajuus.value?.maksimi;
+  }
+  else {
+    return null;
+  }
+});
+
+const style = computed(() => {
+  return {
+    'min-height': (isRyhma.value ? 52 : 42) + 'px',
+    ...(!tosa.value && { 'border-left': '9px solid ' + color.value }),
+    'border-bottom-left-radius': '4px',
+    'border-top-left-radius': '4px',
   };
+});
 
-  remove() {
-    this.$emit('remove');
+const color = computed(() => {
+  return rakenneNodecolor(props.modelValue, props.pakollinen);
+});
+
+const tutkinnonOsaColor = computed(() => {
+  if (props.pakollinen) {
+    return ColorMap['pakollinen'];
   }
 
-  edit() {
-    (this.$refs.eprakennemodal as any).show();
-  }
+  return ColorMap['valinnainen'];
+});
 
-  toggleDescription(toggle?) {
-    if (toggle) {
-      this.showDescription = toggle;
-    }
-    else {
-      this.showDescription = !this.showDescription;
-    }
-  }
+const isRyhma = computed(() => {
+  return !!props.modelValue.rooli;
+});
 
-  addUusi(root) {
-    const template = ryhmaTemplate(this.uusi.tyyppi, this);
-    if (this.uusi) {
-      root.osat = [{
-        ...template,
-        ...this.uusi.ryhma,
-      }, ...root.osat];
-    }
-  }
+const remove = () => {
+  emit('remove');
+};
 
-  lisaaRyhma() {
-    this.uusi = _.cloneDeep(DefaultRyhma);
-    (this.$refs.eprakennemodalNew as any).show(true);
-  }
+const edit = () => {
+  (eprakennemodal.value as any).show();
+};
 
-  liitaTosa() {
-    (this.$refs.tutkinnonosatModal as any).show();
+const toggleDescription = (toggle?) => {
+  if (toggle !== undefined) {
+    showDescription.value = toggle;
   }
-
-  get tutkinnonosat() {
-    return _.chain(this.tutkinnonOsatMap)
-      .keys()
-      .map(tosaViite => {
-        return {
-          ...this.tutkinnonOsatMap[tosaViite],
-          _tutkinnonOsaViite: tosaViite,
-        };
-      })
-      .value();
+  else {
+    showDescription.value = !showDescription.value;
   }
+};
 
-  lisaaTutkinnonosat(tutkinnonosat) {
-    this.value.osat = [
-      ...this.value.osat,
+const addUusi = (root) => {
+  const template = ryhmaTemplate(uusi.value.tyyppi || '');
+  if (uusi.value) {
+    root.osat = [{
+      ...template,
+      ...uusi.value.ryhma,
+    }, ...root.osat];
+  }
+};
+
+const lisaaRyhma = () => {
+  uusi.value = _.cloneDeep(DefaultRyhma);
+  (eprakennemodalNew.value as any).show(true);
+};
+
+const liitaTosa = () => {
+  (tutkinnonosatModal.value as any).show();
+};
+
+const tutkinnonosat = computed(() => {
+  return _.chain(props.tutkinnonOsatMap)
+    .keys()
+    .map(tosaViite => {
+      return {
+        ...props.tutkinnonOsatMap[tosaViite],
+        _tutkinnonOsaViite: tosaViite,
+      };
+    })
+    .value();
+});
+
+const lisaaTutkinnonosat = (tutkinnonosat) => {
+  emit('update:modelValue', {
+    ...props.modelValue,
+    osat: [
+      ...props.modelValue.osat,
       ..._.map(tutkinnonosat, tosa => {
         return {
           kuvaus: null,
@@ -353,13 +439,19 @@ export default class MuodostumisItem extends Vue {
           _tutkinnonOsaViite: tosa._tutkinnonOsaViite,
         };
       }),
-    ];
-  }
+    ],
+  });
+};
 
-  copy() {
-    this.$emit('copy');
-  }
-}
+const copy = () => {
+  emit('copy');
+};
+
+defineExpose({
+  edit,
+  toggleDescription,
+  innerModel,
+});
 </script>
 
 <style scoped lang="scss">
@@ -376,6 +468,7 @@ export default class MuodostumisItem extends Vue {
 
   .nimi {
     font-weight: 600;
+    user-select: none;
   }
 }
 
@@ -401,5 +494,4 @@ export default class MuodostumisItem extends Vue {
   height: 100%;
   width: 8px;
 }
-
 </style>

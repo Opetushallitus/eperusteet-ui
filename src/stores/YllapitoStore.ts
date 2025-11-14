@@ -1,9 +1,6 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-import { Maintenance, PerusteDto, Perusteet, PerusteKevytDto, YllapitoDto } from '@shared/api/eperusteet';
+import { reactive, computed } from 'vue';
+import { Maintenance, Perusteet, PerusteKevytDto, YllapitoDto } from '@shared/api/eperusteet';
 import _ from 'lodash';
-
-Vue.use(VueCompositionApi);
 
 export class YllapitoStore {
   private state = reactive({

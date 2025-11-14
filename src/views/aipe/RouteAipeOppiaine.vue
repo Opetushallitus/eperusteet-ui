@@ -1,23 +1,47 @@
 <template>
-  <EpEditointi :store="store" :versionumero="versionumero">
+  <EpEditointi
+    :store="store"
+    :versionumero="versionumero"
+  >
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton-oppiaine') }}</h2>
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton-oppiaine') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing, supportData }">
       <b-row>
-        <b-col cols="8" v-if="isEditing">
+        <b-col
+          v-if="isEditing"
+          cols="8"
+        >
           <b-form-group :label="$t('oppiaineen-nimi')">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -38,92 +62,151 @@
 
       <b-row>
         <b-col cols="11">
-          <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['tehtava', 'tyotavat', 'ohjaus', 'arviointi', 'sisaltoalueinfo']" />
+          <EpSisaltoTekstikappaleet
+            v-model="storeData"
+            :is-editing="isEditing"
+            :sisalto-avaimet="['tehtava', 'tyotavat', 'ohjaus', 'arviointi', 'sisaltoalueinfo']"
+          />
 
           <template v-if="!data['_oppiaine'] && oppiaineId && (!data.kurssit || data.kurssit.length == 0)">
             <b-form-group :label="$t('oppimaarat')">
-              <draggable
+              <VueDraggable
                 v-bind="oppiaineetDragOptions"
+                v-model="data.oppimaarat"
                 tag="div"
-                v-model="data.oppimaarat">
-                  <div class="listaus p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                    <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                  </div>
-              </draggable>
+              >
+                <div
+                  v-for="oppimaara in data.oppimaarat"
+                  :key="'oppimaara'+oppimaara.id"
+                  class="listaus p-3 d-flex"
+                >
+                  <EpMaterialIcon
+                    v-if="isEditing"
+                    class="order-handle mr-2"
+                  >
+                    drag_indicator
+                  </EpMaterialIcon>
+                  <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppimaara.id } }">
+                    {{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}
+                  </router-link>
+                </div>
+              </VueDraggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              variant="outline-primary"
+              icon="add"
+              @click="lisaaOppimaara"
+            >
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>
 
           <template v-if="oppiaineId && (!data.oppimaarat || data.oppimaarat.length == 0)">
-            <b-form-group :label="$t('kurssit')" class="mt-4">
-              <draggable
+            <b-form-group
+              :label="$t('kurssit')"
+              class="mt-4"
+            >
+              <VueDraggable
                 v-bind="kurssitDragOptions"
+                v-model="data.kurssit"
                 tag="div"
-                v-model="data.kurssit">
-                  <div class="listaus p-3 d-flex" v-for="kurssi in data.kurssit" :key="'kurssi'+kurssi.id">
-                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                    <router-link :to="{ name: 'aipekurssi', params: { kurssiId: kurssi.id } }">{{ $kaanna(kurssi.nimi) || $t('nimeton-kurssi') }}</router-link>
-                  </div>
-              </draggable>
+              >
+                <div
+                  v-for="kurssi in data.kurssit"
+                  :key="'kurssi'+kurssi.id"
+                  class="listaus p-3 d-flex"
+                >
+                  <EpMaterialIcon
+                    v-if="isEditing"
+                    class="order-handle mr-2"
+                  >
+                    drag_indicator
+                  </EpMaterialIcon>
+                  <router-link :to="{ name: 'aipekurssi', params: { kurssiId: kurssi.id } }">
+                    {{ $kaanna(kurssi.nimi) || $t('nimeton-kurssi') }}
+                  </router-link>
+                </div>
+              </VueDraggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="add" @click="lisaaKurssi" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              variant="outline-primary"
+              icon="add"
+              @click="lisaaKurssi"
+            >
               {{ $t('lisaa-kurssi') }}
             </ep-button>
           </template>
 
-          <b-form-group :label="$t('opetuksen-tavoitteet')" class="mt-4 pt-3">
-            <draggable
+          <b-form-group
+            :label="$t('opetuksen-tavoitteet')"
+            class="mt-4 pt-3"
+          >
+            <VueDraggable
               v-bind="tavoitteetDragOptions"
+              v-model="data.tavoitteet"
               tag="div"
-              v-model="data.tavoitteet">
-
-                <EpCollapse
-                  v-for="(tavoite, tavoiteIndex) in data.tavoitteet"
-                  :key="'tavoite'+tavoiteIndex"
-                  class="tavoite p-3 mb-4 w-100"
-                  :borderBottom="false"
-                  :usePadding="false">
-
-                  <div slot="header" class="d-flex">
-                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-3">drag_indicator</EpMaterialIcon>
-                    <h4 class="mb-0">{{$kaanna(tavoite.tavoite)}}</h4>
+            >
+              <EpCollapse
+                v-for="(tavoite, tavoiteIndex) in data.tavoitteet"
+                :key="'tavoite'+tavoiteIndex"
+                class="tavoite p-3 mb-4 w-100"
+                :border-bottom="false"
+                :use-padding="false"
+              >
+                <template #header>
+                  <div class="d-flex">
+                    <EpMaterialIcon
+                      v-if="isEditing"
+                      class="order-handle mr-3"
+                    >
+                      drag_indicator
+                    </EpMaterialIcon>
+                    <h4 class="mb-0">
+                      {{ $kaanna(tavoite.tavoite) }}
+                    </h4>
                   </div>
+                </template>
 
-                  <EpOppiaineenTavoite v-model="data.tavoitteet[tavoiteIndex]" :isEditing="isEditing" :supportData="supportData" @poista="poistaTavoite(tavoite)"/>
+                <EpOppiaineenTavoite
+                  v-model="data.tavoitteet[tavoiteIndex]"
+                  :is-editing="isEditing"
+                  :support-data="supportData"
+                  @poista="poistaTavoite(tavoite)"
+                />
+              </EpCollapse>
+            </VueDraggable>
 
-                </EpCollapse>
-            </draggable>
-
-            <ep-button @click="lisaaTavoite" variant="outline" icon="add" v-if="isEditing">
+            <ep-button
+              v-if="isEditing"
+              variant="outline"
+              icon="add"
+              @click="lisaaTavoite"
+            >
               {{ $t('lisaa-tavoite') }}
             </ep-button>
           </b-form-group>
-
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { AipeOppiaineStore } from '@/stores/AipeOppiaineStore';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { TermitStore } from '@/stores/TermitStore';
-import EpContent from '@shared/components/EpContent/EpContent.vue';
-import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -132,153 +215,136 @@ import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpOppiaineenTavoite from '@/views/aipe/yleiset/EpOppiaineenTavoite.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    draggable,
-    EpKoodistoSelect,
-    EpSisaltoTekstikappaleet,
-    EpCollapse,
-    EpOppiaineenTavoite,
-    EpMaterialIcon,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteAipeOppiaine extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  vaiheId: {
+    type: [String, Number],
+    required: false,
+  },
+  oppiaineId: {
+    type: [String, Number],
+    required: false,
+  },
+  parentId: {
+    type: [String, Number],
+    required: false,
+  },
+});
 
-  @Prop({ required: false })
-  vaiheId: any;
+const route = useRoute();
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  @Prop({ required: false })
-  oppiaineId: any;
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
 
-  @Prop({ required: false })
-  parentId: any;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  store: EditointiStore | null = null;
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'oppiaineetyleissivistava2',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  @Watch('oppiaineId', { immediate: true })
-  async oppiaineChange() {
-    const store = new AipeOppiaineStore(this.perusteId!, this.vaiheId, this.oppiaineId, this.parentId, this.perusteStore, this, this.versionumero);
-    this.store = new EditointiStore(store);
-  }
+const storeData = computed({
+  get: () => store.value?.data,
+  set: (data) => store.value?.setData(data),
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.oppiaineChange();
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing;
+});
 
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'oppiaineetyleissivistava2',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
+const oppiaineetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'oppiaineet',
     },
-  });
+  };
+});
 
-  get storeData() {
-    return this.store?.data.value;
-  }
+const kurssitDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'kurssit',
+    },
+  };
+});
 
-  set storeData(data) {
-    this.store?.setData(data);
-  }
+const tavoitteetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'tavoitteet',
+    },
+  };
+});
 
-  lisaaOppimaara() {
-    this.$router.push({ name: 'aipeoppimaara', params: { vaiheId: this.vaiheId, parentId: this.oppiaineId } });
-  }
+const lisaaOppimaara = () => {
+  router.push({ name: 'aipeoppimaara', params: { vaiheId: props.vaiheId, parentId: props.oppiaineId } });
+};
 
-  lisaaKurssi() {
-    this.$router.push({ name: 'aipekurssi', params: { vaiheId: this.vaiheId, oppiaineId: this.oppiaineId } });
-  }
+const lisaaKurssi = () => {
+  router.push({ name: 'aipekurssi', params: { vaiheId: props.vaiheId, oppiaineId: props.oppiaineId } });
+};
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
+const lisaaTavoite = () => {
+  store.value?.setData(
+    {
+      ...store.value.data,
+      tavoitteet: [
+        ...store.value.data.tavoitteet,
+        {
+          laajattavoitteet: [],
+          arvioinninkohteet: [],
+          sisaltoalueet: [],
+          oppiaineenTavoitteenOpetuksenTavoitteet: [],
+        },
+      ],
+    },
+  );
+};
 
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
+const poistaTavoite = (poistettavaTavoite) => {
+  store.value?.setData(
+    {
+      ...store.value.data,
+      tavoitteet: _.reject(store.value.data.tavoitteet, poistettavaTavoite),
+    },
+  );
+};
 
-  get oppiaineetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'oppiaineet',
-      },
-    };
-  }
+const oppiaineChange = async () => {
+  const storeInstance = new AipeOppiaineStore(perusteId.value!, props.vaiheId, props.oppiaineId, props.parentId, props.perusteStore, versionumero.value);
+  store.value = new EditointiStore(storeInstance);
+};
 
-  get kurssitDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'kurssit',
-      },
-    };
-  }
+watch(() => props.oppiaineId, async () => {
+  await oppiaineChange();
+}, { immediate: true });
 
-  get tavoitteetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'tavoitteet',
-      },
-    };
-  }
-
-  lisaaTavoite() {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        tavoitteet: [
-          ...this.store.data.value.tavoitteet,
-          {
-            laajattavoitteet: [],
-            arvioinninkohteet: [],
-            sisaltoalueet: [],
-            oppiaineenTavoitteenOpetuksenTavoitteet: [],
-          },
-        ],
-      },
-    );
-  }
-
-  poistaTavoite(poistettavaTavoite) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        tavoitteet: _.reject(this.store.data.value.tavoitteet, poistettavaTavoite),
-      },
-    );
-  }
-}
+watch(versionumero, async () => {
+  await oppiaineChange();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">

@@ -1,13 +1,10 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { reactive, computed, ref, watch } from 'vue';
 import { TiedoteDto, Tiedotteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { ITiedotteetProvider } from '@shared/stores/types';
 import { TiedoteQuery } from '@shared/api/types';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import { Page } from '@shared/tyypit';
-
-Vue.use(VueCompositionApi);
 
 export class TiedotteetStore implements ITiedotteetProvider {
   private state = reactive({
@@ -53,11 +50,10 @@ export class TiedotteetStore implements ITiedotteetProvider {
     return res;
   }
 
-  @Debounced(300)
-  public async fetch() {
+  public fetch = debounced(async () => {
     this.state.tiedotteetPage = null;
     this.state.tiedotteetPage = await this.fetchImpl(this.options.value);
-  }
+  });
 
   public async save(tiedote: TiedoteDto) {
     if (_.isNil(tiedote.id)) {

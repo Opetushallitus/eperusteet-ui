@@ -1,26 +1,45 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
         <span v-if="!isOppimaara">{{ $t('nimeton-oppiaine') }}</span>
         <span v-if="isOppimaara">{{ $t('nimeton-oppimaara') }}</span>
       </h2>
-      </template>
+    </template>
 
     <template #default="{ data, isEditing }">
       <b-row>
-        <b-col cols="8" v-if="isEditing">
+        <b-col
+          v-if="isEditing"
+          cols="8"
+        >
           <b-form-group :label="!isOppimaara ? $t('oppiaineen-nimi') : $t('oppimaaran-nimi')">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -41,68 +60,107 @@
 
       <b-row>
         <b-col cols="11">
-          <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['tehtava']" />
+          <EpSisaltoTekstikappaleet
+            v-model="storeData"
+            :is-editing="isEditing"
+            :sisalto-avaimet="['tehtava']"
+          />
 
           <b-form-group :label="$t('tavoitealueet-kaikilla-vuosiluokilla')">
-            <EpTavoitealueetEditModal v-model="storeData" :isEditing="isEditing" :perusteId="perusteId" :oppiaineId="oppiaineId"/>
+            <EpTavoitealueetEditModal
+              v-model="storeData"
+              :is-editing="isEditing"
+              :peruste-id="perusteId"
+              :oppiaine-id="oppiaineId"
+            />
           </b-form-group>
 
-          <hr/>
+          <hr>
 
-          <b-form-group class="mt-4 mb-4" :label="$t('vuosiluokat')" v-if="isEditing">
-            <b-form-checkbox-group v-model="valitutVuosiluokkakokonaisuudet" stacked @change="vlkChange">
-                <b-form-checkbox
-                  v-for="(vlk, index) in valittavatVuosiluokkakokonaisuudet"
-                  :value="vlk"
-                  :key="'valittavaVlk' + index"
-                  class="col-3 mb-1">
-                  {{ vlk.nimi }}
-                </b-form-checkbox>
-            </b-form-checkbox-group>
+          <b-form-group
+            v-if="isEditing"
+            class="mt-4 mb-4"
+            :label="$t('vuosiluokat')"
+          >
+            <EpToggleGroup
+              v-model="valitutVuosiluokkakokonaisuudet"
+              :items="valittavatVuosiluokkakokonaisuudet"
+            >
+              <template #default="{ item }">
+                <div class="mb-1">
+                  {{ item.nimi }}
+                </div>
+              </template>
+            </EpToggleGroup>
           </b-form-group>
 
           <b-tabs v-if="valitutVuosiluokkakokonaisuudet.length > 0">
-            <b-tab :title="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].nimi" v-for="(vlk, index) in data.vuosiluokkakokonaisuudet" :key="'vlk' + index">
+            <b-tab
+              v-for="(vlk, index) in data.vuosiluokkakokonaisuudet"
+              :key="'vlk' + index"
+              :title="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].nimi"
+            >
               <EpOppiaineenVuosiluokkakokonaisuus
                 v-model="data.vuosiluokkakokonaisuudet[index]"
-                :isEditing="isEditing"
+                :is-editing="isEditing"
                 :vuosiluokat="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].vuosiluokat"
-                :supportData="vlkSupportData"
-                :perusteId="perusteId"
-                :oppiaineId="oppiaineId"/>
+                :support-data="vlkSupportData"
+                :peruste-id="perusteId"
+                :oppiaine-id="oppiaineId"
+              />
             </b-tab>
 
-            <hr/>
+            <hr>
           </b-tabs>
 
           <template v-if="!isOppimaara">
-            <b-form-group :label="$t('oppimaarat')" v-if="!isEditing || (data.oppimaarat && data.oppimaarat.length > 0)">
-              <draggable
+            <b-form-group
+              v-if="!isEditing || (data.oppimaarat && data.oppimaarat.length > 0)"
+              :label="$t('oppimaarat')"
+            >
+              <VueDraggable
                 v-bind="oppiaineetDragOptions"
+                v-model="data.oppimaarat"
                 tag="div"
-                v-model="data.oppimaarat">
-                  <div class="taulukko-rivi-varitys p-3 d-flex" v-for="oppimaara in data.oppimaarat" :key="'oppimaara'+oppimaara.id">
-                    <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                    <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">{{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}</router-link>
-                  </div>
-              </draggable>
+              >
+                <div
+                  v-for="oppimaara in data.oppimaarat"
+                  :key="'oppimaara'+oppimaara.id"
+                  class="taulukko-rivi-varitys p-3 d-flex"
+                >
+                  <EpMaterialIcon
+                    v-if="isEditing"
+                    class="order-handle mr-2"
+                  >
+                    drag_indicator
+                  </EpMaterialIcon>
+                  <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppimaara.id } }">
+                    {{ $kaanna(oppimaara.nimi) || $t('nimeton-oppimaara') }}
+                  </router-link>
+                </div>
+              </VueDraggable>
             </b-form-group>
 
-            <ep-button variant="outline-primary" icon="add" @click="lisaaOppimaara" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+            <ep-button
+              v-if="!isEditing"
+              v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+              variant="outline-primary"
+              icon="add"
+              @click="lisaaOppimaara"
+            >
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>
-
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, getCurrentInstance } from 'vue';
+import { useRouter } from 'vue-router';
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -110,7 +168,7 @@ import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -120,210 +178,217 @@ import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpTavoitealueetEditModal from '@/views/perusopetus/EpTavoitealueetEditModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import { unref } from 'vue';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    draggable,
-    EpKoodistoSelect,
-    EpSisaltoTekstikappaleet,
-    EpCollapse,
-    EpOppiaineenVuosiluokkakokonaisuus,
-    EpTavoitealueetEditModal,
-    EpMaterialIcon,
-  },
-})
-export default class RouteOppiaine extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
-
-  @Prop({ required: true })
+const props = defineProps<{
+  perusteStore: PerusteStore;
   oppiaineId: any;
+  uusi?: 'uusi' | null;
+}>();
 
-  @Prop({ required: false })
-  uusi!: 'uusi' | null;
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  store: EditointiStore | null = null;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('oppiaineId', { immediate: true })
-  async oppiaineChange() {
-    const store = new PerusopetusOppiaineStore(this.perusteId!, this.oppiaineId, this.perusteStore, this.uusi === 'uusi', this);
-    this.store = new EditointiStore(store);
-  }
+// Initialize koodisto
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'oppiaineetyleissivistava2',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+// Watch for changes in oppiaineId
+watch(() => props.oppiaineId, async () => {
+  const oppiaineStore = new PerusopetusOppiaineStore(
+    perusteId.value!,
+    props.oppiaineId,
+    props.perusteStore,
+    props.uusi === 'uusi',
+  );
+  store.value = new EditointiStore(oppiaineStore);
+}, { immediate: true });
 
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'oppiaineetyleissivistava2',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
+const isOppimaara = computed(() => {
+  return !!storeData.value?._oppiaine;
+});
+
+const storeData = computed({
+  get() {
+    return store.value?.data;
+  },
+  set(data) {
+    store.value?.setData(data);
+  },
+});
+
+const lisaaOppimaara = async () => {
+  await PerusopetusOppiaineStore.setOppiaineKoosteinen(perusteId.value, props.oppiaineId);
+  const newOppiaine = await PerusopetusOppiaineStore.create(perusteId.value, props.oppiaineId);
+  await props.perusteStore.updateNavigation();
+  await EditointiStore.cancelAll();
+  router.push({
+    name: 'perusopetusoppiaine',
+    params: {
+      oppiaineId: _.toString(newOppiaine.id),
+      uusi: 'uusi',
     },
   });
+};
 
-  get isOppimaara() {
-    return !!this.storeData?._oppiaine;
-  }
 
-  get storeData() {
-    return this.store?.data.value;
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing;
+});
 
-  set storeData(data) {
-    this.store?.setData(data);
-  }
+const getVuosiluokkaNumerot = (vuosiluokat) => {
+  return _.chain(vuosiluokat)
+    .map(vlk => _.split(vlk, '_')[1])
+    .map(_.toNumber)
+    .sortBy()
+    .value();
+};
 
-  async lisaaOppimaara() {
-    await PerusopetusOppiaineStore.setOppiaineKoosteinen(this.perusteId, this.oppiaineId);
-    const newOppiaine = await PerusopetusOppiaineStore.create(this.perusteId, this.oppiaineId);
-    await this.perusteStore.updateNavigation();
-    await EditointiStore.cancelAll();
-    this.$router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
-  }
-
-  get defaultDragOptions() {
+const valittavatVuosiluokkakokonaisuudet = computed(() => {
+  return _.sortBy(_.map(store.value?.supportData.perusteenVuosiluokkakokonaisuudet, valittavaVlk => {
     return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
+      id: _.toString(valittavaVlk.id),
+      vuosiluokat: _.min(getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)) + '-' + _.max(getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)),
+      nimi: $t('vuosiluokat') + ' ' + _.min(getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)) + '-' + _.max(getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)),
     };
+  }), 'nimi');
+});
+
+const valittavatVuosiluokkakokonaisuudetById = computed(() => {
+  return _.keyBy(unref(valittavatVuosiluokkakokonaisuudet), 'id');
+});
+
+const vuosiluokkakokonaisuudet = computed(() => {
+  return store.value?.data?.vuosiluokkakokonaisuudet;
+});
+
+const valitutVuosiluokkakokonaisuudet = ref([]);
+
+// Initialize valitutVuosiluokkakokonaisuudet
+watch(vuosiluokkakokonaisuudet, (newValue) => {
+  if (newValue) {
+    valitutVuosiluokkakokonaisuudet.value = _.filter(
+      valittavatVuosiluokkakokonaisuudet.value,
+      valittavaVlk => !!_.find(newValue, vlk => vlk._vuosiluokkaKokonaisuus === _.toString(valittavaVlk.id)),
+    );
   }
+}, { immediate: true });
 
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
+const valitutVuosiluokkakokonaisuudetById = computed(() => {
+  return _.keyBy(valitutVuosiluokkakokonaisuudet.value, 'id');
+});
 
-  get valittavatVuosiluokkakokonaisuudet() {
-    return _.sortBy(_.map(this.store?.supportData.value.perusteenVuosiluokkakokonaisuudet, valittavaVlk => {
-      return {
-        id: _.toString(valittavaVlk.id),
-        vuosiluokat: _.min(this.getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)) + '-' + _.max(this.getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)),
-        nimi: this.$t('vuosiluokat') + ' ' + _.min(this.getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)) + '-' + _.max(this.getVuosiluokkaNumerot(valittavaVlk.vuosiluokat)),
-      };
-    }), 'nimi');
-  }
+let tempVuosiluokkaChange = [];
 
-  get valittavatVuosiluokkakokonaisuudetById() {
-    return _.keyBy(this.valittavatVuosiluokkakokonaisuudet, 'id');
-  }
+const vlkChange = async () => {
+  const poistettavatVlk = _.find(tempVuosiluokkaChange, vlk => !_.includes(vuosiluokkakokonaisuudet.value, vlk));
+  if (poistettavatVlk) {
+    const edellisetVlk = tempVuosiluokkaChange;
+    const varmistaPoisto = await $bvModal.msgBoxConfirm(
+      $t('vuosiluokkakokonaisuuden-poisto-varmistus-teksti'), {
+        title: $t('vahvista-poisto'),
+        okTitle: $t('poista'),
+        cancelTitle: $t('peruuta'),
+        size: 'lg',
+      });
 
-  get vuosiluokkakokonaisuudet() {
-    return this.store?.data.value.vuosiluokkakokonaisuudet;
-  }
-
-  get valitutVuosiluokkakokonaisuudet() {
-    return _.filter(this.valittavatVuosiluokkakokonaisuudet, valittavaVlk => !!_.find(this.vuosiluokkakokonaisuudet, vlk => vlk._vuosiluokkaKokonaisuus === _.toString(valittavaVlk.id)));
-  }
-
-  get valitutVuosiluokkakokonaisuudetById() {
-    return _.keyBy(this.valitutVuosiluokkakokonaisuudet, 'id');
-  }
-
-  tempVuosiluokkaChange: any[] = [];
-
-  async vlkChange() {
-    if (_.size(this.vuosiluokkakokonaisuudet) < _.size(this.tempVuosiluokkaChange)) {
-      const varmistaPoisto = await this.$bvModal.msgBoxConfirm(
-          this.$t('vuosiluokkakokonaisuuden-poisto-varmistus-teksti') as any, {
-            title: this.$t('vahvista-poisto') as any,
-            okTitle: this.$t('poista') as any,
-            cancelTitle: this.$t('peruuta') as any,
-            size: 'lg',
-          });
-
-      if (!varmistaPoisto) {
-        this.store?.setData({
-          ...this.storeData,
-          vuosiluokkakokonaisuudet: this.tempVuosiluokkaChange,
-        });
-      }
-
-      _.forEach(this.tempVuosiluokkaChange, async vlk => {
-        if (!_.includes(this.vuosiluokkakokonaisuudet, vlk)) {
-          await PerusopetusOppiaineStore.deleteOppiaineenVuosiluokkakokonaisuus(this.perusteId, this.oppiaineId, vlk);
-        }
+    if (!varmistaPoisto) {
+      store.value?.setData({
+        ...storeData.value,
+        vuosiluokkakokonaisuudet: edellisetVlk,
       });
     }
 
-    _.forEach(this.vuosiluokkakokonaisuudet, async vlk => {
-      if (!_.includes(this.tempVuosiluokkaChange, vlk)) {
-        const tallennettu = await PerusopetusOppiaineStore.createOppiaineenVuosiluokkakokonaisuus(this.perusteId, this.oppiaineId, vlk);
-        this.store?.setData({
-          ...this.storeData,
-          vuosiluokkakokonaisuudet: _.map(this.vuosiluokkakokonaisuudet, storeVlk => {
-            if (_.get(storeVlk, '_vuosiluokkaKokonaisuus') === _.get(tallennettu, '_vuosiluokkaKokonaisuus')) {
-              return tallennettu;
-            }
-            return storeVlk;
-          }),
-        });
-      }
-    });
+    if (varmistaPoisto) {
+      await PerusopetusOppiaineStore.deleteOppiaineenVuosiluokkakokonaisuus(perusteId.value, props.oppiaineId, poistettavatVlk);
+    }
+
+    return;
   }
 
-  set valitutVuosiluokkakokonaisuudet(valitutVlk) {
-    this.tempVuosiluokkaChange = this.vuosiluokkakokonaisuudet;
+  _.forEach(vuosiluokkakokonaisuudet.value, async vlk => {
+    if (!_.includes(tempVuosiluokkaChange, vlk)) {
+      const tallennettu = await PerusopetusOppiaineStore.createOppiaineenVuosiluokkakokonaisuus(perusteId.value, props.oppiaineId, vlk);
+      store.value?.setData({
+        ...storeData.value,
+        vuosiluokkakokonaisuudet: _.map(vuosiluokkakokonaisuudet.value, storeVlk => {
+          if (_.get(storeVlk, '_vuosiluokkaKokonaisuus') === _.get(tallennettu, '_vuosiluokkaKokonaisuus')) {
+            return tallennettu;
+          }
+          return storeVlk;
+        }),
+      });
+    }
+  });
+};
 
-    _.forEach(valitutVlk, valittuVlk => {
-      if (!_.find(this.vuosiluokkakokonaisuudet, vlk => vlk._vuosiluokkaKokonaisuus === valittuVlk.id)) {
-        this.store?.setData({
-          ...this.storeData,
-          vuosiluokkakokonaisuudet: _.sortBy([
-            ...this.vuosiluokkakokonaisuudet,
-            {
-              _vuosiluokkaKokonaisuus: valittuVlk.id,
-              vapaatTekstit: [],
-              sisaltoalueinfo: {},
-              tavoitteet: [],
-              sisaltoalueet: [],
-            },
-          ], vlk => this.valittavatVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].nimi),
-        });
-      }
-    });
+// Handler for valitutVuosiluokkakokonaisuudet changes
+watch(valitutVuosiluokkakokonaisuudet, async (valitutVlk) => {
+  tempVuosiluokkaChange = vuosiluokkakokonaisuudet.value;
 
-    _.forEach(this.vuosiluokkakokonaisuudet, async poistettavaVlk => {
-      if (!_.find(valitutVlk, valittuVlk => valittuVlk.id === poistettavaVlk._vuosiluokkaKokonaisuus)) {
-        this.store?.setData({
-          ...this.storeData,
-          vuosiluokkakokonaisuudet: _.filter(this.vuosiluokkakokonaisuudet, vlk => vlk._vuosiluokkaKokonaisuus !== poistettavaVlk._vuosiluokkaKokonaisuus),
-        });
-      }
-    });
-  }
+  _.forEach(valitutVlk, valittuVlk => {
+    if (!_.find(vuosiluokkakokonaisuudet.value, vlk => vlk._vuosiluokkaKokonaisuus === valittuVlk.id)) {
+      store.value?.setData({
+        ...storeData.value,
+        vuosiluokkakokonaisuudet: _.sortBy([
+          ...vuosiluokkakokonaisuudet.value,
+          {
+            _vuosiluokkaKokonaisuus: valittuVlk.id,
+            vapaatTekstit: [],
+            sisaltoalueinfo: {},
+            tavoitteet: [],
+            sisaltoalueet: [],
+          },
+        ], vlk => {
+          return valittavatVuosiluokkakokonaisuudetById.value[vlk._vuosiluokkaKokonaisuus].nimi;
+        }),
+      });
+    }
+  });
 
-  getVuosiluokkaNumerot(vuosiluokat) {
-    return _.chain(vuosiluokat)
-      .map(vlk => _.split(vlk, '_')[1])
-      .map(_.toNumber)
-      .sortBy()
-      .value();
-  }
+  _.forEach(vuosiluokkakokonaisuudet.value, async poistettavaVlk => {
+    if (!_.find(valitutVlk, valittuVlk => valittuVlk.id === poistettavaVlk._vuosiluokkaKokonaisuus)) {
+      store.value?.setData({
+        ...storeData.value,
+        vuosiluokkakokonaisuudet: _.filter(vuosiluokkakokonaisuudet.value, vlk => vlk._vuosiluokkaKokonaisuus !== poistettavaVlk._vuosiluokkaKokonaisuus),
+      });
+    }
+  });
 
-  get vlkSupportData() {
-    return {
-      ...this.store!.supportData.value,
-      kohdealueet: this.store!.data.value.kohdealueet,
-    };
-  }
+  await vlkChange();
+});
 
-  get oppiaineetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'oppiaineet',
-      },
-    };
-  }
-}
+const vlkSupportData = computed(() => {
+  return {
+    ...store.value!.supportData,
+    kohdealueet: store.value!.data.kohdealueet,
+  };
+});
+
+const oppiaineetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'oppiaineet',
+    },
+  };
+});
 </script>
 
 <style scoped lang="scss">

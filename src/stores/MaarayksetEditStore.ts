@@ -1,15 +1,17 @@
 import { EditointiStore, EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import * as _ from 'lodash';
-import { computed } from '@vue/composition-api';
-import { minLength, required, requiredIf } from 'vuelidate/lib/validators';
+import { computed } from 'vue';
+import { minLength, required, requiredIf } from '@vuelidate/validators';
 import { Api, Maaraykset, MaarayksetParams, MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysDtoTyyppiEnum, MaaraysLiiteDtoTyyppiEnum, Perusteet, baseURL } from '@shared/api/eperusteet';
 import { Kielet, UiKielet } from '@shared/stores/kieli';
 import { requiredOneLang } from '@shared/validators/required';
 import { Kieli } from '@shared/tyypit';
+import { App } from 'vue';
+import { Router } from 'vue-router';
 
 function kielilistaObjektiksi(objekti) {
   return _.reduce(objekti, (obj, param) => ({ ...obj, ...param }), {});
-};
+}
 
 export function requireOneLiite() {
   return {
@@ -17,16 +19,25 @@ export function requireOneLiite() {
       return _.some(UiKielet, kieli => maaraysDokumenttiExistsAnyKieli(value, kieli as Kieli));
     },
   };
-};
+}
 
 export function maaraysDokumenttiExistsAnyKieli(value: any, kieli: Kieli) {
   return !!_.find(value[kieli].liitteet, liite => liite.tyyppi === MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI);
 }
 
+interface MaarayksetEditStoreConfig {
+  router: Router;
+}
+
 export class MaarayksetEditStore implements IEditoitava {
+  private static config: MaarayksetEditStoreConfig;
+
+  public static install(app: App, config: MaarayksetEditStoreConfig) {
+    MaarayksetEditStore.config = config;
+  }
+
   constructor(
     private maaraysId: number | 'uusi',
-    private el: any,
   ) {
   }
 
@@ -68,7 +79,7 @@ export class MaarayksetEditStore implements IEditoitava {
 
       return async () => {
         await EditointiStore.cancelAll();
-        this.el.$router.push({ name: 'maaraysMuokkaus', params: { maaraysId: _.toString(this.maaraysId) } });
+        MaarayksetEditStore.config.router.push({ name: 'maaraysMuokkaus', params: { maaraysId: _.toString(this.maaraysId) } });
       };
     }
     else {
@@ -79,7 +90,7 @@ export class MaarayksetEditStore implements IEditoitava {
   public async remove() {
     if (this.maaraysId !== 'uusi') {
       await Maaraykset.deleteMaarays(this.maaraysId);
-      this.el.$router.push({ name: 'maarayskokoelma' });
+      MaarayksetEditStore.config.router.push({ name: 'maarayskokoelma' });
     }
   }
 

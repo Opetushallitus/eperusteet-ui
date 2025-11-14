@@ -1,34 +1,61 @@
 <template>
-  <EpEditointi :store="store">
-    <template v-slot:header>
+  <EpEditointi
+    v-if="store"
+    :store="store"
+  >
+    <template #header>
       <div class="d-flex justify-content-between">
         <h1>{{ $t('tutkinnon-osat') }}</h1>
       </div>
     </template>
 
-    <template v-slot:default="{ isEditing }">
-      <div v-if="!isEditing" class="d-md-flex justify-content-between align-items-center">
+    <template #default="{ isEditing }">
+      <div
+        v-if="!isEditing"
+        class="d-md-flex justify-content-between align-items-center"
+      >
         <div>
           <ep-search v-model="query" />
         </div>
         <div>
-          <ep-button @click="lisaaTutkinnonOsa" variant="outline" icon="add">
+          <ep-button
+            variant="outline"
+            icon="add"
+            @click="lisaaTutkinnonOsa"
+          >
             {{ $t('lisaa-tutkinnon-osa') }}
           </ep-button>
-          <ep-button @click="tuoTutkinnonOsa" variant="outline" icon="add">
+          <ep-button
+            variant="outline"
+            icon="add"
+            @click="tuoTutkinnonOsa"
+          >
             {{ $t('tuo-tutkinnon-osa') }}
           </ep-button>
-          <EpTutkinnonosaTuontiModal ref="tutkinnonosaTuontiModal" :peruste="peruste" @refresh="refresh"/>
+          <EpTutkinnonosaTuontiModal
+            ref="tutkinnonosaTuontiModal"
+            :peruste="peruste"
+            @refresh="refresh"
+          />
         </div>
       </div>
 
       <ep-spinner v-if="!items" />
-      <div v-else-if="items.length === 0" class="p-4">
+      <div
+        v-else-if="items.length === 0"
+        class="p-4"
+      >
         <EpAlert :text="$t('tutkinnon-osia-ei-luotu')" />
       </div>
       <div v-else>
-        <div class="table-responsive" v-if="isEditing">
-          <table class="table table-borderless table-striped table-hover" role="table">
+        <div
+          v-if="isEditing"
+          class="table-responsive"
+        >
+          <table
+            class="table table-borderless table-striped table-hover"
+            role="table"
+          >
             <thead role="rowgroup">
               <tr>
                 <th>{{ $t('no') }}</th>
@@ -37,10 +64,16 @@
                 <th>{{ $t('muokattu') }}</th>
               </tr>
             </thead>
-            <draggable v-model="items"
-                       tag="tbody"
-                       v-bind="options">
-              <tr v-for="(item, idx) in raw" :key="idx" role="row">
+            <VueDraggable
+              v-bind="options"
+              v-model="items"
+              tag="tbody"
+            >
+              <tr
+                v-for="(item, idx) in raw"
+                :key="idx"
+                role="row"
+              >
                 <td>
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   {{ idx + 1 }}
@@ -49,7 +82,7 @@
                 <td>{{ item.laajuus }}</td>
                 <td>{{ $ago(item.muokattu) }}</td>
               </tr>
-            </draggable>
+            </VueDraggable>
           </table>
         </div>
 
@@ -61,8 +94,9 @@
           fixed
           hover
           :items="items"
-          :fields="fields">
-          <template v-slot:cell(nimi)="{ item }">
+          :fields="fields"
+        >
+          <template #cell(nimi)="{ item }">
             <router-link :to="item.to">
               {{ $kaanna(item.tutkinnonOsa.nimi) || $t('nimeton-tutkinnonosa') }}
             </router-link>
@@ -73,148 +107,150 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
-import { TutoriaaliStore } from '@shared/stores/tutoriaali';
+<script setup lang="ts">
+import { ref, computed, onMounted, useTemplateRef, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
-import { Prop, Component } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import _ from 'lodash';
 import EpTutkinnonosaTuontiModal from '@/components/EpTutkinnonosaTuontiModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna, $t, $ago, $sdt, $filterBy } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpAlert,
-    EpButton,
-    EpEditointi,
-    EpSearch,
-    EpSpinner,
-    draggable,
-    EpTutkinnonosaTuontiModal,
-    EpMaterialIcon,
-  },
-})
-export default class RouteTutkinnonosat extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  private tutoriaaliStore!: TutoriaaliStore;
+const props = defineProps<{
+  tutkinnonOsaStore: TutkinnonOsaStore;
+  perusteStore: any;
+  projektiId?: number;
+  perusteId?: number;
+}>();
 
-  @Prop({ required: true })
-  private tutkinnonOsaStore!: TutkinnonOsaStore;
+const router = useRouter();
+const route = useRoute();
+const tutkinnonosaTuontiModal = useTemplateRef('tutkinnonosaTuontiModal');
 
-  private store: EditointiStore | null = null;
+const store = ref<EditointiStore | null>(null);
+const query = ref('');
 
-  private query = '';
+const options = computed(() => {
+  return {
+    animation: 300,
+    handle: '.handle',
+    disabled: false,
+    ghostClass: 'placeholder',
+    forceFallback: true,
+  };
+});
 
-  async onProjektiChange() {
-    this.store = new EditointiStore(this.tutkinnonOsaStore);
+const raw = computed(() => {
+  if (!store.value) {
+    return null;
   }
 
-  get options() {
-    return {
-      animation: 300,
-      handle: '.handle',
-      disabled: false,
-      ghostClass: 'placeholder',
-      forceFallback: true,
-    };
-  }
-
-  get raw() {
-    if (!this.store) {
-      return null;
-    }
-
-    return _.map(this.store.data.value,
-      (item, idx) => ({
-        ...item,
-        idx: idx + 1,
-        to: {
-          name: 'tutkinnonosa',
-          params: {
-            tutkinnonOsaId: item.id,
-          },
+  return _.map(store.value.data,
+    (item, idx) => ({
+      ...item,
+      idx: idx + 1,
+      to: {
+        name: 'tutkinnonosa',
+        params: {
+          tutkinnonOsaId: item.id,
         },
-      }));
-  }
+      },
+    }));
+});
 
-  get items() {
-    if (!this.store) {
+const items = computed({
+  get() {
+    if (!store.value) {
       return null;
     }
 
-    return _.filter(this.raw, this.$filterBy('nimi', this.query));
-  }
+    return _.filter(raw.value, $filterBy('nimi', query.value));
+  },
+  set(value: any) {
+    store.value!.setData(value);
+  },
+});
 
-  set items(value: any) {
-    this.store!.setData(value);
-  }
+const fields = computed(() => {
+  return [{
+    key: 'idx',
+    thStyle: { width: '4rem' },
+    label: $t('no'),
+    sortable: true,
+  }, {
+    key: 'nimi',
+    label: $t('nimi'),
+    sortable: true,
+    sortByFormatted: true,
+    thStyle: { width: '50%' },
+    formatter: (value: any, key: any, item: any) => {
+      if (item.tutkinnonOsa.nimi) {
+        return $kaanna(item.tutkinnonOsa.nimi);
+      }
+      return $kaanna(value);
+    },
+  }, {
+    key: 'laajuus',
+    label: $t('laajuus'),
+    sortable: true,
+    sortByFormatted: true,
+  }, {
+    key: 'muokattu',
+    label: $t('muokattu'),
+    sortable: true,
+    formatter: (value: any, key: any, item: any) => {
+      if (item.luotu !== item.muokattu) {
+        return $sdt(value);
+      }
+      return '';
+    },
+  }];
+});
 
-  get fields() {
-    return [{
-      key: 'idx',
-      thStyle: { width: '4rem' },
-      label: this.$t('no'),
-      sortable: true,
-    }, {
-      key: 'nimi',
-      label: this.$t('nimi'),
-      sortable: true,
-      sortByFormatted: true,
-      thStyle: { width: '50%' },
-      formatter: (value: any, key: any, item: any) => {
-        if (item.tutkinnonOsa.nimi) {
-          return (this as any).$kaanna(item.tutkinnonOsa.nimi);
-        }
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value;
+});
 
-        return (this as any).$kaanna(value);
-      },
-    }, {
-      key: 'laajuus',
-      label: this.$t('laajuus'),
-      sortable: true,
-      sortByFormatted: true,
-    }, {
-      key: 'muokattu',
-      label: this.$t('muokattu'),
-      sortable: true,
-      formatter: (value: any, key: any, item: any) => {
-        if (item.luotu !== item.muokattu) {
-          return (this as any).$sdt(value);
-        }
-        return '';
-      },
-    }];
-  }
+const onProjektiChange = async () => {
+  store.value = new EditointiStore(props.tutkinnonOsaStore);
+};
 
-  lisaaTutkinnonOsa() {
-    this.$router.push({
-      name: 'tutkinnonosa',
-      params: {
-        tutkinnonOsaId: 'uusi',
-      },
-    });
-  }
+const lisaaTutkinnonOsa = () => {
+  router.push({
+    name: 'tutkinnonosa',
+    params: {
+      tutkinnonOsaId: 'uusi',
+    },
+  });
+};
 
-  tuoTutkinnonOsa() {
-    (this.$refs.tutkinnonosaTuontiModal as any).show();
-  }
+const tuoTutkinnonOsa = () => {
+  (tutkinnonosaTuontiModal.value as any).show();
+};
 
-  get peruste() {
-    return this.perusteStore.peruste.value;
-  }
+const refresh = async () => {
+  await onProjektiChange();
+  await props.perusteStore.updateNavigation();
+};
 
-  async refresh() {
-    await this.onProjektiChange();
-    await this.perusteStore.updateNavigation();
+// Initialize component when mounted
+onMounted(async () => {
+  await onProjektiChange();
+});
+
+// Watch for changes in projektiId or perusteId
+watch([() => props.projektiId, () => props.perusteId], async () => {
+  if (props.projektiId && props.perusteId) {
+    await onProjektiChange();
   }
-}
+});
 </script>
 
 <style lang="scss" scoped>

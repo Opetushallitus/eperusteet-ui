@@ -1,27 +1,40 @@
 <template>
   <div class="content">
-
     <div class="d-flex justify-content-between">
-      <h3>{{$t('aikataulu')}}</h3>
-      <ep-aikataulu-modal :aikataulut="aikataulut" @tallenna="tallenna" :julkinen-valinta="isAmmatillinen" :pakollisetTapahtumat="['tavoite']">
-        <label slot="aikataululistaus-julkaisu-header">
-          {{$t('peruste-astuu-voimaan')}}
-        </label>
-        <span slot="luomispaiva-topic" v-html="$t('projektin-luomispaiva')"></span>
-        <span slot="julkaisupaiva-topic" v-html="$t('peruste-astuu-voimaan')"></span>
+      <h3>{{ $t('aikataulu') }}</h3>
+      <ep-aikataulu-modal
+        :aikataulut="aikataulut"
+        :julkinen-valinta="isAmmatillinen"
+        :pakolliset-tapahtumat="['tavoite']"
+        @tallenna="tallenna"
+      >
+        <template #aikataululistaus-julkaisu-header>
+          <label>
+            {{ $t('peruste-astuu-voimaan') }}
+          </label>
+        </template>
+        <template #luomispaiva-topic>
+          <span v-html="$t('projektin-luomispaiva')" />
+        </template>
+        <template #julkaisupaiva-topic>
+          <span v-html="$t('peruste-astuu-voimaan')" />
+        </template>
       </ep-aikataulu-modal>
     </div>
 
     <ep-aikataulu :aikataulut="aikataulut">
-      <span slot="luomispaiva-topic" v-html="$t('projektin-luomispaiva')"></span>
-      <span slot="julkaisupaiva-topic" v-html="$t('peruste-astuu-voimaan')"></span>
+      <template #luomispaiva-topic>
+        <span v-html="$t('projektin-luomispaiva')" />
+      </template>
+      <template #julkaisupaiva-topic>
+        <span v-html="$t('peruste-astuu-voimaan')" />
+      </template>
     </ep-aikataulu>
-
   </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from 'vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
@@ -31,105 +44,99 @@ import { Kielet } from '@shared/stores/kieli';
 import * as _ from 'lodash';
 import { PerusteAikatauluDtoTapahtumaEnum } from '@shared/api/eperusteet';
 import { isKoulutustyyppiAmmatillinen } from '@shared/utils/perusteet';
+import { $t, $success, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSpinner,
-    EpButton,
-    EpAikataulu,
-    EpAikatauluModal,
-  },
-})
-export default class EpPerusteAikataulu extends Vue {
-  @Prop({ required: true })
-  private aikatauluStore!: AikatauluStore;
+const props = defineProps<{
+  aikatauluStore: AikatauluStore;
+}>();
 
-  get aikataulut() {
-    if (this.aikatauluStore.aikataulutapahtumat.value) {
-      let aikataulu = this.aikatauluStore.aikataulutapahtumat.value as any;
+const hasTapahtuma = (tapahtumaEnum: PerusteAikatauluDtoTapahtumaEnum) => {
+  return _.head(_.filter(props.aikatauluStore.aikataulutapahtumat.value, tapahtuma => _.toLower(tapahtuma.tapahtuma) === _.toLower(tapahtumaEnum)));
+};
 
-      if (!this.hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.LUOMINEN)) {
-        aikataulu = [
-          ...aikataulu,
-          this.createDefaultTapahtuma(
-            PerusteAikatauluDtoTapahtumaEnum.LUOMINEN,
-            { [Kielet.getSisaltoKieli.value]: this.$t('peruste-luotu') },
-            this.aikatauluStore.peruste.value!.luotu as Date),
-        ];
-      }
+const createDefaultTapahtuma = (tapahtuma: PerusteAikatauluDtoTapahtumaEnum, tavoite: any, tapahtumapaiva?: Date) => {
+  return {
+    tapahtuma: _.toLower(tapahtuma),
+    tavoite: tavoite,
+    tapahtumapaiva: tapahtumapaiva,
+    julkinen: false,
+  };
+};
 
-      if (!this.hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.LAUSUNTOKIERROS)) {
-        aikataulu = [
-          ...aikataulu,
-          this.createDefaultTapahtuma(
-            PerusteAikatauluDtoTapahtumaEnum.LAUSUNTOKIERROS,
-            { [Kielet.getSisaltoKieli.value]: this.$t('lausuntokierros-alkaa') }),
-        ];
-      }
+const aikataulut = computed(() => {
+  if (props.aikatauluStore.aikataulutapahtumat.value) {
+    let aikataulu = props.aikatauluStore.aikataulutapahtumat.value as any;
 
-      if (!this.hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.JOHTOKUNNANKASITTELY)) {
-        aikataulu = [
-          ...aikataulu,
-          this.createDefaultTapahtuma(
-            PerusteAikatauluDtoTapahtumaEnum.JOHTOKUNNANKASITTELY,
-            { [Kielet.getSisaltoKieli.value]: this.$t('johtokunnan-kasittely') }),
-        ];
-      }
-
-      if (!this.hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.ARVIOITUJULKAISUPAIVA)) {
-        aikataulu = [
-          ...aikataulu,
-          this.createDefaultTapahtuma(
-            PerusteAikatauluDtoTapahtumaEnum.ARVIOITUJULKAISUPAIVA,
-            { [Kielet.getSisaltoKieli.value]: this.$t('perusteen-arvioitu-julkaisupaiva') }),
-        ];
-      }
-
-      if (!this.hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.JULKAISU)) {
-        aikataulu = [
-          ...aikataulu,
-          this.createDefaultTapahtuma(
-            PerusteAikatauluDtoTapahtumaEnum.JULKAISU,
-            { [Kielet.getSisaltoKieli.value]: this.$t('peruste-astuu-voimaan') }),
-        ];
-      }
-
-      return aikataulu;
+    if (!hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.LUOMINEN)) {
+      aikataulu = [
+        ...aikataulu,
+        createDefaultTapahtuma(
+          PerusteAikatauluDtoTapahtumaEnum.LUOMINEN,
+          { [Kielet.getSisaltoKieli.value]: $t('peruste-luotu') },
+          props.aikatauluStore.peruste.value!.luotu as Date),
+      ];
     }
-  }
 
-  hasTapahtuma(tapahtumaEnum: PerusteAikatauluDtoTapahtumaEnum) {
-    return _.head(_.filter(this.aikatauluStore.aikataulutapahtumat.value, tapahtuma => _.toLower(tapahtuma.tapahtuma) === _.toLower(tapahtumaEnum)));
-  }
-
-  createDefaultTapahtuma(tapahtuma: PerusteAikatauluDtoTapahtumaEnum, tavoite: any, tapahtumapaiva?: Date) {
-    return {
-      tapahtuma: _.toLower(tapahtuma),
-      tavoite: tavoite,
-      tapahtumapaiva: tapahtumapaiva,
-      julkinen: false,
-    };
-  }
-
-  get isAmmatillinen() {
-    if (this.aikatauluStore.peruste.value) {
-      return isKoulutustyyppiAmmatillinen(this.aikatauluStore.peruste.value.koulutustyyppi!);
+    if (!hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.LAUSUNTOKIERROS)) {
+      aikataulu = [
+        ...aikataulu,
+        createDefaultTapahtuma(
+          PerusteAikatauluDtoTapahtumaEnum.LAUSUNTOKIERROS,
+          { [Kielet.getSisaltoKieli.value]: $t('lausuntokierros-alkaa') }),
+      ];
     }
+
+    if (!hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.JOHTOKUNNANKASITTELY)) {
+      aikataulu = [
+        ...aikataulu,
+        createDefaultTapahtuma(
+          PerusteAikatauluDtoTapahtumaEnum.JOHTOKUNNANKASITTELY,
+          { [Kielet.getSisaltoKieli.value]: $t('johtokunnan-kasittely') }),
+      ];
+    }
+
+    if (!hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.ARVIOITUJULKAISUPAIVA)) {
+      aikataulu = [
+        ...aikataulu,
+        createDefaultTapahtuma(
+          PerusteAikatauluDtoTapahtumaEnum.ARVIOITUJULKAISUPAIVA,
+          { [Kielet.getSisaltoKieli.value]: $t('perusteen-arvioitu-julkaisupaiva') }),
+      ];
+    }
+
+    if (!hasTapahtuma(PerusteAikatauluDtoTapahtumaEnum.JULKAISU)) {
+      aikataulu = [
+        ...aikataulu,
+        createDefaultTapahtuma(
+          PerusteAikatauluDtoTapahtumaEnum.JULKAISU,
+          { [Kielet.getSisaltoKieli.value]: $t('peruste-astuu-voimaan') }),
+      ];
+    }
+
+    return aikataulu;
   }
 
-  async tallenna(aikataulut) {
-    try {
-      await this.aikatauluStore.saveAikataulut(_.filter(aikataulut, 'tapahtumapaiva'));
-      this.$success(this.$t('aikataulu-tallennettu') as string);
-    }
-    catch (e) {
-      this.$fail(this.$t('virhe-palvelu-virhe') as string);
-    }
+  return [];
+});
+
+const isAmmatillinen = computed(() => {
+  if (props.aikatauluStore.peruste.value) {
+    return isKoulutustyyppiAmmatillinen(props.aikatauluStore.peruste.value.koulutustyyppi!);
   }
-}
+  return false;
+});
+
+const tallenna = async (aikataulut) => {
+  try {
+    await props.aikatauluStore.saveAikataulut(_.filter(aikataulut, 'tapahtumapaiva'));
+    $success($t('aikataulu-tallennettu') as string);
+  }
+  catch (e) {
+    $fail($t('virhe-palvelu-virhe') as string);
+  }
+};
 </script>
 
 <style scoped lang="scss">
 @import "@/styles/_variables.scss";
-
 </style>

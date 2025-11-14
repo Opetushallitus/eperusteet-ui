@@ -1,23 +1,22 @@
 import Vue from 'vue';
-import VueCompositionApi, { computed, reactive } from '@vue/composition-api';
+import { computed, reactive, unref } from 'vue';
 import { Perusteenosat, Sisallot } from '@shared/api/eperusteet';
 import { Revision } from '@shared/tyypit';
 import _ from 'lodash';
 import { PerusteStore } from '@/stores/PerusteStore';
-import VueRouter from 'vue-router';
+import { Router } from 'vue-router';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-
-Vue.use(VueCompositionApi);
+import { App } from 'vue';
 
 interface AbstractPerusteenOsaViiteStoreStoreConfig {
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: Router;
 }
 
 export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
   protected static config: AbstractPerusteenOsaViiteStoreStoreConfig;
 
-  public static install(vue: typeof Vue, config: AbstractPerusteenOsaViiteStoreStoreConfig) {
+  public static install(app: App, config: AbstractPerusteenOsaViiteStoreStoreConfig) {
     AbstractPerusteenOsaViiteStore.config = config;
   }
 
@@ -67,7 +66,7 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
     if (data.nimiKoodi) {
       data.nimi = data.nimiKoodi.nimi;
     }
-    const res = await Perusteenosat.updatePerusteenOsa(this.perusteenOsaId.value!, data);
+    const res = await Perusteenosat.updatePerusteenOsa(this.state.perusteenOsaId!, data);
 
     AbstractPerusteenOsaViiteStore.config.perusteStore!.updateNavigationEntry({
       id: this.perusteenOsaViiteId!,
@@ -93,16 +92,16 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
 
     if (_.isEmpty(tekstikappaleIsa)) {
       const tallennettu = (await Sisallot.addSisaltoViiteUUSI(
-        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value!,
-        AbstractPerusteenOsaViiteStore.config?.perusteStore.perusteSuoritustapa.value!,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value as number,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteSuoritustapa.value as any,
         perusteenOsa,
       ));
       return tallennettu.data;
     }
     else {
       const tallennettu = (await Sisallot.addSisaltoUusiLapsiViitteella(
-        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value!,
-        AbstractPerusteenOsaViiteStore.config?.perusteStore.perusteSuoritustapa.value!,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteId.value as number,
+        AbstractPerusteenOsaViiteStore.config.perusteStore.perusteSuoritustapa.value as any,
         tekstikappaleIsa.id,
         perusteenOsa,
       ));
@@ -112,7 +111,7 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
 
   public async lock() {
     try {
-      const res = await Perusteenosat.checkPerusteenOsaLock(this.perusteenOsaId.value!);
+      const res = await Perusteenosat.checkPerusteenOsaLock(this.state.perusteenOsaId!);
       return res.data;
     }
     catch (err) {
@@ -121,22 +120,22 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
   }
 
   public async acquire() {
-    const res = await Perusteenosat.lockPerusteenOsa(this.perusteenOsaId.value!);
+    const res = await Perusteenosat.lockPerusteenOsa(this.state.perusteenOsaId!);
     return res.data;
   }
 
   public async release() {
-    await Perusteenosat.unlockPerusteenOsa(this.perusteenOsaId.value!);
+    await Perusteenosat.unlockPerusteenOsa(this.state.perusteenOsaId!);
   }
 
   public async revisions() {
-    const res = await Perusteenosat.getPerusteenOsaVersiot(this.perusteenOsaId.value!);
+    const res = await Perusteenosat.getPerusteenOsaVersiot(this.state.perusteenOsaId!);
     return res.data as Revision[];
   }
 
   public async restore(rev: number) {
     await this.acquire();
-    await Perusteenosat.revertPerusteenOsaToVersio(this.perusteenOsaId.value!, rev);
+    await Perusteenosat.revertPerusteenOsaToVersio(this.state.perusteenOsaId!, rev);
     await this.release();
   }
 

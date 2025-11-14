@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
 import RouteArviointi from '@/views/RouteArviointi.vue';
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue';
@@ -7,7 +6,6 @@ import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';
 import RouteHome from '@/views/RouteHome.vue';
 import RouteJarjesta from '@/views/RouteJarjesta.vue';
 import RouteJulkaise from '@/views/RouteJulkaise.vue';
-import RouteKaannokset from '@/views/RouteKaannokset.vue';
 import RouteKasite from '@/views/RouteKasite.vue';
 import RouteKoulutuksenOsa from '@/views/RouteKoulutuksenOsa.vue';
 import RouteKvliite from '@/views/RouteKvliite.vue';
@@ -73,24 +71,29 @@ import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import { isYleissivistavaKoulutustyyppi } from '@shared/utils/perusteet';
+import { createRouter, createWebHashHistory } from 'vue-router';
+import { useLoading } from 'vue-loading-overlay';
+import { loadingOptions } from '@/utils/loading';
+import { $bvModal } from '@shared/utils/globals';
+import { convertRouteParamsToNumbers } from '@/utils/routing';
 
-Vue.use(VueRouter);
-Vue.use(VueMeta, {
-  refreshOnceOnNavigation: true,
-});
 
 const props = (route: any) => {
   return {
-    ...route.params,
+    ...convertRouteParamsToNumbers(route.params),
+    ...convertRouteParamsToNumbers(route.query),
     ...stores,
   };
 };
 
-const router = new VueRouter({
+const router = createRouter({
+  history: createWebHashHistory(),
   routes: [{
     path: '',
+    redirect: () => '/fi',
   }, {
     path: '/',
+    redirect: () => '/fi',
   }, {
     path: '/:lang',
     component: RouteRoot,
@@ -609,7 +612,7 @@ const router = new VueRouter({
       },
       ],
     }, {
-      path: '*',
+      path: '/:catchAll(.*)',
       redirect: (to) => {
         console.log('Unknown route', to);
         return {
@@ -644,9 +647,16 @@ router.beforeEach((to, from, next) => {
   }
 });
 
+router.beforeEach((to, from, next) => {
+  if (!EditointiStore.anyEditing()) {
+    loaders.push($loading.show());
+  }
+  next();
+});
+
 router.beforeEach(async (to, from, next) => {
   if (EditointiStore.anyEditing()) {
-    const value = await router.app.$bvModal.msgBoxConfirm(
+    const value = await $bvModal.msgBoxConfirm(
       Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti-dialogi'), {
         title: Kielet.kaannaOlioTaiTeksti('haluatko-poistua-tallentamatta'),
         okTitle: Kielet.kaannaOlioTaiTeksti('poistu-tallentamatta'),
@@ -692,8 +702,43 @@ router.beforeEach(async (to, from, next) => {
   next();
 });
 
+router.beforeEach(async (to, from, next) => {
+
+  if (to.params.projektiId && to.params.projektiId !== from.params.projektiId) {
+    const projektiIdNumber = _.parseInt(to.params.projektiId);
+    window.scrollTo(0, 0);
+    try {
+      stores.kayttajaStore?.clear();
+      stores.muokkaustietoStore?.clear();
+      stores.aikatauluStore?.clear();
+      stores.tiedotteetStore?.clear();
+      stores.tyoryhmaStore?.clear();
+      await stores.kayttajaStore?.setPerusteprojekti(projektiIdNumber);
+      await stores.perusteStore?.init(projektiIdNumber);
+      await stores.termitStore.init(stores.perusteStore.peruste.value?.id);
+    }
+    catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  next();
+});
+
+const $loading = useLoading(loadingOptions);
+const loaders: any[] = [];
+
 router.afterEach(() => {
+  hideLoading();
   BrowserStore.changeLocation(location.href);
 });
+
+function hideLoading() {
+  if (loaders.length > 0) {
+    (loaders[loaders.length - 1] as any).hide();
+    loaders.pop();
+  }
+}
 
 export default router;

@@ -1,72 +1,83 @@
 <template>
-<EpHomeTile icon="description" :route="{ name: 'tiedotteet' }" :count="uudetTiedotteetCount">
-  <template slot="header">
-    <span>{{ $t('tiedotteet') }}</span>
-  </template>
-  <template slot="content">
-    <div v-if="tiedotteet">
-      <div v-for="(tiedote, index) in viimeisimmatTiedotteet" :key="index" class="row justify-content-center text-left">
-        <div class="col-2">{{$sd(tiedote.muokattu)}}</div>
-        <div class="col-8 otsikko" :class="{'font-weight-bold': tiedote.uusi}">{{$kaanna(tiedote.otsikko)}}</div>
+  <EpHomeTile
+    icon="description"
+    :route="{ name: 'tiedotteet' }"
+    :count="uudetTiedotteetCount"
+  >
+    <template #header>
+      <span>{{ $t('tiedotteet') }}</span>
+    </template>
+    <template #content>
+      <div v-if="tiedotteet.length > 0">
+        <div
+          v-for="(tiedote, index) in viimeisimmatTiedotteet"
+          :key="index"
+          class="row justify-content-center text-left"
+        >
+          <div class="col-2">
+            {{ $sd(tiedote.muokattu) }}
+          </div>
+          <div
+            class="col-8 otsikko"
+            :class="{'font-weight-bold': tiedote.uusi}"
+          >
+            {{ $kaanna(tiedote.otsikko) }}
+          </div>
+        </div>
       </div>
-    </div>
-    <div v-else-if="tiedotteet === []">
-      <p>{{ $t('ei-tiedotteita') }}</p>
-    </div>
-    <ep-spinner v-else />
-  </template>
-</EpHomeTile>
+      <div v-else-if="tiedotteet.length === 0">
+        <p>{{ $t('ei-tiedotteita') }}</p>
+      </div>
+      <ep-spinner v-else />
+    </template>
+  </EpHomeTile>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted } from 'vue';
 import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import _ from 'lodash';
 import { perustetila } from '@shared/utils/perusteet';
 import { onkoUusi } from '@shared/utils/tiedote';
+import { $t, $sd, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpHomeTile,
-    EpSpinner,
-  },
-})
-export default class TileTiedotteet extends Vue {
-  @Prop({ required: true })
-  private tiedotteetStore!: TiedotteetStore;
+const props = defineProps<{
+  tiedotteetStore: TiedotteetStore;
+}>();
 
-  mounted() {
-    this.tiedotteetStore.fetch();
+onMounted(() => {
+  props.tiedotteetStore.fetch();
+});
+
+const isLoading = computed(() => {
+  return !!tiedotteet.value;
+});
+
+const tiedotteet = computed(() => {
+  if (props.tiedotteetStore.tiedotteet.value) {
+    return _.chain(props.tiedotteetStore.tiedotteet.value)
+      .filter(tiedote => _.isEmpty(tiedote.perusteet) || !_.some(tiedote.perusteet, (peruste) => (peruste.tila as any) !== perustetila.valmis))
+      .map(tiedote => {
+        return {
+          ...tiedote,
+          uusi: onkoUusi(tiedote.luotu),
+        };
+      })
+      .value();
   }
 
-  get isLoading() {
-    return !!this.tiedotteet;
-  }
+  return [];
+});
 
-  get tiedotteet() {
-    if (this.tiedotteetStore.tiedotteet.value) {
-      return _.chain(this.tiedotteetStore.tiedotteet.value)
-        .filter(tiedote => _.isEmpty(tiedote.perusteet) || !_.some(tiedote.perusteet, (peruste) => (peruste.tila as any) !== perustetila.valmis))
-        .map(tiedote => {
-          return {
-            ...tiedote,
-            uusi: onkoUusi(tiedote.luotu),
-          };
-        })
-        .value();
-    }
-  }
+const viimeisimmatTiedotteet = computed(() => {
+  return _.take(tiedotteet.value, 3);
+});
 
-  get viimeisimmatTiedotteet() {
-    return _.take(this.tiedotteet, 3);
-  }
-
-  get uudetTiedotteetCount() {
-    return _.size(_.filter(this.tiedotteet, 'uusi'));
-  }
-}
+const uudetTiedotteetCount = computed(() => {
+  return _.size(_.filter(tiedotteet.value, 'uusi'));
+});
 </script>
 
 <style scoped lang="scss">

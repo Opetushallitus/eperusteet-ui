@@ -2,32 +2,47 @@
   <div class="row">
     <div class="col-xl-3 col-md-3 col-sm-12">
       <ep-form-content name="aikavertailu">
-        <ep-multi-select :multiple="false"
+        <ep-multi-select
           id="tilaFilter"
+          v-model="model.tyyppi"
+          :multiple="false"
           :is-editing="true"
           :options="aikavaliItems"
-          v-model="model.tyyppi"
           :placeholder="$t('valitse')"
           track-by="value"
-          label="text">
-        </ep-multi-select>
+          label="text"
+        />
       </ep-form-content>
     </div>
 
     <div class="col-xl-9 col-md-9 col-sm-12">
       <ep-form-content name="aikavali">
-        <div class="d-flex align-items-center" :class="{'disabled-events' : !model.tyyppi}">
-          <ep-datepicker v-model="model.aikavaliAlku" :is-editing="true" />
+        <div
+          class="d-flex align-items-center"
+          :class="{'disabled-events' : !model.tyyppi}"
+        >
+          <ep-datepicker
+            v-model="model.aikavaliAlku"
+            :is-editing="true"
+          />
           <span class="mx-2">-</span>
-          <ep-datepicker v-model="model.aikavaliLoppu" :is-editing="true" endOfDay/>
+          <ep-datepicker
+            v-model="model.aikavaliLoppu"
+            :is-editing="true"
+            end-of-day
+          />
         </div>
       </ep-form-content>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from 'vue';
+import { $t } from '@shared/utils/globals';
+import EpFormContent from '@shared/components/forms/EpFormContent.vue';
+import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
+import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 
 export interface AikavaliVertailu {
   tyyppi?: {
@@ -38,36 +53,37 @@ export interface AikavaliVertailu {
   aikavaliLoppu?: string;
 }
 
-@Component
-export default class EpTilastoAikavaliVertailu extends Vue {
-  @Prop({ required: true })
-  value!: AikavaliVertailu;
+const props = defineProps<{
+  modelValue: AikavaliVertailu;
+}>();
 
-  get model() {
-    return this.value;
-  }
+const emit = defineEmits(['update:modelValue']);
 
-  set model(val) {
-    this.$emit('input', val);
-  }
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  get aikavaliItems() {
-    return [
-      {
-        text: this.$t('julkaistu'),
-        value: 'julkaistu',
-      },
-      {
-        text: this.$t('ensijulkaisu'),
-        value: 'ensijulkaisu',
-      },
-      {
-        text: this.$t('luotu'),
-        value: 'luotu',
-      },
-    ];
-  }
-}
+const aikavaliItems = computed(() => {
+  return [
+    {
+      text: $t('julkaistu'),
+      value: 'julkaistu',
+    },
+    {
+      text: $t('ensijulkaisu'),
+      value: 'ensijulkaisu',
+    },
+    {
+      text: $t('luotu'),
+      value: 'luotu',
+    },
+  ];
+});
 </script>
 
 <style scoped lang="scss">

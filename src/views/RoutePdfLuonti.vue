@@ -1,88 +1,108 @@
 <template>
-
   <div class="dokumentit">
     <div class="ylapaneeli d-flex align-items-center">
-        <h2 class="otsikko">{{ $t('luo-pdf') }}</h2>
+      <h2 class="otsikko">
+        {{ $t('luo-pdf') }}
+      </h2>
     </div>
     <div class="sisalto">
       <div class="mb-4">
         <h3>{{ $t('luo-ja-lataa-pdf') }}</h3>
-        <p>{{ $t(selitteenteksti)}}</p>
-        <ep-pdf-luonti :store="perusteDokumenttiStore" :pdfnimi="perusteNimi"/>
+        <p>{{ $t(selitteenteksti) }}</p>
+        <ep-pdf-luonti
+          :store="perusteDokumenttiStore"
+          :pdfnimi="perusteNimi"
+        />
 
-        <h4 v-if="kvliite" class="mt-5">{{$t('kvliite')}}</h4>
-        <ep-pdf-luonti v-if="kvliite" :store="kvliiteStore" pdfnimi="kvliite" :nayta-julkaistu="false"/>
+        <h4
+          v-if="kvliite"
+          class="mt-5"
+        >
+          {{ $t('kvliite') }}
+        </h4>
+        <ep-pdf-luonti
+          v-if="kvliite"
+          :store="kvliiteStore"
+          pdfnimi="kvliite"
+          :nayta-julkaistu="false"
+        />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Watch, Prop } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
 import { Kielet } from '@shared/stores/kieli';
-import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpFormContent from '@shared/components/forms/EpFormContent.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpPdfLuonti from '@shared/components/EpPdfLuonti/EpPdfLuonti.vue';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { DokumenttiStore } from '@/stores/DokumenttiStore';
 import { PerusteDto } from '@shared/api/eperusteet';
 import { isKoulutustyyppiAmmatillinen } from '@shared/utils/perusteet';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpFormContent,
-    EpSpinner,
-    EpPdfLuonti,
-  },
-})
-export default class RoutePdfLuonti extends PerusteprojektiRoute {
-  @Prop({ required: false, default: 'luo-peruste-pdf-selite' })
-  protected selitteenteksti!:string;
 
-  private perusteDokumenttiStore: DokumenttiStore | null = null;
-  private kvliiteStore: DokumenttiStore | null = null;
+const props = withDefaults(defineProps<{
+  selitteenteksti?: string;
+  projektiId?: number;
+  perusteId?: number;
+  perusteStore?: any;
+}>(), {
+  selitteenteksti: 'luo-peruste-pdf-selite',
+});
 
-  async onProjektiChange(projektiId: number, perusteId: number) {
-    this.perusteDokumenttiStore = new DokumenttiStore(this.peruste, this.perusteenSuoritustapa, 'uusi');
-    this.perusteDokumenttiStore.init();
+const perusteDokumenttiStore = ref<DokumenttiStore | null>(null);
+const kvliiteStore = ref<DokumenttiStore | null>(null);
 
-    this.kvliiteStore = new DokumenttiStore(this.peruste, this.perusteenSuoritustapa, 'kvliite');
-    this.kvliiteStore.init();
+const perusteenSuoritustapa = computed(() => {
+  return props.perusteStore.perusteSuoritustapa.value as string;
+});
+
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value as PerusteDto;
+});
+
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
+
+const perusteNimi = computed(() => {
+  if (peruste.value) {
+    return $kaanna(peruste.value.nimi as any);
   }
+  return undefined;
+});
 
-  get perusteenSuoritustapa(): string {
-    return this.perusteStore.perusteSuoritustapa.value as string;
+const kvliite = computed(() => {
+  if (peruste.value) {
+    return isKoulutustyyppiAmmatillinen(peruste.value.koulutustyyppi as string) && !props.perusteStore.isOpas.value;
   }
+  return false;
+});
 
-  get peruste(): PerusteDto {
-    return this.perusteStore.peruste.value as PerusteDto;
+const onProjektiChange = async () => {
+  perusteDokumenttiStore.value = new DokumenttiStore(peruste.value, perusteenSuoritustapa.value, 'uusi');
+  perusteDokumenttiStore.value.init();
+
+  kvliiteStore.value = new DokumenttiStore(peruste.value, perusteenSuoritustapa.value, 'kvliite');
+  kvliiteStore.value.init();
+};
+
+watch(kieli, async () => {
+  await perusteDokumenttiStore.value?.init();
+  await kvliiteStore.value?.init();
+});
+
+// Initialize when component is mounted or when project changes
+onMounted(async () => {
+  await onProjektiChange();
+});
+
+// Watch for changes in the peruste or projektiId
+watch([() => props.projektiId, () => props.perusteId], async () => {
+  if (props.projektiId && props.perusteId) {
+    await onProjektiChange();
   }
-
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
-
-  get perusteNimi() {
-    if (this.peruste) {
-      return this.$kaanna(this.peruste.nimi as any);
-    }
-  }
-
-  @Watch('kieli')
-  async kieliChanged() {
-    await this.perusteDokumenttiStore?.init();
-    await this.kvliiteStore?.init();
-  }
-
-  get kvliite() {
-    if (this.peruste) {
-      return isKoulutustyyppiAmmatillinen(this.peruste.koulutustyyppi as string) && !this.perusteStore.isOpas.value;
-    }
-  }
-}
-
+});
 </script>
 
 <style lang="scss" scoped>

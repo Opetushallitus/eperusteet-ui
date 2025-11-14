@@ -1,6 +1,9 @@
 <template>
   <div>
-    <Portal to="headerExtension">
+    <Teleport
+      defer
+      to="#headerExtension"
+    >
       <div class="container">
         <div class="container-fluid">
           <div class="row no-gutters">
@@ -11,28 +14,36 @@
           </div>
         </div>
       </div>
-    </Portal>
+    </Teleport>
+
     <div class="container tile-container">
       <div class="d-flex flex-row flex-wrap justify-content-center">
-        <TilePerusteprojektit v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
-        <TilePohjat v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileTiedotteet :tiedotteetStore="tiedotteetStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
-        <TileOppaat :perusteOppaatStore="perusteOppaatStore" v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"/>
-        <TileMaaraysKokoelma v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet_maarays'}"/>
-        <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" :digitaalisetOsaamisetStore="digitaalisetOsaamisetStore"/>
+        <TilePerusteprojektit v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}" />
+        <TilePohjat v-oikeustarkastelu="{oikeus:'hallinta'}" />
+        <TileTiedotteet
+          v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"
+          :tiedotteet-store="tiedotteetStore"
+        />
+        <TileOppaat
+          v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}"
+          :peruste-oppaat-store="perusteOppaatStore"
+        />
+        <TileMaaraysKokoelma v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet_maarays'}" />
+        <TileDigitaalinenOsaaminen
+          v-if="$hasOphCrud()"
+          :digitaaliset-osaamiset-store="digitaalisetOsaamisetStore"
+        />
         <TileOsaamismerkit v-if="$hasOphCrud()" />
-        <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}"/>
-        <TileYllapito v-if="$isAdmin()"/>
+        <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}" />
+        <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}" />
+        <TileYllapito v-if="$isAdmin()" />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import EpSearch from '@shared/components/forms/EpSearch.vue';
-import TileArkistoidut from './tiles/TileArkistoidut.vue';
+<script setup lang="ts">
+import { computed, getCurrentInstance, onMounted, ref } from 'vue';
 import TileOppaat from './tiles/TileOppaat.vue';
 import TilePerusteprojektit from './tiles/TilePerusteprojektit.vue';
 import TilePohjat from './tiles/TilePohjat.vue';
@@ -45,50 +56,20 @@ import TileYllapito from './tiles/TileYllapito.vue';
 import TileOsaamismerkit from './tiles/TileOsaamismerkit.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
-import { Meta } from '@shared/utils/decorators';
 import { PerusteetStore } from '@/stores/PerusteetStore';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSearch,
-    TileYllapito,
-    TileArkistoidut,
-    TileOppaat,
-    TilePerusteprojektit,
-    TilePohjat,
-    TileTiedotteet,
-    TileArviointiasteikot,
-    TileTilastot,
-    TileDigitaalinenOsaaminen,
-    TileOsaamismerkit,
-    TileMaaraysKokoelma,
-  },
-})
-export default class Home extends Vue {
-  @Prop({ required: true })
-  private tiedotteetStore!: TiedotteetStore;
+const props = defineProps<{
+  tiedotteetStore: TiedotteetStore;
+  kayttajaStore: KayttajaStore;
+  perusteOppaatStore: PerusteetStore;
+  digitaalisetOsaamisetStore: PerusteetStore;
+}>();
 
-  @Prop({ required: true })
-  private kayttajaStore!: KayttajaStore;
+const nimi = computed(() => {
+  return props.kayttajaStore?.nimi?.value || null;
+});
 
-  @Prop({ required: true })
-  private perusteOppaatStore!: PerusteetStore;
-
-  @Prop({ required: true })
-  private digitaalisetOsaamisetStore!: PerusteetStore;
-
-  @Meta
-  getMetaInfo() {
-    return {
-      title: this.$t('eperusteet'),
-      titleTemplate: null,
-    };
-  }
-
-  get nimi() {
-    return this.kayttajaStore?.nimi?.value || null;
-  }
-}
 </script>
 
 <style lang="scss" scoped>
@@ -102,7 +83,7 @@ export default class Home extends Vue {
   .header {
     color: white;
     background-color: $etusivu-header-background;
-    background-image: url('~@assets/img/banners/header.svg');
+    background-image: url('@assets/img/banners/header.svg');
     background-position: 100% 0;
     background-repeat: no-repeat;
     @media only screen and (min-width: 2503px)  {

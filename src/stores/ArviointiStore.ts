@@ -1,14 +1,12 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 
 import _ from 'lodash';
 
 import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
 import { KieliStore } from '@shared/stores/kieli';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import { fail, success } from '@shared/utils/notifications';
-
-Vue.use(VueCompositionApi);
+import { $fail, $success, $t } from '@shared/utils/globals';
 
 export class ArviointiStore {
   constructor(
@@ -62,14 +60,13 @@ export class ArviointiStore {
   public async toggleAll() {
     const val = !this.allClosed.value;
     _.forEach(this.geneeriset.value, value => {
-      Vue.set(this.state.closed, value.id!, val);
+      this.state.closed[value.id!] = val;
     });
   }
 
-  @Debounced(300)
-  public async filterGeneeriset(value: string) {
+  public filterGeneeriset = debounced(async (value: string) => {
     this.state.filterStr = value;
-  }
+  });
 
   public async toggleOpen(value: GeneerinenArviointiasteikkoDto, state?: boolean) {
     if (!value.id) {
@@ -77,10 +74,10 @@ export class ArviointiStore {
     }
 
     if (state !== undefined) {
-      Vue.set(this.state.closed, value.id, !!state);
+      this.state.closed[value.id] = !!state;
     }
     else {
-      Vue.set(this.state.closed, value.id, !this.state.closed[value.id]);
+      this.state.closed[value.id] = !this.state.closed[value.id];
     }
   }
 
@@ -94,11 +91,11 @@ export class ArviointiStore {
         };
       });
       this.state.geneeriset = [...(this.state.geneeriset || []), res.data];
-      success('tallennettu');
+      $success($t('tallennettu'));
       return res.data;
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail($t('virhe-palvelu-virhe'));
     }
   }
 
@@ -106,11 +103,13 @@ export class ArviointiStore {
     try {
       const res = await GeneerinenArviointiasteikko.updateGeneerinenArviontiasteikko(value.id!, value);
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      Vue.set(this.state.geneeriset!, idx, res.data);
-      success('tallennettu');
+      if (this.state.geneeriset) {
+        this.state.geneeriset[idx] = res.data;
+      }
+      $success($t('tallennettu'));
     }
     catch (err) {
-      fail('tallennus-epaonnistui');
+      $fail($t('tallennus-epaonnistui'));
     }
   }
 
@@ -121,11 +120,13 @@ export class ArviointiStore {
         julkaistu,
       });
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      Vue.set(this.state.geneeriset!, idx, res.data);
-      success('geneerinen-arviointi-julkaistu');
+      if (this.state.geneeriset) {
+        this.state.geneeriset[idx] = res.data;
+      }
+      $success($t('geneerinen-arviointi-julkaistu'));
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail($t('virhe-palvelu-virhe'));
     }
   }
 
@@ -133,11 +134,13 @@ export class ArviointiStore {
     try {
       await GeneerinenArviointiasteikko.removeGeneerinenArviontiasteikko(value.id!);
       const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      Vue.delete(this.state.geneeriset!, idx);
-      success('geneerinen-arviointi-poistettu');
+      if (this.state.geneeriset) {
+        this.state.geneeriset.splice(idx, 1);
+      }
+      $success($t('geneerinen-arviointi-poistettu'));
     }
     catch (err) {
-      fail('virhe-palvelu-virhe');
+      $fail($t('virhe-palvelu-virhe'));
     }
   }
 }

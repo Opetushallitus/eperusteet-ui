@@ -1,12 +1,8 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { reactive, computed, ref, watch } from 'vue';
 import { Ulkopuoliset, getPerusteprojektit, PerusteprojektiKevytDto, Perusteprojektit, PerusteQuery, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { Page } from '@shared/tyypit';
 import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
-import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
-
-Vue.use(VueCompositionApi);
 
 export class TyoryhmaStore {
   private state = reactive({

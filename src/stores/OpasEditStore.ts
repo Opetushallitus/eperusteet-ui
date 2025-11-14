@@ -1,7 +1,7 @@
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { reactive, computed, ref, watch } from 'vue';
 import { Perusteprojektit, Perusteet } from '@shared/api/eperusteet';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import * as _ from 'lodash';
 import { Kielet } from '@shared/stores/kieli';
 import { PerusteStore } from './PerusteStore';

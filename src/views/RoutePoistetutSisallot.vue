@@ -1,85 +1,98 @@
 <template>
   <div class="poistetut">
     <div class="ylapaneeli d-flex align-items-center">
-      <h2 class="otsikko">{{ $t('poistetut') }}</h2>
+      <h2 class="otsikko">
+        {{ $t('poistetut') }}
+      </h2>
     </div>
     <div class="sisalto">
       <EpSpinner v-if="!poistetut" />
-      <b-tabs content-class="mt-4" v-model="tabIndex">
-        <b-tab v-for="(tab, index) in tabs" :key="'tab'+index" :title="$t(tab.otsikko)">
+      <b-tabs
+        v-model="tabIndex"
+        content-class="mt-4"
+      >
+        <b-tab
+          v-for="(tab, index) in tabs"
+          :key="'tab'+index"
+          :title="$t(tab.otsikko)"
+        >
           <ep-spinner v-if="!poistetut" />
-          <poistetut-haku-table v-else
-                                :poistetut="tab.poistetut"
-                                @palauta="palauta" />
+          <poistetut-haku-table
+            v-else
+            :poistetut="tab.poistetut"
+            @palauta="palauta"
+          />
         </b-tab>
       </b-tabs>
 
-      <div v-if="poistetut && poistetut.length === 0 ">{{$t('ei-poistettuja-sisaltoja')}}</div>
+      <div v-if="poistetut && poistetut.length === 0 ">
+        {{ $t('ei-poistettuja-sisaltoja') }}
+      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, onMounted, getCurrentInstance } from 'vue';
 import _ from 'lodash';
-import { Component, Vue, Prop } from 'vue-property-decorator';
-
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import PoistetutHakuTable from '@shared/components/EpPoistettuTable/PoistetutHakuTable.vue';
 import { PoistetutStore } from '@/stores/PoistetutStore';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 import { PoistettuSisaltoDtoTyyppiEnum } from '@shared/api/eperusteet';
-import { success, fail } from '@shared/utils/notifications';
+import { PerusteStore } from '@/stores/PerusteStore';
+import { $t, $success, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpSpinner,
-    PoistetutHakuTable,
-  },
-})
-export default class RoutePoistetutSisallot extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  private poistetutStore!: PoistetutStore;
+const props = defineProps<{
+  poistetutStore: PoistetutStore;
+  perusteStore: PerusteStore;
+}>();
 
-  private tabIndex = 0;
+const tabIndex = ref(0);
 
-  async mounted() {
-    await this.fetch();
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value;
+});
+
+const poistetut = computed(() => {
+  return props.poistetutStore.poistetut.value;
+});
+
+const tekstikappaleet = computed(() => {
+  return _.filter(poistetut.value, p => _.toLower(p.tyyppi) === _.toLower(PoistettuSisaltoDtoTyyppiEnum.TEKSTIKAPPALE));
+});
+
+const tabs = computed(() => {
+  return _.filter([{
+    otsikko: 'tekstikappaleet',
+    poistetut: tekstikappaleet.value,
+  }], tab => _.size(tab.poistetut) > 0);
+});
+
+const fetch = async () => {
+  if (peruste.value && peruste.value.id) {
+    await props.poistetutStore.init(perusteId.value);
   }
+};
 
-  async fetch() {
-    if (this.peruste && this.peruste.id) {
-      await this.poistetutStore.init(this.perusteId);
-    }
+const palauta = async (poistettu: any) => {
+  try {
+    await props.poistetutStore.palauta(perusteId.value, poistettu);
+    await fetch();
+    await props.perusteStore.updateNavigation();
+    $success($t('palautus-onnistui'));
   }
+  catch (e) {
+    $fail($t('virhe-palvelu-virhe'));
+  }
+};
 
-  get poistetut() {
-    return this.poistetutStore.poistetut.value;
-  }
-
-  get tabs() {
-    return _.filter([{
-      otsikko: 'tekstikappaleet',
-      poistetut: this.tekstikappaleet,
-    },
-    ], tab => _.size(tab.poistetut) > 0);
-  }
-
-  get tekstikappaleet() {
-    return _.filter(this.poistetut, p => _.toLower(p.tyyppi) === _.toLower(PoistettuSisaltoDtoTyyppiEnum.TEKSTIKAPPALE));
-  }
-
-  async palauta(poistettu: any) {
-    try {
-      await this.poistetutStore.palauta(this.perusteId, poistettu);
-      await this.fetch();
-      await this.perusteStore.updateNavigation();
-      success('palautus-onnistui');
-    }
-    catch (e) {
-      fail('virhe-palvelu-virhe');
-    }
-  }
-}
+onMounted(async () => {
+  await fetch();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -87,7 +100,7 @@ export default class RoutePoistetutSisallot extends PerusteprojektiRoute {
 
 .poistetut {
 
-  ::v-deep .tabs .nav-item a {
+  :deep(.tabs .nav-item a) {
     margin: 0;
     padding: 10px;
   }
@@ -107,5 +120,4 @@ export default class RoutePoistetutSisallot extends PerusteprojektiRoute {
     padding: 15px;
   }
 }
-
 </style>

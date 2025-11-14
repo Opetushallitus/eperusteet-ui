@@ -1,23 +1,24 @@
 <template>
   <div class="box d-inline-flex flex-column  align-items-center justify-content-center text-center">
-    <div class="count">{{count}}</div>
-    <div class="topic">{{topic}}</div>
+    <div class="count">
+      {{ count }}
+    </div>
+    <div class="topic">
+      {{ topic }}
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-
-import { Vue, Component, Prop } from 'vue-property-decorator';
+<script setup lang="ts">
 import _ from 'lodash';
 
-@Component
-export default class EpSmallDataBox extends Vue {
-  @Prop({ required: true })
-  private topic!: string;
+const props = defineProps<{
+  topic: string;
+  count: number;
+}>();
 
-  @Prop({ required: true })
-  private count!: number;
-}
+// Destructuring props into local variables for easier access in template
+const { topic, count } = props;
 </script>
 
 <style scoped lang="scss">

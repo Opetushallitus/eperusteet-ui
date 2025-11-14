@@ -5,222 +5,231 @@
     <template v-else>
       <ep-form-content name="aikavali">
         <div class="d-flex align-items-center">
-          <ep-datepicker v-model="alkupvm" :is-editing="true" />
+          <ep-datepicker
+            v-model="alkupvm"
+            :is-editing="true"
+          />
           <span class="mx-2">-</span>
-          <ep-datepicker v-model="loppupvm" :is-editing="true" endOfDay/>
+          <ep-datepicker
+            v-model="loppupvm"
+            :is-editing="true"
+            end-of-day
+          />
         </div>
       </ep-form-content>
 
-      <div>{{$t('suunnitelmien-lukumaarat-selite')}}</div>
+      <div>{{ $t('suunnitelmien-lukumaarat-selite') }}</div>
 
       <b-table
         borderless
         :items="lukumaarat"
         :fields="fields"
-        :tbody-tr-class="rowClass">
-      </b-table>
+        :tbody-tr-class="rowClass"
+      />
     </template>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed, onMounted, ref } from 'vue';
 import { TilastotStore } from '@/stores/TilastotStore';
 import { koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
 import { suunnitelmatTilastoksi, koulutustyyppiTilastoSort } from './tilastot';
+import { $t } from '@shared/utils/globals';
+import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpFormContent from '@shared/components/forms/EpFormContent.vue';
+import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 
-@Component
-export default class EpLukumaaraTilastot extends Vue {
-  @Prop({ required: true })
-  private tilastotStore!: TilastotStore;
+const props = defineProps<{
+  tilastotStore: TilastotStore;
+}>();
 
-  alkupvm: number | null = null;
-  loppupvm: number | null = null;
+const alkupvm = ref<number | null>(null);
+const loppupvm = ref<number | null>(null);
 
-  mounted() {
-    this.alkupvm = new Date().setMonth(new Date().getMonth() - 4);
-    this.loppupvm = new Date().getTime();
-  }
+onMounted(() => {
+  alkupvm.value = new Date().setMonth(new Date().getMonth() - 4);
+  loppupvm.value = new Date().getTime();
+});
 
-  get toteutussuunnitelmat() {
-    return this.tilastotStore.toteutussuunnitelmat.value;
-  }
+const toteutussuunnitelmat = computed(() => {
+  return props.tilastotStore.toteutussuunnitelmat.value;
+});
 
-  get opetussuunnitelmat() {
-    return this.tilastotStore.opetussuunnitelmat.value;
-  }
+const opetussuunnitelmat = computed(() => {
+  return props.tilastotStore.opetussuunnitelmat.value;
+});
 
-  get suunnitelmat() {
-    return [
-      ...this.toteutussuunnitelmat ?? [],
-      ...this.opetussuunnitelmat ?? [],
-    ];
-  }
+const suunnitelmat = computed(() => {
+  return [
+    ...toteutussuunnitelmat.value ?? [],
+    ...opetussuunnitelmat.value ?? [],
+  ];
+});
 
-  get lukumaarat() {
-    let lukumaarat = _.chain([
-      ...this.suunnitelmaLukumaarat,
-      ...this.ryhmaLukumaarat,
-    ])
-      .sortBy((rivi: any) => koulutustyyppiTilastoSort[rivi.koulutustyyppi] ?? 99)
-      .sortBy((rivi: any) => rivi.tyyppi === 'ryhma' ? 0 : 1)
-      .sortBy((rivi: any) => koulutustyyppiRyhmaSort[rivi.ryhma] ?? 99)
-      .value();
+const suunnitelmaLukumaarat = computed(() => {
+  return suunnitelmatTilastoksi(suunnitelmat.value, alkupvm.value!, loppupvm.value!);
+});
 
-    lukumaarat = [
-      ...lukumaarat,
-      this.kaikkiYhteensa,
-    ];
-
-    let evenrow = false;
-    lukumaarat = _.map(lukumaarat, (rivi, index) => {
-      if (index > 0) {
-        if (!_.isEqual(rivi.ryhma, (lukumaarat as any[])[index - 1]?.ryhma)) {
-          evenrow = !evenrow;
-        }
-      }
-
+const ryhmaLukumaarat = computed(() => {
+  return _.chain(suunnitelmaLukumaarat.value)
+    .groupBy('ryhma')
+    .map((ryhma: any) => {
       return {
-        ...rivi,
-        evenrow,
+        koulutustyyppi: ryhma[0].ryhma,
+        ryhma: ryhma[0].ryhma,
+        julkaistut: _.sumBy(ryhma, 'julkaistut'),
+        luonnokset: _.sumBy(ryhma, 'luonnokset'),
+        arkistoidut: _.sumBy(ryhma, 'arkistoidut'),
+        yhteensa: _.sumBy(ryhma, 'yhteensa'),
+        uusia: _.sumBy(ryhma, 'uusia'),
+        tyyppi: 'ryhma',
       };
-    });
+    })
+    .filter(ryhma => _.size(_.filter((suunnitelmaLukumaarat.value as any[]), suunnitelma => suunnitelma.ryhma === ryhma.ryhma)) > 1)
+    .value();
+});
 
-    return lukumaarat;
-  }
+const kaikkiYhteensa = computed(() => {
+  return {
+    koulutustyyppi: 'kaikki-yhteensa',
+    ryhma: 'kaikki-yhteensa',
+    tyyppi: 'kaikki-yhteensa',
+    julkaistut: _.sumBy(suunnitelmaLukumaarat.value, 'julkaistut'),
+    luonnokset: _.sumBy(suunnitelmaLukumaarat.value, 'luonnokset'),
+    arkistoidut: _.sumBy(suunnitelmaLukumaarat.value, 'arkistoidut'),
+    yhteensa: _.sumBy(suunnitelmaLukumaarat.value, 'yhteensa'),
+    uusia: _.sumBy(suunnitelmaLukumaarat.value, 'uusia'),
+  };
+});
 
-  get kaikkiYhteensa() {
+const lukumaarat = computed(() => {
+  let lukumaarat = _.chain([
+    ...suunnitelmaLukumaarat.value,
+    ...ryhmaLukumaarat.value,
+  ])
+    .sortBy((rivi: any) => koulutustyyppiTilastoSort[rivi.koulutustyyppi] ?? 99)
+    .sortBy((rivi: any) => rivi.tyyppi === 'ryhma' ? 0 : 1)
+    .sortBy((rivi: any) => koulutustyyppiRyhmaSort[rivi.ryhma] ?? 99)
+    .value();
+
+  lukumaarat = [
+    ...lukumaarat,
+    kaikkiYhteensa.value,
+  ];
+
+  let evenrow = false;
+  lukumaarat = _.map(lukumaarat, (rivi, index) => {
+    if (index > 0) {
+      if (!_.isEqual(rivi.ryhma, (lukumaarat as any[])[index - 1]?.ryhma)) {
+        evenrow = !evenrow;
+      }
+    }
+
     return {
-      koulutustyyppi: 'kaikki-yhteensa',
-      ryhma: 'kaikki-yhteensa',
-      tyyppi: 'kaikki-yhteensa',
-      julkaistut: _.sumBy(this.suunnitelmaLukumaarat, 'julkaistut'),
-      luonnokset: _.sumBy(this.suunnitelmaLukumaarat, 'luonnokset'),
-      arkistoidut: _.sumBy(this.suunnitelmaLukumaarat, 'arkistoidut'),
-      yhteensa: _.sumBy(this.suunnitelmaLukumaarat, 'yhteensa'),
-      uusia: _.sumBy(this.suunnitelmaLukumaarat, 'uusia'),
+      ...rivi,
+      evenrow,
     };
-  }
+  });
 
-  get suunnitelmaLukumaarat() {
-    return suunnitelmatTilastoksi(this.suunnitelmat, this.alkupvm!, this.loppupvm!);
-  }
+  return lukumaarat;
+});
 
-  get ryhmaLukumaarat() {
-    return _.chain(this.suunnitelmaLukumaarat)
-      .groupBy('ryhma')
-      .map((ryhma: any) => {
-        return {
-          koulutustyyppi: ryhma[0].ryhma,
-          ryhma: ryhma[0].ryhma,
-          julkaistut: _.sumBy(ryhma, 'julkaistut'),
-          luonnokset: _.sumBy(ryhma, 'luonnokset'),
-          arkistoidut: _.sumBy(ryhma, 'arkistoidut'),
-          yhteensa: _.sumBy(ryhma, 'yhteensa'),
-          uusia: _.sumBy(ryhma, 'uusia'),
-          tyyppi: 'ryhma',
-        };
-      })
-      .filter(ryhma => _.size(_.filter((this.suunnitelmaLukumaarat as any[]), suunnitelma => suunnitelma.ryhma === ryhma.ryhma)) > 1)
-      .value();
-  }
+const koulutustyyppiKiellelinenMuutos = computed(() => {
+  return {
+    'koulutustyyppi_muu': 'jotpa-rahoitteisia',
+  };
+});
 
-  get koulutustyyppiKiellelinenMuutos() {
-    return {
-      'koulutustyyppi_muu': 'jotpa-rahoitteisia',
-    };
-  }
+const fields = computed(() => {
+  return [
+    {
+      key: 'koulutustyyppi',
+      label: $t('koulutustyyppi'),
+      formatter: (value: string) => $t(koulutustyyppiKiellelinenMuutos.value[value] ?? value),
+    },
+    {
+      key: 'julkaistut',
+      label: $t('julkaistut'),
+      thClass: 'text-right otsikko',
+      tdClass: 'text-right',
+    },
+    {
+      key: 'luonnokset',
+      label: $t('luonnokset'),
+      thClass: 'text-right otsikko',
+      tdClass: 'text-right',
+    },
+    {
+      key: 'arkistoidut',
+      label: $t('arkistoidut'),
+      thClass: 'text-right otsikko',
+      tdClass: 'text-right',
+    },
+    {
+      key: 'yhteensa',
+      label: $t('yhteensa'),
+      thClass: 'text-right otsikko',
+      tdClass: 'text-right',
+    },
+    {
+      key: 'uusia',
+      label: $t('uusia-aikavalilla'),
+      thClass: 'text-right uusia',
+      tdClass: 'text-right uusia',
+    },
+  ];
+});
 
-  get fields() {
-    return [
-      {
-        key: 'koulutustyyppi',
-        label: this.$t('koulutustyyppi'),
-        formatter: (value: string) => this.$t(this.koulutustyyppiKiellelinenMuutos[value] ?? value),
-      },
-      {
-        key: 'julkaistut',
-        label: this.$t('julkaistut'),
-        thClass: 'text-right otsikko',
-        tdClass: 'text-right',
-      },
-      {
-        key: 'luonnokset',
-        label: this.$t('luonnokset'),
-        thClass: 'text-right otsikko',
-        tdClass: 'text-right',
-      },
-      {
-        key: 'arkistoidut',
-        label: this.$t('arkistoidut'),
-        thClass: 'text-right otsikko',
-        tdClass: 'text-right',
-      },
-      {
-        key: 'yhteensa',
-        label: this.$t('yhteensa'),
-        thClass: 'text-right otsikko',
-        tdClass: 'text-right',
-      },
-      {
-        key: 'uusia',
-        label: this.$t('uusia-aikavalilla'),
-        thClass: 'text-right uusia',
-        tdClass: 'text-right uusia',
-      },
-    ];
-  }
+const rowClass = (item, type) => {
+  if (!item || type !== 'row') return;
+  let rowClass = '';
+  if (item.tyyppi !== 'ryhma' && _.includes(_.map(ryhmaLukumaarat.value, 'ryhma'), item.ryhma)) rowClass += 'ryhman-alainen-rivi ';
+  if (item.evenrow) rowClass += 'even-row ';
 
-  rowClass(item, type) {
-    if (!item || type !== 'row') return;
-    let rowClass = '';
-    if (item.tyyppi !== 'ryhma' && _.includes(_.map(this.ryhmaLukumaarat, 'ryhma'), item.ryhma)) rowClass += 'ryhman-alainen-rivi ';
-    if (item.evenrow) rowClass += 'even-row ';
-
-    return rowClass + item.tyyppi;
-  }
-}
+  return rowClass + item.tyyppi;
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
 
-::v-deep .table {
+:deep(.table) {
   border-collapse: collapse !important;
 }
 
-::v-deep .table .ryhma, ::v-deep .table .kaikki-yhteensa {
+:deep(.table .ryhma), :deep(.table .kaikki-yhteensa) {
   font-weight: bold;
 }
 
-::v-deep .table .kaikki-yhteensa td {
+:deep(.table .kaikki-yhteensa td) {
   border-top: 2px solid #ccc;
   border-bottom: 2px solid #ccc;
 }
 
-::v-deep .otsikko {
+:deep(.otsikko) {
   width: 150px;
 }
 
-::v-deep .uusia {
+:deep(.uusia) {
   width: 200px;
   border-left: 2px solid #ccc;
 }
 
-::v-deep .ryhman-alainen-rivi td {
+:deep(.ryhman-alainen-rivi td) {
   padding-left: 25px;
 }
 
-::v-deep .even-row td {
+:deep(.even-row td) {
   background-color: $table-odd-row-bg-color;
 }
 
-::v-deep .table {
+:deep(.table) {
   border-collapse: separate;
 }
 
-::v-deep .table > thead  {
+:deep(.table > thead) {
   background-color: $white;
   position: sticky !important;
   top: 0px;

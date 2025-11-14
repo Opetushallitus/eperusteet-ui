@@ -5,84 +5,95 @@
     </template>
 
     <b-tabs>
-      <b-tab :title="$t('suunnitelmien-lukumaarat')" class="mt-3 taulukko-graafi">
+      <b-tab
+        :title="$t('suunnitelmien-lukumaarat')"
+        class="mt-3 taulukko-graafi"
+      >
         <b-tabs pills>
-          <b-tab :title="$t('taulukko')" active>
-            <EpLukumaaraTilastot :tilastotStore="tilastotStore" class="mt-4"/>
+          <b-tab
+            :title="$t('taulukko')"
+            active
+          >
+            <EpLukumaaraTilastot
+              :tilastot-store="tilastotStore"
+              class="mt-4"
+            />
           </b-tab>
           <b-tab :title="$t('graafi')">
-            <EpLukumaaraGraafit :tilastotStore="tilastotStore" class="mt-4"/>
+            <EpLukumaaraGraafit
+              :tilastot-store="tilastotStore"
+              class="mt-4"
+            />
           </b-tab>
         </b-tabs>
       </b-tab>
 
-      <b-tab :title="$t('amosaa-tyokalu')" class="mt-5">
+      <b-tab
+        :title="$t('amosaa-tyokalu')"
+        class="mt-5"
+      >
         <EpAmosaaTilastot :toteutussuunnitelmat="toteutussuunnitelmat" />
       </b-tab>
 
-      <b-tab :title="$t('ops-tyokalu')" class="mt-5">
-        <EpYlopsTilastot :opetussuunnitelmat="opetussuunnitelmat" :perusteet="perusteet"/>
+      <b-tab
+        :title="$t('ops-tyokalu')"
+        class="mt-5"
+      >
+        <EpYlopsTilastot
+          :opetussuunnitelmat="opetussuunnitelmat"
+          :perusteet="perusteet"
+        />
       </b-tab>
-
     </b-tabs>
-
   </ep-main-view>
 </template>
 
-<script lang="ts" >
-import { Component, Vue, Prop } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted, getCurrentInstance } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { TilastotStore } from '@/stores/TilastotStore';
 import EpAmosaaTilastot from '@/components/tilastot/EpAmosaaTilastot.vue';
 import EpYlopsTilastot from '@/components/tilastot/EpYlopsTilastot.vue';
 import EpLukumaaraTilastot from '@/components/tilastot/EpLukumaaraTilastot.vue';
 import EpLukumaaraGraafit from '@/components/tilastot/EpLukumaaraGraafit.vue';
+import { $t, $fail } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpAmosaaTilastot,
-    EpYlopsTilastot,
-    EpLukumaaraTilastot,
-    EpLukumaaraGraafit,
-  },
-})
-export default class RouteTilastot extends Vue {
-  @Prop({ required: true })
-  private tilastotStore!: TilastotStore;
+const props = defineProps<{
+  tilastotStore: TilastotStore;
+}>();
 
-  async mounted() {
-    try {
-      await this.tilastotStore.fetch();
-    }
-    catch (e) {
-      this.$fail(this.$t('virhe-palvelu-virhe') as string);
-    }
+
+const toteutussuunnitelmat = computed(() => {
+  return props.tilastotStore.toteutussuunnitelmat.value;
+});
+
+const opetussuunnitelmat = computed(() => {
+  return props.tilastotStore.opetussuunnitelmat.value;
+});
+
+const perusteet = computed(() => {
+  return props.tilastotStore.perusteet.value;
+});
+
+onMounted(async () => {
+  try {
+    await props.tilastotStore.fetch();
   }
-
-  get toteutussuunnitelmat() {
-    return this.tilastotStore.toteutussuunnitelmat.value;
+  catch (e) {
+    $fail($t('virhe-palvelu-virhe') as string);
   }
-
-  get opetussuunnitelmat() {
-    return this.tilastotStore.opetussuunnitelmat.value;
-  }
-
-  get perusteet() {
-    return this.tilastotStore.perusteet.value;
-  }
-}
+});
 </script>
 
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
 
-::v-deep .container{
+:deep(.container) {
   max-width: 1500px;
 }
 
-::v-deep .taulukko-graafi .nav-pills .nav-item {
+:deep(.taulukko-graafi .nav-pills .nav-item) {
   border: 2px solid #3367E3;
 
   .nav-link {
@@ -90,14 +101,13 @@ export default class RouteTilastot extends Vue {
   }
 }
 
-::v-deep .taulukko-graafi .nav-pills .nav-item:first-child {
+:deep(.taulukko-graafi .nav-pills .nav-item:first-child) {
   border-top-left-radius: 0.5rem;
   border-bottom-left-radius: 0.5rem;
 }
 
-::v-deep .taulukko-graafi .nav-pills .nav-item:last-child {
+:deep(.taulukko-graafi .nav-pills .nav-item:last-child) {
   border-top-right-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem
+  border-bottom-right-radius: 0.5rem;
 }
-
 </style>

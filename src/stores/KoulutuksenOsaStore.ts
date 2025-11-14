@@ -1,11 +1,8 @@
-import Vue from 'vue';
-import VueCompositionApi, { computed } from '@vue/composition-api';
-import { required, minValue } from 'vuelidate/lib/validators';
+import { computed } from 'vue';
+import { required, minValue } from '@vuelidate/validators';
 import { translated } from '@shared/validators/required';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { AbstractPerusteenOsaViiteStore } from '@/stores/AbstractPerusteenOsaViiteStore';
-
-Vue.use(VueCompositionApi);
 
 export class KoulutuksenOsaStore extends AbstractPerusteenOsaViiteStore implements IEditoitava {
   constructor(

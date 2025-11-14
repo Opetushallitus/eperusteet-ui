@@ -1,10 +1,7 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { Oppaat, OpasLuontiDto, PerusteHakuDto } from '@shared/api/eperusteet';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import _ from 'lodash';
-
-Vue.use(VueCompositionApi);
 
 interface Breadcrumb {
   label: string;
@@ -18,8 +15,7 @@ export class BreadcrumbStore {
 
   public readonly breacrumbs = computed(() => this.state.crumbs);
 
-  @Debounced(10)
-  public async update(value: Breadcrumb[]) {
+  public update = debounced(async (value: Breadcrumb[]) => {
     this.state.crumbs = value;
-  }
+  }, 10);
 }

@@ -1,33 +1,51 @@
 <template>
   <div>
-
     <template v-if="isEditing">
-      <EpMultiSelect v-model="model"
-                 :placeholder="$t('maarays-asiasanat-placeholder')"
-                 :tagPlaceholder="$t('maarays-asiasanat-lisays-placeholder')"
-                 :search-identity="identity"
-                 :options="valittavatAsiasanat"
-                 :maxHeight="500"
-                 :multiple="true"
-                 :closeOnSelect="false"
-                 :taggable="true"
-                 @tag="lisaaAsiasana">
-
-        <template slot="option" slot-scope="{ option }">
+      <EpMultiSelect
+        v-model="model"
+        :placeholder="$t('maarays-asiasanat-placeholder')"
+        :tag-placeholder="$t('maarays-asiasanat-lisays-placeholder')"
+        :search-identity="identity"
+        :options="valittavatAsiasanat"
+        :max-height="500"
+        :multiple="true"
+        :close-on-select="false"
+        :taggable="true"
+        @tag="lisaaAsiasana"
+      >
+        <template #option="{ option }">
           <span v-if="option.label">{{ option.label }}</span>
           <span v-else>{{ option }}</span>
         </template>
 
-        <template v-slot:checkbox><span/></template>
+        <template #checkbox>
+          <span />
+        </template>
 
-        <template slot="selection" slot-scope="{ values }">
-          <div class="d-flex align-items-center" :class="{'mb-2': values.length > 0}">
-            <span class="multiselect__tag" v-for="value in values" :key="'value' + value">
+        <template #selection="{ values }">
+          <div
+            class="d-flex align-items-center"
+            :class="{'mb-2': values.length > 0}"
+          >
+            <span
+              v-for="value in values"
+              :key="'value' + value"
+              class="multiselect__tag"
+            >
               <span class="nimi">{{ value }}</span>
-              <span class="multiselect__tag-icon clickable" @click.prevent @mousedown.prevent.stop="poista(value)"/>
+              <span
+                class="multiselect__tag-icon clickable"
+                @click.prevent
+                @mousedown.prevent.stop="poista(value)"
+              />
             </span>
 
-            <span v-if="values.length > 0" class="ml-auto clickable border-right pr-2 remove-all" @click.prevent @mousedown.prevent.stop="poistaKaikki()">
+            <span
+              v-if="values.length > 0"
+              class="ml-auto clickable border-right pr-2 remove-all"
+              @click.prevent
+              @mousedown.prevent.stop="poistaKaikki()"
+            >
               <ep-material-icon>close</ep-material-icon>
             </span>
           </div>
@@ -36,82 +54,86 @@
     </template>
 
     <ul v-else>
-      <li v-for="(asiasana, index) in model" :key="'asiasana' + index">{{asiasana}}</li>
+      <li
+        v-for="(asiasana, index) in model"
+        :key="'asiasana' + index"
+      >
+        {{ asiasana }}
+      </li>
     </ul>
-
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
+import { computed } from 'vue';
+import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMaterialIcon,
-    EpMultiSelect,
-    EpButton,
-    EpInput,
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    required: true,
   },
-})
-export default class EpMaaraysAsiasanat extends Vue {
-  @Prop({ required: true })
-  value!: any[];
+  asiasanat: {
+    type: Array,
+    required: true,
+  },
+  isEditing: {
+    type: Boolean,
+    required: false,
+  },
+});
 
-  @Prop({ required: true })
-  asiasanat!: any[];
+const emit = defineEmits(['update:modelValue']);
 
-  @Prop({ required: false })
-  isEditing!: boolean;
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  set model(val) {
-    this.$emit('input', val);
+const valittavatAsiasanat = computed(() => {
+  if (props.asiasanat && model.value) {
+    return _.uniq([
+      ...props.asiasanat,
+      ...model.value,
+    ]);
   }
 
-  get model() {
-    return this.value;
-  }
+  return [];
+});
 
-  get valittavatAsiasanat() {
-    if (this.asiasanat && this.model) {
-      return _.uniq([
-        ...this.asiasanat,
-        ...this.model,
-      ]);
-    }
+const identity = (asiasana) => {
+  return asiasana;
+};
 
-    return [];
-  }
+const lisaaAsiasana = (uusiAsiasana) => {
+  model.value = [
+    ...model.value,
+    uusiAsiasana,
+  ];
+};
 
-  identity(asiasana) {
-    return asiasana;
-  }
+const poista = (asiasana) => {
+  model.value = _.without(model.value, asiasana);
+};
 
-  lisaaAsiasana(uusiAsiasana) {
-    this.model = [
-      ...this.model,
-      uusiAsiasana,
-    ];
-  }
-
-  poista(asiasana) {
-    this.model = _.without(this.model, asiasana);
-  }
-
-  poistaKaikki() {
-    this.model = [];
-  }
-}
+const poistaKaikki = () => {
+  model.value = [];
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
 
-::v-deep .multiselect__tags {
+:deep(.multiselect__tags) {
   .multiselect__tag {
     .nimi {
       margin-left: 5px;
@@ -119,5 +141,4 @@ export default class EpMaaraysAsiasanat extends Vue {
     }
   }
 }
-
 </style>

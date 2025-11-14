@@ -1,7 +1,7 @@
-import { computed, reactive } from '@vue/composition-api';
+import { computed, reactive } from 'vue';
 import { Page } from '@shared/tyypit';
 import { Osaamismerkit, OsaamismerkitQuery, OsaamismerkkiDto } from '@shared/api/eperusteet';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import { OsaamismerkkiKategoriaDto } from '@shared/generated/eperusteet';
 
 export class OsaamismerkitStore {
@@ -25,11 +25,10 @@ export class OsaamismerkitStore {
     await this.fetchKategoriat();
   }
 
-  @Debounced(300)
-  public async updateOsaamismerkkiQuery(query: OsaamismerkitQuery) {
+  public updateOsaamismerkkiQuery = debounced(async (query: OsaamismerkitQuery) => {
     this.state.osaamismerkkiPage = null;
     this.state.osaamismerkkiPage = await this.fetchOsaamismerkitImpl(query);
-  }
+  });
 
   private async fetchOsaamismerkitImpl(q: OsaamismerkitQuery) {
     const res = (await Osaamismerkit.findOsaamismerkitBy(

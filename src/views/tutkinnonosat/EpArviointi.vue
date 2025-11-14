@@ -1,173 +1,227 @@
 <template>
   <b-form-group>
-    <div slot="label">
-      <div v-if="isEditing" class="mb-2">{{$t('ammattitaitovaatimus-tekemisena')}}</div>
-      <EpInput :isEditing="isEditing" v-model="arvioinninKohdeAlue.otsikko" :class="{'mb-3': isEditing }"/>
-    </div>
-    <draggable v-bind="defaultDragOptions"
-               tag="div"
-               v-model="arvioinninKohdeAlue.arvioinninKohteet">
-      <div class="ml-3 mt-2 d-flex" v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet" :key="'arvioinninKohde' + arvindex">
-        <div v-if="isEditing" class="order-handle">
+    <template #label>
+      <div>
+        <div
+          v-if="isEditing"
+          class="mb-2"
+        >
+          {{ $t('ammattitaitovaatimus-tekemisena') }}
+        </div>
+        <EpInput
+          v-model="arvioinninKohdeAlue.otsikko"
+          :is-editing="isEditing"
+          :class="{'mb-3': isEditing }"
+        />
+      </div>
+    </template>
+    <VueDraggable
+      v-bind="defaultDragOptions"
+      v-model="arvioinninKohdeAlue.arvioinninKohteet"
+      tag="div"
+    >
+      <div
+        v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet"
+        :key="'arvioinninKohde' + arvindex"
+        class="ml-3 mt-2 d-flex"
+      >
+        <div
+          v-if="isEditing"
+          class="order-handle"
+        >
           <EpMaterialIcon>drag_indicator</EpMaterialIcon>
         </div>
         <div class="w-100">
           <div class="mb-2">
-            <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)">
-              <span v-if="isEditing">{{$t('ryhmittelyotsikko-vapaaehtoinen')}}</span>
-              <span v-if="!isEditing">{{$t('ryhmittelyotsikko')}}</span>
+            <div
+              v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)"
+              class="mb-1 font-weight-600"
+            >
+              <span v-if="isEditing">{{ $t('ryhmittelyotsikko-vapaaehtoinen') }}</span>
+              <span v-if="!isEditing">{{ $t('ryhmittelyotsikko') }}</span>
             </div>
-            <EpInput :isEditing="isEditing" v-model="arvioinninKohde.otsikko" />
+            <EpInput
+              v-model="arvioinninKohde.otsikko"
+              :is-editing="isEditing"
+            />
           </div>
           <div class="mb-3">
-            <div class="mb-1 font-weight-600" v-if="isEditing || !!$kaanna(arvioinninKohde.selite)">{{$t('arvioinnin-kohde')}}</div>
-            <EpInput :isEditing="isEditing" v-model="arvioinninKohde.selite" />
+            <div
+              v-if="isEditing || !!$kaanna(arvioinninKohde.selite)"
+              class="mb-1 font-weight-600"
+            >
+              {{ $t('arvioinnin-kohde') }}
+            </div>
+            <EpInput
+              v-model="arvioinninKohde.selite"
+              :is-editing="isEditing"
+            />
           </div>
 
           <template v-if="!arvioinninKohde._arviointiAsteikko">
-            <div class="font-weight-600">{{$t('arviointi-asteikon-valinta')}}</div>
-            <b-form-radio-group v-model="arvioinninKohde._arviointiAsteikko" stacked @input="arviointiVaihdos(arvioinninKohde)" class="mt-2">
-              <b-form-radio
-                class="mt-2"
-                v-for="arviointiasteikko in arviointiasteikot"
-                name="arviointiasteikko"
-                :value="arviointiasteikko.id"
-                :key="'arviointiasteikko-' + arviointiasteikko.id">
-
-              <span v-for="(osaamistaso, index) in arviointiasteikko.osaamistasot" :key="'osaamistaso' + osaamistaso.id">
+            <div class="font-weight-600">
+              {{ $t('arviointi-asteikon-valinta') }}
+            </div>
+            <EpRadio
+              v-for="arviointiasteikko in arviointiasteikot"
+              :key="'arviointiasteikko-' + arviointiasteikko.id"
+              v-model="arvioinninKohde._arviointiAsteikko"
+              :value="arviointiasteikko.id"
+              :is-editing="isEditing"
+              @update:model-value="arviointiVaihdos(arvioinninKohde)"
+            >
+              <span
+                v-for="(osaamistaso, index) in arviointiasteikko.osaamistasot"
+                :key="'osaamistaso' + osaamistaso.id"
+              >
                 <span v-if="index > 0"> / </span>
-                {{$kaanna(osaamistaso.otsikko)}}
+                {{ $kaanna(osaamistaso.otsikko) }}
               </span>
-
-              </b-form-radio>
-            </b-form-radio-group>
+            </EpRadio>
           </template>
 
           <template v-else>
             <OsaamistasonKriteeri
-              class="mb-3 ml-0 p-1 taulukko-rivi-varitys"
               v-for="(osaamistasonkriteeri, osaamistasoIndex) in arvioinninKohde.osaamistasonKriteerit"
               :key="'osaamistasonkriteeri'+osaamistasonkriteeri._osaamistaso"
               v-model="arvioinninKohde.osaamistasonKriteerit[osaamistasoIndex]"
-              :isEditing="isEditing"
+              class="mb-3 ml-0 p-1 taulukko-rivi-varitys"
+              :is-editing="isEditing"
               :arviointiasteikko="arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko]"
             />
           </template>
 
-          <div class="d-flex mb-2 mt-4" :class="{'justify-content-end' : !arvioinninKohde._arviointiAsteikko, 'justify-content-between': arvioinninKohde._arviointiAsteikko}">
-            <EpButton v-if="isEditing && arvioinninKohde._arviointiAsteikko" variant="link" icon="refresh" @click="poistaArviointiasteikko(arvioinninKohde)">
-              {{$t('vaihda-arviointiasteikko')}}
+          <div
+            class="d-flex mb-2 mt-4"
+            :class="{'justify-content-end' : !arvioinninKohde._arviointiAsteikko, 'justify-content-between': arvioinninKohde._arviointiAsteikko}"
+          >
+            <EpButton
+              v-if="isEditing && arvioinninKohde._arviointiAsteikko"
+              variant="link"
+              icon="refresh"
+              @click="poistaArviointiasteikko(arvioinninKohde)"
+            >
+              {{ $t('vaihda-arviointiasteikko') }}
             </EpButton>
 
-            <EpButton v-if="isEditing" variant="link" icon="delete" @click="poistaArvioinninKohde(arvioinninKohde)">
-              {{$t('poista-ryhmittelyotsikko')}}
+            <EpButton
+              v-if="isEditing"
+              variant="link"
+              icon="delete"
+              @click="poistaArvioinninKohde(arvioinninKohde)"
+            >
+              {{ $t('poista-ryhmittelyotsikko') }}
             </EpButton>
           </div>
 
-          <hr v-if="arvindex < arvioinninKohdeAlue.arvioinninKohteet.length - 1" class="mb-2"/>
+          <hr
+            v-if="arvindex < arvioinninKohdeAlue.arvioinninKohteet.length - 1"
+            class="mb-2"
+          >
         </div>
       </div>
-    </draggable>
-    <hr v-if="isEditing" class="mb-2"/>
+    </VueDraggable>
+    <hr
+      v-if="isEditing"
+      class="mb-2"
+    >
     <div class="d-flex justify-content-between">
-      <EpButton v-if="isEditing" variant="outline" icon="add" @click="lisaaArvionninkohde">{{$t('lisaa-ryhmittelyotsikko')}}</EpButton>
+      <EpButton
+        v-if="isEditing"
+        variant="outline"
+        icon="add"
+        @click="lisaaArvionninkohde"
+      >
+        {{ $t('lisaa-ryhmittelyotsikko') }}
+      </EpButton>
       <slot name="poisto" />
     </div>
   </b-form-group>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import draggable from 'vuedraggable';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { VueDraggable } from 'vue-draggable-plus';
+import { computed } from 'vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import OsaamistasonKriteeri from '@/views/tutkinnonosat/OsaamistasonKriteeri.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
+import { $t, $kaanna } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
-@Component({
-  components: {
-    EpMaterialIcon,
-    draggable,
-    EpInput,
-    EpButton,
-    OsaamistasonKriteeri,
+const props = defineProps<{
+  modelValue: any;
+  isEditing: boolean;
+  arviointiasteikot: any;
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const arvioinninKohdeAlue = computed({
+  get() {
+    return props.modelValue;
   },
-})
-export default class EpArviointi extends Vue {
-  @Prop({ required: true })
-  private value!: any;
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: true })
-  private isEditing!: boolean;
+const kieli = computed(() => {
+  return Kielet.getSisaltoKieli.value;
+});
 
-  @Prop({ required: true })
-  private arviointiasteikot!: any;
-
-  get arvioinninKohdeAlue() {
-    return this.value;
-  }
-
-  set arvioinninKohdeAlue(val) {
-    this.$emit('input', val);
-  }
-
-  get kieli() {
-    return Kielet.getSisaltoKieli.value;
-  }
-
-  get arviointiasteikotKeyById() {
-    return _.keyBy(_.map(this.arviointiasteikot, arviointiasteikko => {
-      return {
-        ...arviointiasteikko,
-        osaamistasot: _.keyBy(arviointiasteikko.osaamistasot, 'id'),
-      };
-    }), 'id');
-  }
-
-  lisaaArvionninkohde() {
-    this.arvioinninKohdeAlue.arvioinninKohteet = [
-      ...this.arvioinninKohdeAlue.arvioinninKohteet,
-      {
-        selite: {
-          [this.kieli]: this.$t('opiskelija') },
-      },
-    ];
-  }
-
-  poistaArvioinninKohde(poistettavaKohde) {
-    this.arvioinninKohdeAlue.arvioinninKohteet = _.filter(this.arvioinninKohdeAlue.arvioinninKohteet, arvioinninKohde => arvioinninKohde !== poistettavaKohde);
-  }
-
-  arviointiVaihdos(muokattavaArvioinninKohde) {
-    this.arvioinninKohdeAlue.arvioinninKohteet = _.map(this.arvioinninKohdeAlue.arvioinninKohteet, arvioinninKohde => {
-      if (arvioinninKohde === muokattavaArvioinninKohde) {
-        const arviointiasteikko = this.arviointiasteikotKeyById[arvioinninKohde._arviointiAsteikko];
-        return {
-          ...arvioinninKohde,
-          osaamistasonKriteerit: _.map(arviointiasteikko.osaamistasot, osaamistaso => ({
-            _osaamistaso: _.toString(osaamistaso.id),
-            kriteerit: [],
-          })),
-        };
-      }
-
-      return arvioinninKohde;
-    });
-  }
-
-  poistaArviointiasteikko(arvioinninKohde) {
-    arvioinninKohde._arviointiAsteikko = null;
-  }
-
-  get defaultDragOptions() {
+const arviointiasteikotKeyById = computed(() => {
+  return _.keyBy(_.map(props.arviointiasteikot, arviointiasteikko => {
     return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
+      ...arviointiasteikko,
+      osaamistasot: _.keyBy(arviointiasteikko.osaamistasot, 'id'),
     };
-  }
+  }), 'id');
+});
+
+function lisaaArvionninkohde() {
+  arvioinninKohdeAlue.value.arvioinninKohteet = [
+    ...arvioinninKohdeAlue.value.arvioinninKohteet,
+    {
+      selite: {
+        [kieli.value]: $t('opiskelija') },
+    },
+  ];
 }
+
+function poistaArvioinninKohde(poistettavaKohde: any) {
+  arvioinninKohdeAlue.value.arvioinninKohteet = _.filter(arvioinninKohdeAlue.value.arvioinninKohteet, arvioinninKohde => arvioinninKohde !== poistettavaKohde);
+}
+
+function arviointiVaihdos(muokattavaArvioinninKohde: any) {
+  arvioinninKohdeAlue.value.arvioinninKohteet = _.map(arvioinninKohdeAlue.value.arvioinninKohteet, arvioinninKohde => {
+    if (arvioinninKohde === muokattavaArvioinninKohde) {
+      const arviointiasteikko = arviointiasteikotKeyById.value[arvioinninKohde._arviointiAsteikko];
+      return {
+        ...arvioinninKohde,
+        osaamistasonKriteerit: _.map(arviointiasteikko.osaamistasot, osaamistaso => ({
+          _osaamistaso: _.toString(osaamistaso.id),
+          kriteerit: [],
+        })),
+      };
+    }
+
+    return arvioinninKohde;
+  });
+}
+
+function poistaArviointiasteikko(arvioinninKohde: any) {
+  arvioinninKohde._arviointiAsteikko = null;
+}
+
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+  };
+});
 </script>
 
 <style scoped lang="scss">

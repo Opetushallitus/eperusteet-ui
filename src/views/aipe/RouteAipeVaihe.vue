@@ -1,74 +1,140 @@
 <template>
-  <EpEditointi :store="store" :versionumero="versionumero">
+  <EpEditointi
+    :store="store"
+    :versionumero="versionumero"
+  >
     <template #header="{ data }">
-      <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
+      <h2 v-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing }">
       <div class="col-11 pl-0">
-
-        <div class="mt-1" v-if="isEditing">
-          <h3>{{$t('vaiheen-nimi')}} *</h3>
-          <ep-input v-model="data.nimi" :is-editing="true"></ep-input>
+        <div
+          v-if="isEditing"
+          class="mt-1"
+        >
+          <h3>{{ $t('vaiheen-nimi') }} *</h3>
+          <ep-input
+            v-model="data.nimi"
+            :is-editing="true"
+          />
         </div>
 
-        <hr v-if="isEditing" class="mt-5"/>
+        <hr
+          v-if="isEditing"
+          class="mt-5"
+        >
 
-        <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava']" />
+        <EpSisaltoTekstikappaleet
+          v-model="storeData"
+          :is-editing="isEditing"
+          :sisalto-avaimet="['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava']"
+        />
 
         <template v-if="vaiheId">
           <b-form-group :label="$t('oppiaineet')">
-            <draggable
+            <VueDraggable
               v-bind="oppiaineetDragOptions"
+              v-model="data.oppiaineet"
               tag="div"
-              v-model="data.oppiaineet">
-                <div class="oppiaine p-3 d-flex" v-for="oppiaine in data.oppiaineet" :key="'oppiaine'+oppiaine.id">
-                  <EpMaterialIcon v-if="isEditing" class="order-handle mr-2">drag_indicator</EpMaterialIcon>
-                  <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppiaine.id } }">{{ $kaanna(oppiaine.nimi) || $t('nimeton-oppiaine') }}</router-link>
-                </div>
-            </draggable>
+            >
+              <div
+                v-for="oppiaine in data.oppiaineet"
+                :key="'oppiaine'+oppiaine.id"
+                class="oppiaine p-3 d-flex"
+              >
+                <EpMaterialIcon
+                  v-if="isEditing"
+                  class="order-handle mr-2"
+                >
+                  drag_indicator
+                </EpMaterialIcon>
+                <router-link :to="{ name: 'aipeoppiaine', params: { oppiaineId: oppiaine.id } }">
+                  {{ $kaanna(oppiaine.nimi) || $t('nimeton-oppiaine') }}
+                </router-link>
+              </div>
+            </VueDraggable>
           </b-form-group>
 
-          <ep-button variant="outline-primary" icon="add" @click="lisaaOppiaine" v-if="!isEditing" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
+          <ep-button
+            v-if="!isEditing"
+            v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+            variant="outline-primary"
+            icon="add"
+            @click="lisaaOppiaine"
+          >
             {{ $t('lisaa-oppiaine') }}
           </ep-button>
 
-          <hr/>
+          <hr>
         </template>
 
-        <b-form-group class="mt-4" :label="$t('opetuksen-tavoitealueet')">
+        <b-form-group
+          class="mt-4"
+          :label="$t('opetuksen-tavoitealueet')"
+        >
           <div v-if="isEditing">
-            <draggable
+            <VueDraggable
               v-bind="defaultDragOptions"
+              v-model="data.opetuksenKohdealueet"
               tag="div"
-              v-model="data.opetuksenKohdealueet">
-
-              <b-row v-for="(kohdealue, index) in data.opetuksenKohdealueet" :key="'tavoite'+index" class="pb-2">
+            >
+              <b-row
+                v-for="(kohdealue, index) in data.opetuksenKohdealueet"
+                :key="'tavoite'+index"
+                class="pb-2"
+              >
                 <b-col cols="11">
-                  <ep-input v-model="kohdealue.nimi" :is-editing="isEditing">
-                    <div class="order-handle m-2" slot="left">
-                      <EpMaterialIcon>drag_indicator</EpMaterialIcon>
-                    </div>
+                  <ep-input
+                    v-model="kohdealue.nimi"
+                    :is-editing="isEditing"
+                  >
+                    <template #left>
+                      <div class="order-handle m-2">
+                        <EpMaterialIcon>drag_indicator</EpMaterialIcon>
+                      </div>
+                    </template>
                   </ep-input>
                 </b-col>
-                <b-col cols="1" v-if="isEditing">
-                  <div class="default-icon clickable mt-2" @click="poistaKohdealue(kohdealue)">
+                <b-col
+                  v-if="isEditing"
+                  cols="1"
+                >
+                  <div
+                    class="default-icon clickable mt-2"
+                    @click="poistaKohdealue(kohdealue)"
+                  >
                     <EpMaterialIcon>delete</EpMaterialIcon>
                   </div>
                 </b-col>
               </b-row>
-            </draggable>
+            </VueDraggable>
 
-            <ep-button variant="outline" icon="add" @click="lisaaKohdealue" v-if="isEditing">
+            <ep-button
+              v-if="isEditing"
+              variant="outline"
+              icon="add"
+              @click="lisaaKohdealue"
+            >
               {{ $t('lisaa-tavoitealue') }}
             </ep-button>
           </div>
 
           <div v-else>
             <ul>
-              <li v-for="(kohdealue, index) in data.opetuksenKohdealueet" :key="'tavoite'+index">
-                {{$kaanna(kohdealue.nimi)}}
+              <li
+                v-for="(kohdealue, index) in data.opetuksenKohdealueet"
+                :key="'tavoite'+index"
+              >
+                {{ $kaanna(kohdealue.nimi) }}
               </li>
             </ul>
           </div>
@@ -78,129 +144,117 @@
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { AipeVaiheStore } from '@/stores/AipeVaiheStore';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { TermitStore } from '@/stores/TermitStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    draggable,
-    EpCollapse,
-    EpSisaltoTekstikappaleet,
-    EpMaterialIcon,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteAipeVaihe extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  vaiheId: {
+    type: [String, Number],
+    required: false,
+  },
+});
 
-  @Prop({ required: false })
-  vaiheId: any;
+const route = useRoute();
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  store: EditointiStore | null = null;
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
 
-  @Watch('vaiheId', { immediate: true })
-  async vaiheChange() {
-    const store = new AipeVaiheStore(this.perusteId!, this.vaiheId, this.perusteStore, this, this.versionumero);
-    this.store = new EditointiStore(store);
-  }
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.vaiheChange();
-  }
+const sisaltoTekstiAvaimet = computed(() => {
+  return _.filter(['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava'], avain => !!_.get(store.value?.data, avain));
+});
 
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
+const storeData = computed({
+  get: () => store.value?.data,
+  set: (data) => store.value?.setData(data),
+});
 
-  get sisaltoTekstiAvaimet() {
-    return _.filter(['paikallisestiPaatettavatAsiat', 'siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava'], avain => !!_.get(this.store?.data.value, avain));
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing;
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+  };
+});
 
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
+const oppiaineetDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'oppiaineet',
+    },
+  };
+});
 
-  async postSave() {
-    await this.perusteStore.updateNavigation();
-  }
+const postSave = async () => {
+  await props.perusteStore.updateNavigation();
+};
 
-  get storeData() {
-    return this.store?.data.value;
-  }
+const lisaaKohdealue = () => {
+  store.value?.setData(
+    {
+      ...store.value.data,
+      opetuksenKohdealueet: [
+        ...store.value.data.opetuksenKohdealueet,
+        {},
+      ],
+    },
+  );
+};
 
-  set storeData(data) {
-    this.store?.setData(data);
-  }
+const poistaKohdealue = (poistettavaKohdealue) => {
+  store.value?.setData(
+    {
+      ...store.value.data,
+      opetuksenKohdealueet: _.filter(store.value.data.opetuksenKohdealueet, kohdealue => kohdealue !== poistettavaKohdealue),
+    },
+  );
+};
 
-  lisaaKohdealue() {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        opetuksenKohdealueet: [
-          ...this.store.data.value.opetuksenKohdealueet,
-          {},
-        ],
-      },
-    );
-  }
+const lisaaOppiaine = () => {
+  router.push({ name: 'aipeoppiaine', params: { vaiheId: props.vaiheId } });
+};
 
-  poistaKohdealue(poistettavaKohdealue) {
-    this.store?.setData(
-      {
-        ...this.store.data.value,
-        opetuksenKohdealueet: _.filter(this.store.data.value.opetuksenKohdealueet, kohdealue => kohdealue !== poistettavaKohdealue),
-      },
-    );
-  }
+const vaiheChange = async () => {
+  const storeInstance = new AipeVaiheStore(perusteId.value!, props.vaiheId, props.perusteStore, versionumero.value);
+  store.value = new EditointiStore(storeInstance);
+};
 
-  lisaaOppiaine() {
-    this.$router.push({ name: 'aipeoppiaine', params: { vaiheId: this.vaiheId } });
-  }
+watch(() => props.vaiheId, async () => {
+  await vaiheChange();
+}, { immediate: true });
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-    };
-  }
-
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
-
-  get oppiaineetDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'oppiaineet',
-      },
-    };
-  }
-}
+watch(versionumero, async () => {
+  await vaiheChange();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
@@ -212,5 +266,4 @@ export default class RouteAipeVaihe extends Vue {
   .oppiaine:nth-of-type(odd) {
     background-color: $table-odd-row-bg-color;
   }
-
 </style>

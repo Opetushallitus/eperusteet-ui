@@ -1,6 +1,6 @@
 <template>
   <ep-main-view :container="true">
-    <template slot="header">
+    <template #header>
       <h1>{{ $t('yllapito') }}</h1>
     </template>
 
@@ -14,219 +14,275 @@
           show-empty
           :empty-text="$t('ei-sisaltoa')"
           :items="yllapitoTiedot"
-          :fields="fields">
-
-          <template v-slot:cell(kuvaus)="data">
-            <ep-input v-model="data.item.kuvaus"/>
+          :fields="fields"
+        >
+          <template #cell(kuvaus)="data">
+            <ep-input v-model="data.item.kuvaus" />
           </template>
 
-          <template v-slot:cell(key)="data">
-            <ep-input v-model="data.item.key" :is-editing="false" />
+          <template #cell(key)="data">
+            <ep-input
+              v-model="data.item.key"
+              :is-editing="false"
+            />
           </template>
 
-          <template v-slot:cell(value)="data">
-            <ep-toggle v-model="data.item.value" :is-editing="isEditing" v-if="isBoolean(data.item.value)"/>
-            <ep-input type="string" v-model="data.item.value" :is-editing="isEditing" v-else/>
+          <template #cell(value)="data">
+            <ep-toggle
+              v-if="isBoolean(data.item.value)"
+              v-model="data.item.value"
+              :is-editing="isEditing"
+            />
+            <ep-input
+              v-else
+              v-model="data.item.value"
+              type="string"
+              :is-editing="isEditing"
+            />
           </template>
-
         </b-table>
       </div>
       <div v-if="!isEditing">
-        <ep-button variant="primary ml-2" @click="onEdit()">{{ $t('muokkaa') }}</ep-button>
+        <ep-button
+          variant="primary ml-2"
+          @click="onEdit()"
+        >
+          {{ $t('muokkaa') }}
+        </ep-button>
       </div>
-      <div v-else class="d-flex justify-content-between">
+      <div
+        v-else
+        class="d-flex justify-content-between"
+      >
         <div>
-          <ep-button class="ml-2" variant="primary" @click="onSave()" :disabled="$v.$invalid">{{ $t('tallenna') }}</ep-button>
+          <ep-button
+            class="ml-2"
+            variant="primary"
+            :disabled="v$.$invalid"
+            @click="onSave()"
+          >
+            {{ $t('tallenna') }}
+          </ep-button>
         </div>
       </div>
-      <hr class="my-4"/>
+      <hr class="my-4">
     </template>
 
-    <h2 class="mt-5">{{ $t('julkisivun-perusteiden-jarjestys') }}</h2>
-    <EpButton @click="muokkaaPerusteidenJarjestysta" v-if="!isEditingPerusteJarjestys">{{ $t('muokkaa')}}</EpButton>
-    <EpButton @click="peruuta" v-if="isEditingPerusteJarjestys" link>{{ $t('peruuta')}}</EpButton>
-    <EpButton @click="tallenna" v-if="isEditingPerusteJarjestys">{{ $t('tallenna')}}</EpButton>
-    <EpSpinner v-if="!julkisivunPerusteetRyhmiteltyna"/>
-    <div v-for="perusteRyhma in julkisivunPerusteetRyhmiteltyna" :key="perusteRyhma.ryhma">
-      <h3 class="mt-4">{{ $t(perusteRyhma.ryhma) }}</h3>
-      <EpBalloonList v-model="perusteRyhma.perusteet" :isEditing="isEditingPerusteJarjestys" sortable>
-        <template v-slot:default="{ item }">
+    <h2 class="mt-5">
+      {{ $t('julkisivun-perusteiden-jarjestys') }}
+    </h2>
+    <EpButton
+      v-if="!isEditingPerusteJarjestys"
+      @click="muokkaaPerusteidenJarjestysta"
+    >
+      {{ $t('muokkaa') }}
+    </EpButton>
+    <EpButton
+      v-if="isEditingPerusteJarjestys"
+      link
+      @click="peruuta"
+    >
+      {{ $t('peruuta') }}
+    </EpButton>
+    <EpButton
+      v-if="isEditingPerusteJarjestys"
+      @click="tallenna"
+    >
+      {{ $t('tallenna') }}
+    </EpButton>
+    <EpSpinner v-if="!julkisivunPerusteetRyhmiteltyna" />
+    <div
+      v-for="perusteRyhma in julkisivunPerusteetRyhmiteltyna"
+      :key="perusteRyhma.ryhma"
+    >
+      <h3 class="mt-4">
+        {{ $t(perusteRyhma.ryhma) }}
+      </h3>
+      <EpBalloonList
+        v-model="perusteRyhma.perusteet"
+        :is-editing="isEditingPerusteJarjestys"
+        sortable
+      >
+        <template #default="{ item }">
           <div class="d-flex w-100 justify-content-between">
             <div>{{ $kaanna(item.nimi) }}</div>
-            <EpToggle v-model="item.piilotaJulkisivulta" :isEditing="isEditingPerusteJarjestys"> {{ $t('piilota-julkisivulta') }}</EpToggle>
+            <EpToggle
+              v-model="item.piilotaJulkisivulta"
+              :is-editing="isEditingPerusteJarjestys"
+            >
+              {{ $t('piilota-julkisivulta') }}
+            </EpToggle>
           </div>
         </template>
       </EpBalloonList>
     </div>
 
-    <hr/>
+    <hr>
 
-    <h2 class="mb-5">{{ $t('muut-toimenpiteet') }}</h2>
-    <EpButton @click="amosaaKoulutustoimijaPaivitys()" :showSpinner="amosaaKtPaivitysLoading">{{$t('paivita-amosaa-koulutustoimijat')}}</EpButton>
+    <h2 class="mb-5">
+      {{ $t('muut-toimenpiteet') }}
+    </h2>
+    <EpButton
+      :show-spinner="amosaaKtPaivitysLoading"
+      @click="amosaaKoulutustoimijaPaivitys()"
+    >
+      {{ $t('paivita-amosaa-koulutustoimijat') }}
+    </EpButton>
   </ep-main-view>
 </template>
 
-<script lang="ts" >
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
 import { YllapitoStore } from '@/stores/YllapitoStore';
 import { YllapitoDto } from '@shared/generated/eperusteet';
-import { Validations } from 'vuelidate-property-decorators';
+import { useVuelidate } from '@vuelidate/core';
 import { notNull } from '@shared/validators/required';
 import { Maintenance } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { EperusteetKoulutustyyppiRyhmaSort, julkisivuPerusteKoosteJarjestys, themes } from '@shared/utils/perusteet';
-import EpBalloonList from '@shared/components/EpBalloonList/EpBalloonList.vue';
+import { $t, $kaanna, $success } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpButton,
-    EpInput,
-    EpSpinner,
-    EpToggle,
-    EpBalloonList,
-  },
-})
-export default class RouteYllapito extends Vue {
-  @Prop({ required: true })
-  private yllapitoStore!: YllapitoStore;
+const props = defineProps<{
+  yllapitoStore: YllapitoStore;
+}>();
 
-  private isEditing = false;
-  private isEditingPerusteJarjestys = false;
-  private yllapitoTiedot: YllapitoDto[] | null = null;
-  private amosaaKtPaivitysLoading = false;
-  private julkisivunPerusteetRyhmiteltyna: any[] | null = null;
+const isEditing = ref(false);
+const isEditingPerusteJarjestys = ref(false);
+const yllapitoTiedot = ref<YllapitoDto[] | null>(null);
+const amosaaKtPaivitysLoading = ref(false);
+const julkisivunPerusteetRyhmiteltyna = ref<any[] | null>(null);
 
-  @Validations()
-  validations = {
-    inner: {
-      $each: {
-        kuvaus: notNull(),
-        key: notNull(),
-        value: notNull(),
-      },
+const rules = {
+  inner: {
+    $each: {
+      kuvaus: notNull(),
+      key: notNull(),
+      value: notNull(),
     },
-  };
+  },
+};
 
-  async mounted() {
-    this.yllapitoTiedot = await this.yllapitoStore.fetch();
-    await this.fetchJulkisivunPerusteet();
-  }
+const v$ = useVuelidate(rules, { inner: yllapitoTiedot });
 
-  async fetchJulkisivunPerusteet() {
-    this.julkisivunPerusteetRyhmiteltyna = null;
-    await this.yllapitoStore.fetchJulkisivunPerusteet();
-    this.julkisivunPerusteetRyhmiteltyna = this.ryhmittelePerusteet();
-  }
+onMounted(async () => {
+  yllapitoTiedot.value = await props.yllapitoStore.fetch();
+  await fetchJulkisivunPerusteet();
+});
 
-  get julkisivunPerusteet() {
-    return this.yllapitoStore.julkisivunPerusteet.value;
-  }
+const fetchJulkisivunPerusteet = async () => {
+  julkisivunPerusteetRyhmiteltyna.value = null;
+  await props.yllapitoStore.fetchJulkisivunPerusteet();
+  julkisivunPerusteetRyhmiteltyna.value = ryhmittelePerusteet();
+};
 
-  ryhmittelePerusteet() {
-    const ryhmitetty = _.map(this.julkisivunPerusteet, (peruste) => {
+const julkisivunPerusteet = computed(() => {
+  return props.yllapitoStore.julkisivunPerusteet.value;
+});
+
+const ryhmittelePerusteet = () => {
+  const ryhmitetty = _.map(julkisivunPerusteet.value, (peruste) => {
+    return {
+      ...peruste,
+      ryhma: themes[peruste.koulutustyyppi!],
+    };
+  });
+
+  return _.chain(ryhmitetty)
+    .groupBy('ryhma')
+    .map((perusteet, ryhma) => {
       return {
-        ...peruste,
-        ryhma: themes[peruste.koulutustyyppi!],
+        ryhma,
+        perusteet: _.chain(perusteet)
+          .map(peruste => {
+            return {
+              ...peruste,
+              kaannettyNimi: $kaanna(peruste.nimi!),
+            };
+          })
+          .orderBy(julkisivuPerusteKoosteJarjestys.keys, julkisivuPerusteKoosteJarjestys.sortby)
+          .value(),
       };
-    });
+    })
+    .orderBy(perusteRyhma => EperusteetKoulutustyyppiRyhmaSort[perusteRyhma.ryhma])
+    .value();
+};
 
-    return _.chain(ryhmitetty)
-      .groupBy('ryhma')
-      .map((perusteet, ryhma) => {
-        return {
-          ryhma,
-          perusteet: _.chain(perusteet)
-            .map(peruste => {
-              return {
-                ...peruste,
-                kaannettyNimi: this.$kaanna(peruste.nimi!),
-              };
-            })
-            .orderBy(julkisivuPerusteKoosteJarjestys.keys, julkisivuPerusteKoosteJarjestys.sortby)
-            .value(),
-        };
-      })
-      .orderBy(perusteRyhma => EperusteetKoulutustyyppiRyhmaSort[perusteRyhma.ryhma])
-      .value();
+const onSave = async () => {
+  await props.yllapitoStore.save(yllapitoTiedot.value!);
+  $success($t('tallennus-onnistui') as string);
+  isEditing.value = false;
+};
+
+const fields = computed(() => {
+  return [{
+    key: 'kuvaus',
+    label: $t('kuvaus') as string,
+    thStyle: { width: '33%' },
+    sortable: false,
+  }, {
+    key: 'key',
+    label: $t('avain') as string,
+    thStyle: { width: '33%' },
+    sortable: false,
+  }, {
+    key: 'value',
+    label: $t('arvo') as string,
+    thStyle: { width: '33%' },
+    sortable: false,
+  }];
+});
+
+const onEdit = () => {
+  isEditing.value = true;
+};
+
+const isBoolean = (val) => {
+  return val === false || val === true || val === 'false' || val === 'true';
+};
+
+const amosaaKoulutustoimijaPaivitys = async () => {
+  amosaaKtPaivitysLoading.value = true;
+  try {
+    await Maintenance.paivitaAmosaaKoulutustoimijat();
+    $success($t('Päivitys käynnistetty'));
   }
-
-  async onSave() {
-    await this.yllapitoStore.save(this.yllapitoTiedot!);
-    this.$success(this.$t('tallennus-onnistui') as string);
-    this.isEditing = false;
+  catch (e) {
+    $success($t('virhe-palvelu-virhe') as string);
   }
+  amosaaKtPaivitysLoading.value = false;
+};
 
-  get fields() {
-    return [{
-      key: 'kuvaus',
-      label: this.$t('kuvaus') as string,
-      thStyle: { width: '33%' },
-      sortable: false,
-    }, {
-      key: 'key',
-      label: this.$t('avain') as string,
-      thStyle: { width: '33%' },
-      sortable: false,
-    }, {
-      key: 'value',
-      label: this.$t('arvo') as string,
-      thStyle: { width: '33%' },
-      sortable: false,
-    }];
-  }
+const muokkaaPerusteidenJarjestysta = () => {
+  isEditingPerusteJarjestys.value = !isEditingPerusteJarjestys.value;
+};
 
-  onEdit() {
-    this.isEditing = true;
-  }
+const peruuta = async () => {
+  isEditingPerusteJarjestys.value = !isEditingPerusteJarjestys.value;
+  await fetchJulkisivunPerusteet();
+};
 
-  isBoolean(val) {
-    return val === false || val === true || val === 'false' || val === 'true';
-  }
+const tallenna = async () => {
+  const perusteet = _.chain(julkisivunPerusteetRyhmiteltyna.value)
+    .reduce((acc, ryhma) => {
+      return acc.concat(ryhma.perusteet);
+    }, [])
+    .map((peruste, index) => ({
+      ...peruste as any,
+      julkisivuJarjestysNro: index,
+    }))
+    .value();
 
-  async amosaaKoulutustoimijaPaivitys() {
-    this.amosaaKtPaivitysLoading = true;
-    try {
-      await Maintenance.paivitaAmosaaKoulutustoimijat();
-      this.$success('Päivitys käynnistetty');
-    }
-    catch (e) {
-      this.$success(this.$t('virhe-palvelu-virhe') as string);
-    }
-    this.amosaaKtPaivitysLoading = false;
-  }
-
-  muokkaaPerusteidenJarjestysta() {
-    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
-  }
-
-  async peruuta() {
-    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
-    await this.fetchJulkisivunPerusteet();
-  }
-
-  async tallenna() {
-    const perusteet = _.chain(this.julkisivunPerusteetRyhmiteltyna)
-      .reduce((acc, ryhma) => {
-        return acc.concat(ryhma.perusteet);
-      }, [])
-      .map((peruste, index) => ({
-        ...peruste as any,
-        julkisivuJarjestysNro: index,
-      }))
-      .value();
-
-    await this.yllapitoStore.tallennaJulkisivunPerusteet(perusteet);
-    this.isEditingPerusteJarjestys = !this.isEditingPerusteJarjestys;
-    this.$success(this.$t('tallennus-onnistui') as string);
-    await this.fetchJulkisivunPerusteet();
-  }
-}
+  await props.yllapitoStore.tallennaJulkisivunPerusteet(perusteet);
+  isEditingPerusteJarjestys.value = !isEditingPerusteJarjestys.value;
+  $success($t('tallennus-onnistui') as string);
+  await fetchJulkisivunPerusteet();
+};
 </script>
 
 <style scoped lang="scss">

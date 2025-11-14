@@ -1,115 +1,134 @@
 <template>
-  <EpEditointi :store="store">
+  <EpEditointi
+    v-if="store"
+    :store="store"
+  >
     <template #header>
-      <h3>{{$t('oppiaineet')}}</h3>
+      <h3>{{ $t('oppiaineet') }}</h3>
     </template>
     <template #muokkaa>
-      {{$t('muokkaa-jarjestysta')}}
+      {{ $t('muokkaa-jarjestysta') }}
     </template>
     <template #default="{ data, isEditing }">
       <div class="d-flex justify-content-end">
-        <EpButton variant="outline" :disabled="isEditing" icon="add" @click="lisaaOppiaine" v-oikeustarkastelu="{ oikeus: 'muokkaus' }">
-          {{ $t('uusi-oppiaine')}}
+        <EpButton
+          v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
+          variant="outline"
+          :disabled="isEditing"
+          icon="add"
+          @click="lisaaOppiaine"
+        >
+          {{ $t('uusi-oppiaine') }}
         </EpButton>
       </div>
 
-      <b-row class="border-bottom-1 m-0 pb-2" v-if="data.oppiaineet.length > 0">
-        <b-col cols="5" class="font-weight-bold">{{$t('nimi')}}</b-col>
+      <b-row
+        v-if="data.oppiaineet.length > 0"
+        class="border-bottom-1 m-0 pb-2"
+      >
+        <b-col
+          cols="5"
+          class="font-weight-bold"
+        >
+          {{ $t('nimi') }}
+        </b-col>
       </b-row>
 
-      <draggable
+      <VueDraggable
         v-bind="defaultDragOptions"
+        v-model="data.oppiaineet"
         tag="div"
-        v-model="data.oppiaineet">
-
-        <b-row v-for="(oppiaine, index) in data.oppiaineet" :key="'lao'+index" class="taulukko-rivi-varitys py-3 m-0">
-          <b-col cols="5" class="d-flex">
-            <div class="order-handle mr-2" v-if="isEditing">
+      >
+        <b-row
+          v-for="(oppiaine, index) in data.oppiaineet"
+          :key="'lao'+index"
+          class="taulukko-rivi-varitys py-3 m-0"
+        >
+          <b-col
+            cols="5"
+            class="d-flex"
+          >
+            <div
+              v-if="isEditing"
+              class="order-handle mr-2"
+            >
               <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
             <div>
               <router-link :to="{ name: 'perusopetusoppiaine', params: { oppiaineId: oppiaine.id } }">
                 <span v-if="oppiaine.nimi">{{ $kaanna(oppiaine.nimi) }}</span>
-                <span v-else>{{$t('nimeton-oppiaine')}}</span>
+                <span v-else>{{ $t('nimeton-oppiaine') }}</span>
                 <span v-if="oppiaine.koodiArvo"> ({{ oppiaine.koodiArvo }})</span>
               </router-link>
             </div>
           </b-col>
         </b-row>
-      </draggable>
+      </VueDraggable>
     </template>
-
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusopetusOppiaineetStore } from '@/stores/PerusopetusOppiaineetStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
-import draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpButton,
-    EpEditointi,
-    EpMaterialIcon,
-    draggable,
-  },
-})
-export default class RouteOppiaineet extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
 
-  store: EditointiStore | null = null;
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
 
-  async mounted() {
-    const store = new PerusopetusOppiaineetStore(this.perusteId!, this.perusteStore);
-    this.store = new EditointiStore(store);
-  }
+onMounted(async () => {
+  const storeInstance = new PerusopetusOppiaineetStore(perusteId.value!, props.perusteStore);
+  store.value = new EditointiStore(storeInstance);
+});
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  get fields() {
-    return [{
-      label: this.$t('nimi'),
-      key: 'nimi',
-      sortable: true,
-    }];
-  }
+const fields = computed(() => {
+  return [{
+    label: $t('nimi'),
+    key: 'nimi',
+    sortable: true,
+  }];
+});
 
-  async lisaaOppiaine() {
-    const newOppiaine = await PerusopetusOppiaineStore.create(this.perusteId);
-    await this.perusteStore.updateNavigation();
-    await EditointiStore.cancelAll();
-    this.$router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
-  }
+const isEditing = computed(() => {
+  return store.value?.isEditing;
+});
 
-  get defaultDragOptions() {
-    return {
-      ...DEFAULT_DRAGGABLE_PROPERTIES,
-      disabled: !this.isEditing,
-      group: {
-        name: 'oppiaineet',
-      },
-    };
-  }
+const defaultDragOptions = computed(() => {
+  return {
+    ...DEFAULT_DRAGGABLE_PROPERTIES,
+    disabled: !isEditing.value,
+    group: {
+      name: 'oppiaineet',
+    },
+  };
+});
 
-  get isEditing() {
-    return this.store?.isEditing.value;
-  }
-}
+const lisaaOppiaine = async () => {
+  const newOppiaine = await PerusopetusOppiaineStore.create(perusteId.value);
+  await props.perusteStore.updateNavigation();
+  await EditointiStore.cancelAll();
+  router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
+};
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

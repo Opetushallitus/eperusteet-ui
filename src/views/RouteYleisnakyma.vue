@@ -3,19 +3,44 @@
     <div v-if="tyyppi === 'peruste'">
       <div class="row">
         <div class="col">
-          <ep-peruste-aikataulu class="info-box" :aikatauluStore="aikatauluStore" :peruste="peruste"/>
+          <ep-peruste-aikataulu
+            class="info-box"
+            :aikataulu-store="aikatauluStore"
+            :peruste="peruste"
+          />
         </div>
       </div>
 
       <div class="row">
         <div class="col">
-          <ep-peruste-tiedotteet class="info-box" :peruste="peruste" :tiedotteetStore="tiedotteetStore"/>
-          <ep-peruste-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
-          <ep-peruste-tutkinnon-osat class="info-box" :peruste="peruste" :tutkinnonOsaStore="tutkinnonOsaStore" v-if="isAmmatillinen"/>
-          <ep-peruste-rakenne class="info-box" :perusteStore="perusteStore"/>
+          <ep-peruste-tiedotteet
+            class="info-box"
+            :peruste="peruste"
+            :tiedotteet-store="tiedotteetStore"
+          />
+          <ep-peruste-perustiedot
+            class="info-box"
+            :peruste="peruste"
+            :projekti="projekti"
+            :tyoryhma-store="tyoryhmaStore"
+          />
+          <ep-peruste-tutkinnon-osat
+            v-if="isAmmatillinen"
+            class="info-box"
+            :peruste="peruste"
+            :tutkinnon-osa-store="tutkinnonOsaStore"
+          />
+          <ep-peruste-rakenne
+            class="info-box"
+            :peruste-store="perusteStore"
+          />
         </div>
         <div class="col">
-          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :tyyppi="perusteTyyppi"/>
+          <EpViimeaikainenToiminta
+            class="info-box"
+            :muokkaustieto-store="muokkaustietoStore"
+            :tyyppi="perusteTyyppi"
+          />
         </div>
       </div>
     </div>
@@ -23,20 +48,28 @@
     <div v-else>
       <div class="row">
         <div class="col">
-          <ep-opas-perustiedot class="info-box" :peruste="peruste" :projekti="projekti" :tyoryhmaStore="tyoryhmaStore"/>
+          <ep-opas-perustiedot
+            class="info-box"
+            :peruste="peruste"
+            :projekti="projekti"
+            :tyoryhma-store="tyoryhmaStore"
+          />
         </div>
         <div class="col">
-          <EpViimeaikainenToiminta class="info-box" :muokkaustietoStore="muokkaustietoStore" :tyyppi="perusteTyyppi"/>
+          <EpViimeaikainenToiminta
+            class="info-box"
+            :muokkaustieto-store="muokkaustietoStore"
+            :tyyppi="perusteTyyppi"
+          />
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import _ from 'lodash';
-import { Prop, Mixins, Component, Vue, Watch } from 'vue-property-decorator';
+import { computed, watch, onMounted } from 'vue';
 import EpPerusteAikataulu from '@/components/EpYleisnakyma/EpPerusteAikataulu.vue';
 import EpPerustePerustiedot from '@/components/EpYleisnakyma/EpPerustePerustiedot.vue';
 import EpOpasPerustiedot from '@/components/EpYleisnakyma/EpOpasPerustiedot.vue';
@@ -45,50 +78,55 @@ import EpPerusteTiedotteet from '@/components/EpYleisnakyma/EpPerusteTiedotteet.
 import EpPerusteRakenne from '@/components/EpYleisnakyma/EpPerusteRakenne.vue';
 import EpViimeaikainenToiminta from '@shared/components/EpViimeaikainenToiminta/EpViimeaikainenToiminta.vue';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
 
-@Component({
-  components: {
-    EpPerusteAikataulu,
-    EpPerusteTutkinnonOsat,
-    EpPerustePerustiedot,
-    EpPerusteTiedotteet,
-    EpOpasPerustiedot,
-    EpPerusteRakenne,
-    EpViimeaikainenToiminta,
-  },
-})
-export default class RouteYleisnakyma extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  private tutkinnonOsaStore!: TutkinnonOsaStore;
+const props = withDefaults(defineProps<{
+  tutkinnonOsaStore: TutkinnonOsaStore;
+  tyyppi?: 'opas' | 'peruste';
+  perusteStore: any;
+  muokkaustietoStore: any;
+  aikatauluStore: any;
+  tiedotteetStore: any;
+  tyoryhmaStore: any;
+  isAmmatillinen?: boolean;
+}>(), {
+  tyyppi: 'peruste',
+});
 
-  @Prop({ required: false, default: 'peruste' })
-  private tyyppi!: 'opas' | 'peruste';
+const projekti = computed(() => {
+  return props.perusteStore.projekti.value;
+});
 
-  async onProjektiChange() {
-    if (this.peruste && this.peruste.id) {
-      await Promise.all([
-        this.muokkaustietoStore.init(this.peruste.id),
-        this.aikatauluStore.init(this.peruste),
-        this.tiedotteetStore.init({ perusteIds: [this.peruste.id] }),
-        this.tyoryhmaStore.init(this.projekti?.ryhmaOid),
-        ...(this.isAmmatillinen ? [this.tutkinnonOsaStore.fetch()] : []),
-      ]);
-    }
+const peruste = computed(() => {
+  return props.perusteStore.peruste.value;
+});
+
+const perusteTyyppi = computed(() => {
+  return _.get(peruste.value, 'tyyppi');
+});
+
+const onProjektiChange = async () => {
+  if (peruste.value && peruste.value.id) {
+    await Promise.all([
+      props.muokkaustietoStore.init(peruste.value.id),
+      props.aikatauluStore.init(peruste.value),
+      props.tiedotteetStore.init({ perusteIds: [peruste.value.id] }),
+      props.tyoryhmaStore.init(projekti.value?.ryhmaOid),
+      ...(props.isAmmatillinen ? [props.tutkinnonOsaStore.fetch()] : []),
+    ]);
   }
+};
 
-  get projekti() {
-    return this.perusteStore.projekti.value;
-  }
+// Initialize component when mounted
+onMounted(async () => {
+  await onProjektiChange();
+});
 
-  get peruste() {
-    return this.perusteStore.peruste.value;
+// Watch for changes in peruste
+watch(peruste, async (newValue) => {
+  if (newValue && newValue.id) {
+    await onProjektiChange();
   }
-
-  get perusteTyyppi() {
-    return _.get(this.peruste, 'tyyppi');
-  }
-}
+}, { deep: true });
 </script>
 
 <style scoped lang="scss">

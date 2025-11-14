@@ -1,14 +1,13 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
+import { watch, reactive, computed } from 'vue';
 import { TutkinnonOsaViiteDto, OsaAlueet, TutkinnonRakenne } from '@shared/api/eperusteet';
 import { EditoitavaFeatures, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
 import { translated, requiredOneLang } from '@shared/validators/required';
-
-Vue.use(VueCompositionApi);
+import { App } from 'vue';
 
 interface OsaalueStoreConfig {
   perusteStore: PerusteStore;
@@ -19,12 +18,12 @@ export class OsaalueStore implements IEditoitava {
     private readonly perusteId: number,
     private tovId: number,
     private osaalueId: number | string,
-    private router: VueRouter,
+    private router: any,
   ) { }
 
   private static config: OsaalueStoreConfig;
 
-  public static install(vue: typeof Vue, config: OsaalueStoreConfig) {
+  public static install(app: App, config: OsaalueStoreConfig) {
     OsaalueStore.config = config;
   }
 
@@ -43,7 +42,7 @@ export class OsaalueStore implements IEditoitava {
       };
     }
     else {
-      const tutkinnonOsaViite = (await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, OsaalueStore.config?.perusteStore.perusteSuoritustapa.value!, this.tovId)).data;
+      const tutkinnonOsaViite = (await TutkinnonRakenne.getTutkinnonOsaViite(this.perusteId, OsaalueStore.config.perusteStore.perusteSuoritustapa.value as any, this.tovId)).data;
       supportDataProvider(tutkinnonOsaViite);
 
       return (await OsaAlueet.getOsaAlueV2(this.tovId, Number(this.osaalueId))).data;
@@ -79,6 +78,7 @@ export class OsaalueStore implements IEditoitava {
       }
     }
     catch (err) {
+      // Ignore error when releasing lock
     }
   }
 

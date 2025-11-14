@@ -2,13 +2,24 @@ import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/Edit
 import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+
+interface AipeLaajaAlainenOsaaminenStoreConfig {
+  router: Router;
+}
 
 export class AipeLaajaAlainenOsaaminenStore implements IEditoitava {
+  private static config: AipeLaajaAlainenOsaaminenStoreConfig;
+
+  public static install(app: App, config: AipeLaajaAlainenOsaaminenStoreConfig) {
+    AipeLaajaAlainenOsaaminenStore.config = config;
+  }
+
   constructor(
     private perusteId: number,
     private laoId: number | null,
     private perusteStore: PerusteStore,
-    private el: any,
   ) {
   }
 
@@ -38,7 +49,7 @@ export class AipeLaajaAlainenOsaaminenStore implements IEditoitava {
       this.laoId = lao.id!;
       await this.perusteStore.updateNavigation();
       await EditointiStore.cancelAll();
-      this.el.$router.push({ name: 'aipelaajaAlainenOsaaminen', params: { laoId: lao.id } });
+      AipeLaajaAlainenOsaaminenStore.config.router.push({ name: 'aipelaajaAlainenOsaaminen', params: { laoId: lao.id } });
     }
   }
 
@@ -46,7 +57,7 @@ export class AipeLaajaAlainenOsaaminenStore implements IEditoitava {
     if (this.laoId) {
       await Aipeopetuksensisalto.deleteAipeOsaaminen(this.perusteId, this.laoId);
       await this.perusteStore.updateNavigation();
-      this.el.$router.push({ name: 'aipeLaajaAlaisetOsaamiset' });
+      AipeLaajaAlainenOsaaminenStore.config.router.push({ name: 'aipeLaajaAlaisetOsaamiset' });
     }
   }
 }

@@ -1,23 +1,11 @@
 import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { reactive, computed, ref, watch } from 'vue';
 import { Matala, Perusteenosat, Sisallot, PerusteprojektiListausDto } from '@shared/api/eperusteet';
 import { Revision, Page } from '@shared/tyypit';
-import { Debounced } from '@shared/utils/delay';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-// import { NotifikaatiotStore } from '@shared/stores/NotifikaatiotStore';
-
-Vue.use(VueCompositionApi);
-
-interface JarjestysStoreConfig {
-}
 
 export class JarjestysStore implements IEditoitava {
-  private static config: JarjestysStoreConfig;
-
-  public static install(vue: typeof Vue, config: JarjestysStoreConfig) {
-    JarjestysStore.config = config;
-  }
 
   constructor(
     private readonly stores: { [key: string]: IEditoitava },

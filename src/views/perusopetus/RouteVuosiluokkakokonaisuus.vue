@@ -1,67 +1,124 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
+      <h2 v-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing, supportData }">
       <div class="col-11 pl-0">
-        <div class="mt-1" v-if="isEditing">
-          <h3>{{$t('vuosiluokkakokonaisuuden-nimi')}} *</h3>
-          <ep-input v-model="data.nimi" :is-editing="true"></ep-input>
+        <div
+          v-if="isEditing"
+          class="mt-1"
+        >
+          <h3>{{ $t('vuosiluokkakokonaisuuden-nimi') }} *</h3>
+          <ep-input
+            v-model="data.nimi"
+            :is-editing="true"
+          />
         </div>
 
-        <b-form-group class="mt-4" :label="$t('vuosiluokat') + (isEditing ? ' *' : '')">
-            <b-form-checkbox-group v-model="data.vuosiluokat" v-if="isEditing">
-                <b-form-checkbox :value="vuosiluokka.value" v-for="(vuosiluokka, index) in valittavatVuosiluokat" :key="'vl' + index" class="col-3" size="lg">
-                  {{ vuosiluokka.name }}
-                </b-form-checkbox>
-            </b-form-checkbox-group>
+        <b-form-group
+          class="mt-4"
+          :label="$t('vuosiluokat') + (isEditing ? ' *' : '')"
+        >
+          <EpToggleGroup
+            v-if="isEditing"
+            v-model="data.vuosiluokat"
+            :items="valittavatVuosiluokat"
+          >
+            <template #default="{ item }">
+              <div class="mr-5">
+                {{ $t('vuosiluokka') }} {{ $t(item) }}
+              </div>
+            </template>
+          </EpToggleGroup>
 
-            <div v-else>
-              <span v-for="(vuosiluokka, index) in vuosiluokat" :key="'vlk' + index"><span v-if="index > 0">, </span>{{$t(vuosiluokka)}}</span>
-            </div>
+          <div v-else>
+            <span
+              v-for="(vuosiluokka, index) in vuosiluokat"
+              :key="'vlk' + index"
+            ><span v-if="index > 0">, </span>{{ $t(vuosiluokka) }}</span>
+          </div>
         </b-form-group>
 
-        <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="['siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava', 'laajaalainenOsaaminen']" />
+        <EpSisaltoTekstikappaleet
+          v-model="storeData"
+          :is-editing="isEditing"
+          :sisalto-avaimet="['siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava', 'laajaalainenOsaaminen']"
+        />
 
-        <b-form-group class="mt-4" :label="$t('laaja-alaiset-osaamiset')">
-          <div v-for="(lao, index) in data.laajaalaisetOsaamiset" :key="'lao' +index" :class="{'mb-5': index + 1 < data.laajaalaisetOsaamiset.length}">
-            <h5>{{$kaanna(supportData.laajaalaisetOsaamiset[lao._laajaalainenOsaaminen].nimi)}}</h5>
+        <b-form-group
+          class="mt-4"
+          :label="$t('laaja-alaiset-osaamiset')"
+        >
+          <div
+            v-for="(lao, index) in data.laajaalaisetOsaamiset"
+            :key="'lao' +index"
+            :class="{'mb-5': index + 1 < data.laajaalaisetOsaamiset.length}"
+          >
+            <h5>{{ $kaanna(supportData.laajaalaisetOsaamiset[lao._laajaalainenOsaaminen].nimi) }}</h5>
 
-            <ep-content layout="normal" v-model="lao.kuvaus" :is-editable="isEditing"> </ep-content>
+            <ep-content
+              v-model="lao.kuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
 
-            <ep-collapse v-if="isEditing" :borderBottom="false" :usePadding="false" chevronLocation="left" :expandedByDefault="false">
+            <ep-collapse
+              v-if="isEditing"
+              :border-bottom="false"
+              :use-padding="false"
+              chevron-location="left"
+              :expanded-by-default="false"
+            >
               <template #header>
-                <div class="link-style">{{ $t('nayta-osaamiskokonaisuuden-yleiskuvaus')}}</div>
+                <div class="link-style">
+                  {{ $t('nayta-osaamiskokonaisuuden-yleiskuvaus') }}
+                </div>
               </template>
 
-              <ep-content layout="normal" :value="supportData.laajaalaisetOsaamiset[lao._laajaalainenOsaaminen].kuvaus" :is-editable="false"> </ep-content>
+              <ep-content
+                layout="normal"
+                :value="supportData.laajaalaisetOsaamiset[lao._laajaalainenOsaaminen].kuvaus"
+                :is-editable="false"
+              />
             </ep-collapse>
-
           </div>
-
         </b-form-group>
 
-        <hr/>
+        <hr>
 
-        <ep-collapse :collapsable="!isEditing" :borderBottom="false" :usePadding="false">
+        <ep-collapse
+          :collapsable="!isEditing"
+          :border-bottom="false"
+          :use-padding="false"
+        >
           <template #header>
-            <h4>{{ $t('paikallisesti-paatettavat-asiat')}}</h4>
+            <h4>{{ $t('paikallisesti-paatettavat-asiat') }}</h4>
           </template>
-          <ep-content layout="normal" v-model="data.paikallisestiPaatettavatAsiat.teksti" :is-editable="isEditing"> </ep-content>
+          <ep-content
+            v-model="data.paikallisestiPaatettavatAsiat.teksti"
+            layout="normal"
+            :is-editable="isEditing"
+          />
         </ep-collapse>
-
       </div>
     </template>
   </EpEditointi>
-
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -70,54 +127,48 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpSisaltoTekstikappaleet,
-    EpCollapse,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  vlkId?: any;
+}>();
+
+const router = useRouter();
+const store = ref<EditointiStore | null>(null);
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+// Watch for changes in vlkId
+watch(() => props.vlkId, async () => {
+  const vlkStore = new PerusopetusVuosiluokkakokonaisuusStore(
+    perusteId.value!,
+    props.vlkId,
+    props.perusteStore,
+    { $router: router },
+  );
+  store.value = new EditointiStore(vlkStore);
+}, { immediate: true });
+
+const storeData = computed({
+  get() {
+    return store.value?.data;
   },
-})
-export default class RouteVuosiluokkakokonaisuus extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 
-  @Prop({ required: false })
-  vlkId: any;
+const vuosiluokat = computed(() => {
+  return _.sortBy(store.value?.data.vuosiluokat);
+});
 
-  store: EditointiStore | null = null;
-
-  @Watch('vlkId', { immediate: true })
-  async laoChange() {
-    const store = new PerusopetusVuosiluokkakokonaisuusStore(this.perusteId!, this.vlkId, this.perusteStore, this);
-    this.store = new EditointiStore(store);
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-
-  get vuosiluokat() {
-    return _.sortBy(this.store?.data.value.vuosiluokat);
-  }
-
-  get valittavatVuosiluokat(): any {
-    return _.map(_.range(1, 10), vlk => ({
-      name: this.$t('vuosiluokka') + ' ' + vlk,
-      value: 'vuosiluokka_' + vlk,
-    }));
-  }
-}
+const valittavatVuosiluokat = computed((): any => {
+  return _.map(_.range(1, 10), vlk => ('vuosiluokka_' + vlk));
+});
 </script>
 
 <style scoped lang="scss">

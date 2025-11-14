@@ -1,16 +1,37 @@
 <template>
-  <EpEditointi v-if="editointiStore" :store="editointiStore" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 class="m-0" v-if="data.nimi" >{{ $kaanna(data.nimi) }}</h2>
-      <h2 class="m-0" v-else >{{ $t('nimeton-opinto') }}</h2>
+  <EpEditointi
+    v-if="editointiStore"
+    :store="editointiStore"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2
+        v-if="data.nimi"
+        class="m-0"
+      >
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="m-0"
+      >
+        {{ $t('nimeton-opinto') }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing }">
-
-      <b-row v-if="isEditing" class="mb-4">
+    <template #default="{ data, isEditing }">
+      <b-row
+        v-if="isEditing"
+        class="mb-4"
+      >
         <b-col lg="8">
-          <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
-            <ep-input v-model="data.nimi" :is-editing="isEditing">
-            </ep-input>
+          <b-form-group
+            :label="$t('otsikko') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-input
+              v-model="data.nimi"
+              :is-editing="isEditing"
+            />
           </b-form-group>
         </b-col>
       </b-row>
@@ -18,60 +39,81 @@
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <div v-if="isEditing" slot="label">{{$t('kappaleen-teksti')}}</div>
-            <ep-content v-model="data.yleiskuvaus"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+            <template
+              v-if="isEditing"
+              #label
+            >
+              <div>{{ $t('kappaleen-teksti') }}</div>
+            </template>
+            <ep-content
+              v-model="data.yleiskuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
         </b-col>
       </b-row>
 
-      <b-row v-if="data.osaamisAlueet.length > 0" class="mt-4">
+      <b-row
+        v-if="data.osaamisAlueet.length > 0"
+        class="mt-4"
+      >
         <b-col lg="8">
-          <div v-for="(osaamisalue, index) in data.osaamisAlueet"
-               :key="index+'kotoLaajaAlainenOsaaminen'">
-            <div slot="header" class="mt-4">
-                <span>
-                  <h3 class="d-inline">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
-                  <b-button variant="link"
-                            @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)"
-                            v-if="isEditing">
-                    <EpMaterialIcon>delete</EpMaterialIcon>
-                    {{ $t('poista') }}
-                  </b-button>
-                </span>
+          <div
+            v-for="(osaamisalue, index) in data.osaamisAlueet"
+            :key="index+'kotoLaajaAlainenOsaaminen'"
+          >
+            <div class="mt-4">
+              <span>
+                <h3 class="d-inline">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
+                <b-button
+                  v-if="isEditing"
+                  variant="link"
+                  @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)"
+                >
+                  <EpMaterialIcon>delete</EpMaterialIcon>
+                  {{ $t('poista') }}
+                </b-button>
+              </span>
             </div>
             <ep-content
-              layout="normal"
               v-model="osaamisalue.kuvaus"
-              :is-editable="isEditing"></ep-content>
+              layout="normal"
+              :is-editable="isEditing"
+            />
           </div>
         </b-col>
       </b-row>
 
       <b-row class="mt-4">
         <b-col lg="8">
-          <b-dropdown v-if="isEditing" :text="$t('lisaa-laaja-alainen-osaaminen')" variant="primary" class="mb-4">
+          <b-dropdown
+            v-if="isEditing"
+            :text="$t('lisaa-laaja-alainen-osaaminen')"
+            variant="primary"
+            class="mb-4"
+          >
             <b-dropdown-item-button
               v-for="(laajaAlainenKoodi, index) in laajaAlaisetKoodit"
-              @click="addLaajaAlainenOsaaminen(laajaAlainenKoodi)"
               :key="index+'addlaaja'"
-              :disabled="laajaAlainenKoodi.isAlreadySelected">
+              :disabled="laajaAlainenKoodi.isAlreadySelected"
+              @click="addLaajaAlainenOsaaminen(laajaAlainenKoodi)"
+            >
               {{ laajaAlainenKoodi.arvo + '. ' + $kaanna(laajaAlainenKoodi.nimi) }}
             </b-dropdown-item-button>
           </b-dropdown>
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
@@ -86,126 +128,110 @@ import { KuvaStore } from '@/stores/KuvaStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { $t, $kaanna, $vahvista } from '@shared/utils/globals';
 
 interface LaajaaAlainenOsaaminenKoodi {
   nimi: { [locale: string]: string };
   arvo: string;
   uri: string;
   koodisto: string;
-  isAlreadySelected: boolean
+  isAlreadySelected: boolean;
 }
 
-@Component({
-  components: {
-    EpEditointi,
-    EpSpinner,
-    EpContent,
-    EpInput,
-    EpMaterialIcon,
-  },
-})
-export default class RouteKotoLaajaalainenOsaaminen extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
 
-  private editointiStore: EditointiStore | null = null;
-  private laajaAlaisetKoodit: LaajaaAlainenOsaaminenKoodi[] = [];
+const route = useRoute();
+const editointiStore = ref<EditointiStore | null>(null);
+const laajaAlaisetKoodit = ref<LaajaaAlainenOsaaminenKoodi[]>([]);
 
-  async mounted() {
-    try {
-      const koodit = (await Koodisto.kaikki(
-        'laajaalainenosaaminenkoto2022')).data;
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
 
-      this.laajaAlaisetKoodit = koodit
-        .sort(x => parseInt(x.koodiArvo!))
-        .reverse()
-        .map(koodi => ({
-          uri: koodi.koodiUri!,
-          arvo: koodi.koodiArvo!,
-          koodisto: koodi.koodisto!.koodistoUri!,
-          nimi: this.extractNimi(koodi),
-          isAlreadySelected: false,
-        }));
-    }
-    catch (err) {
-      console.error(err);
-    }
+const kotoLaajaalainenOsaaminenId = computed(() => {
+  return route.params.kotoLaajaalainenOsaaminenId;
+});
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const kasiteHandler = inject('kasiteHandler');
+const kuvaHandler = inject('kuvaHandler');
+
+onMounted(async () => {
+  try {
+    const koodit = (await Koodisto.kaikki(
+      'laajaalainenosaaminenkoto2022')).data;
+
+    laajaAlaisetKoodit.value = koodit
+      .sort(x => parseInt(x.koodiArvo!))
+      .reverse()
+      .map(koodi => ({
+        uri: koodi.koodiUri!,
+        arvo: koodi.koodiArvo!,
+        koodisto: koodi.koodisto!.koodistoUri!,
+        nimi: extractNimi(koodi),
+        isAlreadySelected: false,
+      }));
   }
-
-  @Watch('kotoLaajaalainenOsaaminenId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-    await this.fetch();
+  catch (err) {
+    console.error(err);
   }
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
+watch(kotoLaajaalainenOsaaminenId, async (id: string, oldId: string) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const kotoStore = new KotoLaajaalainenOsaaminenStore(this.perusteId!, Number(this.kotoLaajaalainenOsaaminenId), this.versionumero);
-    this.editointiStore = new EditointiStore(kotoStore);
-  }
+watch(versionumero, async () => {
+  await fetch();
+}, { immediate: true });
 
-  private extractNimi(koodi) {
-    const nimet: { [locale: string]: string } = {};
+async function fetch() {
+  await props.perusteStore.blockUntilInitialized();
+  const kotoStore = new KotoLaajaalainenOsaaminenStore(perusteId.value!, Number(kotoLaajaalainenOsaaminenId.value), versionumero.value);
+  editointiStore.value = new EditointiStore(kotoStore);
+}
 
-    koodi.metadata!.forEach(meta => {
-      nimet[meta.kieli!.toLowerCase()] = meta.nimi;
-    });
+function extractNimi(koodi) {
+  const nimet: { [locale: string]: string } = {};
 
-    return nimet;
-  }
+  koodi.metadata!.forEach(meta => {
+    nimet[meta.kieli!.toLowerCase()] = meta.nimi;
+  });
 
-  private addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
-    this.setKoodiSelected(laajaAlainenKoodi.arvo);
-    this.editointiStore!.data.value.osaamisAlueet.push({ koodi: laajaAlainenKoodi });
-  }
+  return nimet;
+}
 
-  private setKoodiSelected(koodiarvo) {
-    let selectedOsaaminen = this.laajaAlaisetKoodit.find(koodi => koodi.arvo === koodiarvo);
-    if (selectedOsaaminen) {
-      selectedOsaaminen.isAlreadySelected = true;
-    }
-  }
+function addLaajaAlainenOsaaminen(laajaAlainenKoodi) {
+  setKoodiSelected(laajaAlainenKoodi.arvo);
+  editointiStore.value!.data.osaamisAlueet.push({ koodi: laajaAlainenKoodi });
+}
 
-  private async removeLaajaAlainenOsaaminen(index, koodiarvo) {
-    if (await this.$vahvista(this.$t('vahvista-poisto') as string, this.$t('poista-koto-laaja-alainen-osaamisalue') as string)) {
-      this.editointiStore!.data.value.osaamisAlueet.splice(index, 1);
-      this.setKoodiNotSelected(koodiarvo);
-    }
-  }
-
-  private setKoodiNotSelected(koodiarvo) {
-    let selectedOsaaminen = this.laajaAlaisetKoodit.find(koodi => koodi.arvo === koodiarvo);
-    if (selectedOsaaminen) {
-      selectedOsaaminen.isAlreadySelected = false;
-    }
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get kotoLaajaalainenOsaaminenId() {
-    return this.$route.params.kotoLaajaalainenOsaaminenId;
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
+function setKoodiSelected(koodiarvo) {
+  let selectedOsaaminen = laajaAlaisetKoodit.value.find(koodi => koodi.arvo === koodiarvo);
+  if (selectedOsaaminen) {
+    selectedOsaaminen.isAlreadySelected = true;
   }
 }
 
+async function removeLaajaAlainenOsaaminen(index, koodiarvo) {
+  if (await $vahvista($t('vahvista-poisto'), $t('poista-koto-laaja-alainen-osaamisalue'))) {
+    editointiStore.value!.data.osaamisAlueet.splice(index, 1);
+    setKoodiNotSelected(koodiarvo);
+  }
+}
+
+function setKoodiNotSelected(koodiarvo) {
+  let selectedOsaaminen = laajaAlaisetKoodit.value.find(koodi => koodi.arvo === koodiarvo);
+  if (selectedOsaaminen) {
+    selectedOsaaminen.isAlreadySelected = false;
+  }
+}
 </script>

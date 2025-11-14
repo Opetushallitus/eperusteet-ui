@@ -1,35 +1,65 @@
 <template>
   <div>
     <template v-if="isEditing">
-      <b-form-radio v-model="model.liittyyTyyppi" :value="EILIITY" :disabled="disabloidutValinnat.includes(EILIITY)">
+      <EpRadio
+        v-model="model.liittyyTyyppi"
+        :value="EILIITY"
+        :disabled="disabloidutValinnat.includes(EILIITY)"
+      >
         {{ $t('ei-liity-toiseen-maaraykseen') }}
-      </b-form-radio>
-      <b-form-radio v-model="model.liittyyTyyppi" :value="MUUTTAA">
+      </EpRadio>
+      <EpRadio
+        v-model="model.liittyyTyyppi"
+        :value="MUUTTAA"
+      >
         {{ $t('muuttaa-toista-maaraysta') }}
-      </b-form-radio>
+      </EpRadio>
 
-      <div v-if="model.liittyyTyyppi === MUUTTAA" class="my-3 ml-4">
-        <EpMaaraysLiittyyMaaraykseen v-model="model.muutettavatMaaraykset" :maarayksetNimella="maarayksetNimella" tyyppi="muuttaa"/>
+      <div
+        v-if="model.liittyyTyyppi === MUUTTAA"
+        class="my-3 ml-4"
+      >
+        <EpMaaraysLiittyyMaaraykseen
+          v-model="model.muutettavatMaaraykset"
+          :maaraykset-nimella="maarayksetNimella"
+          tyyppi="muuttaa"
+        />
       </div>
 
-      <b-form-radio v-model="model.liittyyTyyppi" :value="KORVAA">
+      <EpRadio
+        v-model="model.liittyyTyyppi"
+        :value="KORVAA"
+      >
         {{ $t('korvaa-toisen-maarayksen') }}
-      </b-form-radio>
+      </EpRadio>
 
-      <div v-if="model.liittyyTyyppi === KORVAA" class="my-3 ml-4">
-        <EpMaaraysLiittyyMaaraykseen v-model="model.korvattavatMaaraykset" :maarayksetNimella="maarayksetNimella" tyyppi="korvaa"/>
+      <div
+        v-if="model.liittyyTyyppi === KORVAA"
+        class="my-3 ml-4"
+      >
+        <EpMaaraysLiittyyMaaraykseen
+          v-model="model.korvattavatMaaraykset"
+          :maaraykset-nimella="maarayksetNimella"
+          tyyppi="korvaa"
+        />
       </div>
     </template>
     <template v-else-if="model.muutettavatMaaraykset.length > 0 || model.korvattavatMaaraykset.length > 0">
       <ul>
-        <li v-for="(muuttaa, index) in model.muutettavatMaaraykset" :key="'muuttaa' + index">
+        <li
+          v-for="(muuttaa, index) in model.muutettavatMaaraykset"
+          :key="'muuttaa' + index"
+        >
           <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: muuttaa.id } }">
-            {{$kaanna(muuttaa.nimi)}}
+            {{ $kaanna(muuttaa.nimi) }}
           </router-link>
         </li>
-        <li v-for="(korvaa, index) in model.korvattavatMaaraykset" :key="'korvaa' + index">
+        <li
+          v-for="(korvaa, index) in model.korvattavatMaaraykset"
+          :key="'korvaa' + index"
+        >
           <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: korvaa.id } }">
-            {{$kaanna(korvaa.nimi)}}
+            {{ $kaanna(korvaa.nimi) }}
           </router-link>
         </li>
       </ul>
@@ -37,49 +67,55 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { MaaraysDto, MaaraysDtoLiittyyTyyppiEnum, MaaraysKevytDto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed } from 'vue';
 import EpMaaraysLiittyyMaaraykseen from '@/components/maaraykset/EpMaaraysLiittyyMaaraykseen.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
-@Component({
-  components: {
-    EpMaaraysLiittyyMaaraykseen,
+const EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
+const MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
+const KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
+
+const props = defineProps({
+  modelValue: {
+    type: Object as () => MaaraysDto,
+    required: true,
   },
-})
-export default class EpMaaraysLiittyyMuuttaaValinta extends Vue {
-  private EILIITY = MaaraysDtoLiittyyTyyppiEnum.EILIITY;
-  private MUUTTAA = MaaraysDtoLiittyyTyyppiEnum.MUUTTAA;
-  private KORVAA = MaaraysDtoLiittyyTyyppiEnum.KORVAA;
+  isEditing: {
+    type: Boolean,
+    required: false,
+  },
+  maarayksetNimella: {
+    type: Array as () => MaaraysKevytDto[],
+    required: false,
+    default: () => [],
+  },
+  disabloidutValinnat: {
+    type: Array as () => MaaraysDtoLiittyyTyyppiEnum[],
+    required: false,
+    default: () => [],
+  },
+});
 
-  @Prop({ required: false })
-  isEditing!: boolean;
+const emit = defineEmits(['update:modelValue']);
 
-  @Prop({ required: false, default: [] })
-  maarayksetNimella!: MaaraysKevytDto[];
+const model = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(val) {
+    emit('update:modelValue', val);
+  },
+});
 
-  @Prop({ required: false, default: [] })
-  disabloidutValinnat!: MaaraysDtoLiittyyTyyppiEnum[];
-
-  @Prop({ required: true })
-  value!: MaaraysDto;
-
-  set model(val) {
-    this.$emit('input', val);
-  }
-
-  get model() {
-    return this.value;
-  }
-s;
-get isRequired() {
-  return this.isEditing ? ' *' : '';
-}
-}
+const isRequired = computed(() => {
+  return props.isEditing ? ' *' : '';
+});
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

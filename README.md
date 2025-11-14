@@ -46,17 +46,6 @@ ympäristömuuttujalla EPERUSTEET\_SPECFILE osoittamaan hakemistoon.
 # Kaikki testit
 yarn test
 
-# Ainoastaan yksikkötestit
-yarn test:unit
-
-# Pitää testit käynnissä
-yarn test:unit:dev
-
-# e2e testit
-yarn test:e2e
-
-# Editoi e2e testejä
-yarn dev:e2e
 ```
 
 
@@ -69,7 +58,7 @@ Käynnistä ensin [eperusteet backend](https://github.com/Opetushallitus/eperust
 
 Sen jälkeen komento:
 ```bash
-yarn serve
+yarn dev
 ```
 
 #### Lähdekoodin analysoiminen
@@ -80,7 +69,6 @@ yarn lint
 # Korjaus automaattisesti
 yarn lint:fix
 
-yarn test:unit:coverage
 ```
 
 #### Tuotantoversion buildaus

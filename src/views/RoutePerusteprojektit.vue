@@ -1,35 +1,42 @@
 <template>
   <EpMainView>
-    <EpPerusteprojektiListaus :provider="perusteetStore"
-                              :edit-route="'perusteprojekti'"
-                              :new-route="{ name: 'perusteprojektiLuonti' }"
-                              :eiTuetutKoulutustyypit="eiTuetutKoulutustyypit">
-      <h2 slot="upperheader">{{ $t('perusteprojektisi') }}</h2>
-      <h2 slot="published-header">{{ $t('julkaistut-perusteet') }}</h2>
-      <h2 slot="lowerheader">{{ $t('kaikki-perusteprojektit') }}</h2>
+    <EpPerusteprojektiListaus
+      :provider="perusteetStore"
+      :edit-route="'perusteprojekti'"
+      :new-route="{ name: 'perusteprojektiLuonti' }"
+      :filters="['koulutustyyppi', 'amosaayhteinen', 'tila', 'voimassaolo']"
+      :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
+    >
+      <template #upperheader>
+        <h2>{{ $t('perusteprojektisi') }}</h2>
+      </template>
+      <template #published-header>
+        <h2>{{ $t('julkaistut-perusteet') }}</h2>
+      </template>
+      <template #lowerheader>
+        <h2>{{ $t('kaikki-perusteprojektit') }}</h2>
+      </template>
     </EpPerusteprojektiListaus>
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import { PerusteetStore } from '@/stores/PerusteetStore';
 import { EiTuetutKoulutustyypit } from '@/utils/perusteet';
+import { $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpMainView,
-    EpPerusteprojektiListaus,
-  },
-})
-export default class RoutePerusteprojektit extends Vue {
-  @Prop({ required: true })
-  perusteetStore!: PerusteetStore;
+const props = defineProps<{
+  perusteetStore: PerusteetStore;
+}>();
 
-  get eiTuetutKoulutustyypit() {
-    return EiTuetutKoulutustyypit;
-  }
-}
+const eiTuetutKoulutustyypit = computed(() => {
+  return EiTuetutKoulutustyypit;
+});
+
+const perusteetStore = computed(() => {
+  return props.perusteetStore;
+});
 </script>

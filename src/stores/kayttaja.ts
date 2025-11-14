@@ -2,11 +2,9 @@ import _ from 'lodash';
 import Vue from 'vue';
 import { Kayttajat as KayttajatApi, KayttajanTietoDto, Perusteprojektit } from '@shared/api/eperusteet';
 import { createLogger } from '@shared/utils/logger';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { getSovellusoikeudet, IOikeusProvider } from '@shared/plugins/oikeustarkastelu';
 import { getCasKayttaja } from '@shared/api/common';
-
-Vue.use(VueCompositionApi);
 
 // FIXME: tyypitä backendiin
 export type Oikeus = 'luku' | 'kommentointi' | 'muokkaus' | 'luonti' | 'poisto' | 'tilanvaihto' | 'hallinta';

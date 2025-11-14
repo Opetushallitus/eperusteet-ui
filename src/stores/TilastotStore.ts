@@ -1,10 +1,8 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
-import { Tilastot, getAllPerusteet, Perusteet } from '@shared/api/eperusteet';
+import { defineStore } from 'pinia';
+import { reactive, computed } from 'vue';
+import { Tilastot, Perusteet } from '@shared/api/eperusteet';
 import { yleissivistavatKoulutustyypit } from '@shared/utils/perusteet';
 import * as _ from 'lodash';
-
-Vue.use(VueCompositionApi);
 
 export class TilastotStore {
   public state = reactive({

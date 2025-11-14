@@ -1,24 +1,22 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed, ref, watch } from '@vue/composition-api';
+import { reactive, computed, ref, watch } from 'vue';
 import { Termit, TermiDto } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { ITermiStore, ITermi } from '@shared/components/EpContent/KasiteHandler';
 
-Vue.use(VueCompositionApi);
-
 export class TermitStore implements ITermiStore {
   public state = reactive({
     termit: null as TermiDto[] | null,
+    perusteId: null as number | null,
   });
-
-  constructor(private readonly perusteId?: number) {
-  }
 
   public readonly termit = computed(() => this.state.termit);
 
-  public async init(perusteId: number) {
+  public async init(perusteId) {
+    this.state.perusteId = perusteId;
     this.state.termit = null;
     this.state.termit = (await Termit.getAllTermit(perusteId)).data;
+
+    return this;
   }
 
   public async save(perusteId: number, muokattuTermi: TermiDto) {
@@ -42,6 +40,8 @@ export class TermitStore implements ITermiStore {
         ...this.state.termit || [],
       ];
     }
+
+    return muokattuTermi;
   }
 
   public async delete(perusteId: number, poistettavaTermi: TermiDto) {
@@ -55,21 +55,14 @@ export class TermitStore implements ITermiStore {
   }
 
   getTermi(avain: string) {
-    return Termit.getTermi(this.perusteId!, avain);
+    return _.find(this.termit.value, termi => termi.avain === avain);
   }
 
   getAllTermit() {
-    return Termit.getAllTermit(this.perusteId!);
+    return this.state.termit || [];
   }
 
-  updateTermi(termiId: number, termi: ITermi) {
-    return Termit.updateTermi(this.perusteId!, termiId, termi);
-  }
-
-  addTermi(termi: ITermi) {
-    return Termit.addTermi(this.perusteId!, {
-      ...termi,
-      avain: this.makeKey(termi),
-    });
+  async updateOrAddTermi(termi: ITermi) {
+    return await this.save(this.state.perusteId!, termi);
   }
 }

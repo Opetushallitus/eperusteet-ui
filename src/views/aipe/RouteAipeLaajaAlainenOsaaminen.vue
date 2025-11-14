@@ -1,62 +1,78 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
+      <h2 v-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing }">
-      <div class="mt-1" v-if="isEditing">
-        <h3>{{$t('laaja-alaisen-osaamisen-nimi')}} *</h3>
-        <ep-input v-model="data.nimi" :is-editing="true"></ep-input>
+      <div
+        v-if="isEditing"
+        class="mt-1"
+      >
+        <h3>{{ $t('laaja-alaisen-osaamisen-nimi') }} *</h3>
+        <ep-input
+          v-model="data.nimi"
+          :is-editing="true"
+        />
       </div>
       <div :class="{ 'mt-4': isEditing }">
-        <h3 v-if="isEditing">{{$t('kuvaus')}}</h3>
-        <ep-content v-model="data.kuvaus"
-                  layout="normal"
-                  :is-editable="isEditing"/>
+        <h3 v-if="isEditing">
+          {{ $t('kuvaus') }}
+        </h3>
+        <ep-content
+          v-model="data.kuvaus"
+          layout="normal"
+          :is-editable="isEditing"
+        />
       </div>
     </template>
   </EpEditointi>
-
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { computed, ref, watch } from 'vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { AipeLaajaAlainenOsaaminenStore } from '@/stores/AipeLaajaAlainenOsaaminenStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import { $kaanna, $t } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
+const props = defineProps({
+  perusteStore: {
+    type: Object as () => PerusteStore,
+    required: true,
   },
-})
-export default class RouteAipeLaajaAlainenOsaaminen extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  laoId: {
+    type: [String, Number],
+    required: false,
+  },
+});
 
-  @Prop({ required: false })
-  laoId: any;
+const store = ref<EditointiStore | null>(null);
 
-  store: EditointiStore | null = null;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('laoId', { immediate: true })
-  async laoChange() {
-    const store = new AipeLaajaAlainenOsaaminenStore(this.perusteId!, this.laoId, this.perusteStore, this);
-    this.store = new EditointiStore(store);
-  }
+const laoChange = async () => {
+  const storeInstance = new AipeLaajaAlainenOsaaminenStore(perusteId.value!, props.laoId, props.perusteStore);
+  store.value = new EditointiStore(storeInstance);
+};
 
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-}
+watch(() => props.laoId, async () => {
+  await laoChange();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">

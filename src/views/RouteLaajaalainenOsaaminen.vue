@@ -1,21 +1,44 @@
 <template>
-  <EpEditointi v-if="store" :store="store" :versionumero="versionumero">
-    <template v-slot:header="{ data }">
-      <h2 class="m-0" v-if="data.nimiKoodi" >{{ $kaanna(data.nimiKoodi.nimi) }}</h2>
+  <EpEditointi
+    v-if="store"
+    :store="store"
+    :versionumero="versionumero"
+  >
+    <template #header="{ data }">
+      <h2
+        v-if="data.nimiKoodi"
+        class="m-0"
+      >
+        {{ $kaanna(data.nimiKoodi.nimi) }}
+      </h2>
     </template>
-    <template v-slot:default="{ data, isEditing }">
-
-      <b-row v-if="isEditing" class="mb-4">
+    <template #default="{ data, isEditing }">
+      <b-row
+        v-if="isEditing"
+        class="mb-4"
+      >
         <b-col lg="8">
-          <b-form-group :label="$t('otsikko') + (isEditing ? ' *' : '')" required>
-            <ep-koodisto-select :store="laajaalainenOsaaminenKoodisto" v-model="data.nimiKoodi" :is-editing="isEditing" :naytaArvo="false">
+          <b-form-group
+            :label="$t('otsikko') + (isEditing ? ' *' : '')"
+            required
+          >
+            <ep-koodisto-select
+              v-model="data.nimiKoodi"
+              :store="laajaalainenOsaaminenKoodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -26,27 +49,35 @@
         </b-col>
       </b-row>
 
-      <ep-toggle v-if="isEditing" class="my-4" v-model="data.liite">{{$t('nayta-laaja-alainen-osaaminen-liitteena')}}</ep-toggle>
+      <ep-toggle
+        v-if="isEditing"
+        v-model="data.liite"
+        class="my-4"
+      >
+        {{ $t('nayta-laaja-alainen-osaaminen-liitteena') }}
+      </ep-toggle>
 
       <b-row>
         <b-col lg="8">
           <b-form-group required>
-            <ep-content v-model="data.teksti"
-                        layout="normal"
-                        :is-editable="isEditing"
-                        :kasiteHandler="kasiteHandler"
-                        :kuvaHandler="kuvaHandler"></ep-content>
+            <ep-content
+              v-model="data.teksti"
+              layout="normal"
+              :is-editable="isEditing"
+              :kasite-handler="kasiteHandler"
+              :kuva-handler="kuvaHandler"
+            />
           </b-form-group>
         </b-col>
       </b-row>
-
     </template>
   </EpEditointi>
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Prop, Component, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
@@ -62,89 +93,72 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { TermitStore } from '@/stores/TermitStore';
 import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpSpinner,
-    EpContent,
-    EpKoodistoSelect,
-    EpToggle,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+}>();
+
+const store = ref<EditointiStore | null>(null);
+const route = useRoute();
+
+const laajaalainenOsaaminenKoodisto = new KoodistoSelectStore({
+  koodisto: 'tutkintokoulutukseenvalmentavakoulutuslaajaalainenosaaminen',
+  async query(query: string, sivu = 0, koodisto: string) {
+    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    }));
+    return data as any;
   },
-})
-export default class RouteLaajaalainenOsaaminen extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+});
 
-  private store: EditointiStore | null = null;
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
 
-  @Watch('laajaalainenosaaminenId', { immediate: true })
-  async onParamChange(id: string, oldId: string) {
-    if (!id || id === oldId) {
-      return;
-    }
-    await this.fetch();
+const versionumero = computed(() => {
+  return _.toNumber(route.query.versionumero);
+});
+
+const laajaalainenosaaminenId = computed(() => {
+  return route.params.laajaalainenosaaminenId;
+});
+
+
+const fetch = async () => {
+  await props.perusteStore.blockUntilInitialized();
+  const tkstore = new LaajaalainenOsaaminenStore(perusteId.value!, Number(laajaalainenosaaminenId.value), versionumero.value);
+  store.value = new EditointiStore(tkstore);
+};
+
+watch(() => laajaalainenosaaminenId.value, async (id, oldId) => {
+  if (!id || id === oldId) {
+    return;
   }
+  await fetch();
+}, { immediate: true });
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
-
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const tkstore = new LaajaalainenOsaaminenStore(this.perusteId!, Number(this.laajaalainenosaaminenId), this.versionumero);
-    this.store = new EditointiStore(tkstore);
-  }
-
-  private readonly laajaalainenOsaaminenKoodisto = new KoodistoSelectStore({
-    koodisto: 'tutkintokoulutukseenvalmentavakoulutuslaajaalainenosaaminen',
-    async query(query: string, sivu = 0, koodisto: string) {
-      const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      }));
-      return data as any;
-    },
-  });
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-
-  get laajaalainenosaaminenId() {
-    return this.$route.params.laajaalainenosaaminenId;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  get kuvaHandler() {
-    return createKuvaHandler(new KuvaStore(this.perusteId!));
-  }
-}
+watch(() => versionumero.value, async () => {
+  await fetch();
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
 @import "@shared/styles/_variables.scss";
 
-  ::v-deep fieldset {
-    padding-right: 0;
-  }
+:deep(fieldset) {
+  padding-right: 0;
+}
 
-  ::v-deep .input-wrapper {
-    flex: 1 1 0;
+:deep(.input-wrapper) {
+  flex: 1 1 0;
 
-    input {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
+  input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
+}
 </style>

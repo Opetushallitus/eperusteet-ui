@@ -1,36 +1,61 @@
 <template>
   <EpMainView>
     <b-container>
-      <EpSteps ref="epsteps" :steps="steps" :initial-step="0" :on-save="onSave" @cancel="onCancel" @stepChange="onStepChange">
-
-        <template v-slot:pohja>
-          <div class="mb-5">{{ $t('digitaalinen-osaaminen-luonti-selite') }}</div>
+      <EpSteps
+        ref="epsteps"
+        :steps="steps"
+        :initial-step="0"
+        :on-save="onSave"
+        @cancel="onCancel"
+        @step-change="onStepChange"
+      >
+        <template #pohja>
+          <div class="mb-5">
+            {{ $t('digitaalinen-osaaminen-luonti-selite') }}
+          </div>
 
           <div class="row">
             <div class="col-sm-10 mb-4">
-              <b-form-group class="mt-0" :label="$t('kayta-pohjana') + ' *'">
+              <b-form-group
+                class="mt-0"
+                :label="$t('kayta-pohjana') + ' *'"
+              >
+                <EpRadio
+                  v-model="tyyppi"
+                  value="perusteesta"
+                  name="tyyppi"
+                  :disabled="!perusteet || perusteet.length === 0"
+                >
+                  {{ $t('toinen-projekti') }}
+                </EpRadio>
 
-                <b-form-radio v-model="tyyppi" value="perusteesta" name="tyyppi" :disabled="!perusteet || perusteet.length === 0">{{ $t('toinen-projekti') }}</b-form-radio>
                 <div v-if="tyyppi === 'perusteesta'">
                   <EpMultiSelect
                     v-if="perusteet"
                     :value="data.peruste"
-                    @input="valitsePeruste($event)"
                     :placeholder="$t('valitse-peruste')"
                     :is-editing="true"
                     :search-identity="nimiSearchIdentity"
                     :options="perusteet"
-                    class="perustevalinta mb-2 mt-2">
-                    <template slot="singleLabel" slot-scope="{ option }">
+                    class="perustevalinta mb-2 mt-2"
+                    @input="valitsePeruste($event)"
+                  >
+                    <template #singleLabel="{ option }">
                       {{ $kaanna(option.nimi) }}
-                      <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
-                        (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span>-<span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                      <span
+                        v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu"
+                        class="ml-3 voimassaolo"
+                      >
+                        (<span v-if="option.voimassaoloAlkaa">{{ $sd(option.voimassaoloAlkaa) }}</span>-<span v-if="option.voimassaoloLoppuu">{{ $sd(option.voimassaoloLoppuu) }}</span>)
                       </span>
                     </template>
-                    <template slot="option" slot-scope="{ option }">
+                    <template #option="{ option }">
                       {{ $kaanna(option.nimi) }}
-                      <span class="ml-3 voimassaolo" v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu">
-                        (<span v-if="option.voimassaoloAlkaa">{{$sd(option.voimassaoloAlkaa)}}</span> - <span v-if="option.voimassaoloLoppuu">{{$sd(option.voimassaoloLoppuu)}}</span>)
+                      <span
+                        v-if="option.voimassaoloAlkaa || option.voimassaoloLoppuu"
+                        class="ml-3 voimassaolo"
+                      >
+                        (<span v-if="option.voimassaoloAlkaa">{{ $sd(option.voimassaoloAlkaa) }}</span> - <span v-if="option.voimassaoloLoppuu">{{ $sd(option.voimassaoloLoppuu) }}</span>)
                       </span>
                     </template>
                   </EpMultiSelect>
@@ -38,165 +63,157 @@
                 </div>
               </b-form-group>
 
-              <b-form-radio class="mb-4" v-model="tyyppi" value="uusi" name="tyyppi">{{ $t('luo-uusi') }}</b-form-radio>
-              <b-form-group :label="$t('projektin-nimi') + '*'" required v-if="tyyppi">
-                <ep-input v-model="data.nimi" type="string" :is-editing="true" :placeholder="$t('kirjoita-projektin-nimi')" :validation="$v.data.nimi"/>
+              <EpRadio
+                v-model="tyyppi"
+                class="mb-4"
+                value="uusi"
+                name="tyyppi"
+              >
+                {{ $t('luo-uusi') }}
+              </EpRadio>
+              <b-form-group
+                v-if="tyyppi"
+                :label="$t('projektin-nimi') + '*'"
+                required
+              >
+                <ep-input
+                  v-model="data.nimi"
+                  type="string"
+                  :is-editing="true"
+                  :placeholder="$t('kirjoita-projektin-nimi')"
+                  :validation="v$.data.nimi"
+                />
               </b-form-group>
             </div>
-           </div>
+          </div>
         </template>
 
-        <template v-slot:luo>
-          {{$t('luo-perusteprojekti')}}
+        <template #luo>
+          {{ $t('luo-perusteprojekti') }}
         </template>
-
       </EpSteps>
     </b-container>
   </EpMainView>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import useVuelidate from '@vuelidate/core';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpSearch from '@shared/components/forms/EpSearch.vue';
-import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSteps, { Step } from '@shared/components/EpSteps/EpSteps.vue';
-import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
-import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { PerusteprojektiLuontiDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
 import * as _ from 'lodash';
 import { notNull } from '@shared/validators/required';
-import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
+import { $t, $kaanna, $sd } from '@shared/utils/globals';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
-export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
-@Component({
-  components: {
-    EpAikataulu,
-    EpButton,
-    EpColorIndicator,
-    EpInput,
-    EpMainView,
-    EpMultiSelect,
-    EpSearch,
-    EpSelect,
-    EpSpinner,
-    EpSteps,
-    EpDatepicker,
-    KoulutustyyppiSelect,
-    EpToggle,
-  },
-  validations() {
-    return {
-      data: this.validator,
-    };
-  },
-})
-export default class RouteDigitaalisetOsaamisetLuonti extends Vue {
-  @Prop({ required: true })
-  perusteprojektiStore!: PerusteprojektiStore;
+const props = defineProps<{
+  perusteprojektiStore: PerusteprojektiStore;
+}>();
 
-  private data: any = {
-    nimi: null,
+const data = ref({
+  nimi: null as string | null,
+  peruste: null as any,
+});
+
+const currentStep = ref<Step | null>(null);
+const tyyppi = ref<'perusteesta' | 'uusi' | null>(null);
+const router = useRouter();
+
+onMounted(async () => {
+  await props.perusteprojektiStore.fetchPohjaDigitaalisetOsaamiset();
+});
+
+watch(() => tyyppi.value, () => {
+  data.value = {
+    ...data.value,
     peruste: null,
   };
-  private currentStep: Step | null = null;
-  private tyyppi: 'perusteesta' | 'uusi' | null = null;
+});
 
-  async mounted() {
-    await this.perusteprojektiStore.fetchPohjaDigitaalisetOsaamiset();
+const perusteet = computed(() => {
+  if (props.perusteprojektiStore.perusteet.value) {
+    return _.sortBy(props.perusteprojektiStore.perusteet.value, peruste => _.toLower($kaanna(peruste.nimi!)));
   }
+  return undefined;
+});
 
-  @Watch('tyyppi')
-  onTyyppiChange() {
-    this.data = {
-      ...this.data,
-      peruste: null,
-    };
-  }
+const steps = computed(() => {
+  return [{
+    key: 'pohja',
+    name: $t('uusi-projekti'),
+    isValid() {
+      if (_.isEmpty(data.value.nimi)) {
+        return false;
+      }
 
-  get perusteet() {
-    if (this.perusteprojektiStore.perusteet.value) {
-      return _.sortBy(this.perusteprojektiStore.perusteet.value, peruste => _.toLower(this.$kaanna(peruste.nimi!)));
-    }
-  }
+      if (tyyppi.value === 'perusteesta' && !data.value.peruste) {
+        return false;
+      }
 
-  get steps() {
-    const self = this;
-    return [{
-      key: 'pohja',
-      name: this.$t('uusi-projekti'),
-      isValid() {
-        if (_.isEmpty(self.data.nimi)) {
-          return false;
-        }
+      return true;
+    },
+  }];
+});
 
-        if (self.tyyppi === 'perusteesta' && !self.data.peruste) {
-          return false;
-        }
+const valitsePeruste = (event: any) => {
+  data.value.peruste = event;
+};
 
-        return true;
-      },
-    }];
-  }
+const nimiSearchIdentity = (obj: any) => {
+  return _.toLower($kaanna(obj.nimi));
+};
 
-  valitsePeruste(event) {
-    this.data.peruste = event;
-  }
+const onSave = async () => {
+  let luotu;
+  const projekti = {
+    nimi: data.value.nimi,
+    perusteId: data.value.peruste?.id,
+    tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.DIGITAALINENOSAAMINEN,
+  };
 
-  nimiSearchIdentity(obj: any) {
-    return _.toLower(this.$kaanna(obj.nimi));
-  }
+  luotu = await props.perusteprojektiStore.addPerusteprojekti(projekti);
 
-  async onSave() {
-    let luotu;
-    const projekti = {
-      nimi: this.data.nimi,
-      perusteId: this.data.peruste?.id,
-      tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.DIGITAALINENOSAAMINEN,
-    };
+  router.push({
+    name: 'perusteprojekti',
+    params: {
+      projektiId: '' + luotu.id,
+    },
+  });
+};
 
-    luotu = await this.perusteprojektiStore.addPerusteprojekti(projekti);
+const onCancel = () => {
+  router.push({
+    name: 'digitaalisetosaamiset',
+  });
+};
 
-    this.$router.push({
-      name: 'perusteprojekti',
-      params: {
-        projektiId: '' + luotu.id,
-      },
-    });
-  }
+const onStepChange = (step: Step) => {
+  currentStep.value = step;
+};
 
-  onCancel() {
-    this.$router.push({
-      name: 'digitaalisetosaamiset',
-    });
-  }
-
-  onStepChange(step) {
-    this.currentStep = step;
-  }
-
-  get validator() {
-    if (this.currentStep && this.currentStep.key === 'pohja') {
-      return {
+const validator = computed(() => {
+  if (currentStep.value && currentStep.value.key === 'pohja') {
+    return {
+      data: {
         nimi: notNull(),
-      };
-    }
-
-    return {};
+      },
+    };
   }
-}
+
+  return {};
+});
+
+const v$ = useVuelidate(validator, { data });
 </script>
 
 <style lang="scss" scoped>
-
 .tieto {
   padding: 20px 20px 20px 0px;
 
@@ -206,10 +223,8 @@ export default class RouteDigitaalisetOsaamisetLuonti extends Vue {
 }
 
 .perustevalinta {
-
   .voimassaolo {
-    font-size:0.9rem;
+    font-size: 0.9rem;
   }
 }
-
 </style>

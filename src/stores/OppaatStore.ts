@@ -1,10 +1,7 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { Oppaat, OpasLuontiDto, PerusteHakuDto } from '@shared/api/eperusteet';
-import { Debounced } from '@shared/utils/delay';
+import { debounced } from '@shared/utils/delay';
 import _ from 'lodash';
-
-Vue.use(VueCompositionApi);
 
 export class OppaatStore {
   private state = reactive({
@@ -24,9 +21,8 @@ export class OppaatStore {
     return res.data;
   }
 
-  @Debounced(300)
-  public async updateQuery() {
+  public updateQuery = debounced(async () => {
     const res = (await Oppaat.getAllOppaatKevyt(1000)).data;
     this.state.oppaat = (res as any).data as any;
-  }
+  });
 }

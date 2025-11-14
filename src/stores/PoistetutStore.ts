@@ -1,9 +1,6 @@
-import Vue from 'vue';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import * as _ from 'lodash';
 import { PoistettuSisalto, PoistettuSisaltoDto } from '@shared/api/eperusteet';
-
-Vue.use(VueCompositionApi);
 
 export class PoistetutStore {
   public state = reactive({

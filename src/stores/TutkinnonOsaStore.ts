@@ -1,11 +1,9 @@
-import Vue from 'vue';
-import VueCompositionApi, { watch, reactive, computed } from '@vue/composition-api';
+import Vue, { computed, reactive } from 'vue';
 import { TutkinnonOsaViiteDto, TutkinnonRakenne } from '@shared/api/eperusteet';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from './PerusteStore';
 import _ from 'lodash';
-
-Vue.use(VueCompositionApi);
+import { unref } from 'vue';
 
 export class TutkinnonOsaStore implements IEditoitava {
   constructor(
@@ -19,8 +17,8 @@ export class TutkinnonOsaStore implements IEditoitava {
   public readonly tutkinnonOsat = computed(() => this.state.tutkinnonOsat);
 
   public async fetch() {
-    const perusteId = this.perusteStore.perusteId.value;
-    const st = this.perusteStore.suoritustavat.value;
+    const perusteId = unref(this.perusteStore.perusteId);
+    const st = unref(this.perusteStore.suoritustavat);
     if (perusteId && st) {
       this.state.tutkinnonOsat = null;
       await this.init(perusteId, st);
@@ -44,12 +42,12 @@ export class TutkinnonOsaStore implements IEditoitava {
 
   public async load() {
     await this.fetch();
-    return this.tutkinnonOsat.value;
+    return this.state.tutkinnonOsat;
   }
 
   public async save(data: any[]) {
-    const perusteId = this.perusteStore.perusteId.value;
-    const st = this.perusteStore.suoritustavat.value[0] as any;
+    const perusteId = unref(this.perusteStore.perusteId);
+    const st = unref(this.perusteStore.suoritustavat)[0] as any;
     const payload = _.map(data, (tosa, idx) => ({
       id: tosa.id,
       jarjestys: idx,

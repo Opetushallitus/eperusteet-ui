@@ -1,58 +1,86 @@
 <template>
-  <router-view v-if="maaraysId"/>
+  <router-view v-if="maaraysId" />
 
-  <ep-main-view container v-else>
-    <template slot="header">
+  <ep-main-view
+    v-else
+    container
+  >
+    <template #header>
       <div class="d-flex justify-content-between">
         <h1>{{ $t('maarayskokoelma-otsikko') }}</h1>
         <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: 'uusi' } }">
           <EpButton
+            v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
             icon="add"
             variant="outline"
-            v-oikeustarkastelu="{oikeus:'muokkaus', kohde: 'eperusteet_maarays'}"
-            >{{ $t('lisaa-maarays') }}</EpButton>
+          >
+            {{ $t('lisaa-maarays') }}
+          </EpButton>
         </router-link>
       </div>
     </template>
 
     <div>
-      <div class="mb-3">{{$t('maarayskokoelma-selite')}}</div>
+      <div class="mb-3">
+        {{ $t('maarayskokoelma-selite') }}
+      </div>
 
       <div class="row ml-0 mb-2 mt-4">
-
-        <b-form-group :label="$t('hae')" class="col-4">
-          <ep-search v-model="query.nimi" :placeholder="$t('etsi-maarayksia')"/>
+        <b-form-group
+          :label="$t('hae')"
+          class="col-4"
+        >
+          <ep-search
+            v-model="query.nimi"
+            :placeholder="$t('etsi-maarayksia')"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('tyyppi')" class="col-3">
-          <EpMultiSelect v-model="query.tyyppi"
-                  :enable-empty-option="true"
-                  placeholder="kaikki"
-                  :is-editing="true"
-                  :options="tyyppiVaihtoehdot">
-            <template slot="singleLabel" slot-scope="{ option }">
+        <b-form-group
+          :label="$t('tyyppi')"
+          class="col-3"
+        >
+          <EpMultiSelect
+            v-model="query.tyyppi"
+            :enable-empty-option="true"
+            placeholder="kaikki"
+            :is-editing="true"
+            :options="tyyppiVaihtoehdot"
+          >
+            <template #singleLabel="{ option }">
               {{ $t('maarays-tyyppi-' + option.toLowerCase()) }}
             </template>
-            <template slot="option" slot-scope="{ option }">
+            <template #option="{ option }">
               {{ $t('maarays-tyyppi-' + option.toLowerCase()) }}
             </template>
           </EpMultiSelect>
         </b-form-group>
 
-        <b-form-group :label="$t('koulutus-tai-tutkinto')" class="col-3">
-          <EpMaarayskokoelmaKoulutustyyppiSelect v-model="query.koulutustyyppi" :isEditing="true"/>
+        <b-form-group
+          :label="$t('koulutus-tai-tutkinto')"
+          class="col-3"
+        >
+          <EpMaarayskokoelmaKoulutustyyppiSelect
+            v-model="query.koulutustyyppi"
+            :is-editing="true"
+          />
         </b-form-group>
 
-        <b-form-group :label="$t('voimassaolo')" class="col-2">
-          <EpMultiSelect v-model="query.voimassaolo"
-                    :enable-empty-option="true"
-                    placeholder="kaikki"
-                    :is-editing="true"
-                    :options="voimassaVaihtoehdot">
-            <template slot="singleLabel" slot-scope="{ option }">
+        <b-form-group
+          :label="$t('voimassaolo')"
+          class="col-2"
+        >
+          <EpMultiSelect
+            v-model="query.voimassaolo"
+            :enable-empty-option="true"
+            placeholder="kaikki"
+            :is-editing="true"
+            :options="voimassaVaihtoehdot"
+          >
+            <template #singleLabel="{ option }">
               {{ $t('ajoitus-' + option.toLowerCase()) }}
             </template>
-            <template slot="option" slot-scope="{ option }">
+            <template #option="{ option }">
               {{ $t('ajoitus-' + option.toLowerCase()) }}
             </template>
           </EpMultiSelect>
@@ -60,14 +88,24 @@
       </div>
 
       <div class="d-flex mb-4">
-        <EpToggle v-model="query.luonnos" checkbox>{{ $t('luonnos') }}</EpToggle>
-        <EpToggle v-model="query.julkaistu" checkbox>{{ $t('julkaistu') }}</EpToggle>
+        <EpToggle
+          v-model="query.luonnos"
+          checkbox
+        >
+          {{ $t('luonnos') }}
+        </EpToggle>
+        <EpToggle
+          v-model="query.julkaistu"
+          checkbox
+        >
+          {{ $t('julkaistu') }}
+        </EpToggle>
       </div>
 
       <ep-spinner v-if="!maaraykset" />
 
       <div v-else-if="maaraykset.length === 0">
-      {{$t('ei-maarayksia')}}
+        {{ $t('ei-maarayksia') }}
       </div>
 
       <b-table
@@ -82,44 +120,43 @@
         :fields="tableFields"
         :per-page="perPage"
         no-local-sorting
+        :sort-by="sort.sortBy"
+        :sort-desc="sort.sortDesc"
         @sort-changed="sortingChanged"
-        :sort-by.sync="sort.sortBy"
-        :sort-desc.sync="sort.sortDesc">
-
-      <template v-slot:cell(nimi)="{ item }">
-        <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: item.id } }">
-          {{$kaanna(item.nimi)}}
-        </router-link>
-      </template>
-
+      >
+        <template #cell(nimi)="{ item }">
+          <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: item.id } }">
+            {{ $kaanna(item.nimi) }}
+          </router-link>
+        </template>
       </b-table>
 
       <ep-pagination
         v-model="sivu"
         :per-page="perPage"
-        :total-rows="maarayksetCount"/>
+        :total-rows="maarayksetCount"
+      />
     </div>
   </ep-main-view>
 </template>
 
-<script lang="ts">
-import * as _ from 'lodash';
-import { Prop, Component, Vue, ProvideReactive, Watch } from 'vue-property-decorator';
-import { MaarayksetStore, MaaraysQueryDto } from '@shared/stores/MaarayksetStore';
-import EpIcon from '@shared/components/EpIcon/EpIcon.vue';
+<script setup lang="ts">
+import _ from 'lodash';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { MaarayksetStore } from '@shared/stores/MaarayksetStore';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { MaaraysDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpMaterialIcon from '@shared/components//EpMaterialIcon/EpMaterialIcon.vue';
 import { Murupolku } from '@shared/stores/murupolku';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
-import { Debounced } from '@shared/utils/delay';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
+import { $kaanna, $t, $sd } from '@shared/utils/globals';
 
 interface MaaraysQuery {
   nimi: string,
@@ -128,168 +165,150 @@ interface MaaraysQuery {
   jarjestysTapa?: string;
   jarjestys: string;
   koulutustyyppi: string | null,
+  luonnos?: boolean,
+  julkaistu?: boolean,
+  tyyppi?: any,
 }
 
-@Component({
-  components: {
-    EpIcon,
-    EpMainView,
-    EpSearch,
-    EpSpinner,
-    EpButton,
-    EpMaterialIcon,
-    EpMultiSelect,
-    EpMaarayskokoelmaKoulutustyyppiSelect,
-    EpPagination,
-    EpToggle,
-  },
-})
-export default class RouteMaaraysKokoelma extends Vue {
-  @Prop({ required: true })
-  private maarayksetStore!: MaarayksetStore;
+const maarayksetStore = new MaarayksetStore();
+const route = useRoute();
+const router = useRouter();
 
-  private perPage = 10;
-  private sivu = 1;
-  private sort = {};
-  private query: MaaraysQuery = {
-    nimi: '',
-    sivukoko: 10,
-    voimassaolo: null,
-    jarjestysTapa: 'nimi',
-    jarjestys: 'ASC',
-    koulutustyyppi: null,
-  };
+const perPage = ref(10);
+const sivu = ref(1);
+const sort = ref({});
+const query = ref<MaaraysQuery>({
+  nimi: '',
+  sivukoko: 10,
+  voimassaolo: null,
+  jarjestysTapa: 'nimi',
+  jarjestys: 'ASC',
+  koulutustyyppi: null,
+});
 
-  async mounted() {
-    Murupolku.aseta('maarayskokoelma', this.$t('route-maaraykset'), {
-      name: 'maarayskokoelma',
-    });
-  }
+onMounted(async () => {
+  Murupolku.aseta('maarayskokoelma', $t('route-maaraykset'), {
+    name: 'maarayskokoelma',
+  });
+});
 
-  @Watch('maaraysId', { immediate: true })
-  async maaraysChange() {
-    if (!this.maaraysId) {
-      await this.fetch();
-    }
-  }
+const maaraysId = computed(() => route.params.maaraysId);
 
-  get maaraykset() {
-    return this.maarayksetStore.maaraykset.value?.data;
-  }
+const maaraykset = computed(() => maarayksetStore.maaraykset.value?.data);
+const maarayksetCount = computed(() => maarayksetStore.maaraykset.value?.kokonaismäärä);
 
-  get maarayksetCount() {
-    return this.maarayksetStore.maaraykset.value?.kokonaismäärä;
-  }
+const tyyppiVaihtoehdot = computed(() => [
+  MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
+  MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
+  MaaraysDtoTyyppiEnum.PERUSTE,
+]);
 
-  get tyyppiVaihtoehdot() {
-    return [
-      MaaraysDtoTyyppiEnum.OPETUSHALLITUKSENMUU,
-      MaaraysDtoTyyppiEnum.AMMATILLINENMUU,
-      MaaraysDtoTyyppiEnum.PERUSTE,
-    ];
-  }
+const voimassaVaihtoehdot = computed(() => [
+  'KAIKKI',
+  'TULEVA',
+  'VOIMASSAOLO',
+  'POISTUNUT',
+]);
 
-  get voimassaVaihtoehdot() {
-    return [
-      'KAIKKI',
-      'TULEVA',
-      'VOIMASSAOLO',
-      'POISTUNUT',
-    ];
-  }
-
-  @Watch('sivu')
-  async sivuChange() {
-    await this.fetch();
-  }
-
-  @Watch('query', { deep: true })
-  async queryChange() {
-    this.sivu = 1;
-    await this.fetch();
-  }
-
-  @Debounced(300)
-  async fetch() {
-    await this.maarayksetStore.fetch(
-      {
-        ...this.query as any,
-        kieli: Kielet.getSisaltoKieli.value,
-        sivu: this.sivu - 1,
-        tuleva: this.query.voimassaolo === 'TULEVA',
-        voimassaolo: this.query.voimassaolo === 'VOIMASSAOLO',
-        poistunut: this.query.voimassaolo === 'POISTUNUT',
-        koulutustyypit: this.query.koulutustyyppi ? [this.query.koulutustyyppi] : [],
-      });
-  }
-
-  get tableFields() {
-    return [{
-      key: 'nimi',
-      label: this.$t('maarayksen-nimi'),
-      sortable: true,
-      sortByFormatted: true,
-      thStyle: { width: '35%' },
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$kaanna(value);
-      },
-    }, {
-      key: 'tila',
-      label: this.$t('tila'),
-      sortable: false,
-      thClass: 'border-0',
-      formatter: (value: any, key: any, item: any) => {
-        return this.$t(value.toLowerCase());
-      },
-    }, {
-      key: 'muokattu',
-      label: this.$t('muokattu'),
-      sortable: false,
-      thClass: 'border-0',
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sd(value);
-      },
-    }, {
-      key: 'voimassaoloAlkaa',
-      label: this.$t('voimaantulo'),
-      sortable: false,
-      thClass: 'border-0',
-      formatter: (value: any, key: any, item: any) => {
-        return (this as any).$sd(value);
-      },
-    }, {
-      key: 'voimassaoloLoppuu',
-      label: this.$t('voimassaolo-paattyy'),
-      sortable: false,
-      thClass: 'border-0',
-      formatter: (value: any, key: any, item: any) => {
-        if (value) {
-          return (this as any).$sd(value);
-        }
-
-        return null;
-      },
+const tableFields = computed(() => [
+  {
+    key: 'nimi',
+    label: $t('maarayksen-nimi'),
+    sortable: true,
+    sortByFormatted: true,
+    thStyle: { width: '35%' },
+    formatter: (value: any) => {
+      return $kaanna(value);
     },
-    ];
-  }
+  },
+  {
+    key: 'tila',
+    label: $t('tila'),
+    sortable: false,
+    thClass: 'border-0',
+    formatter: (value: any) => {
+      return $t(value.toLowerCase());
+    },
+  },
+  {
+    key: 'muokattu',
+    label: $t('muokattu'),
+    sortable: false,
+    thClass: 'border-0',
+    formatter: (value: any) => {
+      return $sd(value);
+    },
+  },
+  {
+    key: 'voimassaoloAlkaa',
+    label: $t('voimaantulo'),
+    sortable: false,
+    thClass: 'border-0',
+    formatter: (value: any) => {
+      return $sd(value);
+    },
+  },
+  {
+    key: 'voimassaoloLoppuu',
+    label: $t('voimassaolo-paattyy'),
+    sortable: false,
+    thClass: 'border-0',
+    formatter: (value: any) => {
+      if (value) {
+        return $sd(value);
+      }
+      return null;
+    },
+  },
+]);
 
-  sortingChanged(sort) {
-    this.sort = sort;
-    this.sivu = 1;
-    this.query = {
-      ...this.query,
-      jarjestys: sort.sortDesc ? 'DESC' : 'ASC',
-      jarjestysTapa: sort.sortBy,
-    };
+// Watch for changes in maaraysId
+watch(maaraysId, async () => {
+  if (!maaraysId.value) {
+    await fetch();
   }
+});
 
-  get maaraysId() {
-    return this.$route.params.maaraysId;
-  }
-}
+// Watch for changes in sivu
+watch(sivu, async () => {
+  await fetch();
+});
+
+// Watch for changes in query
+watch(query, async () => {
+  sivu.value = 1;
+  await fetch();
+}, { deep: true });
+
+const fetch = _.debounce(async () => {
+  await maarayksetStore.fetch(
+    {
+      ...query.value as any,
+      kieli: Kielet.getSisaltoKieli.value,
+      sivu: sivu.value - 1,
+      tuleva: query.value.voimassaolo === 'TULEVA',
+      voimassaolo: query.value.voimassaolo === 'VOIMASSAOLO',
+      poistunut: query.value.voimassaolo === 'POISTUNUT',
+      koulutustyypit: query.value.koulutustyyppi ? [query.value.koulutustyyppi] : [],
+    });
+}, 300);
+
+const sortingChanged = (sortVal: any) => {
+  sort.value = sortVal;
+  sivu.value = 1;
+  query.value = {
+    ...query.value,
+    jarjestys: sortVal.sortDesc ? 'DESC' : 'ASC',
+    jarjestysTapa: sortVal.sortBy,
+  };
+};
+
+onMounted(async () => {
+  await fetch();
+});
+
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
-
 </style>

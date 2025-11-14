@@ -1,23 +1,45 @@
 <template>
-  <EpEditointi :store="store" :versionumero="versionumero">
+  <EpEditointi
+    v-if="store"
+    :store="store"
+    :versionumero="versionumero"
+  >
     <template #header="{ data }">
-      <h2 v-if="data.koodi">{{ $kaanna(data.koodi.nimi) }}</h2>
-      <h2 v-else-if="data.nimi">{{ $kaanna(data.nimi) }}</h2>
-      <h2 v-else class="font-italic" >{{ $t('nimeton') }}</h2>
+      <h2 v-if="data.koodi">
+        {{ $kaanna(data.koodi.nimi) }}
+      </h2>
+      <h2 v-else-if="data.nimi">
+        {{ $kaanna(data.nimi) }}
+      </h2>
+      <h2
+        v-else
+        class="font-italic"
+      >
+        {{ $t('nimeton') }}
+      </h2>
     </template>
 
     <template #default="{ data, isEditing }">
       <b-row v-if="isEditing">
         <b-col cols="11">
           <b-form-group :label="$t('taiteenala') + ' *'">
-            <ep-koodisto-select :store="koodisto" v-model="data.koodi" :is-editing="isEditing" :naytaArvo="false">
+            <ep-koodisto-select
+              v-model="data.koodi"
+              :store="koodisto"
+              :is-editing="isEditing"
+              :nayta-arvo="false"
+            >
               <template #default="{ open }">
                 <b-input-group>
                   <b-form-input
                     :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled></b-form-input>
+                    disabled
+                  />
                   <b-input-group-append>
-                    <b-button @click="open" variant="primary">
+                    <b-button
+                      variant="primary"
+                      @click="open"
+                    >
                       {{ $t('hae-koodistosta') }}
                     </b-button>
                   </b-input-group-append>
@@ -29,25 +51,39 @@
       </b-row>
 
       <div class="col-11 pl-0">
-
-        <h4 class="mt-4" v-if="isEditing">{{$t('kuvaus')}} *</h4>
+        <h4
+          v-if="isEditing"
+          class="mt-4"
+        >
+          {{ $t('kuvaus') }} *
+        </h4>
         <ep-content
-          layout="normal"
           v-model="data.teksti"
+          layout="normal"
           :is-editable="isEditing"
-          :kasiteHandler="kasiteHandler"/>
+          :kasite-handler="kasiteHandler"
+        />
 
-        <hr v-if="isEditing" class="mt-5"/>
+        <hr
+          v-if="isEditing"
+          class="mt-5"
+        >
 
-        <EpSisaltoTekstikappaleet v-model="storeData" :isEditing="isEditing" :sisaltoAvaimet="sisaltoTekstiAvaimet" sisaltoTekstiOtsikkoField="nimi"/>
+        <EpSisaltoTekstikappaleet
+          v-model="storeData"
+          :is-editing="isEditing"
+          :sisalto-avaimet="sisaltoTekstiAvaimet"
+          sisalto-teksti-otsikko-field="nimi"
+        />
       </div>
     </template>
   </EpEditointi>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import * as _ from 'lodash';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
@@ -62,86 +98,85 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import { Koodisto } from '@shared/api/eperusteet';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
+import { onMounted } from 'vue';
 
-@Component({
-  components: {
-    EpEditointi,
-    EpInput,
-    EpContent,
-    EpButton,
-    EpCollapse,
-    EpSisaltoTekstikappaleet,
-    EpKoodistoSelect,
+const props = defineProps<{
+  perusteStore: PerusteStore;
+  taiteenalaId: number;
+  uusi?: string;
+}>();
+
+const route = useRoute();
+const store = ref<EditointiStore | null>(null);
+
+const perusteId = computed(() => {
+  return props.perusteStore.perusteId.value;
+});
+
+const versionumero = computed(() => {
+  return route.query.versionumero ? _.toNumber(route.query.versionumero) : undefined;
+});
+
+const kasiteHandler = inject('kasiteHandler');
+
+const sisaltoTekstiAvaimet = computed(() => {
+  return ['aikuistenOpetus', 'kasvatus', 'oppimisenArviointiOpetuksessa', 'teemaopinnot', 'tyotavatOpetuksessa', 'yhteisetOpinnot'];
+});
+
+const storeData = computed({
+  get() {
+    return store.value?.data;
   },
-})
-export default class RouteTaiteenala extends Vue {
-  @Prop({ required: true })
-  perusteStore!: PerusteStore;
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 
-  @Prop({ required: true })
-  taiteenalaId: any;
+const taiteenalaIdType = computed(() => {
+  return typeof props.taiteenalaId;
+});
 
-  @Prop({ required: false })
-  uusi!: string;
+const fetch = async () => {
+  const taiteenalaStore = new TaiteenalaStore(
+    perusteId.value!,
+    props.taiteenalaId,
+    versionumero.value,
+    !!props.uusi,
+  );
+  store.value = new EditointiStore(taiteenalaStore);
+};
 
-  store: EditointiStore | null = null;
+// Initialize koodisto
+const koodisto = new KoodistoSelectStore({
+  koodisto: 'oppiaineetyleissivistava2',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  @Watch('taiteenalaId', { immediate: true })
-  async taiteenalaChange() {
-    await this.fetch();
-  }
+// Watch for changes in taiteenalaId
+watch(() => props.taiteenalaId, async () => {
+  await fetch();
+});
 
-  @Watch('versionumero', { immediate: true })
-  async versionumeroChange() {
-    await this.fetch();
-  }
+// Watch for changes in versionumero
+watch(versionumero, async () => {
+  await fetch();
+});
 
-  public async fetch() {
-    await this.perusteStore.blockUntilInitialized();
-    const store = new TaiteenalaStore(this.perusteId!, this.taiteenalaId, this.versionumero, !!this.uusi);
-    this.store = new EditointiStore(store);
-  }
+const postSave = async () => {
+  await props.perusteStore.updateNavigation();
+};
 
-  private readonly koodisto = new KoodistoSelectStore({
-    koodisto: 'oppiaineetyleissivistava2',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  get sisaltoTekstiAvaimet() {
-    return ['aikuistenOpetus', 'kasvatus', 'oppimisenArviointiOpetuksessa', 'teemaopinnot', 'tyotavatOpetuksessa', 'yhteisetOpinnot'];
-  }
-
-  get perusteId() {
-    return this.perusteStore.perusteId.value;
-  }
-
-  get kasiteHandler() {
-    return createKasiteHandler(new TermitStore(this.perusteId!));
-  }
-
-  async postSave() {
-    await this.perusteStore.updateNavigation();
-  }
-
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-
-  get versionumero() {
-    return _.toNumber(this.$route.query.versionumero);
-  }
-}
+onMounted(async () => {
+  await fetch();
+});
 </script>
 
 <style scoped lang="scss">

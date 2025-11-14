@@ -1,16 +1,14 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
-import VueCompositionApi, { reactive, computed } from '@vue/composition-api';
+import { reactive, computed } from 'vue';
 import { Matala, Sisallot } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
-
-Vue.use(VueCompositionApi);
+import { App } from 'vue';
 
 interface TekstiRakenneStoreConfig {
   perusteStore: PerusteStore;
-  router: VueRouter;
+  router: any;
 }
 
 export class TekstiRakenneStore implements IEditoitava {
@@ -20,7 +18,7 @@ export class TekstiRakenneStore implements IEditoitava {
 
   private static config: TekstiRakenneStoreConfig;
 
-  public static install(vue: typeof Vue, config: TekstiRakenneStoreConfig) {
+  public static install(app: App, config: TekstiRakenneStoreConfig) {
     TekstiRakenneStore.config = config;
   }
 
@@ -37,7 +35,7 @@ export class TekstiRakenneStore implements IEditoitava {
   }
 
   public async load() {
-    const res = await Sisallot.getSuoritustapaSisaltoUUSI(this.perusteId, TekstiRakenneStore.config?.perusteStore.perusteSuoritustapa.value!, 'laaja');
+    const res = await Sisallot.getSuoritustapaSisaltoUUSI(this.perusteId, TekstiRakenneStore.config.perusteStore.perusteSuoritustapa.value!, 'laaja');
     return res.data;
   }
 
@@ -61,7 +59,7 @@ export class TekstiRakenneStore implements IEditoitava {
 
     const filtered = pick(data);
     if (data.id) {
-      await Sisallot.updateSisaltoViiteWithPut(this.perusteId, TekstiRakenneStore.config?.perusteStore.perusteSuoritustapa.value!, data.id!, filtered);
+      await Sisallot.updateSisaltoViiteWithPut(this.perusteId, TekstiRakenneStore.config.perusteStore.perusteSuoritustapa.value!, data.id!, filtered);
       await TekstiRakenneStore.config.perusteStore.updateNavigation();
     }
   }

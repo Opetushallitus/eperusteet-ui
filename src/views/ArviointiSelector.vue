@@ -1,88 +1,106 @@
 <template>
   <div>
-    <b-modal ref="modal" size="lg">
-      <template slot="modal-header">
-        {{$t('luo-uusi-arviointi')}}
+    <b-modal
+      ref="modal"
+      size="lg"
+    >
+      <template #modal-header>
+        {{ $t('luo-uusi-arviointi') }}
       </template>
-      <template v-slot:modal-footer>
-        <ep-button variant="secondary" @click="onClose">{{ $t('peruuta') }}</ep-button>
-        <ep-button variant="primary" :disabled="!model" @click="onOk">{{ $t('luo-uusi-arviointi') }}</ep-button>
+      <template #modal-footer>
+        <ep-button
+          variant="secondary"
+          @click="onClose"
+        >
+          {{ $t('peruuta') }}
+        </ep-button>
+        <ep-button
+          variant="primary"
+          :disabled="!model"
+          @click="onOk"
+        >
+          {{ $t('luo-uusi-arviointi') }}
+        </ep-button>
       </template>
 
       <b-form-group :label="$t('arviointiasteikko')">
-        <b-form-radio-group v-model="model" @change="onInput" stacked>
-          <b-form-radio :value="asteikko.id" v-for="asteikko in asteikot" :key="asteikko.id">
-            <span class="text-wrap">
-              <span v-for="(taso, idx) in asteikko.osaamistasot" :key="'taso-' + taso.id">
-                <span v-if="idx !== 0" class="text-muted">/</span>
-                <EpExpandText :text="$kaanna(taso.otsikko)" />
-              </span>
+        <EpRadio
+          v-for="asteikko in asteikot"
+          :key="asteikko.id"
+          v-model="model"
+          :value="asteikko.id"
+          :is-editing="true"
+          @update:model-value="onInput"
+        >
+          <span class="text-wrap">
+            <span
+              v-for="(taso, idx) in asteikko.osaamistasot"
+              :key="'taso-' + taso.id"
+            >
+              <span v-if="idx !== 0"> / </span>
+              <EpExpandText :text="$kaanna(taso.otsikko)" />
             </span>
-          </b-form-radio>
-        </b-form-radio-group>
+          </span>
+        </EpRadio>
       </b-form-group>
     </b-modal>
-    <ep-button @click="onOpen" variant="outline" icon="add">
-      <slot name="valinta">{{ $t('valitse-arviointiasteikko') }}</slot>
+    <ep-button
+      variant="outline"
+      icon="add"
+      @click="onOpen"
+    >
+      <slot name="valinta">
+        {{ $t('valitse-arviointiasteikko') }}
+      </slot>
     </ep-button>
   </div>
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+<script setup lang="ts">
+import { ref, computed, watch, useTemplateRef } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import EpInput from '@shared/components/forms/EpInput.vue';
 import EpExpandText from '@shared/components/EpExpandText/EpExpandText.vue';
+import EpRadio from '@shared/components/forms/EpRadio.vue';
 
-@Component({
-  components: {
-    EpButton,
-    EpInput,
-    EpMainView,
-    EpSpinner,
-    EpExpandText,
-  },
-})
-export default class GeneerinenArviointi extends Vue {
-  @Prop({ default: null })
-  value!: number | null;
+const props = defineProps<{
+  modelValue: number | null;
+  arviointiStore: ArviointiStore;
+}>();
 
-  @Prop({ required: true })
-  arviointiStore!: ArviointiStore;
+const emit = defineEmits<{
+  'update:modelValue': [value: number | null];
+}>();
 
-  private model: number | null = null;
+const modal = useTemplateRef('modal');
+const model = ref<number | null>(null);
 
-  @Watch('value', { immediate: true })
-  onValueChange(value: number | null) {
-    this.model = value;
-  }
+watch(() => props.modelValue, (value: number | null) => {
+  model.value = value;
+}, { immediate: true });
 
-  get asteikot() {
-    return this.arviointiStore.arviointiasteikot.value;
-  }
+const asteikot = computed(() => {
+  return props.arviointiStore.arviointiasteikot.value;
+});
 
-  onInput(value: number | null) {
-    this.model = value;
-  }
+const onInput = (value: number | null) => {
+  model.value = value;
+};
 
-  onOk() {
-    this.$emit('input', this.model);
-    this.model = null;
-    (this.$refs.modal as any).hide();
-  }
+const onOk = () => {
+  emit('update:modelValue', model.value);
+  model.value = null;
+  (modal.value as any)?.hide();
+};
 
-  onClose() {
-    this.model = null;
-    (this.$refs.modal as any).hide();
-  }
+const onClose = () => {
+  model.value = null;
+  (modal.value as any)?.hide();
+};
 
-  onOpen() {
-    (this.$refs.modal as any).show();
-  }
-}
+const onOpen = () => {
+  (modal.value as any)?.show();
+};
 </script>
 
 <style lang="scss" scoped>

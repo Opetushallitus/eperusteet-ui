@@ -3,13 +3,24 @@ import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eper
 import * as _ from 'lodash';
 import { PerusteStore } from './PerusteStore';
 import { Revision } from '@shared/tyypit';
+import { App } from 'vue';
+import { Router } from 'vue-router';
+
+interface AipeVaiheStoreConfig {
+  router: Router;
+}
 
 export class AipeVaiheStore implements IEditoitava {
+  private static config: AipeVaiheStoreConfig;
+
+  public static install(app: App, config: AipeVaiheStoreConfig) {
+    AipeVaiheStore.config = config;
+  }
+
   constructor(
     private perusteId: number,
     private vaiheId: number | null,
     private perusteStore: PerusteStore,
-    private el: any,
     public versionumero?: number,
   ) {
   }
@@ -53,7 +64,7 @@ export class AipeVaiheStore implements IEditoitava {
       await this.perusteStore.updateNavigation();
 
       await EditointiStore.cancelAll();
-      this.el.$router.push({ name: 'aipevaihe', params: { vaiheId: newData.id } });
+      AipeVaiheStore.config.router.push({ name: 'aipevaihe', params: { vaiheId: newData.id } });
     }
   }
 
@@ -61,7 +72,7 @@ export class AipeVaiheStore implements IEditoitava {
     if (this.vaiheId) {
       await Aipeopetuksensisalto.removeVaihe(this.perusteId, this.vaiheId);
       await this.perusteStore.updateNavigation();
-      this.el.$router.push({ name: 'perusteprojekti' });
+      AipeVaiheStore.config.router.push({ name: 'perusteprojekti' });
     }
   }
 

@@ -1,133 +1,217 @@
 <template>
-  <div v-if="!isInitializing && store">
+  <div v-if="store">
     <EpEditointi :store="store">
-      <template v-slot:header>
-        <h2 class="m-0">{{ $t('oppaan-tiedot') }}</h2>
+      <template #header>
+        <h2 class="m-0">
+          {{ $t('oppaan-tiedot') }}
+        </h2>
       </template>
-      <template v-slot:default="{ data, isEditing, validation }">
+      <template #default="{ data, isEditing, validation }">
         <h3>{{ $t('perustiedot') }}</h3>
         <b-container fluid>
           <b-row no-gutters>
             <b-col lg="6">
               <b-form-group :label="$t('oppaan-nimi')+'*'">
-                <ep-input v-model="data.peruste.nimi"
-                          type="localized"
-                          :is-editing="isEditing"
-                          :validation="validation.peruste.nimi"></ep-input>
+                <ep-input
+                  v-model="data.peruste.nimi"
+                  type="localized"
+                  :is-editing="isEditing"
+                  :validation="validation.peruste.nimi"
+                />
               </b-form-group>
             </b-col>
             <b-col lg="6">
               <b-form-group :label="$t('opastyoryhma')+'*'">
-                <perustetyoryhma-select v-model="data.ryhmaOid"
-                                        :ulkopuoliset-store="ulkopuolisetStore"
-                                        :is-editing="isEditing" />
+                <perustetyoryhma-select
+                  v-model="data.ryhmaOid"
+                  :ulkopuoliset-store="ulkopuolisetStore"
+                  :is-editing="isEditing"
+                />
               </b-form-group>
             </b-col>
           </b-row>
 
-          <b-row no-gutters class="mt-4" v-if="oppaanTyyppiTietoaPalvelusta || isEditing">
+          <b-row
+            v-if="oppaanTyyppiTietoaPalvelusta || isEditing"
+            no-gutters
+            class="mt-4"
+          >
             <b-col lg="6">
               <b-form-group :label="$t('sisallonhallinta')">
-                <b-form-checkbox-group v-if="isEditing" v-model="oppaanTyyppi" stacked>
-                  <b-form-checkbox v-for="tyyppi in oppaanTyypit" :key="tyyppi" :value="tyyppi">
-                    {{ $t('oppaan-tyyppi-' + tyyppi) }}
-                  </b-form-checkbox>
-                </b-form-checkbox-group>
+                <EpToggleGroup
+                  v-if="isEditing"
+                  v-model="oppaanTyyppi"
+                  :items="oppaanTyypit"
+                  stacked
+                  :is-editing="isEditing"
+                >
+                  <template #default="{ item }">
+                    {{ $t('oppaan-tyyppi-' + item) }}
+                  </template>
+                </EpToggleGroup>
                 <div v-if="oppaanTyyppiTietoaPalvelusta && !isEditing">
                   {{ $t('oppaan-tyyppi-' + oppaanTyyppi[0]) }}
                 </div>
               </b-form-group>
             </b-col>
-            <b-col lg="6" v-if="oppaanTyyppiTietoaPalvelusta">
+            <b-col
+              v-if="oppaanTyyppiTietoaPalvelusta"
+              lg="6"
+            >
               <b-form-group :label="$t('tietoa-palvelusta-etusivu-teksti')">
-                <ep-content v-model="data.peruste.tietoapalvelustaKuvaus" layout="simplified" :is-editable="isEditing"/>
+                <ep-content
+                  v-model="data.peruste.tietoapalvelustaKuvaus"
+                  layout="simplified"
+                  :is-editable="isEditing"
+                />
               </b-form-group>
             </b-col>
           </b-row>
 
-          <b-row no-gutters class="mt-4">
-             <b-col lg="6">
-              <b-form-group :label="$t('koulutustyyppi')" class="pr-5">
-                <EpMultiListSelect v-model="data.peruste.oppaanKoulutustyypit"
-                           :is-editing="isEditing"
-                           :items="koulutustyypit"
-                           :required="false">
-                  <template slot="singleLabel" slot-scope="{ option }">
+          <b-row
+            no-gutters
+            class="mt-4"
+          >
+            <b-col lg="6">
+              <b-form-group
+                :label="$t('koulutustyyppi')"
+                class="pr-5"
+              >
+                <EpMultiListSelect
+                  v-model="data.peruste.oppaanKoulutustyypit"
+                  :is-editing="isEditing"
+                  :items="koulutustyypit"
+                  :required="false"
+                >
+                  <template #singleLabel="{ option }">
                     <span class="text-nowrap">
-                      <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
+                      <EpColorIndicator
+                        :size="10"
+                        :kind="ktToRyhma(option.value)"
+                      />
                       <span class="ml-2">{{ option.text }}</span>
                     </span>
                   </template>
-                  <template slot="option" slot-scope="{ option }">
+                  <template #option="{ option }">
                     <span class="text-nowrap">
-                      <EpColorIndicator :size="10" :kind="ktToRyhma(option.value)" />
+                      <EpColorIndicator
+                        :size="10"
+                        :kind="ktToRyhma(option.value)"
+                      />
                       <span class="ml-2">{{ option.text }}</span>
                     </span>
                   </template>
-                  <template slot="lisaaTeksti">
-                    {{$t('lisaa-koulutus-tutkintotyyppi')}}
+                  <template #lisaaTeksti>
+                    {{ $t('lisaa-koulutus-tutkintotyyppi') }}
                   </template>
                 </EpMultiListSelect>
-                <span class="asettamatta" v-if="!isEditing && (!data.peruste.oppaanKoulutustyypit || data.peruste.oppaanKoulutustyypit.length === 0)">{{$t('ei-asetettu')}}</span>
+                <span
+                  v-if="!isEditing && (!data.peruste.oppaanKoulutustyypit || data.peruste.oppaanKoulutustyypit.length === 0)"
+                  class="asettamatta"
+                >{{ $t('ei-asetettu') }}</span>
               </b-form-group>
-             </b-col>
+            </b-col>
 
-             <b-col lg="6">
-              <b-form-group :label="$t('peruste')" class="pr-5">
-                <EpMultiListSelect v-model="data.peruste.oppaanPerusteet"
-                           :is-editing="isEditing"
-                           :items="perusteet"
-                           :required="false">
-                  <template slot="lisaaTeksti">
-                    {{$t('lisaa-peruste')}}
+            <b-col lg="6">
+              <b-form-group
+                :label="$t('peruste')"
+                class="pr-5"
+              >
+                <EpMultiListSelect
+                  v-model="data.peruste.oppaanPerusteet"
+                  :is-editing="isEditing"
+                  :items="perusteet"
+                  :required="false"
+                >
+                  <template #lisaaTeksti>
+                    {{ $t('lisaa-peruste') }}
                   </template>
                 </EpMultiListSelect>
-                <span class="asettamatta" v-if="!isEditing && (!data.peruste.oppaanPerusteet || data.peruste.oppaanPerusteet.length === 0)">{{$t('ei-asetettu')}}</span>
+                <span
+                  v-if="!isEditing && (!data.peruste.oppaanPerusteet || data.peruste.oppaanPerusteet.length === 0)"
+                  class="asettamatta"
+                >{{ $t('ei-asetettu') }}</span>
               </b-form-group>
-             </b-col>
+            </b-col>
           </b-row>
 
-          <b-row no-gutters class="mt-4">
+          <b-row
+            no-gutters
+            class="mt-4"
+          >
             <b-col lg="6">
               <b-form-group :label="$t('oppaan-kielet')">
-                <b-form-checkbox-group v-if="isEditing" v-model="data.peruste.kielet" stacked>
-                  <b-form-checkbox v-for="kieli in kielet" :key="kieli" :value="kieli">
-                    {{ $t(kieli) }}
-                  </b-form-checkbox>
-                </b-form-checkbox-group>
-                <div v-else class="text-nowrap">
-                  <span v-for="(kieli, idx) in data.peruste.kielet" :key="kieli" :value="kieli">
-                    {{ $t(kieli) }}<span class="mr-0" v-if="idx < data.peruste.kielet.length - 1">,</span>
+                <EpToggleGroup
+                  v-if="isEditing"
+                  v-model="data.peruste.kielet"
+                  :items="kielet"
+                  stacked
+                  :is-editing="isEditing"
+                >
+                  <template #default="{ item }">
+                    {{ $t(item) }}
+                  </template>
+                </EpToggleGroup>
+                <div
+                  v-else
+                  class="text-nowrap"
+                >
+                  <span
+                    v-for="(kieli, idx) in data.peruste.kielet"
+                    :key="kieli"
+                    :value="kieli"
+                  >
+                    {{ $t(kieli) }}<span
+                      v-if="idx < data.peruste.kielet.length - 1"
+                      class="mr-0"
+                    >,</span>
                   </span>
-                  <span class="asettamatta" v-if="!isEditing && (!data.peruste.kielet || data.peruste.kielet.length === 0)">{{$t('ei-asetettu')}}</span>
+                  <span
+                    v-if="!isEditing && (!data.peruste.kielet || data.peruste.kielet.length === 0)"
+                    class="asettamatta"
+                  >{{ $t('ei-asetettu') }}</span>
                 </div>
               </b-form-group>
             </b-col>
 
-            <b-col lg="6" v-if="!oppaanTyyppiTietoaPalvelusta">
+            <b-col
+              v-if="!oppaanTyyppiTietoaPalvelusta"
+              lg="6"
+            >
               <b-form-group :label="$t('voimassaolo')">
-              <div class="asettamatta" v-if="!data.peruste.voimassaoloAlkaa && !data.peruste.voimassaoloLoppuu && !isEditing">
-                {{$t('ei-asetettu')}}
-              </div>
-              <div v-else class="d-flex align-items-center">
-                <ep-datepicker v-model="data.peruste.voimassaoloAlkaa" :is-editing="isEditing"/>
-                <div class="ml-2 mr-2">-</div>
-                <ep-datepicker v-model="data.peruste.voimassaoloLoppuu" :is-editing="isEditing"/>
-              </div>
-            </b-form-group>
+                <div
+                  v-if="!data.peruste.voimassaoloAlkaa && !data.peruste.voimassaoloLoppuu && !isEditing"
+                  class="asettamatta"
+                >
+                  {{ $t('ei-asetettu') }}
+                </div>
+                <div
+                  v-else
+                  class="d-flex align-items-center"
+                >
+                  <ep-datepicker
+                    v-model="data.peruste.voimassaoloAlkaa"
+                    :is-editing="isEditing"
+                  />
+                  <div class="ml-2 mr-2">
+                    -
+                  </div>
+                  <ep-datepicker
+                    v-model="data.peruste.voimassaoloLoppuu"
+                    :is-editing="isEditing"
+                  />
+                </div>
+              </b-form-group>
             </b-col>
           </b-row>
 
-          <b-row>
+          <b-row class="mt-4">
             <b-col>
-              <EpEsikatselu opas v-model="storeData" :is-editing="isEditing" />
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col v-if="!isEditing">
-              <b-form-group :label="$t('oppaan-lataus')">
-                <ep-button variant="primary" @click="lataa">{{ $t('lataa-opas-json') }}</ep-button>
-              </b-form-group>
+              <EpEsikatselu
+                v-model="storeData"
+                opas
+                :is-editing="isEditing"
+              />
             </b-col>
           </b-row>
         </b-container>
@@ -135,111 +219,141 @@
         <b-container fluid>
           <b-row no-gutters>
             <b-col lg="8">
-              <h3 class="mt-5">{{ $t('oppaan-liittaminen-perusteen-sisaltoihin') }}</h3>
-              <div class="mb-4">{{ $t('oppaan-liittaminen-perusteen-sisaltoihin-kuvaus') }}</div>
+              <h3 class="mt-5">
+                {{ $t('oppaan-liittaminen-perusteen-sisaltoihin') }}
+              </h3>
+              <div class="mb-4">
+                {{ $t('oppaan-liittaminen-perusteen-sisaltoihin-kuvaus') }}
+              </div>
             </b-col>
           </b-row>
         </b-container>
 
         <b-container fluid>
           <template v-if="isEditing || (tutkinnonosaKoodit.length > 0 || osaamisalaKoodit.length > 0)">
-            <h4>{{$t('ammatillinen-koulutus')}}</h4>
-              <b-row no-gutters>
-                <b-col lg="8">
-                  <div class="koodiryhma">
-                    <EpKoodistoSelectTable
-                      v-if="isEditing || tutkinnonosaKoodit.length > 0"
-                      class="mb-4"
-                      :store="tutkinnonOsatKoodisto"
-                      :isEditing="isEditing"
-                      v-model="tutkinnonosaKoodit"
-                      @remove="removeOppaanKoodi">
-                      <h4 slot="header">{{$t('tutkinnonosat')}}</h4>
-                      <span slot="button-text">{{$t('lisaa-tutkinnon-osa')}}</span>
-                    </EpKoodistoSelectTable>
-                    <EpKoodistoSelectTable
-                      v-if="isEditing || osaamisalaKoodit.length > 0"
-                      :store="osaamisalaKoodisto"
-                      :isEditing="isEditing"
-                      v-model="osaamisalaKoodit"
-                      @remove="removeOppaanKoodi">
-                      <h4 slot="header">{{$t('osaamisalat')}}</h4>
-                      <span slot="button-text">{{$t('lisaa-osaamisala')}}</span>
-                    </EpKoodistoSelectTable>
-                  </div>
-                </b-col>
-              </b-row>
+            <h4>{{ $t('ammatillinen-koulutus') }}</h4>
+            <b-row no-gutters>
+              <b-col lg="8">
+                <div class="koodiryhma">
+                  <EpKoodistoSelectTable
+                    v-if="isEditing || tutkinnonosaKoodit.length > 0"
+                    v-model="tutkinnonosaKoodit"
+                    class="mb-4"
+                    :store="tutkinnonOsatKoodisto"
+                    :is-editing="isEditing"
+                    @remove="removeOppaanKoodi"
+                  >
+                    <template #header>
+                      <h4>{{ $t('tutkinnonosat') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-tutkinnon-osa') }}</span>
+                    </template>
+                  </EpKoodistoSelectTable>
+                  <EpKoodistoSelectTable
+                    v-if="isEditing || osaamisalaKoodit.length > 0"
+                    v-model="osaamisalaKoodit"
+                    :store="osaamisalaKoodisto"
+                    :is-editing="isEditing"
+                    @remove="removeOppaanKoodi"
+                  >
+                    <template #header>
+                      <h4>{{ $t('osaamisalat') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-osaamisala') }}</span>
+                    </template>
+                  </EpKoodistoSelectTable>
+                </div>
+              </b-col>
+            </b-row>
           </template>
 
           <template v-if="isEditing || oppiaineKoodit.length > 0">
-            <h4>{{$t('lukiokoulutus')}}</h4>
+            <h4>{{ $t('lukiokoulutus') }}</h4>
 
             <b-row no-gutters>
               <b-col lg="8">
                 <div class="koodiryhma">
-                <EpKoodistoSelectTable
-                  :store="oppiaineKoodisto"
-                  :isEditing="isEditing"
-                  v-model="oppiaineKoodit"
-                  @remove="removeOppaanKoodi"
-                  :showKoodiArvo="false">
-                  <h4 slot="header">{{$t('oppiaineet')}}</h4>
-                  <span slot="button-text">{{$t('lisaa-oppiaine')}}</span>
-                </EpKoodistoSelectTable>
+                  <EpKoodistoSelectTable
+                    v-model="oppiaineKoodit"
+                    :store="oppiaineKoodisto"
+                    :is-editing="isEditing"
+                    :show-koodi-arvo="false"
+                    @remove="removeOppaanKoodi"
+                  >
+                    <template #header>
+                      <h4>{{ $t('oppiaineet') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-oppiaine') }}</span>
+                    </template>
+                  </EpKoodistoSelectTable>
                 </div>
               </b-col>
             </b-row>
           </template>
 
           <template v-if="isEditing || opintokokonaisuusKoodit.length > 0">
-            <h4>{{$t('vapaa-sivistystyo')}}</h4>
+            <h4>{{ $t('vapaa-sivistystyo') }}</h4>
 
             <b-row no-gutters>
               <b-col lg="8">
                 <div class="koodiryhma">
-                <EpKoodistoSelectTable
-                  :store="opintokokonaisuusKoodisto"
-                  :isEditing="isEditing"
-                  v-model="opintokokonaisuusKoodit"
-                  @remove="removeOppaanKoodi"
-                  :showKoodiArvo="false">
-                  <h4 slot="header">{{$t('opintokokonaisuudet')}}</h4>
-                  <span slot="button-text">{{$t('lisaa-opintokokonaisuus')}}</span>
-                </EpKoodistoSelectTable>
+                  <EpKoodistoSelectTable
+                    v-model="opintokokonaisuusKoodit"
+                    :store="opintokokonaisuusKoodisto"
+                    :is-editing="isEditing"
+                    :show-koodi-arvo="false"
+                    @remove="removeOppaanKoodi"
+                  >
+                    <template #header>
+                      <h4>{{ $t('opintokokonaisuudet') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-opintokokonaisuus') }}</span>
+                    </template>
+                  </EpKoodistoSelectTable>
                 </div>
               </b-col>
             </b-row>
           </template>
 
           <template v-if="isEditing || koulutuksenosaKoodit.length > 0">
-            <h4>{{$t('tutkintokoulutukseen-valmentava-koulutus')}}</h4>
+            <h4>{{ $t('tutkintokoulutukseen-valmentava-koulutus') }}</h4>
 
             <b-row no-gutters>
               <b-col lg="8">
                 <div class="koodiryhma">
                   <EpKoodistoSelectTable
-                    :store="koulutuksenosaKoodisto"
-                    :isEditing="isEditing"
                     v-model="koulutuksenosaKoodit"
+                    :store="koulutuksenosaKoodisto"
+                    :is-editing="isEditing"
+                    :show-koodi-arvo="false"
                     @remove="removeOppaanKoodi"
-                    :showKoodiArvo="false">
-                    <h4 slot="header">{{$t('koulutuksenosat')}}</h4>
-                    <span slot="button-text">{{$t('lisaa-koulutuksenosa')}}</span>
+                  >
+                    <template #header>
+                      <h4>{{ $t('koulutuksenosat') }}</h4>
+                    </template>
+                    <template #button-text>
+                      <span>{{ $t('lisaa-koulutuksenosa') }}</span>
+                    </template>
                   </EpKoodistoSelectTable>
                 </div>
               </b-col>
             </b-row>
           </template>
         </b-container>
-
       </template>
     </EpEditointi>
   </div>
   <EpSpinner v-else />
 </template>
 
-<script lang="ts">
-import { Watch, Prop, Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, computed, watch, provide, reactive, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import * as _ from 'lodash';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -249,12 +363,11 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
-import { PerusteprojektiRoute } from './PerusteprojektiRoute';
+import { usePerusteprojekti } from './PerusteprojektiRoute';
 import { OpasEditStore } from '@/stores/OpasEditStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import PerustetyoryhmaSelect from './PerustetyoryhmaSelect.vue';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
-import _ from 'lodash';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import { themes, koulutustyyppiRyhmaSort, EperusteetKoulutustyypit } from '@shared/utils/perusteet';
 import EpMultiListSelect, { MultiListSelectItem } from '@shared/components/forms/EpMultiListSelect.vue';
@@ -267,302 +380,301 @@ import { Koodisto, PerusteBaseDtoOpasTyyppiEnum } from '@shared/api/eperusteet';
 import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 import { KoulutusTyyppi } from '@/utils/perusteet';
+import { $t, $kaanna } from '@shared/utils/globals';
+import { PerusteStore } from '@/stores/PerusteStore';
+import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 
-@Component({
-  components: {
-    EpButton,
-    EpCollapse,
-    EpContent,
-    EpEditointi,
-    EpInput,
-    EpSpinner,
-    EpToggle,
-    PerustetyoryhmaSelect,
-    EpKoulutustyyppiSelect,
-    EpDatepicker,
-    EpMultiListSelect,
-    EpColorIndicator,
-    EpExternalLink,
-    EpKoodistoSelectTable,
-    EpEsikatselu,
+const props = defineProps<{
+  ulkopuolisetStore: UlkopuolisetStore;
+  perusteprojektiStore: PerusteprojektiStore;
+  perusteStore: PerusteStore;
+}>();
+
+const store = ref<EditointiStore | null>(null);
+const maintenanceStore = ref<MaintenanceStore | null>(null);
+
+const {
+  projektiId,
+} = usePerusteprojekti(props);
+
+onMounted(async () => {
+  await props.perusteprojektiStore.fetchPohjaProjektit();
+  await onProjektiChange(parseInt(projektiId.value), props.perusteStore.perusteId.value!);
+});
+
+watch(projektiId, async (newValue, oldValue) => {
+  if (newValue && newValue !== oldValue) {
+    await onProjektiChange(parseInt(newValue), props.perusteStore.perusteId.value!);
+  }
+});
+
+async function onProjektiChange(projektiId: number, perusteId: number) {
+  store.value = new EditointiStore(new OpasEditStore(projektiId, perusteId, props.perusteStore));
+  maintenanceStore.value = new MaintenanceStore(projektiId, perusteId);
+}
+
+const kielet = computed(() => {
+  return UiKielet;
+});
+
+function ktToRyhma(koulutustyyppi) {
+  return themes[koulutustyyppi];
+}
+
+const koulutustyypit = computed(() => {
+  return _.chain([...EperusteetKoulutustyypit, KoulutusTyyppi.MUU])
+    .map(koulutustyyppi => {
+      return {
+        value: koulutustyyppi,
+        text: $t(koulutustyyppi),
+      } as MultiListSelectItem;
+    })
+    .sortBy(item => koulutustyyppiRyhmaSort[ktToRyhma(item.value)])
+    .value();
+});
+
+const perusteet = computed(() => {
+  return _.chain(props.perusteprojektiStore.perusteet.value)
+    .map(peruste => {
+      return {
+        value: {
+          id: peruste.id,
+        },
+        text: $kaanna((peruste as any).nimi),
+      } as MultiListSelectItem;
+    })
+    .sortBy(peruste => _.toLower(peruste.text))
+    .value();
+});
+
+const tutkinnonOsatKoodisto = new KoodistoSelectStore({
+  koodisto: 'tutkinnonosat',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
   },
-})
-export default class RouteOppaanTiedot extends PerusteprojektiRoute {
-  @Prop({ required: true })
-  ulkopuolisetStore!: UlkopuolisetStore;
+});
 
-  @Prop({ required: true })
-  perusteprojektiStore!: PerusteprojektiStore;
+const osaamisalaKoodisto = new KoodistoSelectStore({
+  koodisto: 'osaamisala',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  private store: EditointiStore | null = null;
-  private maintenanceStore: MaintenanceStore | null = null;
+const oppiaineKoodisto = new KoodistoSelectStore({
+  koodisto: 'oppiaineetjaoppimaaratlops2021',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  async mounted() {
-    await this.perusteprojektiStore.fetchPohjaProjektit();
-  }
+const opintokokonaisuusKoodisto = new KoodistoSelectStore({
+  koodisto: 'opintokokonaisuusnimet',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  async onProjektiChange(projektiId: number, perusteId: number) {
-    this.store = new EditointiStore(new OpasEditStore(projektiId, perusteId, this.perusteStore));
-    this.maintenanceStore = new MaintenanceStore(projektiId, perusteId);
-  }
+const koulutuksenosaKoodisto = new KoodistoSelectStore({
+  koodisto: 'koulutuksenosattuva',
+  async query(query: string, sivu = 0, koodisto: string) {
+    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
+      params: {
+        sivu,
+        sivukoko: 10,
+      },
+    })).data as any;
+  },
+});
 
-  get kielet() {
-    return UiKielet;
-  }
+const oppaanKiinnitetytKoodit = computed(() => {
+  return store.value!.data.peruste.oppaanSisalto.oppaanKiinnitetytKoodit;
+});
 
-  ktToRyhma(koulutustyyppi) {
-    return themes[koulutustyyppi];
-  }
+const oppaanKiinnitetytKooditUris = computed(() => {
+  return _.map(oppaanKiinnitetytKoodit.value, okk => okk.koodi.uri);
+});
 
-  get koulutustyypit() {
-    return _.chain([...EperusteetKoulutustyypit, KoulutusTyyppi.MUU])
-      .map(koulutustyyppi => {
-        return {
-          value: koulutustyyppi,
-          text: this.$t(koulutustyyppi),
-        } as MultiListSelectItem;
-      })
-      .sortBy(item => koulutustyyppiRyhmaSort[this.ktToRyhma(item.value)])
-      .value();
-  }
-
-  get perusteet() {
-    return _.chain(this.perusteprojektiStore.perusteet.value)
-      .map(peruste => {
-        return {
-          value: {
-            id: peruste.id,
-          },
-          text: this.$kaanna((peruste as any).nimi),
-        } as MultiListSelectItem;
-      })
-      .sortBy(peruste => _.toLower(peruste.text))
-      .value();
-  }
-
-  async lataa() {
-    await this.maintenanceStore?.exportPeruste();
-  }
-
-  private tutkinnonOsatKoodisto = new KoodistoSelectStore({
-    koodisto: 'tutkinnonosat',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  private osaamisalaKoodisto = new KoodistoSelectStore({
-    koodisto: 'osaamisala',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  private oppiaineKoodisto = new KoodistoSelectStore({
-    koodisto: 'oppiaineetjaoppimaaratlops2021',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  private opintokokonaisuusKoodisto = new KoodistoSelectStore({
-    koodisto: 'opintokokonaisuusnimet',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  private koulutuksenosaKoodisto = new KoodistoSelectStore({
-    koodisto: 'koulutuksenosattuva',
-    async query(query: string, sivu = 0, koodisto: string) {
-      return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-        params: {
-          sivu,
-          sivukoko: 10,
-        },
-      })).data as any;
-    },
-  });
-
-  get tutkinnonosaKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const tutkinnonosaKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'TUTKINNONOSA')
       .map('koodi')
       .value();
-  }
-
-  set tutkinnonosaKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'TUTKINNONOSA',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get osaamisalaKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const osaamisalaKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OSAAMISALA')
       .map('koodi')
       .value();
-  }
-
-  set osaamisalaKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'OSAAMISALA',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get oppiaineKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const oppiaineKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OPPIAINE')
       .map('koodi')
       .value();
-  }
-
-  set oppiaineKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'OPPIAINE',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get opintokokonaisuusKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const opintokokonaisuusKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'OPINTOKOKONAISUUS')
       .map('koodi')
       .value();
-  }
-
-  set opintokokonaisuusKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'OPINTOKOKONAISUUS',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get koulutuksenosaKoodit() {
-    return _.chain(this.oppaanKiinnitetytKoodit)
+const koulutuksenosaKoodit = computed({
+  get() {
+    return _.chain(oppaanKiinnitetytKoodit.value)
       .filter(kiinnitettyKoodi => kiinnitettyKoodi.kiinnitettyKoodiTyyppi === 'KOULUTUKSENOSA')
       .map('koodi')
       .value();
-  }
-
-  set koulutuksenosaKoodit(koodit) {
-    this.asetaOppaanKoodit(_.map(koodit, koodi => {
+  },
+  set(koodit) {
+    asetaOppaanKoodit(_.map(koodit, koodi => {
       return {
         kiinnitettyKoodiTyyppi: 'KOULUTUKSENOSA',
         koodi,
       };
     }));
-  }
+  },
+});
 
-  get oppaanKiinnitetytKoodit() {
-    return this.store!.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit;
-  }
-
-  get oppaanKiinnitetytKooditUris() {
-    return _.map(this.oppaanKiinnitetytKoodit, okk => okk.koodi.uri);
-  }
-
-  asetaOppaanKoodit(kiinnitettyKoodi) {
-    this.store!.setData(
+function asetaOppaanKoodit(kiinnitettyKoodi) {
+  if (store.value) {
+    store.value.setData(
       {
-        ...this.store?.data.value,
+        ...store.value.data,
         peruste: {
-          ...this.store?.data.value.peruste,
+          ...store.value.data.peruste,
           oppaanSisalto: {
-            ...this.store?.data.value.peruste.oppaanSisalto,
+            ...store.value.data.peruste.oppaanSisalto,
             oppaanKiinnitetytKoodit: [
-              ...this.store?.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit,
-              ..._.filter(kiinnitettyKoodi, koodi => !_.includes(this.oppaanKiinnitetytKooditUris, koodi.koodi.uri)),
+              ...store.value.data.peruste.oppaanSisalto.oppaanKiinnitetytKoodit,
+              ..._.filter(kiinnitettyKoodi, koodi => !_.includes(oppaanKiinnitetytKooditUris.value, koodi.koodi.uri)),
             ],
           },
         },
       },
     );
   }
+}
 
-  removeOppaanKoodi(koodi) {
-    this.store!.setData(
+function removeOppaanKoodi(koodi) {
+  if (store.value) {
+    store.value.setData(
       {
-        ...this.store?.data.value,
+        ...store.value.data,
         peruste: {
-          ...this.store?.data.value.peruste,
+          ...store.value.data.peruste,
           oppaanSisalto: {
-            ...this.store?.data.value.peruste.oppaanSisalto,
-            oppaanKiinnitetytKoodit: _.filter(this.store?.data.value.peruste.oppaanSisalto.oppaanKiinnitetytKoodit, kiinnitettyKoodi => kiinnitettyKoodi.koodi.uri !== koodi.uri),
+            ...store.value.data.peruste.oppaanSisalto,
+            oppaanKiinnitetytKoodit: _.filter(store.value.data.peruste.oppaanSisalto.oppaanKiinnitetytKoodit, kiinnitettyKoodi => kiinnitettyKoodi.koodi.uri !== koodi.uri),
           },
         },
       },
     );
   }
+}
 
-  get oppaanTyypit() {
-    return [
-      _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA),
-    ];
-  }
+const oppaanTyypit = [
+  _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA),
+];
 
-  get oppaanTyyppi() {
-    if (!this.store?.data.value.peruste.opasTyyppi || this.store?.data.value.peruste.opasTyyppi === _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI)) {
+const oppaanTyyppi = computed({
+  get() {
+    if (!store.value?.data.peruste.opasTyyppi || store.value?.data.peruste.opasTyyppi === _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI)) {
       return [];
     }
-
-    return [this.store?.data.value.peruste.opasTyyppi];
-  }
-
-  set oppaanTyyppi(tyyppi) {
-    this.store!.setData(
-      {
-        ...this.store?.data.value,
-        peruste: {
-          ...this.store?.data.value.peruste,
-          opasTyyppi: tyyppi[0] || _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI),
+    return [store.value?.data.peruste.opasTyyppi];
+  },
+  set(tyyppi) {
+    if (store.value) {
+      store.value.setData(
+        {
+          ...store.value.data,
+          peruste: {
+            ...store.value.data.peruste,
+            opasTyyppi: tyyppi[0] || _.toLower(PerusteBaseDtoOpasTyyppiEnum.NORMAALI),
+          },
         },
-      },
-    );
-  };
+      );
+    }
+  },
+});
 
-  get oppaanTyyppiTietoaPalvelusta() {
-    return _.includes(this.oppaanTyyppi, _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA));
-  }
+const oppaanTyyppiTietoaPalvelusta = computed(() => {
+  return _.includes(oppaanTyyppi.value, _.toLower(PerusteBaseDtoOpasTyyppiEnum.TIETOAPALVELUSTA));
+});
 
-  get storeData() {
-    return this.store?.data.value;
-  }
-
-  set storeData(data) {
-    this.store?.setData(data);
-  }
-}
+const storeData = computed({
+  get() {
+    return store.value?.data;
+  },
+  set(data) {
+    store.value?.setData(data);
+  },
+});
 </script>
 
 <style lang="scss" scoped>
