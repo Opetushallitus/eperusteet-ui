@@ -119,7 +119,7 @@
             </b-popover>
           </template>
         </b-table>
-        <b-pagination
+        <EpPagination
           v-if="totalRows > sisaltoSivuKoko"
           v-model="page"
           :total-rows="totalRows"
@@ -193,6 +193,7 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { PerusteDto, TutkinnonOsaViiteKontekstiDto } from '@shared/generated/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna, $sd, $success, $fail, $bvModal } from '@shared/utils/globals';
+import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
 const props = defineProps<{
   peruste: PerusteDto;

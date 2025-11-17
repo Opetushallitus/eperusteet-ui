@@ -59,7 +59,7 @@
         @row-clicked="avaaTiedote"
       />
 
-      <b-pagination
+      <EpPagination
         v-model="page"
         :total-rows="totalRows"
         :per-page="perPage"
@@ -86,6 +86,7 @@ import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { PerusteKevytDto } from '@shared/generated/eperusteet';
 import { $t, $sdt, $kaanna } from '@shared/utils/globals';
+import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
 const props = defineProps<{
   tiedotteetStore: TiedotteetStore;
