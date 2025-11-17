@@ -72,7 +72,7 @@
           {{ $kaanna(item.nimi) }}
         </template>
       </b-table>
-      <b-pagination
+      <EpPagination
         v-model="sivu"
         :total-rows="items.length"
         :per-page="10"
@@ -93,6 +93,7 @@ import { ref, computed, useTemplateRef, inject } from 'vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
 const props = defineProps({
   tutkinnonosat: {

@@ -160,7 +160,7 @@
       </template>
     </b-table>
 
-    <b-pagination
+    <EpPagination
       v-model="opsPage"
       :total-rows="toteutussuunnitelmatFiltered.length"
       :per-page="perPage"
@@ -183,7 +183,7 @@
       :per-page="perPage"
     />
 
-    <b-pagination
+    <EpPagination
       v-model="ktPage"
       :total-rows="koulutustoimijatFiltered.length"
       :per-page="perPage"
@@ -207,6 +207,7 @@ import EpTilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilast
 import { csvAikaleima, dataTiedostoksi } from './tilastot';
 import { $t, $kaanna, $sd } from '@shared/utils/globals';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
 
 interface Toteutussuunnitelma {
   id: string | number;
