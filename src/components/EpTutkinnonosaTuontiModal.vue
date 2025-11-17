@@ -225,7 +225,7 @@ const defaults = () => {
 };
 
 const perusteet = computed(() => {
-  return tutkinnonosatTuontiStore.value?.perusteet.value?.data || null;
+  return tutkinnonosatTuontiStore.value?.perusteet.data || null;
 });
 
 const perusteetLoading = computed(() => {
@@ -233,7 +233,7 @@ const perusteetLoading = computed(() => {
 });
 
 const tutkinnonosat = computed(() => {
-  return tutkinnonosatTuontiStore.value?.tutkinnonosat?.value?.data || null;
+  return tutkinnonosatTuontiStore.value?.tutkinnonosat?.data || null;
 });
 
 const tutkinnonosatWithSelected = computed(() => {
@@ -256,7 +256,7 @@ const tutkinnonosatWithSalliMuokattavaksi = computed(() => {
 });
 
 const tutkinnonosatPage = computed(() => {
-  return tutkinnonosatTuontiStore.value?.tutkinnonosat.value || null;
+  return tutkinnonosatTuontiStore.value?.tutkinnonosat || null;
 });
 
 const totalRows = computed(() => {
