@@ -140,8 +140,6 @@ describe('RoutePohjatLuonti component', () => {
 
     wrapper.find('input[placeholder="kirjoita-projektin-nimi"]').setValue('nimi');
 
-    console.log(wrapper.html());
-
     await clickMultiselectOption(wrapper.find('#perustetyoryhma'));
     await clickMultiselectOption(wrapper.find('#koulutustutkintotyyppi'));
 

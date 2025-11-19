@@ -249,7 +249,7 @@
           <ep-toggle
             :value="!!innerModel.muodostumisSaanto.laajuus.maksimi"
             switch
-            @input="toggleMaksimi"
+            @update:modelValue="toggleMaksimi"
           >
             {{ $t('aseta-myos-maksimiarvo') }}
           </ep-toggle>
@@ -471,12 +471,6 @@ const show = (isNew) => {
 
   tempModel.value = _.cloneDeep(innerModel.value);
   setDefaultNimi();
-
-  console.log('DEBUG show() - innerModel.value:', innerModel.value);
-  console.log('DEBUG show() - osaamisala:', innerModel.value.osaamisala);
-  console.log('DEBUG show() - tutkintonimike:', innerModel.value.tutkintonimike);
-  console.log('DEBUG show() - selectableOsaamisalat:', selectableOsaamisalat.value);
-  console.log('DEBUG show() - selectableTutkintonimikkeet:', selectableTutkintonimikkeet.value);
 
   emit('update:modelValue',
     {

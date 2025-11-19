@@ -230,7 +230,6 @@ const muutosmaaraysUrl = (muutosmaarays) => {
 };
 
 const avaaMuokkausModal = (julkaisu) => {
-  console.log('avaaMuokkausModal', julkaisu);
   julkaisuModal.value.muokkaa(julkaisu, latestJulkaisuRevision.value!.revision === julkaisu.revision);
 };
 </script>
