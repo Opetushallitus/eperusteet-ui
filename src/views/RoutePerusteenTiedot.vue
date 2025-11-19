@@ -754,6 +754,10 @@ const perustetyyppiTietoFilters = [
     tyyppi: ['digitaalinen_osaaminen'],
     filters: ['diaarinumero', 'paatospaivamaara', 'voimassaolo', 'siirtymaPaattyy', 'perusteenkieli'],
   },
+  {
+    tyyppi: ['kieli_kaantaja_tutkinto'],
+    filters: ['diaarinumero', 'paatospaivamaara', 'voimassaolo', 'siirtymaPaattyy', 'perusteenkieli'],
+  },
 ];
 
 const koulutustyyppiTietoFilters = [

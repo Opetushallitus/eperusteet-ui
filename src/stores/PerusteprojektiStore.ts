@@ -26,6 +26,10 @@ export class PerusteprojektiStore {
     this.state.perusteet = (await Perusteet.getPohjaperusteet('digitaalinen_osaaminen')).data;
   }
 
+  public async fetchPohjaKieliKaantajaTutkinnot() {
+    this.state.perusteet = (await Perusteet.getPohjaperusteet('kieli_kaantaja_tutkinto')).data;
+  }
+
   public async addPerusteprojekti(luontiDto: PerusteprojektiLuontiDto) {
     const res = await Perusteprojektit.addPerusteprojekti(luontiDto);
     return res.data;

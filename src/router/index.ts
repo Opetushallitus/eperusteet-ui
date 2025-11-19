@@ -23,6 +23,8 @@ import RoutePerusteprojektit from '@/views/RoutePerusteprojektit.vue';
 import RoutePohjat from '@/views/RoutePohjat.vue';
 import RouteDigitaalisetOsaamiset from '@/views/RouteDigitaalisetOsaamiset.vue';
 import RouteDigitaalisetOsaamisetLuonti from '@/views/RouteDigitaalisetOsaamisetLuonti.vue';
+import RouteKieliKaantajaTutkinnot from '@/views/RouteKieliKaantajaTutkinnot.vue';
+import RouteKieliKaantajaTutkintoLuonti from '@/views/RouteKieliKaantajaTutkintoLuonti.vue';
 import RoutePohjatLuonti from '@/views/RoutePohjatLuonti.vue';
 import RouteProjektiTiedot from '@/views/RouteProjektiTiedot.vue';
 import RouteRoot from '@/views/RouteRoot.vue';
@@ -63,6 +65,8 @@ import RoutePerusopetusLaajaAlaisetOsaamiset from '@/views/perusopetus/RouteLaaj
 import RoutePerusopetusLaajaAlainenOsaaminen from '@/views/perusopetus/RouteLaajaAlainenOsaaminen.vue';
 import RoutePerusopetusOppiaine from '@/views/perusopetus/RouteOppiaine.vue';
 import RouteOsaamismerkkiKategoriat from '@/views/RouteOsaamismerkkiKategoriat.vue';
+import RouteKaantajaTaito from '@/views/RouteKaantajaTaito.vue';
+import RouteKaantajaTaitotasoasteikko from '@/views/RouteKaantajaTaitotasoasteikko.vue';
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
 import { asetaValmiiksi, avaaPeruste, kooditaPeruste, nollaaJulkaisuTila, pakotaJulkaisu, vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
@@ -131,6 +135,11 @@ const router = createRouter({
       path: 'digitaalisetosaamiset',
       name: 'digitaalisetosaamiset',
       component: RouteDigitaalisetOsaamiset,
+      props,
+    }, {
+      path: 'kielikaantajatutkinnot',
+      name: 'kielikaantajatutkinnot',
+      component: RouteKieliKaantajaTutkinnot,
       props,
     }, {
       path: 'tiedotteet',
@@ -204,6 +213,11 @@ const router = createRouter({
       path: 'digitaalisetosaamiset/uusi',
       name: 'digitaalinenOsaaminenLuonti',
       component: RouteDigitaalisetOsaamisetLuonti,
+      props,
+    }, {
+      path: 'kielikaantajatutkinnot/uusi',
+      name: 'kieliKaantajaTutkintoLuonti',
+      component: RouteKieliKaantajaTutkintoLuonti,
       props,
     }, {
       path: 'perusteprojekti/:projektiId',
@@ -511,6 +525,16 @@ const router = createRouter({
         path: 'perusopetus/oppiaine/:oppiaineId/:uusi?',
         name: 'perusopetusoppiaine',
         component: RoutePerusopetusOppiaine,
+        props,
+      }, {
+        path: 'kaantajataito/:kaantajataitoId',
+        name: 'kaantajataito',
+        component: RouteKaantajaTaito,
+        props,
+      }, {
+        path: 'kaantajataitotasoasteikko/:kaantajataitotasoasteikkoId',
+        name: 'kaantajataitotasoasteikko',
+        component: RouteKaantajaTaitotasoasteikko,
         props,
       },
       ],
