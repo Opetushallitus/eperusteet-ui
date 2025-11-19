@@ -3473,7 +3473,7 @@ __metadata:
     pinia: "npm:^2.2.4"
     qs: "npm:^6.9.0"
     register-service-worker: "npm:^1.6.2"
-    sass: "npm:^1.80.0"
+    sass: "npm:^1.94.1"
     svg-url-loader: "npm:^8.0.0"
     tslib: "npm:^2.2.0"
     typescript: "npm:^5.8.3"
@@ -6343,9 +6343,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.80.0":
-  version: 1.89.2
-  resolution: "sass@npm:1.89.2"
+"sass@npm:^1.94.1":
+  version: 1.94.1
+  resolution: "sass@npm:1.94.1"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
     chokidar: "npm:^4.0.0"
@@ -6356,7 +6356,7 @@ __metadata:
       optional: true
   bin:
     sass: sass.js
-  checksum: 10c0/752ccc7581b0c6395f63918116c20924e99943a86d79e94f5c4a0d41b1e981fe1f0ecd1ee82fff21496f81dbc91f68fb35a498166562ec8ec53e7aad7c3dbd9d
+  checksum: 10c0/ab6170dc272245940a271e7b24bc87ef0b5c732ff3b2b4b4ac50d6e714bc19bcc4537c058596486d82fe3d96d69821189e4b49c663c8a59ba475dbeff0cb1cd1
   languageName: node
   linkType: hard
 
