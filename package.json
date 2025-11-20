@@ -63,7 +63,7 @@
     "sass": "^1.94.1",
     "svg-url-loader": "^8.0.0",
     "tslib": "^2.2.0",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.3",
     "url": "0.11.4",
     "uuid": "^7.0.2",
     "vite": "^6.4.1",
