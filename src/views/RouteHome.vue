@@ -29,11 +29,8 @@
           :peruste-oppaat-store="perusteOppaatStore"
         />
         <TileMaaraysKokoelma v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet_maarays'}" />
-        <TileDigitaalinenOsaaminen
-          v-if="$hasOphCrud()"
-          :digitaaliset-osaamiset-store="digitaalisetOsaamisetStore"
-        />
         <TileKieliKaantajaTutkinto v-if="$hasOphCrud()" />
+        <TileDigitaalinenOsaaminen v-if="$hasOphCrud()" />
         <TileOsaamismerkit v-if="$hasOphCrud()" />
         <TileArviointiasteikot v-oikeustarkastelu="{oikeus:'hallinta'}" />
         <TileTilastot v-oikeustarkastelu="{oikeus:'hallinta'}" />
