@@ -18,7 +18,7 @@
     "@eslint/js": "^9.37.0",
     "@kyvg/vue3-notification": "^3.4.1",
     "@tiptap/extension-table": "^3.0.9",
-    "@tiptap/extension-table-cell": "^3.0.9",
+    "@tiptap/extension-table-cell": "^3.9.1",
     "@tiptap/extension-table-header": "^3.0.9",
     "@tiptap/extension-table-row": "^3.0.9",
     "@tiptap/pm": "^3.0.9",
