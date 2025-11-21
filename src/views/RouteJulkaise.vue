@@ -232,8 +232,8 @@ const props = defineProps<{
 }>();
 
 const julkaisu = ref({
-  tiedote: {},
-  julkinenTiedote: {},
+  tiedote: null,
+  julkinenTiedote: null,
   julkinen: true,
   muutosmaaraysVoimaan: null,
   liitteet: [],
