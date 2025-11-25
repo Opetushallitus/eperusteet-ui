@@ -93,13 +93,8 @@ const props = (route: any) => {
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [{
-    path: '',
-    redirect: () => '/fi',
-  }, {
-    path: '/',
-    redirect: () => '/fi',
-  }, {
     path: '/:lang',
+    alias: ['/', ''],
     component: RouteRoot,
     props,
     children: [{
@@ -704,10 +699,10 @@ router.beforeEach(async (to, from, next) => {
 
 router.beforeEach(async (to, from, next) => {
   if (_.get(to.params, 'lang') === 'maarayskokoelma') {
-    router.push({ path: '/' + await getCasKayttajaKieli() + '/maarayskokoelma' });
+    router.replace({ path: '/' + await getCasKayttajaKieli() + '/maarayskokoelma' });
   }
   else if (!_.get(to.params, 'lang')) {
-    router.push({ path: '/' + await getCasKayttajaKieli() });
+    router.replace({ path: '/' + await getCasKayttajaKieli() });
   }
 
   next();
