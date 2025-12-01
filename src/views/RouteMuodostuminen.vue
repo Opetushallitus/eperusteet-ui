@@ -254,7 +254,7 @@
                             :store="osaamisalaStore"
                             :value="index"
                             class="w-100"
-                            @add="osaamisalaKoodiLisays"
+                            @add="(value) => osaamisalaKoodiLisays(value, index)"
                           >
                             <template #default="{ open }">
                               <b-input-group class="w-100 d-flex">
@@ -352,7 +352,7 @@
                             :store="tutkintonimikeStore"
                             :value="index"
                             class="w-100"
-                            @add="tutkintonimikeKoodiLisays"
+                            @add="(value) => tutkintonimikeKoodiLisays(value, index)"
                           >
                             <template #default="{ open }">
                               <b-input-group class="w-100 d-flex">
