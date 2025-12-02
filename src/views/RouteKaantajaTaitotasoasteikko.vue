@@ -42,6 +42,14 @@
             :is-editable="isEditing"
           />
         </b-form-group>
+
+        <ep-toggle
+          v-if="isEditing"
+          v-model="data.liite"
+          class="mt-4"
+        >
+          {{ $t('nayta-kaantaja-taitotasoasteikko-liitteena') }}
+        </ep-toggle>
       </div>
 
       <hr v-if="isEditing || data.kuvaus">
@@ -222,6 +230,7 @@ import EpJarjestaInput from '@shared/components/forms/EpJarjestaInput.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 
 const props = defineProps({
   perusteStore: {
