@@ -250,7 +250,7 @@ const isPakollinen = (node) => {
     return props.parentMandatory;
   }
 
-  if (node.nimi && node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-valinnainen')) {
+  if (node.nimi && _.startsWith(node.nimi[Kielet.getUiKieli.value], $t('rakenne-moduuli-valinnainen'))) {
     return false;
   }
 

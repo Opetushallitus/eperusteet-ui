@@ -343,6 +343,10 @@ const defaultTyyppi = computed(() => {
     return 'tutkintonimike';
   }
 
+  if (_.startsWith(props.modelValue?.nimi[Kielet.getUiKieli.value], $t('rakenne-moduuli-valinnainen'))) {
+      return 'rakenne-moduuli-valinnainen';
+    }
+
   const rakennetyypit = [
     'osaamisala',
     'tutkintonimike',
