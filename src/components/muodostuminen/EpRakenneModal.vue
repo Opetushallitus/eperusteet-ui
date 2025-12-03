@@ -249,7 +249,7 @@
           <ep-toggle
             :value="!!innerModel.muodostumisSaanto.laajuus.maksimi"
             switch
-            @update:modelValue="toggleMaksimi"
+            @update:model-value="toggleMaksimi"
           >
             {{ $t('aseta-myos-maksimiarvo') }}
           </ep-toggle>
@@ -344,8 +344,8 @@ const defaultTyyppi = computed(() => {
   }
 
   if (_.startsWith(props.modelValue?.nimi[Kielet.getUiKieli.value], $t('rakenne-moduuli-valinnainen'))) {
-      return 'rakenne-moduuli-valinnainen';
-    }
+    return 'rakenne-moduuli-valinnainen';
+  }
 
   const rakennetyypit = [
     'osaamisala',

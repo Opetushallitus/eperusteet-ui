@@ -60,19 +60,20 @@
                   <div class="text-muted mb-3">
                     {{ $t('perusteprojekti-ohje-kuvaus') }}
                   </div>
-                    <EpRadio
-                      v-model="data.projektiKuvaus"
-                      :value="kuvaus.korjaus"
-                      name="projektiKuvaus">
-                      {{ $t('perusteen-korjaus') }}
-                    </EpRadio>
-                    <EpRadio
-                      v-model="data.projektiKuvaus"
-                      :value="kuvaus.uudistus"
-                      name="projektiKuvaus"
-                    >
-                      {{ $t('perusteen-uudistus') }}
-                    </EpRadio>
+                  <EpRadio
+                    v-model="data.projektiKuvaus"
+                    :value="kuvaus.korjaus"
+                    name="projektiKuvaus"
+                  >
+                    {{ $t('perusteen-korjaus') }}
+                  </EpRadio>
+                  <EpRadio
+                    v-model="data.projektiKuvaus"
+                    :value="kuvaus.uudistus"
+                    name="projektiKuvaus"
+                  >
+                    {{ $t('perusteen-uudistus') }}
+                  </EpRadio>
                 </div>
                 <div v-else-if="data.projektiKuvaus === kuvaus.korjaus">
                   {{ $t('perusteen-korjaus') }}
