@@ -1,5 +1,5 @@
 import RoutePohjatLuonti from '../RoutePohjatLuonti.vue';
-import { PerusteetStore } from '@/stores/PerusteetStore';
+import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import { mockPohjaPerusteet, mockTyoryhmat } from './data';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
@@ -25,7 +25,7 @@ describe('RoutePohjatLuonti component', () => {
     mockRouterPush.mockClear();
   });
 
-  const pohjatStore = mock(PerusteetStore);
+  const pohjatStore = mock(OmatPerusteetStore);
   pohjatStore.updateQuery = vi.fn(async () => {});
   pohjatStore.state.projects = mockPohjaPerusteet();
   const ulkopuolisetStore = mock(UlkopuolisetStore);

@@ -727,7 +727,7 @@ import { Api, Liitetiedostot, Koodisto, LiiteDtoTyyppiEnum, LiitetiedostotParam,
 import { AmmatillisetKoulutustyypit, Koulutustyyppi } from '@shared/tyypit';
 import { usePerusteprojekti } from './PerusteprojektiRoute';
 import { PerusteEditStore } from '@/stores/PerusteEditStore';
-import { PerusteetStore } from '@/stores/PerusteetStore';
+import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpKoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelect.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
@@ -776,7 +776,7 @@ const koulutustyyppiTietoFilters = [
 ];
 
 const props = defineProps<{
-  perusteetStore: PerusteetStore;
+  perusteetStore: OmatPerusteetStore;
   perusteStore: PerusteStore;
   kayttajaStore: KayttajaStore;
   tiedotteetStore: TiedotteetStore;

@@ -24,12 +24,12 @@
 import { computed } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
-import { PerusteetStore } from '@/stores/PerusteetStore';
+import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import { EiTuetutKoulutustyypit } from '@/utils/perusteet';
 import { $t } from '@shared/utils/globals';
 
 const props = defineProps<{
-  perusteetStore: PerusteetStore;
+  perusteetStore: OmatPerusteetStore;
 }>();
 
 const eiTuetutKoulutustyypit = computed(() => {

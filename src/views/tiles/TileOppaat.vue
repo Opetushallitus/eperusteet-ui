@@ -48,11 +48,11 @@ import EpHomeTile from '@shared/components/EpHomeTiles/EpHomeTile.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import * as _ from 'lodash';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { PerusteetStore } from '@/stores/PerusteetStore';
+import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import { $t, $kaanna, $hasOphCrud } from '@shared/utils/globals';
 
 const props = defineProps<{
-  perusteOppaatStore: PerusteetStore;
+  perusteOppaatStore: OmatPerusteetStore;
 }>();
 
 onMounted(async () => {

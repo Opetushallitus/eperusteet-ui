@@ -5,7 +5,7 @@ import { IProjektiProvider } from '@/components/EpPerusteprojektiListaus/types';
 import { debounced } from '@shared/utils/delay';
 import _ from 'lodash';
 
-export class KieliKaantajaTutkinnotStore implements IProjektiProvider {
+export class OmatPerusteetStore implements IProjektiProvider {
   constructor(
     private overrides = {} as PerusteQuery & any,
   ) {
@@ -17,15 +17,16 @@ export class KieliKaantajaTutkinnotStore implements IProjektiProvider {
     perusteQuery: {} as PerusteQuery,
   });
 
-  public readonly ownProjects = computed(() => this.state.ownProjects);
+  public readonly ownProjects = computed(() => {
+    return this.state.ownProjects;
+  });
+
   public readonly projects = computed(() => this.state.projects);
 
   public async updateOwnProjects() {
-    const res = _.map(await Promise.all(
-      [
-        this.findPerusteet({ tila: ['LAADINTA'] }),
-        this.findPerusteet({ tila: ['JULKAISTU'] }),
-      ],
+    const res = _.map(await Promise.all([
+      Perusteprojektit.getOmatPerusteprojektit([...this.overrides.tyyppi]),
+      Perusteprojektit.getOmatJulkaistutPerusteprojektit([...this.overrides.tyyppi])],
     ), 'data') as any;
     this.state.ownProjects = _.uniqBy([...res[0], ...res[1]], projekti => projekti.id);
   }
@@ -36,13 +37,19 @@ export class KieliKaantajaTutkinnotStore implements IProjektiProvider {
   }
 
   public updateQuery = debounced(async (query: PerusteQuery) => {
-    this.state.projects = (await this.findPerusteet({ tila: ['POISTETTU'] }));
+    const res = (await getPerusteprojektit({
+      ...query,
+      ...this.overrides,
+    })).data as any;
+    const projectIds = _.chain((res).data)
+      .map('id')
+      .value() as number[];
 
-    if (_.size(this.state.projects.data) > 0) {
-      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(_.map(this.state.projects.data, 'id') as number[])).data;
+    if (_.size(projectIds) > 0) {
+      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(projectIds)).data;
       const resWithRights = {
-        ...this.state.projects,
-        data: (this.state.projects).data.map(proj => ({
+        ...res,
+        data: (res).data.map((proj: PerusteprojektiKevytDto) => ({
           ...proj,
           oikeudet: rights[proj.id!],
         })),
@@ -50,24 +57,15 @@ export class KieliKaantajaTutkinnotStore implements IProjektiProvider {
 
       this.state.projects = resWithRights;
     }
+    else {
+      this.state.projects = res;
+    }
   });
 
-  public async findPerusteet(query) {
-    const res = await getPerusteprojektit({
-      sivu: 0,
-      sivukoko: 100,
-      voimassaolo: false,
-      siirtyma: false,
-      tuleva: false,
-      poistunut: false,
-      tyyppi: ['KIELI_KAANTAJA_TUTKINTO'],
-      nimi: '',
-      jarjestysOrder: false,
-      jarjestysTapa: 'nimi',
-      perusteet: [],
+  public async findPerusteet(query: PerusteQuery) {
+    const res = await getAllPerusteet({
       ...query,
     });
-    return res.data as Page<PerusteprojektiKevytDto>;
+    return res.data as Page<PerusteHakuDto>;
   }
 }
-

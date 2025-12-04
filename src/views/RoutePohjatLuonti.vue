@@ -133,7 +133,7 @@ import EpAikataulu from '@shared/components/EpAikataulu/EpAikataulu.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { PerusteprojektiLuontiDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { PerusteprojektiStore } from '@/stores/PerusteprojektiStore';
-import { PerusteetStore } from '@/stores/PerusteetStore';
+import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import { UlkopuolisetStore } from '@/stores/UlkopuolisetStore';
 import * as _ from 'lodash';
 import { themes, koulutustyyppiRyhmaSort, EperusteetKoulutustyypit } from '@shared/utils/perusteet';
@@ -146,7 +146,7 @@ import { $t, $kaanna, $kaannaOlioTaiTeksti, $fail } from '@shared/utils/globals'
 import EpRadio from '@shared/components/forms/EpRadio.vue';
 
 const props = defineProps<{
-  pohjatStore: PerusteetStore;
+  pohjatStore: OmatPerusteetStore;
   ulkopuolisetStore: UlkopuolisetStore;
   perusteprojektiStore: PerusteprojektiStore;
 }>();
