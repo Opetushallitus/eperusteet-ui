@@ -57,13 +57,13 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import _ from 'lodash';
 import EpArkistoidutModal from '@shared/components/EpArkistoidutModal/EpArkistoidutModal.vue';
 import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
-import { KieliKaantajaTutkinnotStore } from '@/stores/KieliKaantajaTutkinnotStore';
+import { PerusteetStore } from '@/stores/PerusteetStore';
 import { $t } from '@shared/utils/globals';
 import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
 
 const props = defineProps<{
-  kieliKaantajaTutkinnotStore: KieliKaantajaTutkinnotStore;
+  kieliKaantajaTutkinnotStore: PerusteetStore;
 }>();
 
 const route = useRoute();

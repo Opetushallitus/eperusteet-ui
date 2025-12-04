@@ -22,11 +22,11 @@
 import { getCurrentInstance, computed } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
-import { PerusteetStore } from '@/stores/PerusteetStore';
+import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import { $t } from '@shared/utils/globals';
 
 const props = defineProps<{
-  pohjatStore: PerusteetStore;
+  pohjatStore: OmatPerusteetStore;
 }>();
 
 const pohjatStore = computed(() => {

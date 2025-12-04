@@ -17,20 +17,16 @@ export class PerusteetStore implements IProjektiProvider {
     perusteQuery: {} as PerusteQuery,
   });
 
-  public readonly ownProjects = computed(() => {
-    if (this.state.ownProjects) {
-      return _.filter(this.state.ownProjects, p => {
-        const tyyppi = this.overrides?.tyyppi;
-        return !tyyppi || _.includes(tyyppi, _.toUpper(p.peruste?.tyyppi));
-      });
-    }
-    return null;
-  });
-
+  public readonly ownProjects = computed(() => this.state.ownProjects);
   public readonly projects = computed(() => this.state.projects);
 
   public async updateOwnProjects() {
-    const res = _.map(await Promise.all([Perusteprojektit.getOmatPerusteprojektit(), Perusteprojektit.getOmatJulkaistutPerusteprojektit()]), 'data') as any;
+    const res = _.map(await Promise.all(
+      [
+        this.findPerusteet({ tila: ['LAADINTA'] }),
+        this.findPerusteet({ tila: ['JULKAISTU'] }),
+      ],
+    ), 'data') as any;
     this.state.ownProjects = _.uniqBy([...res[0], ...res[1]], projekti => projekti.id);
   }
 
@@ -40,19 +36,13 @@ export class PerusteetStore implements IProjektiProvider {
   }
 
   public updateQuery = debounced(async (query: PerusteQuery) => {
-    const res = (await getPerusteprojektit({
-      ...query,
-      ...this.overrides,
-    })).data as any;
-    const projectIds = _.chain((res).data)
-      .map('id')
-      .value() as number[];
+    this.state.projects = (await this.findPerusteet({ tila: ['POISTETTU'] }));
 
-    if (_.size(projectIds) > 0) {
-      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(projectIds)).data;
+    if (_.size(this.state.projects.data) > 0) {
+      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(_.map(this.state.projects.data, 'id') as number[])).data;
       const resWithRights = {
-        ...res,
-        data: (res).data.map((proj: PerusteprojektiKevytDto) => ({
+        ...this.state.projects,
+        data: (this.state.projects).data.map(proj => ({
           ...proj,
           oikeudet: rights[proj.id!],
         })),
@@ -60,15 +50,23 @@ export class PerusteetStore implements IProjektiProvider {
 
       this.state.projects = resWithRights;
     }
-    else {
-      this.state.projects = res;
-    }
   });
 
-  public async findPerusteet(query: PerusteQuery) {
-    const res = await getAllPerusteet({
+  public async findPerusteet(query) {
+    const res = await getPerusteprojektit({
+      sivu: 0,
+      sivukoko: 100,
+      voimassaolo: false,
+      siirtyma: false,
+      tuleva: false,
+      poistunut: false,
+      nimi: '',
+      jarjestysOrder: false,
+      jarjestysTapa: 'nimi',
+      perusteet: [],
       ...query,
+      ...this.overrides,
     });
-    return res.data as Page<PerusteHakuDto>;
+    return res.data as Page<PerusteprojektiKevytDto>;
   }
 }

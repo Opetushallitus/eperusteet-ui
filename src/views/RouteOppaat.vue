@@ -86,7 +86,7 @@ import { onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpPerusteprojektiListaus from '@/components/EpPerusteprojektiListaus/EpPerusteprojektiListaus.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import { PerusteetStore } from '@/stores/PerusteetStore';
+import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import * as _ from 'lodash';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
@@ -94,7 +94,7 @@ import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
 import { $t, $isAdmin, $hasOphCrud } from '@shared/utils/globals';
 
 const props = defineProps<{
-  perusteOppaatStore: PerusteetStore;
+  perusteOppaatStore: OmatPerusteetStore;
 }>();
 
 onMounted(() => {

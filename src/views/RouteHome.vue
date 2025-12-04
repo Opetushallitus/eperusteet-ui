@@ -55,14 +55,13 @@ import TileYllapito from './tiles/TileYllapito.vue';
 import TileOsaamismerkit from './tiles/TileOsaamismerkit.vue';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { KayttajaStore } from '@/stores/kayttaja';
-import { PerusteetStore } from '@/stores/PerusteetStore';
+import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import { $t } from '@shared/utils/globals';
 
 const props = defineProps<{
   tiedotteetStore: TiedotteetStore;
   kayttajaStore: KayttajaStore;
-  perusteOppaatStore: PerusteetStore;
-  digitaalisetOsaamisetStore: PerusteetStore;
+  perusteOppaatStore: OmatPerusteetStore;
 }>();
 
 const nimi = computed(() => {
