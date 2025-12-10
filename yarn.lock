@@ -1425,6 +1425,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-text-style@npm:^3.0.9":
+  version: 3.13.0
+  resolution: "@tiptap/extension-text-style@npm:3.13.0"
+  peerDependencies:
+    "@tiptap/core": ^3.13.0
+  checksum: 10c0/b9ec43d46c8f481874bf498a06d011e931f2fcb55f114c85966f22d18da6f0f1c17ca4b2c516b49f1ad16456728c1503f9b048a6e4c28920022222b43ee9e1bf
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-text@npm:^3.0.9":
   version: 3.0.9
   resolution: "@tiptap/extension-text@npm:3.0.9"
@@ -3442,6 +3451,7 @@ __metadata:
     "@tiptap/extension-table-cell": "npm:^3.0.9"
     "@tiptap/extension-table-header": "npm:^3.0.9"
     "@tiptap/extension-table-row": "npm:^3.0.9"
+    "@tiptap/extension-text-style": "npm:^3.0.9"
     "@tiptap/pm": "npm:^3.0.9"
     "@tiptap/starter-kit": "npm:^3.0.9"
     "@tiptap/vue-3": "npm:^3.0.9"
@@ -3512,6 +3522,7 @@ __metadata:
     vue-sticky-directive: "npm:^0.0.10"
     vue-template-compiler: "npm:^2.7.16"
     vue-upload-component: "npm:^2.8.22"
+    vue3-text-clamp: "npm:^0.1.2"
     webpack: "npm:^5.58.0"
   languageName: unknown
   linkType: soft
@@ -6196,6 +6207,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"resize-detector@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "resize-detector@npm:0.3.0"
+  checksum: 10c0/f512be6d4ca714ce8923ac62bda53702f75de70b5bba04c57ffcbe5c74c913df2243a154181042bfea44bbd69cbd15366d54219474f0a801b82f9403da00711e
+  languageName: node
+  linkType: hard
+
 "resolve-from@npm:^4.0.0":
   version: 4.0.0
   resolution: "resolve-from@npm:4.0.0"
@@ -7645,6 +7663,19 @@ __metadata:
   version: 2.8.23
   resolution: "vue-upload-component@npm:2.8.23"
   checksum: 10c0/5b17a7e782e8497c2127f7d5beec0410e9f8fb9ba3e757ff5f46b3302f7525a07321fd7f1e662a6bb08276398b80dfb915a3bdb281d4d7a0f7e3d0a0f9c23aaf
+  languageName: node
+  linkType: hard
+
+"vue3-text-clamp@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "vue3-text-clamp@npm:0.1.2"
+  dependencies:
+    resize-detector: "npm:^0.3.0"
+    vue: "npm:^3.2.37"
+  peerDependencies:
+    resize-detector: ^0.3.0
+    vue: ^3.2.37
+  checksum: 10c0/2286fa2cbebedcef5f8eedf2e45580c276bdb421994a97dd544b32664dbdcd6c7e5a7363da92cb9735f3d93619ba572496eba7485a3ca1b1876b144450cc1f03
   languageName: node
   linkType: hard
 

@@ -22,6 +22,7 @@
     "@tiptap/extension-table-cell": "^3.0.9",
     "@tiptap/extension-table-header": "^3.0.9",
     "@tiptap/extension-table-row": "^3.0.9",
+    "@tiptap/extension-text-style": "^3.0.9",
     "@tiptap/pm": "^3.0.9",
     "@tiptap/starter-kit": "^3.0.9",
     "@tiptap/vue-3": "^3.0.9",
@@ -88,6 +89,7 @@
     "vue-sticky-directive": "^0.0.10",
     "vue-template-compiler": "^2.7.16",
     "vue-upload-component": "^2.8.22",
+    "vue3-text-clamp": "^0.1.2",
     "webpack": "^5.58.0"
   },
   "engines": {
