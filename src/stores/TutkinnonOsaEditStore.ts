@@ -9,6 +9,8 @@ import { Kielet } from '@shared/stores/kieli';
 import { App } from 'vue';
 import { Router } from 'vue-router';
 import { $t } from '@shared/utils/globals';
+import { helpers, required, requiredIf } from '@vuelidate/validators';
+import { langMinLength, langOnlyCharacterOrNumber, requiredOneLang } from '@shared/validators/required';
 
 export function notNull() {
   return {
@@ -150,11 +152,44 @@ export class TutkinnonOsaEditStore implements IEditoitava {
     // Noop
   }
 
-  // public readonly validator = computed(() => {
-  //   return {
-  //     tutkinnonOsa: {},
-  //   };
-  // });
+  public readonly validator = computed(() => {
+    // Wrap validator to skip when koodi exists (field not required)
+    const skipIfKoodi = (validatorFn: (value: any) => boolean) => {
+      return (value: any, siblings: any) => {
+        if (siblings.koodi) return true;
+        return validatorFn(value);
+      };
+    };
+
+    const vaatimusValidators = {
+      required: requiredIf((value, parent) => {
+        return !parent.koodi;
+      }),
+      'min-length-3': skipIfKoodi(langMinLength(3)['min-length-3']),
+      'only-character-or-number': skipIfKoodi(langOnlyCharacterOrNumber()['only-character-or-number']),
+    };
+
+    return {
+      tutkinnonOsa: {
+        ammattitaitovaatimukset2019: {
+          vaatimukset: {
+            $each: helpers.forEach({
+              vaatimus: vaatimusValidators,
+            }),
+          },
+          kohdealueet: {
+            $each: helpers.forEach({
+              vaatimukset: {
+                $each: helpers.forEach({
+                  vaatimus: vaatimusValidators,
+                }),
+              },
+            }),
+          },
+        },
+      },
+    };
+  });
 
   public async remove() {
     if (!this.tutkinnonOsaViiteId) {

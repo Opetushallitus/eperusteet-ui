@@ -27,31 +27,29 @@
       />
     </template>
 
-    <template #default="{ data, isEditing }">
+    <template #default="{ data, isEditing, validation }">
       <div
         v-if="isEditing && isNew"
         class="mt-1"
       >
-        <ep-error-wrapper>
-          <b-form-group :label="$t('tyyppi')">
-            <EpRadio
-              v-model="data.tutkinnonOsa.tyyppi"
-              name="tyyppi"
-              value="normaali"
-              :is-editing="true"
-            >
-              {{ $t('ammatillinen-tutkinnon-osa') }}
-            </EpRadio>
-            <EpRadio
-              v-model="data.tutkinnonOsa.tyyppi"
-              name="tyyppi"
-              value="reformi_tutke2"
-              :is-editing="true"
-            >
-              {{ $t('yhteinen-tutkinnon-osa') }}
-            </EpRadio>
-          </b-form-group>
-        </ep-error-wrapper>
+        <b-form-group :label="$t('tyyppi')">
+          <EpRadio
+            v-model="data.tutkinnonOsa.tyyppi"
+            name="tyyppi"
+            value="normaali"
+            :is-editing="true"
+          >
+            {{ $t('ammatillinen-tutkinnon-osa') }}
+          </EpRadio>
+          <EpRadio
+            v-model="data.tutkinnonOsa.tyyppi"
+            name="tyyppi"
+            value="reformi_tutke2"
+            :is-editing="true"
+          >
+            {{ $t('yhteinen-tutkinnon-osa') }}
+          </EpRadio>
+        </b-form-group>
       </div>
 
       <b-row class="mb-4">
@@ -161,6 +159,7 @@
             <EpAmmattitaitovaatimukset
               v-model="data.tutkinnonOsa.ammattitaitovaatimukset2019"
               :is-editing="isEditing"
+              :validation="validation?.tutkinnonOsa?.ammattitaitovaatimukset2019"
             />
           </b-form-group>
         </ep-collapse>
