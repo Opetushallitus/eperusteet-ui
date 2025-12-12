@@ -228,12 +228,12 @@ const toggleTermi = (termi: any) => {
 };
 
 const avaaMuokkausModal = (termi?: TermiDto) => {
-  // if (!termi) {
-  //   kasite.value = {};
-  // }
-  // else {
-  //   kasite.value = _.cloneDeep(termi);
-  // }
+  if (!termi) {
+    kasite.value = {};
+  }
+  else {
+    kasite.value = _.cloneDeep(termi);
+  }
   (kasitteenLuontiModal.value as any).show();
 };
 
