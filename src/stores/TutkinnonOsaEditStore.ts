@@ -10,7 +10,7 @@ import { App } from 'vue';
 import { Router } from 'vue-router';
 import { $t } from '@shared/utils/globals';
 import { helpers, required, requiredIf } from '@vuelidate/validators';
-import { langMinLength, langOnlyCharacterOrNumber, requiredOneLang } from '@shared/validators/required';
+import { langMinLength, } from '@shared/validators/required';
 
 export function notNull() {
   return {
@@ -166,7 +166,6 @@ export class TutkinnonOsaEditStore implements IEditoitava {
         return !parent.koodi;
       }),
       'min-length-3': skipIfKoodi(langMinLength(3)['min-length-3']),
-      'only-character-or-number': skipIfKoodi(langOnlyCharacterOrNumber()['only-character-or-number']),
     };
 
     return {
