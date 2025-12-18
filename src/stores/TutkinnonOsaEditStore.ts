@@ -10,7 +10,7 @@ import { App } from 'vue';
 import { Router } from 'vue-router';
 import { $t } from '@shared/utils/globals';
 import { helpers, required, requiredIf } from '@vuelidate/validators';
-import { langMinLength, } from '@shared/validators/required';
+import { langMinLength } from '@shared/validators/required';
 
 export function notNull() {
   return {
