@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 export class OmatPerusteetStore implements IProjektiProvider {
   constructor(
-    private overrides = {} as PerusteQuery & any,
+    private initQuery = {} as PerusteQuery & any,
   ) {
   }
 
@@ -25,8 +25,8 @@ export class OmatPerusteetStore implements IProjektiProvider {
 
   public async updateOwnProjects() {
     const res = _.map(await Promise.all([
-      Perusteprojektit.getOmatPerusteprojektit([...this.overrides.tyyppi]),
-      Perusteprojektit.getOmatJulkaistutPerusteprojektit([...this.overrides.tyyppi])],
+      Perusteprojektit.getOmatPerusteprojektit([...this.initQuery.tyyppi]),
+      Perusteprojektit.getOmatJulkaistutPerusteprojektit([...this.initQuery.tyyppi])],
     ), 'data') as any;
     this.state.ownProjects = _.uniqBy([...res[0], ...res[1]], projekti => projekti.id);
   }
@@ -38,8 +38,8 @@ export class OmatPerusteetStore implements IProjektiProvider {
 
   public updateQuery = debounced(async (query: PerusteQuery) => {
     const res = (await getPerusteprojektit({
+      ...this.initQuery,
       ...query,
-      ...this.overrides,
     })).data as any;
     const projectIds = _.chain((res).data)
       .map('id')
