@@ -163,6 +163,36 @@ export function routeToNode(route: RouteLocationNormalized): NavigationNodeDto |
       type: 'vuosiluokkakokonaisuus',
       id: Number(route.params.vlkId),
     };
+  case 'kaantajataito':
+    return {
+      type: 'kaantajataito',
+      id: Number(route.params.kaantajataitoId),
+    };
+  case 'kaantajataitotasoasteikko':
+    return {
+      type: 'kaantajataitotasoasteikko',
+      id: Number(route.params.kaantajataitotasoasteikkoId),
+    };
+  case 'kaantajakielitaito':
+    return {
+      type: 'kaantajakielitaito',
+      id: Number(route.params.kaantajakielitaitoId),
+    };
+  case 'kaantajataitotasokuvaus':
+    return {
+      type: 'kaantajataitotasokuvaus',
+      id: Number(route.params.kaantajataitotasokuvausId),
+    };
+  case 'kaantajaaihealue':
+    return {
+      type: 'kaantajaaihealue',
+      id: Number(route.params.kaantajaaihealueId),
+    };
+  case 'kaantajatodistusmalli':
+    return {
+      type: 'kaantajatodistusmalli',
+      id: Number(route.params.kaantajatodistusmalliId),
+    };
   case 'peruste-yleisnakyma':
     return null;
   default:
@@ -179,6 +209,13 @@ export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
   }
 
   switch (node.type) {
+  case 'tekstikappale':
+    return {
+      name: 'tekstikappale',
+      params: {
+        tekstiKappaleId: _.toString(node.id),
+      },
+    };
   case 'viite':
     return {
       name: 'tekstikappale',
@@ -384,6 +421,34 @@ export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
       name: 'kaantajataito',
       params: {
         kaantajataitoId: _.toString(node.id),
+      },
+    };
+  case 'kaantajakielitaito':
+    return {
+      name: 'kaantajakielitaito',
+      params: {
+        kaantajakielitaitoId: _.toString(node.id),
+      },
+    };
+  case 'kaantajataitotasokuvaus':
+    return {
+      name: 'kaantajataitotasokuvaus',
+      params: {
+        kaantajataitotasokuvausId: _.toString(node.id),
+      },
+    };
+  case 'kaantajaaihealue':
+    return {
+      name: 'kaantajaaihealue',
+      params: {
+        kaantajaaihealueId: _.toString(node.id),
+      },
+    };
+  case 'kaantajatodistusmalli':
+    return {
+      name: 'kaantajatodistusmalli',
+      params: {
+        kaantajatodistusmalliId: _.toString(node.id),
       },
     };
   default:

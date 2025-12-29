@@ -29,7 +29,7 @@
       </div>
 
       <div class="mb-4 w-80">
-        <b-form-group>
+        <b-form-group class="p-0">
           <template
             v-if="isEditing"
             #label
