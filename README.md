@@ -18,7 +18,9 @@ Opetussuunnitelmien perusteiden laadintatyökalun käyttöliittymä.
 
 ### 3.1. Esivaatimukset
 
-Asenna haluamallasi tavalla (esim [nvm](https://github.com/nvm-sh/nvm)) `Node.js 14 LTS`
+Asenna haluamallasi tavalla (esim [nvm](https://github.com/nvm-sh/nvm)) `Node.js 21`
+
+Projekti käyttää Yarn 4.9.2 pakettienhallintaan. Yarn asentuu automaattisesti kun ajat `yarn install`.
 
 ### Rajapintojen generointi
 
@@ -41,10 +43,18 @@ ympäristömuuttujalla EPERUSTEET\_SPECFILE osoittamaan hakemistoon.
 
 ### 3.2. Testien ajaminen
 
+Projekti käyttää Vitest-testauskirjastoa.
+
 ```bash
 
 # Kaikki testit
 yarn test
+
+# Testit watch-tilassa
+yarn test --watch
+
+# Testit UI:lla
+yarn test --ui
 
 ```
 
@@ -67,14 +77,19 @@ yarn dev
 yarn lint
 
 # Korjaus automaattisesti
-yarn lint:fix
+yarn lint --fix
 
 ```
 
 #### Tuotantoversion buildaus
 
+Projekti käyttää Vite-builderoa.
+
 ```bash
 yarn build
+
+# Preview tuotantobuildista
+yarn preview
 ```
 
 ### 3.4.1. Kikkoja lokaaliin kehitykseen
@@ -100,10 +115,13 @@ Testiympäristöjen swaggerit löytyvät seuraavista osoitteista
 
 https://github.com/Opetushallitus/eperusteet-ui/actions
 
-### 5. Koodityyli
+## 5. Koodityyli
+
+Projekti on migroitu Vue 3:een.
 
 Suositeltavia resursseja:
- - [Vue style guide](https://vuejs.org/v2/style-guide)
+ - [Vue 3 style guide](https://vuejs.org/style-guide/)
+ - [Vue 3 documentation](https://vuejs.org/guide/introduction.html)
  - [BootstrapVue](https://bootstrap-vue.org/docs)
 
 ## ePerusteet-projektit
