@@ -280,6 +280,42 @@
                 </div>
               </template>
 
+              <template #kaantajakielitaito="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'kaantajakielitaito', params: { kaantajakielitaitoId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-kielitaito') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template #kaantajataitotasokuvaus="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'kaantajataitotasokuvaus', params: { kaantajataitotasokuvausId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-taitotasokuvaus') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template #kaantajaaihealue="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'kaantajaaihealue', params: { kaantajaaihealueId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-aihealue') }}
+                  </router-link>
+                </div>
+              </template>
+
+              <template #kaantajatodistusmalli="{ item }">
+                <div class="menu-item">
+                  <router-link :to="{ name: 'kaantajatodistusmalli', params: { kaantajatodistusmalliId: item.id } }">
+                    <span class="text-muted mr-1">{{ item.chapter }}</span>
+                    {{ $kaanna(item.label) || $t('nimeton-todistusmalli') }}
+                  </router-link>
+                </div>
+              </template>
+
               <template #osaamiskokonaisuus_paa_alue="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'osaamiskokonaisuus_paa_alue', params: { osaamiskokonaisuusPaaAlueId: item.id } }">

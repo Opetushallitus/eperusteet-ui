@@ -67,6 +67,10 @@ import RoutePerusopetusOppiaine from '@/views/perusopetus/RouteOppiaine.vue';
 import RouteOsaamismerkkiKategoriat from '@/views/RouteOsaamismerkkiKategoriat.vue';
 import RouteKaantajaTaito from '@/views/RouteKaantajaTaito.vue';
 import RouteKaantajaTaitotasoasteikko from '@/views/RouteKaantajaTaitotasoasteikko.vue';
+import RouteKaantajaKielitaito from '@/views/RouteKaantajaKielitaito.vue';
+import RouteKaantajaTaitotasokuvaus from '@/views/RouteKaantajaTaitotasokuvaus.vue';
+import RouteKaantajaAihealue from '@/views/RouteKaantajaAihealue.vue';
+import RouteKaantajaTodistusmalli from '@/views/RouteKaantajaTodistusmalli.vue';
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
 import { asetaValmiiksi, avaaPeruste, kooditaPeruste, nollaaJulkaisuTila, pakotaJulkaisu, vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
@@ -530,6 +534,26 @@ const router = createRouter({
         path: 'kaantajataitotasoasteikko/:kaantajataitotasoasteikkoId',
         name: 'kaantajataitotasoasteikko',
         component: RouteKaantajaTaitotasoasteikko,
+        props,
+      }, {
+        path: 'kaantajakielitaito/:kaantajakielitaitoId',
+        name: 'kaantajakielitaito',
+        component: RouteKaantajaKielitaito,
+        props,
+      }, {
+        path: 'kaantajataitotasokuvaus/:kaantajataitotasokuvausId',
+        name: 'kaantajataitotasokuvaus',
+        component: RouteKaantajaTaitotasokuvaus,
+        props,
+      }, {
+        path: 'kaantajaaihealue/:kaantajaaihealueId',
+        name: 'kaantajaaihealue',
+        component: RouteKaantajaAihealue,
+        props,
+      }, {
+        path: 'kaantajatodistusmalli/:kaantajatodistusmalliId',
+        name: 'kaantajatodistusmalli',
+        component: RouteKaantajaTodistusmalli,
         props,
       },
       ],
