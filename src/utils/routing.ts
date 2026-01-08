@@ -361,6 +361,7 @@ export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
       name: 'moduuli',
       params: {
         moduuliId: _.toString(node.id),
+        oppiaineId: _.toString(node.meta!.oppiaine),
       },
     };
   case 'lukio_oppiaineet':
