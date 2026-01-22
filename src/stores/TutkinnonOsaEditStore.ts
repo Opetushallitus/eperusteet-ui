@@ -47,6 +47,15 @@ export class TutkinnonOsaEditStore implements IEditoitava {
   }
 
   public async load(supportDataProvider) {
+
+    const defaultAmmattitaitovaatimukset2019 = {
+      ammattitaitovaatimukset2019: {
+        kohde: { [Kielet.getSisaltoKieli.value]: $t('opiskelija') },
+        vaatimukset: [],
+        kohdealueet: [],
+      },
+    };
+
     if (!this.tutkinnonOsaViiteId) {
       return {
         tyyppi: 'normaali',
@@ -58,11 +67,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
           osaAlueet: [],
           tyyppi: 'normaali',
           osanTyyppi: 'tutkinnonosa',
-          ammattitaitovaatimukset2019: {
-            kohde: { [Kielet.getSisaltoKieli.value]: $t('opiskelija') },
-            vaatimukset: [],
-            kohdealueet: [],
-          },
+          ...defaultAmmattitaitovaatimukset2019,
           vapaatTekstit: [],
           _geneerinenArviointiasteikko: null,
           arviointi: {
@@ -88,6 +93,7 @@ export class TutkinnonOsaEditStore implements IEditoitava {
       ...res.data,
       tutkinnonOsa: {
         ...res.data.tutkinnonOsa,
+        ...(res.data.tutkinnonOsa.ammattitaitovaatimukset2019 || defaultAmmattitaitovaatimukset2019),
         ...(res.data.tutkinnonOsa.arviointi ? {
           arviointi: {
             ...res.data.tutkinnonOsa.arviointi,
