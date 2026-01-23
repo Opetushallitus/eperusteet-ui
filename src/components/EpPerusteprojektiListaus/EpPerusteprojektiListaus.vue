@@ -353,7 +353,6 @@ const query = reactive<PerusteprojektiQuery>({
   jarjestysOrder: false,
   jarjestysTapa: 'nimi',
   perusteet: [],
-  tyyppi: ['NORMAALI'],
 });
 
 onMounted(async () => {
