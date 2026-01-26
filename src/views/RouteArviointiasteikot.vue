@@ -162,8 +162,8 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
-import { ArviointiAsteikkoDto, Koodisto } from '@shared/api/eperusteet';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import { ArviointiAsteikkoDto } from '@shared/api/eperusteet';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import _ from 'lodash';
 import VueScrollTo from 'vue-scrollto';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
@@ -181,13 +181,7 @@ const arviointiasteikot = ref<ArviointiAsteikkoDto[] | null>(null);
 const koodisto = new KoodistoSelectStore({
   koodisto: 'arviointiasteikkoammatillinen15',
   async query(query: string, sivu = 0, koodisto: string) {
-    const { data } = await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    });
-    return data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

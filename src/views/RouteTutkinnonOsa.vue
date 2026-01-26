@@ -382,8 +382,8 @@ import { TutkinnonOsaEditStore } from '@/stores/TutkinnonOsaEditStore';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import _ from 'lodash';
 import { Murupolku } from '@shared/stores/murupolku';
-import { Koodisto, TutkinnonosatPrivate } from '@shared/api/eperusteet';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import { TutkinnonosatPrivate, Koodisto } from '@shared/api/eperusteet';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpTutkinnonOsaKaytossaModal from '@/components/EpTutkinnonOsaKaytossaModal.vue';
@@ -407,14 +407,8 @@ const arvioinninTyyppi = ref<'geneerinen' | 'tutkinnonosa-kohtainen' | null>(nul
 const tutkinnonosaKoodisto = new KoodistoSelectStore({
   koodisto: 'tutkinnonosat',
   async query(query: string, sivu = 0, koodisto: string) {
-    const koodit = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
-
-    const kaytetyt = (await TutkinnonosatPrivate.getTutkinnonOsaByKoodit(_.map(koodit.data, 'koodiUri'))).data;
+    const koodit = await getKoodistoSivutettuna(koodisto, query, sivu) as any;
+    const kaytetyt = koodit.data.length > 0 ? (await TutkinnonosatPrivate.getTutkinnonOsaByKoodit(_.map(koodit.data, 'koodiUri'))).data : {};
 
     return {
       ...koodit,

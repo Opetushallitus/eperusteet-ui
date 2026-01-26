@@ -291,8 +291,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import { Koodisto } from '@shared/api/eperusteet';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpKoodistoSelectDraggable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectDraggable.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
@@ -377,26 +376,14 @@ const poistaTaitotaso = (tutkintotasoIndex: number, osaIndex: number, taitotasoI
 const arvosanaKoodisto = new KoodistoSelectStore({
   koodisto: 'ykiarvosana',
   async query(query: string, sivu = 0, koodisto: string) {
-    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    }));
-    return data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
 const suorituksenOsaKoodisto = new KoodistoSelectStore({
   koodisto: 'ykisuorituksenosa',
   async query(query: string, sivu = 0, koodisto: string) {
-    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    }));
-    return data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

@@ -327,13 +327,12 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import { getKoodistoSivutettuna, KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpAlert from '@shared/components/EpAlert/EpAlert.vue';
 import {
-  Koodisto,
   KoulutuksenOsaDtoKoulutusOsanKoulutustyyppiEnum,
   KoulutuksenOsaDtoKoulutusOsanTyyppiEnum,
 } from '@shared/api/eperusteet';
@@ -405,12 +404,7 @@ const laajuusAnnettu = computed(() => {
 const koodisto = new KoodistoSelectStore({
   koodisto: 'koulutuksenosattuva',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

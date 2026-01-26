@@ -376,8 +376,8 @@ import { UiKielet } from '@shared/stores/kieli';
 import { MaintenanceStore } from '@/stores/MaintenanceStore';
 import EpExternalLink from '@shared/components/EpExternalLink/EpExternalLink.vue';
 import EpKoodistoSelectTable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectTable.vue';
-import { Koodisto, PerusteBaseDtoOpasTyyppiEnum } from '@shared/api/eperusteet';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import { PerusteBaseDtoOpasTyyppiEnum } from '@shared/api/eperusteet';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 import { KoulutusTyyppi } from '@/utils/perusteet';
 import { $t, $kaanna } from '@shared/utils/globals';
@@ -450,60 +450,35 @@ const perusteet = computed(() => {
 const tutkinnonOsatKoodisto = new KoodistoSelectStore({
   koodisto: 'tutkinnonosat',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
 const osaamisalaKoodisto = new KoodistoSelectStore({
   koodisto: 'osaamisala',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
 const oppiaineKoodisto = new KoodistoSelectStore({
   koodisto: 'oppiaineetjaoppimaaratlops2021',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
 const opintokokonaisuusKoodisto = new KoodistoSelectStore({
   koodisto: 'opintokokonaisuusnimet',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
 const koulutuksenosaKoodisto = new KoodistoSelectStore({
   koodisto: 'koulutuksenosattuva',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
