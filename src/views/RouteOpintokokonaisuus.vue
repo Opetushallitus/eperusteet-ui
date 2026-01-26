@@ -255,8 +255,7 @@ import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
-import { Koodisto } from '@shared/api/eperusteet';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import _ from 'lodash';
@@ -276,12 +275,7 @@ const store = ref<EditointiStore | null>(null);
 const koodisto = new KoodistoSelectStore({
   koodisto: 'opintokokonaisuusnimet',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

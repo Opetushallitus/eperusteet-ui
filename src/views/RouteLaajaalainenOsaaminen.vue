@@ -83,8 +83,7 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import { Koodisto } from '@shared/api/eperusteet';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import * as _ from 'lodash';
 import { KuvaStore } from '@/stores/KuvaStore';
@@ -105,13 +104,7 @@ const route = useRoute();
 const laajaalainenOsaaminenKoodisto = new KoodistoSelectStore({
   koodisto: 'tutkintokoulutukseenvalmentavakoulutuslaajaalainenosaaminen',
   async query(query: string, sivu = 0, koodisto: string) {
-    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    }));
-    return data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

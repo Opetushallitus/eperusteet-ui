@@ -169,8 +169,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { VueDraggable } from 'vue-draggable-plus';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import { Koodisto } from '@shared/api/eperusteet';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import EpOppiaineenVuosiluokkakokonaisuus from '@/views/perusopetus/EpOppiaineenVuosiluokkakokonaisuus.vue';
@@ -199,12 +198,7 @@ const perusteId = computed(() => {
 const koodisto = new KoodistoSelectStore({
   koodisto: 'oppiaineetyleissivistava2',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

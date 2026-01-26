@@ -456,7 +456,7 @@ import { ref, computed, watch, onMounted, provide } from 'vue';
 import { useRoute } from 'vue-router';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
@@ -468,7 +468,6 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import MuodostumisNode from '@/components/muodostuminen/MuodostumisNode.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { MuodostuminenStore } from '@/stores/MuodostuminenStore';
-import { Koodisto } from '@shared/api/eperusteet';
 import { usePerusteprojekti } from './PerusteprojektiRoute';
 import { BrowserStore } from '@shared/stores/BrowserStore';
 import _ from 'lodash';
@@ -535,24 +534,14 @@ const {
 const osaamisalaStore = new KoodistoSelectStore({
   koodisto: 'osaamisala',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
 const tutkintonimikeStore = new KoodistoSelectStore({
   koodisto: 'tutkintonimikkeet',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

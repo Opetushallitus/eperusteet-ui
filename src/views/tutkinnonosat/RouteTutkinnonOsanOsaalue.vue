@@ -170,9 +170,8 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import { Koodisto } from '@shared/api/eperusteet';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import Osaamistavoite from '@shared/components/EpOsaamistavoite/Osaamistavoite.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -256,24 +255,14 @@ const kielet = computed(() => {
 const koodisto = new KoodistoSelectStore({
   koodisto: Koodistot.AMMATILLISENOPPIAINEET,
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
 const kielikoodisto = new KoodistoSelectStore({
   koodisto: Koodistot.KIELIVALIKOIMA,
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

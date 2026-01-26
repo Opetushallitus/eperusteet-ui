@@ -126,8 +126,7 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
 import { TermitStore } from '@/stores/TermitStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import { Koodisto } from '@shared/api/eperusteet';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpDraggableCollapse from '@shared/components/EpDraggableCollapse/EpDraggableCollapse.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
@@ -150,12 +149,7 @@ const perusteId = computed(() => {
 const koodisto = new KoodistoSelectStore({
   koodisto: 'laajaalainenosaaminenlops2021',
   async query(query: string, sivu = 0, koodisto: string) {
-    return (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    })).data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 

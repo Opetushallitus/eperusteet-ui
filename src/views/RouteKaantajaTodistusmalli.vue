@@ -181,8 +181,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
-import { KoodistoSelectStore } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
-import { Koodisto } from '@shared/api/eperusteet';
+import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelectDraggable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectDraggable.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { $t } from '@shared/utils/globals';
@@ -232,13 +231,7 @@ const poistaTaitotaso = (taso: 'ylintaso' | 'keskitaso' | 'perustaso', index: nu
 const arvosanaKoodisto = new KoodistoSelectStore({
   koodisto: 'ykiarvosana',
   async query(query: string, sivu = 0, koodisto: string) {
-    const { data } = (await Koodisto.kaikkiSivutettuna(koodisto, query, {
-      params: {
-        sivu,
-        sivukoko: 10,
-      },
-    }));
-    return data as any;
+    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
   },
 });
 
