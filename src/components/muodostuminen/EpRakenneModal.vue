@@ -209,7 +209,7 @@
             v-else
             class="mt-1 ml-4"
             is-editing
-            value=""
+            model-value=""
             :disabled="true"
           />
         </b-form-group>
@@ -247,7 +247,7 @@
             </div>
           </div>
           <ep-toggle
-            :value="!!innerModel.muodostumisSaanto.laajuus.maksimi"
+            :model-value="!!innerModel.muodostumisSaanto.laajuus.maksimi"
             switch
             @update:model-value="toggleMaksimi"
           >
@@ -315,8 +315,6 @@ const rakenneModal = ref(null);
 
 const osaamisalat = inject('osaamisalat', ref([]));
 const tutkintonimikkeet = inject('tutkintonimikkeet', ref([]));
-
-
 
 const tyyppiRoolit = {
   'rakenne-moduuli-pakollinen': 'määritelty',
@@ -565,7 +563,7 @@ watch(nimiValinta, (newVal, oldVal) => {
 });
 
 const nimiChanged = (newVal, oldVal) => {
-  if (!newVal && !oldVal) {
+  if (!newVal || !oldVal) {
     return;
   }
 
@@ -580,7 +578,7 @@ const nimiChanged = (newVal, oldVal) => {
 };
 
 watch(tyyppi, (newVal, oldVal) => {
-  if (!newVal && !oldVal) {
+  if (!newVal || !oldVal) {
     return;
   }
 
