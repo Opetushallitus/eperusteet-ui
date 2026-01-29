@@ -722,7 +722,7 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (_.get(to.params, 'lang') === 'maarayskokoelma') {
+  if (_.get(to, 'href') === '#/maarayskokoelma') {
     router.replace({ path: '/' + await getCasKayttajaKieli() + '/maarayskokoelma' });
   }
   else if (!_.get(to.params, 'lang')) {
