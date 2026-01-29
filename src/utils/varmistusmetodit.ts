@@ -22,6 +22,7 @@ export async function vaihdaPerusteTilaConfirm({ meta, route, router }) {
       $fail($t('tilan-vaihto-' + meta.tila + '-epaonnistui'));
     }
     if (meta.reroute) {
+      console.log('reroute', meta.reroute());
       router.push({
         name: meta.reroute(),
       });

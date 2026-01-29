@@ -17,7 +17,7 @@
           <div class="row">
             <div class="col-sm-10 mb-4">
               <b-form-group
-                class="mt-0"
+                class="mt-0 mb-3"
                 :label="$t('kayta-pohjana') + ' *'"
               >
                 <EpRadio
@@ -61,16 +61,38 @@
                   </EpMultiSelect>
                   <EpSpinner v-else />
                 </div>
+
+                <EpRadio
+                  v-model="tyyppi"
+                  value="uusi"
+                  name="tyyppi"
+                >
+                  {{ $t('luo-uusi') }}
+                </EpRadio>
               </b-form-group>
 
-              <EpRadio
-                v-model="tyyppi"
-                class="mb-4"
-                value="uusi"
-                name="tyyppi"
+              <b-form-group
+                v-if="tyyppi !== null && tyyppi !== 'perusteesta'"
+                class="mt-0 mb-3"
+                :label="$t('tutkinnon-tyyppi') + ' *'"
               >
-                {{ $t('luo-uusi') }}
-              </EpRadio>
+                <EpRadio
+                  v-model="koulutustyyppitoteutus"
+                  value="kielitutkinto"
+                  name="koulutustyyppitoteutus"
+                >
+                  {{ $t('kielitutkinto') }}
+                </EpRadio>
+
+                <EpRadio
+                  v-model="koulutustyyppitoteutus"
+                  value="kaantajatutkinto"
+                  name="koulutustyyppitoteutus"
+                >
+                  {{ $t('kaantajatutkinto') }}
+                </EpRadio>
+              </b-form-group>
+
               <b-form-group
                 v-if="tyyppi"
                 :label="$t('projektin-nimi') + '*'"
@@ -113,6 +135,7 @@ import { $t, $kaanna, $sd } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
 import { MaarayksetEditStore } from '@/stores/MaarayksetEditStore';
 import { Kielet } from '@shared/stores/kieli';
+import { Koulutustyyppi, KoulutustyyppiToteutus } from '@shared/tyypit';
 
 
 const props = defineProps<{
@@ -126,6 +149,7 @@ const data = ref({
 
 const currentStep = ref<Step | null>(null);
 const tyyppi = ref<'perusteesta' | 'uusi' | null>(null);
+const koulutustyyppitoteutus = ref<KoulutustyyppiToteutus | null>(null);
 const router = useRouter();
 
 onMounted(async () => {
@@ -159,6 +183,10 @@ const steps = computed(() => {
         return false;
       }
 
+      if (tyyppi.value !== 'perusteesta' && !koulutustyyppitoteutus.value) {
+        return false;
+      }
+
       return true;
     },
   }];
@@ -177,11 +205,14 @@ const onSave = async () => {
   const projekti = {
     nimi: data.value.nimi,
     perusteId: data.value.peruste?.id,
+    koulutustyyppi: Koulutustyyppi.kielikaantajatutkinto,
     tyyppi: PerusteprojektiLuontiDtoTyyppiEnum.KIELIKAANTAJATUTKINTO,
+    toteutus: koulutustyyppitoteutus.value,
     maarays: MaarayksetEditStore.createEmptyMaarays({
       nimi: { [Kielet.getSisaltoKieli.value]: data.value.nimi },
       tyyppi: MaaraysDtoTyyppiEnum.PERUSTE,
       tila: MaaraysDtoTilaEnum.LUONNOS,
+      koulutustyypit: [Koulutustyyppi.kielikaantajatutkinto],
     }),
   };
 

@@ -15,7 +15,6 @@
               <EpArkistoidutModal
                 v-if="arkistoidut && arkistoidut.length > 0"
                 :arkistoidut="arkistoidut"
-                @restore="onRestore"
               >
                 <template #title>
                   <span>{{ $t('arkistoidut-projektit') }}</span>
@@ -70,18 +69,12 @@ const route = useRoute();
 const router = useRouter();
 
 const haePoistetut = async () => {
-  await props.kieliKaantajaTutkinnotStore.updateQuery({
-    sivu: 0,
-    sivukoko: 100,
-    tila: ['POISTETTU'],
-    jarjestysOrder: false,
-    jarjestysTapa: 'nimi',
-  });
+  await props.kieliKaantajaTutkinnotStore.updatePoistetutQuery();
 };
 
 const arkistoidut = computed(() => {
-  if (props.kieliKaantajaTutkinnotStore.projects.value) {
-    return _.map(props.kieliKaantajaTutkinnotStore.projects.value?.data, (perusteprojekti: any) => {
+  if (props.kieliKaantajaTutkinnotStore.poistetutProjektit.value) {
+    return _.map(props.kieliKaantajaTutkinnotStore.poistetutProjektit.value.data, (perusteprojekti: any) => {
       return {
         ...perusteprojekti,
         muokattu: perusteprojekti.peruste.muokattu,
@@ -108,8 +101,9 @@ const onRestore = async (perusteprojekti: any) => {
       router,
     },
   );
-  await haePoistetut();
+  props.kieliKaantajaTutkinnotStore.clear();
   await props.kieliKaantajaTutkinnotStore.updateOwnProjects();
+  await haePoistetut();
 };
 
 onMounted(async () => {

@@ -258,7 +258,6 @@ const router = createRouter({
             confirm: 'arkistoi-peruste-vahvistus',
             reroute: () => stores.perusteStore.arkistointiReroute.value,
             tila: 'poistettu',
-            callback: async () => stores.perusteStore.updateCurrent(),
           },
         }, {
           separator: true,
@@ -594,7 +593,6 @@ const router = createRouter({
             confirm: 'arkistoi-opas-vahvistus',
             reroute: () => 'oppaat',
             tila: 'poistettu',
-            callback: async () => stores.perusteStore.updateCurrent(),
           },
         }],
         palautusMeta: {

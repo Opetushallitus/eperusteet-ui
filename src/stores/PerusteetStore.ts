@@ -13,12 +13,13 @@ export class PerusteetStore implements IProjektiProvider {
 
   public state = reactive({
     ownProjects: null as PerusteprojektiListausDto[] | null,
-    projects: null as Page<PerusteprojektiKevytDto> | null,
+    poistetutProjektit: null as Page<PerusteprojektiKevytDto> | null,
     perusteQuery: {} as PerusteQuery,
   });
 
   public readonly ownProjects = computed(() => this.state.ownProjects);
-  public readonly projects = computed(() => this.state.projects);
+  public readonly projects = computed(() => null);
+  public readonly poistetutProjektit = computed(() => this.state.poistetutProjektit);
 
   public async updateOwnProjects() {
     const res = _.map(await Promise.all(
@@ -32,23 +33,25 @@ export class PerusteetStore implements IProjektiProvider {
 
   public clear() {
     this.state.ownProjects = null;
-    this.state.projects = null;
+    this.state.poistetutProjektit = null;
   }
 
-  public updateQuery = debounced(async (query: PerusteQuery) => {
-    this.state.projects = (await this.findPerusteet({ tila: ['POISTETTU'] }));
+  public updateQuery = debounced(async () => {});
 
-    if (_.size(this.state.projects.data) > 0) {
-      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(_.map(this.state.projects.data, 'id') as number[])).data;
+  public updatePoistetutQuery = debounced(async () => {
+    this.state.poistetutProjektit = (await this.findPerusteet({ tila: ['POISTETTU'] }));
+
+    if (_.size(this.state.poistetutProjektit.data) > 0) {
+      const rights = (await Perusteprojektit.getPerusteprojektienOikeudet(_.map(this.state.poistetutProjektit.data, 'id') as number[])).data;
       const resWithRights = {
-        ...this.state.projects,
-        data: (this.state.projects).data.map(proj => ({
+        ...this.state.poistetutProjektit,
+        data: (this.state.poistetutProjektit).data.map(proj => ({
           ...proj,
           oikeudet: rights[proj.id!],
         })),
       };
 
-      this.state.projects = resWithRights;
+      this.state.poistetutProjektit = resWithRights;
     }
   });
 

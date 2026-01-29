@@ -70,18 +70,12 @@ const route = useRoute();
 const router = useRouter();
 
 const haePoistetut = async () => {
-  await props.digitaalisetOsaamisetStore.updateQuery({
-    sivu: 0,
-    sivukoko: 100,
-    tila: ['POISTETTU'],
-    jarjestysOrder: false,
-    jarjestysTapa: 'nimi',
-  });
+  await props.digitaalisetOsaamisetStore.updatePoistetutQuery();
 };
 
 const arkistoidut = computed(() => {
-  if (props.digitaalisetOsaamisetStore.projects.value) {
-    return _.map(props.digitaalisetOsaamisetStore.projects.value?.data, (perusteprojekti: any) => {
+  if (props.digitaalisetOsaamisetStore.poistetutProjektit.value) {
+    return _.map(props.digitaalisetOsaamisetStore.poistetutProjektit.value?.data, (perusteprojekti: any) => {
       return {
         ...perusteprojekti,
         muokattu: perusteprojekti.peruste.muokattu,
@@ -108,8 +102,9 @@ const onRestore = async (perusteprojekti: any) => {
       router,
     },
   );
-  await haePoistetut();
+  props.digitaalisetOsaamisetStore.clear();
   await props.digitaalisetOsaamisetStore.updateOwnProjects();
+  await haePoistetut();
 };
 
 onMounted(async () => {
