@@ -137,7 +137,7 @@ import { ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import * as _ from 'lodash';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
-import { Koulutustyyppi } from '@shared/tyypit';
+import { Koulutustyyppi, KoulutustyyppiToteutus } from '@shared/tyypit';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
@@ -389,7 +389,12 @@ const perusteTyyppiSisaltoLisays = computed(() => {
           'sijainti': 'osaamiskokonaisuuden-sijainti',
         },
       }],
-    [_.toLower(PerusteDtoTyyppiEnum.KIELIKAANTAJATUTKINTO)]: [
+  };
+});
+
+const perusteKoulutustyyppiToteutusSisaltoLisays = computed(() => {
+  return {
+    [KoulutustyyppiToteutus.kaantajatutkinto]: [
       {
         groupedSisalto: [],
         save: tallennaUusiTaito,
@@ -408,6 +413,8 @@ const perusteTyyppiSisaltoLisays = computed(() => {
           'sijainti': 'taitotasoasteikon-sijainti',
         },
       },
+    ],
+    [KoulutustyyppiToteutus.kielitutkinto]: [
       {
         groupedSisalto: [],
         save: tallennaUusiKielitaito,
@@ -443,7 +450,8 @@ const perusteTyyppiSisaltoLisays = computed(() => {
           'lisaa': 'lisaa-todistusmalli',
           'sijainti': 'todistusmallin-sijainti',
         },
-      }],
+      },
+    ],
   };
 });
 
@@ -451,12 +459,12 @@ const osaamisalat = computed(() => {
   return peruste.value?.osaamisalat;
 });
 
-const isLisasisaltoLisays = computed(() => {
-  return !!peruste.value && (!!koulutustyypinLisasisaltoLisays.value[peruste.value.koulutustyyppi!] || !!perusteTyyppiSisaltoLisays.value[peruste.value.tyyppi!]);
-});
-
 const lisasisaltoLisays = computed(() => {
-  return koulutustyypinLisasisaltoLisays.value[peruste.value!.koulutustyyppi!] || perusteTyyppiSisaltoLisays.value[peruste.value!.tyyppi!] || [];
+  return [
+    ...(koulutustyypinLisasisaltoLisays.value[peruste.value!.koulutustyyppi!] || []),
+    ...(perusteTyyppiSisaltoLisays.value[peruste.value!.tyyppi!] || []),
+    ...(perusteKoulutustyyppiToteutusSisaltoLisays.value[peruste.value!.toteutus!] || []),
+  ];
 });
 
 const makeCall = async (call) => {

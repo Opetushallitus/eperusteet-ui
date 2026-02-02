@@ -46,7 +46,21 @@ export class PerusteStore implements IEditoitava {
   public readonly julkaisemattomiaMuutoksia = computed(() => this.state.julkaisemattomiaMuutoksia);
   public readonly isJulkaistu = computed(() => (_.size(this.state.julkaisut) > 0 || this.state.peruste?.tila === PerusteDtoTilaEnum.VALMIS) && _.toLower(this.state.peruste?.tila) !== _.toLower(PerusteDtoTilaEnum.POISTETTU));
   public readonly viimeisinJulkaisuTila = computed(() => this.state.viimeisinJulkaisuTila);
-  public readonly arkistointiReroute = computed(() => _.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN) ? 'digitaalisetosaamiset' : unref(this.isPohja) ? 'pohjat' : 'perusteprojektit');
+  public readonly arkistointiReroute = computed(() => {
+    if (_.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.DIGITAALINENOSAAMINEN)) {
+      return 'digitaalisetosaamiset';
+    }
+
+    if (_.toLower(this.state.peruste?.tyyppi) === _.toLower(PerusteDtoTyyppiEnum.KIELIKAANTAJATUTKINTO)) {
+      return 'kielikaantajatutkinnot';
+    }
+
+    if (unref(this.isPohja)) {
+      return 'pohjat';
+    }
+
+    return 'perusteprojektit';
+  });
   public readonly muutosmaaraykset = computed(() => this.state.muutosmaaraykset ? _.reverse(_.sortBy(this.state.muutosmaaraykset, 'voimassaoloAlkaa')) : null);
   public readonly isInitialized = computed(() => this.state.isInitialized);
   public readonly maarays = computed(() => this.state.maarays);
