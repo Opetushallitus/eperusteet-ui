@@ -175,21 +175,6 @@
                 </div>
               </template>
 
-              <template #liite="{ item }">
-                <div class="menu-item">
-                  <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
-                    {{ $kaanna(item.label) || $t('nimeton-tekstikappale') }}
-                  </router-link>
-                  <EpMaterialIcon
-                    v-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}"
-                    size="16px"
-                  >
-                    attach_file
-                  </EpMaterialIcon>
-                </div>
-              </template>
-
               <template #opintokokonaisuus="{ item }">
                 <div class="menu-item">
                   <router-link :to="{ name: 'opintokokonaisuus', params: { opintokokonaisuusId: item.id } }">
