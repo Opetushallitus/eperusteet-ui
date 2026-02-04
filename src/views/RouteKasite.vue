@@ -24,20 +24,22 @@
         <div
           v-for="(termi) in termitFiltered"
           :key="'termi-' + termi.id"
-          class="row align-items-start"
-          :class="{open: !termi.closed}"
+          class="kasite d-flex justify-content-between align-items-start"
+          :class="{open: !termi.open}"
         >
-          <div
-            class="col col-3 font-weight-bold pl-3"
-            v-html="$kaanna(termi.termi)"
-          />
-          <div class="col col-6 pl-3">
-            <ep-content
-              :model-value="termi.selitys"
-              layout="normal"
+          <div>
+            <div
+              class="font-weight-bold pl-3"
+              v-html="$kaanna(termi.termi)"
             />
+            <div class="pl-3 pb-2" v-if="termi.open">
+              <ep-content
+                :model-value="termi.selitys"
+                layout="normal"
+              />
+            </div>
           </div>
-          <div class="col col-3 text-right toiminnot">
+          <div class="text-right toiminnot">
             <button
               class="btn btn-link"
               @click="avaaPoistoModal(termi)"
@@ -54,7 +56,7 @@
               class="btn btn-link"
               @click="toggleTermi(termi)"
             >
-              <EpMaterialIcon v-if="termi.closed">
+              <EpMaterialIcon v-if="!termi.open">
                 expand_more
               </EpMaterialIcon>
               <EpMaterialIcon v-else>
@@ -203,7 +205,7 @@ const termitToggled = computed(() => {
   return _.map(termit.value, termi => {
     return {
       ...termi,
-      closed: !_.includes(toggled.value, termi.id),
+      open: !_.includes(toggled.value, termi.id),
     };
   });
 });
@@ -279,11 +281,11 @@ watch(() => perusteId.value, async () => {
 @import '@shared/styles/_variables';
 
   .kasitelista {
-    .row:nth-child(odd) {
+    .kasite:nth-child(odd) {
       background-color: $table-odd-row-bg-color;
     }
 
-    .row{
+    .kasite{
 
       .col:not(.toiminnot) {
         padding-top: 10px;
@@ -301,23 +303,6 @@ watch(() => perusteId.value, async () => {
       :deep(.btn-link:focus, .btn-link:active) {
         outline: none !important;
       }
-    }
-
-    .row:not(.open) {
-      min-width: auto;
-      overflow: hidden;
-
-      height: 2.5em;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-
-      :deep(p) {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        height: 2.5em;
-      }
-
     }
   }
 </style>
