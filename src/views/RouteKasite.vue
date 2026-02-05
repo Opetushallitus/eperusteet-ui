@@ -9,9 +9,18 @@
           :placeholder="$t('etsi')"
         />
         <ep-button
+          link
+          icon="expand_all"
+          class="ml-2"
+          @click="avaaKaikki"
+        >
+          {{ $t('avaa-kaikki') }}
+        </ep-button>
+        <ep-button
           v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           variant="outline"
           icon="add"
+          class="ml-auto"
           @click="avaaMuokkausModal()"
         >
           {{ $t('lisaa-kasite') }}
@@ -19,52 +28,37 @@
       </div>
       <div
         v-if="termit.length > 0"
-        class="kasitelista m-3"
+        class="kasitelista"
       >
-        <div
+        <ep-collapse
           v-for="(termi) in termitFiltered"
           :key="'termi-' + termi.id"
-          class="kasite d-flex justify-content-between align-items-start"
-          :class="{open: !termi.open}"
+          ref="kasiteCollapse"
+          :title="$kaanna(termi.termi)"
+          :expanded-by-default="false"
+          :use-padding="false"
+          class="kasite"
         >
-          <div>
-            <div
-              class="font-weight-bold pl-3"
-              v-html="$kaanna(termi.termi)"
-            />
-            <div class="pl-3 pb-2" v-if="termi.open">
-              <ep-content
-                :model-value="termi.selitys"
-                layout="normal"
+          <template #header>
+            <div class="d-flex justify-content-between align-items-center w-100 px-2">
+              <div
+                class="font-weight-bold text-truncate flex-grow-1"
+                v-html="$kaanna(termi.termi)"
               />
+              <ep-button
+                class="btn btn-link flex-shrink-0"
+                @click="avaaMuokkausModal(termi)"
+              >
+                {{ $t('muokkaa') }}
+              </ep-button>
             </div>
-          </div>
-          <div class="text-right toiminnot">
-            <button
-              class="btn btn-link"
-              @click="avaaPoistoModal(termi)"
-            >
-              <EpMaterialIcon>delete</EpMaterialIcon>
-            </button>
-            <button
-              class="btn btn-link"
-              @click="avaaMuokkausModal(termi)"
-            >
-              <EpMaterialIcon>edit</EpMaterialIcon>
-            </button>
-            <button
-              class="btn btn-link"
-              @click="toggleTermi(termi)"
-            >
-              <EpMaterialIcon v-if="!termi.open">
-                expand_more
-              </EpMaterialIcon>
-              <EpMaterialIcon v-else>
-                expand_less
-              </EpMaterialIcon>
-            </button>
-          </div>
-        </div>
+          </template>
+
+          <ep-content
+            :model-value="termi.selitys"
+            layout="normal"
+          />
+        </ep-collapse>
       </div>
 
       <div v-else>
@@ -77,7 +71,8 @@
       ref="kasitteenPoistoModal"
       class="backdrop"
       :lazy="true"
-      size="lg"
+      size="md"
+      hide-header-close
       @ok="poistaKasite"
     >
       <span class="mr-2">{{ $t('haluatko-poistaa-kasitteen') }}</span>
@@ -98,7 +93,6 @@
       :lazy="true"
       :ok-disabled="validation.$invalid"
       size="lg"
-      @ok="tallennaKasite"
     >
       <template #modal-header>
         <div class="row w-100">
@@ -136,11 +130,35 @@
         </ep-toggle>
       </ep-form-content>
 
-      <template #modal-cancel>
-        {{ $t('peruuta') }}
-      </template>
-      <template #modal-ok>
-        {{ kasite.id ? $t('tallenna') : $t('lisaa-kasite') }}
+      <template #modal-footer>
+        <div class="d-flex w-100">
+          <ep-button
+            v-if="kasite.id"
+            link
+            icon="delete"
+            class="btn btn-link mr-auto"
+            @click="avaaPoistoModal(termi)"
+          >
+            {{ $t('poista') }}
+          </ep-button>
+          <div
+            v-else
+            class="flex-grow-1"
+          />
+          <ep-button
+            class="btn btn-link"
+            link
+            @click="suljeKasiteModal"
+          >
+            {{ $t('peruuta') }}
+          </ep-button>
+          <ep-button
+            class="btn btn-link"
+            @click="tallennaKasite"
+          >
+            {{ kasite.id ? $t('tallenna') : $t('lisaa-kasite') }}
+          </ep-button>
+        </div>
       </template>
     </b-modal>
   </ep-sub-view>
@@ -168,7 +186,7 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
 import { $t, $success, $fail } from '@shared/utils/globals';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { nextTick } from 'vue';
-
+import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 
 const props = defineProps<{
   termitStore: TermitStore;
@@ -177,6 +195,7 @@ const props = defineProps<{
 
 const kasitteenPoistoModal = useTemplateRef('kasitteenPoistoModal');
 const kasitteenLuontiModal = useTemplateRef('kasitteenLuontiModal');
+const kasiteCollapse = useTemplateRef('kasiteCollapse');
 
 const query = ref('');
 const kasite = ref<TermiDto>({});
@@ -240,7 +259,7 @@ const avaaMuokkausModal = (termi?: TermiDto) => {
 };
 
 const avaaPoistoModal = (kasiteItem: any) => {
-  kasite.value = _.cloneDeep(kasiteItem);
+  suljeKasiteModal();
   (kasitteenPoistoModal.value as any).show();
 };
 
@@ -258,6 +277,7 @@ const tallennaKasite = async () => {
   try {
     await props.termitStore.save(perusteId.value!, kasite.value);
     await nextTick();
+    suljeKasiteModal();
     $success($t('kasite-tallennettu') as string);
   }
   catch (err) {
@@ -275,6 +295,17 @@ onMounted(async () => {
 watch(() => perusteId.value, async () => {
   await onProjektiChange();
 });
+
+const suljeKasiteModal = () => {
+  (kasitteenLuontiModal.value as any).hide();
+};
+
+const avaaKaikki = () => {
+  (kasiteCollapse.value as any).forEach(collapse => {
+    collapse.toggle();
+  });
+};
+
 </script>
 
 <style scoped lang="scss">
@@ -305,4 +336,11 @@ watch(() => perusteId.value, async () => {
       }
     }
   }
+
+  :deep(.ep-collapse) {
+    .header {
+      overflow: hidden;
+    }
+  }
+
 </style>
