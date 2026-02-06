@@ -43,6 +43,14 @@
             :is-editable="isEditing"
           />
         </b-form-group>
+
+        <ep-toggle
+          v-if="isEditing"
+          v-model="data.liite"
+          class="mt-4"
+        >
+          {{ $t('nayta-liitteena') }}
+        </ep-toggle>
       </div>
 
       <hr v-if="isEditing || data.kuvaus">
@@ -218,6 +226,7 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 
 const props = defineProps({
   perusteStore: {
