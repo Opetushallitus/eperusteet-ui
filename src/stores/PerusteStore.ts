@@ -199,17 +199,21 @@ export class PerusteStore implements IEditoitava {
     return node;
   }
 
-  public updateNavigationEntry(item: { id: number, label: { [key: string]: string }}) {
+  public updateNavigationEntry(item: { id: number, label: { [key: string]: string }, meta?: { [key: string]: any }}) {
     if (this.state.navigation) {
       this.state.navigation = this.updateImpl(this.state.navigation, item);
     }
   }
 
-  updateImpl(node: NavigationNodeDto, item: { id: number, label: { [key: string]: string }}): NavigationNodeDto {
+  updateImpl(node: NavigationNodeDto, item: { id: number, label: { [key: string]: string }, meta?: { [key: string]: any }}): NavigationNodeDto {
     node.children = _(node.children || [])
       .map(child => {
         if (child.id === item.id) {
-          return { ...child, label: item.label };
+          return {
+            ...child,
+            label: item.label,
+            ...(item.meta ? { meta: item.meta } : {}),
+          };
         }
         return child;
       })

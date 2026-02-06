@@ -42,6 +42,14 @@
             :is-editable="isEditing"
           />
         </b-form-group>
+
+        <ep-toggle
+          v-if="isEditing"
+          v-model="data.liite"
+          class="mt-4"
+        >
+          {{ $t('nayta-liitteena') }}
+        </ep-toggle>
       </div>
 
       <template v-if="isEditing">
@@ -157,6 +165,7 @@ import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
 import EpKoodistoSelectDraggable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectDraggable.vue';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 
 const props = defineProps({
   perusteStore: {

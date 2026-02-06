@@ -71,6 +71,10 @@ export abstract class AbstractPerusteenOsaViiteStore implements IEditoitava {
     AbstractPerusteenOsaViiteStore.config.perusteStore!.updateNavigationEntry({
       id: this.perusteenOsaViiteId!,
       label: (res.data as any).nimi as any,
+      meta: {
+        ...(res.data as any).meta,
+        liite: (res.data as any).liite,
+      },
     });
     return res.data;
   }
