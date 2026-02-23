@@ -6,6 +6,7 @@ import { PerusteStore } from './PerusteStore';
 import { required } from '@vuelidate/validators';
 import { App } from 'vue';
 import { Router } from 'vue-router';
+import { Kielet } from '@shared/stores/kieli';
 
 interface PerusopetusOppiaineStoreConfig {
   router: Router;
@@ -42,7 +43,10 @@ export class PerusopetusOppiaineStore implements IEditoitava {
         return _.first(_.sortBy(perusteenVuosiluokkakokonaisuus?.vuosiluokat));
       }),
       kohdealueet: _.sortBy(oppiaine.kohdealueet, 'id'),
-      oppimaarat: _.sortBy(oppiaine.oppimaarat, 'jnro'),
+      oppimaarat: _.sortBy(oppiaine.oppimaarat, [
+        o => o.jnro ?? Number.MAX_SAFE_INTEGER,
+        o => _.get(o.nimi, Kielet.getSisaltoKieli.value) ?? '',
+      ]),
     };
 
     supportDataProvider({ perusteenVuosiluokkakokonaisuudet, tavoitealueet, laajaAlaisetOsaamiset });
@@ -52,6 +56,12 @@ export class PerusopetusOppiaineStore implements IEditoitava {
   }
 
   async save(data: any) {
+    if (data.oppimaarat) {
+      data.oppimaarat = _.map(data.oppimaarat, o => ({
+        ...o,
+        jnro: _.indexOf(data.oppimaarat, o),
+      }));
+    }
     await PerusopetuksenPerusteenSisalto.updatePerusopetusOppiaine(this.perusteId, this.oppiaineId, data);
     await this.perusteStore.updateNavigation();
 
