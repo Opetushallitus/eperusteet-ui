@@ -146,6 +146,7 @@
               v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
               variant="outline-primary"
               icon="add"
+              :show-spinner="oppimaaraLisaysLoader"
               @click="lisaaOppimaara"
             >
               {{ $t('lisaa-oppimaara') }}
@@ -189,6 +190,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const store = ref<EditointiStore | null>(null);
+const oppimaaraLisaysLoader = ref(false);
 
 const perusteId = computed(() => {
   return props.perusteStore.perusteId.value;
@@ -227,6 +229,7 @@ const storeData = computed({
 });
 
 const lisaaOppimaara = async () => {
+  oppimaaraLisaysLoader.value = true;
   await PerusopetusOppiaineStore.setOppiaineKoosteinen(perusteId.value, props.oppiaineId);
   const newOppiaine = await PerusopetusOppiaineStore.create(perusteId.value, props.oppiaineId);
   await props.perusteStore.updateNavigation();
@@ -238,6 +241,7 @@ const lisaaOppimaara = async () => {
       uusi: 'uusi',
     },
   });
+  oppimaaraLisaysLoader.value = false;
 };
 
 
