@@ -1,29 +1,42 @@
 <template>
   <div class="poistetut">
-    <div class="ylapaneeli d-flex align-items-center">
+    <div class="ylapaneeli flex items-center">
       <h2 class="otsikko">
         {{ $t('poistetut') }}
       </h2>
     </div>
     <div class="sisalto">
       <EpSpinner v-if="!poistetut" />
-      <b-tabs
-        v-model="tabIndex"
-        content-class="mt-4"
+      <Tabs
+        value="0"
+        @update:value="onPoistetutTabChange"
       >
-        <b-tab
-          v-for="(tab, index) in tabs"
-          :key="'tab'+index"
-          :title="$t(tab.otsikko)"
-        >
-          <ep-spinner v-if="!poistetut" />
-          <poistetut-haku-table
-            v-else
-            :poistetut="tab.poistetut"
-            @palauta="palauta"
-          />
-        </b-tab>
-      </b-tabs>
+        <TabList>
+          <Tab
+            v-for="(tab, index) in tabs"
+            :key="'tab'+index"
+            :value="String(index)"
+          >
+            {{ $t(tab.otsikko) }}
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel
+            v-for="(tab, index) in tabs"
+            :key="'panel-tab'+index"
+            :value="String(index)"
+          >
+            <div class="tab-content-wrapper mt-4">
+              <ep-spinner v-if="!poistetut" />
+              <poistetut-haku-table
+                v-else
+                :poistetut="tab.poistetut"
+                @palauta="palauta"
+              />
+            </div>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
 
       <div v-if="poistetut && poistetut.length === 0 ">
         {{ $t('ei-poistettuja-sisaltoja') }}
@@ -41,6 +54,11 @@ import { PoistetutStore } from '@/stores/PoistetutStore';
 import { PoistettuSisaltoDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { $t, $success, $fail } from '@shared/utils/globals';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 
 const props = defineProps<{
   poistetutStore: PoistetutStore;
@@ -48,6 +66,10 @@ const props = defineProps<{
 }>();
 
 const tabIndex = ref(0);
+
+function onPoistetutTabChange(v: string | number) {
+  tabIndex.value = typeof v === 'string' ? parseInt(v, 10) : v;
+}
 
 const perusteId = computed(() => {
   return props.perusteStore.perusteId.value;
@@ -100,9 +122,17 @@ onMounted(async () => {
 
 .poistetut {
 
-  :deep(.tabs .nav-item a) {
-    margin: 0;
-    padding: 10px;
+  :deep(.p-tabs-nav) {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  :deep(.p-tab) {
+    margin-left: 0 !important;
+  }
+
+  :deep(.p-tabpanels) {
+    padding: 1rem 0;
   }
 
   .ylapaneeli {

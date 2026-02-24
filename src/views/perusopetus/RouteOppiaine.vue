@@ -17,67 +17,50 @@
     </template>
 
     <template #default="{ data, isEditing }">
-      <b-row>
-        <b-col
+      <div class="flex flex-wrap gap-4">
+        <div
           v-if="isEditing"
-          cols="8"
+          class="flex-[8] min-w-0"
         >
-          <b-form-group :label="!isOppimaara ? $t('oppiaineen-nimi') : $t('oppimaaran-nimi')">
+          <EpFormGroup :label="!isOppimaara ? $t('oppiaineen-nimi') : $t('oppimaaran-nimi')">
             <ep-koodisto-select
               v-model="data.koodi"
               :store="koodisto"
               :is-editing="isEditing"
               :nayta-arvo="false"
-            >
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled
-                  />
-                  <b-input-group-append>
-                    <b-button
-                      variant="primary"
-                      @click="open"
-                    >
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-            </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
+            />
+          </EpFormGroup>
+        </div>
 
-        <b-col cols="3">
-          <b-form-group :label="$t('koodi')">
+        <div class="w-1/4">
+          <EpFormGroup :label="$t('koodi')">
             <span v-if="data.koodi">
               {{ data.koodi.arvo }}
             </span>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row>
-        <b-col cols="11">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-[11] min-w-0">
           <EpSisaltoTekstikappaleet
             v-model="storeData"
             :is-editing="isEditing"
             :sisalto-avaimet="['tehtava']"
           />
 
-          <b-form-group :label="$t('tavoitealueet-kaikilla-vuosiluokilla')">
+          <EpFormGroup :label="$t('tavoitealueet-kaikilla-vuosiluokilla')">
             <EpTavoitealueetEditModal
               v-model="storeData"
               :is-editing="isEditing"
               :peruste-id="perusteId"
               :oppiaine-id="oppiaineId"
             />
-          </b-form-group>
+          </EpFormGroup>
 
           <hr>
 
-          <b-form-group
+          <EpFormGroup
             v-if="isEditing"
             class="mt-4 mb-4"
             :label="$t('vuosiluokat')"
@@ -87,34 +70,47 @@
               :items="valittavatVuosiluokkakokonaisuudet"
             >
               <template #default="{ item }">
-                <div class="mb-1">
-                  {{ item.nimi }}
-                </div>
+                {{ item.nimi }}
               </template>
             </EpToggleGroup>
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-tabs v-if="valitutVuosiluokkakokonaisuudet.length > 0">
-            <b-tab
-              v-for="(vlk, index) in data.vuosiluokkakokonaisuudet"
-              :key="'vlk' + index"
-              :title="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].nimi"
-            >
-              <EpOppiaineenVuosiluokkakokonaisuus
-                v-model="data.vuosiluokkakokonaisuudet[index]"
-                :is-editing="isEditing"
-                :vuosiluokat="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].vuosiluokat"
-                :support-data="vlkSupportData"
-                :peruste-id="perusteId"
-                :oppiaine-id="oppiaineId"
-              />
-            </b-tab>
-
-            <hr>
-          </b-tabs>
+          <Tabs
+            v-if="valitutVuosiluokkakokonaisuudet.length > 0"
+            value="0"
+          >
+            <TabList>
+              <Tab
+                v-for="(vlk, index) in data.vuosiluokkakokonaisuudet"
+                :key="'vlk' + index"
+                :value="String(index)"
+              >
+                {{ valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].nimi }}
+              </Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel
+                v-for="(vlk, index) in data.vuosiluokkakokonaisuudet"
+                :key="'vlk-panel' + index"
+                :value="String(index)"
+              >
+                <div class="tab-content-wrapper">
+                  <EpOppiaineenVuosiluokkakokonaisuus
+                    v-model="data.vuosiluokkakokonaisuudet[index]"
+                    :is-editing="isEditing"
+                    :vuosiluokat="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].vuosiluokat"
+                    :support-data="vlkSupportData"
+                    :peruste-id="perusteId"
+                    :oppiaine-id="oppiaineId"
+                  />
+                </div>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+          <hr v-if="valitutVuosiluokkakokonaisuudet.length > 0">
 
           <template v-if="!isOppimaara">
-            <b-form-group
+            <EpFormGroup
               v-if="!isEditing || (data.oppimaarat && data.oppimaarat.length > 0)"
               :label="$t('oppimaarat')"
             >
@@ -126,7 +122,7 @@
                 <div
                   v-for="oppimaara in data.oppimaarat"
                   :key="'oppimaara'+oppimaara.id"
-                  class="taulukko-rivi-varitys p-3 d-flex"
+                  class="taulukko-rivi-varitys p-3 flex"
                 >
                   <EpMaterialIcon
                     v-if="isEditing"
@@ -139,7 +135,7 @@
                   </router-link>
                 </div>
               </VueDraggable>
-            </b-form-group>
+            </EpFormGroup>
 
             <ep-button
               v-if="!isEditing"
@@ -152,8 +148,8 @@
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>
-        </b-col>
-      </b-row>
+        </div>
+      </div>
     </template>
   </EpEditointi>
 </template>
@@ -168,6 +164,8 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
@@ -178,8 +176,13 @@ import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpTavoitealueetEditModal from '@/views/perusopetus/EpTavoitealueetEditModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import { $t, $kaanna, $confirmModal } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 import { unref } from 'vue';
 
 const props = defineProps<{
@@ -297,7 +300,7 @@ const vlkChange = async () => {
   const poistettavatVlk = _.find(tempVuosiluokkaChange, vlk => !_.includes(vuosiluokkakokonaisuudet.value, vlk));
   if (poistettavatVlk) {
     const edellisetVlk = tempVuosiluokkaChange;
-    const varmistaPoisto = await $bvModal.msgBoxConfirm(
+    const varmistaPoisto = await $confirmModal.msgBoxConfirm(
       $t('vuosiluokkakokonaisuuden-poisto-varmistus-teksti'), {
         title: $t('vahvista-poisto'),
         okTitle: $t('poista'),
@@ -393,4 +396,16 @@ const oppiaineetDragOptions = computed(() => {
 @import '@shared/styles/_variables.scss';
 @import '@shared/styles/_mixins.scss';
 
+:deep(.p-tabs-nav) {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+:deep(.p-tab) {
+  margin-left: 0 !important;
+}
+
+:deep(.p-tabpanels) {
+  padding: 1rem 0;
+}
 </style>

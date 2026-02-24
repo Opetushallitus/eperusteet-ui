@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <div class="d-flex justify-content-between">
+    <div class="flex justify-between">
       <h2>{{ $t('julkaisunakyma') }}</h2>
     </div>
 
@@ -34,7 +34,7 @@
         <div v-else>
           <div
             v-if="isPerusteValid"
-            class="d-flex"
+            class="flex"
           >
             <EpMaterialIcon class="no-errors">
               check_circle
@@ -45,7 +45,7 @@
           </div>
           <div
             v-else
-            class="d-flex"
+            class="flex"
           >
             <EpMaterialIcon class="errors">
               info
@@ -76,53 +76,53 @@
     <div v-if="peruste && julkaisuMahdollinen && !isPohja">
       <hr class="mt-4 mb-4">
       <h3>{{ $t(koulutustyyppiKohtaisetKaannokset.perusteentiedot) }}</h3>
-      <b-container fluid>
-        <b-row no-gutters>
-          <b-col>
-            <b-form-group :label="$t(koulutustyyppiKohtaisetKaannokset.perusteennimi) + '*'">
+      <div class="w-full">
+        <div class="flex flex-wrap">
+          <div class="w-full">
+            <EpFormGroup :label="$t(koulutustyyppiKohtaisetKaannokset.perusteennimi) + '*'">
               <ep-input v-model="peruste.nimi" />
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row no-gutters>
-          <b-col lg="6">
-            <b-form-group :label="$t('diaarinumero')">
+            </EpFormGroup>
+          </div>
+        </div>
+        <div class="flex flex-wrap ">
+          <div class="lg:w-1/2">
+            <EpFormGroup :label="$t('diaarinumero')">
               <ep-input
                 v-model="peruste.diaarinumero"
                 type="string"
               />
-            </b-form-group>
-          </b-col>
-          <b-col lg="6">
-            <b-form-group :label="$t('maarayksen-paatospaivamaara')">
+            </EpFormGroup>
+          </div>
+          <div class="lg:w-1/2">
+            <EpFormGroup :label="$t('maarayksen-paatospaivamaara')">
               <ep-datepicker v-model="peruste.paatospvm" />
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row no-gutters>
-          <b-col lg="6">
-            <b-form-group :label="$t('voimassaolo')">
-              <div class="d-flex align-items-center">
+            </EpFormGroup>
+          </div>
+        </div>
+        <div class="flex flex-wrap">
+          <div class="lg:w-1/2">
+            <EpFormGroup :label="$t('voimassaolo')">
+              <div class="flex items-center">
                 <ep-datepicker v-model="peruste.voimassaoloAlkaa" />
                 <div class="ml-2 mr-2">
                   -
                 </div>
                 <ep-datepicker v-model="peruste.voimassaoloLoppuu" />
               </div>
-            </b-form-group>
-          </b-col>
-          <b-col
+            </EpFormGroup>
+          </div>
+          <div
             v-if="peruste.koulutustyyppi"
-            lg="6"
+            class="lg:w-1/2"
           >
-            <b-form-group :label="$t('koulutustyyppi')">
+            <EpFormGroup :label="$t('koulutustyyppi')">
               <ep-koulutustyyppi-select :value="peruste.koulutustyyppi" />
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row no-gutters>
-          <b-col lg="6">
-            <b-form-group :label="$t('perusteen-kielet')">
+            </EpFormGroup>
+          </div>
+        </div>
+        <div class="flex flex-wrap">
+          <div class="lg:w-1/2">
+            <EpFormGroup :label="$t('perusteen-kielet')">
               <div class="text-nowrap">
                 <span
                   v-for="(kieli, idx) in peruste.kielet"
@@ -135,10 +135,10 @@
                   >,</span>
                 </span>
               </div>
-            </b-form-group>
-          </b-col>
-        </b-row>
-      </b-container>
+            </EpFormGroup>
+          </div>
+        </div>
+      </div>
     </div>
 
     <template v-if="!isPohja">
@@ -166,14 +166,14 @@
           :store="perusteStore"
         />
 
-        <b-form-group>
+        <EpFormGroup>
           <EpJulkaisuButton
             v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
             :julkaise="julkaise"
             :julkaisu-kesken="julkaisuKesken"
             :disabled="!julkaisuValid"
           />
-        </b-form-group>
+        </EpFormGroup>
       </div>
 
       <hr class="mt-4 mb-4">
@@ -218,6 +218,7 @@ import { buildKatseluUrl } from '@shared/utils/esikatselu';
 import { koulutustyyppiTheme } from '@shared/utils/perusteet';
 import { Kielet } from '@shared/stores/kieli';
 import EpJulkaisuForm from '@/components/EpJulkaisu/EpJulkaisuForm.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import EpJulkaisuMuutosmaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosmaarays.vue';
 import { nodeToRoute } from '@/utils/routing';
 import EpJulkaisuValidointi from '@shared/components/EpJulkaisuValidointi/EpJulkaisuValidointi.vue';

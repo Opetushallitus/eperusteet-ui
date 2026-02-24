@@ -1,5 +1,5 @@
 <template>
-  <EpEditointi :store="store">
+  <EpEditointi :store="store" v-if="store">
     <template #header>
       <h3>{{ $t('laaja-alaiset-osaamiset') }}</h3>
     </template>
@@ -7,7 +7,7 @@
       {{ $t('muokkaa-jarjestysta') }}
     </template>
     <template #default="{ data, isEditing }">
-      <div class="d-flex justify-content-end">
+      <div class="flex justify-end">
         <EpButton
           v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           variant="outline"
@@ -19,35 +19,26 @@
         </EpButton>
       </div>
 
-      <b-row class="border-bottom-1 m-0">
-        <b-col
-          cols="5"
-          class="font-weight-bold"
-        >
+      <div class="flex flex-wrap gap-4 border-bottom-1 m-0">
+        <div class="w-5/12 font-semibold">
           {{ $t('nimi') }}
-        </b-col>
-        <b-col
-          cols="5"
-          class="font-weight-bold"
-        >
+        </div>
+        <div class="w-5/12 font-semibold">
           {{ $t('muokattu') }}
-        </b-col>
-      </b-row>
+        </div>
+      </div>
 
       <VueDraggable
         v-bind="defaultDragOptions"
         v-model="data.laajaAlaisetOsaamiset"
         tag="div"
       >
-        <b-row
+        <div
           v-for="(lao, index) in data.laajaAlaisetOsaamiset"
           :key="'lao'+index"
-          class="taulukko-rivi-varitys py-3 m-0"
+          class="flex flex-wrap gap-4 taulukko-rivi-varitys py-3 m-0"
         >
-          <b-col
-            cols="5"
-            class="d-flex"
-          >
+          <div class="w-5/12 flex">
             <div
               v-if="isEditing"
               class="order-handle mr-2"
@@ -59,11 +50,11 @@
                 {{ $kaanna(lao.nimi) }}
               </router-link>
             </div>
-          </b-col>
-          <b-col cols="5">
+          </div>
+          <div class="w-5/12">
             <span v-if="lao.muokattu">{{ $sdt(lao.muokattu) }}</span>
-          </b-col>
-        </b-row>
+          </div>
+        </div>
       </VueDraggable>
     </template>
   </EpEditointi>

@@ -27,14 +27,14 @@
       </template>
     </EpSortableTextList>
 
-    <b-modal
+    <EpModal
       v-if="isEditing"
       ref="EpSisaltoalueetEditModal"
-      :title="$t('tavoitealueet-kaikilla-vuosiluokilla')"
       size="xl"
+      @cancel="peruuta"
     >
-      <template #modal-header>
-        <div class="d-flex justify-content-between w-100">
+      <template #modal-title>
+        <div class="flex justify-between w-full">
           <div>{{ $t('tavoitealueet-kaikilla-vuosiluokilla') }}</div>
           <ep-kielivalinta />
         </div>
@@ -61,22 +61,20 @@
       </EpSortableTextList>
 
       <template #modal-footer>
-        <div>
-          <ep-button
-            variant="link"
-            @click="peruuta"
-          >
-            {{ $t('peruuta') }}
-          </ep-button>
-          <ep-button
-            :show-spinner="tallennetaan"
-            @click="tallenna"
-          >
-            {{ $t('tallenna') }}
-          </ep-button>
-        </div>
+        <ep-button
+          variant="link"
+          @click="peruuta"
+        >
+          {{ $t('peruuta') }}
+        </ep-button>
+        <ep-button
+          :show-spinner="tallennetaan"
+          @click="tallenna"
+        >
+          {{ $t('tallenna') }}
+        </ep-button>
       </template>
-    </b-modal>
+    </EpModal>
   </div>
 </template>
 
@@ -86,6 +84,7 @@ import { computed, ref, useTemplateRef } from 'vue';
 import EpSortableTextList from '@shared/components/EpSortableTextList/EpSortableTextList.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { $kaanna, $t, $fail } from '@shared/utils/globals';

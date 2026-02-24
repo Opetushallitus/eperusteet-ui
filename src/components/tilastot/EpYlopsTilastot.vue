@@ -1,14 +1,14 @@
 <template>
   <ep-spinner v-if="!opetussuunnitelmat || !perusteet" />
   <div v-else>
-    <div class="row">
-      <div class="col-xl-3 col-md-6 col-sm-12">
+    <div class="flex gap-4">
+      <div class="w-1/4">
         <ep-form-content name="nimi">
           <ep-search v-model="query" />
         </ep-form-content>
       </div>
 
-      <div class="col-xl-3 col-md-6 col-sm-12">
+      <div class="w-1/4">
         <ep-form-content name="koulutustyyppi">
           <ep-multi-select
             v-model="valitutKoulutustyypit"
@@ -22,7 +22,7 @@
         </ep-form-content>
       </div>
 
-      <div class="col-xl-3 col-md-6 col-sm-12">
+      <div class="w-full md:w-1/2 xl:w-1/4">
         <ep-form-content name="tila">
           <ep-multi-select
             v-model="valitutTilat"
@@ -36,7 +36,7 @@
         </ep-form-content>
       </div>
 
-      <div class="col-xl-3 col-md-6 col-sm-12">
+      <div class="w-1/5">
         <ep-form-content name="voimassaolo">
           <ep-multi-select
             v-model="valitutVoimassaolot"
@@ -49,13 +49,15 @@
           />
         </ep-form-content>
       </div>
+    </div>
 
-      <EpTilastoAikavaliVertailu
-        v-model="aikavali"
-        class="col-12"
-      />
+    <EpTilastoAikavaliVertailu
+      v-model="aikavali"
+      class="w-full"
+    />
 
-      <div class="col-xl-6 col-md-6 col-sm-12">
+    <div class="flex gap-4">
+      <div class="w-full md:w-1/2">
         <ep-form-content name="peruste">
           <ep-multi-select
             v-model="valitutPerusteet"
@@ -69,7 +71,7 @@
         </ep-form-content>
       </div>
 
-      <div class="col-xl-6 col-md-6 col-sm-12">
+      <div class="w-1/2">
         <ep-form-content name="koulutuksenjarjestaja">
           <ep-multi-select
             v-model="valitutKoulutuksenjarjestajat"
@@ -82,8 +84,10 @@
           />
         </ep-form-content>
       </div>
+    </div>
 
-      <div class="col-xl-3 col-md-3 col-sm-12">
+    <div class="flex gap-4">
+      <div class="w-1/3">
         <ep-form-content name="koulutuksenjarjestajan-tyyppi">
           <ep-multi-select
             v-model="valitutKoulutuksenjarjestajaTyypit"
@@ -102,11 +106,11 @@
       {{ $t('opetussuunnitelmien-lukumaarat') }}
     </h2>
 
-    <div class="row">
+    <div class="flex flex-wrap gap-4 justify-center">
       <div
         v-for="(tilastotieto,i) in statistiikkaData"
         :key="i"
-        class="col-xl-4 col-md-6 col-sm-12 tilastotyyppi"
+        class="w-1/4 tilastotyyppi"
       >
         <div class="otsake">
           {{ $t(tilastotieto.otsikko) }}
@@ -127,25 +131,25 @@
     </div>
 
     <h2 class="mt-5">
-      <span>{{ $t('opetussuunnitelmat') }} {{ opetussuunnitelmatFiltered.length }} {{ $t('kpl') }}</span>
-      <EpButton
-        class="ml-5"
-        variant="link"
-        no-padding
-        @click="downloadTiedosto('csv')"
-      >
-        Lataa csv
-      </EpButton>
-      <EpButton
-        variant="link"
-        no-padding
-        @click="downloadTiedosto('xlsx')"
-      >
-        Lataa xlsx
-      </EpButton>
+      <div class="flex gap-2 items-center">
+        <span>{{ $t('opetussuunnitelmat') }} {{ opetussuunnitelmatFiltered.length }} {{ $t('kpl') }}</span>
+        <EpButton
+          class="ml-5"
+          variant="link"
+          @click="downloadTiedosto('csv')"
+        >
+          Lataa csv
+        </EpButton>
+        <EpButton
+          variant="link"
+          @click="downloadTiedosto('xlsx')"
+        >
+          Lataa xlsx
+        </EpButton>
+      </div>
     </h2>
 
-    <b-table
+    <EpTable
       responsive
       borderless
       striped
@@ -154,47 +158,40 @@
       :fields="tableFields"
       :current-page="currentPage"
       :per-page="perPage"
+      @update:current-page="currentPage = $event"
     >
-      <template #cell(nimi)="{item, value}">
+      <template #cell(nimi)="{ item, value }">
         <template v-if="item">
           <a
             :href="item.url"
             rel="noopener noreferrer"
             target="_blank"
-          >{{ value }}</a>
+          >{{ $kaanna(value) }}</a>
         </template>
       </template>
 
-      <template #cell(koulutustyyppi)="data">
-        {{ $t(data.value) }}
+      <template #cell(koulutustyyppi)="{ value }">
+        {{ $t(value) }}
       </template>
 
-      <template #cell(tila)="data">
-        {{ $t(data.value) }}
+      <template #cell(tila)="{ value }">
+        {{ $t(value) }}
       </template>
 
-      <template #cell(perusteenVoimassaoloAlkaa)="data">
-        {{ $sd(data.value) }}
+      <template #cell(perusteenVoimassaoloAlkaa)="{ value }">
+        {{ $sd(value) }}
       </template>
 
-      <template #cell(perusteenVoimassaoloLoppuu)="data">
-        {{ $sd(data.value) }}
+      <template #cell(perusteenVoimassaoloLoppuu)="{ value }">
+        {{ $sd(value) }}
       </template>
-    </b-table>
-
-    <EpPagination
-      v-model="currentPage"
-      :total-rows="opetussuunnitelmatFiltered.length"
-      :per-page="perPage"
-      aria-controls="opetussuunnitelmat"
-      align="center"
-    />
+    </EpTable>
 
     <h2 class="mt-5">
       {{ $t('koulutuksenjarjestajat') }} {{ koulutuksenjarjestajaFiltered.length }} {{ $t('kpl') }}
     </h2>
 
-    <b-table
+    <EpTable
       responsive
       borderless
       striped
@@ -203,14 +200,7 @@
       :fields="koulutuksenjarjestajaFields"
       :current-page="koulutuksenjarjestajaPage"
       :per-page="perPage"
-    />
-
-    <EpPagination
-      v-model="koulutuksenjarjestajaPage"
-      :total-rows="koulutuksenjarjestajaFiltered.length"
-      :per-page="perPage"
-      aria-controls="opetussuunnitelmat"
-      align="center"
+      @update:current-page="koulutuksenjarjestajaPage = $event"
     />
   </div>
 </template>
@@ -228,7 +218,7 @@ import EpTilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilast
 import { csvAikaleima, dataTiedostoksi } from './tilastot';
 import { $t, $kaanna, $sd } from '@shared/utils/globals';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 interface Opetussuunnitelma {
   id: string | number;
@@ -395,6 +385,7 @@ const tableFields = computed(() => {
   return [{
     key: 'nimi',
     label: $t('nimi'),
+    thStyle: { width: '20%' },
     sortable: true,
     sortByFormatted: true,
     formatter: (value: any, key: string, item: any) => {
@@ -632,7 +623,6 @@ async function downloadTiedosto(tyyppi: string) {
     .otsake {
       margin-bottom:20px;
     }
-
   }
 
 </style>

@@ -26,4 +26,14 @@ export class AipeLaajaAlaisetOsaamisetStore implements IEditoitava {
     await Aipeopetuksensisalto.updateLaajaalaisetJarjestys(this.perusteId, data.laajaAlaisetOsaamiset);
     await this.perusteStore.updateNavigation();
   }
+
+  async validator() {
+    return {
+      laajaAlaisetOsaamiset: {
+        $each: {
+          nimi: { required },
+        },
+      },
+    };
+  }
 }

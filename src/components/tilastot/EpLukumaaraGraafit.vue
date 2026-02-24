@@ -3,7 +3,7 @@
     <EpSpinner v-if="!toteutussuunnitelmat || !opetussuunnitelmat" />
 
     <template v-else>
-      <div class="d-flex">
+      <div class="flex gap-4">
         <ep-form-content name="koulutustyyppi">
           <koulutustyyppi-select
             v-model="koulutustyyppi"

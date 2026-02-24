@@ -7,19 +7,19 @@
     <template #header="{ data }">
       <h2
         v-if="data.nimiKoodi"
-        class="m-0"
+        class="!m-0"
       >
         {{ $kaanna(data.nimiKoodi.nimi) }}
       </h2>
     </template>
     <template #default="{ data, isEditing }">
-      <b-row
+      <div
         v-if="isEditing"
-        class="mb-4"
+        class="flex flex-wrap gap-4 mb-4"
       >
-        <b-col lg="8">
-          <b-form-group
-            :label="$t('otsikko') + (isEditing ? ' *' : '')"
+        <div class="lg:w-2/3">
+          <EpFormGroup
+            :label="$t('otsikko')"
             required
           >
             <ep-koodisto-select
@@ -27,27 +27,10 @@
               :store="laajaalainenOsaaminenKoodisto"
               :is-editing="isEditing"
               :nayta-arvo="false"
-            >
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled
-                  />
-                  <b-input-group-append>
-                    <b-button
-                      variant="primary"
-                      @click="open"
-                    >
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-            </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
-      </b-row>
+            />
+          </EpFormGroup>
+        </div>
+      </div>
 
       <ep-toggle
         v-if="isEditing"
@@ -57,9 +40,12 @@
         {{ $t('nayta-laaja-alainen-osaaminen-liitteena') }}
       </ep-toggle>
 
-      <b-row>
-        <b-col lg="8">
-          <b-form-group required>
+      <div class="flex flex-wrap gap-4">
+        <div class="lg:w-2/3">
+          <EpFormGroup
+            :label="isEditing ? $t('kuvaus') : ''"
+            required
+          >
             <ep-content
               v-model="data.teksti"
               layout="normal"
@@ -67,9 +53,9 @@
               :kasite-handler="kasiteHandler"
               :kuva-handler="kuvaHandler"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
     </template>
   </EpEditointi>
   <EpSpinner v-else />
@@ -92,6 +78,8 @@ import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { TermitStore } from '@/stores/TermitStore';
 import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 
 const props = defineProps<{

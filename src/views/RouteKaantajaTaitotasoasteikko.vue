@@ -14,7 +14,7 @@
     </template>
     <template #default="{ data, isEditing }">
       <div class="mb-4 w-80">
-        <b-form-group>
+        <EpFormGroup>
           <template
             v-if="isEditing"
             #label
@@ -25,11 +25,11 @@
             v-model="data.nimi"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
       </div>
 
       <div class="mb-4 w-80">
-        <b-form-group class="p-0">
+        <EpFormGroup class="p-0">
           <template
             v-if="isEditing"
             #label
@@ -41,7 +41,7 @@
             layout="normal"
             :is-editable="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
         <ep-toggle
           v-if="isEditing"
@@ -55,7 +55,7 @@
       <hr v-if="isEditing || data.kuvaus">
 
       <template v-if="isEditing">
-        <h3 class="mt-4 mb-3">
+        <h3 class="mt-4">
           {{ $t('taitotasoasteikko') }}
         </h3>
 
@@ -69,10 +69,10 @@
           <div
             v-for="(kategoria, kategoriaIndex) in data.taitotasoasteikkoKategoriat"
             :key="'kategoria' + kategoriaIndex"
-            class="mb-4 w-80"
+            class="w-80 mt-3"
             :class="{ 'kategoria-editing': isEditing, 'dragging': dragging }"
           >
-            <div class="d-flex">
+            <div class="flex">
               <ep-material-icon
                 v-if="isEditing"
                 class="order-handle mr-2 flex-shrink-0"
@@ -80,9 +80,9 @@
               >
                 drag_indicator
               </ep-material-icon>
-              <div class="w-100">
-                <div class="d-flex mb-3">
-                  <h4 class="mb-0 w-100">
+              <div class="w-full">
+                <div class="flex mb-3">
+                  <h4 class="mb-0 w-full">
                     <div
                       v-if="isEditing"
                       class="mb-2"
@@ -120,9 +120,9 @@
                     >
                       <div
                         v-if="isEditing"
-                        class="d-flex"
+                        class="flex"
                       >
-                        <div class="w-100">
+                        <div class="w-full">
                           <ep-jarjesta-input
                             v-model="taitotaso.otsikko"
                             :is-editing="isEditing"
@@ -148,13 +148,11 @@
                     </div>
                   </VueDraggable>
 
-                  <div class="d-flex justify-content-between">
+                  <div class="flex justify-between items-center mt-4">
                     <ep-button
                       v-if="isEditing"
                       variant="outline"
                       icon="add"
-                      class="mt-2"
-                      no-padding
                       @click="lisaaTaitotaso(kategoriaIndex)"
                     >
                       {{ $t('lisaa-taitotaso') }}
@@ -164,8 +162,6 @@
                       v-if="isEditing"
                       variant="link"
                       icon="delete"
-                      no-padding
-                      class="mr-5"
                       @click="poistaKategoria(kategoriaIndex)"
                     >
                       {{ $t('poista-kategoria') }}
@@ -180,7 +176,7 @@
         <ep-button
           variant="outline"
           icon="add"
-          class="mt-3"
+          class="mt-2"
           @click="lisaaKategoria()"
         >
           {{ $t('lisaa-kategoria') }}
@@ -231,6 +227,7 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps({
   perusteStore: {

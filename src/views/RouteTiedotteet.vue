@@ -7,7 +7,7 @@
       />
     </template>
     <template #header>
-      <div class="d-flex justify-content-between">
+      <div class="flex justify-between">
         <h1>{{ $t('tiedotteet') }}</h1>
         <ep-tiedote-modal
           ref="eptiedotemodal"
@@ -18,11 +18,17 @@
       </div>
     </template>
 
-    <div class="row align-items-end mb-4">
-      <div class="col-4">
-        <ep-search v-model="nimiFilter" />
+    <div class="flex mb-4 gap-4 items-end">
+      <div class="w-1/3 shrink-0 mt-6">
+        <ep-form-content
+          :show-header="false"
+          name="nimiFilter"
+          class="mb-0"
+        >
+          <ep-search v-model="nimiFilter" />
+        </ep-form-content>
       </div>
-      <div class="col-6">
+      <div class="w-1/2 shrink-0">
         <ep-form-content
           name="tiedote-julkaistu"
           class="mb-0"
@@ -43,7 +49,7 @@
     <ep-spinner v-if="!tiedotteetPage" />
 
     <div v-else>
-      <b-table
+      <EpTable
         responsive
         borderless
         striped
@@ -54,17 +60,15 @@
         :sort-desc="sort.sortDesc"
         :items="tiedotteetFiltered"
         :fields="tableFields"
-        :per-page="perPage"
         @sort-changed="sortingChanged"
         @row-clicked="avaaTiedote"
       />
 
-      <EpPagination
+      <EpBPagination
         v-model="page"
-        :total-rows="totalRows"
-        :per-page="perPage"
+        :total="totalRows"
+        :items-per-page="perPage"
         aria-controls="tiedotteet"
-        align="center"
       />
     </div>
   </ep-main-view>
@@ -86,7 +90,8 @@ import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { PerusteKevytDto } from '@shared/generated/eperusteet';
 import { $t, $sdt, $kaanna } from '@shared/utils/globals';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 const props = defineProps<{
   tiedotteetStore: TiedotteetStore;

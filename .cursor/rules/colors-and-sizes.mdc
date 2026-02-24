@@ -1,0 +1,7 @@
+---
+description: 
+alwaysApply: true
+---
+
+do not use tailwind classes with color values direclty in elements.
+always try to use design system colors from _variables.scss. apply equivalent color if making changes.

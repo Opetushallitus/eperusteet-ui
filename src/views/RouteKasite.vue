@@ -2,7 +2,7 @@
   <ep-sub-view :header="$t('kasitteet')">
     <ep-spinner v-if="!termit" />
     <div v-else>
-      <div class="d-flex justify-content-between">
+      <div class="flex justify-between">
         <ep-search
           v-model="query"
           class="mb-3"
@@ -40,9 +40,9 @@
           class="kasite"
         >
           <template #header>
-            <div class="d-flex justify-content-between align-items-center w-100 px-2">
+            <div class="flex justify-between items-center w-full px-2">
               <div
-                class="font-weight-bold text-truncate flex-grow-1"
+                class="font-semibold truncate flex-1"
                 v-html="$kaanna(termi.termi)"
               />
               <ep-button
@@ -66,40 +66,31 @@
       </div>
     </div>
 
-    <b-modal
-      id="kasitteenPoistoModal"
+    <EpModal
       ref="kasitteenPoistoModal"
       class="backdrop"
-      :lazy="true"
       size="md"
-      hide-header-close
+      :hide-header-close="true"
+      :cancel-text="$t('peruuta')"
+      :ok-text="$t('poista')"
       @ok="poistaKasite"
     >
       <span class="mr-2">{{ $t('haluatko-poistaa-kasitteen') }}</span>
-      <template #modal-cancel>
-        {{ $t('peruuta') }}
-      </template>
-      <template #modal-ok>
-        {{ $t('poista') }}
-      </template>
-    </b-modal>
+    </EpModal>
 
-    <b-modal
-      id="kasitteenLuontiModal"
+    <EpModal
       ref="kasitteenLuontiModal"
       class="backdrop"
-      :no-close-on-backdrop="true"
-      :no-enforce-focus="true"
-      :lazy="true"
-      :ok-disabled="validation.$invalid"
       size="lg"
+      :ok-disabled="validation.$invalid"
+      @cancel="suljeKasiteModal"
     >
-      <template #modal-header>
-        <div class="row w-100">
-          <div class="col">
+      <template #modal-title>
+        <div class="flex flex-wrap w-full">
+          <div class="flex-1 min-w-0">
             <span class="mr-2">{{ kasite.id ? $t('muokkaa-kasitetta') : $t('lisaa-uusi-kasite') }}</span>
           </div>
-          <div class="col text-right">
+          <div class="flex-1 min-w-0 text-right">
             <ep-kielivalinta />
           </div>
         </div>
@@ -131,7 +122,7 @@
       </ep-form-content>
 
       <template #modal-footer>
-        <div class="d-flex w-100">
+        <div class="flex w-full">
           <ep-button
             v-if="kasite.id"
             link
@@ -143,7 +134,7 @@
           </ep-button>
           <div
             v-else
-            class="flex-grow-1"
+            class="flex-1"
           />
           <ep-button
             class="btn btn-link"
@@ -160,7 +151,7 @@
           </ep-button>
         </div>
       </template>
-    </b-modal>
+    </EpModal>
   </ep-sub-view>
 </template>
 
@@ -187,6 +178,7 @@ import { $t, $success, $fail } from '@shared/utils/globals';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { nextTick } from 'vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 
 const props = defineProps<{
   termitStore: TermitStore;

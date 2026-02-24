@@ -1,16 +1,11 @@
 <template>
-  <b-modal
-    id="julkaisuModal"
+  <EpModal
     ref="julkaisuModal"
-    class="backdrop"
-    :no-close-on-backdrop="true"
-    :no-enforce-focus="true"
-    :lazy="true"
     size="xl"
     :hide-footer="true"
   >
-    <template #modal-header>
-      <div class="d-flex justify-content-between w-100">
+    <template #modal-title>
+      <div class="flex justify-between w-full">
         <div class="mt-1">
           {{ $t('muokkaa') }}
         </div>
@@ -47,7 +42,7 @@
         {{ $t('tallenna') }}
       </EpButton>
     </div>
-  </b-modal>
+  </EpModal>
 </template>
 
 <script setup lang="ts">
@@ -58,6 +53,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpJulkaisuMuutosmaarays from '@/components/EpJulkaisu/EpJulkaisuMuutosmaarays.vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import { $t, $success, $fail } from '@shared/utils/globals';
 
 const props = defineProps<{

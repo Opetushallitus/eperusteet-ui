@@ -17,7 +17,7 @@
         v-if="isEditing"
         class="mb-4 w-80"
       >
-        <b-form-group
+        <EpFormGroup
           class="p-0"
           :label="$t('otsikko')"
           required
@@ -26,10 +26,10 @@
             v-model="data.nimi"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
       </div>
       <div class="mb-4 w-80">
-        <b-form-group class="p-0">
+        <EpFormGroup class="p-0">
           <template
             v-if="isEditing"
             #label
@@ -41,7 +41,7 @@
             layout="normal"
             :is-editable="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
         <ep-toggle
           v-if="isEditing"
@@ -70,7 +70,7 @@
             class="mb-4 w-80"
             :class="{ 'taitotaso-editing': isEditing, 'dragging': dragging }"
           >
-            <div class="d-flex">
+            <div class="flex">
               <ep-material-icon
                 v-if="isEditing"
                 class="order-handle mr-2 flex-shrink-0"
@@ -78,10 +78,10 @@
               >
                 drag_indicator
               </ep-material-icon>
-              <div class="w-100">
+              <div class="w-full">
                 <div class="mb-3">
                   <h5>{{ $t('taitotaso') }}</h5>
-                  <div class="d-flex align-items-start">
+                  <div class="flex items-start">
                     <ep-koodisto-select-draggable
                       v-model="taitotaso.taitotaso"
                       :store="arvosanaKoodisto"
@@ -101,12 +101,11 @@
                   />
                 </div>
 
-                <div class="d-flex justify-content-end">
+                <div class="flex justify-end">
                   <ep-button
                     v-if="isEditing"
                     variant="link"
                     icon="delete"
-                    no-padding
                     class="mr-5"
                     @click="poistaTaitotaso(taitotasoIndex)"
                   >
@@ -166,6 +165,7 @@ import { VueDraggable } from 'vue-draggable-plus';
 import EpKoodistoSelectDraggable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectDraggable.vue';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps({
   perusteStore: {

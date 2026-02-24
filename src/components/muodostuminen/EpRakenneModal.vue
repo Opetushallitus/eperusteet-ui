@@ -1,10 +1,10 @@
 <template>
-  <b-modal
+  <EpModal
     ref="rakenneModal"
     size="xl"
-    :cancel-title="$t('peruuta')"
+    @cancel="cancel"
   >
-    <template #modal-header>
+    <template #modal-title>
       <h2 v-if="muokkaus">
         {{ $t('muokkaa-ryhmaa') }}: {{ $kaanna(nimi) }}
       </h2>
@@ -16,12 +16,12 @@
     </template>
 
     <template #modal-footer>
-      <div class="d-flex justify-content-end w-100">
+      <div class="flex justify-end w-full gap-4 items-center">
         <ep-button
           v-if="muokkaus"
           icon="delete"
           variant="link"
-          class="flex-grow-1"
+          class="flex-1"
           @click="remove"
         >
           {{ $t('poista') }}
@@ -43,7 +43,7 @@
 
     <template #default>
       <div v-if="isRyhma">
-        <b-form-group :label="$t('ryhma') + ' *'">
+        <EpFormGroup :label="$t('ryhma')" required>
           <EpRadio
             v-model="tyyppi"
             class="ml-1"
@@ -100,18 +100,19 @@
           >
             {{ $t('rakenne-moduuli-paikalliset') }}
           </EpRadio>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           v-if="tyyppi ==='osaamisala'"
-          :label="$t('osaamisala') + ' *'"
+          :label="$t('osaamisala')" required>
         >
           <div class="mb-2">
             <span v-if="selectableOsaamisalat.length === 0">{{ $t('ei-valittavia-osaamisaloja') }} </span>
             <span v-else>{{ $t('valitse-osaamisala') }} </span>
-            <span>{{ $t('uusia-osaamisaloja-voit-luoda') }} </span>
+            <span class="ml-1">{{ $t('uusia-osaamisaloja-voit-luoda') }} </span>
             <a
               class="btn-link px-1"
+              href="javascript:void(0)"
               @click="cancel()"
             >{{ $t('tutkinnon-muodostumisen') }} </a>
             <span>{{ $t('nakymasta') }}</span>
@@ -126,18 +127,19 @@
           >
             {{ $kaanna(osaamisala.nimi) }}
           </EpRadio>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           v-if="tyyppi ==='tutkintonimike'"
-          :label="$t('tutkintonimike') + ' *'"
+          :label="$t('tutkintonimike')" required>
         >
           <div class="mb-2">
             <span v-if="selectableOsaamisalat.length === 0">{{ $t('ei-valittavia-tutkintonimikkeita') }} </span>
             <span v-else>{{ $t('valitse-tutkintonimike') }} </span>
-            <span>{{ $t('uusia-tutkintonimikkeita-voit-luoda') }} </span>
+            <span class="ml-1">{{ $t('uusia-tutkintonimikkeita-voit-luoda') }} </span>
             <a
-              class="btn-link px-1"
+              class="px-1"
+              href="javascript:void(0)"
               @click="cancel()"
             >{{ $t('tutkinnon-muodostumisen') }} </a>
             <span>{{ $t('nakymasta') }}</span>
@@ -152,11 +154,11 @@
           >
             {{ $kaanna(tutkintonimike.nimi) }}
           </EpRadio>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           v-if="tyyppi ==='rakenne-moduuli-paikalliset'"
-          :label="$t('nimi') + ' *'"
+          :label="$t('nimi')" required>
         >
           <EpRadio
             v-model="nimiValinta"
@@ -212,13 +214,13 @@
             model-value=""
             :disabled="true"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           v-if="innerModel.muodostumisSaanto"
           :label="$t('laajuus')"
         >
-          <div class="d-flex align-items-center">
+          <div class="flex items-center mb-2">
             <div>
               <ep-input
                 v-model="innerModel.muodostumisSaanto.laajuus.minimi"
@@ -253,30 +255,31 @@
           >
             {{ $t('aseta-myos-maksimiarvo') }}
           </ep-toggle>
-        </b-form-group>
+        </EpFormGroup>
       </div>
       <div v-else>
-        <b-form-group :label="$t('pakollisuus')">
+        <EpFormGroup :label="$t('pakollisuus')">
           <ep-toggle
             v-model="pakollinenModel"
             switch
           >
             {{ $t('tutkinnon-osa-on-pakollinen') }}
           </ep-toggle>
-        </b-form-group>
+        </EpFormGroup>
       </div>
-      <b-form-group :label="$t('kuvaus')">
+      <EpFormGroup :label="$t('kuvaus')">
         <ep-content
           v-model="kuvausModel"
           :is-editable="true"
           layout="normal"
         />
-      </b-form-group>
+      </EpFormGroup>
     </template>
-  </b-modal>
+  </EpModal>
 </template>
 
 <script setup lang="ts">
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
@@ -288,6 +291,7 @@ import { ref, computed, watch, inject, useTemplateRef, unref } from 'vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps({
   modelValue: {
@@ -563,7 +567,7 @@ watch(nimiValinta, (newVal, oldVal) => {
 });
 
 const nimiChanged = (newVal, oldVal) => {
-  if (!newVal || !oldVal) {
+  if (!newVal) {
     return;
   }
 
@@ -578,7 +582,8 @@ const nimiChanged = (newVal, oldVal) => {
 };
 
 watch(tyyppi, (newVal, oldVal) => {
-  if (!newVal || !oldVal) {
+  console.log('tyyppi', newVal, oldVal);
+  if (!newVal) {
     return;
   }
 
@@ -597,8 +602,9 @@ watch(tyyppi, (newVal, oldVal) => {
       osaamisala,
     });
   }
-  else if (tyyppi.value && tyyppi.value === 'rakenne-moduuli-paikalliset') {
-    nimiChanged(nimiValinta.value, nimiValinta.value);
+  else if (newVal === 'rakenne-moduuli-paikalliset') {
+    nimiValinta.value = null;
+    emit('update:modelValue', { ...innerModel.value, nimi: null });
   }
   else if (oldVal) {
     emit('update:modelValue', { ...innerModel.value, nimi: null });
