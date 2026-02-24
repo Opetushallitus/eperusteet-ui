@@ -1,6 +1,6 @@
 <template>
-  <EpMainView>
-    <b-container>
+  <EpMainView container>
+    <div class="w-full">
       <EpSteps
         ref="epsteps"
         :steps="steps"
@@ -14,11 +14,11 @@
             {{ $t('kieli-kaantaja-tutkinto-luonti-selite') }}
           </div>
 
-          <div class="row">
-            <div class="col-sm-10 mb-4">
-              <b-form-group
+          <div class="flex flex-wrap gap-4">
+            <div class="sm:w-5/6 mb-4">
+              <EpFormGroup
                 class="mt-0 mb-3"
-                :label="$t('kayta-pohjana') + ' *'"
+                :label="$t('kayta-pohjana')" required>
               >
                 <EpRadio
                   v-model="tyyppi"
@@ -69,12 +69,12 @@
                 >
                   {{ $t('luo-uusi') }}
                 </EpRadio>
-              </b-form-group>
+              </EpFormGroup>
 
-              <b-form-group
+              <EpFormGroup
                 v-if="tyyppi !== null && tyyppi !== 'perusteesta'"
                 class="mt-0 mb-3"
-                :label="$t('tutkinnon-tyyppi') + ' *'"
+                :label="$t('tutkinnon-tyyppi')" required>
               >
                 <EpRadio
                   v-model="koulutustyyppitoteutus"
@@ -91,11 +91,11 @@
                 >
                   {{ $t('kaantajatutkinto') }}
                 </EpRadio>
-              </b-form-group>
+              </EpFormGroup>
 
-              <b-form-group
+              <EpFormGroup
                 v-if="tyyppi"
-                :label="$t('projektin-nimi') + '*'"
+                :label="$t('projektin-nimi')"
                 required
               >
                 <ep-input
@@ -105,7 +105,7 @@
                   :placeholder="$t('kirjoita-projektin-nimi')"
                   :validation="v$.data.nimi"
                 />
-              </b-form-group>
+              </EpFormGroup>
             </div>
           </div>
         </template>
@@ -114,7 +114,7 @@
           {{ $t('luo-perusteprojekti') }}
         </template>
       </EpSteps>
-    </b-container>
+    </div>
   </EpMainView>
 </template>
 
@@ -133,6 +133,7 @@ import * as _ from 'lodash';
 import { notNull } from '@shared/validators/required';
 import { $t, $kaanna, $sd } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import { MaarayksetEditStore } from '@/stores/MaarayksetEditStore';
 import { Kielet } from '@shared/stores/kieli';
 import { Koulutustyyppi, KoulutustyyppiToteutus } from '@shared/tyypit';

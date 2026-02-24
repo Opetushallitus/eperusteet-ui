@@ -1,10 +1,10 @@
 import { Julkaisut, Perusteprojektit, Maintenance } from '@shared/api/eperusteet';
-import { $bvModal, $t, $success, $fail } from '@shared/utils/globals';
+import { $confirmModal, $t, $success, $fail } from '@shared/utils/globals';
 import * as _ from 'lodash';
 import { h } from 'vue';
 
 export async function vaihdaPerusteTilaConfirm({ meta, route, router }) {
-  const vaihdaTila = await $bvModal.msgBoxConfirm($t(meta.confirm) as any, {
+  const vaihdaTila = await $confirmModal.msgBoxConfirm($t(meta.confirm) as any, {
     title: $t(meta.title),
     okVariant: 'primary',
     okTitle: $t(meta.okTitle ? meta.okTitle : 'kylla') as any,
@@ -30,7 +30,7 @@ export async function vaihdaPerusteTilaConfirm({ meta, route, router }) {
 }
 
 export async function asetaValmiiksi({ route }) {
-  const asetaValmiiksi = await $bvModal.msgBoxConfirm($t('peruste-valmis-varmistus') as any, {
+  const asetaValmiiksi = await $confirmModal.msgBoxConfirm($t('peruste-valmis-varmistus') as any, {
     title: $t('aseta-peruste-valmiiksi') as any,
     okVariant: 'primary',
     okTitle: $t('aseta-valmiiksi') as any,
@@ -50,7 +50,7 @@ export async function asetaValmiiksi({ route }) {
 }
 
 export async function avaaPeruste({ route }) {
-  const avaa = await $bvModal.msgBoxConfirm($t('peruste-avaus-varmistus') as any, {
+  const avaa = await $confirmModal.msgBoxConfirm($t('peruste-avaus-varmistus') as any, {
     title: $t('avaa-peruste') as any,
     okVariant: 'primary',
     okTitle: $t('avaa') as any,
@@ -71,7 +71,7 @@ export async function avaaPeruste({ route }) {
 }
 
 export async function kooditaPeruste({ meta }) {
-  const avaa = await $bvModal.msgBoxConfirm($t('peruste-kooditus-varmistus') as any, {
+  const avaa = await $confirmModal.msgBoxConfirm($t('peruste-kooditus-varmistus') as any, {
     title: $t('koodita-peruste') as any,
     okVariant: 'primary',
     okTitle: $t('koodita') as any,
@@ -92,7 +92,7 @@ export async function kooditaPeruste({ meta }) {
 }
 
 export async function nollaaJulkaisuTila({ meta }) {
-  const avaa = await $bvModal.msgBoxConfirm($t('nollaa-julkaisu-tila-varmistus') as any, {
+  const avaa = await $confirmModal.msgBoxConfirm($t('nollaa-julkaisu-tila-varmistus') as any, {
     title: $t('nollaa-julkaisu-tila') as any,
     okVariant: 'primary',
     okTitle: $t('ok') as any,
@@ -126,7 +126,7 @@ export async function pakotaJulkaisu({ meta }) {
     ],
   ).children;
 
-  const pakota = await $bvModal.msgBoxConfirm(vahvistusSisalto as any, {
+  const pakota = await $confirmModal.msgBoxConfirm(vahvistusSisalto as any, {
     title: $t('pakota-julkaisu') as any,
     okVariant: 'primary',
     okTitle: $t('ok') as any,

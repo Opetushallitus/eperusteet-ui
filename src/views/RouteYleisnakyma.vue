@@ -1,8 +1,8 @@
 <template>
   <div class="yleisnakyma">
     <div v-if="tyyppi === 'peruste'">
-      <div class="row">
-        <div class="col">
+      <div class="flex flex-wrap">
+        <div class="flex-1 min-w-0 pl-2.5">
           <ep-peruste-aikataulu
             class="info-box"
             :aikataulu-store="aikatauluStore"
@@ -11,8 +11,8 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col">
+      <div class="flex flex-wrap">
+        <div class="flex-1 min-w-0 pl-2.5">
           <ep-peruste-tiedotteet
             class="info-box"
             :peruste="peruste"
@@ -35,7 +35,7 @@
             :peruste-store="perusteStore"
           />
         </div>
-        <div class="col">
+        <div class="flex-1 min-w-0 pl-2.5">
           <EpViimeaikainenToiminta
             class="info-box"
             :muokkaustieto-store="muokkaustietoStore"
@@ -46,8 +46,8 @@
     </div>
 
     <div v-else>
-      <div class="row">
-        <div class="col">
+      <div class="flex flex-wrap">
+        <div class="flex-1 min-w-0 pl-2.5">
           <ep-opas-perustiedot
             class="info-box"
             :peruste="peruste"
@@ -55,7 +55,7 @@
             :tyoryhma-store="tyoryhmaStore"
           />
         </div>
-        <div class="col">
+        <div class="flex-1 min-w-0 pl-2.5">
           <EpViimeaikainenToiminta
             class="info-box"
             :muokkaustieto-store="muokkaustietoStore"
@@ -138,14 +138,6 @@ watch(peruste, async (newValue) => {
   background-color: $gray-lighten-5;
   padding: 10px;
 
-  .row {
-    margin: 0px;
-
-    .col {
-      padding: 0px;
-      padding-left: 10px;
-    }
-  }
 
   .info-box {
     margin-bottom: 10px;

@@ -1,17 +1,14 @@
 <template>
-  <b-modal
-    id="osaamismerkkiModal"
+  <EpModal
     ref="osaamismerkkiModal"
     class="backdrop"
-    :no-close-on-backdrop="true"
-    :no-enforce-focus="true"
-    :lazy="true"
     size="xl"
     :hide-footer="true"
+    @cancel="sulje"
   >
-    <template #modal-header>
-      <div class="row w-100">
-        <div class="col">
+    <template #modal-title>
+      <div class="flex flex-wrap w-full">
+        <div class="flex-1">
           <span
             v-if="osaamismerkki.id"
             class="mr-2"
@@ -39,13 +36,13 @@
     </template>
 
     <div class="mb-2">
-      <b-row
+      <div
         v-if="osaamismerkki.id"
-        no-gutters
+        class="flex flex-wrap gap-4"
       >
-        <b-col lg="8">
-          <b-form-group :label="$t('tila')">
-            <div class="d-flex">
+        <div class="lg:w-2/3">
+          <EpFormGroup :label="$t('tila')">
+            <div class="flex">
               <EpToggle
                 v-model="isJulkinen"
                 checkbox
@@ -58,34 +55,34 @@
               >{{ muokkausText + $sdt(osaamismerkki.muokattu) }}</span>
             </div>
             <div />
-          </b-form-group>
-        </b-col>
+          </EpFormGroup>
+        </div>
 
-        <b-col lg="4">
-          <b-form-group
+        <div class="lg:w-1/3">
+          <EpFormGroup
             v-if="osaamismerkki.koodiUri"
             :label="$t('koodi')"
           >
             <span>{{ koodi }}</span>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-form-group :label="$t('nimi') + ' *'">
+      <EpFormGroup :label="$t('nimi')" required>
         <EpInput
           v-model="osaamismerkki.nimi"
           :is-editing="true"
         />
-      </b-form-group>
+      </EpFormGroup>
 
-      <b-form-group :label="$t('kuvaus')">
+      <EpFormGroup :label="$t('kuvaus')">
         <EpInput
           v-model="osaamismerkki.kuvaus"
           :is-editing="true"
         />
-      </b-form-group>
+      </EpFormGroup>
 
-      <b-form-group :label="$t('teema') + ' *'">
+      <EpFormGroup :label="$t('teema')" required>
         <EpMultiSelect
           v-model="osaamismerkki.kategoria"
           :is-editing="true"
@@ -102,10 +99,10 @@
             {{ $kaanna(option.nimi) }}
           </template>
         </EpMultiSelect>
-      </b-form-group>
+      </EpFormGroup>
 
-      <b-form-group :label="$t('voimassaolo') + ' *'">
-        <div class="d-flex align-items-center">
+      <EpFormGroup :label="$t('voimassaolo')" required>
+        <div class="flex items-center">
           <EpDatepicker
             v-model="osaamismerkki.voimassaoloAlkaa"
             :is-editing="true"
@@ -118,10 +115,10 @@
             :is-editing="true"
           />
         </div>
-      </b-form-group>
+      </EpFormGroup>
     </div>
 
-    <b-form-group :label="$t('osaamistavoitteet') + ' *'">
+    <EpFormGroup :label="$t('osaamistavoitteet')" required>
       <VueDraggable
         v-bind="defaultDragOptions"
         v-model="osaamismerkki.osaamistavoitteet"
@@ -136,9 +133,9 @@
         <div
           v-for="(tavoite, i) in osaamismerkki.osaamistavoitteet"
           :key="'tavoite'+i"
-          class="row mb-2"
+          class="flex flex-wrap gap-4 mb-2"
         >
-          <div class="col">
+          <div class="flex-1">
             <EpInput
               v-model="tavoite.osaamistavoite"
               :is-editing="true"
@@ -151,7 +148,7 @@
               </template>
             </EpInput>
           </div>
-          <div class="col-1">
+          <div class="w-1/12">
             <EpButton
               variant="link"
               icon="delete"
@@ -167,9 +164,9 @@
       >
         {{ $t('lisaa-osaamistavoite') }}
       </EpButton>
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group :label="$t('arviointikriteerit') + ' *'">
+    <EpFormGroup :label="$t('arviointikriteerit')" required>
       <VueDraggable
         v-bind="defaultDragOptions"
         v-model="osaamismerkki.arviointikriteerit"
@@ -184,9 +181,9 @@
         <div
           v-for="(kriteeri, i) in osaamismerkki.arviointikriteerit"
           :key="'kriteeri'+i"
-          class="row mb-2"
+          class="flex flex-wrap gap-4 mb-2"
         >
-          <div class="col">
+          <div class="flex-1">
             <EpInput
               v-model="kriteeri.arviointikriteeri"
               :is-editing="true"
@@ -199,7 +196,7 @@
               </template>
             </EpInput>
           </div>
-          <div class="col-1">
+          <div class="w-1/12">
             <EpButton
               variant="link"
               icon="delete"
@@ -215,7 +212,7 @@
       >
         {{ $t('lisaa-arviointikriteeri') }}
       </EpButton>
-    </b-form-group>
+    </EpFormGroup>
 
     <div class="float-right">
       <EpButton
@@ -226,6 +223,7 @@
       </EpButton>
       <EpButton
         v-if="osaamismerkki.id"
+        class="ml-2"
         :show-spinner="tallennetaan"
         :disabled="isJulkinen"
         @click="poistaOsaamismerkki"
@@ -241,7 +239,7 @@
         {{ $t('tallenna') }}
       </EpButton>
     </div>
-  </b-modal>
+  </EpModal>
 </template>
 
 <script setup lang="ts">
@@ -262,6 +260,8 @@ import { notNull, requiredLokalisoituTeksti } from '@shared/validators/required'
 import { required } from '@vuelidate/validators';
 import { $t, $kaanna, $sdt, $success, $fail } from '@shared/utils/globals';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   store: OsaamismerkitStore;

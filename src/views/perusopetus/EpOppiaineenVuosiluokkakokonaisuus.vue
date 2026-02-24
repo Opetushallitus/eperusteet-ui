@@ -6,7 +6,7 @@
       :sisalto-avaimet="['tehtava', 'ohjaus', 'tyotavat', 'arviointi']"
     />
 
-    <b-form-group class="mt-4 pt-3">
+    <EpFormGroup class="mt-4 pt-3">
       <template #label>
         <h4
           v-if="model.sisaltoalueinfo"
@@ -23,11 +23,11 @@
         :peruste-id="perusteId"
         :oppiaine-id="oppiaineId"
       />
-    </b-form-group>
+    </EpFormGroup>
 
     <hr class="mt-4">
 
-    <b-form-group
+    <EpFormGroup
       :label="$t('opetuksen-tavoitteet-vuosiluokilla-' + vuosiluokat)"
       class="mt-4 pt-3"
     >
@@ -39,12 +39,12 @@
         <EpCollapse
           v-for="(tavoite, tavoiteIndex) in model.tavoitteet"
           :key="'tavoite'+tavoiteIndex"
-          class="tavoite p-3 mb-4 w-100"
+          class="tavoite p-3 mb-4 w-full"
           :border-bottom="false"
           :use-padding="false"
         >
           <template #header>
-            <div class="d-flex">
+            <div class="flex items-center">
               <div
                 v-if="isEditing"
                 class="order-handle mr-3"
@@ -54,7 +54,7 @@
                 </EpMaterialIcon>
               </div>
               <h4
-                class="mb-0"
+                class="!mb-0"
                 v-html="$kaanna(tavoite.tavoite)"
               />
             </div>
@@ -77,7 +77,7 @@
       >
         {{ $t('lisaa-tavoite') }}
       </ep-button>
-    </b-form-group>
+    </EpFormGroup>
   </div>
 </template>
 
@@ -95,6 +95,7 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import EpSisaltoalueetEditModal from '@/views/perusopetus/EpSisaltoalueetEditModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   modelValue: OppiaineenVuosiluokkaKokonaisuusDto;

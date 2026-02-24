@@ -1,10 +1,11 @@
 <template>
   <div>
-    <b-modal
+    <EpModal
       ref="modal"
       size="lg"
+      @cancel="onClose"
     >
-      <template #modal-header>
+      <template #modal-title>
         {{ $t('luo-uusi-arviointi') }}
       </template>
       <template #modal-footer>
@@ -23,7 +24,7 @@
         </ep-button>
       </template>
 
-      <b-form-group :label="$t('arviointiasteikko')">
+      <EpFormGroup :label="$t('arviointiasteikko')">
         <EpRadio
           v-for="asteikko in asteikot"
           :key="asteikko.id"
@@ -42,8 +43,8 @@
             </span>
           </span>
         </EpRadio>
-      </b-form-group>
-    </b-modal>
+      </EpFormGroup>
+    </EpModal>
     <ep-button
       variant="outline"
       icon="add"
@@ -59,9 +60,11 @@
 <script setup lang="ts">
 import { ref, computed, watch, useTemplateRef } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import EpExpandText from '@shared/components/EpExpandText/EpExpandText.vue';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   modelValue: number | null;

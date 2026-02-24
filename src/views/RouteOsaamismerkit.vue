@@ -2,9 +2,9 @@
   <div v-if="$route.name === 'osaamismerkit'">
     <EpMainView>
       <template #header>
-        <div class="d-flex justify-content-between">
+        <div class="flex justify-between">
           <h1>{{ $t('osaamismerkit') }}</h1>
-          <div class="d-flex">
+          <div class="flex gap-2 items-center">
             <router-link :to="{ name: 'osaamismerkkikategoriat' }">
               <EpButton
                 class="m-0 p-0"
@@ -29,13 +29,13 @@
         </div>
       </template>
 
-      <div class="row align-items-end">
-        <div class="col-6">
+      <div class="flex gap-4">
+        <div class="w-1/2">
           <EpFormContent name="hae">
             <EpSearch v-model="query.nimi" />
           </EpFormContent>
         </div>
-        <div class="col-3">
+        <div class="w-1/4">
           <EpFormContent name="teema">
             <EpMultiSelect
               v-model="kategoria"
@@ -47,7 +47,7 @@
             />
           </EpFormContent>
         </div>
-        <div class="col-3">
+        <div class="w-1/4">
           <EpFormContent name="voimassaolo">
             <EpMultiSelect
               v-model="voimassaolo"
@@ -66,8 +66,8 @@
         </div>
       </div>
 
-      <div class="row align-items-end">
-        <div class="col-4">
+      <div class="flex items-end">
+        <div class="w-1/3 shrink-0">
           <EpToggleGroup
             v-model="tila"
             :items="osaamismerkkiTilat"
@@ -81,23 +81,21 @@
 
       <EpSpinner v-if="!osaamismerkitPage" />
       <div v-else-if="totalRows > 0">
-        <b-table
+        <EpTable
           responsive
           borderless
           striped
           fixed
           hover
-          no-local-sorting
           :items="osaamismerkitFiltered"
           :fields="tableFields"
-          :per-page="perPage"
           @row-clicked="avaaOsaamismerkkiModal"
         />
 
-        <EpPagination
+        <EpBPagination
           v-model="page"
-          :total-rows="totalRows"
-          :per-page="perPage"
+          :total="totalRows"
+          :items-per-page="perPage"
         />
       </div>
       <div
@@ -134,7 +132,8 @@ import { Murupolku } from '@shared/stores/murupolku';
 import { Kielet } from '@shared/stores/kieli';
 import { $kaanna, $t, $sdt, $sd, $fail } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 const props = defineProps({
   osaamismerkitStore: {

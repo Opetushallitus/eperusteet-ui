@@ -18,7 +18,7 @@
         <h3>{{ $t('ei-oppaita') }}</h3>
       </template>
       <template #lowerheader>
-        <h2 class="pt-2 flex-grow-1">
+        <h2 class="pt-2 flex-1">
           {{ $t('oppaat') }}
         </h2>
         <router-link :to="{ name: 'opasLuonti' }">
@@ -46,35 +46,37 @@
           <span class="ml-1">
             {{ $t(ensimmainenKoulutustyyppi(perusteProjekti)) }}
           </span>
-          <span
+          <EpPopover
             v-if="koulutustyypit(perusteProjekti) && koulutustyypit(perusteProjekti).length > 1"
-            :id="'koulutustyypit'+perusteProjekti.id"
-            class="lukumaara"
+            :triggers="['hover', 'click', 'focus']"
           >
-            +{{ koulutustyypit(perusteProjekti).length -1 }}
-            <b-popover
-              triggers="hover click focus"
-              :target="'koulutustyypit'+perusteProjekti.id"
-              placement="bottomright"
-            >
-              <h3>{{ $t('koulutustyypit') }}</h3>
-              <ep-julki-lista
-                :tiedot="koulutustyypit(perusteProjekti)"
-                listaus-tyyppi="sivutus"
-                tieto-maara="5"
+            <template #trigger>
+              <span
+                :id="'koulutustyypit'+perusteProjekti.id"
+                class="lukumaara"
               >
-                <template #otsikko="{ item }">
-                  <EpColorIndicator
-                    :size="10"
-                    :kind="item.otsikko"
-                  />
-                  <span class="ml-1">
-                    {{ $t(item.otsikko) }}
-                  </span>
-                </template>
-              </ep-julki-lista>
-            </b-popover>
-          </span>
+                +{{ koulutustyypit(perusteProjekti).length -1 }}
+              </span>
+            </template>
+            <template #header>
+              <h3>{{ $t('koulutustyypit') }}</h3>
+            </template>
+            <ep-julki-lista
+              :tiedot="koulutustyypit(perusteProjekti)"
+              listaus-tyyppi="sivutus"
+              tieto-maara="5"
+            >
+              <template #otsikko="{ item }">
+                <EpColorIndicator
+                  :size="10"
+                  :kind="item.otsikko"
+                />
+                <span class="ml-1">
+                  {{ $t(item.otsikko) }}
+                </span>
+              </template>
+            </ep-julki-lista>
+          </EpPopover>
         </span>
       </template>
     </EpPerusteprojektiListaus>
@@ -90,6 +92,7 @@ import { OmatPerusteetStore } from '@/stores/OmatPerusteetStore';
 import * as _ from 'lodash';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpJulkiLista from '@shared/components/EpJulkiLista/EpJulkiLista.vue';
+import EpPopover from '@shared/components/EpPopover/EpPopover.vue';
 import { koulutustyyppiRyhmaSort, themes } from '@shared/utils/perusteet';
 import { $t, $isAdmin, $hasOphCrud } from '@shared/utils/globals';
 

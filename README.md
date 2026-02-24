@@ -122,7 +122,6 @@ Projekti on migroitu Vue 3:een.
 Suositeltavia resursseja:
  - [Vue 3 style guide](https://vuejs.org/style-guide/)
  - [Vue 3 documentation](https://vuejs.org/guide/introduction.html)
- - [BootstrapVue](https://bootstrap-vue.org/docs)
 
 ## ePerusteet-projektit
 

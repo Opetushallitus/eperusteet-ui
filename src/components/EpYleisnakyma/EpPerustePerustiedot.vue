@@ -4,20 +4,20 @@
       <h3>{{ $t('projektin-tiedot') }}</h3>
     </router-link>
 
-    <div class="row">
-      <div class="col-12">
+    <div class="flex flex-wrap">
+      <div class="w-full">
         <ep-perustieto-data
           icon="info"
           :topic="$t('projektin-kuvaus')"
-          class="w-100"
+          class="w-full"
         >
           <div v-html="$kaanna(projektinKuvaus)" />
         </ep-perustieto-data>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-5">
+    <div class="flex flex-wrap">
+      <div class="w-5/12">
         <ep-perustieto-data
           icon="comment"
           :topic="$t('yhteyshenkilo')"
@@ -25,7 +25,7 @@
           {{ yhteyshenkilo }}
         </ep-perustieto-data>
       </div>
-      <div class="col-7">
+      <div class="w-7/12">
         <ep-perustieto-data
           icon="language"
           :topic="$t('julkaisukielet')"
@@ -35,8 +35,8 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-5">
+    <div class="flex flex-wrap">
+      <div class="w-5/12">
         <ep-perustieto-data
           icon="calendar_today"
           :topic="$t('luotu')"
@@ -44,7 +44,7 @@
           {{ $sdt(peruste.luotu) }}
         </ep-perustieto-data>
       </div>
-      <div class="col-7">
+      <div class="w-7/12">
         <ep-perustieto-data
           icon="calendar_today"
           :topic="$t('julkaistu')"
@@ -54,8 +54,8 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-5">
+    <div class="flex flex-wrap">
+      <div class="w-5/12">
         <ep-perustieto-data
           v-if="virkailijat"
           icon="groups"
@@ -79,7 +79,7 @@
           </ep-button>
         </ep-perustieto-data>
       </div>
-      <div class="col-7">
+      <div class="w-7/12">
         <EpPerustietoData icon="visibility">
           <template #header>
             {{ $t('esikatsele-perustetta') }}
@@ -164,7 +164,7 @@ const esikatseluUrl = computed(() => {
 </script>
 
 <style scoped lang="scss">
-@import "@/styles/_variables.scss";
+@import "@shared/styles/_variables.scss";
 @import "@/styles/_mixins.scss";
 @include perustiedot-content;
 </style>

@@ -8,64 +8,75 @@
       <h2>{{ $t('muokkaa-jarjestysta') }}</h2>
     </template>
     <template #default="{ data, isEditing }">
-      <b-tabs content-class="mt-3">
-        <b-tab
-          v-if="data.tutkinnonOsat"
-          :title="$t('tutkinnon-osat')"
-        >
-          <EpJarjesta
-            v-model="data.tutkinnonOsat"
-            group="sisaltoJarjestysGroup"
-            :is-editable="isEditing"
+      <Tabs value="0">
+        <TabList>
+          <Tab
+            v-for="(tab, idx) in jarjestaTabs(data)"
+            :key="tab.id"
+            :value="String(idx)"
           >
-            <template #default="{ node }">
-              <span>
-                {{ $kaanna(node.nimi) }}
-              </span>
-            </template>
-          </EpJarjesta>
-        </b-tab>
-        <b-tab
-          v-if="data.tekstit"
-          :title="$t('tekstikappaleet')"
-        >
-          <EpJarjesta
-            v-model="data.tekstit.lapset"
-            child-field="lapset"
-            group="sisaltoJarjestysGroup"
-            :is-editable="isEditing"
+            {{ $t(tab.titleKey) }}
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel
+            v-for="(tab, idx) in jarjestaTabs(data)"
+            :key="'panel-' + tab.id"
+            :value="String(idx)"
           >
-            <template #default="{ node }">
-              <span>
-                {{ $kaanna(node.perusteenOsa.nimi) }}
-              </span>
-              <EpMaterialIcon
-                v-if="node.perusteenOsa.liite"
-                v-b-popover="{content: $t('tekstikappale-naytetaan-liitteena'), trigger: 'hover'}"
-                size="18px"
+            <div class="tab-content-wrapper mt-3">
+              <EpJarjesta
+                v-if="tab.id === 'tutkinnonOsat'"
+                v-model="data.tutkinnonOsat"
+                group="sisaltoJarjestysGroup"
+                :is-editable="isEditing"
               >
-                attach_file
-              </EpMaterialIcon>
-            </template>
-          </EpJarjesta>
-        </b-tab>
-        <b-tab
-          v-if="data.vaiheet"
-          :title="$t('vaiheet')"
-        >
-          <EpJarjesta
-            v-model="data.vaiheet.vaiheet"
-            group="sisaltoJarjestysGroup"
-            :is-editable="isEditing"
-          >
-            <template #default="{ node }">
-              <span>
-                {{ $kaanna(node.nimi) }}
-              </span>
-            </template>
-          </EpJarjesta>
-        </b-tab>
-      </b-tabs>
+                <template #default="{ node }">
+                  <span>
+                    {{ $kaanna(node.nimi) }}
+                  </span>
+                </template>
+              </EpJarjesta>
+              <EpJarjesta
+                v-else-if="tab.id === 'tekstit'"
+                v-model="data.tekstit.lapset"
+                child-field="lapset"
+                group="sisaltoJarjestysGroup"
+                :is-editable="isEditing"
+              >
+                <template #default="{ node }">
+                  <span>
+                    {{ $kaanna(node.perusteenOsa.nimi) }}
+                  </span>
+                  <EpPopover
+                    v-if="node.perusteenOsa.liite"
+                    :triggers="['hover']"
+                  >
+                    <template #trigger>
+                      <EpMaterialIcon size="18px">
+                        attach_file
+                      </EpMaterialIcon>
+                    </template>
+                    {{ $t('tekstikappale-naytetaan-liitteena') }}
+                  </EpPopover>
+                </template>
+              </EpJarjesta>
+              <EpJarjesta
+                v-else-if="tab.id === 'vaiheet'"
+                v-model="data.vaiheet.vaiheet"
+                group="sisaltoJarjestysGroup"
+                :is-editable="isEditing"
+              >
+                <template #default="{ node }">
+                  <span>
+                    {{ $kaanna(node.nimi) }}
+                  </span>
+                </template>
+              </EpJarjesta>
+            </div>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </template>
   </EpEditointi>
 </template>
@@ -83,6 +94,12 @@ import { TekstiRakenneStore } from '@/stores/TekstiRakenneStore';
 import { Koulutustyyppi } from '@shared/tyypit';
 import { AipeVaiheetStore } from '@/stores/AipeVaiheetStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpPopover from '@shared/components/EpPopover/EpPopover.vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 import { $kaanna, $t } from '@shared/utils/globals';
 import { useRoute } from 'vue-router';
 
@@ -93,6 +110,30 @@ const props = defineProps<{
 const store = ref<EditointiStore | null>(null);
 const stores = ref<{ [key: string]: IEditoitava }>({});
 const route = useRoute();
+
+type JarjestaTabId = 'tutkinnonOsat' | 'tekstit' | 'vaiheet';
+
+function jarjestaTabs(data: any) {
+  const tabs: { id: JarjestaTabId; titleKey: string }[] = [];
+  if (data?.tutkinnonOsat) {
+    tabs.push({ id: 'tutkinnonOsat', titleKey: 'tutkinnon-osat' });
+  }
+  if (data?.tekstit) {
+    tabs.push({ id: 'tekstit', titleKey: 'tekstikappaleet' });
+  }
+  if (data?.vaiheet) {
+    tabs.push({ id: 'vaiheet', titleKey: 'vaiheet' });
+  }
+  return tabs;
+}
+
+function jarjestaTabsKey(data: any) {
+  return [
+    data?.tutkinnonOsat ? '1' : '0',
+    data?.tekstit ? '1' : '0',
+    data?.vaiheet ? '1' : '0',
+  ].join('-');
+}
 
 const peruste = computed(() => {
   return props.perusteStore.peruste.value;
@@ -140,3 +181,18 @@ watch([() => projektiId, () => perusteId], async () => {
   }
 });
 </script>
+
+<style scoped lang="scss">
+:deep(.p-tabs-nav) {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+:deep(.p-tab) {
+  margin-left: 0 !important;
+}
+
+:deep(.p-tabpanels) {
+  padding: 1rem 0;
+}
+</style>

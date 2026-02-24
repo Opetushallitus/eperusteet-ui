@@ -2,29 +2,29 @@
   <div v-if="!isInitializing && store">
     <EpEditointi :store="store">
       <template #header>
-        <h2 class="m-0">
+        <h2 class="!m-0">
           {{ $t('projektin-tiedot') }}
         </h2>
       </template>
       <template #default="{ data, isEditing, validation }">
         <h3>{{ $t('perustiedot') }}</h3>
-        <b-container fluid>
-          <b-row no-gutters>
-            <b-col lg="6">
-              <b-form-group :label="$t('projektin-nimi') + '*'">
+        <div class="w-full">
+          <div class="flex flex-wrap gap-4">
+            <div class="lg:w-1/2">
+              <EpFormGroup :label="$t('projektin-nimi') + '*'">
                 <ep-input
                   v-model="data.nimi"
                   type="string"
                   :is-editing="isEditing"
                   :validation="validation.nimi"
                 />
-              </b-form-group>
-            </b-col>
-            <b-col lg="6" />
-          </b-row>
-          <b-row no-gutters>
-            <b-col lg="6">
-              <b-form-group :label="$t('perustetyoryhma')">
+              </EpFormGroup>
+            </div>
+            <div class="lg:w-1/2" />
+          </div>
+          <div class="flex flex-wrap gap-4">
+            <div class="lg:w-1/2">
+              <EpFormGroup :label="$t('perustetyoryhma')">
                 <perustetyoryhma-select
                   v-model="data.ryhmaOid"
                   :ulkopuoliset-store="ulkopuolisetStore"
@@ -40,22 +40,22 @@
                 >
                   {{ $t('tyhjenna-valinta') }}
                 </ep-button>
-              </b-form-group>
-            </b-col>
-            <b-col lg="6">
-              <b-form-group :label="$t('yhteyshenkilo')">
+              </EpFormGroup>
+            </div>
+            <div class="lg:w-1/3">
+              <EpFormGroup :label="$t('yhteyshenkilo')">
                 <ep-input
                   v-model="data.yhteistyotaho"
                   type="string"
                   :is-editing="isEditing"
                   :validation="validation.yhteistyotaho"
                 />
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-row no-gutters>
-            <b-col>
-              <b-form-group :label="$t('kuvaus')">
+              </EpFormGroup>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-4">
+            <div class="w-full">
+              <EpFormGroup :label="$t('kuvaus')">
                 <div v-if="isEditing">
                   <div class="text-muted mb-3">
                     {{ $t('perusteprojekti-ohje-kuvaus') }}
@@ -86,19 +86,19 @@
                   layout="normal"
                   :is-editable="isEditing"
                 />
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-row no-gutters>
-            <b-col lg="6">
+              </EpFormGroup>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-4">
+            <div class="lg:w-1/2">
               <EpEsikatselu
                 v-model="storeData"
                 peruste
                 :is-editing="isEditing"
               />
-            </b-col>
-            <b-col lg="6">
-              <b-form-group
+            </div>
+            <div class="lg:w-1/3">
+              <EpFormGroup
                 v-if="!isEditing && data.peruste.tyyppi === 'normaali'"
                 :label="$t('perusteen-lataus')"
               >
@@ -109,10 +109,10 @@
                 >
                   {{ $t('lataa-peruste-json') }}
                 </ep-button>
-              </b-form-group>
-            </b-col>
-          </b-row>
-        </b-container>
+              </EpFormGroup>
+            </div>
+          </div>
+        </div>
       </template>
     </EpEditointi>
   </div>
@@ -134,6 +134,7 @@ import { Maintenance, PerusteprojektiLuontiKuvausEnum } from '@shared/api/eperus
 import EpEsikatselu from '@shared/components/EpEsikatselu/EpEsikatselu.vue';
 import { $t } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   ulkopuolisetStore: UlkopuolisetStore;

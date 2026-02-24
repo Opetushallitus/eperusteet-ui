@@ -5,21 +5,34 @@
       {{ $t('lisaa-muutosmaarayksen-kieliversiot-samaan-muutosmaaraykseen') }}
     </EpInfoBanner>
 
-    <b-tabs
-      :value="tabindex"
+    <Tabs
+      value="0"
       class="mb-3"
-      @input="tabindex = $event"
+      @update:value="onKieliTabChange"
     >
-      <b-tab
-        v-for="kieli in kielet"
-        :key="'kieli' + kieli"
-        :title="$t('translatiivi-' + kieli)"
-      />
-    </b-tabs>
+      <TabList>
+        <Tab
+          v-for="(kieli, idx) in kielet"
+          :key="'kieli' + kieli"
+          :value="String(idx)"
+        >
+          {{ $t('translatiivi-' + kieli) }}
+        </Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel
+          v-for="(kieli, idx) in kielet"
+          :key="'panel-kieli' + kieli"
+          :value="String(idx)"
+        >
+          <div class="tab-content-wrapper" />
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
 
-    <b-form-group>
+    <EpFormGroup>
       <template #label>
-        <div class="d-flex">
+        <div class="flex">
           <span>{{ $t('lataa-uusi-muutosmaarays') + isRequired }}</span>
           <EpInfoPopover
             class="ml-2"
@@ -35,9 +48,9 @@
         :tyyppi="MAARAYSDOKUMENTTI"
         yksittainen
       />
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group
+    <EpFormGroup
       :label="$t('muutosmaarayksen-nimi') + isRequired"
       class="mt-4 w-40"
     >
@@ -45,9 +58,9 @@
         v-model="model.nimi"
         :is-editing="isEditing"
       />
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group
+    <EpFormGroup
       :label="$t('asiasana')"
       class="mt-4"
     >
@@ -56,9 +69,9 @@
         :asiasanat="kielenAsiasanat"
         :is-editing="isEditing"
       />
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group
+    <EpFormGroup
       :label="$t('kuvaus')"
       class="mt-4"
     >
@@ -67,11 +80,11 @@
         layout="simplified_w_links"
         :is-editable="isEditing"
       />
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group class="mt-4">
+    <EpFormGroup class="mt-4">
       <template #label>
-        <div class="d-flex">
+        <div class="flex">
           <span>{{ $t('liitteet') + ' (pdf)' }}</span>
           <EpInfoPopover
             class="ml-2"
@@ -87,23 +100,23 @@
         :tyyppi="LIITE"
         nimisyote
       />
-    </b-form-group>
+    </EpFormGroup>
 
     <hr class="my-4">
 
     <h3>{{ $t('muutosmaarayksen-kieliversioiden-yhteiset-tiedot') }}</h3>
 
-    <b-form-group
+    <EpFormGroup
       :label="$t('muutosmaarays-astuu-voimaan') + isRequired"
-      class="mt-4 d-flex"
+      class="mt-4 flex"
     >
       <ep-datepicker
         v-model="model.voimassaoloAlkaa"
         :is-editing="isEditing"
       />
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group
+    <EpFormGroup
       :label="$t('muutosmaarayksen-diaarinumero') + isRequired"
       class="mt-4 w-40"
     >
@@ -112,19 +125,19 @@
         :is-editing="isEditing"
         type="string"
       />
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group
+    <EpFormGroup
       :label="$t('maarays-annettu') + isRequired"
-      class="mt-4 d-flex"
+      class="mt-4 flex"
     >
       <ep-datepicker
         v-model="model.maarayspvm"
         :is-editing="isEditing"
       />
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group
+    <EpFormGroup
       :label="$t('liittyyko-maarays-toiseen-maaraykseen') + isRequired"
       class="mt-4"
     >
@@ -134,7 +147,7 @@
         :maaraykset-nimella="maarayksetNimella"
         :disabloidut-valinnat="disabloidutMuuttaaValinnat"
       />
-    </b-form-group>
+    </EpFormGroup>
   </div>
 </template>
 
@@ -155,6 +168,12 @@ import { Kieli } from '@shared/tyypit';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpInfoBanner from '@shared/components/EpInfoBanner/EpInfoBanner.vue';
 import { $t } from '@shared/utils/globals';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 
 const MAARAYSDOKUMENTTI = MaaraysLiiteDtoTyyppiEnum.MAARAYSDOKUMENTTI;
 const LIITE = MaaraysLiiteDtoTyyppiEnum.LIITE;
@@ -169,7 +188,10 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue']);
 
 const fileMaxSize = 10;
-const tabindex = ref(0);
+
+function onKieliTabChange(index: string | number) {
+  Kielet.setSisaltoKieli(Kieli[kielet.value[index]]);
+}
 
 const model = computed({
   get() {
@@ -204,11 +226,21 @@ const kielet = computed(() => {
   return UiKielet;
 });
 
-watch(tabindex, (index) => {
-  Kielet.setSisaltoKieli(Kieli[kielet.value[index]]);
-});
 </script>
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
+
+// :deep(.p-tabs-nav) {
+//   margin-left: 0;
+//   padding-left: 0;
+// }
+
+// :deep(.p-tab) {
+//   margin-left: 0 !important;
+// }
+
+// :deep(.p-tabpanels) {
+//   padding: 1rem 0;
+// }
 </style>

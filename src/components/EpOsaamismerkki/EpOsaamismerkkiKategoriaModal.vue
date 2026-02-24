@@ -1,17 +1,13 @@
 <template>
-  <b-modal
-    id="osaamismerkkiKategoriaModal"
+  <EpModal
     ref="osaamismerkkiKategoriaModal"
     class="backdrop"
-    :no-close-on-backdrop="true"
-    :no-enforce-focus="true"
-    :lazy="true"
     size="xl"
-    :hide-footer="true"
+    @cancel="sulje"
   >
-    <template #modal-header>
-      <div class="row w-100">
-        <div class="col">
+    <template #modal-title>
+      <div class="flex flex-wrap w-full">
+        <div class="flex-1">
           <span
             v-if="kategoria.id"
             class="mr-2"
@@ -24,36 +20,26 @@
         <div>
           <EpKielivalinta />
         </div>
-        <div
-          class="close-btn clickable ml-3 pt-1"
-          @click="sulje"
-        >
-          <EpMaterialIcon
-            aria-hidden="false"
-            :aria-label="$t('sulje')"
-          >
-            close
-          </EpMaterialIcon>
-        </div>
       </div>
     </template>
 
     <div class="mb-5">
-      <b-form-group :label="$t('nimi') + ' *'">
+      <EpFormGroup :label="$t('nimi')" required>
         <EpInput
           v-model="kategoria.nimi"
           :is-editing="true"
         />
-      </b-form-group>
-      <b-form-group :label="$t('kuvaus')">
+      </EpFormGroup>
+      <EpFormGroup :label="$t('kuvaus')">
         <EpInput
           v-model="kategoria.kuvaus"
           :is-editing="true"
         />
-      </b-form-group>
-      <b-form-group :label="$t('kuva') + ' *'">
+      </EpFormGroup>
+      <EpFormGroup :label="$t('kuva')" required>
         <EpTiedostoInput
           v-if="!liite"
+          ref="tiedostoInput"
           v-model="kategoria.liite"
           :file-types="mimeTypes"
           @input="fileChanged"
@@ -81,10 +67,10 @@
             delete
           </EpMaterialIcon>
         </div>
-      </b-form-group>
+      </EpFormGroup>
     </div>
 
-    <div class="float-right">
+    <template #modal-footer>
       <EpButton
         variant="link"
         @click="sulje"
@@ -99,21 +85,22 @@
         {{ $t('poista') }}
       </EpButton>
       <EpButton
-        class="ml-2"
         :show-spinner="tallennetaan"
         :disabled="invalid"
         @click="tallenna"
       >
         {{ $t('tallenna') }}
       </EpButton>
-    </div>
-  </b-modal>
+    </template>
+  </EpModal>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, nextTick } from 'vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import * as _ from 'lodash';
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { OsaamismerkkiKategoriaDto } from '@shared/generated/eperusteet';
@@ -132,6 +119,7 @@ const props = defineProps<{
 const osaamismerkkiKategoriaModal = useTemplateRef('osaamismerkkiKategoriaModal');
 
 const tallennetaan = ref(false);
+const tiedostoInput = useTemplateRef('tiedostoInput');
 const kategoria = ref<OsaamismerkkiKategoriaDto>({});
 const newImagePreviewUrl = ref<string | null>(null);
 const imageWidth = ref(0);
@@ -164,6 +152,9 @@ const tallenna = async () => {
   catch (err) {
     tallennetaan.value = false;
     $fail($t('teeman-paivitys-epaonnistui') as string);
+    kategoria.value.liite = undefined;
+    newImagePreviewUrl.value = null;
+    nextTick(() => (tiedostoInput.value as { reset?: () => void })?.reset?.());
   }
 };
 
@@ -199,6 +190,7 @@ const fileChanged = async (file: File) => {
       else {
         kategoria.value.liite = undefined;
         $fail(imageInfoText.value);
+        (tiedostoInput.value as { reset?: () => void })?.reset?.();
       }
     };
     img.src = evt.target.result;
@@ -227,6 +219,7 @@ const clear = () => {
   newImagePreviewUrl.value = null;
   imageWidth.value = 0;
   imageHeight.value = 0;
+  nextTick(() => (tiedostoInput.value as { reset?: () => void })?.reset?.());
 };
 
 const isValidImage = () => {

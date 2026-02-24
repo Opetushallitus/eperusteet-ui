@@ -16,49 +16,32 @@
     </template>
 
     <template #default="{ data, isEditing }">
-      <b-row>
-        <b-col
+      <div class="flex flex-wrap gap-4">
+        <div
           v-if="isEditing"
-          cols="8"
+          class="flex-[8] min-w-0"
         >
-          <b-form-group :label="$t('oppiaineen-nimi')">
+          <EpFormGroup :label="$t('oppiaineen-nimi')">
             <ep-koodisto-select
               v-model="data.koodi"
               :store="koodisto"
               :is-editing="isEditing"
               :nayta-arvo="false"
-            >
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled
-                  />
-                  <b-input-group-append>
-                    <b-button
-                      variant="primary"
-                      @click="open"
-                    >
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-            </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
+            />
+          </EpFormGroup>
+        </div>
 
-        <b-col cols="3">
-          <b-form-group :label="$t('koodi')">
+        <div class="w-1/4">
+          <EpFormGroup :label="$t('koodi')">
             <span v-if="data.koodi">
               {{ data.koodi.arvo }}
             </span>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row>
-        <b-col cols="11">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-[11] min-w-0">
           <hr>
 
           <EpCollapse
@@ -115,14 +98,14 @@
                   :key="'tavoite'+tavoitealueIndex"
                   class="mt-4 p-2 tavoitealue editing"
                 >
-                  <div class="d-flex">
+                  <div class="flex">
                     <div class="order-handle m-2">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
-                    <div class="mt-2 w-100">
-                      <div class="row">
-                        <div class="col-11">
-                          <div class="font-weight-bold mb-2">
+                    <div class="mt-2 w-full">
+                      <div class="flex flex-wrap gap-4">
+                        <div class="flex-[11] min-w-0">
+                          <div class="font-semibold mb-2">
                             {{ $t('tavoitealueen-nimi') }}
                           </div>
                           <ep-input
@@ -130,7 +113,7 @@
                             :is-editing="true"
                           />
 
-                          <div class="mt-3 mb-2 font-weight-bold">
+                          <div class="mt-3 mb-2 font-semibold">
                             {{ $t('kohde') }}
                           </div>
                           <ep-input
@@ -140,7 +123,7 @@
                         </div>
                       </div>
 
-                      <div class="mt-3 mb-2 font-weight-bold">
+                      <div class="mt-3 mb-2 font-semibold">
                         {{ $t('tavoitteet') }}
                       </div>
                       <EpTavoitealueTavoitteet v-model="tavoitealue.tavoitteet">
@@ -151,7 +134,7 @@
                             class="input-wrapper"
                           >
                             <template #left>
-                              <div class="order-handle m-2">
+                              <div class="order-handle m-1">
                                 <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                               </div>
                             </template>
@@ -160,7 +143,7 @@
                         <template #footer>
                           <EpButton
                             icon="delete"
-                            class="mr-5"
+                            class="mr-2"
                             variant="link"
                             @click="poistaTavoitealue(tavoitealue)"
                           >
@@ -189,7 +172,7 @@
                 :key="'tavoite'+tavoitealueIndex"
                 class="tavoitealue"
               >
-                <div class="font-weight-bold">
+                <div class="font-semibold">
                   {{ $kaanna(tavoitealue.nimi) }}
                 </div>
                 <div>{{ $kaanna(tavoitealue.kohde) }}</div>
@@ -310,7 +293,7 @@
               <div
                 v-for="oppimaara in data.oppimaarat"
                 :key="'oppimaara'+oppimaara.id"
-                class="listaus p-3 d-flex"
+                class="listaus p-3 flex"
               >
                 <EpMaterialIcon
                   v-if="isEditing"
@@ -335,8 +318,8 @@
               {{ $t('lisaa-oppimaara') }}
             </EpButton>
           </EpCollapse>
-        </b-col>
-      </b-row>
+        </div>
+      </div>
     </template>
   </EpEditointi>
 </template>
@@ -361,6 +344,8 @@ import EpTavoitealueTavoitteet from '@shared/components/EpTavoitesisaltoalue/EpT
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpModuuli from '@shared/components/EpModuuli/EpModuuli.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import { $kaanna } from '@shared/utils/globals';
 
 const props = defineProps<{
