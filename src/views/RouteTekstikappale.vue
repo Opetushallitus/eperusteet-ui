@@ -1,5 +1,5 @@
 <template>
-  <div v-if="store">
+  <div v-if="store && peruste">
     <EpEditointi
       :store="store"
       :versionumero="versionumero"
@@ -188,6 +188,10 @@ const versionumero = computed(() => _.toNumber(route.query.versionumero) || unde
 
 const osaamisalat = computed(() => {
   return props.perusteStore.peruste?.value?.osaamisalat || [];
+});
+
+const peruste = computed(() => {
+  return props.perusteStore.peruste?.value;
 });
 
 const tutkintonimikkeet = computed(() => {

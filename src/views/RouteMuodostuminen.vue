@@ -484,7 +484,6 @@ import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
-import { inject } from 'vue';
 import { $bvModal, $kaanna, $filterBy } from '@shared/utils/globals';
 import { unref } from 'vue';
 import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
