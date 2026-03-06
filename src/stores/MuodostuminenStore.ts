@@ -58,6 +58,7 @@ export class MuodostuminenStore implements IEditoitava {
     await Perusteet.updateOsaamisalat(this.perusteId, data.osaamisalat);
     await Perusteet.updateTutkintonimikkeet(this.perusteId, data.tutkintonimikkeet);
     await TutkinnonRakenne.updatePerusteenRakenne(this.perusteId, MuodostuminenStore.config.perusteStore.perusteSuoritustapa.value as any, rakenne as any);
+    await MuodostuminenStore.config.perusteStore.fetchPeruste();
   }
 
   public readonly validator = computed(() => {

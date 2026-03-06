@@ -4,6 +4,7 @@ import RoutePerusteprojekti from './RoutePerusteprojekti.vue';
 import { globalStubs } from '@shared/utils/__tests__/stubs';
 import { mock } from '@shared/utils/jestutils';
 import { vi } from 'vitest';
+import { TermitStore } from '@/stores/TermitStore';
 
 vi.mock('vue-router', () => ({
   useRoute: vi.fn(() => ({
@@ -20,6 +21,7 @@ describe('RoutePerusteprojekti', () => {
     const wrapper = mount(RoutePerusteprojekti, {
       props: {
         perusteStore: mock(PerusteStore),
+        termitStore: mock(TermitStore),
       },
       global: {
         ...globalStubs,
