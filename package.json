@@ -31,7 +31,7 @@
     "@types/lodash": "4.14.202",
     "@types/qs": "^6.9.1",
     "@types/uuid": "^7.0.0",
-    "@unhead/vue": "^2.0.8",
+    "@unhead/vue": "^2.1.11",
     "@vitejs/plugin-vue": "^6.0.3",
     "@vitejs/plugin-vue2": "^2.3.4",
     "@vue/compat": "3.5.22",
