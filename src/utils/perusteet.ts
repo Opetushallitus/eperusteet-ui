@@ -127,3 +127,14 @@ export function koodiNumero(koodillinen: object | string) {
 export function koodiSorters(): any[] {
   return [koodiAlku, koodiNumero];
 }
+
+export const KoulutustTyyppiKoodistot = {
+  [KoulutusTyyppi.ESIOPETUS]: [
+    'esiopetuslaajaalainenosaaminen',
+    'esiopetusoppimisenaleet',
+  ],
+  [KoulutusTyyppi.VARHAISKASVATUS]: [
+    'varhaiskasvatuslaajaalainenosaaminen',
+    'varhaiskasvatusoppimisenaleet',
+  ],
+};

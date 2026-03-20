@@ -9,6 +9,7 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { requiredOneLang } from '@shared/validators/required';
 import { PerusteenOsaDto } from '@shared/generated/eperusteet';
 import { App } from 'vue';
+import { KoulutustTyyppiKoodistot } from '@/utils/perusteet';
 
 interface TekstikappaleStoreConfig {
   perusteStore: PerusteStore;
@@ -146,6 +147,27 @@ export class TekstikappaleStore implements IEditoitava {
     return {
       valid: true,
     };
+  }
+
+  public async addCoding(koodi: any) {
+    await this.acquire();
+    const data = (await Perusteenosat.getPerusteenOsatByViite(this.tekstiKappaleViiteId)).data;
+    await Perusteenosat.updatePerusteenOsaPerusteella(this.tekstiKappaleViiteId, this.perusteId, this.state.tekstikappale!.id!, {
+      ...data,
+      koodi: koodi,
+    } as any);
+    await this.release();
+  }
+
+  public async removeCoding() {
+    await this.addCoding(null);
+  }
+
+  public features(data) {
+    return computed(() => ({
+      codes: KoulutustTyyppiKoodistot[TekstikappaleStore.config.perusteStore.peruste.value?.koulutustyyppi],
+      hasCoding: !!data.koodi,
+    }));
   }
 
   public async create(otsikko, tekstikappaleIsa, osaamisala) {
