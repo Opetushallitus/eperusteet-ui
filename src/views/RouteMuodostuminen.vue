@@ -29,11 +29,9 @@
                   {{ laskettuLaajuus }}
                 </span>
                 / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
-              <ep-button
-                v-if="isEditing"
-                variant="link"
-                icon="edit"
-                @click="editMuodostuminen"
+              <MuodostuminenLaajuusModal
+                v-model="data.rakenne.muodostumisSaanto.laajuus.minimi"
+                :is-editing="isEditing"
               />
             </h5>
             <div class="filters">
@@ -419,33 +417,6 @@
             </div>
           </div>
         </div>
-        <b-modal
-          ref="editModal"
-          size="lg"
-        >
-          <template #modal-header>
-            <h2>{{ $t('muokkaa') }}: {{ $kaanna({}) }}</h2>
-          </template>
-
-          <template #default>
-            <div>
-              <b-form-group :label="$t('laajuus')">
-                <div class="d-flex align-items-center">
-                  <div>
-                    <ep-input
-                      v-model="data.rakenne.muodostumisSaanto.laajuus.minimi"
-                      type="number"
-                      is-editing
-                    />
-                  </div>
-                  <div class="ml-2">
-                    {{ $t('osaamispiste') }}
-                  </div>
-                </div>
-              </b-form-group>
-            </div>
-          </template>
-        </b-modal>
       </template>
     </EpEditointi>
   </div>
@@ -460,8 +431,6 @@ import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
-import EpJarjesta from '@shared/components/EpJarjesta/EpJarjesta.vue';
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
@@ -476,6 +445,7 @@ import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
+import MuodostuminenLaajuusModal from '@/components/muodostuminen/MuodostuminenLaajuusModal.vue';
 import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolor } from '@/components/muodostuminen/utils';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
@@ -516,8 +486,6 @@ const sivukoot = ref(5);
 const leikelauta = ref<any[]>([]);
 const root = ref<any>(null);
 const eprakennemodalUusiRyhma = ref<any>(null);
-const editModal = ref<any>(null);
-
 const {
   isInitializing,
   perusteId,
@@ -821,10 +789,6 @@ function onLeikelautaAdd(evt) {
       ...recursiveClone(leike),
     };
   });
-}
-
-function editMuodostuminen() {
-  editModal.value.show();
 }
 
 async function onProjektiChange(projektiId: number) {
