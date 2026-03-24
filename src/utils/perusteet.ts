@@ -130,8 +130,8 @@ export function koodiSorters(): any[] {
 
 export const KoulutustTyyppiKoodistot = {
   [KoulutusTyyppi.ESIOPETUS]: [
-    'esiopetuslaajaalainenosaaminen',
-    'esiopetusoppimisenaleet',
+    'esiopetus2014laajaalainenosaaminen',
+    'esiopetus2014oppimiskokonaisuudet',
   ],
   [KoulutusTyyppi.VARHAISKASVATUS]: [
     'varhaiskasvatuslaajaalainenosaaminen',
