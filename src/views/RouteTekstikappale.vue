@@ -9,7 +9,12 @@
     >
       <template #header="{ data }">
         <h2 class="m-0">
-          {{ $kaanna(data.nimi) }}
+          <template v-if="data.koodi">
+            {{ $kaanna(data.koodi.nimi) }}
+          </template>
+          <template v-else>
+            {{ $kaanna(data.nimi) }}
+          </template>
         </h2>
       </template>
       <template #postHeader="{ data }">
@@ -18,7 +23,7 @@
       <template #default="{ data, isEditing, validation }">
         <div
           v-if="isEditing"
-          class="mt-1 otsikko"
+          class="mt-1 otsikko col-11 pl-0"
         >
           <div
             v-if="osaamisalat.length > 0 || tutkintonimikkeet.length > 0"
@@ -116,13 +121,42 @@
             v-if="tekstikappaleTyyppi === 'tekstikappale'"
             class="mb-4"
           >
-            <h3>{{ $t('otsikko') }}</h3>
-            <ep-input
-              v-model="data.nimi"
-              :is-editing="true"
-              :validation="validation.nimi"
-              :disabled="!!data.osaamisala || !!data.tutkintonimike"
-            />
+            <template v-if="data.koodi">
+              <h3>{{ $t('koodi') }}</h3>
+              <ep-koodisto-select
+                v-if="isEditing"
+                v-model="data.koodi"
+                :koodisto="data.koodi.koodisto"
+                :is-editing="isEditing"
+                :nayta-arvo="false"
+              >
+                <template #default="{ open }">
+                  <b-input-group>
+                    <b-form-input
+                      :value="data.koodi ? ($kaanna(data.koodi.nimi) + ' (' + data.koodi.arvo + ')') : ''"
+                      disabled
+                    />
+                    <b-input-group-append>
+                      <b-button
+                        variant="primary"
+                        @click="open"
+                      >
+                        {{ $t('hae-koodistosta') }}
+                      </b-button>
+                    </b-input-group-append>
+                  </b-input-group>
+                </template>
+              </ep-koodisto-select>
+            </template>
+            <template v-else>
+              <h3>{{ $t('otsikko') }}</h3>
+              <ep-input
+                v-model="data.nimi"
+                :is-editing="true"
+                :validation="validation.nimi"
+                :disabled="!!data.osaamisala || !!data.tutkintonimike"
+              />
+            </template>
           </div>
           <ep-toggle
             v-model="data.liite"
@@ -132,11 +166,21 @@
           </ep-toggle>
         </div>
 
-        <div :class="{ 'mt-4': isEditing }">
-          <EpContent
-            v-model="data.teksti"
-            :is-editable="isEditing"
-          />
+        <div class="col-11 pl-0">
+          <b-form-group
+            v-if="data.koodi && data.koodi.arvo && !isEditing"
+            class="mb-4"
+            :label="$t('koodi')"
+          >
+            {{ data.koodi.arvo }}
+          </b-form-group>
+
+          <div :class="{ 'mt-4': isEditing }">
+            <EpContent
+              v-model="data.teksti"
+              :is-editable="isEditing"
+            />
+          </div>
         </div>
       </template>
     </EpEditointi>
@@ -158,18 +202,10 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import * as _ from 'lodash';
 import { Murupolku } from '@shared/stores/murupolku';
-import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
-import { TermitStore } from '@/stores/TermitStore';
-import { KuvaStore } from '@/stores/KuvaStore';
-import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
-
-interface koodistoryhma {
-  ryhma: string;
-  koodistot: string[];
-}
+import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -212,14 +248,6 @@ const tekstikappale = computed(() => {
 
 const oldNimi = computed(() => {
   return store.value?.data?.originalNimi;
-});
-
-const kasiteHandler = computed(() => {
-  return createKasiteHandler(new TermitStore(perusteId.value!));
-});
-
-const kuvaHandler = computed(() => {
-  return createKuvaHandler(new KuvaStore(perusteId.value!));
 });
 
 const postRemove = computed(() => {
