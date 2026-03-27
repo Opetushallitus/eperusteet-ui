@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" v-if="navigation">
     <h3>{{ $t('rakenne') }}</h3>
 
     <ep-spinner v-if="!peruste" />
@@ -50,6 +50,10 @@ const koulutustyyppiLisasisalto = {
   },
 };
 
+const navigation = computed(() => {
+  return props.perusteStore.navigation.value;
+});
+
 const peruste = computed(() => {
   return props.perusteStore.peruste.value;
 });
@@ -67,7 +71,7 @@ const sisaltoLapset = (sisalto) => {
 };
 
 const sisaltoFlat = computed(() => {
-  return sisaltoLapset(props.perusteStore.navigation.value);
+  return sisaltoLapset(navigation.value);
 });
 
 const tekstikappaleita = computed(() => {
