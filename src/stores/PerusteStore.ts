@@ -145,20 +145,15 @@ export class PerusteStore implements IEditoitava {
       this.state.projekti = null;
       this.state.validoinnit = null;
       this.state.julkaisut = null;
+      this.state.navigation = null;
       Murupolku.tyhjenna();
       this.state.projekti = (await Perusteprojektit.getPerusteprojekti(projektiId)).data;
       const perusteId = Number((this.state.projekti as any)._peruste);
 
-      [
-        this.state.peruste,
-        this.state.navigation,
-      ] = _.map(await Promise.all([
-        Perusteet.getPerusteenTiedot(perusteId),
-        Perusteet.getNavigation(perusteId),
-      ]), 'data');
-
-      await this.updateValidointi();
-      await this.fetchJulkaisut();
+      await this.fetchPeruste(perusteId);
+      this.updateNavigation();
+      this.updateValidointi();
+      this.fetchJulkaisut();
 
       this.state.isInitialized = true;
     }
@@ -173,11 +168,11 @@ export class PerusteStore implements IEditoitava {
   async updateCurrent() {
     this.state.projekti = (await Perusteprojektit.getPerusteprojekti(this.state.projekti!.id!)).data;
     await this.fetchPeruste();
-    await this.updateValidointi();
+    this.updateValidointi();
   }
 
-  async fetchPeruste() {
-    this.state.peruste = (await Perusteet.getPerusteenTiedot(this.state.peruste!.id!)).data;
+  async fetchPeruste(id?: number) {
+    this.state.peruste = (await Perusteet.getPerusteenTiedot(id || this.state.peruste!.id!)).data;
   }
 
   public async updateNavigation() {
