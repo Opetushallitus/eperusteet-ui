@@ -28,7 +28,7 @@ export class TutkinnonOsaStore implements IEditoitava {
   public async init(projektiId: number, suoritustapakoodit: readonly string[]) {
     if (!_.isEmpty(suoritustapakoodit)) {
       const tutkinnonosat = _.chain(await Promise.all(
-        _.map(suoritustapakoodit, suoritustapakoodi => TutkinnonRakenne.getPerusteenTutkinnonOsat(projektiId, (suoritustapakoodi as any)))))
+        _.map(suoritustapakoodit, suoritustapakoodi => TutkinnonRakenne.getPerusteenTutkinnonOsatKevyt(projektiId, (suoritustapakoodi as any)))))
         .map('data')
         .flatMap()
         .sortBy('jarjestys')
