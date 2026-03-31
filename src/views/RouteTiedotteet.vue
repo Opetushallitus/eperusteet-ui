@@ -105,7 +105,10 @@ onMounted(async () => {
     sivu: sivu.value,
     sivukoko: 10,
   });
-  perusteet.value = (await Perusteet.getJulkaistutPerusteet()).data;
+  perusteet.value = _.flatten(_.map(await Promise.all([
+    Perusteet.getJulkaistutVoimassaolevatPerusteetByTyyppi('NORMAALI'),
+    Perusteet.getJulkaistutVoimassaolevatPerusteetByTyyppi('KIELI_KAANTAJA_TUTKINTO'),
+  ]), 'data'));
 });
 
 watch(nimiFilter, () => {
