@@ -106,8 +106,8 @@ onMounted(async () => {
     sivukoko: 10,
   });
   perusteet.value = _.flatten(_.map(await Promise.all([
-    Perusteet.getJulkaistutVoimassaolevatPerusteetByTyyppi('NORMAALI'),
-    Perusteet.getJulkaistutVoimassaolevatPerusteetByTyyppi('KIELI_KAANTAJA_TUTKINTO'),
+    Perusteet.getJulkaistutVoimassaolevatJaTulevatPerusteetByTyyppi('NORMAALI'),
+    Perusteet.getJulkaistutVoimassaolevatJaTulevatPerusteetByTyyppi('KIELI_KAANTAJA_TUTKINTO'),
   ]), 'data'));
 });
 
