@@ -1,5 +1,8 @@
 <template>
-  <div class="content" v-if="navigation">
+  <div
+    v-if="navigation"
+    class="content"
+  >
     <h3>{{ $t('rakenne') }}</h3>
 
     <ep-spinner v-if="!peruste" />
