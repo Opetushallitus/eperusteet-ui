@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2">
+  <div class="mt-2 ml-3">
     <ep-tekstikappale-lisays
       v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
       :tallenna="tallennaUusiTekstikappale"
@@ -89,6 +89,7 @@
           variant="link"
           button-class="text-decoration-none"
           :show-spinner="loading"
+          no-padding
           @click="makeCall(lisasisalto.call)"
         >
           <EpMaterialIcon
