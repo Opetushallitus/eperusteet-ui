@@ -8,7 +8,12 @@
       :osaamisalat="osaamisalat"
     >
       <template #default="{tekstikappale}">
-        <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
+        <span
+          v-if="tekstikappale.meta?.numerointi"
+          class="text-muted mr-1"
+        >
+          {{ tekstikappale.meta?.numerointi }}
+        </span>
         {{ $kaanna(tekstikappale.label) }}
       </template>
     </ep-tekstikappale-lisays>
@@ -76,7 +81,12 @@
                 {{ $t(groupedLisasisalto.label['sijainti']) }}
               </template>
               <template #default="{tekstikappale}">
-                <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
+                <span
+                  v-if="tekstikappale.meta?.numerointi"
+                  class="text-muted mr-1"
+                >
+                  {{ tekstikappale.meta?.numerointi }}
+                </span>
                 {{ $kaanna(tekstikappale.label) }}
               </template>
             </ep-tekstikappale-lisays>
@@ -124,7 +134,12 @@
             {{ $t(lisasisalto.label['sijainti']) }}
           </template>
           <template #default="{tekstikappale}">
-            <span class="text-muted mr-1">{{ tekstikappale.chapter }}</span>
+            <span
+              v-if="tekstikappale.meta?.numerointi"
+              class="text-muted mr-1"
+            >
+              {{ tekstikappale.meta?.numerointi }}
+            </span>
             {{ $kaanna(tekstikappale.label) }}
           </template>
         </ep-tekstikappale-lisays>
@@ -218,7 +233,7 @@ const perusteenOsat = computed(() => {
     ...tavoitesisaltoalueet.value,
     ...kotoKielitaitotasot.value,
     ...kotoOpinnot.value,
-  ], osa => chapterStringSort(osa.chapter));
+  ], osa => chapterStringSort(osa.meta?.numerointi ?? osa.chapter ?? ''));
 });
 
 const tekstikappaleRoute = computed(() => {
