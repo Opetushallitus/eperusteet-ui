@@ -138,14 +138,12 @@
 
                 <template #viite="{ item }">
                   <router-link :to="{ name: tekstikappaleRoute, params: { tekstiKappaleId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) }}
                   </router-link>
                 </template>
 
                 <template #tutkinnonosaviite="{ item }">
                   <router-link :to="{ name: 'tutkinnonosa', params: { tutkinnonOsaId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-tutkinnon-osa') }}
                   </router-link>
                 </template>
@@ -170,140 +168,120 @@
 
                 <template #opintokokonaisuus="{ item }">
                   <router-link :to="{ name: 'opintokokonaisuus', params: { opintokokonaisuusId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-opintokokonaisuus') }}
                   </router-link>
                 </template>
 
                 <template #tavoitesisaltoalue="{ item }">
                   <router-link :to="{ name: 'tavoitesisaltoalue', params: { tavoitesisaltoalueId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-tavoitesisaltoalue') }}
                   </router-link>
                 </template>
 
                 <template #koulutuksenosa="{ item }">
                   <router-link :to="{ name: 'koulutuksenosa', params: { koulutuksenosaId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-koulutuksen-osa') }}
                   </router-link>
                 </template>
 
                 <template #laajaalainenosaaminen="{ item }">
                   <router-link :to="{ name: 'laajaalainenosaaminen', params: { laajaalainenosaaminenId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-laaja-alainen-osaaminen') }}
                   </router-link>
                 </template>
 
                 <template #koto_kielitaitotaso="{ item }">
                   <router-link :to="{ name: 'koto_kielitaitotaso', params: { kotokielitaitotasoId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-kielitaitotaso') }}
                   </router-link>
                 </template>
 
                 <template #koto_opinto="{ item }">
                   <router-link :to="{ name: 'koto_opinto', params: { kotoOpintoId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-opinto') }}
                   </router-link>
                 </template>
 
                 <template #koto_laajaalainenosaaminen="{ item }">
                   <router-link :to="{ name: 'koto_laajaalainenosaaminen', params: { kotoLaajaalainenOsaaminenId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-laaja-alainen-osaaminen') }}
                   </router-link>
                 </template>
 
                 <template #osaamiskokonaisuus="{ item }">
                   <router-link :to="{ name: 'osaamiskokonaisuus', params: { osaamiskokonaisuusId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-osaamiskokonaisuus') }}
                   </router-link>
                 </template>
 
                 <template #kaantajataito="{ item }">
                   <router-link :to="{ name: 'kaantajataito', params: { kaantajataitoId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-taito') }}
                   </router-link>
                 </template>
 
                 <template #kaantajataitotasoasteikko="{ item }">
                   <router-link :to="{ name: 'kaantajataitotasoasteikko', params: { kaantajataitotasoasteikkoId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-taitotasoasteikko') }}
                   </router-link>
                 </template>
 
                 <template #kaantajakielitaito="{ item }">
                   <router-link :to="{ name: 'kaantajakielitaito', params: { kaantajakielitaitoId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-kielitaito') }}
                   </router-link>
                 </template>
 
                 <template #kaantajataitotasokuvaus="{ item }">
                   <router-link :to="{ name: 'kaantajataitotasokuvaus', params: { kaantajataitotasokuvausId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-taitotasokuvaus') }}
                   </router-link>
                 </template>
 
                 <template #kaantajaaihealue="{ item }">
                   <router-link :to="{ name: 'kaantajaaihealue', params: { kaantajaaihealueId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-aihealue') }}
                   </router-link>
                 </template>
 
                 <template #kaantajatodistusmalli="{ item }">
                   <router-link :to="{ name: 'kaantajatodistusmalli', params: { kaantajatodistusmalliId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-todistusmalli') }}
                   </router-link>
                 </template>
 
                 <template #osaamiskokonaisuus_paa_alue="{ item }">
                   <router-link :to="{ name: 'osaamiskokonaisuus_paa_alue', params: { osaamiskokonaisuusPaaAlueId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-osaamiskokonaisuus_paa_alue') }}
                   </router-link>
                 </template>
 
-                <template #kvliite="{ item }">
+                <template #kvliite>
                   <router-link :to="{ name: 'kvliite' }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $t('kvliite') }}
                   </router-link>
                 </template>
 
-                <template #tutkinnonosat="{ item }">
+                <template #tutkinnonosat>
                   <router-link :to="{ name: 'tutkinnonosat' }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $t('tutkinnonosat') }}
                   </router-link>
                 </template>
 
-                <template #muodostuminen="{ item }">
+                <template #muodostuminen>
                   <router-link :to="{ name: 'muodostuminen' }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $t('tutkinnon-rakenne') }}
                   </router-link>
                 </template>
 
-                <template #laajaalaiset="{ item }">
+                <template #laajaalaiset>
                   <router-link :to="{ name: 'lukio_laajaAlaisetOsaamiset' }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $t('laaja-alaisen-osaamisen-osa-alueet') }}
                   </router-link>
                 </template>
 
-                <template #oppiaineet="{ item }">
+                <template #oppiaineet>
                   <router-link :to="{ name: 'lukio_oppiaineet' }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $t('oppiaineet') }}
                   </router-link>
                 </template>
@@ -338,42 +316,36 @@
 
                 <template #aipevaihe="{ item }">
                   <router-link :to="{ name: 'aipevaihe', params: { vaiheId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-vaihe') }}
                   </router-link>
                 </template>
 
                 <template #aipeoppiaine="{ item }">
                   <router-link :to="{ name: 'aipeoppiaine', params: { vaiheId: item.meta.vaiheId, oppiaineId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-oppiaine') }}
                   </router-link>
                 </template>
 
                 <template #aipekurssi="{ item }">
                   <router-link :to="{ name: 'aipekurssi', params: { vaiheId: item.meta.vaiheId, oppiaineId: item.meta.oppiaineId, kurssiId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-kurssi') }}
                   </router-link>
                 </template>
 
-                <template #aipe_laajaalaisetosaamiset="{ item }">
+                <template #aipe_laajaalaisetosaamiset>
                   <router-link :to="{ name: 'aipeLaajaAlaisetOsaamiset' }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $t('laaja-alaiset-osaamiset') }}
                   </router-link>
                 </template>
 
                 <template #aipe_laajaalainenosaaminen="{ item }">
                   <router-link :to="{ name: 'aipelaajaAlainenOsaaminen', params: { laoId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-laaja-alainen-osaaminen') }}
                   </router-link>
                 </template>
 
                 <template #taiteenala="{ item }">
                   <router-link :to="{ name: 'taiteenala', params: { taiteenalaId: item.id } }">
-                    <span class="text-muted mr-1">{{ item.chapter }}</span>
                     {{ $kaanna(item.label) || $t('nimeton-taiteenala') }}
                   </router-link>
                 </template>
