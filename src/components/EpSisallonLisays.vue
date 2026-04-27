@@ -34,6 +34,7 @@
             <ep-button
               variant="link"
               button-class="text-decoration-none"
+              no-padding
             >
               <EpMaterialIcon
                 :color="'inherit'"
