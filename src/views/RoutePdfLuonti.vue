@@ -1,6 +1,6 @@
 <template>
   <div class="dokumentit">
-    <div class="ylapaneeli d-flex align-items-center">
+    <div class="ylapaneeli flex items-center">
       <h2 class="otsikko">
         {{ $t('luo-pdf') }}
       </h2>

@@ -14,7 +14,7 @@
           class="mt-5"
         >
           <slot name="unpublished-header" />
-          <div class="d-flex flex-wrap pt-4">
+          <div class="flex flex-wrap pt-4">
             <div
               v-oikeustarkastelu="luontioikeus"
               class="card-wrapper"
@@ -23,15 +23,15 @@
                 :full-background="true"
                 :link="newRoute"
               >
-                <div class="d-flex align-items-center flex-column h-100">
-                  <div class="h-50 text-center d-flex align-items-center pt-5">
+                <div class="flex items-center flex-col h-full">
+                  <div class="h-1/2 text-center flex items-center pt-5">
                     <div class="ikoni">
                       <EpMaterialIcon size="50px">
                         add
                       </EpMaterialIcon>
                     </div>
                   </div>
-                  <div class="h-50 text-center d-flex align-items-center pb-5">
+                  <div class="h-1/2 text-center flex items-center pb-5">
                     <div class="teksti">
                       {{ $t('luo-uusi') }}
                     </div>
@@ -55,14 +55,12 @@
                   :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
                   :tile-image="project.tileImage"
                 >
+                  {{ project.nimi }}
                   <template #lower>
                     <div class="small-text">
                       {{ $t('tila-' + project.tila) }}
                     </div>
                   </template>
-                  <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
-                    {{ project.nimi }}
-                  </div>
                 </ProjektiCard>
               </div>
             </template>
@@ -82,7 +80,7 @@
           <slot name="published-header">
             <h2>{{ $t('julkaistut-perusteet') }}</h2>
           </slot>
-          <div class="d-flex flex-wrap pt-4">
+          <div class="flex flex-wrap pt-4">
             <div
               v-for="project in ownPublishedProjects"
               :key="project.id"
@@ -94,14 +92,14 @@
                 :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
                 :tile-image="project.tileImage"
               >
+                <!-- <div class="h-full w-full items-center justify-center text-center p-4"> -->
+                {{ project.nimi }}
+                <!-- </div> -->
                 <template #lower>
                   <div class="small-text">
                     {{ $t('tila-' + project.tila) }}
                   </div>
                 </template>
-                <div class="h-100 w-100 d-flex align-items-center justify-content-center text-center p-4">
-                  {{ project.nimi }}
-                </div>
               </ProjektiCard>
             </div>
           </div>
@@ -117,7 +115,7 @@
         class="lower"
         :class="{'mt-0': !showCards}"
       >
-        <div class="d-flex">
+        <div class="flex">
           <slot name="lowerheader">
             <h1 class="bg-danger">
               slot: lowerheader
@@ -131,8 +129,8 @@
         v-if="items"
         class="filters"
       >
-        <div class="d-flex align-items-end">
-          <div class="flex-fill mr-3">
+        <div class="flex items-end">
+          <div class="flex-1 mr-3">
             <label>&nbsp;</label>
             <EpSearch
               v-model="query.nimi"
@@ -141,7 +139,7 @@
           </div>
           <div
             v-if="filtersInclude('koulutustyyppi')"
-            class="flex-fill mr-3"
+            class="flex-1 mr-3"
           >
             <label>{{ $t('koulutustyyppi') }}</label>
             <koulutustyyppi-select
@@ -152,7 +150,7 @@
           </div>
           <div
             v-if="filtersInclude('peruste')"
-            class="flex-fill mr-3"
+            class="flex-1 mr-3"
           >
             <label>{{ $t('peruste') }}</label>
             <EpMultiSelect
@@ -172,7 +170,7 @@
           </div>
           <div
             v-if="filtersInclude('voimassaolo')"
-            class="flex-fill"
+            class="flex-1"
           >
             <label>{{ $t('voimassaolo') }}</label>
             <EpMultiSelect
@@ -191,7 +189,7 @@
           </div>
         </div>
 
-        <div class="d-flex my-3 justify-content-between">
+        <div class="flex my-3 justify-between">
           <div
             v-if="filtersInclude('tila')"
           >
@@ -216,15 +214,15 @@
         </div>
 
         <div v-if="items.data.length > 0">
-          <b-table
+          <EpTable
             striped
             hover
             responsive
-            :items="items.data"
-            :fields="fields"
             no-local-sorting
             :sort-by="sort.sortBy"
             :sort-desc="sort.sortDesc"
+            :items="items.data"
+            :fields="fields"
             @sort-changed="sortingChanged"
           >
             <template
@@ -233,46 +231,46 @@
             >
               <slot name="nimiotsikko" />
             </template>
-            <template #cell(nimi)="data">
-              <router-link :to="{ name: editRoute, params: { projektiId: data.item.id } }">
-                {{ data.value }}
+            <template #cell(nimi)="{ item, value }">
+              <router-link :to="{ name: editRoute, params: { projektiId: item.id } }">
+                {{ value }}
               </router-link>
             </template>
-            <template #cell(koulutustyyppi)="data">
+            <template #cell(koulutustyyppi)="{ item }">
               <slot
                 name="koulutustyyppisarake"
-                :peruste-projekti="data.item"
+                :peruste-projekti="item"
               >
                 <span class="text-nowrap">
                   <EpColorIndicator
-                    v-if="data.item.koulutustyyppi"
+                    v-if="item.koulutustyyppi"
                     :size="10"
-                    :kind="data.item.koulutustyyppi"
+                    :kind="item.koulutustyyppi"
                   />
                   <span class="ml-1">
-                    {{ $t(data.item.koulutustyyppi) }}
+                    {{ $t(item.koulutustyyppi) }}
                   </span>
                 </span>
               </slot>
             </template>
-            <template #cell(tila)="data">
-              <div class="d-flex">
-                {{ $t(data.item.tila) }}
+            <template #cell(tila)="{ item }">
+              <div class="flex">
+                {{ $t(item.tila) }}
                 <ep-button
-                  v-if="data.item.tila === 'poistettu' && stateChangeAllowed(data.item.oikeudet.perusteprojekti)"
+                  v-if="item.tila === 'poistettu' && stateChangeAllowed(item.oikeudet.perusteprojekti)"
                   variant="link py-0"
                   icon="keyboard_return"
-                  @click="restore(data.item)"
+                  @click="restore(item)"
                 >
                   {{ $t('palauta') }}
                 </ep-button>
               </div>
             </template>
-          </b-table>
-          <ep-pagination
+          </EpTable>
+          <ep-b-pagination
             v-model="sivu"
-            :per-page="perPage"
-            :total-rows="total"
+            :items-per-page="perPage"
+            :total="total"
           />
         </div>
         <div
@@ -289,15 +287,15 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { PerusteQuery, PerusteprojektiKevytDto, Perusteet, PerusteKevytDto, PerusteprojektiQuery } from '@shared/api/eperusteet';
 import { EperusteetKoulutustyypit } from '@shared/utils/perusteet';
-import { BvTableFieldArray } from 'bootstrap-vue';
 import { IProjektiProvider } from './types';
 import ProjektiCard from './ProjektiCard.vue';
 import * as _ from 'lodash';
@@ -441,6 +439,7 @@ watch(() => peruste.value, (newPeruste: PerusteKevytDto | null) => {
 });
 
 const sortingChanged = (newSort) => {
+  console.log('sortingChanged', newSort);
   sort.value = newSort;
   Object.assign(query, {
     sivu: 0,
@@ -516,7 +515,7 @@ const items = computed(() => {
   return props.provider.projects.value;
 });
 
-const initialFields = computed((): BvTableFieldArray => {
+const initialFields = computed((): any => {
   const dateFormatter = (value: Date | null | undefined) => {
     return value
       ? $sd(value)
@@ -527,7 +526,6 @@ const initialFields = computed((): BvTableFieldArray => {
     key: 'nimi',
     label: $t('projektin-nimi') as string,
     sortable: true,
-    sortByFormatted: true,
     formatter(value: any, key: string, item: PerusteprojektiKevytDto) {
       return _.upperCase(item.peruste!.tyyppi) === 'OPAS' ? $kaanna(item.peruste!.nimi!) : item.nimi;
     },

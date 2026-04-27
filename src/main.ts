@@ -1,12 +1,11 @@
 import Vue, { createApp } from 'vue';
 
 import App from './App.vue';
-import '@shared/config/bootstrap';
 import '@shared/config/styles';
 import { createI18n } from 'vue-i18n';
 import VueScrollTo from 'vue-scrollto';
 import { LoadingPlugin } from 'vue-loading-overlay';
-import VueApexCharts from 'vue-apexcharts';
+import Vue3ApexCharts from 'vue3-apexcharts';
 import { Oikeustarkastelu } from '@shared/plugins/oikeustarkastelu';
 import Aikaleima from '@shared/plugins/aikaleima';
 import { Notifikaatiot } from '@shared/plugins/notifikaatiot';
@@ -36,34 +35,37 @@ import { AipeVaiheStore } from './stores/AipeVaiheStore';
 import { LukioModuuliStore } from './stores/LukioModuuliStore';
 import { PerusopetusLaajaAlainenOsaaminenStore } from './stores/PerusopetusLaajaAlainenOsaaminenStore';
 import { PerusopetusOppiaineStore } from './stores/PerusopetusOppiaineStore';
-import { configureCompat } from '@vue/compat';
 import { Kieli } from '@shared/tyypit';
 import fiLocale from '@shared/translations/locale-fi.json';
 import svLocale from '@shared/translations/locale-sv.json';
 import enLocale from '@shared/translations/locale-en.json';
 import { TekstikappaleStore } from './stores/TekstikappaleStore';
-import { setAppInstance } from '@shared/utils/globals';
+import { setAppInstance, $confirmModal } from '@shared/utils/globals';
 import { createPinia } from 'pinia';
 import Kaannos from '@shared/plugins/kaannos';
 import { createHead } from '@unhead/vue/client';
-import Sticky from 'vue-sticky-directive';
 import { TaiteenalaStore } from './stores/TaiteenalaStore';
 import { LukioOppiaineStore } from './stores/LukioOppiaineStore';
 import { registerIconColorSchemeChange } from '@shared/utils/icon';
+import { setPrimeVue } from '@shared/primevue';
+import { vBToggle } from '@shared/directives/vBToggle';
+import { vSticky } from '@shared/directives/vSticky';
+import ConfirmationService from 'primevue/confirmationservice';
 
 const app = createApp(App);
 
+app.directive('b-toggle', vBToggle);
+app.directive('sticky', vSticky);
+
 registerIconColorSchemeChange();
 
-configureCompat({
-  COMPONENT_V_MODEL: false,
-});
-
 setAppInstance(app);
+app.config.globalProperties.$confirmModal = $confirmModal;
 
 app.use(createPinia());
 app.use(router);
 app.use(Kaannos);
+app.use(ConfirmationService);
 
 export const i18n = createI18n({
   legacy: false, // Set to false to use Composition API
@@ -83,6 +85,7 @@ export const i18n = createI18n({
 });
 
 app.use(i18n);
+setPrimeVue(app);
 app.use(Kielet, { i18n });
 app.use(Aikaleima);
 app.use(LoadingPlugin);
@@ -90,19 +93,17 @@ app.use(createHead());
 app.use(Oikeustarkastelu, { oikeusProvider: Kayttajat });
 app.use(Notifikaatiot);
 
-// Vue.use(Vahvistus);
-Vue.use(VueScrollTo, {
+app.use(VueScrollTo, {
   duration: 1000,
 });
-Vue.use(VueApexCharts);
-Vue.component('Apexchart', VueApexCharts);
+app.use(Vue3ApexCharts);
+app.component('Apexchart', Vue3ApexCharts);
 
 app.use(EditointiStore, { router, kayttajaProvider: Kayttajat });
 app.use(TekstikappaleStore, {
   perusteStore: stores.perusteStore,
   router,
 });
-app.use(Sticky);
 
 app.use(TekstiRakenneStore, {
   perusteStore: stores.perusteStore,

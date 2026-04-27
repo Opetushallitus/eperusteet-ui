@@ -12,7 +12,7 @@
       :is-editing="isEditing"
     />
 
-    <b-form-group
+    <EpFormGroup
       class="mt-4"
       :label="$t('opetuksen-tavoitteet')"
     >
@@ -24,22 +24,22 @@
         <div
           v-for="(tavoite, i) in model.oppiaineenTavoitteenOpetuksenTavoitteet"
           :key="'tavoite'+i"
-          class="row mb-2"
+          class="flex flex-wrap gap-4 mb-2 items-center"
         >
-          <div class="col">
+          <div class="flex-1">
             <EpInput
               v-model="tavoite.tavoite"
               :is-editing="isEditing"
               class="input-wrapper"
             >
               <template #left>
-                <div class="order-handle m-2">
+                <div class="order-handle m-1">
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
               </template>
             </EpInput>
           </div>
-          <div class="col-1">
+          <div class="w-1/12">
             <EpButton
               v-if="isEditing"
               variant="link"
@@ -57,7 +57,7 @@
       >
         {{ $t('lisaa-osaamistavoite') }}
       </EpButton>
-    </b-form-group>
+    </EpFormGroup>
 
     <h4 class="mt-4">
       {{ $t('tavoitteista-johdetut-oppimisen-tavoitteet') }}
@@ -71,8 +71,8 @@
     <h4 class="mt-4">
       {{ $t('tavoitealue') }}
     </h4>
-    <b-row>
-      <b-col cols="10">
+    <div class="flex flex-wrap gap-4">
+      <div class="flex-[10] min-w-0">
         <ep-select
           v-if="isEditing"
           v-model="kohdealue"
@@ -93,8 +93,8 @@
             class="disabled-text"
           >{{ $t('ei-asetettu') }}</span>
         </div>
-      </b-col>
-      <b-col cols="2">
+      </div>
+      <div class="w-1/6">
         <ep-button
           v-if="isEditing"
           variant="link"
@@ -102,8 +102,8 @@
         >
           {{ $t('tyhjenna-valinta') }}
         </ep-button>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
 
     <h4 class="mt-4">
       {{ $t('laaja-alainen-osaaminen') }}
@@ -118,11 +118,11 @@
       :expanded-by-default="false"
     >
       <template #header>
-        <div class="d-flex">
+        <div class="flex">
           <div>{{ $kaanna(lao.nimi) }}</div>
           <div
             v-if="isEditing"
-            class="default-icon clickable ml-3 mt-1"
+            class="default-icon clickable ml-3"
             @click="poistaLaajaAlainenOsaaminen(lao)"
           >
             <EpMaterialIcon>delete</EpMaterialIcon>
@@ -137,20 +137,23 @@
       />
     </ep-collapse>
 
-    <b-dropdown
+    <EpDropdown
       v-if="isEditing"
-      :text="$t('lisaa-laaja-alainen-osaaminen')"
-      variant="primary"
     >
-      <b-dropdown-item-button
+      <template #button-content>
+        <ep-button variant="primary">
+          {{ $t('lisaa-laaja-alainen-osaaminen') }}
+        </ep-button>
+      </template>
+      <EpDropdownItem
         v-for="(laaja, index) in laajaAlaisetOsaamisetValinnat"
         :key="index+'addlaaja'"
         :disabled="laaja.valittu"
         @click="lisaaLaajaAlainenOsaaminen(laaja)"
       >
         {{ $kaanna(laaja.nimi) }}
-      </b-dropdown-item-button>
-    </b-dropdown>
+      </EpDropdownItem>
+    </EpDropdown>
 
     <template v-if="sisaltoalueetValinnat">
       <h4 class="mt-4">
@@ -166,11 +169,11 @@
         :expanded-by-default="false"
       >
         <template #header>
-          <div class="d-flex">
+          <div class="flex">
             <div>{{ $kaanna(sisaltoalue.nimi) }}</div>
             <div
               v-if="isEditing"
-              class="default-icon clickable ml-3 mt-1"
+              class="default-icon clickable ml-3"
               @click="poistaSisaltoalue(sisaltoalue)"
             >
               <EpMaterialIcon>delete</EpMaterialIcon>
@@ -185,20 +188,23 @@
         />
       </ep-collapse>
 
-      <b-dropdown
+      <EpDropdown
         v-if="isEditing"
-        :text="$t('lisaa-sisaltoalue')"
-        variant="primary"
       >
-        <b-dropdown-item-button
+        <template #button-content>
+          <ep-button variant="primary">
+            {{ $t('lisaa-sisaltoalue') }}
+          </ep-button>
+        </template>
+        <EpDropdownItem
           v-for="(sisaltoalue, index) in sisaltoalueetValinnat"
           :key="index+'addSisaltoalue'"
           :disabled="sisaltoalue.valittu"
           @click="lisaaSisaltoalue(sisaltoalue)"
         >
           {{ $kaanna(sisaltoalue.nimi) }}
-        </b-dropdown-item-button>
-      </b-dropdown>
+        </EpDropdownItem>
+      </EpDropdown>
     </template>
 
     <h4 class="mt-4">
@@ -226,22 +232,22 @@
       {{ $kaanna(model.arvioinninOtsikko) }}
     </h4>
 
-    <b-row class="mt-4 border-bottom-2 mx-1">
-      <b-col cols="4">
+    <div class="flex flex-wrap gap-4 mt-4 border-bottom-2 mx-1">
+      <div class="w-1/3">
         <h5>{{ $t('arviointitaulukko-arvosana-otsikko') }}</h5>
-      </b-col>
-      <b-col cols="8">
+      </div>
+      <div class="w-2/3">
         <h5>{{ $t('arviointitaulukko-osaaminen-otsikko') }}</h5>
-      </b-col>
-    </b-row>
+      </div>
+    </div>
 
     <template v-if="isEditing">
-      <b-row
+      <div
         v-for="(arvioinninkohde, index) in model.arvioinninkohteet"
         :key="'arvio'+index"
-        class="mt-2 mx-1 py-2 border-bottom"
+        class="flex flex-wrap gap-4 mt-2 mx-1 py-2 border-bottom"
       >
-        <b-col cols="4">
+        <div class="w-1/3">
           <ep-select
             v-model="arvioinninkohde.arvosana"
             :items="arvosanat"
@@ -254,14 +260,14 @@
               {{ $t('osaamisen-kuvaus-arvosanalle_' + item) }}
             </template>
           </ep-select>
-        </b-col>
-        <b-col cols="7">
+        </div>
+        <div class="flex-[7] min-w-0">
           <ep-input
             v-model="arvioinninkohde.osaamisenKuvaus"
             :is-editing="isEditing"
           />
-        </b-col>
-        <b-col
+        </div>
+        <div
           cols="1"
           class="text-center"
         >
@@ -276,23 +282,23 @@
               delete
             </EpMaterialIcon>
           </div>
-        </b-col>
-      </b-row>
+        </div>
+      </div>
     </template>
 
     <template v-else>
-      <b-row
+      <div
         v-for="(arvioinninkohde, index) in arvioinninKohteetSorted"
         :key="'arvio'+index"
-        class="mt-2 mx-1 py-2 listaus"
+        class="flex flex-wrap gap-4 mt-2 mx-1 py-2 listaus"
       >
-        <b-col cols="4">
+        <div class="w-1/3">
           <div>{{ $t('osaamisen-kuvaus-arvosanalle_' + arvioinninkohde.arvosana) }}</div>
-        </b-col>
-        <b-col cols="7">
+        </div>
+        <div class="flex-[7] min-w-0">
           {{ $kaanna(arvioinninkohde.osaamisenKuvaus) }}
-        </b-col>
-      </b-row>
+        </div>
+      </div>
     </template>
 
     <ep-button
@@ -323,7 +329,7 @@
 
     <div
       v-if="isEditing"
-      class="text-right"
+      class="text-right mt-4"
     >
       <ep-button
         variant="link"
@@ -346,9 +352,11 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { EpDropdown, EpDropdownItem } from '@shared/components/EpDropdown';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
 import { $kaanna } from '@shared/utils/globals';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 interface OppiaineenTavoiteSupportData {
   kohdealueet: any[];

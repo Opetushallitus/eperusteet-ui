@@ -12,14 +12,14 @@
         <div
           v-for="(tiedote, index) in viimeisimmatTiedotteet"
           :key="index"
-          class="row justify-content-center text-left"
+          class="flex justify-center text-left"
         >
-          <div class="col-2">
+          <div class="w-1/6 shrink-0">
             {{ $sd(tiedote.muokattu) }}
           </div>
           <div
-            class="col-8 otsikko"
-            :class="{'font-weight-bold': tiedote.uusi}"
+            class="w-2/3 otsikko"
+            :class="{'font-semibold': tiedote.uusi}"
           >
             {{ $kaanna(tiedote.otsikko) }}
           </div>

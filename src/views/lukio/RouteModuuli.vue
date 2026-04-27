@@ -16,95 +16,70 @@
     </template>
 
     <template #default="{ data, isEditing }">
-      <b-row>
-        <b-col
+      <div class="flex flex-wrap gap-2">
+        <div
           v-if="isEditing"
-          cols="8"
-          class="mb-3"
+          class="flex-[8] min-w-0 mb-3"
         >
-          <b-form-group :label="$t('moduulin-nimi')">
+          <EpFormGroup :label="$t('moduulin-nimi')">
             <ep-koodisto-select
               v-model="data.koodi"
               :store="koodisto"
               :is-editing="isEditing"
               :nayta-arvo="false"
-            >
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled
-                  />
-                  <b-input-group-append>
-                    <b-button
-                      variant="primary"
-                      @click="open"
-                    >
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-            </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
+            />
+          </EpFormGroup>
+        </div>
 
-        <b-col cols="3">
-          <b-form-group :label="$t('koodi')">
+        <div class="w-1/4">
+          <EpFormGroup :label="$t('koodi')">
             <span v-if="data.koodi">
               {{ data.koodi.arvo }}
             </span>
-          </b-form-group>
-        </b-col>
+          </EpFormGroup>
+        </div>
+      </div>
 
-        <b-col
-          :cols="isEditing ? 12 : 3"
-          class="mb-3"
-        >
-          <b-form-group>
-            <template #label>
-              <div class="d-flex">
-                <div>{{ $t('tyyppi') }}</div>
-                <EpInfoPopover
-                  v-if="isEditing"
-                  class="ml-2"
-                >
-                  {{ $t('ohje-moduuli-pakollinen') }}
-                </EpInfoPopover>
-              </div>
-            </template>
-            <template v-if="isEditing">
-              <EpRadio
-                v-model="data.pakollinen"
-                :value="true"
-                :label="$t('pakollinen')"
-                name="moduulipakollinen"
-              />
-              <EpRadio
-                v-model="data.pakollinen"
-                :value="false"
-                :label="$t('valinnainen')"
-                name="moduulipakollinen"
-              />
-            </template>
-            <div v-else-if="data.pakollinen">
-              {{ $t('pakollinen') }}
+        <EpFormGroup :class="[isEditing ? 'w-full' : 'w-1/4', 'mb-2']">
+          <template #label>
+            <div class="flex">
+              <div>{{ $t('tyyppi') }}</div>
+              <EpInfoPopover
+                v-if="isEditing"
+                class="ml-2"
+              >
+                {{ $t('ohje-moduuli-pakollinen') }}
+              </EpInfoPopover>
             </div>
-            <div v-else-if="!data.pakollinen">
-              {{ $t('valinnainen') }}
-            </div>
-          </b-form-group>
-        </b-col>
+          </template>
+          <template v-if="isEditing">
+            <EpRadio
+              v-model="data.pakollinen"
+              :value="true"
+              :label="$t('pakollinen')"
+              name="moduulipakollinen"
+            />
+            <EpRadio
+              v-model="data.pakollinen"
+              :value="false"
+              :label="$t('valinnainen')"
+              name="moduulipakollinen"
+            />
+          </template>
+          <div v-else-if="data.pakollinen">
+            {{ $t('pakollinen') }}
+          </div>
+          <div v-else-if="!data.pakollinen">
+            {{ $t('valinnainen') }}
+          </div>
+        </EpFormGroup>
 
-        <b-col
-          cols="2"
-          class="mb-3"
-        >
-          <b-form-group>
+        <div class="w-1/6 mb-3">
+          <EpFormGroup>
             <template #label>
               {{ $t('laajuus') }}
             </template>
-            <div class="d-flex align-items-center">
+            <div class="flex items-center">
               <ep-input
                 v-model="data.laajuus"
                 type="number"
@@ -114,11 +89,11 @@
                 {{ $t('opintopiste') }}
               </div>
             </div>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      <!-- </div> -->
 
-      <b-form-group>
+      <EpFormGroup>
         <template
           v-if="isEditing"
           #label
@@ -130,7 +105,7 @@
           layout="normal"
           :is-editable="isEditing"
         />
-      </b-form-group>
+      </EpFormGroup>
 
       <hr>
 
@@ -144,9 +119,9 @@
         </template>
 
         <template v-if="isEditing">
-          <div class="row">
-            <div class="col-11">
-              <div class="mb-2 font-weight-bold">
+          <div class="flex flex-wrap gap-4">
+            <div class="flex-[11] min-w-0">
+              <div class="mb-2 font-semibold">
                 {{ $t('kohde') }}
               </div>
               <ep-input
@@ -156,7 +131,7 @@
             </div>
           </div>
 
-          <div class="mb-2 mt-3 font-weight-bold">
+          <div class="mb-2 mt-3 font-semibold">
             {{ $t('tavoitteet') }}
           </div>
           <VueDraggable
@@ -167,31 +142,31 @@
             <div
               v-for="(tavoite, tavoiteindex) in data.tavoitteet.tavoitteet"
               :key="'tavoitteet' +tavoiteindex"
-              class="row mb-2"
+              class="flex mb-2"
             >
-              <div class="col-11">
+              <!-- <div class="flex-[11] min-w-0"> -->
                 <EpInput
                   v-model="data.tavoitteet.tavoitteet[tavoiteindex]"
                   :is-editing="true"
                   class="input-wrapper"
                 >
                   <template #left>
-                    <div class="order-handle m-2">
+                    <div class="order-handle m-1">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
                   </template>
                 </EpInput>
-              </div>
-              <div class="col-1">
+              <!-- </div> -->
+              <!-- <div class="flex-1 min-w-0"> -->
                 <div
-                  class="default-icon clickable mt-2"
+                  class="default-icon clickable mt-1 ml-2"
                   @click="poistaTavoite(tavoite)"
                 >
                   <EpMaterialIcon icon-shape="outlined">
                     delete
                   </EpMaterialIcon>
                 </div>
-              </div>
+              <!-- </div> -->
             </div>
           </VueDraggable>
 
@@ -206,7 +181,7 @@
         </template>
 
         <template v-else>
-          <div class="font-weight-bold">
+          <div class="font-semibold">
             {{ $kaanna(data.tavoitteet.kohde) }}
           </div>
           <ul>
@@ -241,14 +216,14 @@
               :key="'sisalto'+sisaltoIndex"
               class="mt-4 p-2 tavoitealue editing"
             >
-              <div class="d-flex">
+              <div class="flex">
                 <div class="order-handle m-2">
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
-                <div class="mt-2 w-100">
-                  <div class="row">
-                    <div class="col-11">
-                      <div class="mb-2 font-weight-bold">
+                <div class="mt-2 w-full">
+                  <div class="flex flex-wrap gap-4">
+                    <div class="flex-[11] min-w-0">
+                      <div class="mb-2 font-semibold">
                         {{ $t('kohde') }}
                       </div>
                       <ep-input
@@ -258,7 +233,7 @@
                     </div>
                   </div>
 
-                  <div class="mt-3 mb-2 font-weight-bold">
+                  <div class="mt-3 mb-2 font-semibold">
                     {{ $t('sisallot') }}
                   </div>
                   <EpTavoitealueTavoitteet v-model="sisaltoalue.sisallot">
@@ -269,7 +244,7 @@
                         class="input-wrapper"
                       >
                         <template #left>
-                          <div class="order-handle m-2">
+                          <div class="order-handle m-1">
                             <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                           </div>
                         </template>
@@ -281,7 +256,7 @@
                     <template #footer>
                       <EpButton
                         icon="delete"
-                        class="mr-5"
+                        class="mr-1"
                         variant="link"
                         @click="poistaSisaltoalue(sisaltoalue)"
                       >
@@ -310,7 +285,7 @@
             :key="'sisalto'+sisaltoIndex"
             class="tavoitealue"
           >
-            <div class="font-weight-bold">
+            <div class="font-semibold">
               {{ $kaanna(sisalto.kohde) }}
             </div>
             <ul>
@@ -337,6 +312,8 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';

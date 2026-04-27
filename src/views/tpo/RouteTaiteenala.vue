@@ -20,9 +20,12 @@
     </template>
 
     <template #default="{ data, isEditing }">
-      <b-row v-if="isEditing">
-        <b-col cols="11">
-          <b-form-group :label="$t('taiteenala') + ' *'">
+      <div
+        v-if="isEditing"
+        class="flex flex-wrap gap-4"
+      >
+        <div class="flex-[11] min-w-0">
+          <EpFormGroup :label="$t('taiteenala')" required>
             <ep-koodisto-select
               v-model="data.koodi"
               :store="koodisto"
@@ -30,27 +33,28 @@
               :nayta-arvo="false"
             >
               <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
+                <EpInputGroup>
+                  <ep-input
+                    :model-value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
+                    :is-editing="true"
                     disabled
                   />
-                  <b-input-group-append>
-                    <b-button
+                  <template #append>
+                    <ep-button
                       variant="primary"
                       @click="open"
                     >
                       {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
+                    </ep-button>
+                  </template>
+                </EpInputGroup>
               </template>
             </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <div class="col-11 pl-0">
+      <div class="flex-[11] min-w-0 pl-0">
         <h4
           v-if="isEditing"
           class="mt-4"
@@ -94,6 +98,8 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';

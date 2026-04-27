@@ -1,55 +1,48 @@
 <template>
   <div class="mt-5">
-    <div class="d-flex align-items-sm-center justify-content-sm-between flex-sm-row flex-column mb-1">
-      <div class="d-flex">
-        <h2 class="m-0">
+    <div class="flex sm:items-center sm:justify-between flex-col sm:flex-row mb-1">
+      <div class="flex">
+        <h2 class="!m-0">
           {{ $t('arviointiasteikot') }}
         </h2>
         <EpInfoPopover class="ml-3">
           {{ $t('arviointiasteikot-muokkaus-huomio-teksti') }}
         </EpInfoPopover>
       </div>
-      <div class="mt-sm-0 mt-3">
-        <div>
-          <ep-button
-            v-if="!isEditing"
-            v-oikeustarkastelu="{oikeus:'hallinta'}"
-            variant="link"
-            icon="edit"
-            class="mt-sm-0 mt-3"
-            @click="toggleEdit()"
-          >
-            {{ $t('muokkaa') }}
-          </ep-button>
-          <ep-button
-            v-if="!isEditing"
-            v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
-            variant="link"
-            icon="add"
-            class="mt-sm-0 mt-3"
-            @click="lisaaArviointiasteikko()"
-          >
-            {{ $t('lisaa-uusi') }}
-          </ep-button>
-        </div>
-        <div>
-          <ep-button
-            v-if="isEditing"
-            variant="link"
-            @click="toggleEdit()"
-          >
-            {{ $t('peruuta') }}
-          </ep-button>
-          <ep-button
-            v-if="isEditing"
-            class="ml-2"
-            variant="primary"
-            :show-spinner="isSaving"
-            @click="saveArviointiAsteikko()"
-          >
-            {{ $t('tallenna') }}
-          </ep-button>
-        </div>
+      <div class="flex gap-4 items-center">
+        <ep-button
+          v-if="!isEditing"
+          v-oikeustarkastelu="{oikeus:'hallinta'}"
+          variant="link"
+          icon="edit"
+          @click="toggleEdit()"
+        >
+          {{ $t('muokkaa') }}
+        </ep-button>
+        <ep-button
+          v-if="!isEditing"
+          v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
+          variant="link"
+          icon="add"
+          @click="lisaaArviointiasteikko()"
+        >
+          {{ $t('lisaa-uusi') }}
+        </ep-button>
+        <ep-button
+          v-if="isEditing"
+          variant="link"
+          @click="toggleEdit()"
+        >
+          {{ $t('peruuta') }}
+        </ep-button>
+        <ep-button
+          v-if="isEditing"
+          variant="primary"
+          :show-spinner="isSaving"
+          @click="saveArviointiAsteikko()"
+        >
+          {{ $t('tallenna') }}
+        </ep-button>
       </div>
     </div>
     <div class="taso-wrapper">
@@ -60,7 +53,7 @@
           class="asteikko mt-4"
         >
           <span class="text-nowrap">
-            <div class="d-flex align-text-top justify-content-between">
+            <div class="flex align-text-top justify-between">
               <h3>{{ $t('arviointiasteikko') + ' ' + (idx+1) }}</h3>
               <ep-button
                 v-if="isEditing"
@@ -85,10 +78,10 @@
                 </template>
                 <div
                   v-else
-                  class="d-flex w-100 align-items-end"
+                  class="flex w-full items-end"
                 >
-                  <b-form-group
-                    class="w-50"
+                  <EpFormGroup
+                    class="w-1/2"
                     :label="$t('osaamistaso') + ' ' + (index + 1)"
                   >
                     <ep-input
@@ -96,9 +89,9 @@
                       :name="$t('osaamistaso')"
                       :is-editing="true"
                     />
-                  </b-form-group>
+                  </EpFormGroup>
 
-                  <b-form-group class="w-40">
+                  <EpFormGroup class="w-2/5 ml-3">
                     <ep-koodisto-select
                       v-model="taso.koodi"
                       :store="koodisto"
@@ -106,25 +99,26 @@
                       :nayta-arvo="true"
                     >
                       <template #default="{ open }">
-                        <b-input-group>
-                          <b-form-input
-                            :value="taso.koodi ? $kaanna(taso.koodi.nimi) : ''"
+                        <EpInputGroup :disabled="true">
+                          <ep-input
+                            :model-value="taso.koodi ? $kaanna(taso.koodi.nimi) : ''"
+                            :is-editing="true"
                             disabled
                           />
-                          <b-input-group-append>
-                            <b-button
+                          <template #append>
+                            <ep-button
                               variant="primary"
                               @click="open"
                             >
                               {{ $t('hae-koodistosta') }}
-                            </b-button>
-                          </b-input-group-append>
-                        </b-input-group>
+                            </ep-button>
+                          </template>
+                        </EpInputGroup>
                       </template>
                     </ep-koodisto-select>
-                  </b-form-group>
+                  </EpFormGroup>
 
-                  <b-form-group>
+                  <EpFormGroup>
                     <div
                       v-oikeustarkastelu="{oikeus:'hallinta', kohde:'pohja'}"
                       class="default-icon clickable mb-2 ml-4"
@@ -132,7 +126,7 @@
                     >
                       <EpMaterialIcon icon-shape="outlined">delete</EpMaterialIcon>
                     </div>
-                  </b-form-group>
+                  </EpFormGroup>
                 </div>
               </div>
               <ep-button
@@ -168,6 +162,8 @@ import _ from 'lodash';
 import VueScrollTo from 'vue-scrollto';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import { $t, $success, $fail, $kaanna } from '@shared/utils/globals';
 
 const props = defineProps<{

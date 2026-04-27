@@ -8,7 +8,7 @@
       label-remove-confirm="vahvista-tekstikappaleen-poisto"
     >
       <template #header="{ data }">
-        <h2 class="m-0">
+        <h2 class="!m-0">
           <template v-if="data.koodi">
             {{ $kaanna(data.koodi.nimi) }}
           </template>
@@ -23,7 +23,7 @@
       <template #default="{ data, isEditing, validation }">
         <div
           v-if="isEditing"
-          class="mt-1 otsikko col-11 pl-0"
+          class="mt-1 otsikko w-11/12 pl-0"
         >
           <div
             v-if="osaamisalat.length > 0 || tutkintonimikkeet.length > 0"
@@ -57,16 +57,20 @@
             v-if="tekstikappaleTyyppi === 'osaamisala'"
             class="mb-4"
           >
-            <div class="d-flex">
+            <div class="flex">
               <h3>{{ $t('osaamisala') }}</h3>
-              <EpMaterialIcon
-                v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"
-                class="ml-2"
-                icon-shape="outlined"
-                size="20px"
-              >
-                info
-              </EpMaterialIcon>
+              <EpPopover :triggers="['hover']">
+                <template #trigger>
+                  <EpMaterialIcon
+                    class="ml-2"
+                    icon-shape="outlined"
+                    size="20px"
+                  >
+                    info
+                  </EpMaterialIcon>
+                </template>
+                {{ $t('valintaa-kaytetaan-tekstikappaleen-otsikkona') }}
+              </EpPopover>
             </div>
             <EpMultiSelect
               v-model="data.osaamisala"
@@ -89,16 +93,20 @@
             v-if="tekstikappaleTyyppi === 'tutkintonimike'"
             class="mb-4"
           >
-            <div class="d-flex">
+            <div class="flex">
               <h3>{{ $t('tutkintonimike') }}</h3>
-              <EpMaterialIcon
-                v-b-popover="{content: $t('valintaa-kaytetaan-tekstikappaleen-otsikkona'), trigger: 'hover', placement: 'top', variant: 'primary'}"
-                class="ml-2"
-                icon-shape="outlined"
-                size="20px"
-              >
-                info
-              </EpMaterialIcon>
+              <EpPopover :triggers="['hover']">
+                <template #trigger>
+                  <EpMaterialIcon
+                    class="ml-2"
+                    icon-shape="outlined"
+                    size="20px"
+                  >
+                    info
+                  </EpMaterialIcon>
+                </template>
+                {{ $t('valintaa-kaytetaan-tekstikappaleen-otsikkona') }}
+              </EpPopover>
             </div>
             <EpMultiSelect
               v-model="data.tutkintonimike"
@@ -129,24 +137,7 @@
                 :koodisto="data.koodi.koodisto"
                 :is-editing="isEditing"
                 :nayta-arvo="false"
-              >
-                <template #default="{ open }">
-                  <b-input-group>
-                    <b-form-input
-                      :value="data.koodi ? ($kaanna(data.koodi.nimi) + ' (' + data.koodi.arvo + ')') : ''"
-                      disabled
-                    />
-                    <b-input-group-append>
-                      <b-button
-                        variant="primary"
-                        @click="open"
-                      >
-                        {{ $t('hae-koodistosta') }}
-                      </b-button>
-                    </b-input-group-append>
-                  </b-input-group>
-                </template>
-              </ep-koodisto-select>
+              />
             </template>
             <template v-else>
               <h3>{{ $t('otsikko') }}</h3>
@@ -166,14 +157,14 @@
           </ep-toggle>
         </div>
 
-        <div class="col-11 pl-0">
-          <b-form-group
+        <div class="w-11/12 pl-0">
+          <ep-form-group
             v-if="data.koodi && data.koodi.arvo && !isEditing"
             class="mb-4"
             :label="$t('koodi')"
           >
             {{ data.koodi.arvo }}
-          </b-form-group>
+          </ep-form-group>
 
           <div :class="{ 'mt-4': isEditing }">
             <EpContent
@@ -203,9 +194,13 @@ import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import * as _ from 'lodash';
 import { Murupolku } from '@shared/stores/murupolku';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import EpPopover from '@shared/components/EpPopover/EpPopover.vue';
+import { $t, $kaanna } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;

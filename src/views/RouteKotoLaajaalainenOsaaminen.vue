@@ -7,38 +7,38 @@
     <template #header="{ data }">
       <h2
         v-if="data.nimi"
-        class="m-0"
+        class="!m-0"
       >
         {{ $kaanna(data.nimi) }}
       </h2>
       <h2
         v-else
-        class="m-0"
+        class="!m-0"
       >
         {{ $t('nimeton-opinto') }}
       </h2>
     </template>
     <template #default="{ data, isEditing }">
-      <b-row
+      <div
         v-if="isEditing"
-        class="mb-4"
+        class="flex flex-wrap gap-4 mb-4"
       >
-        <b-col lg="8">
-          <b-form-group
-            :label="$t('otsikko') + (isEditing ? ' *' : '')"
+        <div class="lg:w-2/3">
+          <EpFormGroup
+            :label="$t('otsikko')"
             required
           >
             <ep-input
               v-model="data.nimi"
               :is-editing="isEditing"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row>
-        <b-col lg="8">
-          <b-form-group required>
+      <div class="flex flex-wrap gap-4">
+        <div class="lg:w-2/3">
+          <EpFormGroup required>
             <template
               v-if="isEditing"
               #label
@@ -52,31 +52,30 @@
               :kasite-handler="kasiteHandler"
               :kuva-handler="kuvaHandler"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row
+      <div
         v-if="data.osaamisAlueet.length > 0"
-        class="mt-4"
+        class="flex flex-wrap gap-4 mt-4"
       >
-        <b-col lg="8">
+        <div class="lg:w-2/3">
           <div
             v-for="(osaamisalue, index) in data.osaamisAlueet"
             :key="index+'kotoLaajaAlainenOsaaminen'"
           >
-            <div class="mt-4">
-              <span>
-                <h3 class="d-inline">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
-                <b-button
-                  v-if="isEditing"
-                  variant="link"
-                  @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)"
-                >
-                  <EpMaterialIcon>delete</EpMaterialIcon>
-                  {{ $t('poista') }}
-                </b-button>
-              </span>
+            <div class="flex items-center justify-between mb-1 mt-5">
+              <h3 class="inline !mb-0">{{ $kaanna(osaamisalue.koodi.nimi) }}</h3>
+              <ep-button
+                v-if="isEditing"
+                class="ml-2"
+                variant="link"
+                icon="delete"
+                @click.stop="removeLaajaAlainenOsaaminen(index, osaamisalue.koodi.arvo)"
+              >
+                {{ $t('poista') }}
+              </ep-button>
             </div>
             <ep-content
               v-model="osaamisalue.kuvaus"
@@ -84,28 +83,31 @@
               :is-editable="isEditing"
             />
           </div>
-        </b-col>
-      </b-row>
+        </div>
+      </div>
 
-      <b-row class="mt-4">
-        <b-col lg="8">
-          <b-dropdown
+      <div class="flex flex-wrap gap-4 mt-4">
+        <div class="lg:w-2/3">
+          <EpDropdown
             v-if="isEditing"
-            :text="$t('lisaa-laaja-alainen-osaaminen')"
-            variant="primary"
             class="mb-4"
           >
-            <b-dropdown-item-button
+            <template #button-content>
+              <ep-button variant="primary">
+                {{ $t('lisaa-laaja-alainen-osaaminen') }}
+              </ep-button>
+            </template>
+            <EpDropdownItem
               v-for="(laajaAlainenKoodi, index) in laajaAlaisetKoodit"
               :key="index+'addlaaja'"
               :disabled="laajaAlainenKoodi.isAlreadySelected"
               @click="addLaajaAlainenOsaaminen(laajaAlainenKoodi)"
             >
               {{ laajaAlainenKoodi.arvo + '. ' + $kaanna(laajaAlainenKoodi.nimi) }}
-            </b-dropdown-item-button>
-          </b-dropdown>
-        </b-col>
-      </b-row>
+            </EpDropdownItem>
+          </EpDropdown>
+        </div>
+      </div>
     </template>
   </EpEditointi>
   <EpSpinner v-else />
@@ -118,7 +120,9 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
+import { EpDropdown, EpDropdownItem } from '@shared/components/EpDropdown';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
@@ -129,6 +133,7 @@ import { Koodisto } from '@shared/api/eperusteet';
 import * as _ from 'lodash';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna, $vahvista } from '@shared/utils/globals';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
 
 interface LaajaaAlainenOsaaminenKoodi {
   nimi: { [locale: string]: string };
@@ -168,7 +173,6 @@ onMounted(async () => {
 
     laajaAlaisetKoodit.value = koodit
       .sort(x => parseInt(x.koodiArvo!))
-      .reverse()
       .map(koodi => ({
         uri: koodi.koodiUri!,
         arvo: koodi.koodiArvo!,

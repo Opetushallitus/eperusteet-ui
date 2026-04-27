@@ -1,6 +1,6 @@
 <template>
-  <EpMainView>
-    <b-container>
+  <EpMainView container>
+    <div class="w-full">
       <EpSteps
         :steps="steps"
         :initial-step="0"
@@ -8,12 +8,12 @@
         @cancel="onCancel"
       >
         <template #pohja>
-          <div class="row">
-            <legend class="col-form-label col-sm-2">
+          <div class="flex flex-wrap gap-4">
+            <legend class="sm:w-1/6 mb-2">
               {{ $t('kayta-pohjana') }}
             </legend>
-            <div class="col-sm-10 mb-4">
-              <b-form-group class="mt-0 pt-0">
+            <div class="sm:w-5/6 mb-4">
+              <EpFormGroup class="mt-0 pt-0">
                 <EpRadio
                   v-model="tyyppi"
                   class="p-2"
@@ -52,14 +52,14 @@
                 >
                   {{ $t('luo-uusi-perustepohja') }}
                 </EpRadio>
-              </b-form-group>
+              </EpFormGroup>
             </div>
           </div>
         </template>
 
         <template #tiedot>
-          <b-form-group
-            :label="$t('projektin-nimi-label') + ' *'"
+          <EpFormGroup
+            :label="$t('projektin-nimi-label')"
             required
             class="pl-0"
           >
@@ -69,9 +69,9 @@
               :placeholder="$t('kirjoita-projektin-nimi')"
               :validation="$v.data.nimi"
             />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group
+          <EpFormGroup
             id="perustetyoryhma"
             :label="$t('perustetyoryhma')"
             required
@@ -93,11 +93,11 @@
               </template>
             </EpMultiSelect>
             <EpSpinner v-else />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group
+          <EpFormGroup
             id="koulutustutkintotyyppi"
-            :label="$t('koulutus-tutkintotyyppi') + ' *'"
+            :label="$t('koulutus-tutkintotyyppi')" required>
             required
           >
             <koulutustyyppi-select
@@ -106,14 +106,14 @@
               required
               :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
             />
-          </b-form-group>
+          </EpFormGroup>
         </template>
 
         <template #luo>
           {{ $t('luo-perustepohja') }}
         </template>
       </EpSteps>
-    </b-container>
+    </div>
   </EpMainView>
 </template>
 
@@ -144,6 +144,7 @@ import KoulutustyyppiSelect from '@shared/components/forms/EpKoulutustyyppiSelec
 import { EiTuetutKoulutustyypit, isKoulutustyyppiSupported } from '@/utils/perusteet';
 import { $t, $kaanna, $kaannaOlioTaiTeksti, $fail } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   pohjatStore: OmatPerusteetStore;

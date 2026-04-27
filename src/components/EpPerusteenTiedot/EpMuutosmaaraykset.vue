@@ -50,7 +50,7 @@
     </ep-button>
 
     <EpSpinner v-if="!muutosmaaraykset" />
-    <b-table
+    <EpTable
       v-else-if="muutosmaaraykset.length > 0"
       class="w-90 mt-3"
       :items="muutosmaaryksetSorted"
@@ -69,10 +69,10 @@
         </div>
       </template>
 
-      <template #cell(toiminnot)="{item}">
+      <template #cell(toiminnot)="{ item }">
         <div
           v-if="isEditing"
-          class="d-flex"
+          class="flex"
         >
           <EpButton
             icon="edit"
@@ -91,7 +91,7 @@
           </EpButton>
         </div>
       </template>
-    </b-table>
+    </EpTable>
 
     <EpMuutosmaaraysModal
       ref="muutosmaaraysModal"
@@ -108,16 +108,18 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { MaarayksetParams, MaaraysLiiteDtoTyyppiEnum, baseURL } from '@shared/api/eperusteet';
 import EpMuutosmaaraysModal from '@/components/EpPerusteenTiedot/EpMuutosmaaraysModal.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t, $success, $bvModal, $slang, $sd } from '@shared/utils/globals';
+import { $t, $success, $confirmModal, $slang, $sd } from '@shared/utils/globals';
+import EpPdfLink from '@shared/components/EpPdfLink/EpPdfLink.vue';
 
 const props = defineProps({
   modelValue: {
-    type: Array,
-    required: true,
+    type: [Array, null],
+    required: false,
   },
   isEditing: {
     type: Boolean,
@@ -208,7 +210,7 @@ const muokkaaMuutosmaarausta = async (muutosmaarays) => {
 };
 
 const poistaMuutosmaarays = async (muutosmaarays) => {
-  const poista = await $bvModal.msgBoxConfirm($t('poista-muutosmaarays-varmistus'), {
+  const poista = await $confirmModal.msgBoxConfirm($t('poista-muutosmaarays-varmistus'), {
     title: $t('poista-muutosmaarays'),
     okVariant: 'primary',
     okTitle: $t('poista'),

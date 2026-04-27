@@ -5,15 +5,15 @@
     :versionumero="versionumero"
   >
     <template #header="{ data }">
-      <h2 class="m-0">
+      <h2 class="!m-0">
         {{ $kaanna(data.nimiKoodi ? data.nimiKoodi.nimi : data.nimi) || $t('nimeton-koulutuksen-osa') }}
       </h2>
     </template>
     <template #default="{ data, isEditing, validation }">
-      <b-row class="mb-4">
-        <b-col>
-          <b-form-group
-            :label="$t('koulutustyyppi') + (isEditing ? ' *' : '')"
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div class="w-full">
+          <EpFormGroup
+            :label="$t('koulutustyyppi')"
             required
           >
             <p
@@ -44,13 +44,13 @@
             >
               {{ $t('ei-asetettu') }}
             </p>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row class="mb-4">
-        <b-col md="6">
-          <b-form-group
-            :label="$t('koulutuksen-osan-nimi') + (isEditing ? ' *' : '')"
+          </EpFormGroup>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div class="md:w-1/2">
+          <EpFormGroup
+            :label="$t('koulutuksen-osan-nimi')"
             required
           >
             <EpKoodistoSelect
@@ -61,27 +61,22 @@
               @add="onNimiKoodiAdd()"
             >
               <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    v-if="data.nimi && !data.nimiKoodi"
-                    class="font-italic"
-                    :value="$kaanna(data.nimi)"
+                <EpInputGroup>
+                  <ep-input
+                    :model-value="data.nimi && !data.nimiKoodi ? $kaanna(data.nimi) : (data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : '')"
+                    :is-editing="true"
+                    :class="{ 'font-italic': data.nimi && !data.nimiKoodi }"
                     disabled
                   />
-                  <b-form-input
-                    v-else
-                    :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
-                    disabled
-                  />
-                  <b-input-group-append>
-                    <b-button
+                  <template #append>
+                    <ep-button
                       variant="primary"
                       @click="open"
                     >
                       {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
+                    </ep-button>
+                  </template>
+                </EpInputGroup>
               </template>
               <template #empty>
                 <div v-if="data.nimi">
@@ -89,16 +84,16 @@
                 </div>
               </template>
             </EpKoodistoSelect>
-          </b-form-group>
-        </b-col>
-        <b-col md="4">
-          <b-form-group
-            :label="$t('laajuus') + (isEditing ? ' *' : '')"
+          </EpFormGroup>
+        </div>
+        <div class="md:w-1/3">
+          <EpFormGroup
+            :label="$t('laajuus')"
             required
           >
             <div
               v-if="isEditing || !isEditing && laajuusAnnettu"
-              class="d-flex align-items-center"
+              class="flex items-center"
             >
               <EpInput
                 v-model="data.laajuusMinimi"
@@ -123,13 +118,13 @@
             >
               {{ $t('ei-asetettu') }}
             </p>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row class="mb-4">
-        <b-col>
-          <b-form-group
-            :label="$t('opintojen-tyyppi') + (isEditing ? ' *' : '')"
+          </EpFormGroup>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div class="w-full">
+          <EpFormGroup
+            :label="$t('opintojen-tyyppi')"
             required
           >
             <template v-if="isEditing">
@@ -154,12 +149,12 @@
             >
               {{ $t('ei-asetettu') }}
             </p>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row class="mb-4">
-        <b-col md="10">
-          <b-form-group :label="$t('kuvaus')">
+          </EpFormGroup>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div class="md:w-5/6">
+          <EpFormGroup :label="$t('kuvaus')">
             <EpContent
               v-if="isEditing || !isEditing && data.kuvaus"
               v-model="data.kuvaus"
@@ -171,54 +166,54 @@
               v-if="!isEditing && !data.kuvaus"
               :text="$t('ei-sisaltoa')"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
       <hr>
-      <b-row>
-        <b-col md="10">
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-5/6">
           <h3 class="mb-4">
             {{ $t('tavoitteet') }}
           </h3>
-          <b-form-group :label="$t('opiskelija')">
+          <EpFormGroup :label="$t('opiskelija')">
             <template v-if="isEditing">
               <VueDraggable
                 v-bind="tavoitteetOptions"
                 v-model="data.tavoitteet"
                 tag="div"
               >
-                <b-row
+                <div
                   v-for="(tavoite, i) in data.tavoitteet"
                   :key="tavoite.id"
-                  class="pb-2"
+                  class="flex flex-wrap gap-4 pb-2"
                 >
-                  <b-col cols="11">
+                  <div class="flex-[11] min-w-0">
                     <EpInput
                       v-model="data.tavoitteet[i]"
                       :is-editing="isEditing"
                       :disabled="tavoite.uri !== undefined"
                     >
                       <template #left>
-                        <div class="order-handle m-2">
+                        <div class="order-handle m-1">
                           <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                         </div>
                       </template>
                     </EpInput>
-                  </b-col>
-                  <b-col
+                  </div>
+                  <div
                     v-if="isEditing"
-                    cols="1"
+                    class="w-1/12"
                   >
                     <div
-                      class="default-icon clickable mt-2"
+                      class="default-icon clickable mt-1"
                       @click="onRemoveListItem(tavoite, 'tavoitteet')"
                     >
                       <EpMaterialIcon icon-shape="outlined">
                         delete
                       </EpMaterialIcon>
                     </div>
-                  </b-col>
-                </b-row>
+                  </div>
+                </div>
               </VueDraggable>
               <EpButton
                 v-if="isEditing"
@@ -245,13 +240,13 @@
             >
               {{ $t('ei-asetettu') }}
             </p>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
       <hr>
-      <b-row>
-        <b-col md="10">
-          <b-form-group>
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-5/6">
+          <EpFormGroup>
             <template #label>
               <h3>{{ $t('laaja-alainen-osaaminen') }}</h3>
             </template>
@@ -266,13 +261,13 @@
               v-if="!isEditing && !data.laajaAlaisenOsaamisenKuvaus"
               :text="$t('ei-sisaltoa')"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
       <hr>
-      <b-row>
-        <b-col md="10">
-          <b-form-group>
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-5/6">
+          <EpFormGroup>
             <template #label>
               <h3>{{ $t('keskeinen-sisalto') }}</h3>
             </template>
@@ -287,13 +282,13 @@
               v-if="!isEditing && !data.keskeinenSisalto"
               :text="$t('ei-sisaltoa')"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
       <hr>
-      <b-row>
-        <b-col md="10">
-          <b-form-group>
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-5/6">
+          <EpFormGroup>
             <template #label>
               <h3>{{ $t('arviointi') }}</h3>
             </template>
@@ -308,9 +303,9 @@
               v-if="!isEditing && !data.arvioinninKuvaus"
               :text="$t('ei-sisaltoa')"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
     </template>
   </EpEditointi>
 </template>
@@ -339,6 +334,8 @@ import {
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;

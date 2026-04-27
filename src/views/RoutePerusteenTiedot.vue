@@ -2,358 +2,353 @@
   <div v-if="!isInitializing && store">
     <EpEditointi :store="store">
       <template #header="{ }">
-        <h2 class="m-0">
+        <h2 class="!m-0">
           {{ $t('perusteen-tiedot') }}
         </h2>
       </template>
 
       <template #default="{ data, isEditing, validation }">
-        <b-tabs>
-          <b-tab :title="$t('perustiedot')">
-            <b-container
-              fluid="xl"
-              class="perustiedot-container"
+        <Tabs value="0">
+          <TabList>
+            <Tab value="0">
+              {{ $t('perustiedot') }}
+            </Tab>
+            <Tab value="1">
+              {{ $t('liitteet-ja-maaraykset') }}
+            </Tab>
+            <Tab
+              v-if="isAmmatillinen"
+              value="2"
             >
-              <b-row no-gutters>
-                <b-col class="mb-4">
-                  <b-form-group :label="$t('perusteen-nimi') + '*'">
-                    <ep-input
-                      v-model="data.nimi"
-                      :is-editing="isEditing"
-                      :validation="validation.nimi"
-                    />
-                  </b-form-group>
-                </b-col>
-              </b-row>
-              <b-row no-gutters>
-                <b-col
-                  v-if="filtersContain('laajuus') && data.vstSisalto"
-                  lg="6"
-                  class="mb-4"
-                >
-                  <b-form-group :label="$t('laajuus')">
-                    <div class="d-flex align-items-center">
-                      <ep-input
-                        v-model="data.vstSisalto.laajuus"
-                        type="string"
-                        :is-editing="isEditing"
-                        :validation="validation.laajuus"
-                      />
-                      <div class="ml-2">
-                        {{ $t('opintopiste') }}
-                      </div>
-                    </div>
-                  </b-form-group>
-                </b-col>
-                <b-col
-                  v-if="filtersContain('diaarinumero')"
-                  lg="6"
-                  class="mb-4"
-                >
-                  <b-form-group :label="$t('diaarinumero')">
-                    <div class="d-flex">
-                      <ep-input
-                        v-model="data.diaarinumero"
-                        type="string"
-                        :is-editing="isEditing"
-                        :validation="validation.diaarinumero"
-                        class="w-80"
-                      />
-                      <EpInfoPopover
-                        v-if="isEditing"
-                        class="info ml-2"
-                        unique-id="1"
-                      >
-                        {{ $t('diaarinumeron-muoto') }}
-                      </EpInfoPopover>
-                    </div>
-                  </b-form-group>
-                </b-col>
-                <b-col
-                  v-if="filtersContain('paatospaivamaara')"
-                  lg="6"
-                  class="mb-4"
-                >
-                  <b-form-group :label="$t('maarayksen-paatospaivamaara')">
-                    <ep-datepicker
-                      v-model="data.paatospvm"
-                      :is-editing="isEditing"
-                    />
-                  </b-form-group>
-                </b-col>
-                <b-col
-                  v-if="filtersContain('voimassaolo')"
-                  lg="6"
-                  class="mb-4"
-                >
-                  <b-form-group :label="$t('voimassaolo')">
-                    <div class="d-flex align-items-center">
-                      <ep-datepicker
-                        v-model="data.voimassaoloAlkaa"
-                        :is-editing="isEditing"
-                      />
-                      <div class="ml-2 mr-2">
-                        -
-                      </div>
-                      <ep-datepicker
-                        v-model="data.voimassaoloLoppuu"
-                        :is-editing="isEditing"
-                      />
-                    </div>
-                  </b-form-group>
-                </b-col>
-                <b-col
-                  v-if="filtersContain('siirtymaPaattyy')"
-                  lg="6"
-                  class="mb-4"
-                >
-                  <b-form-group :label="$t('siirtymaajan-paattymisaika')">
-                    <ep-datepicker
-                      v-model="data.siirtymaPaattyy"
-                      :is-editing="isEditing"
-                      :help="'siirtymaajan-paattymisaika-kuvaus'"
-                    />
-                  </b-form-group>
-                </b-col>
-                <b-col
-                  v-if="filtersContain('koulutustyyppi')"
-                  lg="6"
-                  class="mb-4"
-                >
-                  <b-form-group :label="$t('koulutustyyppi')">
-                    <ep-koulutustyyppi-select
-                      v-model="data.koulutustyyppi"
-                      :koulutustyypit="valittavatKoulutustyypit"
-                      :is-editing="isEditing && (!data.koulutustyyppi || valittavatKoulutustyypit.includes(data.koulutustyyppi))"
-                    />
-                  </b-form-group>
-                </b-col>
-                <b-col
-                  v-if="filtersContain('perusteenkieli')"
-                  lg="6"
-                  class="mb-4"
-                >
-                  <b-form-group :label="$t('perusteen-kielet')">
-                    <EpToggleGroup
-                      v-model="data.kielet"
-                      :label="$t('perusteen-kielet')"
-                      :items="kielet"
-                      stacked
-                      :is-editing="isEditing"
-                    >
-                      <template #default="{ item }">
-                        {{ $t(item) }}
-                      </template>
-                    </EpToggleGroup>
-                  </b-form-group>
-                </b-col>
-                <b-col
-                  v-if="tyypinVaihtoSallittu && (isEditing || peruste.tyyppi === 'amosaayhteinen') "
-                  lg="6"
-                  class="mb-4"
-                >
-                  <b-form-group :label="$t('tyyppi')">
-                    <EpToggle
-                      v-if="isEditing"
-                      v-model="amosaaYhteinen"
-                      :label="$t('perustetyyppi-amosaa_yhteinen')"
-                    />
-                    <div v-else>
-                      {{ $t('perustetyyppi-amosaa_yhteinen') }}
-                    </div>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-
-              <b-row
-                v-if="data.kvliite"
-                no-gutters
+              {{ $t('osaamisalat-ja-tutkintonimikkeet') }}
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel value="0">
+              <div
+                class="mt-2 ml-2 xl:w-10/12"
               >
-                <b-col class="mb-4">
-                  <b-form-group>
-                    <div class="d-flex mb-2">
-                      <span class="font-weight-600">{{ $t('tutkinnon-suorittaneen-osaaminen') }}</span>
-                      <EpInfoPopover
-                        v-if="isEditing"
-                        class="ml-2"
-                        unique-id="2"
-                      >
-                        {{ $t('kentat-tulostetaan-kv-liitteelle') }}
-                      </EpInfoPopover>
-                    </div>
-                    <ep-content
-                      v-model="data.kvliite.suorittaneenOsaaminen"
-                      layout="normal"
-                      :is-editable="isEditing"
-                    />
-                  </b-form-group>
-                </b-col>
-              </b-row>
-
-              <b-row
-                v-if="data.kvliite"
-                no-gutters
-              >
-                <b-col class="mb-4">
-                  <b-form-group>
-                    <div class="d-flex mb-2">
-                      <span class="font-weight-600">{{ $t('tyotehtavat-joissa-voi-toimia') }}</span>
-                      <EpInfoPopover
-                        v-if="isEditing"
-                        class="ml-2"
-                        unique-id="3"
-                      >
-                        {{ $t('kentat-tulostetaan-kv-liitteelle') }}
-                      </EpInfoPopover>
-                    </div>
-                    <ep-content
-                      v-if="data.kvliite.tyotehtavatJoissaVoiToimia || isEditing"
-                      v-model="data.kvliite.tyotehtavatJoissaVoiToimia"
-                      layout="normal"
-                      :is-editable="isEditing"
-                    />
-                  </b-form-group>
-                </b-col>
-              </b-row>
-
-              <hr>
-
-              <b-row no-gutters>
-                <b-col class="mb-4">
-                  <b-form-group>
-                    <template #label>
-                      <h3>{{ $t('peruste-koulutukset') }}</h3>
-                    </template>
-                    <b-table
-                      striped
-                      show-empty
-                      :items="data.koulutukset"
-                      :fields="koulutuksetFields"
-                      :empty-text="$t('ei-koulutuskoodeja') "
-                    >
-                      <template #empty="">
-                        <h4>{{ $t('ei-koulutuskoodeja') }}</h4>
-                      </template>
-                      <template #cell(koodi)="data">
-                        <span class="font-weight-bold">{{ data.item.koulutuskoodiArvo }}</span>
-                      </template>
-                      <template #cell(nimi)="data">
-                        {{ $kaanna(data.item.nimi) }}
-                      </template>
-                      <template #cell(poista)="data">
-                        <div
+                <EpFormGroup
+                  :label="$t('perusteen-nimi') + '*'"
+                >
+                  <ep-input
+                    v-model="data.nimi"
+                    :is-editing="isEditing"
+                    :validation="validation.nimi"
+                  />
+                </EpFormGroup>
+                <div class="flex flex-wrap justify-between">
+                  <div
+                    v-if="filtersContain('diaarinumero')"
+                    class="mb-4"
+                  >
+                    <EpFormGroup :label="$t('diaarinumero')">
+                      <div class="flex w-[300px]">
+                        <ep-input
+                          v-model="data.diaarinumero"
+                          class="!w-[225px]"
+                          type="string"
+                          :is-editing="isEditing"
+                          :validation="validation.diaarinumero"
+                        />
+                        <EpInfoPopover
                           v-if="isEditing"
-                          class="default-icon clickable"
-                          @click="poistaKoulutusKoodi(data)"
+                          class="info ml-2"
                         >
-                          <EpMaterialIcon>delete</EpMaterialIcon>
+                          {{ $t('diaarinumeron-muoto') }}
+                        </EpInfoPopover>
+                      </div>
+                    </EpFormGroup>
+                  </div>
+                  <div
+                    v-if="filtersContain('laajuus') && data.vstSisalto"
+                    class="xl:w-1/6 mb-4"
+                  >
+                    <EpFormGroup :label="$t('laajuus')" >
+                      <div class="flex items-center">
+                        <ep-input
+                          v-model="data.vstSisalto.laajuus"
+                          type="string"
+                          :is-editing="isEditing"
+                          :validation="validation.laajuus"
+                        />
+                        <div class="ml-2">
+                          {{ $t('opintopiste') }}
                         </div>
-                      </template>
-                    </b-table>
-                    <ep-koodisto-select
-                      v-if="isEditing"
-                      :store="koulutuskoodisto"
-                      @add="addKoulutuskoodi(data, $event)"
-                    >
-                      <template #default="{ open }">
-                        <ep-button
-                          icon="add"
-                          variant="outline"
-                          @click="open"
-                        >
-                          {{ $t('lisaa-koulutus') }}
-                        </ep-button>
-                      </template>
-                    </ep-koodisto-select>
-                  </b-form-group>
-                </b-col>
-              </b-row>
+                      </div>
+                    </EpFormGroup>
+                  </div>
+                  <div
+                    v-if="filtersContain('paatospaivamaara')"
+                    class="xl:w-1/3 w-full mb-4"
+                  >
+                    <EpFormGroup :label="$t('maarayksen-paatospaivamaara')">
+                      <ep-datepicker
+                        v-model="data.paatospvm"
+                        :is-editing="isEditing"
+                      />
+                    </EpFormGroup>
+                  </div>
+                  <div
+                    v-if="filtersContain('voimassaolo')"
+                    class="xl:w-1/2 w-full mb-4"
+                  >
+                    <EpFormGroup :label="$t('voimassaolo')">
+                      <div class="flex items-center">
+                        <ep-datepicker
+                          v-model="data.voimassaoloAlkaa"
+                          :is-editing="isEditing"
+                        />
+                        <div class="ml-2 mr-2">
+                          -
+                        </div>
+                        <ep-datepicker
+                          v-model="data.voimassaoloLoppuu"
+                          :is-editing="isEditing"
+                        />
+                      </div>
+                    </EpFormGroup>
+                  </div>
+                  <div
+                    v-if="filtersContain('siirtymaPaattyy')"
+                    class="xl:w-1/3 mb-4 w-full"
+                  >
+                    <EpFormGroup :label="$t('siirtymaajan-paattymisaika')">
+                      <ep-datepicker
+                        v-model="data.siirtymaPaattyy"
+                        :is-editing="isEditing"
+                        :help="'siirtymaajan-paattymisaika-kuvaus'"
+                      />
+                    </EpFormGroup>
+                  </div>
+                  <div
+                    v-if="filtersContain('koulutustyyppi')"
+                    class="xl:w-1/2 mb-4"
+                  >
+                    <EpFormGroup :label="$t('koulutustyyppi')">
+                      <ep-koulutustyyppi-select
+                        v-model="data.koulutustyyppi"
+                        :koulutustyypit="valittavatKoulutustyypit"
+                        :is-editing="isEditing && (!data.koulutustyyppi || valittavatKoulutustyypit.includes(data.koulutustyyppi))"
+                      />
+                    </EpFormGroup>
+                  </div>
+                  <div
+                    v-if="filtersContain('perusteenkieli')"
+                    class="xl:w-1/3 mb-4"
+                  >
+                    <EpFormGroup :label="$t('perusteen-kielet')">
+                      <EpToggleGroup
+                        v-model="data.kielet"
+                        :label="$t('perusteen-kielet')"
+                        :items="kielet"
+                        stacked
+                        :is-editing="isEditing"
+                      >
+                        <template #default="{ item }">
+                          {{ $t(item) }}
+                        </template>
+                      </EpToggleGroup>
+                    </EpFormGroup>
+                  </div>
+                  <div
+                    v-if="tyypinVaihtoSallittu && (isEditing || peruste.tyyppi === 'amosaayhteinen') "
+                    class="xl:w-1/2 mb-4"
+                  >
+                    <EpFormGroup :label="$t('tyyppi')">
+                      <EpToggle
+                        v-if="isEditing"
+                        v-model="amosaaYhteinen"
+                        :label="$t('perustetyyppi-amosaa_yhteinen')"
+                      />
+                      <div v-else>
+                        {{ $t('perustetyyppi-amosaa_yhteinen') }}
+                      </div>
+                    </EpFormGroup>
+                  </div>
+                </div>
 
-              <b-row no-gutters>
-                <b-col class="mb-4">
-                  <b-form-group>
-                    <template #label>
-                      <h3>{{ $t('korvattavat-perusteet') }}</h3>
-                    </template>
-                    <b-table
-                      v-if="korvattavatDiaarinumerot && korvattavatDiaarinumerot.length > 0"
-                      :items="korvattavatDiaarinumerot"
-                      :fields="korvattavatFields"
-                      responsive
-                      borderless
-                      striped
-                      fixed
-                      hover
+                <EpFormGroup
+                  v-if="data.kvliite"
+                  class="mb-4"
+                >
+                  <div class="flex mb-2">
+                    <span class="font-semibold">{{ $t('tutkinnon-suorittaneen-osaaminen') }}</span>
+                    <EpInfoPopover
+                      v-if="isEditing"
+                      class="ml-2"
+                      unique-id="2"
                     >
-                      <template #cell(diaarinumero)="data">
-                        {{ data.item }}
+                      {{ $t('kentat-tulostetaan-kv-liitteelle') }}
+                    </EpInfoPopover>
+                  </div>
+                  <ep-content
+                    v-model="data.kvliite.suorittaneenOsaaminen"
+                    layout="normal"
+                    :is-editable="isEditing"
+                  />
+                </EpFormGroup>
+
+
+                <EpFormGroup
+                  v-if="data.kvliite"
+                  class="mb-4"
+                >
+                  <div class="flex mb-2">
+                    <span class="font-semibold">{{ $t('tyotehtavat-joissa-voi-toimia') }}</span>
+                    <EpInfoPopover
+                      v-if="isEditing"
+                      class="ml-2"
+                      unique-id="3"
+                    >
+                      {{ $t('kentat-tulostetaan-kv-liitteelle') }}
+                    </EpInfoPopover>
+                  </div>
+                  <ep-content
+                    v-if="data.kvliite.tyotehtavatJoissaVoiToimia || isEditing"
+                    v-model="data.kvliite.tyotehtavatJoissaVoiToimia"
+                    layout="normal"
+                    :is-editable="isEditing"
+                  />
+                </EpFormGroup>
+
+                <hr>
+
+                <div class="flex flex-wrap gap-4">
+                  <div class="mb-4 w-full">
+                    <EpFormGroup>
+                      <template #label>
+                        <h3>{{ $t('peruste-koulutukset') }}</h3>
                       </template>
-                      <template #cell(peruste)="data">
-                        <span v-if="korvattavatPerusteet[data.item]">
-                          {{ $kaanna(korvattavatPerusteet[data.item].nimi) }}
-                        </span>
-                        <span
-                          v-else-if="korvattavatPerusteet[data.item] === null"
-                          class="font-italic"
-                        >
-                          {{ $t('ei-eperusteissa') }}
-                        </span>
-                        <ep-spinner v-else />
-                      </template>
-                      <template #cell(toiminnot)="data">
-                        <div
-                          v-if="isEditing"
-                          class="text-center"
-                        >
-                          <ep-button
-                            variant="link"
-                            icon="delete"
-                            @click="poistaKorvattava(data.item)"
+                      <EpTable
+                        class="mb-2"
+                        striped
+                        :items="data.koulutukset"
+                        :fields="koulutuksetFields"
+                      >
+                        <template #empty>
+                          <h4>{{ $t('ei-koulutuskoodeja') }}</h4>
+                        </template>
+                        <template #cell(koodi)="{ item }">
+                          <span class="font-semibold">{{ item.koulutuskoodiArvo }}</span>
+                        </template>
+                        <template #cell(nimi)="{ item }">
+                          {{ $kaanna(item.nimi) }}
+                        </template>
+                        <template #cell(poista)="{ item }">
+                          <div
+                            v-if="isEditing"
+                            class="default-icon clickable"
+                            @click="poistaKoulutusKoodi(data, { item })"
                           >
-                            {{ $t('poista') }}
+                            <EpMaterialIcon>delete</EpMaterialIcon>
+                          </div>
+                        </template>
+                      </EpTable>
+                      <ep-koodisto-select
+                        v-if="isEditing"
+                        :store="koulutuskoodisto"
+                        @add="addKoulutuskoodi(data, $event)"
+                      >
+                        <template #default="{ open }">
+                          <ep-button
+                            icon="add"
+                            variant="outline"
+                            @click="open"
+                          >
+                            {{ $t('lisaa-koulutus') }}
                           </ep-button>
-                        </div>
+                        </template>
+                      </ep-koodisto-select>
+                    </EpFormGroup>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-4 w-full">
+                  <div class="mb-4 w-full">
+                    <EpFormGroup>
+                      <template #label>
+                        <h3>{{ $t('korvattavat-perusteet') }}</h3>
                       </template>
-                    </b-table>
-                    <b-input-group v-if="isEditing">
-                      <b-form-input
-                        :value="korvattavaDiaarinumero"
-                        @input="korvattavaDiaarinumero = $event"
-                      />
-                      <b-input-group-append>
-                        <b-button
+                      <EpTable
+                        v-if="korvattavatDiaarinumerot && korvattavatDiaarinumerot.length > 0"
+                        :items="korvattavatDiaarinumerot"
+                        :fields="korvattavatFields"
+                        responsive
+                        borderless
+                        striped
+                        fixed
+                        hover
+                      >
+                        <template #cell(diaarinumero)="{ item }">
+                          {{ item }}
+                        </template>
+                        <template #cell(peruste)="{ item }">
+                          <span v-if="korvattavatPerusteet[item]">
+                            {{ $kaanna(korvattavatPerusteet[item].nimi) }}
+                          </span>
+                          <span
+                            v-else-if="korvattavatPerusteet[item] === null"
+                            class="font-italic"
+                          >
+                            {{ $t('ei-eperusteissa') }}
+                          </span>
+                          <ep-spinner v-else />
+                        </template>
+                        <template #cell(toiminnot)="{ item }">
+                          <div
+                            v-if="isEditing"
+                            class="text-center"
+                          >
+                            <ep-button
+                              variant="link"
+                              icon="delete"
+                              @click="poistaKorvattava(item)"
+                            >
+                              {{ $t('poista') }}
+                            </ep-button>
+                          </div>
+                        </template>
+                      </EpTable>
+                      <div
+                        v-if="isEditing"
+                        class="flex gap-2 items-center mt-2"
+                      >
+                        <ep-input
+                          v-model="korvattavaDiaarinumero"
+                          class="w-full"
+                          :is-editing="isEditing"
+                        />
+                        <ep-button
                           variant="primary"
                           :disabled="!korvattavaDiaarinumero"
                           @click="lisaaDiaarinumero"
                         >
                           {{ $t('lisaa-peruste') }}
-                        </b-button>
-                      </b-input-group-append>
-                    </b-input-group>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </b-container>
-          </b-tab>
-
-          <b-tab :title="$t('liitteet-ja-maaraykset')">
-            <b-container
-              fluid="xl"
-              class="perustiedot-container"
-            >
-              <div class="d-flex">
-                <h3>{{ $t('maarayskirje') }}</h3>
-                <EpInfoPopover
-                  v-if="isEditing"
-                  class="ml-2"
-                  unique-id="4"
-                >
-                  {{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}
-                </EpInfoPopover>
+                        </ep-button>
+                      </div>
+                    </EpFormGroup>
+                  </div>
+                </div>
               </div>
+            </TabPanel>
 
-              <b-row no-gutters>
-                <b-col class="mb-4">
+            <TabPanel value="1">
+              <div
+                class="w-10/12 perustiedot-container"
+              >
+                <div class="flex">
+                  <h3>{{ $t('maarayskirje') }}</h3>
+                  <EpInfoPopover
+                    v-if="isEditing"
+                    class="ml-2"
+                    unique-id="4"
+                  >
+                    {{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}
+                  </EpInfoPopover>
+                </div>
+
+                <div class="mb-4">
                   <EpSpinner v-if="maarayskirjeFile" />
 
                   <ep-tiedosto-lataus
@@ -363,9 +358,9 @@
                     :as-binary="true"
                   />
 
-                  <b-table
+                  <EpTable
                     v-if="maarayskirje"
-                    class="mb-2 w-90"
+                    class="mb-2"
                     :items="liitteetMaarayskirje"
                     :fields="liitetableFields"
                   >
@@ -378,7 +373,7 @@
                       >{{ item.nimi }}</a>
                       <span v-else>{{ item.nimi }}</span>
                     </template>
-                    <template #cell(toiminnot)="data">
+                    <template #cell(toiminnot)="{ item }">
                       <div
                         v-if="isEditing"
                         class="text-center"
@@ -386,226 +381,110 @@
                         <ep-button
                           variant="link"
                           icon="delete"
-                          @click="poistaMaarayskirje(data.item)"
+                          @click="poistaMaarayskirje(item)"
                         >
                           {{ $t('poista') }}
                         </ep-button>
                       </div>
                     </template>
-                  </b-table>
-                </b-col>
-              </b-row>
+                  </EpTable>
+                </div>
 
-              <template v-if="data.maarays">
-                <b-row
-                  v-if="isEditing || data.maarays.asiasanat[kieli].asiasana.length > 0"
-                  no-gutters
-                >
-                  <b-col class="mb-4">
-                    <b-form-group :label="$t('maarayskirjeen-asiasana')">
-                      <EpMaaraysAsiasanat
-                        v-model="data.maarays.asiasanat[kieli].asiasana"
-                        :asiasanat="asiasanat"
-                        :is-editing="isEditing"
-                      />
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-
-                <b-row
-                  v-if="isEditing || !!data.maarays.kuvaus"
-                  no-gutters
-                >
-                  <b-col>
-                    <b-form-group :label="$t('maarayskirjeen-kuvaus')">
-                      <ep-content
-                        v-model="data.maarays.kuvaus"
-                        layout="normal"
-                        :is-editable="isEditing"
-                      />
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-              </template>
-
-              <hr>
-
-              <b-row no-gutters>
-                <b-col>
-                  <b-form-group>
-                    <template #label>
-                      <h3>{{ $t('muutosmaaraykset') }}</h3>
-                    </template>
-                    <EpMuutosmaaraykset
-                      v-model="data.muutosmaaraykset"
+                <template v-if="data.maarays">
+                  <EpFormGroup
+                    v-if="isEditing || data.maarays.asiasanat[kieli].asiasana.length > 0"
+                    :label="$t('maarayskirjeen-asiasana')"
+                    class="mt-8"
+                  >
+                    <EpMaaraysAsiasanat
+                      v-model="data.maarays.asiasanat[kieli].asiasana"
+                      :asiasanat="asiasanat"
                       :is-editing="isEditing"
-                      :peruste-store="perusteStore"
                     />
-                  </b-form-group>
-                </b-col>
-              </b-row>
+                  </EpFormGroup>
 
-              <hr>
+                  <EpFormGroup
+                    v-if="isEditing || !!data.maarays.kuvaus"
+                    :label="$t('maarayskirjeen-kuvaus')"
+                    class="mt-8 mb-8"
+                  >
+                    <ep-content
+                      v-model="data.maarays.kuvaus"
+                      layout="normal"
+                      :is-editable="isEditing"
+                    />
+                  </EpFormGroup>
+                </template>
 
-              <b-row>
-                <b-col class="mb-4">
-                  <b-form-group>
-                    <template #label>
-                      <h3>{{ $t('saamen-kielelle-kaannetyt-perusteet') }}</h3>
-                    </template>
-                    <ep-spinner v-if="!liitteet" />
-                    <div
-                      v-if="isEditing"
-                      class="mb-4"
-                    >
-                      <div class="d-flex">
-                        <div class="lataaliite mb-3">
-                          {{ $t('lataa-uusi-liitetiedosto') }}
-                        </div>
-                        <EpInfoPopover
-                          v-if="isEditing"
-                          class="ml-2"
-                          unique-id="5"
-                        >
-                          {{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}
-                        </EpInfoPopover>
-                      </div>
-                      <ep-tiedosto-lataus
-                        v-model="kaannosFile"
-                        :file-types="['application/pdf']"
-                        :as-binary="true"
+                <hr>
+
+                <div class="flex flex-wrap gap-4">
+                  <div>
+                    <EpFormGroup>
+                      <template #label>
+                        <h3>{{ $t('muutosmaaraykset') }}</h3>
+                      </template>
+                      <EpMuutosmaaraykset
+                        v-model="data.muutosmaaraykset"
+                        :is-editing="isEditing"
+                        :peruste-store="perusteStore"
                       />
-                    </div>
-                    <b-table
-                      v-if="kaannokset.length > 0"
-                      :items="kaannokset"
-                      :fields="kaannoksetFields"
-                      responsive
-                      borderless
-                      striped
-                      fixed
-                      hover
-                    >
-                      <template #cell(nimi)="data">
-                        <a
-                          class="btn btn-link pl-0"
-                          :href="data.item.url"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="link"
-                        >
-                          {{ data.item.nimi }}
-                        </a>
+                    </EpFormGroup>
+                  </div>
+                </div>
+
+                <hr>
+
+                <div class="flex flex-wrap gap-4">
+                  <div class="mb-4">
+                    <EpFormGroup>
+                      <template #label>
+                        <h3>{{ $t('saamen-kielelle-kaannetyt-perusteet') }}</h3>
                       </template>
-                      <template #cell(toiminnot)="data">
-                        <div
-                          v-if="isEditing"
-                          class="text-center"
-                        >
-                          <ep-button
-                            variant="link"
-                            icon="delete"
-                            @click="poistaLiite(data.item)"
-                          >
-                            {{ $t('poista') }}
-                          </ep-button>
-                        </div>
-                      </template>
-                    </b-table>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-
-              <hr>
-
-              <b-row v-if="isAmmatillinen">
-                <b-col class="mb-4">
-                  <b-form-group>
-                    <template #label>
-                      <h3>{{ $t('koulutusviennin-ohje') }}</h3>
-                    </template>
-                    <ep-spinner v-if="!liitteet" />
-
-                    <div v-if="isEditing">
-                      <div class="mb-4">
-                        <EpRadio
-                          v-model="data.poikkeamismaaraysTyyppi"
-                          value="ei_tarvita_ohjetta"
-                          name="poikkeamismaaraysTyyppi"
-                          :label="$t('voi-kayttaa-tutkintoviennissa')"
-                        />
-                        <EpRadio
-                          v-model="data.poikkeamismaaraysTyyppi"
-                          value="ei_voi_poiketa"
-                          name="poikkeamismaaraysTyyppi"
-                          :label="$t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa')"
-                        />
-                        <EpRadio
-                          v-model="data.poikkeamismaaraysTyyppi"
-                          value="koulutusvientiliite"
-                          name="poikkeamismaaraysTyyppi"
-                          :label="$t('maarays-tutkinnon-perusteista-poikkeamiseen-tutkintoviennissa')"
-                        />
-
-                        <EpButton
-                          v-if="data.poikkeamismaaraysTyyppi"
-                          variant="link"
-                          class="no-padding"
-                          @click="data.poikkeamismaaraysTyyppi = null"
-                        >
-                          {{ $t('tyhjenna-valinta') }}
-                        </EpButton>
-                      </div>
-                    </div>
-                    <div v-else>
-                      <span>{{ poikkeamismaaraysTyyppiText }}</span>
-                    </div>
-
-                    <div v-if="data.poikkeamismaaraysTyyppi === 'koulutusvientiliite'">
-                      <div v-if="isEditing">
-                        <div class="d-flex">
-                          <div class="lataaliite">
+                      <ep-spinner v-if="!liitteet" />
+                      <div
+                        v-if="isEditing"
+                        class="mb-4"
+                      >
+                        <div class="flex">
+                          <div class="lataaliite mb-3">
                             {{ $t('lataa-uusi-liitetiedosto') }}
                           </div>
                           <EpInfoPopover
                             v-if="isEditing"
                             class="ml-2"
-                            unique-id="6"
+                            unique-id="5"
                           >
                             {{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}
                           </EpInfoPopover>
                         </div>
-                        <div
-                          class="liiteohje"
-                          v-html="$t('koulutusviennin-lataus-ohje')"
-                        />
                         <ep-tiedosto-lataus
-                          v-model="koulutusvienninOhjeFile"
+                          v-model="kaannosFile"
                           :file-types="['application/pdf']"
                           :as-binary="true"
                         />
                       </div>
-                      <b-table
-                        v-if="koulutusvienninOhjeet.length > 0"
-                        :items="koulutusvienninOhjeet"
-                        :fields="koulutusvientiOhjeFields"
+                      <EpTable
+                        v-if="kaannokset.length > 0"
+                        :items="kaannokset"
+                        :fields="kaannoksetFields"
                         responsive
                         borderless
                         striped
                         fixed
                         hover
                       >
-                        <template #cell(diaarinumero)="{index}">
-                          <div class="d-flex">
-                            <EpInput
-                              v-model="koulutusvienninOhjeet[index].lisatieto"
-                              type="string"
-                              :is-editing="isEditing"
-                              :placeholder="$t('kirjoita-diaarinumero')"
-                            />
-                          </div>
+                        <template #cell(nimi)="{ item }">
+                          <a
+                            class="btn btn-link pl-0"
+                            :href="item.url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {{ item.nimi }}
+                          </a>
                         </template>
-                        <template #cell(toiminnot)="data">
+                        <template #cell(toiminnot)="{ item }">
                           <div
                             v-if="isEditing"
                             class="text-center"
@@ -613,98 +492,209 @@
                             <ep-button
                               variant="link"
                               icon="delete"
-                              @click="poistaLiite(data.item)"
+                              @click="poistaLiite(item)"
                             >
                               {{ $t('poista') }}
                             </ep-button>
                           </div>
                         </template>
-                      </b-table>
-                    </div>
+                      </EpTable>
+                    </EpFormGroup>
+                  </div>
+                </div>
 
-                    <b-form-group
-                      :label="$t('tarkennus')"
-                      class="mt-4"
-                    >
-                      <ep-content
-                        v-model="data.poikkeamismaaraysTarkennus"
-                        layout="normal"
-                        :is-editable="isEditing"
-                      />
-                    </b-form-group>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </b-container>
-          </b-tab>
-          <b-tab
-            v-if="isAmmatillinen"
-            :title="$t('osaamisalat-ja-tutkintonimikkeet')"
-          >
-            <b-container
-              fluid="lg"
-              class="perustiedot-container"
+                <hr>
+
+                <div
+                  v-if="isAmmatillinen"
+                  class="flex flex-wrap gap-4"
+                >
+                  <div class="mb-4">
+                    <EpFormGroup>
+                      <template #label>
+                        <h3>{{ $t('koulutusviennin-ohje') }}</h3>
+                      </template>
+                      <ep-spinner v-if="!liitteet" />
+
+                      <div v-if="isEditing">
+                        <div class="mb-4">
+                          <EpRadio
+                            v-model="data.poikkeamismaaraysTyyppi"
+                            value="ei_tarvita_ohjetta"
+                            name="poikkeamismaaraysTyyppi"
+                            :label="$t('voi-kayttaa-tutkintoviennissa')"
+                          />
+                          <EpRadio
+                            v-model="data.poikkeamismaaraysTyyppi"
+                            value="ei_voi_poiketa"
+                            name="poikkeamismaaraysTyyppi"
+                            :label="$t('ei-voi-poiketa-tutkinnon-perusteista-tutkintoviennin-yhteydessa')"
+                          />
+                          <EpRadio
+                            v-model="data.poikkeamismaaraysTyyppi"
+                            value="koulutusvientiliite"
+                            name="poikkeamismaaraysTyyppi"
+                            :label="$t('maarays-tutkinnon-perusteista-poikkeamiseen-tutkintoviennissa')"
+                          />
+
+                          <EpButton
+                            v-if="data.poikkeamismaaraysTyyppi"
+                            variant="link"
+                            @click="data.poikkeamismaaraysTyyppi = null"
+                          >
+                            {{ $t('tyhjenna-valinta') }}
+                          </EpButton>
+                        </div>
+                      </div>
+                      <div v-else>
+                        <span>{{ poikkeamismaaraysTyyppiText }}</span>
+                      </div>
+
+                      <div v-if="data.poikkeamismaaraysTyyppi === 'koulutusvientiliite'">
+                        <div v-if="isEditing">
+                          <div class="flex">
+                            <div class="lataaliite">
+                              {{ $t('lataa-uusi-liitetiedosto') }}
+                            </div>
+                            <EpInfoPopover
+                              v-if="isEditing"
+                              class="ml-2"
+                              unique-id="6"
+                            >
+                              {{ $t('pdf-tiedoston-maksimikoko', { koko: fileMaxSize }) }}
+                            </EpInfoPopover>
+                          </div>
+                          <div
+                            class="liiteohje"
+                            v-html="$t('koulutusviennin-lataus-ohje')"
+                          />
+                          <ep-tiedosto-lataus
+                            v-model="koulutusvienninOhjeFile"
+                            :file-types="['application/pdf']"
+                            :as-binary="true"
+                          />
+                        </div>
+                        <EpTable
+                          v-if="koulutusvienninOhjeet.length > 0"
+                          :items="koulutusvienninOhjeet"
+                          :fields="koulutusvientiOhjeFields"
+                          responsive
+                          borderless
+                          striped
+                          fixed
+                          hover
+                        >
+                          <template #cell(diaarinumero)="{ index }">
+                            <div class="flex">
+                              <EpInput
+                                v-model="koulutusvienninOhjeet[index].lisatieto"
+                                type="string"
+                                :is-editing="isEditing"
+                                :placeholder="$t('kirjoita-diaarinumero')"
+                              />
+                            </div>
+                          </template>
+                          <template #cell(toiminnot)="{ item }">
+                            <div
+                              v-if="isEditing"
+                              class="text-center"
+                            >
+                              <ep-button
+                                variant="link"
+                                icon="delete"
+                                @click="poistaLiite(item)"
+                              >
+                                {{ $t('poista') }}
+                              </ep-button>
+                            </div>
+                          </template>
+                        </EpTable>
+                      </div>
+
+                      <EpFormGroup
+                        :label="$t('tarkennus')"
+                        class="mt-4"
+                      >
+                        <ep-content
+                          v-model="data.poikkeamismaaraysTarkennus"
+                          layout="normal"
+                          :is-editable="isEditing"
+                        />
+                      </EpFormGroup>
+                    </EpFormGroup>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+            <TabPanel
+              v-if="isAmmatillinen"
+              value="2"
             >
-              <b-row no-gutters>
-                <b-col class="mb-4">
-                  <b-form-group>
+              <div
+                class="w-full perustiedot-container"
+                fluid="lg"
+              >
+                <div class="mb-8">
+                  <EpFormGroup>
                     <template #label>
                       <h3>{{ $t('osaamisalat') }}</h3>
                     </template>
                     <div class="text-muted font-size-small">
-                      {{ $t('lisaa-tai-poista-osaamisala') }} <router-link :to="{ name: 'muodostuminen' }">
+                      {{ $t('lisaa-tai-poista-osaamisala') }}
+                      <router-link :to="{ name: 'muodostuminen' }">
                         {{ $t('tutkinnon-muodostumisessa') }}
                       </router-link>
                     </div>
-                    <b-table
+                    <EpTable
                       striped
-                      show-empty
                       :items="osaamisalat"
                       :fields="fields"
-                      :empty-text="$t('ei-kiinnitettyja-osaamisaloja')"
                     >
-                      <template #cell(koodi)="data">
-                        <span class="font-weight-bold">{{ data.item.arvo }}</span>
+                      <template #empty>
+                        <span>{{ $t('ei-kiinnitettyja-osaamisaloja') }}</span>
                       </template>
-                      <template #cell(nimi)="data">
-                        {{ $kaanna(data.item.nimi) }}
+                      <template #cell(koodi)="{ item }">
+                        <span class="font-semibold">{{ item.arvo }}</span>
                       </template>
-                    </b-table>
-                  </b-form-group>
-                </b-col>
-              </b-row>
+                      <template #cell(nimi)="{ item }">
+                        {{ $kaanna(item.nimi) }}
+                      </template>
+                    </EpTable>
+                  </EpFormGroup>
+                </div>
 
-              <b-row no-gutters>
-                <b-col class="mb-4">
-                  <b-form-group>
+                <div class="mb-4">
+                  <EpFormGroup>
                     <template #label>
                       <h3>{{ $t('tutkintonimikkeet') }}</h3>
                     </template>
                     <div class="text-muted font-size-small">
-                      {{ $t('lisaa-tai-poista-tutkintonimike') }} <router-link :to="{ name: 'muodostuminen' }">
+                      {{ $t('lisaa-tai-poista-tutkintonimike') }}
+                      <router-link :to="{ name: 'muodostuminen' }">
                         {{ $t('tutkinnon-muodostumisessa') }}
                       </router-link>
                     </div>
-                    <b-table
+                    <EpTable
                       striped
-                      show-empty
                       :items="tutkintonimikkeet"
                       :fields="fields"
-                      :empty-text="$t('ei-kiinnitettyja-tutkintonimikkeita')"
                     >
-                      <template #cell(koodi)="data">
-                        <span class="font-weight-bold">{{ data.item.tutkintonimikeArvo }}</span>
+                      <template #empty>
+                        <span>{{ $t('ei-kiinnitettyja-tutkintonimikkeita') }}</span>
                       </template>
-                      <template #cell(nimi)="data">
-                        {{ $kaanna(data.item.nimi) }}
+                      <template #cell(koodi)="{ item }">
+                        <span class="font-semibold">{{ item.tutkintonimikeArvo }}</span>
                       </template>
-                    </b-table>
-                  </b-form-group>
-                </b-col>
-              </b-row>
-            </b-container>
-          </b-tab>
-        </b-tabs>
+                      <template #cell(nimi)="{ item }">
+                        {{ $kaanna(item.nimi) }}
+                      </template>
+                    </EpTable>
+                  </EpFormGroup>
+                </div>
+              </div>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </template>
     </EpEditointi>
   </div>
@@ -737,6 +727,13 @@ import { UiKielet, Kielet } from '@shared/stores/kieli';
 import _ from 'lodash';
 import EpMaaraysAsiasanat from '@/components/maaraykset/EpMaaraysAsiasanat.vue';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
@@ -968,12 +965,13 @@ const korvattavatFields = computed(() => {
   return [{
     key: 'diaarinumero',
     label: $t('diaarinumero'),
-    thStyle: { width: '20%' },
+    thStyle: { width: '30%' },
     sortable: true,
   }, {
     key: 'peruste',
     label: $t('perusteen-nimi'),
     sortable: true,
+    thStyle: { width: '60%' },
   }, {
     key: 'toiminnot',
     label: '',
@@ -1207,6 +1205,7 @@ const poistaKorvattava = (diaarinumero: string) => {
 };
 
 const addKoulutuskoodi = (data: any, koodi: any) => {
+  console.log('addKoulutuskoodi', data, koodi);
   data.koulutukset = [...data.koulutukset, {
     nimi: koodi.nimi,
     koulutuskoodiUri: koodi.uri,
@@ -1214,11 +1213,8 @@ const addKoulutuskoodi = (data: any, koodi: any) => {
   }];
 };
 
-const poistaKoulutusKoodi = ({ item }: { item: any }) => {
-  store.value!.setData({
-    ...store.value?.data,
-    koulutukset: _.filter(store.value?.data.koulutukset, koulutus => koulutus.koulutuskoodiUri !== item.koulutuskoodiUri),
-  });
+const poistaKoulutusKoodi = (data: any, { item }: { item: any }) => {
+  data.koulutukset = _.filter(data.koulutukset, koulutus => koulutus.koulutuskoodiUri !== item.koulutuskoodiUri);
 };
 
 const tallennaKoulutusvienninOhjeDiaari = async () => {
@@ -1257,11 +1253,11 @@ onMounted(async () => {
   font-weight: 600;
 }
 
-.perustiedot-container {
-  margin-left: 10px;
-  margin-top: 20px;
-  padding-left: 0px;
-}
+// .perustiedot-container {
+//   margin-left: 10px;
+//   margin-top: 20px;
+//   padding-left: 0px;
+// }
 
 .table-no-edit {
   margin-top: -25px;

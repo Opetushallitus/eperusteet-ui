@@ -6,16 +6,16 @@
     <EpTestiymparisto />
 
     <div class="view-container">
+      <EpNavbar
+        :kayttaja="kayttaja"
+        :sovellus-oikeudet="sovellusOikeudet"
+        :logout-href="logoutHref"
+        :sticky="routeStickyNavi"
+      />
       <div
         ref="header"
         class="header"
       >
-        <EpNavbar
-          :kayttaja="kayttaja"
-          :sovellus-oikeudet="sovellusOikeudet"
-          :logout-href="logoutHref"
-          :sticky="routeStickyNavi"
-        />
         <div id="headerExtension" />
       </div>
       <RouterView />
@@ -41,7 +41,8 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpTestiymparisto from '@shared/components/EpTestiymparisto/EpTestiymparisto.vue';
 import { baseURL } from '@shared/api/eperusteet';
-import { $t } from '@shared/utils/globals';
+import { $t, setConfirmModal } from '@shared/utils/globals';
+import { useConfirm } from 'primevue/useconfirm';
 
 const props = defineProps<{
   browserStore: BrowserStore;
@@ -162,23 +163,28 @@ const dullInject = computed(() => {
   return {};
 });
 
+onMounted(() => {
+  setConfirmModal(useConfirm());
+});
+
 provide('dull', dullInject);
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@import '@shared/styles/_variables.scss';
 
 .home-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 
-  .header {
+  .header, :deep(.topbar) {
     color: white;
     background-image: url('@assets/img/banners/header.svg');
+    background-attachment: fixed;
     background-position: 100% 0;
-    background-repeat: none;
-    background-size: cover;
+    background-repeat: no-repeat;
+    background-size: 100% 200px;
     @media only screen and (min-width: 2503px)  {
     }
   }

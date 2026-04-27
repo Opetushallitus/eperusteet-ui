@@ -11,30 +11,30 @@
 
     <div
       v-if="liitteet.length > 0 && !yksittainen"
-      class="row mt-4 ml-1"
+      class="flex mt-4 mb-2 gap-2"
     >
-      <div class="col font-weight-bold border-bottom ml-0 pl-0 pb-2">
+      <div class="font-semibold border-b ml-0 pl-0 pb-2 w-1/2">
         {{ $t('nimi') }}
       </div>
-      <div class="col font-weight-bold border-bottom ml-0 pl-0 pb-2">
+      <div class="font-semibold border-b ml-0 pl-0 pb-2 w-1/2">
         {{ $t('tiedosto') }}
       </div>
     </div>
     <div
       v-for="(liite, index) in liitteet"
       :key="'liite' + index"
-      class="row mt-2 align-items-center"
+      class="flex items-center gap-2"
     >
       <div
         v-if="nimisyote"
-        class="col"
+        class="w-1/2"
       >
         <ep-input
           v-model="liite.nimi"
           :is-editing="isEditing"
         />
       </div>
-      <div class="col d-flex">
+      <div class="flex w-1/2">
         <a
           v-if="liite.url"
           :href="liite.url"
