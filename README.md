@@ -1,6 +1,6 @@
 # eperusteet-ui
 
-[![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-ui.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-ui)
+[![Build Status](https://github.com/Opetushallitus/eperusteet-ui/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-ui/actions/workflows/build.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/eea9e59302df6e343d57/maintainability)](https://codeclimate.com/github/Opetushallitus/eperusteet-ui/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/eea9e59302df6e343d57/test_coverage)](https://codeclimate.com/github/Opetushallitus/eperusteet-ui/test_coverage)
 [![Known Vulnerabilities](https://snyk.io/test/github/Opetushallitus/eperusteet-ui/badge.svg)](https://snyk.io/test/github/Opetushallitus/eperusteet-ui)
@@ -12,22 +12,44 @@ Opetussuunnitelmien perusteiden laadintatyökalun käyttöliittymä.
 
 ## 2. Arkkitehtuuri
 
+Single-page -sovellus **Vue 3**:lla ja **Vite**-buildilla; käytössä **@vue/compat** (Vue 2 -yhteensopivuustila migraation aikana). Tilaa hallitaan **Pinia**-storeilla, reititys **Vue Router 4**:llä. Jaetuissa komponenteissa (`eperusteet-frontend-utils`) käytetään **Bootstrap Vue**a ja **Bootstrap**-tyylejä; sovelluksen tyylit **SCSS**:llä. Palvelupyynnöt **axios**illa generoitujen TypeScript-rajapintatyypin kanssa (`eperusteet-frontend-utils`). Testit **Vitest**illä.
 
+Aliasit `vite.config.js`:ssa: `@` → tämän projektin `src`, `@shared` ja `@assets` → `eperusteet-frontend-utils` -submoduulin alla.
 
 ## 3. Kehitysympäristö
 
 ### 3.1. Esivaatimukset
 
-Asenna haluamallasi tavalla (esim [nvm](https://github.com/nvm-sh/nvm)) `Node.js 21`
+Asenna haluamallasi tavalla (esim [nvm](https://github.com/nvm-sh/nvm)) `Node.js 24`.
 
-Projekti käyttää Yarn 4.9.2 pakettienhallintaan. Yarn asentuu automaattisesti kun ajat `yarn install`.
+Pakettienhallintaan käytetään **Yarn 4** (määritelty `package.json`:n `packageManager`-kentässä). Käytä Corepackia:
 
-### Rajapintojen generointi
+```bash
+corepack enable
+```
 
-Projekti käyttää eperusteet-frontend-utilsia joka otetaan käyttöön gitin submodulena.
-Tämä onnistuu ajamalla projektin juuressa `git submodule update --init --recursive`
+Sen jälkeen `yarn install` projektin juuressa käyttää oikeaa Yarn-versiota.
 
-Tämän jälkeen generoi typescript interfacet backendin rajapinnasta ajamalla seuraavat komennot:
+### 3.2. Lyhyt käynnistyspolku
+
+```bash
+git clone <repo-url>
+cd eperusteet-ui
+git submodule update --init --recursive
+yarn install
+```
+
+Jos tarvitset tuoreimmat API-tyypit paikalliseen työhön, tee ensin alla kohdan «Rajapintojen generointi» (kohta 3.3) vaiheet. Muuten jatka backendin käynnistyksen jälkeen:
+
+```bash
+yarn dev
+```
+
+### 3.3. Rajapintojen generointi
+
+Projekti käyttää eperusteet-frontend-utilsia, joka otetaan käyttöön gitin submodulena (`git submodule update --init --recursive` projektin juuressa).
+
+Generoi TypeScript-rajapinnat backendin OpenAPI-kuvauksesta:
 
 ```bash
 cd eperusteet-frontend-utils/vue
@@ -35,13 +57,11 @@ yarn install
 yarn gen:api
 ```
 
-Tämän jälkeen poista node_modules-kansio `eperusteet-frontend-utils/vue` alta
-ja aja vielä `yarn install` koko projektin juuressa.
+Poista tämän jälkeen `node_modules`-hakemisto polusta `eperusteet-frontend-utils/vue` ja aja `yarn install` koko projektin juuressa.
 
-Rajapintojen generointiin käytetään oletuksena eperusteisiin generoitua apikuvausta Tiedoston voi ylikirjoittaa
-ympäristömuuttujalla EPERUSTEET\_SPECFILE osoittamaan hakemistoon.
+Oletuksena generointi käyttää ePerusteiden julkaistua API-kuvausta (URL tai polku annetaan skriptille `buildapi.sh`:n kautta). Voit ohittaa sen asettamalla ympäristömuuttujan **`EPERUSTEET_SPECFILE`** osoittamaan omaan OpenAPI JSON -tiedostoosi tai HTTPS-URL:iin (ks. `eperusteet-frontend-utils/vue/scripts/buildapi.sh`).
 
-### 3.2. Testien ajaminen
+### 3.4. Testien ajaminen
 
 Projekti käyttää Vitest-testauskirjastoa.
 
@@ -59,17 +79,19 @@ yarn test --ui
 ```
 
 
-### 3.4. Ajaminen lokaalisti
-
+### 3.5. Ajaminen lokaalisti
 
 #### Kehitysympäristön käynnistys
 
-Käynnistä ensin [eperusteet backend](https://github.com/Opetushallitus/eperusteet)
+Käynnistä ensin [eperusteet backend](https://github.com/Opetushallitus/eperusteet) (oletuksena kuuntelee porttia **8080**).
 
-Sen jälkeen komento:
+Sen jälkeen:
+
 ```bash
 yarn dev
 ```
+
+Vite käynnistyy portissa **9001** ja välittää pyynnöt polusta `/eperusteet-service` backendille (`http://localhost:8080`). Tarvittaessa muuta `vite.config.js`:n `server.proxy`-asetuksia.
 
 #### Lähdekoodin analysoiminen
 
@@ -92,10 +114,14 @@ yarn build
 yarn preview
 ```
 
-### 3.4.1. Kikkoja lokaaliin kehitykseen
+### 3.6. Kehitysvinkkejä
 
+- Tuotantobuildin polku (`base`): `/eperusteet-service/ui` (`vite.config.js`).
+- `yarn genspec` juuressa ajaa API-generoinnin ja käynnistää dev-palvelimen (`package.json` scripts).
 
-### 3.6. Versiohallinta
+### 3.7. Versiohallinta
+
+Lähdekoodi GitHubissa Opetushallituksen alle. Muutokset tulevat tavanomaisella Git-työnkululla (haarat, pull requestit organisaation käytännön mukaan).
 
 ## 4. Ympäristöt
 
@@ -107,13 +133,13 @@ Testiympäristöjen swaggerit löytyvät seuraavista osoitteista
 - [hahtuva](https://virkailija.hahtuvaopintopolku.fi/eperusteet-app/#/fi)
 - [QA eli pallero](https://virkailija.testiopintopolku.fi/eperusteet-app/#/fi)
 
-### 4.3. Lokit
+### 4.2. Lokit
 
+Sovelluslogien ja infrastruktuurilokien ajantasaiset ohjeet löytyvät organisaation sisäisestä dokumentaatiosta ja kunkin ympäristön hallinnasta.
 
+### 4.3. Continuous integration
 
-### 4.4. Continuous integration
-
-https://github.com/Opetushallitus/eperusteet-ui/actions
+Build ja testit: [GitHub Actions](https://github.com/Opetushallitus/eperusteet-ui/actions) (`build.yml`).
 
 ## 5. Koodityyli
 
@@ -126,15 +152,17 @@ Suositeltavia resursseja:
 
 ## ePerusteet-projektit
 
-|Projekti|Build status|Maintainability|Test Coverage|Known Vulnerabilities|
-|-----|-----|-----|-----|-----|
-|[ePerusteet](https://github.com/Opetushallitus/eperusteet) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet)|     |     |     |
-|[ePerusteet-amosaa](https://github.com/Opetushallitus/eperusteet-amosaa) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-amosaa.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-amosaa)|     |     |     |
-|[ePerusteet-ylops](https://github.com/Opetushallitus/eperusteet-ylops) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-ylops.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-ylops)|     |     |     |
-|[ePerusteet-ui](https://github.com/Opetushallitus/eperusteet-ui) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-ui.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-ui)|     |     |     |
-|[eperusteet-ylops-ui](https://github.com/Opetushallitus/eperusteet-ylops-ui) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-ylops-ui.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-ylops-ui) | [![Maintainability](https://api.codeclimate.com/v1/badges/eea9e59302df6e343d57/maintainability)](https://codeclimate.com/github/Opetushallitus/eperusteet-ylops-ui/maintainability) | [![Test Coverage](https://api.codeclimate.com/v1/badges/eea9e59302df6e343d57/test_coverage)](https://codeclimate.com/github/Opetushallitus/eperusteet-ylops-ui/test_coverage)|     |
-|[ePerusteet-amosaa-ui](https://github.com/Opetushallitus/eperusteet-amosaa-ui) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-amosaa-ui.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-amosaa-ui)|     |     |     |
-|[ePerusteet-opintopolku](https://github.com/Opetushallitus/eperusteet-opintopolku) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-opintopolku.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-opintopolku) | [![Maintainability](https://api.codeclimate.com/v1/badges/24fc0c3e2b968b432319/maintainability)](https://codeclimate.com/github/Opetushallitus/eperusteet-opintopolku/maintainability) | [![Test Coverage](https://api.codeclimate.com/v1/badges/24fc0c3e2b968b432319/test_coverage)](https://codeclimate.com/github/Opetushallitus/eperusteet-opintopolku/test_coverage)|     |
-|[ePerusteet-backend-utils](https://github.com/Opetushallitus/eperusteet-backend-utils) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-backend-utils.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-backend-utils)|     |     |     |
-|[ePerusteet-frontend-utils](https://github.com/Opetushallitus/eperusteet-frontend-utils) | [![Build Status](https://travis-ci.org/Opetushallitus/eperusteet-frontend-utils.svg?branch=master)](https://travis-ci.org/Opetushallitus/eperusteet-frontend-utils) | [![Maintainability](https://api.codeclimate.com/v1/badges/f782a4a50622ae34a2bd/maintainability)](https://codeclimate.com/github/Opetushallitus/eperusteet-frontend-utils/maintainability) | [![Test Coverage](https://api.codeclimate.com/v1/badges/f782a4a50622ae34a2bd/test_coverage)](https://codeclimate.com/github/Opetushallitus/eperusteet-frontend-utils/test_coverage)|     |
+|Projekti | Build status |
+|-----|-----|
+|[ePerusteet](https://github.com/Opetushallitus/eperusteet)|[![Build Status](https://github.com/Opetushallitus/eperusteet/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet/actions)|
+|[ePerusteet-amosaa](https://github.com/Opetushallitus/eperusteet-amosaa) | [![Build Status](https://github.com/Opetushallitus/eperusteet-amosaa/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-amosaa/actions)|
+|[ePerusteet-ylops](https://github.com/Opetushallitus/eperusteet-ylops) | [![Build Status](https://github.com/Opetushallitus/eperusteet-ylops/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-ylops/actions)|
+|[ePerusteet-ui](https://github.com/Opetushallitus/eperusteet-ui) | [![Build Status](https://github.com/Opetushallitus/eperusteet-ui/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-ui/actions)|
+|[eperusteet-ylops-ui](https://github.com/Opetushallitus/eperusteet-ylops-ui) | [![Build Status](https://github.com/Opetushallitus/eperusteet-ylops-ui/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-ylops-ui/actions) |
+|[ePerusteet-amosaa-ui](https://github.com/Opetushallitus/eperusteet-amosaa-ui) | [![Build Status](https://github.com/Opetushallitus/eperusteet-amosaa-ui/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-amosaa-ui/actions)|
+|[ePerusteet-opintopolku](https://github.com/Opetushallitus/eperusteet-opintopolku) | [![Build Status](https://github.com/Opetushallitus/eperusteet-opintopolku/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-opintopolku/actions) |
+|[ePerusteet-backend-utils](https://github.com/Opetushallitus/eperusteet-backend-utils) | [![Build Status](https://github.com/Opetushallitus/eperusteet-backend-utils/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-backend-utils/actions)|
+|[ePerusteet-frontend-utils](https://github.com/Opetushallitus/eperusteet-frontend-utils) | [![Build Status](https://github.com/Opetushallitus/eperusteet-frontend-utils/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-frontend-utils/actions) |
+|[ePerusteet-pdf](https://github.com/Opetushallitus/eperusteet-pdf) | [![Build Status](https://github.com/Opetushallitus/eperusteet-pdf/actions/workflows/build.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-pdf/actions) |
+|[eperusteet-e2e-smoke-test](https://github.com/Opetushallitus/eperusteet-e2e-smoke-test) | [![Build Status](https://github.com/Opetushallitus/eperusteet-e2e-smoke-test/actions/workflows/playwright.yml/badge.svg)](https://github.com/Opetushallitus/eperusteet-e2e-smoke-test/actions)|
 
