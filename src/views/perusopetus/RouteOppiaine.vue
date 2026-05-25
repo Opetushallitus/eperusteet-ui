@@ -1,10 +1,7 @@
 <template>
   <EpEditointi :store="store">
     <template #header="{ data }">
-      <h2 v-if="data.koodi">
-        {{ $kaanna(data.koodi.nimi) }}
-      </h2>
-      <h2 v-else-if="data.nimi">
+      <h2 v-if="data.nimi">
         {{ $kaanna(data.nimi) }}
       </h2>
       <h2
@@ -49,11 +46,32 @@
           </b-form-group>
         </b-col>
 
+
         <b-col cols="3">
           <b-form-group :label="$t('koodi')">
             <span v-if="data.koodi">
               {{ data.koodi.arvo }}
             </span>
+          </b-form-group>
+        </b-col>
+      </b-row>
+
+      <b-row v-if="isOppimaara && isEditing" class="mt-3">
+        <b-col
+          cols="8"
+        >
+          <b-form-group :label="$t('vaihtoehtoinen-nimi')">
+            <ep-input
+              v-if="vaihtoehtoinenNimiToggle"
+              v-model="data.alkuperainenNimi"
+              :is-editing="isEditing"
+            />
+            <ep-toggle
+              class="mt-2"
+              v-model="vaihtoehtoinenNimiToggle"
+            >
+              {{ $t('kayta-vaihtoehtoista-nimi') }}
+            </ep-toggle>
           </b-form-group>
         </b-col>
       </b-row>
@@ -181,6 +199,8 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
 import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
 import { unref } from 'vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
+import { Kielet } from '@shared/stores/kieli';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -386,6 +406,21 @@ const oppiaineetDragOptions = computed(() => {
       name: 'oppiaineet',
     },
   };
+});
+
+const vaihtoehtoinenNimiToggle = computed({
+  get() {
+    const nimi = storeData.value.koodi?.nimi;
+    return !!storeData.value.alkuperainenNimi
+      && !!nimi
+      && !_.isEqual(_.pick(storeData.value.alkuperainenNimi, Object.keys(nimi)), nimi);
+  },
+  set(value: boolean) {
+    store.value?.setData({
+      ...storeData.value,
+      alkuperainenNimi: value ? {[Kielet.getSisaltoKieli.value]: ''} : null,
+    });
+  },
 });
 </script>
 
