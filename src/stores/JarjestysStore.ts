@@ -38,7 +38,7 @@ export class JarjestysStore implements IEditoitava {
   }
 
   public async editAfterLoad() {
-    return false;
+    return true;
   }
 
   public readonly validator = computed(() => ({}));
