@@ -34,6 +34,15 @@
               <span v-if="peruste.koulutustyyppi">{{ $t(peruste.koulutustyyppi) }}<span class="mx-2">|</span></span>
               <span v-if="peruste.diaarinumero">{{ peruste.diaarinumero }}<span class="mx-2">|</span></span>
 
+              <template v-if="!isPohja">
+                <EpEsikatseluLinkkiMetaInfo
+                  tyyppi="peruste"
+                  :model="{ ...projekti, peruste }"
+                  :salli-esikatselu="salliEsikatselu"
+                />
+                <span class="mx-2">|</span>
+              </template>
+
               <b-dropdown
                 class="asetukset"
                 size="sm"
@@ -465,6 +474,7 @@ import { useHead } from '@unhead/vue';
 import { $t, $kaanna, $hasOikeus } from '@shared/utils/globals';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import { onMounted } from 'vue';
+import EpEsikatseluLinkkiMetaInfo from '@shared/components/EpEsikatseluLinkkiMetaInfo/EpEsikatseluLinkkiMetaInfo.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
 
@@ -768,6 +778,10 @@ const validoi = async () => {
   isValidating.value = false;
 };
 
+const salliEsikatselu = async () => {
+  await props.perusteStore.updateProjekti({ esikatseltavissa: true });
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -778,7 +792,7 @@ const validoi = async () => {
 }
 
 :deep(.btn-sm) {
-  padding: 0 0 4px 0;
+  padding: 0 0 3px 0 !important;
   font-size: 1rem;
   font-weight: 600;
   color: inherit;
