@@ -60,7 +60,7 @@
         class="d-flex justify-content-between mt-1"
       >
         <ep-button
-          v-if="index+1 === sisaltoTekstiAvaimet.length && vapaatTekstit.length === 0"
+          v-if="allowLisaaTekstikappale && index+1 === sisaltoTekstiAvaimet.length && vapaatTekstit.length === 0"
           variant="outline-primary"
           icon="add"
           @click="lisaaTekstikappale()"
@@ -119,6 +119,7 @@
           class="d-flex justify-content-between mt-1"
         >
           <ep-button
+            v-if="allowLisaaTekstikappale"
             variant="outline-primary"
             icon="add"
             @click="lisaaTekstikappale()"
@@ -138,7 +139,7 @@
     </EpDraggableCollapse>
 
     <ep-button
-      v-if="isEditing && sisaltoTekstiAvaimet.length === 0 && vapaatTekstit.length === 0"
+      v-if="allowLisaaTekstikappale && isEditing && sisaltoTekstiAvaimet.length === 0 && vapaatTekstit.length === 0"
       variant="outline-primary"
       icon="add"
       @click="lisaaTekstikappale()"
@@ -163,8 +164,10 @@ const props = withDefaults(defineProps<{
   sisaltoTekstiOtsikkoField?: string;
   isEditing?: boolean;
   sisaltoAvaimet: string[];
+  allowLisaaTekstikappale?: boolean;
 }>(), {
   sisaltoTekstiOtsikkoField: 'otsikko',
+  allowLisaaTekstikappale: true,
 });
 
 const emit = defineEmits(['update:modelValue']);

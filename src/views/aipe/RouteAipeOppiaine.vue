@@ -68,6 +68,42 @@
             :sisalto-avaimet="['tehtava', 'tyotavat', 'ohjaus', 'arviointi', 'sisaltoalueinfo']"
           />
 
+          <b-form-group
+            v-if="data.pakollinenKurssiKuvaus"
+            :label="$t('pakollinen-kurssi-kuvaus-header')"
+            class="mt-4"
+          >
+            <ep-content
+              v-model="data.pakollinenKurssiKuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
+          </b-form-group>
+
+          <b-form-group
+            v-if="data.syventavaKurssiKuvaus"
+            :label="$t('syventava-kurssi-kuvaus-header')"
+            class="mt-4"
+          >
+            <ep-content
+              v-model="data.syventavaKurssiKuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
+          </b-form-group>
+
+          <b-form-group
+            v-if="data.soveltavaKurssiKuvaus"
+            :label="$t('soveltava-kurssi-kuvaus-header')"
+            class="mt-4"
+          >
+            <ep-content
+              v-model="data.soveltavaKurssiKuvaus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
+          </b-form-group>
+
           <template v-if="!data['_oppiaine'] && oppiaineId && (!data.kurssit || data.kurssit.length == 0)">
             <b-form-group :label="$t('oppimaarat')">
               <VueDraggable
