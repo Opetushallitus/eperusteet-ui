@@ -251,6 +251,7 @@ import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpOppiaineenTavoite from '@/views/aipe/yleiset/EpOppiaineenTavoite.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $kaanna, $t } from '@shared/utils/globals';
+import EpContent from '@shared/components/EpContent/EpContent.vue';
 
 const props = defineProps({
   perusteStore: {
