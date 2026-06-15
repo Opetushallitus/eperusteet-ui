@@ -175,12 +175,12 @@ provide('dull', dullInject);
 
   .header {
     color: white;
+    background-color: $etusivu-header-background;
     background-image: url('@assets/img/banners/header.svg');
     background-position: 100% 0;
-    background-repeat: none;
-    background-size: cover;
-    @media only screen and (min-width: 2503px)  {
-    }
+    background-repeat: no-repeat;
+    background-size: auto 216px;
+    background-attachment: fixed;
   }
 }
 

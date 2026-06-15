@@ -5,8 +5,8 @@
       to="#headerExtension"
     >
       <div class="portal-menu d-flex">
-        <div class="upper-left">
-          <EpValidPopover
+        <div class="upper-left mt-2">
+          <EpValidStatus
             :validoitava="peruste"
             :validoinnit="validoinnit"
             :julkaisemattomia-muutoksia="julkaisemattomiaMuutoksia"
@@ -19,7 +19,7 @@
             @validoi="validoi"
           />
         </div>
-        <div class="flex-grow-1 align-self-center">
+        <div class="flex-grow-1 perusteprojekti-header">
           <div
             v-if="peruste && projekti"
             class="mb-5 p-2"
@@ -439,14 +439,11 @@ import { ref, computed, watch, provide, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import * as _ from 'lodash';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
-import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpSidebar from '@shared/components/EpSidebar/EpSidebar.vue';
 import EpTreeNavibar from '@shared/components/EpTreeNavibar/EpTreeNavibar.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
 import { usePerusteprojekti } from './PerusteprojektiRoute';
-import EpProgressPopover from '@shared/components/EpProgressPopover/EpProgressPopover.vue';
-import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { Koulutustyyppi } from '@shared/tyypit';
 import {
   NavigationNodeDtoTypeEnum,
@@ -455,10 +452,9 @@ import {
 } from '@shared/api/eperusteet';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
-import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpSisallonLisays from '@/components/EpSisallonLisays.vue';
 import { routeToNode, LinkkiHandler } from '@/utils/routing';
-import EpValidPopover from '@shared/components/EpValidPopover/EpValidPopover.vue';
+import EpValidStatus from '@shared/components/EpValidStatus/EpValidStatus.vue';
 import { createKuvaHandler } from '@shared/components/EpContent/KuvaHandler';
 import { KuvaStore } from '@/stores/KuvaStore';
 import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler';
@@ -803,13 +799,18 @@ const salliEsikatselu = async () => {
 }
 
 .portal-menu {
-  height: 140px;
+  height: 160px;
 
   h1 {
     margin: 0;
     padding: 0;
 
   }
+
+  .perusteprojekti-header {
+    margin-top: 13px;
+  }
+
   .diaarinumero {
     .asetukset {
 
