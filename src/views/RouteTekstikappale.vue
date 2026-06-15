@@ -177,6 +177,7 @@
 
           <div :class="{ 'mt-4': isEditing }">
             <EpContent
+              copyable
               v-model="data.teksti"
               :is-editable="isEditing"
             />
