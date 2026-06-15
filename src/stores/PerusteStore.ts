@@ -171,6 +171,17 @@ export class PerusteStore implements IEditoitava {
     this.updateValidointi();
   }
 
+  public async updateProjekti(data: Partial<PerusteprojektiDto>) {
+    if (!this.state.projekti?.id) {
+      return;
+    }
+
+    this.state.projekti = (await Perusteprojektit.updatePerusteprojekti(
+      this.state.projekti.id,
+      { ...this.state.projekti, ...data },
+    )).data;
+  }
+
   async fetchPeruste(id?: number) {
     this.state.peruste = (await Perusteet.getPerusteenTiedot(id || this.state.peruste!.id!)).data;
   }

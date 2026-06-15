@@ -89,33 +89,6 @@ export function usePerusteprojekti(props: {
     // This can be overridden in the component using this composition function
   };
 
-  // Watch for changes in the project ID
-  // watch(projektiId, async (newValue, oldValue) => {
-  //   if (newValue && newValue !== oldValue && !isInitingProjekti.value) {
-  //     const projektiIdNumber = _.parseInt(newValue);
-  //     isInitingProjekti.value = true;
-  //     window.scrollTo(0, 0);
-  //     try {
-  //       props.kayttajaStore?.clear();
-  //       props.muokkaustietoStore?.clear();
-  //       props.aikatauluStore?.clear();
-  //       props.tiedotteetStore?.clear();
-  //       props.tyoryhmaStore?.clear();
-  //       await props.kayttajaStore?.setPerusteprojekti(projektiIdNumber);
-  //       await props.perusteStore?.init(projektiIdNumber);
-  //       await props.perusteStore?.blockUntilInitialized();
-  //       await onProjektiChange(projektiIdNumber, props.perusteStore?.perusteId.value!);
-  //     }
-  //     catch (err) {
-  //       console.error(err);
-  //       throw err;
-  //     }
-  //     finally {
-  //       isInitingProjekti.value = false;
-  //     }
-  //   }
-  // }, { immediate: true });
-
   return {
     showNavigation,
     isInitializing,

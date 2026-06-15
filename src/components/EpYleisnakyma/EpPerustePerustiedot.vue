@@ -79,19 +79,6 @@
           </ep-button>
         </ep-perustieto-data>
       </div>
-      <div class="col-7">
-        <EpPerustietoData icon="visibility">
-          <template #header>
-            {{ $t('esikatsele-perustetta') }}
-          </template>
-          <template v-if="!projekti.esikatseltavissa">
-            {{ $t('et-ole-sallinut-esikatselua') }}
-          </template>
-          <template v-else>
-            <ep-external-link :url="esikatseluUrl" />
-          </template>
-        </EpPerustietoData>
-      </div>
     </div>
   </div>
 </template>
@@ -155,12 +142,6 @@ const virkailijat = computed(() => {
   }
 });
 
-const esikatseluUrl = computed(() => {
-  if (props.peruste) {
-    return buildPerusteEsikatseluUrl(props.peruste);
-  }
-  return '';
-});
 </script>
 
 <style scoped lang="scss">
