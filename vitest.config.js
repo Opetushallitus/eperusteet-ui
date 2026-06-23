@@ -33,6 +33,7 @@ export default defineConfig(() => {
     test: {
       globals: true,
       environment: 'jsdom',
+      setupFiles: './eperusteet-frontend-utils/vue/test/setup.ts',
       coverage: {
         reporter: ['text', 'json', 'html'],
       },

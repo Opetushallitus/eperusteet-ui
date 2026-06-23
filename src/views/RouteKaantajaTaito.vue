@@ -15,22 +15,22 @@
     <template #default="{ data, isEditing }">
       <div
         v-if="isEditing"
-        class="mb-4 w-80"
+        class="mb-4 w-4/5"
       >
-        <b-form-group
+        <EpFormGroup
           class="p-0"
-          :label="$t('taidon-nimi') + ' *'"
+          :label="$t('taidon-nimi')"
           required
         >
           <ep-input
             v-model="data.nimi"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
       </div>
 
-      <div class="mb-4 w-80">
-        <b-form-group class="p-0">
+      <div class="mb-4 w-4/5">
+        <EpFormGroup class="p-0">
           <template
             v-if="isEditing"
             #label
@@ -42,28 +42,29 @@
             layout="normal"
             :is-editable="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
       </div>
 
       <hr>
 
       <h3
         v-if="isEditing"
-        class="mt-4 mb-3 w-80"
+        class="mt-4 mb-3 w-4/5"
       >
         {{ $t('tutkintovaatimukset-ja-arviointikriteerit') }}
       </h3>
 
-      <b-form-group
-        v-if="isEditing"
-        class="w-80 p-0 mb-3"
-        :label="$t('valiotsikko')"
-      >
-        <ep-input
-          v-model="data.valiotsikko"
-          :is-editing="isEditing"
-        />
-      </b-form-group>
+      <div class="w-4/5 mb-4">
+        <EpFormGroup
+          v-if="isEditing"
+          :label="$t('valiotsikko')"
+        >
+          <ep-input
+            v-model="data.valiotsikko"
+            :is-editing="isEditing"
+          />
+        </EpFormGroup>
+      </div>
 
       <VueDraggable
         v-bind="draggingOptions"
@@ -78,7 +79,7 @@
           class="mb-4 w-80"
           :class="{ 'kohdealue-editing': isEditing, 'dragging': dragging }"
         >
-          <div class="d-flex">
+          <div class="flex">
             <ep-material-icon
               v-if="isEditing"
               class="order-handle mr-2 flex-shrink-0"
@@ -86,9 +87,9 @@
             >
               drag_indicator
             </ep-material-icon>
-            <div class="w-100">
-              <div class="d-flex mb-3">
-                <h4 class="mb-0 w-100">
+            <div class="w-full">
+              <div class="flex mb-3">
+                <h4 class="mb-0 w-full">
                   <div
                     v-if="isEditing"
                     class="mb-2"
@@ -125,7 +126,7 @@
                   <div
                     v-for="(vaatimus, vIndex) in kohdealue.tutkintovaatimukset"
                     :key="'vaatimus' + vIndex"
-                    class="mb-2 w-100"
+                    class="mb-2 w-full"
                   >
                     <ep-jarjesta-input
                       v-model="kohdealue.tutkintovaatimukset[vIndex]"
@@ -150,8 +151,7 @@
                   v-if="isEditing"
                   variant="outline"
                   icon="add"
-                  class="mt-2"
-                  no-padding
+                  class="mt-1"
                   @click="lisaaTutkintovaatimus(index)"
                 >
                   {{ $t('lisaa-tutkintovaatimus') }}
@@ -199,13 +199,11 @@
                   </ul>
                 </div>
 
-                <div class="d-flex justify-content-between">
+                <div class="flex justify-between items-center mt-4">
                   <ep-button
                     v-if="isEditing"
                     variant="outline"
                     icon="add"
-                    class="mt-2"
-                    no-padding
                     @click="lisaaArviointikriteeri(index)"
                   >
                     {{ $t('lisaa-arviointikriteeri') }}
@@ -214,7 +212,6 @@
                     v-if="isEditing"
                     variant="link"
                     icon="delete"
-                    no-padding
                     class="mr-5"
                     @click="poistaKohdealue(index)"
                   >
@@ -257,6 +254,7 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
 import EpJarjestaInput from '@shared/components/forms/EpJarjestaInput.vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps({
   perusteStore: {

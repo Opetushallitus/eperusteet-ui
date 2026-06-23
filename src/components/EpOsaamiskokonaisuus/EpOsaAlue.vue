@@ -1,9 +1,9 @@
 <template>
   <div>
     <div v-if="isEditing">
-      <b-form-group>
+      <EpFormGroup>
         <template #label>
-          <div class="d-flex justify-content-between">
+          <div class="flex justify-between">
             <div>{{ $t('osa-alueen-nimi') }}</div>
             <slot name="poisto" />
           </div>
@@ -12,11 +12,11 @@
           v-model="osaAlue.nimi"
           :is-editing="isEditing"
         />
-      </b-form-group>
+      </EpFormGroup>
 
       <hr>
 
-      <b-form-group
+      <EpFormGroup
         v-for="(tasokuvaus, index) in osaAlue.tasokuvaukset"
         :key="'tasokuvaus' + index"
         :label="$t('osa-alue-otsiko-' + tasokuvaus.taso.toLowerCase())"
@@ -26,17 +26,17 @@
           v-model="tasokuvaus.kuvaukset"
           tag="div"
         >
-          <b-row
+          <div
             v-for="(kuvaus, kuvausIndex) in tasokuvaus.kuvaukset"
             :key="'kuvaus'+kuvausIndex"
-            class="pb-2"
+            class="flex flex-wrap gap-4 pb-2"
           >
-            <b-col cols="11">
+            <div class="flex-[11] min-w-0">
               <ep-input
                 v-model="kuvaus[sisaltokieli]"
                 :is-editing="isEditing"
                 type="string"
-                class="flex-grow-1"
+                class="flex-1"
               >
                 <template #left>
                   <div class="order-handle m-2">
@@ -44,16 +44,16 @@
                   </div>
                 </template>
               </ep-input>
-            </b-col>
-            <b-col cols="1">
+            </div>
+            <div class="w-1/12">
               <div
                 class="default-icon clickable mt-2"
                 @click="poistaKuvaus('kuvaukset', kuvaus, tasokuvaus.taso)"
               >
                 <EpMaterialIcon>delete</EpMaterialIcon>
               </div>
-            </b-col>
-          </b-row>
+            </div>
+          </div>
         </VueDraggable>
 
         <ep-button
@@ -74,17 +74,17 @@
             v-model="tasokuvaus.edistynytOsaaminenKuvaukset"
             tag="div"
           >
-            <b-row
+            <div
               v-for="(kuvaus, kuvausIndex) in tasokuvaus.edistynytOsaaminenKuvaukset"
               :key="'kuvaus'+kuvausIndex"
-              class="pb-2"
+              class="flex flex-wrap gap-4 pb-2"
             >
-              <b-col cols="11">
+              <div class="flex-[11] min-w-0">
                 <ep-input
                   v-model="kuvaus[sisaltokieli]"
                   :is-editing="isEditing"
                   type="string"
-                  class="flex-grow-1"
+                  class="flex-1"
                 >
                   <template #left>
                     <div class="order-handle m-2">
@@ -92,16 +92,16 @@
                     </div>
                   </template>
                 </ep-input>
-              </b-col>
-              <b-col cols="1">
+              </div>
+              <div class="w-1/12">
                 <div
                   class="default-icon clickable mt-2"
                   @click="poistaKuvaus('edistynytOsaaminenKuvaukset', kuvaus, tasokuvaus.taso)"
                 >
                   <EpMaterialIcon>delete</EpMaterialIcon>
                 </div>
-              </b-col>
-            </b-row>
+              </div>
+            </div>
           </VueDraggable>
 
           <ep-button
@@ -115,7 +115,7 @@
         </template>
 
         <hr>
-      </b-form-group>
+      </EpFormGroup>
     </div>
 
     <div v-else>
@@ -125,7 +125,7 @@
         v-for="(tasokuvaus, index) in osaAlue.tasokuvaukset"
         :key="'tasokuvaus' + index"
       >
-        <b-form-group
+        <EpFormGroup
           v-if="(tasokuvaus.kuvaukset && tasokuvaus.kuvaukset.length > 0) || (tasokuvaus.edistynytOsaaminenKuvaukset && tasokuvaus.edistynytOsaaminenKuvaukset.length > 0)"
           class="mt-3"
           :label="$t('osa-alue-otsiko-' + tasokuvaus.taso.toLowerCase())"
@@ -158,7 +158,7 @@
               </li>
             </ul>
           </div>
-        </b-form-group>
+        </EpFormGroup>
       </div>
     </div>
   </div>
@@ -173,6 +173,7 @@ import { VueDraggable } from 'vue-draggable-plus';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   modelValue: any;

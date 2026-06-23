@@ -1,6 +1,6 @@
 <template>
-  <div class="row">
-    <div class="col-xl-3 col-md-3 col-sm-12">
+  <div class="flex gap-4">
+    <div class="w-full md:w-1/4">
       <ep-form-content name="aikavertailu">
         <ep-multi-select
           id="tilaFilter"
@@ -15,10 +15,10 @@
       </ep-form-content>
     </div>
 
-    <div class="col-xl-9 col-md-9 col-sm-12">
+    <div class="w-full md:w-2/3">
       <ep-form-content name="aikavali">
         <div
-          class="d-flex align-items-center"
+          class="flex items-center"
           :class="{'disabled-events' : !model.tyyppi}"
         >
           <ep-datepicker

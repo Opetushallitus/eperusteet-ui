@@ -30,12 +30,13 @@
       />
     </div>
 
-    <b-modal
+    <EpModal
       ref="EpSisaltoalueetEditModal"
       size="xl"
+      @cancel="peruuta"
     >
-      <template #modal-header>
-        <div class="d-flex justify-content-between w-100">
+      <template #modal-title>
+        <div class="flex justify-between w-full">
           <div>{{ title }}</div>
           <ep-kielivalinta />
         </div>
@@ -66,11 +67,13 @@
           :key="'sisaltoalue' + index"
           class="mt-4"
         >
-          <div class="d-flex">
-            <div class="order-handle mr-3">
+          <div class="flex items-center mb-1">
+            <div class="order-handle">
               <EpMaterialIcon>drag_indicator</EpMaterialIcon>
             </div>
-            <h4>{{ $t('sisaltoalueen-nimi') }}</h4>
+            <h4 class="!mb-0">
+              {{ $t('sisaltoalueen-nimi') }}
+            </h4>
           </div>
           <div class="ml-4">
             <ep-input
@@ -88,7 +91,7 @@
             />
           </div>
 
-          <div class="d-flex justify-content-between mt-1 ml-3">
+          <div class="flex justify-between mt-1 ml-3">
             <ep-button
               v-if="model.sisaltoalueet && index+1 === model.sisaltoalueet.length"
               variant="outline-primary"
@@ -121,22 +124,20 @@
       </ep-button>
 
       <template #modal-footer>
-        <div>
-          <ep-button
-            variant="link"
-            @click="peruuta"
-          >
-            {{ $t('peruuta') }}
-          </ep-button>
-          <ep-button
-            :show-spinner="tallennetaan"
-            @click="tallenna"
-          >
-            {{ $t('tallenna') }}
-          </ep-button>
-        </div>
+        <ep-button
+          variant="link"
+          @click="peruuta"
+        >
+          {{ $t('peruuta') }}
+        </ep-button>
+        <ep-button
+          :show-spinner="tallennetaan"
+          @click="tallenna"
+        >
+          {{ $t('tallenna') }}
+        </ep-button>
       </template>
-    </b-modal>
+    </EpModal>
   </div>
 </template>
 
@@ -146,6 +147,7 @@ import * as _ from 'lodash';
 import { computed, ref } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import { Kielet } from '@shared/stores/kieli';

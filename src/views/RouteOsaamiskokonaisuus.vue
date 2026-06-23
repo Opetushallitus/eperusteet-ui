@@ -13,26 +13,26 @@
       </h2>
     </template>
     <template #default="{ data, isEditing, supportData }">
-      <b-row
+      <div
         v-if="isEditing"
-        class="mb-4"
+        class="flex flex-wrap gap-4 mb-4"
       >
-        <b-col lg="8">
-          <b-form-group
-            :label="$t('osaamiskokonaisuuden-nimi') + ' *'"
+        <div class="lg:w-2/3">
+          <EpFormGroup
+            :label="$t('osaamiskokonaisuuden-nimi')"
             required
           >
             <ep-input
               v-model="data.nimi"
               :is-editing="isEditing"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row class="mb-4">
-        <b-col md="8">
-          <b-form-group :label="$t('osaamiskokonaisuuden-kuvaus')">
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div class="md:w-2/3">
+          <EpFormGroup :label="$t('osaamiskokonaisuuden-kuvaus')">
             <ep-content
               v-model="data.kuvaus"
               layout="normal"
@@ -40,19 +40,19 @@
               :kasite-handler="kasiteHandler"
               :kuva-handler="kuvaHandler"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
       <h3>{{ $kaanna(data.nimi) }} {{ $t('varhaiskasvatuksessa-ja-esi-ja-perusopetuksessa') }}</h3>
 
-      <b-tabs>
-        <b-tab
-          v-for="kasitteisto in data.kasitteistot"
+      <EpTabs>
+        <EpTab
+          v-for="(kasitteisto) in data.kasitteistot"
           :key="'kasitteisto' + kasitteisto.taso"
           :title="$t(kasitteisto.taso.toLowerCase())"
         >
-          <b-form-group>
+          <EpFormGroup>
             <ep-content
               v-model="kasitteisto.kuvaus"
               layout="normal"
@@ -60,15 +60,15 @@
               :kasite-handler="kasiteHandler"
               :kuva-handler="kuvaHandler"
             />
-          </b-form-group>
-        </b-tab>
-      </b-tabs>
+          </EpFormGroup>
+        </EpTab>
+      </EpTabs>
 
       <hr>
 
-      <b-row>
-        <b-col md="8">
-          <b-form-group>
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-2/3">
+          <EpFormGroup>
             <template #label>
               <div>
                 <h3>{{ $t('keskeinen-kasitteisto') }}</h3>
@@ -81,9 +81,9 @@
               :kasite-handler="kasiteHandler"
               :kuva-handler="kuvaHandler"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
       <hr>
 
@@ -131,6 +131,9 @@ import * as _ from 'lodash';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpTabs from '@shared/components/EpTabs/EpTabs.vue';
+import EpTab from '@shared/components/EpTabs/EpTab.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
 import { onMounted } from 'vue';
 
@@ -185,4 +188,5 @@ watch(versionumero, async () => {
 
 <style scoped lang="scss">
 @import '@shared/styles/_variables.scss';
+
 </style>

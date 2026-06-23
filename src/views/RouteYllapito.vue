@@ -6,41 +6,39 @@
 
     <EpSpinner v-if="!yllapitoTiedot" />
     <template v-else-if="yllapitoTiedot && yllapitoTiedot.length > 0">
-      <div class="mt-4">
-        <b-table
+      <div class="mt-4 mb-4">
+        <EpTable
           striped
           hover
           responsive
-          show-empty
-          :empty-text="$t('ei-sisaltoa')"
           :items="yllapitoTiedot"
           :fields="fields"
         >
-          <template #cell(kuvaus)="data">
-            <ep-input v-model="data.item.kuvaus" />
+          <template #cell(kuvaus)="{ item }">
+            <ep-input v-model="item.kuvaus" />
           </template>
 
-          <template #cell(key)="data">
+          <template #cell(key)="{ item }">
             <ep-input
-              v-model="data.item.key"
+              v-model="item.key"
               :is-editing="false"
             />
           </template>
 
-          <template #cell(value)="data">
+          <template #cell(value)="{ item }">
             <ep-toggle
-              v-if="isBoolean(data.item.value)"
-              v-model="data.item.value"
+              v-if="isBoolean(item.value)"
+              v-model="item.value"
               :is-editing="isEditing"
             />
             <ep-input
               v-else
-              v-model="data.item.value"
+              v-model="item.value"
               type="string"
               :is-editing="isEditing"
             />
           </template>
-        </b-table>
+        </EpTable>
       </div>
       <div v-if="!isEditing">
         <ep-button
@@ -52,11 +50,10 @@
       </div>
       <div
         v-else
-        class="d-flex justify-content-between"
+        class="flex justify-between"
       >
         <div>
           <ep-button
-            class="ml-2"
             variant="primary"
             :disabled="v$.$invalid"
             @click="onSave()"
@@ -71,25 +68,27 @@
     <h2 class="mt-5">
       {{ $t('julkisivun-perusteiden-jarjestys') }}
     </h2>
-    <EpButton
-      v-if="!isEditingPerusteJarjestys"
-      @click="muokkaaPerusteidenJarjestysta"
-    >
-      {{ $t('muokkaa') }}
-    </EpButton>
-    <EpButton
-      v-if="isEditingPerusteJarjestys"
-      link
-      @click="peruuta"
-    >
-      {{ $t('peruuta') }}
-    </EpButton>
-    <EpButton
-      v-if="isEditingPerusteJarjestys"
-      @click="tallenna"
-    >
-      {{ $t('tallenna') }}
-    </EpButton>
+    <div class="flex gap-2 items-center mt-4">
+      <EpButton
+        v-if="!isEditingPerusteJarjestys"
+        @click="muokkaaPerusteidenJarjestysta"
+      >
+        {{ $t('muokkaa') }}
+      </EpButton>
+      <EpButton
+        v-if="isEditingPerusteJarjestys"
+        link
+        @click="peruuta"
+      >
+        {{ $t('peruuta') }}
+      </EpButton>
+      <EpButton
+        v-if="isEditingPerusteJarjestys"
+        @click="tallenna"
+      >
+        {{ $t('tallenna') }}
+      </EpButton>
+    </div>
     <EpSpinner v-if="!julkisivunPerusteetRyhmiteltyna" />
     <div
       v-for="perusteRyhma in julkisivunPerusteetRyhmiteltyna"
@@ -104,7 +103,7 @@
         sortable
       >
         <template #default="{ item }">
-          <div class="d-flex w-100 justify-content-between">
+          <div class="flex w-full justify-between">
             <div>{{ $kaanna(item.nimi) }}</div>
             <EpToggle
               v-model="item.piilotaJulkisivulta"
@@ -135,6 +134,7 @@
 import { ref, computed, onMounted } from 'vue';
 import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';

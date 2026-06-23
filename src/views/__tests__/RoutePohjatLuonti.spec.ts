@@ -71,14 +71,9 @@ describe('RoutePohjatLuonti component', () => {
   });
 
   test('Pohjan luonti canceled', async () => {
-    let currentRoute;
-    const wrapper = mountWrapper({}, {
-      async push(route: any) {
-        currentRoute = route;
-      },
-    });
+    const wrapper = mountWrapper({});
 
-    wrapper.findAll('.b-button').at(0)
+    await wrapper.findAll('button').at(0)
       .trigger('click');
 
     await nextTick();
@@ -92,7 +87,7 @@ describe('RoutePohjatLuonti component', () => {
     const wrapper = mountWrapper({});
 
     expect(wrapper.text()).toContain('kayta-pohjana');
-    wrapper.findAll('.b-button').at(1)
+    await wrapper.findAll('button').at(1)
       .trigger('click');
 
     await nextTick();
@@ -102,7 +97,7 @@ describe('RoutePohjatLuonti component', () => {
     expect(wrapper.html()).toContain('perustetyoryhma');
     expect(wrapper.html()).toContain('koulutus-tutkintotyyppi');
 
-    expect(wrapper.findAll('.b-button').at(2)
+    expect(wrapper.findAll('button').at(2)
       .text()).toContain('luo-perustepohja');
   });
 
@@ -110,12 +105,12 @@ describe('RoutePohjatLuonti component', () => {
     const wrapper = mountWrapper({});
 
     expect(wrapper.text()).toContain('kayta-pohjana');
-    wrapper.findAll('.b-button').at(1)
+    await wrapper.findAll('button').at(1)
       .trigger('click');
 
     await nextTick();
     expect(wrapper.text()).not.toContain('kayta-pohjana');
-    wrapper.findAll('.b-button').at(1)
+    await wrapper.findAll('button').at(1)
       .trigger('click');
 
     await nextTick();
@@ -131,11 +126,11 @@ describe('RoutePohjatLuonti component', () => {
       },
     });
 
-    wrapper.findAll('.b-button').at(1)
+    await wrapper.findAll('button').at(1)
       .trigger('click');
 
     await nextTick();
-    expect(wrapper.findAll('.b-button').at(2)
+    expect(wrapper.findAll('button').at(2)
       .attributes('disabled')).toBeDefined();
 
     wrapper.find('input[placeholder="kirjoita-projektin-nimi"]').setValue('nimi');
@@ -145,7 +140,7 @@ describe('RoutePohjatLuonti component', () => {
 
     await nextTick();
 
-    wrapper.findAll('.b-button').at(2)
+    await wrapper.findAll('button').at(2)
       .trigger('click');
 
     await nextTick();

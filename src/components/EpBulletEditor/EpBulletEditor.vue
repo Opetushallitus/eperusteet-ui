@@ -3,9 +3,9 @@
     <div
       v-for="(bullet, idx) in state"
       :key="idx"
-      class="d-flex mb-1"
+      class="flex mb-1"
     >
-      <div class="flex-grow-1">
+      <div class="flex-1">
         <ep-input
           :model-value="bullet"
           :is-editing="true"
@@ -14,14 +14,14 @@
       </div>
       <div
         v-if="allowStructureChange"
-        class="flex-shrink-1"
+        class="shrink"
       >
-        <b-button
+        <ep-button
+          class="ml-1 mt-1"
           variant="link"
+          icon="delete"
           @click="remove(idx)"
-        >
-          <EpMaterialIcon>delete</EpMaterialIcon>
-        </b-button>
+        />
       </div>
     </div>
     <div
@@ -89,7 +89,7 @@ const onInput = (value: any, idx: number) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@import '@shared/styles/_variables.scss';
 
 ul {
   padding: 10px;

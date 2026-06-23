@@ -13,22 +13,27 @@
     </template>
 
     <template #default="{ data, isEditing, supportData }">
-      <div class="col-11 pl-0">
+      <div class="flex-[11] min-w-0 pl-0">
         <div
           v-if="isEditing"
           class="mt-1"
         >
-          <h3>{{ $t('vuosiluokkakokonaisuuden-nimi') }} *</h3>
+        <EpFormGroup
+          required
+        >
+          <template #label>
+            <h3 class="!mb-0">{{ $t('vuosiluokkakokonaisuuden-nimi') }}</h3>
+          </template>
           <ep-input
             v-model="data.nimi"
-            :is-editing="true"
+            :is-editing="isEditing"
           />
+        </EpFormGroup>
         </div>
 
-        <b-form-group
+        <EpFormGroup
           class="mt-4"
-          :label="$t('vuosiluokat') + (isEditing ? ' *' : '')"
-        >
+          :label="$t('vuosiluokat')" required>
           <EpToggleGroup
             v-if="isEditing"
             v-model="data.vuosiluokat"
@@ -47,7 +52,7 @@
               :key="'vlk' + index"
             ><span v-if="index > 0">, </span>{{ $t(vuosiluokka) }}</span>
           </div>
-        </b-form-group>
+        </EpFormGroup>
 
         <EpSisaltoTekstikappaleet
           v-model="storeData"
@@ -55,7 +60,7 @@
           :sisalto-avaimet="['siirtymaEdellisesta', 'siirtymaSeuraavaan', 'tehtava', 'laajaalainenOsaaminen']"
         />
 
-        <b-form-group
+        <EpFormGroup
           class="mt-4"
           :label="$t('laaja-alaiset-osaamiset')"
         >
@@ -92,7 +97,7 @@
               />
             </ep-collapse>
           </div>
-        </b-form-group>
+        </EpFormGroup>
 
         <hr>
 
@@ -129,6 +134,7 @@ import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue'
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;

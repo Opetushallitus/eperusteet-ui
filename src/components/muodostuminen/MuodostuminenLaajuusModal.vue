@@ -1,55 +1,60 @@
 <template>
-  <ep-button
-    v-if="isEditing"
-    variant="link"
-    icon="edit"
-    @click="show"
-  />
-  <b-modal
-    ref="modalRef"
-    size="lg"
-  >
-    <template #modal-header>
-      <h2>{{ $t('muokkaa-tutkinnon-laajuutta') }}</h2>
-    </template>
+  <div class="muodostuminen-laajuus-modal inline-block">
+    <ep-button
+      v-if="isEditing"
+      variant="link"
+      icon="edit"
+      :text="$t('muokkaa-tutkinnon-laajuutta')"
+      @click="show"
+    />
+    <ep-modal
+      ref="modalRef"
+      small
+    >
+      <template #modal-title>
+        <h2>{{ $t('muokkaa-tutkinnon-laajuutta') }}</h2>
+      </template>
 
-    <template #modal-footer>
-      <div class="d-flex justify-content-end w-100">
-        <ep-button
-          variant="link"
-          @click="cancel"
-        >
-          {{ $t('peruuta') }}
-        </ep-button>
-        <ep-button @click="save">
-          {{ $t('aseta-laajuus') }}
-        </ep-button>
-      </div>
-    </template>
-
-    <template #default>
-      <b-form-group :label="$t('laajuus')">
-        <div class="d-flex align-items-center">
-          <div>
-            <ep-input
-              v-model="draft"
-              type="number"
-              is-editing
-            />
-          </div>
-          <div class="ml-2">
-            {{ $t('osaamispiste') }}
-          </div>
+      <template #modal-footer>
+        <div class="flex justify-end w-full gap-4 items-center">
+          <ep-button
+            variant="link"
+            @click="cancel"
+          >
+            {{ $t('peruuta') }}
+          </ep-button>
+          <ep-button @click="save">
+            {{ $t('aseta-laajuus') }}
+          </ep-button>
         </div>
-      </b-form-group>
-    </template>
-  </b-modal>
+      </template>
+
+      <template #default>
+        <ep-form-group :label="$t('laajuus')">
+          <div class="flex items-center">
+            <div>
+              <ep-input
+                v-model="draft"
+                type="number"
+                is-editing
+              />
+            </div>
+            <div class="ml-2">
+              {{ $t('osaamispiste') }}
+            </div>
+          </div>
+        </ep-form-group>
+      </template>
+    </ep-modal>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   isEditing: boolean;

@@ -5,7 +5,7 @@
   >
     <div
       v-if="koulutustyyppi"
-      class="p-2 pl-4 flex-shrink-1"
+      class="p-2 pl-4 shrink"
     >
       <EpColorIndicator
         :size="16"
@@ -15,15 +15,15 @@
     <div
       v-else-if="tileImage"
       :style="style"
-      class="w-100 h-100"
+      class="w-full h-full"
     />
     <div v-else />
-    <div class="flex-grow-1 mainslot h-100">
+    <div class="flex-1 flex items-center justify-center font-semibold text-[90%] h-full text-center p-2">
       <slot />
     </div>
     <div
       v-if="hasLowerSlot"
-      class="flex-shrink-1 lower d-flex align-items-center justify-content-center text-center"
+      class="lower-slot shrink flex items-center justify-center text-center mx-5 border-t h-[62px] min-h-[62px] max-h-[62px] text-[80%]"
     >
       <slot name="lower" />
     </div>
@@ -60,57 +60,38 @@ const hasLowerSlot = computed(() => {
 });
 
 const classes = computed(() => {
+  const base = 'project-card block rounded-2xl border cursor-pointer h-[230px] max-h-[230px] max-w-[192px] min-h-[230px] min-w-[192px]';
   if (props.fullBackground) {
-    return 'project-card full-color h-100';
+    return `${base} project-card-full h-full`;
   }
-  else {
-    return 'project-card d-flex flex-column h-100 ' + (_.includes(props.eiTuetutKoulutustyypit, (props.koulutustyyppi)) ? 'not-supported' : '');
-  }
+  const notSupported = _.includes(props.eiTuetutKoulutustyypit, props.koulutustyyppi) ? 'project-card-not-supported' : '';
+  return `${base} flex flex-col h-full ${notSupported}`;
 });
 </script>
 
 <style lang="scss" scoped>
 @import "@shared/styles/_variables.scss";
 
-.full-color {
-  background: linear-gradient(180deg, #3C839F 0%, #4797B7 100%);
-  color: white;
-}
-
 .project-card {
-  display: block;
-  border-radius: 16px;
-  border: 1px solid #ebebeb;
-  box-shadow: 5px 5px 20px 1px rgba(27,61,142,0.08);
-  cursor: pointer;
-  height: 230px;
-  max-height: 230px;
-  max-width: 192px;
-  min-height: 230px;
-  min-width: 192px;
+  border-color: $grey100;
+  box-shadow: 5px 5px 20px 1px rgba(27, 61, 142, 0.08);
 
   &:hover {
-    box-shadow: 5px 5px 20px 3px rgba(27,41,102,0.12);
+    box-shadow: 5px 5px 20px 3px rgba(27, 41, 102, 0.12);
   }
 
-  &.not-supported {
-    background-color: $gray-lighten-5;
+  &.project-card-full {
+    background: linear-gradient(180deg, #3C839F 0%, #4797B7 100%);
+    color: $white;
+  }
+
+  &.project-card-not-supported {
+    background-color: $grey50;
   }
 }
 
-.mainslot {
-  font-weight: 600;
-  font-size: 90%;
+.lower-slot {
+  border-color: $grey100;
+  color: $blue1;
 }
-
-.lower {
-  margin: 0 20px 0 20px;
-  border-top: 1px solid #ebebeb;
-  height: 62px;
-  min-height: 62px;
-  max-height: 62px;
-  font-size: 80%;
-  color: #2b4174;
-}
-
 </style>

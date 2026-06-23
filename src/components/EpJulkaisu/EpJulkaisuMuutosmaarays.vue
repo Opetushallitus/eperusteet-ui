@@ -7,7 +7,7 @@
       {{ $t('julkaisuun-liittyy-muutosmaarays') }}
     </EpToggle>
 
-    <b-form-group
+    <EpFormGroup
       v-if="liittyyMuutosmaarays"
       class="mt-4"
       :label="$t('muutosmaarays')"
@@ -26,7 +26,7 @@
       <ep-multi-select
         v-if="muutosmaaraykset && muutosmaaraykset.length > 0"
         v-model="julkaisu.muutosmaarays"
-        class="w-50"
+        class="w-1/2"
         :options="muutosmaaraykset"
         track-by="id"
       >
@@ -40,7 +40,7 @@
           {{ $kaanna(option.nimi) }} ({{ $sd(option.voimassaoloAlkaa) }} - )
         </template>
       </ep-multi-select>
-    </b-form-group>
+    </EpFormGroup>
   </div>
 </template>
 
@@ -52,6 +52,7 @@ import { MaaraysDto } from '@shared/api/eperusteet';
 import { $t, $kaanna, $sd } from '@shared/utils/globals';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   modelValue: any;

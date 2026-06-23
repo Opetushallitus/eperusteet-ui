@@ -19,7 +19,7 @@
           :key="'julkaisu'+index"
           class="julkaisu pb-3 pt-2 px-3"
         >
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="flex justify-between items-center">
             <div>
               <span class="font-bold font-size pr-3 ">{{ $sdt(julkaisu.luotu) }}</span>
               <span
@@ -40,10 +40,10 @@
               >{{ $t('julkaisu-epaonnistui') }}</span>
             </div>
 
-            <div class="d-flex align-items-center">
+            <div class="flex items-center gap-4">
               <div
                 v-if="julkaisu.julkinen"
-                class="d-flex pr-4"
+                class="flex pr-4"
               >
                 <EpMaterialIcon :color="'#4c7f00'">
                   check_circle
@@ -97,7 +97,7 @@
           </div>
           <div
             v-if="julkaisu.muutosmaarays"
-            class="d-flex"
+            class="flex"
           >
             <EpPdfLink :url="julkaisu.muutosmaarays.url">
               {{ $kaanna(julkaisu.muutosmaarays.nimi) }}
@@ -136,7 +136,7 @@ import { parsiEsitysnimi } from '@/stores/kayttaja';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { MaaraysLiiteDtoTyyppiEnum } from '@shared/generated/eperusteet';
 import { MaarayksetParams, baseURL } from '@shared/api/eperusteet';
-import { $t, $bvModal, $kaanna, $slang } from '@shared/utils/globals';
+import { $t, $confirmModal, $kaanna, $slang } from '@shared/utils/globals';
 
 interface Julkaisu {
   revision?: number;
@@ -195,7 +195,7 @@ const latestJulkaisuRevision = computed(() => {
 });
 
 const palautaConfirm = async (julkaisu) => {
-  if (await $bvModal.msgBoxConfirm(($t('toiminto-kopioi-ja-palauttaa-valitsemasi-version-julkiseksi')), {
+  if (await $confirmModal.msgBoxConfirm(($t('toiminto-kopioi-ja-palauttaa-valitsemasi-version-julkiseksi')), {
     title: $t('palauta-versio-julkiseksi'),
     okVariant: 'primary',
     okTitle: $t('kylla'),
@@ -242,17 +242,19 @@ const avaaMuokkausModal = (julkaisu) => {
 
 .julkaistu {
   border-radius: 25px;
-  background-color: $green-1;
-  padding: 5px 10px;
+  background-color: $green4;
+  padding: 5px 15px;
   margin-left: 10px;
   color: $black;
 
   &--kesken {
     background-color: $yellow-1;
+    color: $black;
   }
 
   &--virhe {
-    background-color: $red-lighten-1;
+    background-color: $alias-error;
+    color: $white;
   }
 }
 

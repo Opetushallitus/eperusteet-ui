@@ -1,19 +1,10 @@
 <template>
-  <b-modal
+  <EpModal
     ref="muutosmaaraysModal"
-    class="backdrop"
-    :no-close-on-backdrop="true"
-    :no-enforce-focus="true"
-    :lazy="true"
     size="xl"
-    :hide-footer="true"
+    :hide-footer="false"
+    :header="otsikko"
   >
-    <template #modal-header>
-      <div class="mt-1">
-        {{ otsikko }}
-      </div>
-    </template>
-
     <EpMuutosmaarays
       v-model="muutosmaarays"
       class="mb-4"
@@ -22,7 +13,7 @@
       :maaraykset-nimella="maarayksetNimella"
     />
 
-    <div class="d-flex ">
+    <template #modal-footer>
       <div class="mr-auto">
         <EpButton
           v-if="muutosmaarays && muutosmaarays.id"
@@ -47,8 +38,8 @@
       >
         {{ $t('tallenna-muutosmaarays') }}
       </EpButton>
-    </div>
-  </b-modal>
+    </template>
+  </EpModal>
 </template>
 
 <script setup lang="ts">
@@ -56,6 +47,7 @@ import * as _ from 'lodash';
 import { ref, computed, useTemplateRef } from 'vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import EpMuutosmaarays from '@/components/EpJulkaisu/EpMuutosmaarays.vue';
 import { MaarayksetEditStore, requireOneLiite } from '@/stores/MaarayksetEditStore';
 import { MaaraysDtoLiittyyTyyppiEnum, MaaraysDtoTilaEnum, MaaraysDtoTyyppiEnum } from '@shared/generated/eperusteet';
@@ -63,7 +55,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { requiredOneLang } from '@shared/validators/required';
 import { required } from '@vuelidate/validators';
 import { Maaraykset, MaaraysKevytDto } from '@shared/api/eperusteet';
-import { $t, $success, $fail, $bvModal } from '@shared/utils/globals';
+import { $t, $success, $fail, $confirmModal } from '@shared/utils/globals';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -138,7 +130,7 @@ const muokkaa = async (editMuutosmaarays?) => {
 };
 
 const poista = async () => {
-  const poista = await $bvModal.msgBoxConfirm($t('poista-muutosmaarays-varmistus') as any, {
+  const poista = await $confirmModal.msgBoxConfirm($t('poista-muutosmaarays-varmistus') as any, {
     title: $t('poista-muutosmaarays') as any,
     okVariant: 'primary',
     okTitle: $t('poista') as any,

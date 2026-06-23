@@ -7,16 +7,16 @@
     <template #header="{ data }">
       <h2
         v-if="data.nimiKoodi"
-        class="m-0"
+        class="!m-0"
       >
         {{ $kaanna(data.nimiKoodi.nimi) }}
       </h2>
     </template>
     <template #default="{ data, isEditing, validation }">
-      <b-row>
-        <b-col md="8">
-          <b-form-group
-            :label="$t('opintokokonaisuuden-nimi') + (isEditing ? ' *' : '')"
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-2/3">
+          <EpFormGroup
+            :label="$t('opintokokonaisuuden-nimi')"
             required
           >
             <ep-koodisto-select
@@ -26,27 +26,28 @@
               :nayta-arvo="false"
             >
               <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
+                <EpInputGroup>
+                  <ep-input
+                    :model-value="data.nimiKoodi ? $kaanna(data.nimiKoodi.nimi) : ''"
+                    :is-editing="true"
                     disabled
                   />
-                  <b-input-group-append>
-                    <b-button
+                  <template #append>
+                    <ep-button
                       variant="primary"
                       @click="open"
                     >
                       {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
+                    </ep-button>
+                  </template>
+                </EpInputGroup>
               </template>
             </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
+          </EpFormGroup>
+        </div>
 
-        <b-col md="2">
-          <b-form-group
+        <div class="md:w-1/6">
+          <EpFormGroup
             :label="$t('minimilaajuus')"
             required
           >
@@ -56,14 +57,14 @@
             >
               {{ $t('opintopiste') }}
             </ep-laajuus-input>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row>
-        <b-col md="8">
-          <b-form-group
-            :label="$t('kuvaus') + (isEditing ? ' *' : '')"
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-2/3">
+          <EpFormGroup
+            :label="$t('kuvaus')"
             required
           >
             <ep-content
@@ -74,18 +75,18 @@
               :kasite-handler="kasiteHandler"
               :kuva-handler="kuvaHandler"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
       <hr>
 
       <h3>{{ $t('opetuksen-tavoitteet') }}</h3>
 
-      <b-row>
-        <b-col md="8">
-          <b-form-group
-            :label="$t('tavoitteiden-otsikko') + (isEditing ? ' *' : '')"
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-2/3">
+          <EpFormGroup
+            :label="$t('tavoitteiden-otsikko')"
             required
           >
             <ep-input
@@ -93,12 +94,12 @@
               :is-editing="isEditing"
               :validation="validation.opetuksenTavoiteOtsikko"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-form-group
-        :label="$t('tavoitteet') + (isEditing ? ' *' : '')"
+      <EpFormGroup
+        :label="$t('tavoitteet')"
         required
       >
         <div v-if="isEditing">
@@ -107,41 +108,38 @@
             v-model="data.opetuksenTavoitteet"
             tag="div"
           >
-            <b-row
+            <div
               v-for="(tavoite, index) in data.opetuksenTavoitteet"
               :key="'tavoite'+index"
-              class="pb-2"
+              class="flex flex-wrap gap-4 pb-2"
             >
-              <b-col
-                cols="10"
-                lg="8"
-              >
+              <div class="flex-[10] min-w-0 lg:w-2/3">
                 <ep-input
                   v-model="tavoite.nimi"
                   :is-editing="isEditing"
                   :disabled="!tavoite.uri.startsWith('temporary')"
                 >
                   <template #left>
-                    <div class="order-handle m-2">
+                    <div class="order-handle m-1">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
                   </template>
                 </ep-input>
-              </b-col>
-              <b-col
+              </div>
+              <div
                 v-if="isEditing"
-                cols="1"
+                class="w-1/12"
               >
                 <div
-                  class="default-icon clickable mt-2"
+                  class="default-icon clickable mt-1"
                   @click="poista(tavoite, 'opetuksenTavoitteet')"
                 >
                   <EpMaterialIcon icon-shape="outlined">
                     delete
                   </EpMaterialIcon>
                 </div>
-              </b-col>
-            </b-row>
+              </div>
+            </div>
           </VueDraggable>
 
           <ep-button
@@ -164,14 +162,14 @@
             </li>
           </ul>
         </div>
-      </b-form-group>
+      </EpFormGroup>
 
       <hr>
 
       <h3>{{ $t('arviointi') }}</h3>
 
-      <b-form-group
-        :label="$t('opiskelijan-osaamisen-arvioinnin-kohteet') + (isEditing ? ' *' : '')"
+      <EpFormGroup
+        :label="$t('opiskelijan-osaamisen-arvioinnin-kohteet')"
         required
       >
         <div v-if="isEditing">
@@ -180,42 +178,39 @@
             v-model="data.arvioinnit"
             tag="div"
           >
-            <b-row
+            <div
               v-for="(arviointi, index) in data.arvioinnit"
               :key="'arviointi'+index"
-              class="pb-2"
+              class="flex flex-wrap gap-4 pb-2"
             >
-              <b-col
-                cols="10"
-                lg="8"
-              >
+              <div class="flex-[10] min-w-0 lg:w-2/3">
                 <ep-input
                   v-model="arviointi[sisaltokieli]"
                   :is-editing="isEditing"
                   type="string"
-                  class="flex-grow-1"
+                  class="flex-1"
                 >
                   <template #left>
-                    <div class="order-handle m-2">
+                    <div class="order-handle m-1">
                       <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                     </div>
                   </template>
                 </ep-input>
-              </b-col>
-              <b-col
+              </div>
+              <div
                 v-if="isEditing"
-                cols="1"
+                class="w-1/12"
               >
                 <div
-                  class="default-icon clickable mt-2"
+                  class="default-icon clickable mt-1"
                   @click="poista(arviointi, 'arvioinnit')"
                 >
                   <EpMaterialIcon icon-shape="outlined">
                     delete
                   </EpMaterialIcon>
                 </div>
-              </b-col>
-            </b-row>
+              </div>
+            </div>
           </VueDraggable>
 
           <ep-button
@@ -238,7 +233,7 @@
             </li>
           </ul>
         </div>
-      </b-form-group>
+      </EpFormGroup>
     </template>
   </EpEditointi>
   <EpSpinner v-else />
@@ -263,6 +258,8 @@ import { Kielet } from '@shared/stores/kieli';
 import { VueDraggable } from 'vue-draggable-plus';
 import { generateTemporaryKoodiUri } from '@shared/utils/koodi';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 
 const props = defineProps<{
