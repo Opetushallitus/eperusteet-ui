@@ -179,7 +179,7 @@ provide('dull', dullInject);
     background-image: url('@assets/img/banners/header.svg');
     background-position: 100% 0;
     background-repeat: no-repeat;
-    background-size: auto 216px;
+    background-size: 100% 216px;
     background-attachment: fixed;
   }
 }
