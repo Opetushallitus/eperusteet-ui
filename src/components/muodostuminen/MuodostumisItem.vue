@@ -1,26 +1,20 @@
 <template>
   <div
-    class="d-flex flex-column h-100 moduuli mb-3"
+    class="flex flex-col h-full moduuli mb-3"
     :style="style"
   >
-    <div class="d-flex align-items-center flex-grow-1 h-100">
+    <div class="flex items-center flex-1 h-full">
       <div
         v-if="hasChildren"
         class="pl-1"
       >
-        <b-button
+        <ep-button
           variant="link"
+          :icon="isOpen ? 'expand_less' : 'expand_more'"
           @click="toggleOpen"
-        >
-          <EpMaterialIcon v-if="isOpen">
-            expand_less
-          </EpMaterialIcon>
-          <EpMaterialIcon v-else>
-            expand_more
-          </EpMaterialIcon>
-        </b-button>
+        />
       </div>
-      <div class="flex-grow-1 h-100 p-2 nimi">
+      <div class="flex-1 h-full p-2 nimi">
         <EpColorIndicator
           v-if="tosa"
           :size="10"
@@ -33,49 +27,50 @@
         style="width: 100px;"
         class="text-center"
       >
-        <b-button
-          v-b-popover.hover="$t('laskettu-laajuus') + ': ' + laskettu"
-          variant="none"
-          :class="{ 'text-danger': !validity.isValid }"
-        >
-          <span v-if="laajuusMinimi > 0 || laajuusMaksimi > 0">
-            {{ laajuusMinimi }}
-          </span>
-          <span v-if="laajuusMaksimi > 0">
-            -
-            {{ laajuusMaksimi }}
-          </span>
-        </b-button>
+        <EpPopover :triggers="['hover']">
+          <template #trigger>
+            <ep-button
+              variant="none"
+              :class="{ 'text-danger': !validity.isValid }"
+            >
+              <span v-if="laajuusMinimi > 0 || laajuusMaksimi > 0">
+                {{ laajuusMinimi }}
+              </span>
+              <span v-if="laajuusMaksimi > 0">
+                -
+                {{ laajuusMaksimi }}
+              </span>
+            </ep-button>
+          </template>
+          {{ $t('laskettu-laajuus') }}: {{ laskettu }}
+        </EpPopover>
       </div>
       <div
         style="width: 80px"
         class="clearfix"
       >
-        <div class="float-right">
-          <b-dropdown
+        <div class="float-right mr-2">
+          <EpDropdown
             v-if="isEditing"
-            size="lg"
-            variant="link"
-            toggle-class="text-decoration-none"
             no-caret
           >
             <template #button-content>
               <EpMaterialIcon>more_horiz</EpMaterialIcon>
               <span class="sr-only">{{ $t('muokkaa-ryhmaa') }}</span>
             </template>
-            <b-dropdown-item-button @click="edit">
+            <EpDropdownItem @click="edit">
               {{ $t('muokkaa') }}
-            </b-dropdown-item-button>
-            <b-dropdown-item-button @click="remove">
+            </EpDropdownItem>
+            <EpDropdownItem @click="remove">
               {{ $t('poista') }}
-            </b-dropdown-item-button>
+            </EpDropdownItem>
 
             <template v-if="isRyhma">
-              <b-dropdown-item-button @click="copy">
+              <EpDropdownItem @click="copy">
                 {{ $t('kopioi-leikelaudalle') }}
-              </b-dropdown-item-button>
-              <b-dropdown-divider v-if="isRyhma" />
-              <b-dropdown-text v-if="isRyhma">
+              </EpDropdownItem>
+              <EpDropdownDivider />
+              <EpDropdownText>
                 <ep-button
                   icon="add"
                   variant="outline"
@@ -90,9 +85,9 @@
                 >
                   {{ $t('lisaa-ryhma') }}
                 </ep-button>
-              </b-dropdown-text>
+              </EpDropdownText>
             </template>
-          </b-dropdown>
+          </EpDropdown>
         </div>
       </div>
     </div>
@@ -111,12 +106,11 @@
         />
       </div>
       <div class="text-center description-button">
-        <b-button
+        <ep-button
           variant="link"
+          icon="more_horiz"
           @click="toggleDescription()"
-        >
-          <EpMaterialIcon>more_horiz</EpMaterialIcon>
-        </b-button>
+        />
       </div>
     </div>
     <EpRakenneModal
@@ -154,6 +148,8 @@ import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddMo
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import { ColorMap, rakenneNodecolor } from '@shared/utils/perusterakenne';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { EpDropdown, EpDropdownItem, EpDropdownDivider, EpDropdownText } from '@shared/components/EpDropdown';
+import EpPopover from '@shared/components/EpPopover/EpPopover.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 
 const props = defineProps({

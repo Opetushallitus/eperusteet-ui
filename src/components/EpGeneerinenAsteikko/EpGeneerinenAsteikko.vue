@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form-group v-if="isEditing">
+    <EpFormGroup v-if="isEditing">
       <EpRadio
         v-for="geneerinen in geneeriset"
         :key="'geneerinen-' + geneerinen.id"
@@ -10,10 +10,10 @@
       >
         {{ $kaanna(geneerinen.nimi) }}
       </EpRadio>
-    </b-form-group>
+    </EpFormGroup>
     <div v-else-if="valittuGeneerinen">
       <div class="mt-3 mb-4">
-        <div class="font-weight-bold">
+        <div class="font-semibold">
           {{ $t('arvioinnin-kohde') }}
         </div>
         <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
@@ -61,6 +61,7 @@ import { ArviointiStore } from '@/stores/ArviointiStore';
 import _ from 'lodash';
 import { $t, $kaanna } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 export interface YhdistettyOsaamistaso {
   otsikko?: LokalisoituTekstiDto;

@@ -6,7 +6,7 @@
     container
   >
     <template #header>
-      <div class="d-flex justify-content-between">
+      <div class="flex justify-between">
         <h1>{{ $t('maarayskokoelma-otsikko') }}</h1>
         <router-link :to="{ name: 'maaraysMuokkaus', params: { maaraysId: 'uusi' } }">
           <EpButton
@@ -25,20 +25,20 @@
         {{ $t('maarayskokoelma-selite') }}
       </div>
 
-      <div class="row ml-0 mb-2 mt-4">
-        <b-form-group
+      <div class="flex flex-wrap gap-4 ml-0 mb-2 mt-4">
+        <EpFormGroup
           :label="$t('hae')"
-          class="col-4"
+          class="w-1/3"
         >
           <ep-search
             v-model="query.nimi"
             :placeholder="$t('etsi-maarayksia')"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('tyyppi')"
-          class="col-3"
+          class="w-1/4"
         >
           <EpMultiSelect
             v-model="query.tyyppi"
@@ -54,21 +54,21 @@
               {{ $t('maarays-tyyppi-' + option.toLowerCase()) }}
             </template>
           </EpMultiSelect>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('koulutus-tai-tutkinto')"
-          class="col-3"
+          class="w-1/4"
         >
           <EpMaarayskokoelmaKoulutustyyppiSelect
             v-model="query.koulutustyyppi"
             :is-editing="true"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('voimassaolo')"
-          class="col-2"
+          class="w-1/6"
         >
           <EpMultiSelect
             v-model="query.voimassaolo"
@@ -84,10 +84,10 @@
               {{ $t('ajoitus-' + option.toLowerCase()) }}
             </template>
           </EpMultiSelect>
-        </b-form-group>
+        </EpFormGroup>
       </div>
 
-      <div class="d-flex mb-4">
+      <div class="flex mb-4">
         <EpToggle
           v-model="query.luonnos"
           checkbox
@@ -108,7 +108,7 @@
         {{ $t('ei-maarayksia') }}
       </div>
 
-      <b-table
+      <EpTable
         v-else
         class="mt-3"
         responsive
@@ -116,12 +116,11 @@
         striped
         fixed
         hover
-        :items="maaraykset"
-        :fields="tableFields"
-        :per-page="perPage"
         no-local-sorting
         :sort-by="sort.sortBy"
         :sort-desc="sort.sortDesc"
+        :items="maaraykset"
+        :fields="tableFields"
         @sort-changed="sortingChanged"
       >
         <template #cell(nimi)="{ item }">
@@ -129,12 +128,12 @@
             {{ $kaanna(item.nimi) }}
           </router-link>
         </template>
-      </b-table>
+      </EpTable>
 
-      <ep-pagination
+      <ep-b-pagination
         v-model="sivu"
-        :per-page="perPage"
-        :total-rows="maarayksetCount"
+        :items-per-page="perPage"
+        :total="maarayksetCount"
       />
     </div>
   </ep-main-view>
@@ -152,8 +151,10 @@ import { MaaraysDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { Murupolku } from '@shared/stores/murupolku';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
 import { $kaanna, $t, $sd } from '@shared/utils/globals';

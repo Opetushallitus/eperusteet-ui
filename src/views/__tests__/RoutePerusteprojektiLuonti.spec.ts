@@ -81,10 +81,9 @@ describe('RoutePohjatLuonti component', () => {
   });
 
   test('Projektin luonti canceled', async () => {
-    let currentRoute;
-    const wrapper = mountWrapper({}, {});
+    const wrapper = mountWrapper({});
 
-    wrapper.findAll('.b-button').at(0)
+    await wrapper.findAll('button').at(0)
       .trigger('click');
 
     await nextTick();

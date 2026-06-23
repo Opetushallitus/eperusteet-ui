@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <div class="d-flex justify-content-between">
+    <div class="flex justify-between">
       <h3 class="mb-4">
         {{ $t('tiedotteet') }}
       </h3>
@@ -13,7 +13,9 @@
 
     <ep-spinner v-if="!tiedotteet || !peruste" />
 
-    <div v-else>
+    <div
+      v-else
+      class="mt-3">
       <div
         v-for="(tiedote, index) in tiedotteetFiltered"
         :key="index"

@@ -4,7 +4,7 @@
 
     <template v-else>
       <ep-form-content name="aikavali">
-        <div class="d-flex align-items-center">
+        <div class="flex items-center">
           <ep-datepicker
             v-model="alkupvm"
             :is-editing="true"
@@ -20,11 +20,11 @@
 
       <div>{{ $t('suunnitelmien-lukumaarat-selite') }}</div>
 
-      <b-table
+      <EpTable
         borderless
         :items="lukumaarat"
         :fields="fields"
-        :tbody-tr-class="rowClass"
+        :row-class="(item) => rowClass(item, 'row')"
       />
     </template>
   </div>
@@ -38,6 +38,7 @@ import { koulutustyyppiRyhmaSort } from '@shared/utils/perusteet';
 import { suunnitelmatTilastoksi, koulutustyyppiTilastoSort } from './tilastot';
 import { $t } from '@shared/utils/globals';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import EpFormContent from '@shared/components/forms/EpFormContent.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 

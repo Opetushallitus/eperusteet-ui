@@ -1,5 +1,5 @@
 <template>
-  <div class="box d-inline-flex flex-column  align-items-center justify-content-center text-center">
+  <div class="box inline-flex flex-col items-center justify-center text-center">
     <div class="count">
       {{ count }}
     </div>
@@ -22,7 +22,7 @@ const { topic, count } = props;
 </script>
 
 <style scoped lang="scss">
-@import "@/styles/_variables.scss";
+@import "@shared/styles/_variables.scss";
 
   .box {
     width: 125px;

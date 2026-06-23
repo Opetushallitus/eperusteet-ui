@@ -4,7 +4,7 @@
       defer
       to="#headerExtension"
     >
-      <div class="portal-menu d-flex">
+      <div class="portal-menu flex">
         <div class="upper-left mt-2">
           <EpValidStatus
             :validoitava="peruste"
@@ -19,7 +19,7 @@
             @validoi="validoi"
           />
         </div>
-        <div class="flex-grow-1 perusteprojekti-header">
+        <div class="flex-1 self-center perusteprojekti-header">
           <div
             v-if="peruste && projekti"
             class="mb-5 p-2"
@@ -28,7 +28,6 @@
               <span>{{ nimi }}</span>
             </h1>
             <div
-              v-if="showNavigation"
               class="diaarinumero mt-2"
             >
               <span v-if="peruste.koulutustyyppi">{{ $t(peruste.koulutustyyppi) }}<span class="mx-2">|</span></span>
@@ -43,11 +42,9 @@
                 <span class="mx-2">|</span>
               </template>
 
-              <b-dropdown
+              <EpDropdown
                 class="asetukset"
-                size="sm"
                 no-caret
-                variant="transparent"
               >
                 <template #button-content>
                   <EpSpinner
@@ -66,7 +63,7 @@
                   </template>
                 </template>
 
-                <div
+                <template
                   v-for="(ratasvalinta, index) in ratasvalintaFiltered"
                   :key="'ratasvalinta'+index"
                 >
@@ -75,7 +72,7 @@
                     class="mt-2 mb-2"
                   >
 
-                  <b-dropdown-item
+                  <EpDropdownItem
                     v-if="ratasvalinta.route"
                     :to="{ name: ratasvalinta.route }"
                     :disabled="ratasvalinta.disabled"
@@ -83,26 +80,27 @@
                     <EpMaterialIcon icon-shape="outlined">
                       {{ ratasvalinta.icon }}
                     </EpMaterialIcon>
-                    <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
-                  </b-dropdown-item>
+                    <span class="dropdown-text ml-3">{{ $t(ratasvalinta.text) }}</span>
+                  </EpDropdownItem>
 
-                  <b-dropdown-item
+                  <EpDropdownItem
                     v-if="ratasvalinta.click"
                     v-oikeustarkastelu="ratasvalinta.meta.oikeus()"
                     :disabled="ratasvalinta.disabled"
                     @click="ratasClick(ratasvalinta.click, ratasvalinta.meta)"
                   >
                     <div
-                      class="d-flex"
+                      class="flex"
                       :class="{'validointi-virhe': ratasvalinta.meta.validointi && validointiVirheet.length > 0}"
                     >
                       <EpMaterialIcon
                         v-if="ratasvalinta.icon"
                         icon-shape="outlined"
+                        class="mr-2"
                       >
                         {{ ratasvalinta.icon }}
                       </EpMaterialIcon>
-                      <span class="dropdown-text">{{ $t(ratasvalinta.text) }}</span>
+                      <span class="dropdown-text ml-1">{{ $t(ratasvalinta.text) }}</span>
                       <EpInfoPopover
                         v-if="ratasvalinta.infopopovertext"
                         class="ml-2"
@@ -111,9 +109,9 @@
                         {{ $t(ratasvalinta.infopopovertext) }}
                       </EpInfoPopover>
                     </div>
-                  </b-dropdown-item>
-                </div>
-              </b-dropdown>
+                  </EpDropdownItem>
+                </template>
+              </EpDropdown>
             </div>
           </div>
         </div>
@@ -397,6 +395,7 @@
 
                 <template #new>
                   <EpSisallonLisays
+                    class="ml-3.5"
                     :peruste-store="perusteStore"
                     :navi-store="naviStore"
                   />
@@ -419,14 +418,14 @@
         >
           <div
             v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
-            class="menu-item bottom-menu-item"
+            class="ml-4 bottom-menu-item"
           >
-            <router-link :to="jarjestaRoute">
-              <span class="text-nowrap">
-                <EpMaterialIcon class="order-icon">reorder</EpMaterialIcon>
-                <a class="btn btn-link btn-link-nav">{{ $t('muokkaa-jarjestysta') }}</a>
-              </span>
-            </router-link>
+            <EpButton
+              :to="jarjestaRoute"
+              icon="reorder"
+              :text="$t('muokkaa-jarjestysta')"
+              link
+            />
           </div>
         </template>
       </EpSidebar>
@@ -461,6 +460,7 @@ import { createKasiteHandler } from '@shared/components/EpContent/KasiteHandler'
 import { TermitStore } from '@/stores/TermitStore';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { EpDropdown, EpDropdownItem } from '@shared/components/EpDropdown';
 import { KayttajaStore } from '@/stores/kayttaja';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
@@ -471,23 +471,9 @@ import { $t, $kaanna, $hasOikeus } from '@shared/utils/globals';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import { onMounted } from 'vue';
 import EpEsikatseluLinkkiMetaInfo from '@shared/components/EpEsikatseluLinkkiMetaInfo/EpEsikatseluLinkkiMetaInfo.vue';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
 
 export type ProjektiFilter = 'koulutustyyppi' | 'tila' | 'voimassaolo';
-
-interface ValidationCategory {
-  category: string;
-  ok: number;
-  failcount: number;
-  total: number;
-}
-
-interface ValidationStats {
-  categories: ValidationCategory[];
-  ok: number;
-  warnings: number;
-  total: number;
-  fails: number;
-}
 
 const props = withDefaults(defineProps<{
   perusteStore: PerusteStore;
@@ -571,12 +557,6 @@ const ratasvalintaFiltered = computed(() => {
       };
     })
     .value();
-});
-
-const popupStyle = computed(() => {
-  return {
-    background: '#1d7599',
-  };
 });
 
 const navigation = computed(() => props.perusteStore.navigation.value);
@@ -781,7 +761,7 @@ const salliEsikatselu = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables';
+@import '@shared/styles/_variables';
 
 .order-icon {
   vertical-align: middle;
@@ -862,10 +842,6 @@ const salliEsikatselu = async () => {
   }
 }
 
-.navigation {
-  height: calc(100% - 145px);
-}
-
 .heading {
   margin-left: 28px;
   margin-right: 28px;
@@ -889,11 +865,6 @@ const salliEsikatselu = async () => {
 
 .navigation :deep(.ep-button .btn) {
   font-size: 14px;
-}
-
-.bottom-menu-item {
-  margin-left: 20px;
-  margin-bottom: 10px;
 }
 
 .not-supported {

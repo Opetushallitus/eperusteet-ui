@@ -17,7 +17,7 @@
         v-if="isEditing"
         class="mb-4 w-80"
       >
-        <b-form-group
+        <EpFormGroup
           class="p-0"
           :label="$t('otsikko')"
           required
@@ -26,11 +26,11 @@
             v-model="data.nimi"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
       </div>
 
       <div class="mb-4 w-80">
-        <b-form-group class="p-0">
+        <EpFormGroup class="p-0">
           <template
             v-if="isEditing"
             #label
@@ -42,7 +42,7 @@
             layout="normal"
             :is-editable="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
         <ep-toggle
           v-if="isEditing"
@@ -77,10 +77,10 @@
                 :key="taso.key + '-view-' + index"
                 class="mb-3"
               >
-                <div class="d-flex">
-                  <div class="w-100">
-                    <div class="row mb-2">
-                      <div class="col-md-5">
+                <div class="flex">
+                  <div class="w-full">
+                    <div class="flex flex-wrap gap-4 mb-2">
+                      <div class="md:w-5/12">
                         <label>{{ $t('taitotaso') }}</label>
                         <ep-koodisto-select-draggable
                           v-model="taitotaso.taitotaso"
@@ -89,21 +89,20 @@
                           :nayta-arvo="false"
                         />
                       </div>
-                      <div class="col-md-6">
+                      <div class="md:w-1/2">
                         <label>{{ $t('evkn-asteikko') }}</label>
                         <ep-input
                           v-model="taitotaso.asteikko"
                           :is-editing="isEditing"
                         />
                       </div>
-                      <div class="col-md-1">
+                      <div class="md:w-1/12">
                         <div>&nbsp;</div>
                         <ep-button
                           class="link-style pt-1 mt-2"
                           variant="link"
                           icon="delete"
                           size="sm"
-                          no-padding
                           @click="poistaTaitotaso(taso.key, index)"
                         />
                       </div>
@@ -123,7 +122,6 @@
             <ep-button
               variant="outline"
               icon="add"
-              no-padding
               @click="lisaaTaitotaso(taso.key)"
             >
               {{ $t('lisaa-taitotaso') }}
@@ -194,6 +192,7 @@ import EpKoodistoSelectDraggable from '@shared/components/EpKoodistoSelect/EpKoo
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import { $t } from '@shared/utils/globals';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps({
   perusteStore: {

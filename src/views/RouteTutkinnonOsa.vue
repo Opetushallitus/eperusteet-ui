@@ -8,7 +8,7 @@
   >
     <template #header="{ data }">
       <h2
-        class="m-0"
+        class="!m-0"
         style="white-space: pre"
       >
         <span v-if="data.tutkinnonOsa.nimi">{{ $kaanna(data.tutkinnonOsa.nimi) }}</span>
@@ -32,7 +32,7 @@
         v-if="isEditing && isNew"
         class="mt-1"
       >
-        <b-form-group :label="$t('tyyppi')">
+        <EpFormGroup :label="$t('tyyppi')">
           <EpRadio
             v-model="data.tutkinnonOsa.tyyppi"
             name="tyyppi"
@@ -49,14 +49,14 @@
           >
             {{ $t('yhteinen-tutkinnon-osa') }}
           </EpRadio>
-        </b-form-group>
+        </EpFormGroup>
       </div>
 
-      <b-row class="mb-4">
-        <b-col md="8">
-          <b-form-group :label="$t('tutkinnon-osan-nimi')">
+      <div class="flex flex-wrap mb-4">
+        <div class="md:w-2/3">
+          <EpFormGroup :label="$t('tutkinnon-osan-nimi')">
             <ep-koodisto-select
-              v-if="isEditing || !nimi"
+              v-if="isEditing || !data.tutkinnonOsa.nimi"
               v-model="data.tutkinnonOsa.koodi"
               :store="tutkinnonosaKoodisto"
               :is-editing="isEditing"
@@ -65,22 +65,22 @@
               @add="tutkinnonOsaNimiKoodiLisays"
             >
               <template #default="{ open }">
-                <div class="d-flex">
-                  <b-input-group>
-                    <b-form-input
-                      :value="nimi"
+                <div class="flex gap-2 mr-3 items-center">
+                  <EpInputGroup>
+                    <ep-input
+                      v-model="data.tutkinnonOsa.nimi"
+                      :is-editing="true"
                       :disabled="data.tutkinnonOsa.koodi !== null || koodiTallennus"
-                      @input="nimi = $event"
                     />
-                    <b-input-group-append>
-                      <b-button
+                    <template #append>
+                      <ep-button
                         variant="primary"
                         @click="open"
                       >
                         {{ $t('hae-koodistosta') }}
-                      </b-button>
-                    </b-input-group-append>
-                  </b-input-group>
+                      </ep-button>
+                    </template>
+                  </EpInputGroup>
 
                   <ep-button
                     v-if="data.tutkinnonOsa.koodi"
@@ -90,6 +90,7 @@
                   />
                   <ep-button
                     v-if="!data.tutkinnonOsa.koodi"
+                    class="mx-2"
                     variant="link"
                     :disabled="!hasNimi"
                     @click="lisaaTutkinnonosaNimiKoodistoon"
@@ -101,42 +102,38 @@
               </template>
             </ep-koodisto-select>
             <div v-else>
-              {{ nimi }}
+              {{ $kaanna(data.tutkinnonOsa.nimi) }}
             </div>
-          </b-form-group>
-        </b-col>
+          </EpFormGroup>
+        </div>
 
-        <b-col md="4">
-          <b-form-group :label="$t('laajuus')">
+        <div class="md:w-1/3">
+          <EpFormGroup :label="$t('laajuus')">
             <ep-laajuus-input
               v-model="data.laajuus"
               :is-editing="isEditing"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row class="mb-4">
-        <b-col>
-          <b-form-group :label="$t('koodi')">
+      <div class="flex flex-wrap mb-4">
+        <div>
+          <EpFormGroup :label="$t('koodi')">
             <div v-if="data.tutkinnonOsa.koodi">
               {{ data.tutkinnonOsa.koodi.arvo }}
             </div>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row>
-        <b-col>
-          <b-form-group :label="$t('kuvaus')">
-            <ep-content
-              v-model="data.tutkinnonOsa.kuvaus"
-              layout="normal"
-              :is-editable="isEditing"
-            />
-          </b-form-group>
-        </b-col>
-      </b-row>
+      <EpFormGroup :label="$t('kuvaus')">
+        <ep-content
+          v-model="data.tutkinnonOsa.kuvaus"
+          layout="normal"
+          :is-editable="isEditing"
+        />
+      </EpFormGroup>
 
       <div v-if="data.tutkinnonOsa.tyyppi === 'normaali'">
         <ep-collapse
@@ -147,7 +144,7 @@
           <template #header>
             <h3>{{ $t('ammattitaitovaatimukset') }}</h3>
           </template>
-          <b-form-group>
+          <EpFormGroup>
             <ep-content
               v-if="data.tutkinnonOsa.ammattitaitovaatimukset"
               v-model="data.tutkinnonOsa.ammattitaitovaatimukset"
@@ -161,7 +158,7 @@
               :is-editing="isEditing"
               :validation="validation?.tutkinnonOsa?.ammattitaitovaatimukset2019"
             />
-          </b-form-group>
+          </EpFormGroup>
         </ep-collapse>
 
         <ep-collapse
@@ -186,10 +183,10 @@
             v-if="valittuArviointiTyyppi === 'geneerinen'"
             class="mb-4"
           >
-            <div class="font-weight-600">
+            <div class="font-semibold">
               {{ $t('geneerinen-arviointi') }}
             </div>
-            <b-form-group v-if="isEditing">
+            <EpFormGroup v-if="isEditing">
               <EpRadio
                 v-for="geneerinen in geneeriset"
                 :key="'geneerinen-' + geneerinen.id"
@@ -200,10 +197,10 @@
               >
                 {{ $kaanna(geneerinen.nimi) }}
               </EpRadio>
-            </b-form-group>
-            <b-form-group v-else-if="valittuGeneerinen">
+            </EpFormGroup>
+            <EpFormGroup v-else-if="valittuGeneerinen">
               <div class="mt-3 mb-4">
-                <div class="font-weight-bold">
+                <div class="font-semibold">
                   {{ $t('arvioinnin-kohde') }}
                 </div>
                 <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
@@ -244,11 +241,10 @@
                   </tr>
                 </tbody>
               </table>
-            </b-form-group>
+            </EpFormGroup>
 
             <EpButton
               v-if="isEditing"
-              class="no-padding"
               variant="link"
               icon="delete"
               @click="poistaGeneerinenaArviointi"
@@ -279,13 +275,13 @@
           <template #header>
             <h3>{{ $t('ammattitaidon-osoittamistavat') }}</h3>
           </template>
-          <b-form-group>
+          <EpFormGroup>
             <ep-content
               v-model="data.tutkinnonOsa.ammattitaidonOsoittamistavat"
               layout="normal"
               :is-editable="isEditing"
             />
-          </b-form-group>
+          </EpFormGroup>
         </ep-collapse>
 
         <ep-collapse
@@ -296,13 +292,13 @@
           <template #header>
             <h3>{{ $t('tavoitteet') }}</h3>
           </template>
-          <b-form-group>
+          <EpFormGroup>
             <ep-content
               v-model="data.tutkinnonOsa.tavoitteet"
               layout="normal"
               :is-editable="isEditing"
             />
-          </b-form-group>
+          </EpFormGroup>
         </ep-collapse>
 
         <ep-collapse
@@ -313,13 +309,13 @@
           <template #header>
             <h3>{{ $t('arviointi') }}</h3>
           </template>
-          <b-form-group>
+          <EpFormGroup>
             <ep-content
               v-model="data.tutkinnonOsa.arviointi.lisatiedot"
               layout="normal"
               :is-editable="isEditing"
             />
-          </b-form-group>
+          </EpFormGroup>
         </ep-collapse>
       </div>
       <div v-else>
@@ -391,6 +387,9 @@ import EpArvioinninKohdeAlueet from '@/views/tutkinnonosat/EpArvioinninKohdeAlue
 import { $kaanna, $t, $success, $fail } from '@shared/utils/globals';
 import { useRoute, useRouter } from 'vue-router';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
@@ -562,25 +561,6 @@ const lisaaOsaAlue = async (tutkinnonOsa) => {
 
 const hasNimi = computed(() => {
   return !_.isEmpty(_.get(store.value?.data.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value));
-});
-
-// Computed property for nimi with getter and setter
-const nimi = computed({
-  get() {
-    return _.get(store.value?.data.tutkinnonOsa.nimi, Kielet.getSisaltoKieli.value);
-  },
-  set(value) {
-    store.value?.setData({
-      ...store.value?.data,
-      tutkinnonOsa: {
-        ...store.value?.data.tutkinnonOsa,
-        nimi: {
-          ...store.value?.data.tutkinnonOsa.nimi,
-          [Kielet.getSisaltoKieli.value]: value,
-        },
-      },
-    });
-  },
 });
 
 const tutkinnonOsaNimiKoodiLisays = (koodi) => {

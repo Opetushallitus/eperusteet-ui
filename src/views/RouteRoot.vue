@@ -6,16 +6,16 @@
     <EpTestiymparisto />
 
     <div class="view-container">
+      <EpNavbar
+        :kayttaja="kayttaja"
+        :sovellus-oikeudet="sovellusOikeudet"
+        :logout-href="logoutHref"
+        :sticky="routeStickyNavi"
+      />
       <div
         ref="header"
         class="header"
       >
-        <EpNavbar
-          :kayttaja="kayttaja"
-          :sovellus-oikeudet="sovellusOikeudet"
-          :logout-href="logoutHref"
-          :sticky="routeStickyNavi"
-        />
         <div id="headerExtension" />
       </div>
       <RouterView />
@@ -41,7 +41,11 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpTestiymparisto from '@shared/components/EpTestiymparisto/EpTestiymparisto.vue';
 import { baseURL } from '@shared/api/eperusteet';
-import { $t } from '@shared/utils/globals';
+import { $t, setConfirmModal } from '@shared/utils/globals';
+import { useConfirm } from 'primevue/useconfirm';
+import { usePrimeVue } from 'primevue/config';
+import { Kielet } from '@shared/stores/kieli';
+import { updatePrimeVueLocale } from '@shared/utils/primevueUtils';
 
 const props = defineProps<{
   browserStore: BrowserStore;
@@ -54,6 +58,7 @@ const height = ref<number | null>(null);
 const header = ref<HTMLElement | null>(null);
 const innerPortal = ref<HTMLElement | null>(null);
 const route = useRoute();
+const primevue = usePrimeVue();
 
 const kayttaja = computed(() => {
   return props.kayttajaStore?.tiedot?.value || null;
@@ -134,6 +139,10 @@ const scrollY = computed(() => {
   return props.browserStore.scrollY.value;
 });
 
+watch(() => Kielet.uiKieli.value, () => {
+  updatePrimeVueLocale(primevue);
+}, { immediate: true });
+
 watch(scrollY, (newVal, oldVal) => {
   const threshold = 0.5;
   if ((newVal < threshold && oldVal < threshold)
@@ -162,21 +171,26 @@ const dullInject = computed(() => {
   return {};
 });
 
+onMounted(() => {
+  setConfirmModal(useConfirm());
+});
+
 provide('dull', dullInject);
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@import '@shared/styles/_variables.scss';
 
 .home-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 
-  .header {
+  .header, :deep(.topbar) {
     color: white;
     background-color: $etusivu-header-background;
     background-image: url('@assets/img/banners/header.svg');
+    background-attachment: fixed;
     background-position: 100% 0;
     background-repeat: no-repeat;
     background-size: 100% 216px;

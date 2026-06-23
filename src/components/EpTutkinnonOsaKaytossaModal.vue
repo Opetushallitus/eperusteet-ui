@@ -8,12 +8,14 @@
       {{ $t('muokkaa') }}
     </ep-button>
 
-    <b-modal
-      id="EpTutkinnonOsaKaytossaModal"
-      :title="$t('muokkaa-tutkinnon-osaa')"
+    <EpModal
+      ref="modalRef"
       size="lg"
       hide-footer
     >
+      <template #modal-title>
+        {{ $t('muokkaa-tutkinnon-osaa') }}
+      </template>
       <div class="mb-4">
         {{ $t('tutkinnon-osa-kaytossa-useammassa-perustessa-yla-selite') }}
       </div>
@@ -25,7 +27,7 @@
         {{ $t('muokkaa-tutkinnon-osaa') }}
       </EpButton>
 
-      <div class="font-weight-bold mt-4 mb-2">
+      <div class="font-semibold mt-4 mb-2">
         {{ $t('perusteet-jotka-muuttuvat-kun-tutkinnon-osaa-muokataan') }}:
       </div>
       <div
@@ -54,18 +56,19 @@
           {{ $t('kopioi-tutkinnon-osa-muokattavaksi') }}
         </EpButton>
       </template>
-    </b-modal>
+    </EpModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as _ from 'lodash';
-import { ref, computed, getCurrentInstance } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import { PerusteprojektinPerusteenosaDto, PerusteInfoDto } from '@shared/api/eperusteet';
 import { Kielet } from '@shared/stores/kieli';
-import { $t, $kaanna, $sd, $bvModal } from '@shared/utils/globals';
+import { $t, $kaanna, $sd } from '@shared/utils/globals';
 
 const props = defineProps<{
   projektit: PerusteprojektinPerusteenosaDto[];
@@ -75,12 +78,13 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
+const modalRef = ref<InstanceType<typeof EpModal> | null>(null);
 
 const kopiointiLoading = ref(false);
 const muokkausLoading = ref(false);
 
-const avaa = async () => {
-  $bvModal.show('EpTutkinnonOsaKaytossaModal');
+const avaa = () => {
+  modalRef.value?.show();
 };
 
 const perusteet = computed(() => {
@@ -115,13 +119,13 @@ const eiAlkuperaa = computed(() => {
 const teeKopio = async () => {
   kopiointiLoading.value = true;
   await props.kopioi();
-  $bvModal.hide('EpTutkinnonOsaKaytossaModal');
+  modalRef.value?.hide();
 };
 
 const kaynnistaMuokkaus = async () => {
   muokkausLoading.value = true;
   await props.muokkaa();
-  $bvModal.hide('EpTutkinnonOsaKaytossaModal');
+  modalRef.value?.hide();
 };
 
 defineExpose({ avaa });

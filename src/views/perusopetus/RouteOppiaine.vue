@@ -14,88 +14,66 @@
     </template>
 
     <template #default="{ data, isEditing }">
-      <b-row>
-        <b-col
+      <div class="flex flex-wrap gap-4">
+        <div
           v-if="isEditing"
-          cols="8"
+          class="flex-[8] min-w-0"
         >
-          <b-form-group :label="!isOppimaara ? $t('oppiaineen-nimi') : $t('oppimaaran-nimi')">
+          <EpFormGroup :label="!isOppimaara ? $t('oppiaineen-nimi') : $t('oppimaaran-nimi')">
             <ep-koodisto-select
               v-model="data.koodi"
               :store="koodisto"
               :is-editing="isEditing"
               :nayta-arvo="false"
-            >
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled
-                  />
-                  <b-input-group-append>
-                    <b-button
-                      variant="primary"
-                      @click="open"
-                    >
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-            </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
+            />
+          </EpFormGroup>
+        </div>
 
-
-        <b-col cols="3">
-          <b-form-group :label="$t('koodi')">
+        <div class="w-1/4">
+          <EpFormGroup :label="$t('koodi')">
             <span v-if="data.koodi">
               {{ data.koodi.arvo }}
             </span>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row v-if="isOppimaara && isEditing" class="mt-3">
-        <b-col
-          cols="8"
-        >
-          <b-form-group :label="$t('vaihtoehtoinen-nimi')">
-            <ep-input
-              v-if="vaihtoehtoinenNimiToggle"
-              v-model="data.alkuperainenNimi"
-              :is-editing="isEditing"
-            />
-            <ep-toggle
-              class="mt-2"
-              v-model="vaihtoehtoinenNimiToggle"
-            >
-              {{ $t('kayta-vaihtoehtoista-nimi') }}
-            </ep-toggle>
-          </b-form-group>
-        </b-col>
-      </b-row>
+      <div v-if="isOppimaara && isEditing" class="mt-3">
+        <EpFormGroup :label="$t('vaihtoehtoinen-nimi')">
+          <ep-input
+            v-if="vaihtoehtoinenNimiToggle"
+            v-model="data.alkuperainenNimi"
+            :is-editing="isEditing"
+          />
+          <ep-toggle
+            class="mt-2"
+            v-model="vaihtoehtoinenNimiToggle"
+          >
+            {{ $t('kayta-vaihtoehtoista-nimi') }}
+          </ep-toggle>
+        </EpFormGroup>
+      </div>
 
-      <b-row>
-        <b-col cols="11">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-[11] min-w-0">
           <EpSisaltoTekstikappaleet
             v-model="storeData"
             :is-editing="isEditing"
             :sisalto-avaimet="['tehtava']"
           />
 
-          <b-form-group :label="$t('tavoitealueet-kaikilla-vuosiluokilla')">
+          <EpFormGroup :label="$t('tavoitealueet-kaikilla-vuosiluokilla')">
             <EpTavoitealueetEditModal
               v-model="storeData"
               :is-editing="isEditing"
               :peruste-id="perusteId"
               :oppiaine-id="oppiaineId"
             />
-          </b-form-group>
+          </EpFormGroup>
 
           <hr>
 
-          <b-form-group
+          <EpFormGroup
             v-if="isEditing"
             class="mt-4 mb-4"
             :label="$t('vuosiluokat')"
@@ -105,15 +83,15 @@
               :items="valittavatVuosiluokkakokonaisuudet"
             >
               <template #default="{ item }">
-                <div class="mb-1">
-                  {{ item.nimi }}
-                </div>
+                {{ item.nimi }}
               </template>
             </EpToggleGroup>
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-tabs v-if="valitutVuosiluokkakokonaisuudet.length > 0">
-            <b-tab
+          <EpTabs
+            v-if="valitutVuosiluokkakokonaisuudet.length > 0"
+          >
+            <EpTab
               v-for="(vlk, index) in data.vuosiluokkakokonaisuudet"
               :key="'vlk' + index"
               :title="valitutVuosiluokkakokonaisuudetById[vlk._vuosiluokkaKokonaisuus].nimi"
@@ -126,13 +104,12 @@
                 :peruste-id="perusteId"
                 :oppiaine-id="oppiaineId"
               />
-            </b-tab>
-
-            <hr>
-          </b-tabs>
+            </EpTab>
+          </EpTabs>
+          <hr v-if="valitutVuosiluokkakokonaisuudet.length > 0">
 
           <template v-if="!isOppimaara">
-            <b-form-group
+            <EpFormGroup
               v-if="!isEditing || (data.oppimaarat && data.oppimaarat.length > 0)"
               :label="$t('oppimaarat')"
             >
@@ -144,7 +121,7 @@
                 <div
                   v-for="oppimaara in data.oppimaarat"
                   :key="'oppimaara'+oppimaara.id"
-                  class="taulukko-rivi-varitys p-3 d-flex"
+                  class="taulukko-rivi-varitys p-3 flex"
                 >
                   <EpMaterialIcon
                     v-if="isEditing"
@@ -157,7 +134,7 @@
                   </router-link>
                 </div>
               </VueDraggable>
-            </b-form-group>
+            </EpFormGroup>
 
             <ep-button
               v-if="!isEditing"
@@ -170,8 +147,8 @@
               {{ $t('lisaa-oppimaara') }}
             </ep-button>
           </template>
-        </b-col>
-      </b-row>
+        </div>
+      </div>
     </template>
   </EpEditointi>
 </template>
@@ -186,6 +163,8 @@ import { PerusteStore } from '@/stores/PerusteStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
@@ -196,8 +175,10 @@ import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpTavoitealueetEditModal from '@/views/perusopetus/EpTavoitealueetEditModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import { $t, $kaanna, $confirmModal } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import EpTabs from '@shared/components/EpTabs/EpTabs.vue';
+import EpTab from '@shared/components/EpTabs/EpTab.vue';
 import { unref } from 'vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { Kielet } from '@shared/stores/kieli';
@@ -317,7 +298,7 @@ const vlkChange = async () => {
   const poistettavatVlk = _.find(tempVuosiluokkaChange, vlk => !_.includes(vuosiluokkakokonaisuudet.value, vlk));
   if (poistettavatVlk) {
     const edellisetVlk = tempVuosiluokkaChange;
-    const varmistaPoisto = await $bvModal.msgBoxConfirm(
+    const varmistaPoisto = await $confirmModal.msgBoxConfirm(
       $t('vuosiluokkakokonaisuuden-poisto-varmistus-teksti'), {
         title: $t('vahvista-poisto'),
         okTitle: $t('poista'),

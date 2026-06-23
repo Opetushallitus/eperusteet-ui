@@ -16,7 +16,7 @@
     </template>
 
     <template #default="{ data, isEditing }">
-      <div class="col-11 pl-0">
+      <div class="flex-[11] min-w-0 pl-0">
         <div
           v-if="isEditing"
           class="mt-1"
@@ -40,7 +40,7 @@
         />
 
         <template v-if="vaiheId">
-          <b-form-group :label="$t('oppiaineet')">
+          <EpFormGroup :label="$t('oppiaineet')">
             <VueDraggable
               v-bind="oppiaineetDragOptions"
               v-model="data.oppiaineet"
@@ -49,7 +49,7 @@
               <div
                 v-for="oppiaine in data.oppiaineet"
                 :key="'oppiaine'+oppiaine.id"
-                class="oppiaine p-3 d-flex"
+                class="oppiaine p-3 flex"
               >
                 <EpMaterialIcon
                   v-if="isEditing"
@@ -62,7 +62,7 @@
                 </router-link>
               </div>
             </VueDraggable>
-          </b-form-group>
+          </EpFormGroup>
 
           <ep-button
             v-if="!isEditing"
@@ -77,8 +77,8 @@
           <hr>
         </template>
 
-        <b-form-group
-          class="mt-4"
+        <EpFormGroup
+          class="mt-6"
           :label="$t('opetuksen-tavoitealueet')"
         >
           <div v-if="isEditing">
@@ -87,35 +87,35 @@
               v-model="data.opetuksenKohdealueet"
               tag="div"
             >
-              <b-row
+              <div
                 v-for="(kohdealue, index) in data.opetuksenKohdealueet"
                 :key="'tavoite'+index"
-                class="pb-2"
+                class="flex flex-wrap gap-4 pb-2"
               >
-                <b-col cols="11">
+                <div class="flex-[11] min-w-0">
                   <ep-input
                     v-model="kohdealue.nimi"
                     :is-editing="isEditing"
                   >
                     <template #left>
-                      <div class="order-handle m-2">
+                      <div class="order-handle m-1">
                         <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                       </div>
                     </template>
                   </ep-input>
-                </b-col>
-                <b-col
+                </div>
+                <div
                   v-if="isEditing"
-                  cols="1"
+                  class="w-1/12"
                 >
                   <div
-                    class="default-icon clickable mt-2"
+                    class="default-icon clickable mt-1"
                     @click="poistaKohdealue(kohdealue)"
                   >
                     <EpMaterialIcon>delete</EpMaterialIcon>
                   </div>
-                </b-col>
-              </b-row>
+                </div>
+              </div>
             </VueDraggable>
 
             <ep-button
@@ -138,7 +138,7 @@
               </li>
             </ul>
           </div>
-        </b-form-group>
+        </EpFormGroup>
       </div>
     </template>
   </EpEditointi>
@@ -160,6 +160,7 @@ import { VueDraggable } from 'vue-draggable-plus';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpSisaltoTekstikappaleet from '@/components/EpSisaltoTekstikappaleet.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import { $kaanna, $t } from '@shared/utils/globals';
 
 const props = defineProps({
