@@ -69,9 +69,9 @@ slots.left;
 
 -------------------------------------------------
 
-IF component has EpValidation OR validationMixin
+IF component uses vuelidate validation
 
-THEN convert to use new @vuelidate/core
+THEN use @vuelidate/core (useVuelidate composable)
 
 -------------------------------------------------
 

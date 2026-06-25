@@ -6,8 +6,8 @@
     >
       <div class="container">
         <div class="container-fluid">
-          <div class="row no-gutters">
-            <div class="col my-4 px-3 px-md-0">
+          <div class="flex flex-wrap -mx-0">
+            <div class="flex-1 min-w-0 my-4 px-3 md:px-0">
               <h1>{{ $t('eperusteet-tervetuloa', { nimi }) }}</h1>
               <p>{{ $t('eperusteet-tervetuloa-kuvaus') }}</p>
             </div>
@@ -17,7 +17,7 @@
     </Teleport>
 
     <div class="container tile-container">
-      <div class="d-flex flex-row flex-wrap justify-content-center">
+      <div class="flex flex-row flex-wrap justify-center">
         <TilePerusteprojektit v-oikeustarkastelu="{oikeus:'luku', kohde: 'eperusteet'}" />
         <TilePohjat v-oikeustarkastelu="{oikeus:'hallinta'}" />
         <TileTiedotteet
@@ -71,7 +71,7 @@ const nimi = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@import '@shared/styles/_variables.scss';
 
 .home-container {
   background-color: $etusivu-background;

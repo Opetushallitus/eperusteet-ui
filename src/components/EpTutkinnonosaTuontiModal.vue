@@ -1,19 +1,17 @@
 <template>
   <div>
-    <b-modal
-      id="tuotutkinnonosa"
+    <EpModal
       ref="tutkinnonosaTuontiModal"
       size="xl"
-      centered
-      @close="close"
+      @cancel="close"
     >
       <template #modal-title>
         {{ $t('tuo-tutkinnon-osa') }}
       </template>
 
-      <div class="d-flex">
-        <b-form-group
-          class="w-50"
+      <div class="flex">
+        <EpFormGroup
+          class="w-1/2"
           :label="$t('tutkinnon-osan-nimi')"
         >
           <ep-search
@@ -27,18 +25,18 @@
           >
             {{ $t('nayta-myos-vanhentuneet') }}
           </ep-toggle>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group class="ml-auto w-50">
+        <EpFormGroup class="ml-auto w-1/2">
           <template #label>
-            <div class="d-flex">
+            <div class="flex">
               <div>{{ $t('tutkinto') }}</div>
               <ep-spinner v-if="perusteetLoading" />
             </div>
           </template>
           <EpMultiSelect
             v-model="tutkinnonosaQuery.peruste"
-            class="flex-grow-1"
+            class="flex-1"
             :placeholder="!perusteetLoading ? $t('kirjoita-tutkinnon-nimi') : $t('valitse')"
             :is-editing="true"
             :options="perusteet ? perusteet : []"
@@ -67,13 +65,13 @@
               </span>
             </template>
           </EpMultiSelect>
-        </b-form-group>
+        </EpFormGroup>
       </div>
 
       <ep-spinner v-if="!tutkinnonosat" />
 
       <div v-else-if="tutkinnonosat.length > 0">
-        <b-table
+        <EpTable
           responsive
           striped
           :items="tutkinnonosatWithSelected"
@@ -100,31 +98,27 @@
               <span v-if="item.tutkinnonOsa.koodiArvo">({{ item.tutkinnonOsa.koodiArvo }})</span>
             </div>
           </template>
-          <template #cell(peruste)="{ item, value }">
-            <b-button
-              :id="'peruste-popover-'+item.id"
-              variant="link"
-            >
-              {{ $t('kaytossa') }}
-            </b-button>
-
-            <b-popover
-              :target="'peruste-popover-'+item.id"
-              triggers="hover click"
-            >
-              <template #title>
+          <template #cell(peruste)="{ value }">
+            <EpPopover :triggers="['hover', 'click']">
+              <template #trigger>
+                <ep-button
+                  variant="link"
+                >
+                  {{ $t('kaytossa') }}
+                </ep-button>
+              </template>
+              <template #header>
                 {{ $t('kaytossa-tutkinnossa') }}
               </template>
               {{ value }}
-            </b-popover>
+            </EpPopover>
           </template>
-        </b-table>
-        <EpPagination
+        </EpTable>
+        <EpBPagination
           v-if="totalRows > sisaltoSivuKoko"
           v-model="page"
-          :total-rows="totalRows"
-          :per-page="sisaltoSivuKoko"
-          align="center"
+          :total="totalRows"
+          :items-per-page="sisaltoSivuKoko"
           aria-controls="tuo-tutkinnon-osa"
         />
       </div>
@@ -134,7 +128,7 @@
 
       <div v-if="selectedTutkinnonosat.length > 0">
         <h3>{{ $t('valittu') }} {{ selectedTutkinnonosat.length }} {{ $t('kpl') }}</h3>
-        <b-table
+        <EpTable
           responsive
           striped
           :items="tutkinnonosatWithSalliMuokattavaksi"
@@ -160,7 +154,7 @@
               <span>{{ $t('kylla') }}</span>
             </div>
           </template>
-        </b-table>
+        </EpTable>
       </div>
 
       <template #modal-footer>
@@ -176,7 +170,7 @@
           </ep-button>
         </div>
       </template>
-    </b-modal>
+    </EpModal>
   </div>
 </template>
 
@@ -192,8 +186,12 @@ import { TutkinnonosatTuontiStore } from '@/stores/TutkinnonosatTuontiStore';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { PerusteDto, TutkinnonOsaViiteKontekstiDto } from '@shared/generated/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t, $kaanna, $sd, $success, $fail, $bvModal } from '@shared/utils/globals';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import { $t, $kaanna, $sd, $success, $fail } from '@shared/utils/globals';
+import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
+import EpPopover from '@shared/components/EpPopover/EpPopover.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 const props = defineProps<{
   peruste: PerusteDto;
@@ -341,7 +339,7 @@ const save = async () => {
 };
 
 const close = () => {
-  $bvModal.hide('tuotutkinnonosa');
+  tutkinnonosaTuontiModal.value?.hide();
 };
 
 const selectRow = (item: any) => {

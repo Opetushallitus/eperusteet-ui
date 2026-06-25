@@ -1,8 +1,8 @@
 <template>
   <ep-spinner v-if="!toteutussuunnitelmat" />
   <div v-else>
-    <div class="row">
-      <div class="col-xl-3 col-md-6 col-sm-12">
+    <div class="flex gap-4">
+      <div class="w-1/4">
         <ep-form-content name="nimi">
           <ep-search
             v-model="query"
@@ -11,7 +11,7 @@
         </ep-form-content>
       </div>
 
-      <div class="col-xl-3 col-md-6 col-sm-12">
+      <div class="w-1/4">
         <ep-form-content name="koulutustyyppi">
           <ep-multi-select
             id="koulutustyyppiFilter"
@@ -26,7 +26,7 @@
         </ep-form-content>
       </div>
 
-      <div class="col-xl-3 col-md-6 col-sm-12">
+      <div class="w-full md:w-1/2 xl:w-1/4">
         <ep-form-content name="tila">
           <ep-multi-select
             id="tilaFilter"
@@ -41,7 +41,7 @@
         </ep-form-content>
       </div>
 
-      <div class="col-xl-3 col-md-6 col-sm-12">
+      <div class="w-1/5">
         <ep-form-content name="voimassaolo">
           <ep-multi-select
             id="voimassaoloFilter"
@@ -55,13 +55,16 @@
           />
         </ep-form-content>
       </div>
+    </div>
 
-      <EpTilastoAikavaliVertailu
-        v-model="aikavali"
-        class="col-12"
-      />
 
-      <div class="col-xl-6 col-md-6 col-sm-12">
+    <EpTilastoAikavaliVertailu
+      v-model="aikavali"
+      class="w-full"
+    />
+
+    <div class="flex gap-4">
+      <div class="w-full md:w-1/2">
         <ep-form-content name="peruste">
           <ep-multi-select
             id="perusteFilter"
@@ -76,7 +79,7 @@
         </ep-form-content>
       </div>
 
-      <div class="col-xl-6 col-md-6 col-sm-12">
+      <div class="w-1/2">
         <ep-form-content name="koulutustoimija">
           <ep-multi-select
             id="koulutustoimijaFilter"
@@ -92,15 +95,16 @@
       </div>
     </div>
 
+
     <h2 class="mt-5">
       {{ $t('toteutussuunnitelmien-lukumaarat') }}
     </h2>
 
-    <div class="row">
+    <div class="flex gap-4 justify-center">
       <div
         v-for="(tilastotieto,i) in statistiikkaData"
         :key="i"
-        class="col-xl-4 col-md-6 col-sm-12 tilastotyyppi"
+        class="w-1/3 tilastotyyppi"
       >
         <div class="otsake">
           {{ $t(tilastotieto.otsikko) }}
@@ -121,25 +125,26 @@
     </div>
 
     <h2 class="mt-5">
+      <div class="flex gap-2 items-center">
       <span>{{ $t('toteutussuunnitelmat') }} {{ toteutussuunnitelmatFiltered.length }} {{ $t('kpl') }}</span>
-      <EpButton
-        class="ml-5"
-        variant="link"
-        no-padding
-        @click="downloadTiedosto('csv')"
-      >
-        Lataa csv
-      </EpButton>
-      <EpButton
-        variant="link"
-        no-padding
-        @click="downloadTiedosto('xlsx')"
-      >
-        Lataa xlsx
-      </EpButton>
+
+        <EpButton
+          class="ml-5"
+          variant="link"
+          @click="downloadTiedosto('csv')"
+        >
+          Lataa csv
+        </EpButton>
+        <EpButton
+          variant="link"
+          @click="downloadTiedosto('xlsx')"
+        >
+          Lataa xlsx
+        </EpButton>
+      </div>
     </h2>
 
-    <b-table
+    <EpTable
       responsive
       borderless
       striped
@@ -148,31 +153,24 @@
       :fields="toteutussuunnitelmaFields"
       :current-page="opsPage"
       :per-page="perPage"
+      @update:current-page="opsPage = $event"
     >
-      <template #cell(nimi)="{item, value}">
+      <template #cell(nimi)="{ item, value }">
         <template v-if="item">
           <a
             :href="item.url"
             rel="noopener noreferrer"
             target="_blank"
-          >{{ value }}</a>
+          >{{ $kaanna(value) }}</a>
         </template>
       </template>
-    </b-table>
-
-    <EpPagination
-      v-model="opsPage"
-      :total-rows="toteutussuunnitelmatFiltered.length"
-      :per-page="perPage"
-      aria-controls="opetussuunnitelmat"
-      align="center"
-    />
+    </EpTable>
 
     <h2 class="mt-5">
       {{ $t('koulutustoimijat') }} {{ koulutustoimijatFiltered.length }} {{ $t('kpl') }}
     </h2>
 
-    <b-table
+    <EpTable
       responsive
       borderless
       striped
@@ -181,14 +179,7 @@
       :fields="koulutustoimijaFields"
       :current-page="ktPage"
       :per-page="perPage"
-    />
-
-    <EpPagination
-      v-model="ktPage"
-      :total-rows="koulutustoimijatFiltered.length"
-      :per-page="perPage"
-      aria-controls="opetussuunnitelmat"
-      align="center"
+      @update:current-page="ktPage = $event"
     />
   </div>
 </template>
@@ -207,7 +198,7 @@ import EpTilastoAikavaliVertailu, { AikavaliVertailu } from '@/components/tilast
 import { csvAikaleima, dataTiedostoksi } from './tilastot';
 import { $t, $kaanna, $sd } from '@shared/utils/globals';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 interface Toteutussuunnitelma {
   id: string | number;
@@ -468,6 +459,7 @@ const toteutussuunnitelmaFields = computed(() => {
   return [{
     key: 'nimi',
     label: $t('toteutussuunnitelman-nimi'),
+    thStyle: { width: '20%' },
     sortable: true,
     sortByFormatted: true,
     formatter: (value: any, key: string, item: any) => {

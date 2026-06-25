@@ -7,8 +7,8 @@
       <h3>{{ $t('laaja-alaisen-osaamisen-osa-alueet') }}</h3>
     </template>
     <template #default="{ data, isEditing }">
-      <b-row>
-        <b-col cols="11">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-[11] min-w-0">
           <EpDraggableCollapse
             v-model="data.laajaAlaisetOsaamiset"
             :is-editing="isEditing"
@@ -25,54 +25,37 @@
               </h4>
             </template>
 
-            <template #default="{data}">
-              <div class="row">
+            <template #default="{data, index}">
+              <div class="flex flex-wrap gap-4">
                 <div
                   v-if="isEditing"
-                  class="col-10"
+                  class="flex-[10] min-w-0"
                 >
-                  <b-form-group :label="$t('laaja-alaisen-osaamisen-otsikko')">
+                  <EpFormGroup :label="$t('laaja-alaisen-osaamisen-otsikko')">
                     <ep-koodisto-select
                       v-model="data.koodi"
                       :store="koodisto"
                       :is-editing="isEditing"
                       :nayta-arvo="false"
-                    >
-                      <template #default="{ open }">
-                        <b-input-group>
-                          <b-form-input
-                            :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                            disabled
-                          />
-                          <b-input-group-append>
-                            <b-button
-                              variant="primary"
-                              @click="open"
-                            >
-                              {{ $t('hae-koodistosta') }}
-                            </b-button>
-                          </b-input-group-append>
-                        </b-input-group>
-                      </template>
-                    </ep-koodisto-select>
-                  </b-form-group>
+                    />
+                  </EpFormGroup>
                 </div>
-                <div class="col-2">
-                  <b-form-group
+                <div class="w-1/6">
+                  <EpFormGroup
                     v-if="data.koodi && data.koodi.arvo"
                     :label="$t('koodi')"
                   >
                     {{ data.koodi.arvo }}
-                  </b-form-group>
+                  </EpFormGroup>
                 </div>
               </div>
 
-              <b-form-group>
+              <EpFormGroup>
                 <template
                   v-if="isEditing"
                   #label
                 >
-                  <div class="mt-4">
+                  <div class="mt-1">
                     {{ $t('kuvaus') }}
                   </div>
                 </template>
@@ -82,12 +65,21 @@
                   :is-editable="isEditing"
                   :kasite-handler="kasiteHandler"
                 />
-              </b-form-group>
+              </EpFormGroup>
 
               <div
                 v-if="isEditing"
-                class="d-flex justify-content-end"
+                class="flex justify-between items-center mt-4"
               >
+                <ep-button
+                  v-if="isEditing && index === laajaAlaisetOsaamiset.length - 1"
+                  variant="outline"
+                  icon="add"
+                  @click="lisaaLaajaAlainenOsaaminen()"
+                >
+                  {{ $t('uusi-laaja-alainen') }}
+                </ep-button>
+                <div v-else />
                 <ep-button
                   variant="link"
                   icon="delete"
@@ -100,16 +92,15 @@
           </EpDraggableCollapse>
 
           <ep-button
-            v-if="isEditing"
+            v-if="isEditing && laajaAlaisetOsaamiset.length === 0"
             variant="outline"
             icon="add"
-            class="ml-3 mt-3"
             @click="lisaaLaajaAlainenOsaaminen()"
           >
             {{ $t('uusi-laaja-alainen') }}
           </ep-button>
-        </b-col>
-      </b-row>
+        </div>
+      </div>
     </template>
   </EpEditointi>
 </template>
@@ -129,6 +120,8 @@ import EpContent from '@shared/components/EpContent/EpContent.vue';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpDraggableCollapse from '@shared/components/EpDraggableCollapse/EpDraggableCollapse.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 
 const props = defineProps<{
@@ -171,7 +164,7 @@ const poistaLaajaAlainenOsaaminen = (poistettavaLao: any) => {
 };
 
 const laajaAlaisetOsaamiset = computed(() => {
-  return store.value?.data.laajaAlaisetOsaamiset;
+  return store.value?.data.laajaAlaisetOsaamiset || [];
 });
 
 const isEditing = computed(() => {

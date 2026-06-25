@@ -9,7 +9,7 @@
     >
       <template #upperheader>
         <div>
-          <div class="d-flex justify-content-between">
+          <div class="flex justify-between">
             <h2>{{ $t('kieli-kaantaja-tutkinto') }}</h2>
             <div>
               <EpArkistoidutModal

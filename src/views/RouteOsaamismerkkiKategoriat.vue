@@ -1,9 +1,9 @@
 <template>
   <EpMainView>
     <template #header>
-      <div class="d-flex justify-content-between">
+      <div class="flex justify-between">
         <h1>{{ $t('osaamismerkki-teemojen-hallinta') }}</h1>
-        <div class="d-flex">
+        <div class="flex">
           <EpButton
             class="m-0 p-0"
             variant="outlined"
@@ -18,13 +18,12 @@
 
     <EpSpinner v-if="!kategoriat" />
     <div v-else-if="kategoriat.length > 0">
-      <b-table
+      <EpTable
         responsive
         borderless
         striped
         fixed
         hover
-        no-local-sorting
         :items="kategoriat"
         :fields="tableFields"
         @row-clicked="avaaKategoriaModal"
@@ -54,6 +53,7 @@ import EpOsaamismerkkiKategoriaModal from '@/components/EpOsaamismerkki/EpOsaami
 import { OsaamismerkitStore } from '@/stores/OsaamismerkitStore';
 import { Murupolku } from '@shared/stores/murupolku';
 import { $t, $kaanna, $sdt } from '@shared/utils/globals';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 const props = defineProps<{
   osaamismerkitStore: OsaamismerkitStore;

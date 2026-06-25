@@ -19,56 +19,39 @@
     </template>
 
     <template #default="{ data, isEditing, supportData }">
-      <b-row>
-        <b-col
+      <div class="flex flex-wrap gap-4">
+        <div
           v-if="isEditing"
-          cols="8"
+          class="flex-[8] min-w-0"
         >
-          <b-form-group :label="$t('oppiaineen-nimi')">
+          <EpFormGroup :label="$t('oppiaineen-nimi')">
             <ep-koodisto-select
               v-model="data.koodi"
               :store="koodisto"
               :is-editing="isEditing"
               :nayta-arvo="false"
-            >
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled
-                  />
-                  <b-input-group-append>
-                    <b-button
-                      variant="primary"
-                      @click="open"
-                    >
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-            </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
+            />
+          </EpFormGroup>
+        </div>
 
-        <b-col cols="3">
-          <b-form-group :label="$t('koodi')">
+        <div class="w-1/4">
+          <EpFormGroup :label="$t('koodi')">
             <span v-if="data.koodi">
               {{ data.koodi.arvo }}
             </span>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row>
-        <b-col cols="11">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-[11] min-w-0">
           <EpSisaltoTekstikappaleet
             v-model="storeData"
             :is-editing="isEditing"
             :sisalto-avaimet="['tehtava', 'tyotavat', 'ohjaus', 'arviointi', 'sisaltoalueinfo']"
           />
 
-          <b-form-group
+          <EpFormGroup
             v-if="data.pakollinenKurssiKuvaus"
             :label="$t('pakollinen-kurssi-kuvaus-header')"
             class="mt-4"
@@ -78,9 +61,9 @@
               layout="normal"
               :is-editable="isEditing"
             />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group
+          <EpFormGroup
             v-if="data.syventavaKurssiKuvaus"
             :label="$t('syventava-kurssi-kuvaus-header')"
             class="mt-4"
@@ -90,9 +73,9 @@
               layout="normal"
               :is-editable="isEditing"
             />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group
+          <EpFormGroup
             v-if="data.soveltavaKurssiKuvaus"
             :label="$t('soveltava-kurssi-kuvaus-header')"
             class="mt-4"
@@ -102,10 +85,13 @@
               layout="normal"
               :is-editable="isEditing"
             />
-          </b-form-group>
+          </EpFormGroup>
 
           <template v-if="!data['_oppiaine'] && oppiaineId && (!data.kurssit || data.kurssit.length == 0)">
-            <b-form-group :label="$t('oppimaarat')">
+            <EpFormGroup
+              :label="$t('oppimaarat')"
+              class="mt-4"
+            >
               <VueDraggable
                 v-bind="oppiaineetDragOptions"
                 v-model="data.oppimaarat"
@@ -114,7 +100,7 @@
                 <div
                   v-for="oppimaara in data.oppimaarat"
                   :key="'oppimaara'+oppimaara.id"
-                  class="listaus p-3 d-flex"
+                  class="listaus p-3 flex"
                 >
                   <EpMaterialIcon
                     v-if="isEditing"
@@ -127,7 +113,7 @@
                   </router-link>
                 </div>
               </VueDraggable>
-            </b-form-group>
+            </EpFormGroup>
 
             <ep-button
               v-if="!isEditing"
@@ -141,7 +127,7 @@
           </template>
 
           <template v-if="oppiaineId && (!data.oppimaarat || data.oppimaarat.length == 0)">
-            <b-form-group
+            <EpFormGroup
               :label="$t('kurssit')"
               class="mt-4"
             >
@@ -153,7 +139,7 @@
                 <div
                   v-for="kurssi in data.kurssit"
                   :key="'kurssi'+kurssi.id"
-                  class="listaus p-3 d-flex"
+                  class="listaus p-3 flex"
                 >
                   <EpMaterialIcon
                     v-if="isEditing"
@@ -166,7 +152,7 @@
                   </router-link>
                 </div>
               </VueDraggable>
-            </b-form-group>
+            </EpFormGroup>
 
             <ep-button
               v-if="!isEditing"
@@ -179,7 +165,7 @@
             </ep-button>
           </template>
 
-          <b-form-group
+          <EpFormGroup
             :label="$t('opetuksen-tavoitteet')"
             class="mt-4 pt-3"
           >
@@ -191,19 +177,19 @@
               <EpCollapse
                 v-for="(tavoite, tavoiteIndex) in data.tavoitteet"
                 :key="'tavoite'+tavoiteIndex"
-                class="tavoite p-3 mb-4 w-100"
+                class="tavoite p-3 mb-4 w-full"
                 :border-bottom="false"
                 :use-padding="false"
               >
                 <template #header>
-                  <div class="d-flex">
+                  <div class="flex items-center">
                     <EpMaterialIcon
                       v-if="isEditing"
                       class="order-handle mr-3"
                     >
                       drag_indicator
                     </EpMaterialIcon>
-                    <h4 class="mb-0">
+                    <h4 class="!mb-0">
                       {{ $kaanna(tavoite.tavoite) }}
                     </h4>
                   </div>
@@ -226,9 +212,9 @@
             >
               {{ $t('lisaa-tavoite') }}
             </ep-button>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
     </template>
   </EpEditointi>
 </template>
@@ -242,6 +228,7 @@ import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { AipeOppiaineStore } from '@/stores/AipeOppiaineStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';

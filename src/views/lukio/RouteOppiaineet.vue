@@ -10,7 +10,7 @@
       {{ $t('muokkaa-jarjestysta') }}
     </template>
     <template #default="{ data, isEditing }">
-      <div class="d-flex justify-content-end">
+      <div class="flex justify-end">
         <EpButton
           v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           variant="outline"
@@ -22,32 +22,26 @@
         </EpButton>
       </div>
 
-      <b-row
+      <div
         v-if="data.oppiaineet.length > 0"
-        class="border-bottom-1 m-0"
+        class="flex flex-wrap gap-4 border-bottom-1 m-0"
       >
-        <b-col
-          cols="5"
-          class="font-weight-bold pb-2"
-        >
+        <div class="w-5/12 font-semibold pb-2">
           {{ $t('nimi') }}
-        </b-col>
-      </b-row>
+        </div>
+      </div>
 
       <VueDraggable
         v-bind="defaultDragOptions"
         v-model="data.oppiaineet"
         tag="div"
       >
-        <b-row
+        <div
           v-for="(oppiaine, index) in data.oppiaineet"
           :key="'lao'+index"
-          class="taulukko-rivi-varitys py-3 m-0"
+          class="flex flex-wrap gap-4 taulukko-rivi-varitys py-3 m-0"
         >
-          <b-col
-            cols="5"
-            class="d-flex"
-          >
+          <div class="w-5/12 flex">
             <div
               v-if="isEditing"
               class="order-handle mr-2"
@@ -59,11 +53,11 @@
                 {{ $kaanna(oppiaine.nimi) }}
               </router-link>
             </div>
-          </b-col>
-          <b-col cols="5">
+          </div>
+          <div class="w-5/12">
             <span v-if="oppiaine.muokattu">{{ $sdt(oppiaine.muokattu) }}</span>
-          </b-col>
-        </b-row>
+          </div>
+        </div>
       </VueDraggable>
     </template>
   </EpEditointi>

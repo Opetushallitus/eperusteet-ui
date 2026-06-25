@@ -19,80 +19,63 @@
     </template>
 
     <template #default="{ data, isEditing, supportData }">
-      <b-row>
-        <b-col
+      <div class="flex flex-wrap gap-4">
+        <div
           v-if="isEditing"
-          cols="8"
+          class="flex-[8] min-w-0"
         >
-          <b-form-group :label="$t('kurssin-nimi')">
+          <EpFormGroup :label="$t('kurssin-nimi')">
             <ep-koodisto-select
               v-model="data.koodi"
               :store="koodisto"
               :is-editing="isEditing"
               :nayta-arvo="false"
-            >
-              <template #default="{ open }">
-                <b-input-group>
-                  <b-form-input
-                    :value="data.koodi ? $kaanna(data.koodi.nimi) : ''"
-                    disabled
-                  />
-                  <b-input-group-append>
-                    <b-button
-                      variant="primary"
-                      @click="open"
-                    >
-                      {{ $t('hae-koodistosta') }}
-                    </b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </template>
-            </ep-koodisto-select>
-          </b-form-group>
-        </b-col>
+            />
+          </EpFormGroup>
+        </div>
 
-        <b-col cols="3">
-          <b-form-group :label="$t('koodi')">
+        <div class="w-1/4">
+          <EpFormGroup :label="$t('koodi')">
             <span v-if="data.koodi">
               {{ data.koodi.arvo }}
             </span>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
       <hr>
 
-      <b-row>
-        <b-col cols="11">
-          <b-form-group :label="$t('tavoitteisiin-liittyvat-keskeiset-sisaltoalueet')">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-[11] min-w-0">
+          <EpFormGroup :label="$t('tavoitteisiin-liittyvat-keskeiset-sisaltoalueet')">
             <ep-content
               v-model="data.kuvaus"
               layout="normal"
               :is-editable="isEditing"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
       <hr>
 
-      <b-row>
-        <b-col cols="11">
-          <b-form-group :label="$t('liitetyt-tavoitteet')">
-            <b-form-checkbox-group
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-[11] min-w-0">
+          <EpFormGroup :label="$t('liitetyt-tavoitteet')">
+            <div
               v-if="isEditing"
-              :value="data.tavoitteet"
-              stacked
-              @input="data.tavoitteet = $event"
+              class="flex flex-col gap-2"
             >
-              <b-form-checkbox
+              <ep-toggle
                 v-for="tavoite in supportData.tavoitteet"
                 :key="tavoite.id"
-                :value="tavoite.id"
+                :checkbox="true"
+                :model-value="data.tavoitteet?.includes(tavoite.id)"
+                @update:model-value="(val: boolean) => toggleTavoite(tavoite.id, val)"
               >
                 {{ $kaanna(tavoite.tavoite) }}
-              </b-form-checkbox>
-            </b-form-checkbox-group>
+              </ep-toggle>
+            </div>
             <template v-else>
               <div
                 v-for="tavoite in tavoitteet"
@@ -102,9 +85,9 @@
                 {{ $kaanna(tavoite.tavoite) }}
               </div>
             </template>
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
     </template>
   </EpEditointi>
 </template>
@@ -121,7 +104,10 @@ import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { AipeKurssiStore } from '@/stores/AipeKurssiStore';
 import { $kaanna, $t } from '@shared/utils/globals';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 
 const props = defineProps({
   perusteStore: {
@@ -172,6 +158,16 @@ const tavoitteet = computed(() => {
 const kurssiChange = async () => {
   const storeInstance = new AipeKurssiStore(perusteId.value!, props.vaiheId, props.oppiaineId, props.kurssiId, props.perusteStore, versionumero.value);
   store.value = new EditointiStore(storeInstance);
+};
+
+const toggleTavoite = (tavoiteId: number, checked: boolean) => {
+  if (!store.value?.data?.tavoitteet) return;
+  if (checked) {
+    store.value.data.tavoitteet = [...(store.value.data.tavoitteet || []), tavoiteId];
+  }
+  else {
+    store.value.data.tavoitteet = store.value.data.tavoitteet.filter((id: number) => id !== tavoiteId);
+  }
 };
 
 watch(() => props.kurssiId, async () => {

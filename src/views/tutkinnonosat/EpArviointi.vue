@@ -1,5 +1,5 @@
 <template>
-  <b-form-group>
+  <EpFormGroup>
     <template #label>
       <div>
         <div
@@ -11,7 +11,7 @@
         <EpInput
           v-model="arvioinninKohdeAlue.otsikko"
           :is-editing="isEditing"
-          :class="{'mb-3': isEditing }"
+          :class="{'mb-2': isEditing }"
         />
       </div>
     </template>
@@ -23,7 +23,7 @@
       <div
         v-for="(arvioinninKohde, arvindex) in arvioinninKohdeAlue.arvioinninKohteet"
         :key="'arvioinninKohde' + arvindex"
-        class="ml-3 mt-2 d-flex"
+        class="ml-3 mt-2 flex"
       >
         <div
           v-if="isEditing"
@@ -31,11 +31,11 @@
         >
           <EpMaterialIcon>drag_indicator</EpMaterialIcon>
         </div>
-        <div class="w-100">
+        <div class="w-full">
           <div class="mb-2">
             <div
               v-if="isEditing || !!$kaanna(arvioinninKohde.otsikko)"
-              class="mb-1 font-weight-600"
+              class="mb-1 font-semibold"
             >
               <span v-if="isEditing">{{ $t('ryhmittelyotsikko-vapaaehtoinen') }}</span>
               <span v-if="!isEditing">{{ $t('ryhmittelyotsikko') }}</span>
@@ -48,7 +48,7 @@
           <div class="mb-3">
             <div
               v-if="isEditing || !!$kaanna(arvioinninKohde.selite)"
-              class="mb-1 font-weight-600"
+              class="mb-1 font-semibold"
             >
               {{ $t('arvioinnin-kohde') }}
             </div>
@@ -59,7 +59,7 @@
           </div>
 
           <template v-if="!arvioinninKohde._arviointiAsteikko">
-            <div class="font-weight-600">
+            <div class="font-semibold">
               {{ $t('arviointi-asteikon-valinta') }}
             </div>
             <EpRadio
@@ -92,8 +92,8 @@
           </template>
 
           <div
-            class="d-flex mb-2 mt-4"
-            :class="{'justify-content-end' : !arvioinninKohde._arviointiAsteikko, 'justify-content-between': arvioinninKohde._arviointiAsteikko}"
+            class="flex mb-2 mt-4"
+            :class="{'justify-end' : !arvioinninKohde._arviointiAsteikko, 'justify-between': arvioinninKohde._arviointiAsteikko}"
           >
             <EpButton
               v-if="isEditing && arvioinninKohde._arviointiAsteikko"
@@ -125,7 +125,7 @@
       v-if="isEditing"
       class="mb-2"
     >
-    <div class="d-flex justify-content-between">
+    <div class="flex justify-between">
       <EpButton
         v-if="isEditing"
         variant="outline"
@@ -136,7 +136,7 @@
       </EpButton>
       <slot name="poisto" />
     </div>
-  </b-form-group>
+  </EpFormGroup>
 </template>
 
 <script setup lang="ts">
@@ -151,6 +151,7 @@ import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { $t, $kaanna } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   modelValue: any;

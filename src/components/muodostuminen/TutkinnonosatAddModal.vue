@@ -1,25 +1,23 @@
 <template>
-  <b-modal
+  <EpModal
     ref="tutkinnonosatModal"
     size="xl"
-    :cancel-title="$t('peruuta')"
+    @cancel="cancel"
   >
-    <template #modal-header>
+    <template #modal-title>
       <h2>{{ $t('liita-tutkinnon-osia-ryhmaan') }}</h2>
     </template>
 
     <template #modal-footer>
-      <div class="d-flex justify-content-end w-100">
-        <ep-button
-          variant="link"
-          @click="cancel"
-        >
-          {{ $t('peruuta') }}
-        </ep-button>
-        <ep-button @click="save">
-          {{ $t('liita-valitut-tutkinnon-osat') }}
-        </ep-button>
-      </div>
+      <ep-button
+        variant="link"
+        @click="cancel"
+      >
+        {{ $t('peruuta') }}
+      </ep-button>
+      <ep-button @click="save">
+        {{ $t('liita-valitut-tutkinnon-osat') }}
+      </ep-button>
     </template>
 
     <template #default>
@@ -38,62 +36,52 @@
         </ep-toggle>
       </div>
 
-      <div class="font-weight-600 mt-4">
+      <div class="font-semibold mt-4">
         {{ $t('valittu') }} {{ selected.length }} {{ $t('kpl') }}
       </div>
-      <b-table
+      <EpTable
         striped
         responsive
         borderless
         fixed
         hover
+        data-key="_tutkinnonOsa"
         :current-page="sivu"
         :per-page="10"
         :items="items"
         :fields="fields"
         :selectable="true"
-        select-mode="single"
-        selected-variant=""
+        select-mode="multiple"
+        :selection="selected"
         @row-selected="onRowSelected"
       >
         <template #cell(nimi)="{ item }">
-          <EpMaterialIcon
-            v-if="item.selected"
-            class="checked mr-2"
-          >
-            check_box
-          </EpMaterialIcon>
-          <EpMaterialIcon
-            v-else
-            class="checked mr-2"
-          >
-            check_box_outline_blank
-          </EpMaterialIcon>
           {{ $kaanna(item.nimi) }}
         </template>
-      </b-table>
-      <EpPagination
+      </EpTable>
+      <EpBPagination
         v-model="sivu"
-        :total-rows="items.length"
-        :per-page="10"
+        :total="items.length"
+        :items-per-page="10"
         aria-controls="tutkinnonosat"
-        align="center"
       />
     </template>
-  </b-modal>
+  </EpModal>
 </template>
 
 <script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
 import { ref, computed, useTemplateRef, inject } from 'vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
 
 const props = defineProps({
   tutkinnonosat: {
@@ -156,19 +144,7 @@ const items = computed(() => {
 });
 
 const onRowSelected = (items) => {
-  if (!_.isEmpty(items)) {
-    const row = items[0];
-
-    if (_.includes(_.map(selected.value, '_tutkinnonOsa'), _.get(row, '_tutkinnonOsa'))) {
-      selected.value = _.filter(selected.value, tosa => tosa._tutkinnonOsa !== row._tutkinnonOsa);
-    }
-    else {
-      selected.value = [
-        ...selected.value,
-        row,
-      ];
-    }
-  }
+  selected.value = items;
 };
 
 const fields = computed(() => {

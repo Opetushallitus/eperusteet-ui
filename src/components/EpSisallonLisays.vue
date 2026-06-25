@@ -22,27 +22,20 @@
       <div
         v-for="(lisasisalto, index) in lisasisaltoLisays"
         :key="'lisasisalto'+index"
+        class="mt-1"
       >
-        <b-dropdown
+        <EpDropdown
           v-if="lisasisalto.groupedSisalto && lisasisalto.groupedSisalto.length > 0"
-          variant="link"
-          class="lisasisalto-dropdown mt-2"
-          toggle-class="text-decoration-none"
+          class="lisasisalto-dropdown"
           no-caret
         >
           <template #button-content>
             <ep-button
-              variant="link"
-              button-class="text-decoration-none"
-              no-padding
+              link
+              icon="add"
+              class="navi-button"
+              size="sm"
             >
-              <EpMaterialIcon
-                :color="'inherit'"
-                :background="'inherit'"
-                size="18px"
-              >
-                add
-              </EpMaterialIcon>
               <span>
                 {{ $t(lisasisalto.groupedLinkkiteksti) }}
               </span>
@@ -65,6 +58,7 @@
               :paatasovalinta="true"
               :otsikko-required="false"
               :modal-id="'groupedLisasisaltoLisays'+index"
+              class="mx-2"
             >
               <template #lisays-btn-icon>
                 <span />
@@ -92,24 +86,19 @@
               </template>
             </ep-tekstikappale-lisays>
           </div>
-        </b-dropdown>
+        </EpDropdown>
 
         <ep-button
           v-else-if="lisasisalto.call"
           v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
-          variant="link"
-          button-class="text-decoration-none"
+          link
+          class="navi-button"
           :show-spinner="loading"
           no-padding
+          icon="add"
+          size="sm"
           @click="makeCall(lisasisalto.call)"
         >
-          <EpMaterialIcon
-            :color="'inherit'"
-            :background="'inherit'"
-            size="18px"
-          >
-            add
-          </EpMaterialIcon>
           {{ $t(lisasisalto.label['uusi']) }}
         </ep-button>
 
@@ -172,6 +161,7 @@ import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import { EpDropdown } from '@shared/components/EpDropdown';
 import { KielikaantajanTaitoStore } from '@/stores/KielikaantajanTaitoStore';
 import { KaantajaTaitotasoasteikkoStore } from '@/stores/KaantajaTaitotasoasteikkoStore';
 import { KaantajaKielitaitoStore } from '@/stores/KaantajaKielitaitoStore';
@@ -684,25 +674,24 @@ const uusiPerusopetusoppiaine = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables';
+@import '@shared/styles/_variables';
 
-.lisasisalto-dropdown :deep(ep-button),
-.navigation :deep(.ep-button .btn) {
+.navi-button {
   font-size: 14px;
 }
 
-.lisasisalto-dropdown :deep(.btn) {
+.lisasisalto-dropdown :deep(.ep-button) {
   &.dropdown-toggle {
     padding: 0;
     border: 0;
 
-    .btn {
+    .navi-button {
       padding-top: 0px;
     }
   }
 }
 
-.lisasisalto-dropdown :deep(.dropdown-menu .ep-button .btn) {
+.lisasisalto-dropdown :deep(.dropdown-menu .ep-button) {
   color: $black;
   padding: 0;
 }

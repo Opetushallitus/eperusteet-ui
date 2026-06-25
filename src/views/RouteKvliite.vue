@@ -2,7 +2,7 @@
   <div v-if="!isInitializing && store">
     <EpEditointi :store="store">
       <template #header>
-        <h2 class="m-0">
+        <h2 class="!m-0">
           {{ $t('kvliite') }}
         </h2>
       </template>
@@ -18,32 +18,32 @@
         </EpInfoBanner>
 
         <h3>{{ $t('tutkinnon-suorittaneen-ammatillinen-osaaminen') }}</h3>
-        <b-form-group :label="$t('tutkinnon-muodostuminen')">
+        <EpFormGroup :label="$t('tutkinnon-muodostuminen')">
           <ep-content
             v-model="tutkinnonMuodostuminen"
             layout="simplified"
           />
-        </b-form-group>
+        </EpFormGroup>
 
         <h3>{{ $t('tutkinnon-virallinen-asema') }}</h3>
 
-        <b-form-group :label="$t('tutkintotodistuksen-antaja')">
+        <EpFormGroup :label="$t('tutkintotodistuksen-antaja')">
           <ep-content
             v-model="data.kvliite.tutkintotodistuksenAntaja"
             layout="simplified"
             :is-editable="isEditing && !data.kvliite.periytynyt"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group :label="$t('tutkinnosta-paattava-viranomainen')">
+        <EpFormGroup :label="$t('tutkinnosta-paattava-viranomainen')">
           <ep-content
             v-model="data.kvliite.tutkinnostaPaattavaViranomainen"
             layout="simplified"
             :is-editable="isEditing && !data.kvliite.periytynyt"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group :label="$t('tutkinnon-taso')">
+        <EpFormGroup :label="$t('tutkinnon-taso')">
           <ul
             v-for="(taso, idx) in data.kvliite.tasot"
             :key="idx"
@@ -52,9 +52,9 @@
               {{ $kaanna(taso.nimi) }}
             </li>
           </ul>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group :label="$t('arvosana-asteikko')">
+        <EpFormGroup :label="$t('arvosana-asteikko')">
           <div v-if="(!isEditing || data.kvliite.periytynyt) && data.kvliite._arvosanaAsteikko">
             <span
               v-for="(taso, idx) in data.arviointiasteikot[data.kvliite._arvosanaAsteikko].osaamistasot"
@@ -78,31 +78,31 @@
               </span>
             </EpRadio>
           </div>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group :label="$t('jatkoopinto-kelpoisuus')">
+        <EpFormGroup :label="$t('jatkoopinto-kelpoisuus')">
           <ep-content
             v-model="data.kvliite.jatkoopintoKelpoisuus"
             layout="simplified"
             :is-editable="isEditing && !data.kvliite.periytynyt"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group :label="$t('kansainvaliset-sopimukset')">
+        <EpFormGroup :label="$t('kansainvaliset-sopimukset')">
           <ep-content
             v-model="data.kvliite.kansainvalisetSopimukset"
             layout="simplified"
             :is-editable="isEditing && !data.kvliite.periytynyt"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group :label="$t('saadosperusta')">
+        <EpFormGroup :label="$t('saadosperusta')">
           <ep-content
             v-model="data.kvliite.saadosPerusta"
             layout="simplified"
             :is-editable="isEditing && !data.kvliite.periytynyt"
           />
-        </b-form-group>
+        </EpFormGroup>
 
         <h3>{{ $t('tutkintotodistuksen-saaminen') }}</h3>
 
@@ -112,21 +112,21 @@
           :is-editable="isEditing && !data.kvliite.periytynyt"
         />
 
-        <b-form-group :label="$t('pohjakoulutusvaatimukset')">
+        <EpFormGroup :label="$t('pohjakoulutusvaatimukset')">
           <ep-content
             v-model="data.kvliite.pohjakoulutusvaatimukset"
             layout="simplified"
             :is-editable="isEditing && !data.kvliite.periytynyt"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group :label="$t('lisatietoja')">
+        <EpFormGroup :label="$t('lisatietoja')">
           <ep-content
             v-model="data.kvliite.lisatietoja"
             layout="simplified"
             :is-editable="isEditing && !data.kvliite.periytynyt"
           />
-        </b-form-group>
+        </EpFormGroup>
       </template>
     </EpEditointi>
   </div>
@@ -153,6 +153,7 @@ import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpInfoBanner from '@shared/components/EpInfoBanner/EpInfoBanner.vue';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   kayttajaStore: KayttajaStore;
