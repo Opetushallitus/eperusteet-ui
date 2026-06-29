@@ -1,5 +1,3 @@
-import Vue from 'vue';
-import VueMeta from 'vue-meta';
 import RouteArviointi from '@/views/RouteArviointi.vue';
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue';
 import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';

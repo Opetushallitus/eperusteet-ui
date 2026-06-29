@@ -3122,13 +3122,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"de-indent@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "de-indent@npm:1.0.2"
-  checksum: 10c0/7058ce58abd6dfc123dd204e36be3797abd419b59482a634605420f47ae97639d0c183ec5d1b904f308a01033f473673897afc2bd59bc620ebf1658763ef4291
-  languageName: node
-  linkType: hard
-
 "debug@npm:4, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.4.0, debug@npm:^4.4.1, debug@npm:^4.4.3":
   version: 4.4.3
   resolution: "debug@npm:4.4.3"
@@ -3169,13 +3162,6 @@ __metadata:
     lodash: "npm:^4.17.21"
     lodash-es: "npm:^4.17.21"
   checksum: 10c0/d9e076803279969510cd079a93ec4f664a309c817acf447a51166bc7c07dcdcf79d04f19141065170173d7a79fdfe3783d1926f026d3fe2267a4c19fbc6dce14
-  languageName: node
-  linkType: hard
-
-"deepmerge@npm:^4.2.2":
-  version: 4.3.1
-  resolution: "deepmerge@npm:4.3.1"
-  checksum: 10c0/e53481aaf1aa2c4082b5342be6b6d8ad9dfe387bc92ce197a66dea08bd4265904a087e75e464f14d1347cf2ac8afe1e4c16b266e0561cc5df29382d3c5f80044
   languageName: node
   linkType: hard
 
@@ -3369,12 +3355,9 @@ __metadata:
     vue-i18n: "npm:^11.1.12"
     vue-loading-overlay: "npm:^6.0.6"
     vue-matomo: "npm:^4.2.0"
-    vue-meta: "npm:^2.3.2"
     vue-multiselect: "npm:^3.4.0"
-    vue-observe-visibility: "npm:1.0.0"
     vue-router: "npm:^4.5.1"
     vue-scrollto: "npm:^2.17.1"
-    vue-template-compiler: "npm:^2.7.16"
     vue-upload-component: "npm:^2.8.22"
     vue3-apexcharts: "npm:^1.11.1"
     vue3-text-clamp: "npm:^0.1.2"
@@ -6877,26 +6860,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue-meta@npm:^2.3.2":
-  version: 2.4.0
-  resolution: "vue-meta@npm:2.4.0"
-  dependencies:
-    deepmerge: "npm:^4.2.2"
-  checksum: 10c0/0a2f08fd0fd6c2418dc7352488da17a22aebec7c5ad785a73d94adffff1ade961836e2fb253efd06a2b8dd8ba2f4b8a7b0fa99e28187599dd02e93184524b1bc
-  languageName: node
-  linkType: hard
-
 "vue-multiselect@npm:^3.4.0":
   version: 3.5.0
   resolution: "vue-multiselect@npm:3.5.0"
   checksum: 10c0/bf12a34c15cd984bbff1b6d4d346de549e9ad69d19c665bdab1743f986d7726dafc4060a1d037030d7cd8d2a7ee1ce9f375d20f66cce9c2f8600331b95d4d5a6
-  languageName: node
-  linkType: hard
-
-"vue-observe-visibility@npm:1.0.0":
-  version: 1.0.0
-  resolution: "vue-observe-visibility@npm:1.0.0"
-  checksum: 10c0/579d8141e2c585477496f80279dfe5516a358d3c4f81deb8cf9562031f26ddbd5a41ac14a2dc3cfc4b107a512cdb1f1b5f9d62c2dd466ea8f6d885c45755c603
   languageName: node
   linkType: hard
 
@@ -6917,16 +6884,6 @@ __metadata:
   dependencies:
     bezier-easing: "npm:2.1.0"
   checksum: 10c0/894e7baa586eebb3cd6215af9f86c5fea9b9b43d568f6857b089432ff4c59f3711908d99d7ba6773b656dbbc06f4dab3f1b509de44526e3c7f15734b825e0856
-  languageName: node
-  linkType: hard
-
-"vue-template-compiler@npm:^2.7.16":
-  version: 2.7.16
-  resolution: "vue-template-compiler@npm:2.7.16"
-  dependencies:
-    de-indent: "npm:^1.0.2"
-    he: "npm:^1.2.0"
-  checksum: 10c0/66667ffd5095b707f169c902c4f1a011e9d5ab99fc228e4dac14eb5ca7f107ed99bff261b21578a4b391d2f3d320a8050e754404443472acad13ddaa4bd7bae2
   languageName: node
   linkType: hard
 
