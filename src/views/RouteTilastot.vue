@@ -1,50 +1,44 @@
 <template>
-  <ep-main-view :container="true">
+  <ep-main-view container>
     <template #header>
       <h1>{{ $t('tilastot') }}</h1>
     </template>
 
-    <b-tabs>
-      <b-tab
-        :title="$t('suunnitelmien-lukumaarat')"
-        class="mt-3 taulukko-graafi"
-      >
-        <b-tabs pills>
-          <b-tab
-            :title="$t('taulukko')"
-            active
-          >
-            <EpLukumaaraTilastot
-              :tilastot-store="tilastotStore"
-              class="mt-4"
-            />
-          </b-tab>
-          <b-tab :title="$t('graafi')">
-            <EpLukumaaraGraafit
-              :tilastot-store="tilastotStore"
-              class="mt-4"
-            />
-          </b-tab>
-        </b-tabs>
-      </b-tab>
+    <EpTabs>
+      <EpTab :title="$t('suunnitelmien-lukumaarat')">
+        <div class="mt-3 taulukko-graafi">
+          <EpTabs>
+            <EpTab :title="$t('taulukko')">
+              <EpLukumaaraTilastot
+                :tilastot-store="tilastotStore"
+                class="mt-4"
+              />
+            </EpTab>
+            <EpTab :title="$t('graafi')">
+              <EpLukumaaraGraafit
+                :tilastot-store="tilastotStore"
+                class="mt-4"
+              />
+            </EpTab>
+          </EpTabs>
+        </div>
+      </EpTab>
 
-      <b-tab
-        :title="$t('amosaa-tyokalu')"
-        class="mt-5"
-      >
-        <EpAmosaaTilastot :toteutussuunnitelmat="toteutussuunnitelmat" />
-      </b-tab>
+      <EpTab :title="$t('amosaa-tyokalu')">
+        <EpAmosaaTilastot
+          :toteutussuunnitelmat="toteutussuunnitelmat"
+          class="mt-5"
+        />
+      </EpTab>
 
-      <b-tab
-        :title="$t('ops-tyokalu')"
-        class="mt-5"
-      >
+      <EpTab :title="$t('ops-tyokalu')">
         <EpYlopsTilastot
           :opetussuunnitelmat="opetussuunnitelmat"
           :perusteet="perusteet"
+          class="mt-5"
         />
-      </b-tab>
-    </b-tabs>
+      </EpTab>
+    </EpTabs>
   </ep-main-view>
 </template>
 
@@ -58,6 +52,8 @@ import EpYlopsTilastot from '@/components/tilastot/EpYlopsTilastot.vue';
 import EpLukumaaraTilastot from '@/components/tilastot/EpLukumaaraTilastot.vue';
 import EpLukumaaraGraafit from '@/components/tilastot/EpLukumaaraGraafit.vue';
 import { $t, $fail } from '@shared/utils/globals';
+import EpTabs from '@shared/components/EpTabs/EpTabs.vue';
+import EpTab from '@shared/components/EpTabs/EpTab.vue';
 
 const props = defineProps<{
   tilastotStore: TilastotStore;
@@ -90,24 +86,7 @@ onMounted(async () => {
 @import "@shared/styles/_variables.scss";
 
 :deep(.container) {
-  max-width: 1500px;
+  max-width: 1500px !important;
 }
 
-:deep(.taulukko-graafi .nav-pills .nav-item) {
-  border: 2px solid #3367E3;
-
-  .nav-link {
-    border-radius: 0;
-  }
-}
-
-:deep(.taulukko-graafi .nav-pills .nav-item:first-child) {
-  border-top-left-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
-}
-
-:deep(.taulukko-graafi .nav-pills .nav-item:last-child) {
-  border-top-right-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
-}
 </style>

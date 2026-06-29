@@ -13,26 +13,26 @@
       </h2>
     </template>
     <template #default="{ data, isEditing }">
-      <b-row
+      <div
         v-if="isEditing"
-        class="mb-4"
+        class="flex flex-wrap gap-4 mb-4"
       >
-        <b-col lg="8">
-          <b-form-group
-            :label="$t('paa-alueen-nimi') + ' *'"
+        <div class="lg:w-2/3">
+          <EpFormGroup
+            :label="$t('paa-alueen-nimi')"
             required
           >
             <ep-input
               v-model="data.nimi"
               :is-editing="isEditing"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
-      <b-row>
-        <b-col md="8">
-          <b-form-group>
+      <div class="flex flex-wrap gap-4">
+        <div class="md:w-2/3">
+          <EpFormGroup>
             <template #label>
               <div v-if="isEditing">
                 {{ $t('paa-alueen-kuvaus') }}
@@ -45,9 +45,9 @@
               :kasite-handler="kasiteHandler"
               :kuva-handler="kuvaHandler"
             />
-          </b-form-group>
-        </b-col>
-      </b-row>
+          </EpFormGroup>
+        </div>
+      </div>
 
       <hr>
 
@@ -60,36 +60,36 @@
           v-model="data.osaAlueet"
           tag="div"
         >
-          <b-row
+          <div
             v-for="(osaAlue, index) in data.osaAlueet"
             :key="'tavoite'+index"
-            class="pb-2"
+            class="flex flex-wrap gap-4 pb-2"
           >
-            <b-col md="8">
-              <div class="d-flex">
+            <div class="md:w-2/3">
+              <div class="flex">
                 <div class="order-handle mr-3">
                   <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                 </div>
                 <EpOsaAlue
                   v-model="data.osaAlueet[index]"
                   :is-editing="isEditing"
-                  class="w-100"
+                  class="w-full"
                 >
                   <template #poisto>
                     <div>
-                      <b-button
+                      <ep-button
                         variant="link"
+                        icon="delete"
                         @click.stop="poistaOsaAlue(osaAlue)"
                       >
-                        <EpMaterialIcon>delete</EpMaterialIcon>
                         {{ $t('poista-osa-alue') }}
-                      </b-button>
+                      </ep-button>
                     </div>
                   </template>
                 </EpOsaAlue>
               </div>
-            </b-col>
-          </b-row>
+            </div>
+          </div>
         </VueDraggable>
 
         <ep-button
@@ -134,6 +134,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpOsaAlue from '@shared/components/EpOsaamiskokonaisuus/EpOsaAlue.vue';
 import { OsaamiskokonaisuusPaaAlueStore } from '@/stores/OsaamiskokonaisuusPaaAlueStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import { $kaanna, $t } from '@shared/utils/globals';
 

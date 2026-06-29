@@ -7,7 +7,7 @@
     >
       <template #customheader="{ data, isEditing, cancel, save, disabled, validation, isSaving, modify, remove, editable }">
         <div
-          class="d-flex justify-content-between header py-2"
+          class="flex justify-between header py-2"
           :class="{'editing': isEditing}"
         >
           <h1 class="mb-4 mr-auto">
@@ -70,17 +70,17 @@
 
       <template #default="{ data, isEditing, supportData }">
         <div v-if="!isEditing">
-          <b-form-group :label="$t('tila')">
+          <EpFormGroup :label="$t('tila')">
             <span v-if="data.tila">{{ $t(data.tila.toLowerCase()) }} - {{ $t('muokannut-viimeksi') }}: </span>
             <span v-if="muokkaajaNimi">{{ muokkaajaNimi }} </span>
             <span v-else>{{ data.muokkaaja }} </span>
             <span v-if="data.muokattu">{{ $sdt(data.muokattu) }}</span>
-          </b-form-group>
+          </EpFormGroup>
         </div>
 
-        <b-form-group class="mt-4">
+        <EpFormGroup class="mt-4">
           <template #label>
-            <div class="d-flex">
+            <div class="flex">
               <div>{{ $t('tyyppi') + isRequired }}</div>
               <EpInfoPopover
                 v-if="isEditing"
@@ -105,9 +105,9 @@
             <span v-if="data.peruste">(<router-link :to="{ name : 'perusteprojekti', params: { projektiId: data.peruste._perusteprojekti }}">{{ $kaanna(data.peruste.nimi) }}</router-link>)
             </span>
           </div>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('maarayksen-nimi') + isRequired"
           class="mt-4"
         >
@@ -115,9 +115,9 @@
             v-model="data.nimi"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('maarayksen-diaarinumero') + isRequired"
           class="mt-4"
         >
@@ -126,13 +126,13 @@
             :is-editing="isEditing"
             type="string"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('voimassaolo')"
           class="mt-4"
         >
-          <div class="d-flex align-items-center">
+          <div class="flex items-center">
             <div>
               <div v-if="isEditing">
                 {{ $t('alkaa') }}{{ isRequired }}
@@ -159,19 +159,19 @@
               />
             </div>
           </div>
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('maarayksen-paatospaivamaara') + isRequired"
-          class="mt-4 d-flex"
+          class="mt-4"
         >
           <ep-datepicker
             v-model="data.maarayspvm"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('maaraysdokumentti') + ' (pdf) ' + isRequired"
           class="mt-4"
         >
@@ -189,9 +189,9 @@
             :tyyppi="MAARAYSDOKUMENTTI"
             yksittainen
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="liittyykoToiseenMaaraykseenOtsikko"
           class="mt-4"
         >
@@ -200,9 +200,9 @@
             :maaraykset-nimella="supportData.maarayksetNimella"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('koulutus-tai-tutkinto')"
           class="mt-4"
         >
@@ -210,9 +210,9 @@
             v-model="data.koulutustyypit"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('asiasana')"
           class="mt-4"
         >
@@ -221,9 +221,9 @@
             :asiasanat="asiasanat"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('kuvaus') + isRequired"
           class="mt-4"
         >
@@ -232,9 +232,9 @@
             layout="simplified_w_links"
             :is-editable="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
-        <b-form-group
+        <EpFormGroup
           :label="$t('liitteet') + ' (pdf)'"
           class="mt-4 mb-5"
         >
@@ -244,7 +244,7 @@
             :tyyppi="LIITE"
             nimisyote
           />
-        </b-form-group>
+        </EpFormGroup>
       </template>
     </EpEditointi>
   </ep-main-view>
@@ -272,8 +272,9 @@ import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { Kielet } from '@shared/stores/kieli';
 import EpInfoPopover from '@shared/components/EpInfoPopover/EpInfoPopover.vue';
 import EpMaarayskokoelmaKoulutustyyppiSelect from '@shared/components/EpMaarayskokoelmaKoulutustyyppiSelect/EpMaarayskokoelmaKoulutustyyppiSelect.vue';
-import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import { $t, $kaanna, $confirmModal } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const route = useRoute();
 const instance = getCurrentInstance();
@@ -399,7 +400,7 @@ const liittyykoToiseenMaaraykseenOtsikko = computed(() => {
 });
 
 const poista = async (remove) => {
-  const varmistaPoisto = await $bvModal.msgBoxConfirm(
+  const varmistaPoisto = await $confirmModal.msgBoxConfirm(
     $t('maarays-poisto-varmistus-teksti'), {
       title: $t('poista-maarays'),
       okTitle: $t('poista'),

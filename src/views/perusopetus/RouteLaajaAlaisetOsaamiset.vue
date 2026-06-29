@@ -8,7 +8,7 @@
 
     <EpSpinner v-if="!laajaAlaisetOsaamiset" />
     <div v-else>
-      <div class="d-flex justify-content-end">
+      <div class="flex justify-end mb-2">
         <EpButton
           v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           variant="outline"
@@ -19,43 +19,20 @@
         </EpButton>
       </div>
 
-      <b-row
+      <EpTable
         v-if="laajaAlaisetOsaamiset.length > 0"
-        class="border-bottom-1 m-0 pb-2"
+        striped
+        hover
+        responsive
+        :items="laajaAlaisetOsaamiset"
+        :fields="tableFields"
       >
-        <b-col
-          cols="5"
-          class="font-weight-bold"
-        >
-          {{ $t('nimi') }}
-        </b-col>
-        <b-col
-          cols="5"
-          class="font-weight-bold"
-        >
-          {{ $t('muokattu') }}
-        </b-col>
-      </b-row>
-
-      <b-row
-        v-for="(lao, index) in laajaAlaisetOsaamiset"
-        :key="'lao'+index"
-        class="taulukko-rivi-varitys py-3 m-0"
-      >
-        <b-col
-          cols="5"
-          class="d-flex"
-        >
-          <div>
-            <router-link :to="{ name: 'perusopetusLaajaAlainenOsaaminen', params: { laoId: lao.id } }">
-              {{ $kaanna(lao.nimi) }}
-            </router-link>
-          </div>
-        </b-col>
-        <b-col cols="5">
-          <span v-if="lao.muokattu">{{ $sdt(lao.muokattu) }}</span>
-        </b-col>
-      </b-row>
+        <template #cell(nimi)="{ item }">
+          <router-link :to="{ name: 'perusopetusLaajaAlainenOsaaminen', params: { laoId: item.id } }">
+            {{ $kaanna(item.nimi) }}
+          </router-link>
+        </template>
+      </EpTable>
     </div>
   </EpContentView>
 </template>
@@ -70,6 +47,7 @@ import { PerusopetusLaajaAlaisetOsaamisetStore } from '@/stores/PerusopetusLaaja
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpContentView from '@shared/components/EpContentView/EpContentView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import { $t, $kaanna, $sdt } from '@shared/utils/globals';
 
 const props = defineProps<{
@@ -93,6 +71,20 @@ const laajaAlaisetOsaamiset = computed(() => {
   }
   return [];
 });
+
+const tableFields = computed(() => [
+  {
+    key: 'nimi',
+    label: $t('nimi'),
+    sortable: false,
+  },
+  {
+    key: 'muokattu',
+    label: $t('muokattu'),
+    sortable: false,
+    formatter: (value: unknown) => (value ? $sdt(value as string) : ''),
+  },
+]);
 
 
 const lisaaLaajaAlainenOsaaminen = () => {

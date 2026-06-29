@@ -4,7 +4,7 @@
       v-if="muutosmaarays"
       class="mb-5"
     >
-      <b-form-group :label="$t('lataa-uusi-muutosmaaraus') + asterisk">
+      <EpFormGroup :label="$t('lataa-uusi-muutosmaaraus') + asterisk">
         <ep-tiedosto-lataus
           v-if="!file"
           ref="tiedostoLataus"
@@ -74,20 +74,20 @@
             </tbody>
           </table>
         </div>
-      </b-form-group>
+      </EpFormGroup>
 
-      <b-form-group
+      <EpFormGroup
         :label="$t('muutosmaarays-astuu-voimaan') + asterisk"
-        class="mt-4 col-lg-3"
+        class="mt-4 lg:w-1/4"
       >
         <ep-datepicker
           v-model="julkaisu.muutosmaaraysVoimaan"
           :is-editing="true"
         />
-      </b-form-group>
+      </EpFormGroup>
     </div>
 
-    <b-form-group :label="$t('lyhyt-kuvaus-muutoksesta-hallintanakymaan')">
+    <EpFormGroup :label="$t('lyhyt-kuvaus-muutoksesta-hallintanakymaan')">
       <div class="mb-3">
         {{ $t('kuvaus-naytetaan-taman-sivun-muutoshistoriassa') }}
       </div>
@@ -105,9 +105,9 @@
       >
         {{ $t('julkaisu-naytetaan-julkisen-sivuston-julkaisuhistoriassa') }}
       </ep-toggle>
-    </b-form-group>
+    </EpFormGroup>
 
-    <b-form-group
+    <EpFormGroup
       v-if="julkaisu.julkinen"
       :label="$t('lyhyt-kuvaus-muutoksesta-julkisella-sivustolla')"
       class="mt-4"
@@ -120,7 +120,7 @@
         layout="simplified"
         :is-editable="true"
       />
-    </b-form-group>
+    </EpFormGroup>
   </div>
 </template>
 
@@ -138,6 +138,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { notNull } from '@shared/validators/required';
 import { requiredIf } from '@vuelidate/validators';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import { $t } from '@shared/utils/globals';
 
 const props = defineProps<{

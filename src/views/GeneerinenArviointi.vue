@@ -8,11 +8,11 @@
       role="button"
       @click="toggleOpen()"
     >
-      <div class="d-flex">
-        <div class="flex-grow-1">
+      <div class="flex">
+        <div class="flex-1">
           {{ $kaanna(inner.nimi) }}
         </div>
-        <div class="flex-shrink-1">
+        <div class="shrink">
           <EpMaterialIcon v-if="isOpen">
             expand_less
           </EpMaterialIcon>
@@ -69,34 +69,24 @@
           <div> {{ $kaanna(osaamistaso) }} </div>
         </div>
 
-        <b-table
+        <EpTable
           v-else
           striped
           hover
           responsive
-          show-empty
-          :empty-text="$t('ei-sisaltoa')"
           :items="osaamistasot"
           :fields="fields"
         >
-          <template #table-colgroup="scope">
-            <col
-              v-for="field in scope.fields"
-              :key="field.key"
-              :style="{ width: field.key === 'osaamistaso' && '160px' }"
-            >
-          </template>
-
-          <template #cell(osaamistaso)="data">
+          <template #cell(osaamistaso)="{ item }">
             <div class="osaamistaso">
-              {{ $kaanna(data.item.otsikko) }}
+              {{ $kaanna(item.otsikko) }}
             </div>
           </template>
 
-          <template #cell(kriteerit)="data">
+          <template #cell(kriteerit)="{ item }">
             <EpBulletEditor
               kohde=""
-              :model-value="data.item.kriteerit"
+              :model-value="item.kriteerit"
               :is-editable="isEditing"
               :allow-structure-change="!inner.julkaistu"
             >
@@ -105,11 +95,17 @@
               </template>
             </EpBulletEditor>
           </template>
-        </b-table>
+        </EpTable>
       </div>
       <EpSpinner v-if="isLoading" />
-      <div v-else>
-        <div v-if="!isEditing">
+      <div
+        v-else
+        class="mt-4"
+      >
+        <div
+          v-if="!isEditing"
+          class="flex gap-4"
+        >
           <ep-button
             v-if="inner.julkaistu"
             variant="primary"
@@ -127,40 +123,35 @@
         </div>
         <div
           v-else
-          class="d-flex justify-content-between"
+          class="flex gap-4 items-center"
         >
-          <div>
-            <ep-button
-              v-if="!inner.julkaistu"
-              variant="link"
-              @click="onRemove()"
-            >
-              {{ $t('poista') }}
-            </ep-button>
-            <ep-button
-              class="ml-2"
-              variant="primary"
-              @click="onSave()"
-            >
-              {{ $t('tallenna') }}
-            </ep-button>
-            <ep-button
-              v-if="!inner.julkaistu"
-              class="ml-2"
-              variant="primary"
-              @click="onPublish()"
-            >
-              {{ $t('julkaise') }}
-            </ep-button>
-            <ep-button
-              v-if="inner.julkaistu && kayttajaIsAdmin"
-              class="ml-2"
-              variant="primary"
-              @click="onUnPublish()"
-            >
-              {{ $t('palauta-keskeneraiseksi') }}
-            </ep-button>
-          </div>
+          <ep-button
+            v-if="!inner.julkaistu"
+            variant="link"
+            @click="onRemove()"
+          >
+            {{ $t('poista') }}
+          </ep-button>
+          <ep-button
+            variant="primary"
+            @click="onSave()"
+          >
+            {{ $t('tallenna') }}
+          </ep-button>
+          <ep-button
+            v-if="!inner.julkaistu"
+            variant="primary"
+            @click="onPublish()"
+          >
+            {{ $t('julkaise') }}
+          </ep-button>
+          <ep-button
+            v-if="inner.julkaistu && kayttajaIsAdmin"
+            variant="primary"
+            @click="onUnPublish()"
+          >
+            {{ $t('palauta-keskeneraiseksi') }}
+          </ep-button>
         </div>
       </div>
     </div>
@@ -172,6 +163,7 @@
 import { ref, computed, watch } from 'vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import EpBulletEditor from '@/components/EpBulletEditor/EpBulletEditor.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ArviointiStore } from '@/stores/ArviointiStore';
 import { GeneerinenArviointiasteikkoDto } from '@shared/api/eperusteet';
@@ -179,7 +171,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import * as _ from 'lodash';
 import { KayttajaStore } from '@/stores/kayttaja';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t, $kaanna, $bvModal } from '@shared/utils/globals';
+import { $t, $kaanna, $confirmModal } from '@shared/utils/globals';
 
 const props = defineProps<{
   value: GeneerinenArviointiasteikkoDto;
@@ -224,6 +216,7 @@ const fields = computed(() => {
     key: 'osaamistaso',
     label: $t('osaamistaso') as string,
     sortable: false,
+    thStyle: { width: '160px' },
   }, {
     key: 'kriteerit',
     label: $t('kriteerit') as string,
@@ -280,7 +273,7 @@ const onSave = async () => {
 };
 
 const onPublish = async () => {
-  await $bvModal?.msgBoxConfirm(
+  await $confirmModal?.msgBoxConfirm(
     $t('julkaistaanko-geneerinen-arviointi-kuvaus') as any, {
       title: $t('julkaistaanko-geneerinen-arviointi') as any,
       okTitle: $t('julkaise') as any,
@@ -300,7 +293,7 @@ const onPublish = async () => {
 };
 
 const onUnPublish = async () => {
-  await $bvModal?.msgBoxConfirm(
+  await $confirmModal?.msgBoxConfirm(
     $t('palautetaanko-geneerinen-arviointi-keskeneraiseksi-kuvaus') as any, {
       title: $t('palautetaanko-geneerinen-arviointi-keskeneraiseksi') as any,
       okTitle: $t('palauta-keskeneraiseksi') as any,
@@ -335,7 +328,7 @@ const onRemove = async () => {
     return;
   }
 
-  await $bvModal?.msgBoxConfirm(
+  await $confirmModal?.msgBoxConfirm(
     $t('poistetaanko-geneerinen-arviointi-kuvaus') as any, {
       title: $t('poistetaanko-geneerinen-arviointi') as any,
       okTitle: $t('poista') as any,

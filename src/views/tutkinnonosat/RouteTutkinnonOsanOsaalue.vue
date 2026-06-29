@@ -3,7 +3,7 @@
     <div v-if="store">
       <EpEditointi :store="store">
         <template #header="{ data }">
-          <h2 class="m-0">
+          <h2 class="!m-0">
             <span>
               {{ $kaanna(data.nimi) || $t('nimeton-osaalue') }}{{ data.laajuus ? ',' : '' }}
             </span>
@@ -16,71 +16,73 @@
         <template #default="{ data, isEditing, validation }">
           <EpSpinner v-if="!data" />
           <div v-else>
-            <b-row>
-              <b-col md="5">
-                <b-form-group :label="$t('osaalue-nimi') + (isEditing ? ' *' : '')">
+            <div class="flex flex-wrap gap-4">
+              <div class="md:w-5/12">
+                <EpFormGroup :label="$t('osaalue-nimi')" required>
                   <ep-input
                     v-model="data.nimi"
                     :is-editing="isEditing"
                     :validation="validation.nimi"
                   />
-                </b-form-group>
-              </b-col>
+                </EpFormGroup>
+              </div>
 
-              <b-col md="4">
-                <b-form-group :label="$t('koodi') + (isEditing ? ' *' : '')">
+              <div class="md:w-1/3">
+                <EpFormGroup :label="$t('koodi')" required>
                   <ep-koodisto-select
                     v-model="data.koodi"
                     :store="koodisto"
                     :is-editing="isEditing"
                   >
                     <template #default="{ open }">
-                      <b-input-group>
-                        <b-form-input
-                          :value="data.koodi ? ($kaanna(data.koodi.nimi) + ' (' + data.koodi.arvo + ')') : ''"
+                      <EpInputGroup>
+                        <ep-input
+                          :model-value="data.koodi ? ($kaanna(data.koodi.nimi) + ' (' + data.koodi.arvo + ')') : ''"
+                          :is-editing="true"
                           disabled
                         />
-                        <b-input-group-append>
-                          <b-button
+                        <template #append>
+                          <ep-button
                             variant="primary"
                             @click="open"
                           >
                             {{ $t('hae-koodistosta') }}
-                          </b-button>
-                        </b-input-group-append>
-                      </b-input-group>
+                          </ep-button>
+                        </template>
+                      </EpInputGroup>
                     </template>
                   </ep-koodisto-select>
-                </b-form-group>
-              </b-col>
+                </EpFormGroup>
+              </div>
 
-              <b-col md="3">
-                <b-form-group :label="$t('osa-alue-kieli')">
+              <div class="md:w-1/4">
+                <EpFormGroup :label="$t('osa-alue-kieli')">
                   <ep-koodisto-select
                     v-model="data.kielikoodi"
                     :store="kielikoodisto"
                     :is-editing="isEditing"
                   >
                     <template #default="{ open }">
-                      <b-input-group>
-                        <b-form-input
-                          :value="data.kielikoodi ? ($kaanna(data.kielikoodi.nimi) + ' (' + data.kielikoodi.arvo + ')') : ''"
+                      <EpInputGroup>
+                        <ep-input
+                          :model-value="data.kielikoodi ? ($kaanna(data.kielikoodi.nimi) + ' (' + data.kielikoodi.arvo + ')') : ''"
+                          :is-editing="true"
                           disabled
                         />
-                        <b-input-group-append>
-                          <b-button
+                        <template #append>
+                          <ep-button
                             variant="primary"
                             @click="open"
                           >
                             {{ $t('hae-koodistosta') }}
-                          </b-button>
-                        </b-input-group-append>
-                      </b-input-group>
+                          </ep-button>
+                        </template>
+                      </EpInputGroup>
                     </template>
                   </ep-koodisto-select>
-                </b-form-group>
-              </b-col>
-            </b-row>
+                </EpFormGroup>
+              </div>
+            </div>
           </div>
 
           <ep-collapse
@@ -185,6 +187,8 @@ import _ from 'lodash';
 import { UiKielet } from '@shared/stores/kieli';
 import { Koodistot } from '@shared/utils/koodi';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import { PerusteStore } from '@/stores/PerusteStore';
 
 const props = defineProps<{

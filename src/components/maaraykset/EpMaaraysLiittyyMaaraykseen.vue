@@ -4,9 +4,9 @@
       v-for="(maarays, index) in model"
       :key="tyyppi+index"
     >
-      <div class="d-flex w-100 mb-2 align-items-center">
+      <div class="flex w-full mb-2 items-center">
         <EpMultiSelect
-          class="w-100"
+          class="w-full"
           :model-value="maarays"
           :placeholder="$t('valitse-maarays')"
           :is-editing="true"

@@ -8,7 +8,7 @@
 
     <EpSpinner v-if="!vuosiluokkakokonaisuudet" />
     <div v-else>
-      <div class="d-flex justify-content-end">
+      <div class="flex justify-end mb-2">
         <EpButton
           v-oikeustarkastelu="{ oikeus: 'muokkaus' }"
           variant="outline"
@@ -19,43 +19,20 @@
         </EpButton>
       </div>
 
-      <b-row
+      <EpTable
         v-if="vuosiluokkakokonaisuudet.length > 0"
-        class="border-bottom-1 m-0 pb-2"
+        striped
+        hover
+        responsive
+        :items="vuosiluokkakokonaisuudet"
+        :fields="tableFields"
       >
-        <b-col
-          cols="5"
-          class="font-weight-bold"
-        >
-          {{ $t('nimi') }}
-        </b-col>
-        <b-col
-          cols="5"
-          class="font-weight-bold"
-        >
-          {{ $t('muokattu') }}
-        </b-col>
-      </b-row>
-
-      <b-row
-        v-for="(vlk, index) in vuosiluokkakokonaisuudet"
-        :key="'lao'+index"
-        class="taulukko-rivi-varitys py-3 m-0"
-      >
-        <b-col
-          cols="5"
-          class="d-flex"
-        >
-          <div>
-            <router-link :to="{ name: 'perusopetusVuosiluokkakokonaisuus', params: { vlkId: vlk.id } }">
-              {{ $kaanna(vlk.nimi) }}
-            </router-link>
-          </div>
-        </b-col>
-        <b-col cols="5">
-          <span v-if="vlk.muokattu">{{ $sdt(vlk.muokattu) }}</span>
-        </b-col>
-      </b-row>
+        <template #cell(nimi)="{ item }">
+          <router-link :to="{ name: 'perusopetusVuosiluokkakokonaisuus', params: { vlkId: item.id } }">
+            {{ $kaanna(item.nimi) }}
+          </router-link>
+        </template>
+      </EpTable>
     </div>
   </EpContentView>
 </template>
@@ -69,6 +46,7 @@ import { PerusopetusVuosiluokkakokonaisuudetStore } from '@/stores/PerusopetusVu
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpContentView from '@shared/components/EpContentView/EpContentView.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 import { $kaanna, $t, $sdt } from '@shared/utils/globals';
 
 const props = defineProps({
@@ -89,6 +67,19 @@ const vuosiluokkakokonaisuudet = computed(() => {
   return store.value?.vuosiluokkakokonaisuudet;
 });
 
+const tableFields = computed(() => [
+  {
+    key: 'nimi',
+    label: $t('nimi'),
+    sortable: false,
+  },
+  {
+    key: 'muokattu',
+    label: $t('muokattu'),
+    sortable: false,
+    formatter: (value: unknown) => (value ? $sdt(value as string) : ''),
+  },
+]);
 
 const lisaaVuosiluokkakokonaisuus = () => {
   router.push({

@@ -22,13 +22,12 @@
               v-for="(opas, index) in viimeisimmatOppaat"
               :key="'opas'+index"
             >
-              {{ $kaanna(opas.nimi) }}
+              {{ $kaanna(opas.peruste.nimi) || opas.nimi }}
             </div>
             <ep-button
               v-if="kokonaismaara > viimeisimmatOppaat.length"
               variant="link"
               button-class="pl-0 btn-sm"
-              class="no-padding"
             >
               {{ kokonaismaara - oppaat.length }} {{ $t('muuta-opasta') }}
             </ep-button>

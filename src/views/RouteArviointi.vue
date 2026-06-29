@@ -8,21 +8,31 @@
       />
     </template>
 
-    <b-container>
+    <div class="arviointi-container">
       <h1 class="mb-4">
         {{ $t('arviointi') }}
       </h1>
 
-      <b-nav tabs>
-        <b-nav-item to="geneerinen">
+      <nav class="arviointi-nav">
+        <router-link
+          to="geneerinen"
+          class="arviointi-nav-link"
+          active-class="arviointi-nav-link-active"
+          exact-active-class="arviointi-nav-link-active"
+        >
           {{ $t('geneerinen-arviointi') }}
-        </b-nav-item>
-        <b-nav-item to="arviointiasteikot">
+        </router-link>
+        <router-link
+          to="arviointiasteikot"
+          class="arviointi-nav-link"
+          active-class="arviointi-nav-link-active"
+          exact-active-class="arviointi-nav-link-active"
+        >
           {{ $t('arviointiasteikot') }}
-        </b-nav-item>
-      </b-nav>
+        </router-link>
+      </nav>
       <router-view />
-    </b-container>
+    </div>
   </EpMainView>
 </template>
 
@@ -51,5 +61,36 @@ const geneeriset = computed(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+@import '@shared/styles/_variables.scss';
+
+.arviointi-container {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+.arviointi-nav {
+  display: flex;
+  border-bottom: 1px solid $grey200;
+  margin-bottom: 1rem;
+}
+
+.arviointi-nav-link {
+  padding: 0.5rem 1rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+  color: $grey600;
+
+  &:hover {
+    color: $grey900;
+  }
+}
+
+.arviointi-nav-link-active {
+  border-color: $paletti-blue;
+  color: $paletti-blue;
+  font-weight: 500;
+}
 </style>
