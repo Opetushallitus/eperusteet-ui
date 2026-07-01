@@ -27,6 +27,7 @@ export class PerusteprojektiEditStore implements IEditoitava {
 
   async save(data: any) {
     const res = await Perusteprojektit.updatePerusteprojekti(this.projektiId, data);
+    this.perusteStore.syncProjekti(res.data);
     return res.data;
   }
 
