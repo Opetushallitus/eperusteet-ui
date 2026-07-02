@@ -258,6 +258,8 @@ const lisaaOppimaara = async () => {
     name: 'perusopetusoppiaine',
     params: {
       oppiaineId: _.toString(newOppiaine.id),
+    },
+    query: {
       uusi: 'uusi',
     },
   });

@@ -20,8 +20,11 @@
     </template>
 
     <template #default="{ data, isEditing }">
-      <b-row v-if="isEditing">
-        <b-col cols="11">
+      <b-row>
+        <b-col
+          v-if="isEditing"
+          cols="8"
+        >
           <b-form-group :label="$t('taiteenala') + ' *'">
             <ep-koodisto-select
               v-model="data.koodi"
@@ -46,6 +49,28 @@
                 </b-input-group>
               </template>
             </ep-koodisto-select>
+          </b-form-group>
+        </b-col>
+
+        <b-col
+          v-if="isEditing || data.laajuus"
+          cols="3"
+          class="mb-3"
+        >
+          <b-form-group>
+            <template #label>
+              {{ $t('laajuus') }}
+            </template>
+            <div class="d-flex align-items-center">
+              <ep-input
+                v-model="data.laajuus"
+                type="number"
+                :is-editing="isEditing"
+              />
+              <div class="ml-2">
+                {{ $t('opintopiste-partitiivi') }}
+              </div>
+            </div>
           </b-form-group>
         </b-col>
       </b-row>

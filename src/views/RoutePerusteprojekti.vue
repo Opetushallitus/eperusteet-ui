@@ -359,6 +359,12 @@
                   </router-link>
                 </template>
 
+                <template #taiteenosa="{ item }">
+                  <router-link :to="{ name: 'taiteenosa', params: { taiteenalaId: item.meta?.viiteId, taiteenosaId: item.id } }">
+                    {{ $kaanna(item.label) || $t('nimeton-taiteenosa') }}
+                  </router-link>
+                </template>
+
                 <template #perusopetuslaajaalaisetosaamiset>
                   <router-link :to="{ name: 'perusopetusLaajaAlaisetOsaamiset' }">
                     {{ $t('laaja-alaiset-osaamiset') }}
