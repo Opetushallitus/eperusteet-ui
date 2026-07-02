@@ -20,11 +20,11 @@
     </template>
 
     <template #default="{ data, isEditing }">
-      <div
-        v-if="isEditing"
-        class="flex flex-wrap gap-4"
-      >
-        <div class="flex-[11] min-w-0">
+      <div class="flex flex-wrap gap-4">
+        <div
+          v-if="isEditing"
+          class="flex-[8] min-w-0"
+        >
           <EpFormGroup :label="$t('taiteenala')" required>
             <ep-koodisto-select
               v-model="data.koodi"
@@ -52,9 +52,27 @@
             </ep-koodisto-select>
           </EpFormGroup>
         </div>
+
+        <div
+          v-if="isEditing || data.laajuus"
+          class="flex-[3] min-w-0"
+        >
+          <EpFormGroup :label="$t('laajuus')">
+            <div class="flex items-center">
+              <ep-input
+                v-model="data.laajuus"
+                type="number"
+                :is-editing="isEditing"
+              />
+              <div class="ml-2">
+                {{ $t('opintopiste-partitiivi') }}
+              </div>
+            </div>
+          </EpFormGroup>
+        </div>
       </div>
 
-      <div class="flex-[11] min-w-0 pl-0">
+      <div>
         <h4
           v-if="isEditing"
           class="mt-4"
