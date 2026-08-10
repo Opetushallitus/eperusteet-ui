@@ -54,6 +54,7 @@ import RouteAipeLaajaAlaisetOsaamiset from '@/views/aipe/RouteAipeLaajaAlaisetOs
 import RouteAipeOppiaine from '@/views/aipe/RouteAipeOppiaine.vue';
 import RouteAipeVaihe from '@/views/aipe/RouteAipeVaihe.vue';
 import RouteTaiteenala from '@/views/tpo/RouteTaiteenala.vue';
+import RouteTaiteenosa from '@/views/tpo/RouteTaiteenosa.vue';
 import RouteLaajaAlaisetOsaamiset from '@/views/lukio/RouteLaajaAlaisetOsaamiset.vue';
 import RouteModuuli from '@/views/lukio/RouteModuuli.vue';
 import RouteOppiaine from '@/views/lukio/RouteOppiaine.vue';
@@ -470,7 +471,12 @@ const router = createRouter({
         component: RouteAipeKurssi,
         props,
       }, {
-        path: 'tpo/taiteenala/:taiteenalaId?/:uusi?',
+        path: 'tpo/taiteenala/:taiteenalaId/taiteenosa/:taiteenosaId',
+        name: 'taiteenosa',
+        component: RouteTaiteenosa,
+        props,
+      }, {
+        path: 'tpo/taiteenala/:taiteenalaId?',
         name: 'taiteenala',
         component: RouteTaiteenala,
         props,
@@ -520,7 +526,7 @@ const router = createRouter({
         component: RoutePerusopetusOppiaineet,
         props,
       }, {
-        path: 'perusopetus/oppiaine/:oppiaineId/:uusi?',
+        path: 'perusopetus/oppiaine/:oppiaineId',
         name: 'perusopetusoppiaine',
         component: RoutePerusopetusOppiaine,
         props,

@@ -88,7 +88,7 @@
                 >
                   {{ tekstikappale.meta?.numerointi }}
                 </span>
-                {{ $kaanna(tekstikappale.label) }}
+                <span>{{ $kaanna(tekstikappale.label) }}</span>
               </template>
             </ep-tekstikappale-lisays>
           </div>
@@ -110,7 +110,7 @@
           >
             add
           </EpMaterialIcon>
-          {{ $t(lisasisalto.label['uusi']) }}
+          <span>{{ $t(lisasisalto.label['uusi']) }}</span>
         </ep-button>
 
         <ep-tekstikappale-lisays
@@ -119,7 +119,9 @@
           :tallenna="lisasisalto.save"
           :tekstikappaleet="perusteenOsat"
           :paatasovalinta="true"
-          :otsikko-required="false"
+          :hide-taso="!!lisasisalto.hideTaso"
+          :otsikko-required="lisasisalto.otsikkoRequired ?? false"
+          :otsikko-nimi="lisasisalto.otsikkoNimi"
           :modal-id="'lisasisaltoLisays'+index"
         >
           <template #lisays-btn-text>
@@ -141,7 +143,7 @@
             >
               {{ tekstikappale.meta?.numerointi }}
             </span>
-            {{ $kaanna(tekstikappale.label) }}
+            <span>{{ $kaanna(tekstikappale.label) }}</span>
           </template>
         </ep-tekstikappale-lisays>
       </div>
@@ -165,11 +167,12 @@ import { KotoKielitaitotasoStore } from '@/stores/Koto/KotoKielitaitotasoStore';
 import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { EpTreeNavibarStore } from '@shared/components/EpTreeNavibar/EpTreeNavibarStore';
-import { NavigationNodeDtoTypeEnum, PerusteDtoTyyppiEnum } from '@shared/api/eperusteet';
+import { NavigationNodeDtoTypeEnum, PerusteDtoTyyppiEnum, Perusteenosat } from '@shared/api/eperusteet';
 import { chapterStringSort } from '@shared/utils/NavigationBuilder';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
+import { TaiteenosaStore } from '@/stores/TaiteenosaStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { KielikaantajanTaitoStore } from '@/stores/KielikaantajanTaitoStore';
@@ -476,9 +479,28 @@ const osaamisalat = computed(() => {
   return peruste.value?.osaamisalat;
 });
 
+const taiteenosaLisays = computed(() => {
+  if (peruste.value?.koulutustyyppi !== Koulutustyyppi.tpo || route.name !== 'taiteenala' || !route.params.taiteenalaId) {
+    return [];
+  }
+
+  return [{
+    groupedSisalto: [],
+    save: tallennaUusiTaiteenosa,
+    hideTaso: true,
+    otsikkoRequired: true,
+    otsikkoNimi: 'taiteenosan-nimi',
+    label: {
+      'uusi': 'uusi-taiteenosa',
+      'lisaa': 'lisaa-taiteenosa',
+    },
+  }];
+});
+
 const lisasisaltoLisays = computed(() => {
   return [
     ...(koulutustyypinLisasisaltoLisays.value[peruste.value!.koulutustyyppi!] || []),
+    ...taiteenosaLisays.value,
     ...(perusteTyyppiSisaltoLisays.value[peruste.value!.tyyppi!] || []),
     ...(perusteKoulutustyyppiToteutusSisaltoLisays.value[peruste.value!.toteutus!] || []),
   ];
@@ -671,15 +693,31 @@ const uusiTaiteenala = async () => {
     name: 'taiteenala',
     params: {
       taiteenalaId: '' + tallennettu!.id,
+    },
+    query: {
       uusi: 'uusi',
     },
   });
 };
 
+const tallennaUusiTaiteenosa = async (otsikko) => {
+  const { taiteenalaViiteId, uusiTaiteenosa } = await TaiteenosaStore.create(peruste.value!.id!, _.toNumber(route.params.taiteenalaId), otsikko);
+  await props.perusteStore.updateNavigation();
+  if (uusiTaiteenosa?.id) {
+    await router.push({
+      name: 'taiteenosa',
+      params: {
+        taiteenalaId: '' + taiteenalaViiteId,
+        taiteenosaId: '' + uusiTaiteenosa.id,
+      },
+    });
+  }
+};
+
 const uusiPerusopetusoppiaine = async () => {
   const newOppiaine = await PerusopetusOppiaineStore.create(peruste.value!.id!, route.params?.oppiaineId);
   await props.perusteStore.updateNavigation();
-  router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id), uusi: 'uusi' } });
+  router.push({ name: 'perusopetusoppiaine', params: { oppiaineId: _.toString(newOppiaine.id) }, query: { uusi: 'uusi' } });
 };
 </script>
 
