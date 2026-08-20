@@ -1,5 +1,8 @@
 <template>
-  <EpEditointi :store="store">
+  <EpEditointi
+    v-if="store"
+    :store="store"
+  >
     <template #header>
       <h3>{{ $t('laaja-alaiset-osaamiset') }}</h3>
     </template>
