@@ -194,7 +194,6 @@ provide('dull', dullInject);
     background-position: 100% 0;
     background-repeat: no-repeat;
     background-size: 100% 216px;
-    background-attachment: fixed;
   }
 }
 
