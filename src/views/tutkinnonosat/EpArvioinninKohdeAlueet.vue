@@ -18,7 +18,7 @@
         </div>
         <EpArviointi
           v-model="model[index]"
-          class="w-100"
+          class="w-full"
           :is-editing="isEditing"
           :arviointiasteikot="arviointiasteikot"
         >

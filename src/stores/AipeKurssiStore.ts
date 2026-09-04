@@ -50,7 +50,9 @@ export class AipeKurssiStore implements IEditoitava {
       }
     }
 
-    return {};
+    return {
+      tavoitteet: [],
+    };
   }
 
   async save(data: any) {

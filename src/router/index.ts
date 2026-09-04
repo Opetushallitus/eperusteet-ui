@@ -1,5 +1,3 @@
-import Vue from 'vue';
-import VueMeta from 'vue-meta';
 import RouteArviointi from '@/views/RouteArviointi.vue';
 import RouteArviointiasteikot from '@/views/RouteArviointiasteikot.vue';
 import RouteGeneerinenArviointi from '@/views/RouteGeneerinenArviointi.vue';
@@ -81,8 +79,8 @@ import { BrowserStore } from '@shared/stores/BrowserStore';
 import { isYleissivistavaKoulutustyyppi } from '@shared/utils/perusteet';
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { useLoading } from 'vue-loading-overlay';
-import { loadingOptions } from '@/utils/loading';
-import { $bvModal } from '@shared/utils/globals';
+import { loadingOptions } from '@shared/config/loading';
+import { $confirmModal } from '@shared/utils/globals';
 import { convertRouteParamsToNumbers } from '@/utils/routing';
 
 
@@ -97,8 +95,11 @@ const props = (route: any) => {
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [{
+    path: '/',
+    alias: '',
+    component: { template: '<div></div>' },
+  }, {
     path: '/:lang',
-    alias: ['/', ''],
     component: RouteRoot,
     props,
     children: [{
@@ -653,11 +654,12 @@ const router = createRouter({
       },
       ],
     }, {
-      path: '/:catchAll(.*)',
+      path: '/:catchAll(.*)*',
       redirect: (to) => {
         console.log('Unknown route', to);
         return {
           name: 'virhe',
+          params: { lang: to.params.lang },
           query: {
             virhekoodi: '404',
           },
@@ -697,12 +699,12 @@ router.beforeEach((to, from, next) => {
 
 router.beforeEach(async (to, from, next) => {
   if (EditointiStore.anyEditing()) {
-    const value = await $bvModal.msgBoxConfirm(
+    const value = await $confirmModal.msgBoxConfirm(
       Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti-dialogi'), {
         title: Kielet.kaannaOlioTaiTeksti('haluatko-poistua-tallentamatta'),
+        message: Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti'),
         okTitle: Kielet.kaannaOlioTaiTeksti('poistu-tallentamatta'),
         cancelTitle: Kielet.kaannaOlioTaiTeksti('peruuta'),
-        size: 'lg',
       });
 
     if (value) {

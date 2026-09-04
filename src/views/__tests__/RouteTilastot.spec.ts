@@ -29,7 +29,7 @@ describe('RouteTilastot', () => {
 
   // Helper function to switch to amosaa-tyokalu tab
   const switchToAmosaaTab = async (wrapper: any) => {
-    const amosaaTabs = wrapper.findAll('.nav-tabs .nav-link');
+    const amosaaTabs = wrapper.findAll('[data-pc-name="tab"]');
     const amosaaTab = amosaaTabs.find((tab: any) => tab.text().includes('amosaa-tyokalu'));
 
     if (amosaaTab) {

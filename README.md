@@ -12,7 +12,7 @@ Opetussuunnitelmien perusteiden laadintatyökalun käyttöliittymä.
 
 ## 2. Arkkitehtuuri
 
-Single-page -sovellus **Vue 3**:lla ja **Vite**-buildilla; käytössä **@vue/compat** (Vue 2 -yhteensopivuustila migraation aikana). Tilaa hallitaan **Pinia**-storeilla, reititys **Vue Router 4**:llä. Jaetuissa komponenteissa (`eperusteet-frontend-utils`) käytetään **Bootstrap Vue**a ja **Bootstrap**-tyylejä; sovelluksen tyylit **SCSS**:llä. Palvelupyynnöt **axios**illa generoitujen TypeScript-rajapintatyypin kanssa (`eperusteet-frontend-utils`). Testit **Vitest**illä.
+Single-page -sovellus **Vue 3**:lla ja **Vite**-buildilla. Tilaa hallitaan **Pinia**-storeilla, reititys **Vue Router 4**:llä. Käyttöliittymäkomponenteissa käytetään **PrimeVue 4**:ää; tyylit **Tailwind CSS v4**:llä ja **SCSS**:llä. Jaetut komponentit ja API-tyypit tulevat `eperusteet-frontend-utils`-submoduulista. Palvelupyynnöt **axios**illa generoitujen TypeScript-rajapintatyyppien kanssa. Testit **Vitest**illä.
 
 Aliasit `vite.config.js`:ssa: `@` → tämän projektin `src`, `@shared` ja `@assets` → `eperusteet-frontend-utils` -submoduulin alla.
 
@@ -117,9 +117,13 @@ yarn preview
 ### 3.6. Kehitysvinkkejä
 
 - Tuotantobuildin polku (`base`): `/eperusteet-service/ui` (`vite.config.js`).
-- `yarn genspec` juuressa ajaa API-generoinnin ja käynnistää dev-palvelimen (`package.json` scripts).
+- `yarn genspec` juuressa generoi API-tyypit paikallisesta backendistä (`buildapi.sh -g`, vaatii ympäristömuuttujan `EPERUSTEET_SERVICE_DIR`) ja käynnistää sen jälkeen dev-palvelimen.
 
-### 3.7. Versiohallinta
+### 3.7. Cursor Agent Skills
+
+Jaetut Agent Skills -tiedostot tulevat `eperusteet-frontend-utils`-submoduulista. `yarn install` ajaa `postinstall`-skriptin, joka linkittää ne paikalliseen `.agents/skills/`-kansioon. Sovelluskohtaiset skillit voi lisätä samaan kansioon. `.agents/` on `.gitignore`-tiedostossa.
+
+### 3.8. Versiohallinta
 
 Lähdekoodi GitHubissa Opetushallituksen alle. Muutokset tulevat tavanomaisella Git-työnkululla (haarat, pull requestit organisaation käytännön mukaan).
 
@@ -127,11 +131,11 @@ Lähdekoodi GitHubissa Opetushallituksen alle. Muutokset tulevat tavanomaisella 
 
 ### 4.1. Testiympäristöt
 
-Testiympäristöjen swaggerit löytyvät seuraavista osoitteista
+Käyttöliittymät:
 
-- [untuva](https://virkailija.untuvaopintopolku.fi/eperusteet-app/#/fi)
-- [hahtuva](https://virkailija.hahtuvaopintopolku.fi/eperusteet-app/#/fi)
-- [QA eli pallero](https://virkailija.testiopintopolku.fi/eperusteet-app/#/fi)
+- [untuva](https://virkailija.untuvaopintopolku.fi/eperusteet-service/ui/#/fi)
+- [hahtuva](https://virkailija.hahtuvaopintopolku.fi/eperusteet-service/ui/#/fi)
+- [QA eli pallero](https://virkailija.testiopintopolku.fi/eperusteet-service/ui/#/fi)
 
 ### 4.2. Lokit
 
@@ -148,7 +152,6 @@ Projekti on migroitu Vue 3:een.
 Suositeltavia resursseja:
  - [Vue 3 style guide](https://vuejs.org/style-guide/)
  - [Vue 3 documentation](https://vuejs.org/guide/introduction.html)
- - [BootstrapVue](https://bootstrap-vue.org/docs)
 
 ## ePerusteet-projektit
 

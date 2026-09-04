@@ -2,42 +2,41 @@
   <div v-if="store">
     <EpEditointi :store="store">
       <template #header>
-        <h2 class="m-0">
+        <h2 class="!m-0">
           {{ $t('oppaan-tiedot') }}
         </h2>
       </template>
       <template #default="{ data, isEditing, validation }">
         <h3>{{ $t('perustiedot') }}</h3>
-        <b-container fluid>
-          <b-row no-gutters>
-            <b-col lg="6">
-              <b-form-group :label="$t('oppaan-nimi')+'*'">
+        <div class="w-full">
+          <div class="flex flex-wrap gap-4">
+            <div class="lg:w-1/2">
+              <EpFormGroup :label="$t('oppaan-nimi')+'*'">
                 <ep-input
                   v-model="data.peruste.nimi"
                   type="localized"
                   :is-editing="isEditing"
                   :validation="validation.peruste.nimi"
                 />
-              </b-form-group>
-            </b-col>
-            <b-col lg="6">
-              <b-form-group :label="$t('opastyoryhma')+'*'">
+              </EpFormGroup>
+            </div>
+            <div class="lg:w-1/2">
+              <EpFormGroup :label="$t('opastyoryhma')+'*'">
                 <perustetyoryhma-select
                   v-model="data.ryhmaOid"
                   :ulkopuoliset-store="ulkopuolisetStore"
                   :is-editing="isEditing"
                 />
-              </b-form-group>
-            </b-col>
-          </b-row>
+              </EpFormGroup>
+            </div>
+          </div>
 
-          <b-row
+          <div
             v-if="oppaanTyyppiTietoaPalvelusta || isEditing"
-            no-gutters
-            class="mt-4"
+            class="flex flex-wrap gap-4 mt-4"
           >
-            <b-col lg="6">
-              <b-form-group :label="$t('sisallonhallinta')">
+            <div class="lg:w-1/2">
+              <EpFormGroup :label="$t('sisallonhallinta')">
                 <EpToggleGroup
                   v-if="isEditing"
                   v-model="oppaanTyyppi"
@@ -52,28 +51,25 @@
                 <div v-if="oppaanTyyppiTietoaPalvelusta && !isEditing">
                   {{ $t('oppaan-tyyppi-' + oppaanTyyppi[0]) }}
                 </div>
-              </b-form-group>
-            </b-col>
-            <b-col
+              </EpFormGroup>
+            </div>
+            <div
               v-if="oppaanTyyppiTietoaPalvelusta"
-              lg="6"
+              class="lg:w-1/2"
             >
-              <b-form-group :label="$t('tietoa-palvelusta-etusivu-teksti')">
+              <EpFormGroup :label="$t('tietoa-palvelusta-etusivu-teksti')">
                 <ep-content
                   v-model="data.peruste.tietoapalvelustaKuvaus"
                   layout="simplified"
                   :is-editable="isEditing"
                 />
-              </b-form-group>
-            </b-col>
-          </b-row>
+              </EpFormGroup>
+            </div>
+          </div>
 
-          <b-row
-            no-gutters
-            class="mt-4"
-          >
-            <b-col lg="6">
-              <b-form-group
+          <div class="flex flex-wrap gap-4 mt-4">
+            <div class="lg:w-1/2">
+              <EpFormGroup
                 :label="$t('koulutustyyppi')"
                 class="pr-5"
               >
@@ -109,11 +105,11 @@
                   v-if="!isEditing && (!data.peruste.oppaanKoulutustyypit || data.peruste.oppaanKoulutustyypit.length === 0)"
                   class="asettamatta"
                 >{{ $t('ei-asetettu') }}</span>
-              </b-form-group>
-            </b-col>
+              </EpFormGroup>
+            </div>
 
-            <b-col lg="6">
-              <b-form-group
+            <div class="lg:w-1/2">
+              <EpFormGroup
                 :label="$t('peruste')"
                 class="pr-5"
               >
@@ -131,16 +127,13 @@
                   v-if="!isEditing && (!data.peruste.oppaanPerusteet || data.peruste.oppaanPerusteet.length === 0)"
                   class="asettamatta"
                 >{{ $t('ei-asetettu') }}</span>
-              </b-form-group>
-            </b-col>
-          </b-row>
+              </EpFormGroup>
+            </div>
+          </div>
 
-          <b-row
-            no-gutters
-            class="mt-4"
-          >
-            <b-col lg="6">
-              <b-form-group :label="$t('oppaan-kielet')">
+          <div class="flex flex-wrap gap-4 mt-4">
+            <div class="lg:w-1/2">
+              <EpFormGroup :label="$t('oppaan-kielet')">
                 <EpToggleGroup
                   v-if="isEditing"
                   v-model="data.peruste.kielet"
@@ -171,14 +164,14 @@
                     class="asettamatta"
                   >{{ $t('ei-asetettu') }}</span>
                 </div>
-              </b-form-group>
-            </b-col>
+              </EpFormGroup>
+            </div>
 
-            <b-col
+            <div
               v-if="!oppaanTyyppiTietoaPalvelusta"
-              lg="6"
+              class="lg:w-1/2"
             >
-              <b-form-group :label="$t('voimassaolo')">
+              <EpFormGroup :label="$t('voimassaolo')">
                 <div
                   v-if="!data.peruste.voimassaoloAlkaa && !data.peruste.voimassaoloLoppuu && !isEditing"
                   class="asettamatta"
@@ -187,7 +180,7 @@
                 </div>
                 <div
                   v-else
-                  class="d-flex align-items-center"
+                  class="flex items-center"
                 >
                   <ep-datepicker
                     v-model="data.peruste.voimassaoloAlkaa"
@@ -201,39 +194,39 @@
                     :is-editing="isEditing"
                   />
                 </div>
-              </b-form-group>
-            </b-col>
-          </b-row>
+              </EpFormGroup>
+            </div>
+          </div>
 
-          <b-row class="mt-4">
-            <b-col>
+          <div class="flex flex-wrap gap-4 mt-4">
+            <div>
               <EpEsikatselu
                 v-model="storeData"
                 opas
                 :is-editing="isEditing"
               />
-            </b-col>
-          </b-row>
-        </b-container>
+            </div>
+          </div>
+        </div>
 
-        <b-container fluid>
-          <b-row no-gutters>
-            <b-col lg="8">
+        <div class="w-full">
+          <div class="flex flex-wrap gap-4">
+            <div class="lg:w-2/3">
               <h3 class="mt-5">
                 {{ $t('oppaan-liittaminen-perusteen-sisaltoihin') }}
               </h3>
               <div class="mb-4">
                 {{ $t('oppaan-liittaminen-perusteen-sisaltoihin-kuvaus') }}
               </div>
-            </b-col>
-          </b-row>
-        </b-container>
+            </div>
+          </div>
+        </div>
 
-        <b-container fluid>
+        <div class="w-full">
           <template v-if="isEditing || (tutkinnonosaKoodit.length > 0 || osaamisalaKoodit.length > 0)">
             <h4>{{ $t('ammatillinen-koulutus') }}</h4>
-            <b-row no-gutters>
-              <b-col lg="8">
+            <div class="flex flex-wrap gap-4">
+              <div class="lg:w-2/3">
                 <div class="koodiryhma">
                   <EpKoodistoSelectTable
                     v-if="isEditing || tutkinnonosaKoodit.length > 0"
@@ -265,15 +258,15 @@
                     </template>
                   </EpKoodistoSelectTable>
                 </div>
-              </b-col>
-            </b-row>
+              </div>
+            </div>
           </template>
 
           <template v-if="isEditing || oppiaineKoodit.length > 0">
             <h4>{{ $t('lukiokoulutus') }}</h4>
 
-            <b-row no-gutters>
-              <b-col lg="8">
+            <div class="flex flex-wrap gap-4">
+              <div class="lg:w-2/3">
                 <div class="koodiryhma">
                   <EpKoodistoSelectTable
                     v-model="oppiaineKoodit"
@@ -290,15 +283,15 @@
                     </template>
                   </EpKoodistoSelectTable>
                 </div>
-              </b-col>
-            </b-row>
+              </div>
+            </div>
           </template>
 
           <template v-if="isEditing || opintokokonaisuusKoodit.length > 0">
             <h4>{{ $t('vapaa-sivistystyo') }}</h4>
 
-            <b-row no-gutters>
-              <b-col lg="8">
+            <div class="flex flex-wrap gap-4">
+              <div class="lg:w-2/3">
                 <div class="koodiryhma">
                   <EpKoodistoSelectTable
                     v-model="opintokokonaisuusKoodit"
@@ -315,15 +308,15 @@
                     </template>
                   </EpKoodistoSelectTable>
                 </div>
-              </b-col>
-            </b-row>
+              </div>
+            </div>
           </template>
 
           <template v-if="isEditing || koulutuksenosaKoodit.length > 0">
             <h4>{{ $t('tutkintokoulutukseen-valmentava-koulutus') }}</h4>
 
-            <b-row no-gutters>
-              <b-col lg="8">
+            <div class="flex flex-wrap gap-4">
+              <div class="lg:w-2/3">
                 <div class="koodiryhma">
                   <EpKoodistoSelectTable
                     v-model="koulutuksenosaKoodit"
@@ -340,10 +333,10 @@
                     </template>
                   </EpKoodistoSelectTable>
                 </div>
-              </b-col>
-            </b-row>
+              </div>
+            </div>
           </template>
-        </b-container>
+        </div>
       </template>
     </EpEditointi>
   </div>
@@ -383,6 +376,7 @@ import { KoulutusTyyppi } from '@/utils/perusteet';
 import { $t, $kaanna } from '@shared/utils/globals';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 
 const props = defineProps<{
   ulkopuolisetStore: UlkopuolisetStore;

@@ -4,7 +4,7 @@
     :store="store"
   >
     <template #header>
-      <div class="d-flex justify-content-between">
+      <div class="flex justify-between">
         <h1>{{ $t('tutkinnon-osat') }}</h1>
       </div>
     </template>
@@ -12,12 +12,12 @@
     <template #default="{ isEditing }">
       <div
         v-if="!isEditing"
-        class="d-md-flex justify-content-between align-items-center"
+        class="md:flex justify-between items-center"
       >
         <div>
           <ep-search v-model="query" />
         </div>
-        <div>
+        <div class="flex gap-2">
           <ep-button
             variant="outline"
             icon="add"
@@ -86,7 +86,7 @@
           </table>
         </div>
 
-        <b-table
+        <EpTable
           v-else
           responsive
           borderless
@@ -101,7 +101,7 @@
               {{ $kaanna(item.tutkinnonOsa.nimi) || $t('nimeton-tutkinnonosa') }}
             </router-link>
           </template>
-        </b-table>
+        </EpTable>
       </div>
     </template>
   </EpEditointi>
@@ -122,6 +122,7 @@ import _ from 'lodash';
 import EpTutkinnonosaTuontiModal from '@/components/EpTutkinnonosaTuontiModal.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $kaanna, $t, $ago, $sdt, $filterBy } from '@shared/utils/globals';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 const props = defineProps<{
   tutkinnonOsaStore: TutkinnonOsaStore;

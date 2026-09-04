@@ -5,7 +5,6 @@ import _ from 'lodash';
 import { ArviointiAsteikkoDto, GeneerinenArviointiasteikkoDto, Arviointiasteikot, GeneerinenArviointiasteikko } from '@shared/api/eperusteet';
 import { KieliStore } from '@shared/stores/kieli';
 import { debounced } from '@shared/utils/delay';
-import { fail, success } from '@shared/utils/notifications';
 import { $fail, $success, $t } from '@shared/utils/globals';
 
 export class ArviointiStore {

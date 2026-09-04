@@ -17,7 +17,7 @@
         v-if="isEditing"
         class="mb-4 w-80"
       >
-        <b-form-group
+        <EpFormGroup
           class="p-0"
           :label="$t('otsikko')"
           required
@@ -26,10 +26,10 @@
             v-model="data.nimi"
             :is-editing="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
       </div>
       <div class="mb-4 w-80">
-        <b-form-group class="p-0">
+        <EpFormGroup class="p-0">
           <template
             v-if="isEditing"
             #label
@@ -41,7 +41,7 @@
             layout="normal"
             :is-editable="isEditing"
           />
-        </b-form-group>
+        </EpFormGroup>
 
         <ep-toggle
           v-if="isEditing"
@@ -72,14 +72,14 @@
             class="mb-4 w-80"
             :class="{ 'tutkintotaso-editing': isEditing, 'dragging': dragging }"
           >
-            <div class="d-flex">
+            <div class="flex">
               <ep-material-icon
                 v-if="isEditing"
                 class="order-handle mr-2 flex-shrink-0"
               >
                 drag_indicator
               </ep-material-icon>
-              <div class="w-100">
+              <div class="w-full">
                 <div class="mb-3">
                   <h5>{{ $t('tutkintotaso') }}</h5>
                   <ep-input
@@ -103,10 +103,10 @@
                       :key="'osa' + osaIndex"
                       class="mb-3 pl-3"
                     >
-                      <div class="w-100">
+                      <div class="w-full">
                         <hr v-if="osaIndex > 0">
                         <div class="mb-4">
-                          <div class="d-flex align-items-center mb-2">
+                          <div class="flex items-center mb-2">
                             <ep-material-icon
                               class="order-handle mr-2 flex-shrink-0"
                             >
@@ -114,29 +114,30 @@
                             </ep-material-icon>
                             <span>{{ $t('suorituksen-osa') }}</span>
                           </div>
-                          <div class="d-flex align-items-start w-100">
+                          <div class="flex items-start w-full">
                             <ep-koodisto-select
                               v-model="osa.suorituksenOsa"
-                              class="w-100"
+                              class="w-full"
                               :store="suorituksenOsaKoodisto"
                               :is-editing="isEditing"
                               :nayta-arvo="false"
                             >
                               <template #default="{ open }">
-                                <b-input-group>
-                                  <b-form-input
-                                    :value="osa.suorituksenOsa ? $kaanna(osa.suorituksenOsa.nimi) : ''"
+                                <EpInputGroup>
+                                  <ep-input
+                                    :model-value="osa.suorituksenOsa ? $kaanna(osa.suorituksenOsa.nimi) : ''"
+                                    :is-editing="true"
                                     disabled
                                   />
-                                  <b-input-group-append>
-                                    <b-button
+                                  <template #append>
+                                    <ep-button
                                       variant="primary"
                                       @click="open"
                                     >
                                       {{ $t('hae-koodistosta') }}
-                                    </b-button>
-                                  </b-input-group-append>
-                                </b-input-group>
+                                    </ep-button>
+                                  </template>
+                                </EpInputGroup>
                               </template>
                             </ep-koodisto-select>
                           </div>
@@ -157,9 +158,9 @@
                               :key="'taitotaso' + taitotasoIndex"
                               class="mb-2"
                             >
-                              <div class="d-flex">
-                                <div class="w-100">
-                                  <div class="d-flex align-items-start mb-2 align-items-center">
+                              <div class="flex">
+                                <div class="w-full">
+                                  <div class="flex items-center mb-2">
                                     <ep-koodisto-select-draggable
                                       v-model="taitotaso.taitotaso"
                                       :store="arvosanaKoodisto"
@@ -170,7 +171,6 @@
                                       variant="link"
                                       icon="delete"
                                       size="sm"
-                                      no-padding
                                       class="ml-2 link-style"
                                       @click="poistaTaitotaso(tutkintotasoIndex, osaIndex, taitotasoIndex)"
                                     />
@@ -186,11 +186,10 @@
                             </div>
                           </VueDraggable>
 
-                          <div class="d-flex justify-content-between">
+                          <div class="flex justify-between">
                             <ep-button
                               variant="outline"
                               icon="add"
-                              no-padding
                               @click="lisaaTaitotaso(tutkintotasoIndex, osaIndex)"
                             >
                               {{ $t('lisaa-taitotaso') }}
@@ -198,7 +197,6 @@
                             <ep-button
                               variant="link"
                               icon="delete"
-                              no-padding
                               class="mr-3"
                               @click="poistaSuorituksenOsa(tutkintotasoIndex, osaIndex)"
                             >
@@ -210,11 +208,10 @@
                     </div>
                   </VueDraggable>
 
-                  <div class="d-flex justify-content-between">
+                  <div class="flex justify-between">
                     <ep-button
                       variant="outline"
                       icon="add"
-                      no-padding
                       @click="lisaaSuorituksenOsa(tutkintotasoIndex)"
                     >
                       {{ $t('lisaa-suorituksen-osa') }}
@@ -222,7 +219,6 @@
                     <ep-button
                       variant="link"
                       icon="delete"
-                      no-padding
                       class="mr-3"
                       @click="poistaTutkintotaso(tutkintotasoIndex)"
                     >
@@ -304,6 +300,8 @@ import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSele
 import EpKoodistoSelectDraggable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectDraggable.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 
 const props = defineProps({
   perusteStore: {

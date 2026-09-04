@@ -18,9 +18,9 @@
     </div>
 
     <div class="mt-5">
-      <div class="mt-5 mb-3 d-flex justify-content-between align-items-center">
+      <div class="mt-5 mb-3 flex justify-between items-center">
         <div>
-          <h2 class="m-0">
+          <h2 class="!m-0">
             {{ $t('keskeneraiset-arvioinnit') }}
           </h2>
         </div>

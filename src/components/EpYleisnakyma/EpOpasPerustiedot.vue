@@ -7,8 +7,8 @@
     <ep-spinner v-if="!(peruste && projekti) || !tyoryhma || !virkailijat" />
 
     <template v-else>
-      <div class="row">
-        <div class="col-5">
+      <div class="flex flex-wrap">
+        <div class="w-5/12">
           <ep-perustieto-data
             icon="language"
             :topic="$t('julkaisukielet')"
@@ -16,11 +16,11 @@
             {{ julkaisukielet }}
           </ep-perustieto-data>
         </div>
-        <div class="col-7" />
+        <div class="w-7/12" />
       </div>
 
-      <div class="row">
-        <div class="col-5">
+      <div class="flex flex-wrap">
+        <div class="w-5/12">
           <ep-perustieto-data
             icon="calendar_today"
             :topic="$t('luotu')"
@@ -28,7 +28,7 @@
             {{ $sdt(peruste.luotu) }}
           </ep-perustieto-data>
         </div>
-        <div class="col-7">
+        <div class="w-7/12">
           <ep-perustieto-data
             icon="calendar_today"
             :topic="$t('julkaistu')"
@@ -38,8 +38,8 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-5">
+      <div class="flex flex-wrap">
+        <div class="w-5/12">
           <ep-perustieto-data
             v-if="virkailijat"
             icon="groups"
@@ -64,7 +64,7 @@
             </ep-button>
           </ep-perustieto-data>
         </div>
-        <div class="col-7">
+        <div class="w-7/12">
           <EpPerustietoData icon="visibility">
             <template #header>
               {{ $t('esikatsele-opasta') }}
@@ -79,10 +79,10 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="flex flex-wrap">
         <div
           v-if="peruste.oppaanKoulutustyypit"
-          class="col-5"
+          class="w-5/12"
         >
           <ep-perustieto-data
             icon="account_balance"
@@ -98,7 +98,7 @@
         </div>
         <div
           v-if="peruste.oppaanPerusteet"
-          class="col-7"
+          class="w-7/12"
         >
           <ep-perustieto-data
             icon="article"
@@ -173,7 +173,7 @@ const esikatseluUrl = computed(() => {
 </script>
 
 <style scoped lang="scss">
-@import "@/styles/_variables.scss";
+@import "@shared/styles/_variables.scss";
 @import "@/styles/_mixins.scss";
 @include perustiedot-content;
 

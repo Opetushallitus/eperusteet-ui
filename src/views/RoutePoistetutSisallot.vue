@@ -1,29 +1,28 @@
 <template>
   <div class="poistetut">
-    <div class="ylapaneeli d-flex align-items-center">
+    <div class="ylapaneeli flex items-center">
       <h2 class="otsikko">
         {{ $t('poistetut') }}
       </h2>
     </div>
     <div class="sisalto">
       <EpSpinner v-if="!poistetut" />
-      <b-tabs
-        v-model="tabIndex"
-        content-class="mt-4"
-      >
-        <b-tab
+      <EpTabs v-if="poistetut && poistetut.length > 0 ">
+        <EpTab
           v-for="(tab, index) in tabs"
           :key="'tab'+index"
           :title="$t(tab.otsikko)"
         >
-          <ep-spinner v-if="!poistetut" />
-          <poistetut-haku-table
-            v-else
-            :poistetut="tab.poistetut"
-            @palauta="palauta"
-          />
-        </b-tab>
-      </b-tabs>
+          <div class="mt-4">
+            <ep-spinner v-if="!poistetut" />
+            <poistetut-haku-table
+              v-else
+              :poistetut="tab.poistetut"
+              @palauta="palauta"
+            />
+          </div>
+        </EpTab>
+      </EpTabs>
 
       <div v-if="poistetut && poistetut.length === 0 ">
         {{ $t('ei-poistettuja-sisaltoja') }}
@@ -33,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, getCurrentInstance } from 'vue';
+import { computed, onMounted } from 'vue';
 import _ from 'lodash';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import PoistetutHakuTable from '@shared/components/EpPoistettuTable/PoistetutHakuTable.vue';
@@ -41,13 +40,13 @@ import { PoistetutStore } from '@/stores/PoistetutStore';
 import { PoistettuSisaltoDtoTyyppiEnum } from '@shared/api/eperusteet';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { $t, $success, $fail } from '@shared/utils/globals';
+import EpTabs from '@shared/components/EpTabs/EpTabs.vue';
+import EpTab from '@shared/components/EpTabs/EpTab.vue';
 
 const props = defineProps<{
   poistetutStore: PoistetutStore;
   perusteStore: PerusteStore;
 }>();
-
-const tabIndex = ref(0);
 
 const perusteId = computed(() => {
   return props.perusteStore.perusteId.value;
@@ -99,11 +98,6 @@ onMounted(async () => {
 @import "@shared/styles/_variables.scss";
 
 .poistetut {
-
-  :deep(.tabs .nav-item a) {
-    margin: 0;
-    padding: 10px;
-  }
 
   .ylapaneeli {
     font-weight: 600;

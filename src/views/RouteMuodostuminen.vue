@@ -13,13 +13,13 @@
       <template #default="{ data, isEditing }">
         <div>
           <div class="upper mb-3">
-            <b-form-group :label="$t('rakenteen-kuvaus')">
+            <EpFormGroup :label="$t('rakenteen-kuvaus')">
               <ep-content
                 v-model="data.rakenne.kuvaus"
                 layout="normal"
                 :is-editable="isEditing"
               />
-            </b-form-group>
+            </EpFormGroup>
           </div>
           <div class="lower">
             <h5>
@@ -31,6 +31,7 @@
                 / {{ vaadittuLaajuus }} {{ laajuustyyppi }}</span>
               <MuodostuminenLaajuusModal
                 v-model="data.rakenne.muodostumisSaanto.laajuus.minimi"
+                class="ml-2"
                 :is-editing="isEditing"
               />
             </h5>
@@ -41,9 +42,9 @@
               />
             </div>
             <div class="tree mt-3">
-              <div class="drag-area p-3 d-flex">
-                <div class="flex-grow-1">
-                  <div class="d-flex actions pb-3 justify-content-between">
+              <div class="drag-area p-3 flex">
+                <div class="flex-1">
+                  <div class="flex actions pb-3 justify-between pr-2">
                     <ep-button
                       variant="link"
                       @click="toggleDescription"
@@ -65,18 +66,18 @@
                     />
                   </div>
                   <div class="drag-area-left mr-3">
-                    <div class="d-flex align-items-center mb-1">
-                      <div class="flex-shrink-1 font-weight-bold">
+                    <div class="flex items-center mb-1">
+                      <div class="shrink font-semibold">
                         {{ $t('rakenne') }}
                         <span
                           class="btn-link"
                           @click="toggleRakenne"
                         >({{ $t('avaa') }} / {{ $t('sulje') }})</span>
                       </div>
-                      <div class="flex-grow-1" />
+                      <div class="flex-1" />
                       <div
                         style="width: 100px"
-                        class="text-center font-weight-bold"
+                        class="text-center font-semibold"
                       >
                         {{ $t('osaamispiste') }}
                       </div>
@@ -96,7 +97,7 @@
                     </div>
                     <MuodostumisNode
                       ref="root"
-                      v-model="data.rakenne.osat"
+                      v-model="filteredRakenneOsatRecursively"
                       :is-editing="isEditing"
                       :tutkinnon-osat-map="tutkinnonOsatMap"
                       :copy-to-clip-board="copy"
@@ -108,7 +109,7 @@
                   class="drag-area-right"
                 >
                   <div class="menu p-3">
-                    <h5 class="font-weight-600">
+                    <h5 class="font-semibold">
                       {{ $t('leikelauta') }}
                     </h5>
                     <div class="mt-3">
@@ -123,13 +124,13 @@
                         <div
                           v-for="lauta in leikelautaWithColor"
                           :key="'leikelauta' + (lauta.tunniste || lauta.uuid)"
-                          class="mb-1 d-flex justify-content-center align-items-center draggable kopioitava"
+                          class="mb-1 flex justify-center items-center draggable kopioitava"
                         >
                           <div
                             class="colorblock"
                             :style="{ height: '54px', background: lauta.color }"
                           />
-                          <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                          <div class="flex-1 paaryhma-label pl-2 noselect">
                             {{ $kaanna(lauta.nimi) }}
                             <div v-if="lauta.osat && lauta.osat.length > 0">
                               ({{ lauta.osat.length }}
@@ -141,7 +142,7 @@
                       </VueDraggable>
                     </div>
 
-                    <h5 class="mt-4 font-weight-600">
+                    <h5 class="mt-4 font-semibold">
                       {{ $t('paaryhmat') }}
                     </h5>
                     <div class="mt-3">
@@ -154,20 +155,20 @@
                         <div
                           v-for="ryhma in paaryhmat"
                           :key="ryhma.uuid"
-                          class="mb-1 d-flex justify-content-center paaryhma align-items-center draggable"
+                          class="mb-1 flex justify-center paaryhma items-center draggable"
                         >
                           <div
                             class="colorblock"
                             :style="{ height: '44px', background: colorMap[ryhma.kind] }"
                           />
-                          <div class="flex-grow-1 paaryhma-label pl-2 noselect">
+                          <div class="flex-1 paaryhma-label pl-2 noselect">
                             {{ $t(ryhma.label) }}
                           </div>
                         </div>
                       </VueDraggable>
                     </div>
 
-                    <h5 class="mt-4 font-weight-600">
+                    <h5 class="mt-4 font-semibold">
                       {{ $t('tutkinnon-osat') }}
                     </h5>
                     <div class="mt-3">
@@ -193,7 +194,7 @@
                         <div
                           v-for="tosa in tutkinnonosatPaged"
                           :key="tosa.id"
-                          class="mb-1 d-flex align-items-center p-2 pr-3 m-1 tosa draggable tosa"
+                          class="mb-1 flex items-center p-2 pr-3 m-1 tosa draggable tosa"
                         >
                           <div
                             v-if="isEditing"
@@ -201,7 +202,7 @@
                           >
                             <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                           </div>
-                          <div class="flex-grow-1">
+                          <div class="flex-1">
                             {{ $kaanna(tosa.nimi) }} <span v-if="tosa.tutkinnonOsa.koodiArvo">({{ tosa.tutkinnonOsa.koodiArvo }})</span>
                           </div>
                           <div class="laajuus">
@@ -209,17 +210,16 @@
                           </div>
                         </div>
                       </VueDraggable>
-                      <ep-pagination
+                      <ep-b-pagination
                         v-if="tutkinnonOsat && tutkinnonOsat.length > 0"
                         v-model="tutkinnonosatSivu"
-                        :total-rows="tutkinnonOsat.length"
-                        :per-page="sivukoot"
+                        :total="tutkinnonOsat.length"
+                        :items-per-page="sivukoot"
                         aria-controls="tutkinnonosat"
-                        align="center"
                       />
                     </div>
 
-                    <h5 class="mt-4 font-weight-600">
+                    <h5 class="mt-4 font-semibold">
                       {{ $t('osaamisalat') }}
                     </h5>
                     <div>
@@ -239,7 +239,7 @@
                         <div
                           v-for="(ryhma, index) in osaamisalatPaged"
                           :key="'osaamisala' + index"
-                          class="mb-1 d-flex justify-content-center align-items-center draggable osaamisalat"
+                          class="mb-1 flex justify-center items-center draggable osaamisalat"
                         >
                           <div
                             class="colorblock"
@@ -251,15 +251,18 @@
                             v-if="isEditing"
                             :store="osaamisalaStore"
                             :value="index"
-                            class="w-100"
+                            class="w-full"
                             @add="(value) => osaamisalaKoodiLisays(value, index)"
                           >
                             <template #default="{ open }">
-                              <b-input-group class="w-100 d-flex">
+                              <EpInputGroup
+                                class="w-full flex"
+                                :disabled="!ryhma.osaamisala.osaamisalakoodiUri.startsWith('temporary')"
+                              >
                                 <ep-input
                                   v-if="!ryhma.osaamisala.osaamisalakoodiUri.startsWith('temporary')"
-                                  class="koodi-input flex-grow-1"
-                                  :value="$kaanna(ryhma.nimi) + ' (' + ryhma.osaamisala.osaamisalakoodiArvo + ')'"
+                                  class="koodi-input flex-1"
+                                  :model-value="$kaanna(ryhma.nimi) + ' (' + ryhma.osaamisala.osaamisalakoodiArvo + ')'"
                                   :placeholder="$kaanna(ryhma.nimi) + ' (' + ryhma.osaamisala.osaamisalakoodiArvo + ')'"
                                   :is-editing="true"
                                   :disabled="true"
@@ -267,54 +270,59 @@
                                 <ep-input
                                   v-else
                                   v-model="ryhma.nimi"
-                                  class="koodi-input flex-grow-1"
+                                  class="koodi-input flex-1"
                                   :placeholder="$kaanna(ryhma.nimi)"
                                   :is-editing="true"
                                   :disabled="false"
                                   :change="() => osaamisalaNimiChange(ryhma, index)"
                                 />
-                                <b-input-group-append>
-                                  <b-button
+                                <template #append>
+                                  <ep-button
                                     variant="primary"
                                     @click="open"
                                   >
                                     {{ $t('hae') }}
-                                  </b-button>
-                                </b-input-group-append>
-                              </b-input-group>
+                                  </ep-button>
+                                </template>
+                              </EpInputGroup>
                             </template>
                           </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
+                            <EpPopover
+                              v-if="isEditing && osaamisalatRakenteessa[ryhma.osaamisala.osaamisalakoodiUri]"
+                              :triggers="['hover']"
+                            >
+                              <template #trigger>
+                                <ep-button
+                                  :id="'poista-osaamisala-' + index"
+                                  variant="link"
+                                  icon="delete"
+                                  :disabled="true"
+                                  @click="poistaOsaamisala(index)"
+                                />
+                              </template>
+                              {{ $t('ei-voi-poistaa-koska-loytyy-rakenteesta') }}
+                            </EpPopover>
                             <ep-button
-                              v-if="isEditing"
+                              v-else-if="isEditing"
                               :id="'poista-osaamisala-' + index"
                               variant="link"
                               icon="delete"
-                              :disabled="osaamisalatRakenteessa[ryhma.osaamisala.osaamisalakoodiUri]"
                               @click="poistaOsaamisala(index)"
                             />
-                            <b-popover
-                              v-if="osaamisalatRakenteessa[ryhma.osaamisala.osaamisalakoodiUri]"
-                              :target="'poista-osaamisala-' + index"
-                              triggers="hover"
-                              placement="top"
-                            >
-                              {{ $t('ei-voi-poistaa-koska-loytyy-rakenteesta') }}
-                            </b-popover>
                           </div>
                         </div>
                       </VueDraggable>
-                      <ep-pagination
+                      <ep-b-pagination
                         v-if="osaamisalat && osaamisalat.length > 0"
                         v-model="osaamisalatSivu"
-                        :total-rows="osaamisalat.length"
-                        :per-page="sivukoot"
+                        :total="osaamisalat.length"
+                        :items-per-page="sivukoot"
                         aria-controls="osaamisalat"
-                        align="center"
                       />
                     </div>
 
-                    <h5 class="mt-4 font-weight-600">
+                    <h5 class="mt-4 font-semibold">
                       {{ $t('tutkintonimikkeet') }}
                     </h5>
                     <div>
@@ -335,7 +343,7 @@
                         <div
                           v-for="(ryhma, index) in tutkintonimikkeetPaged"
                           :key="ryhma.tutkintonimike.uri"
-                          class="mb-1 d-flex justify-content-center align-items-center draggable tutkintonimikkeet"
+                          class="mb-1 flex justify-center items-center draggable tutkintonimikkeet"
                         >
                           <div
                             class="colorblock"
@@ -349,15 +357,18 @@
                             v-if="isEditing"
                             :store="tutkintonimikeStore"
                             :value="index"
-                            class="w-100"
+                            class="w-full"
                             @add="(value) => tutkintonimikeKoodiLisays(value, index)"
                           >
                             <template #default="{ open }">
-                              <b-input-group class="w-100 d-flex">
+                              <EpInputGroup
+                                class="w-full flex"
+                                :disabled="!ryhma.tutkintonimike.uri.startsWith('temporary')"
+                              >
                                 <ep-input
                                   v-if="!ryhma.tutkintonimike.uri.startsWith('temporary')"
-                                  class="koodi-input flex-grow-1"
-                                  :value="$kaanna(ryhma.nimi) + ' (' + ryhma.tutkintonimike.arvo + ')'"
+                                  class="koodi-input flex-1"
+                                  :model-value="$kaanna(ryhma.nimi) + ' (' + ryhma.tutkintonimike.arvo + ')'"
                                   :placeholder="$kaanna(ryhma.nimi) + ' (' + ryhma.tutkintonimike.arvo + ')'"
                                   :is-editing="true"
                                   :disabled="true"
@@ -365,50 +376,55 @@
                                 <ep-input
                                   v-else
                                   v-model="ryhma.nimi"
-                                  class="koodi-input flex-grow-1"
+                                  class="koodi-input flex-1"
                                   :placeholder="$kaanna(ryhma.nimi)"
                                   :is-editing="true"
-                                  :disabled="!ryhma.tutkintonimike.uri.startsWith('temporary')"
+                                  :disabled="false"
                                   :change="() => tutkintonimikeNimiChange(ryhma, index)"
                                 />
-                                <b-input-group-append>
-                                  <b-button
+                                <template #append>
+                                  <ep-button
                                     variant="primary"
                                     @click="open"
                                   >
                                     {{ $t('hae') }}
-                                  </b-button>
-                                </b-input-group-append>
-                              </b-input-group>
+                                  </ep-button>
+                                </template>
+                              </EpInputGroup>
                             </template>
                           </ep-koodisto-select>
                           <div class="flex-shrink pl-2">
+                            <EpPopover
+                              v-if="isEditing && tutkintonimikkeetRakenteessa[ryhma.tutkintonimike.uri]"
+                              :triggers="['hover']"
+                            >
+                              <template #trigger>
+                                <ep-button
+                                  :id="'poista-tutkintonimike-' + index"
+                                  variant="link"
+                                  icon="delete"
+                                  :disabled="true"
+                                  @click="poistaTutkintonimike(index)"
+                                />
+                              </template>
+                              {{ $t('ei-voi-poistaa-koska-loytyy-rakenteesta') }}
+                            </EpPopover>
                             <ep-button
-                              v-if="isEditing"
+                              v-else-if="isEditing"
                               :id="'poista-tutkintonimike-' + index"
                               variant="link"
                               icon="delete"
-                              :disabled="tutkintonimikkeetRakenteessa[ryhma.tutkintonimike.uri]"
                               @click="poistaTutkintonimike(index)"
                             />
-                            <b-popover
-                              v-if="tutkintonimikkeetRakenteessa[ryhma.tutkintonimike.uri]"
-                              :target="'poista-tutkintonimike-' + index"
-                              triggers="hover"
-                              placement="top"
-                            >
-                              {{ $t('ei-voi-poistaa-koska-loytyy-rakenteesta') }}
-                            </b-popover>
                           </div>
                         </div>
                       </VueDraggable>
-                      <ep-pagination
+                      <ep-b-pagination
                         v-if="tutkintonimikkeet && tutkintonimikkeet.length > 0"
                         v-model="tutkintonimikkeetSivu"
-                        :total-rows="tutkintonimikkeet.length"
-                        :per-page="sivukoot"
+                        :total="tutkintonimikkeet.length"
+                        :items-per-page="sivukoot"
                         aria-controls="tutkintonimikkeet"
-                        align="center"
                       />
                     </div>
                   </div>
@@ -429,6 +445,8 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
+import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
@@ -444,6 +462,8 @@ import { VueDraggable } from 'vue-draggable-plus';
 import { TutkinnonOsaStore } from '@/stores/TutkinnonOsaStore';
 import { v4 as genUuid } from 'uuid';
 import { Kielet } from '@shared/stores/kieli';
+import EpModal from '@shared/components/EpModal/EpModal.vue';
+import EpPopover from '@shared/components/EpPopover/EpPopover.vue';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import MuodostuminenLaajuusModal from '@/components/muodostuminen/MuodostuminenLaajuusModal.vue';
 import { DefaultRyhma, ryhmaTemplate, ColorMap, RakenneMainType, rakenneNodecolor } from '@/components/muodostuminen/utils';
@@ -454,9 +474,10 @@ import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { MuokkaustietoStore } from '@/stores/MuokkaustietoStore';
 import { AikatauluStore } from '@/stores/AikatauluStore';
 import { TyoryhmaStore } from '@/stores/TyoryhmaStore';
-import { $bvModal, $kaanna, $filterBy } from '@shared/utils/globals';
+import { inject } from 'vue';
+import { $confirmModal, $kaanna, $filterBy } from '@shared/utils/globals';
 import { unref } from 'vue';
-import EpPagination from '@shared/components/EpPagination/EpPagination.vue';
+import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
 
 const props = defineProps<{
   browserStore: BrowserStore;
@@ -740,6 +761,30 @@ const osaamisalat = computed(() => {
   });
 });
 
+const filteredRakenneOsatRecursively = computed(() => {
+  const osat = store.value?.data?.rakenne?.osat;
+  if (!osat) {
+    return [];
+  }
+  const q = query.value.trim();
+  if (!q) {
+    return osat;
+  }
+  const filterOsa = (osa: any): any | null => {
+    if ($filterBy('nimi', q)(osa)) {
+      return osa;
+    }
+    const filteredChildren = osa.osat
+      ? _.compact(_.map(osa.osat, filterOsa))
+      : [];
+    if (filteredChildren.length === 0) {
+      return null;
+    }
+    return { ...osa, osat: filteredChildren };
+  };
+  return _.compact(_.map(osat, filterOsa));
+});
+
 const osaamisalatRakenteessa = computed(() => {
   return _.keyBy(_.filter(rakenteenOsat.value, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri), 'osaamisala.osaamisalakoodiUri');
 });
@@ -960,7 +1005,7 @@ function recursiveClone(clone) {
 
 async function tarkistaTallennusLeikelauta() {
   if (_.size(leikelauta.value) > 0) {
-    const ok = await $bvModal.msgBoxConfirm(
+    const ok = await $confirmModal.msgBoxConfirm(
       Kielet.kaannaOlioTaiTeksti('leikelauta-varoitus'), {
         title: Kielet.kaannaOlioTaiTeksti('vahvista-tallennus'),
         okTitle: Kielet.kaannaOlioTaiTeksti('tallenna'),
@@ -980,7 +1025,7 @@ async function tarkistaTallennusLeikelauta() {
 
 async function tarkistaPeruutusLeikelauta() {
   if (_.size(leikelauta.value) > 0) {
-    const ok = await $bvModal.msgBoxConfirm(
+    const ok = await $confirmModal.msgBoxConfirm(
       Kielet.kaannaOlioTaiTeksti('leikelauta-varoitus'), {
         title: Kielet.kaannaOlioTaiTeksti('vahvista-peruutus'),
         okTitle: Kielet.kaannaOlioTaiTeksti('vahvista-peruutus'),

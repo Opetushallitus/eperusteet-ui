@@ -1,6 +1,6 @@
 <template>
-  <EpMainView>
-    <b-container>
+  <EpMainView container>
+    <div class="w-full">
       <EpSteps
         ref="epsteps"
         :steps="steps"
@@ -10,11 +10,11 @@
         @step-change="onStepChange"
       >
         <template #pohja>
-          <div class="row">
-            <legend class="col-form-label col-sm-2">
+          <div class="flex flex-wrap gap-4">
+            <legend class="sm:w-1/6 mb-2">
               {{ $t('kayta-pohjana') }}
             </legend>
-            <div class="col-sm-10 mb-4">
+            <div class="sm:w-5/6 mb-4">
               <EpRadio
                 v-model="tyyppi"
                 class="p-2"
@@ -51,7 +51,7 @@
                 value="perusteesta"
                 :disabled="!perusteet || perusteet.length === 0"
               >
-                <div class="d-flex">
+                <div class="flex">
                   <div>{{ $t('toista-perusteprojektia') }}</div>
                   <EpInfoPopover class="ml-2">
                     {{ $t('vain-ammatilliset-tutkinnot') }}
@@ -123,8 +123,8 @@
         </template>
 
         <template #tiedot>
-          <b-form-group
-            :label="$t('projektin-nimi') + '*'"
+          <EpFormGroup
+            :label="$t('projektin-nimi')"
             required
           >
             <ep-input
@@ -134,11 +134,11 @@
               :placeholder="$t('kirjoita-projektin-nimi')"
               :validation="$v.data.nimi"
             />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group>
+          <EpFormGroup>
             <template #label>
-              <div class="d-flex">
+              <div class="flex">
                 <h4>{{ $t('projektin-diaarinumero') }}</h4>
                 <EpInfoPopover class="ml-2">
                   {{ $t('diaarinumeron-muoto') }}
@@ -152,11 +152,10 @@
               :placeholder="$t('kirjoita-projektin-diaarinumero')"
               :validation="$v.data.diaarinumero"
             />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group
+          <EpFormGroup
             :label="$t('projektin-kuvaus')"
-            required
           >
             <EpRadio
               v-model="data.projektiKuvaus"
@@ -179,10 +178,10 @@
               :is-editing="true"
               :placeholder="$t('projektin-vapaamuotoinen-kuvaus')"
             />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group
-            :label="$t('koulutus-tutkintotyyppi') + '*'"
+          <EpFormGroup
+            :label="$t('koulutus-tutkintotyyppi')"
             required
           >
             <koulutustyyppi-select
@@ -191,11 +190,10 @@
               required
               :ei-tuetut-koulutustyypit="eiTuetutKoulutustyypit"
             />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group
+          <EpFormGroup
             :label="$t('perustetyoryhma')"
-            required
           >
             <EpMultiSelect
               v-if="tyoryhmat"
@@ -212,11 +210,10 @@
               </template>
             </EpMultiSelect>
             <EpSpinner v-else />
-          </b-form-group>
+          </EpFormGroup>
 
-          <b-form-group
+          <EpFormGroup
             :label="$t('yhteyshenkilo')"
-            required
           >
             <ep-input
               v-model="data.yhteyshenkilo"
@@ -224,7 +221,7 @@
               :is-editing="true"
               :placeholder="$t('kirjoita-yhteyshenkilon-nimi')"
             />
-          </b-form-group>
+          </EpFormGroup>
         </template>
 
         <template #aikataulu>
@@ -237,11 +234,11 @@
             </template>
           </EpAikataulu>
 
-          <b-form-group
+          <EpFormGroup
             v-for="paatavoite in data.paatavoitteet"
             :key="'paatavoite'+paatavoite.tapahtuma"
             :label="$kaanna(paatavoite.tavoite)"
-            class="col-md-4 col-12"
+            class="w-1/4"
           >
             <ep-datepicker
               v-model="paatavoite.tapahtumapaiva"
@@ -255,16 +252,16 @@
             >
               {{ $t('julkinen') }}
             </ep-toggle>
-          </b-form-group>
+          </EpFormGroup>
 
           <div
             v-for="(tpvm, idx) in data.tavoitepaivamaarat"
             :key="idx"
-            class="row p-0 m-0"
+            class="flex flex-wrap p-0 m-0 align-items-center"
           >
-            <b-form-group
+            <EpFormGroup
               :label="$t('tavoitteen-pvm')"
-              class="col-md-4 col-12"
+              class="w-3/12"
             >
               <ep-datepicker
                 v-model="tpvm.tapahtumapaiva"
@@ -278,10 +275,10 @@
               >
                 {{ $t('julkinen') }}
               </ep-toggle>
-            </b-form-group>
-            <b-form-group
+            </EpFormGroup>
+            <EpFormGroup
               :label="$t('tavoitteen-nimi-kuvaus') + '*'"
-              class="col-md-7 col-11"
+              class="w-8/12"
             >
               <ep-input
                 v-model="tpvm.tavoite"
@@ -289,8 +286,8 @@
                 :is-editing="true"
                 :placeholder="$t('kirjoita-tavoite-nimi-kuvaus')"
               />
-            </b-form-group>
-            <b-form-group class="col-1 col-sm-1 text-center">
+            </EpFormGroup>
+            <EpFormGroup class="w-1/12 text-center pt-1">
               <template #label>
                 <br>
               </template>
@@ -299,7 +296,7 @@
                 icon="delete"
                 @click="poistaTavoite(tpvm)"
               />
-            </b-form-group>
+            </EpFormGroup>
           </div>
           <ep-button
             variant="outline"
@@ -311,7 +308,7 @@
         </template>
 
         <template #yhteenveto>
-          <div class="d-flex">
+          <div class="flex">
             <div class="tieto w-50">
               <div class="nimi">
                 {{ $t('projektin-nimi') }}
@@ -328,7 +325,7 @@
               </span>
             </div>
           </div>
-          <div class="d-flex">
+          <div class="flex">
             <div class="tieto w-50">
               <div class="nimi">
                 {{ $t('kuvaus') }}
@@ -362,8 +359,8 @@
               </div>
             </div>
           </div>
-          <div class="d-flex">
-            <div class="tieto w-100">
+          <div class="flex">
+            <div class="tieto w-full">
               <div class="nimi">
                 {{ $t('aikataulu') }}
               </div>
@@ -383,7 +380,7 @@
           {{ $t('luo-perusteprojekti') }}
         </template>
       </EpSteps>
-    </b-container>
+    </div>
   </EpMainView>
 </template>
 
@@ -395,6 +392,7 @@ import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpSelect from '@shared/components/forms/EpSelect.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
+import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
 import EpDatepicker from '@shared/components/forms/EpDatepicker.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
@@ -513,7 +511,7 @@ const perusteet = computed(() => {
     let ammatilliset = _.filter(props.perusteprojektiStore.perusteet.value, peruste => isKoulutustyyppiAmmatillinen(peruste.koulutustyyppi!));
     return _.sortBy(ammatilliset, peruste => _.toLower($kaanna(peruste.nimi!)));
   }
-  return [];
+  return undefined;
 });
 
 const tyoryhmat = computed(() => {
