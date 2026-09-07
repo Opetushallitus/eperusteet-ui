@@ -18,8 +18,8 @@
             <div class="sm:w-5/6 mb-4">
               <EpFormGroup
                 class="mt-0 mb-3"
-                :label="$t('kayta-pohjana')" required>
-              >
+                :label="$t('kayta-pohjana')"
+                required>
                 <EpRadio
                   v-model="tyyppi"
                   value="perusteesta"
@@ -74,8 +74,8 @@
               <EpFormGroup
                 v-if="tyyppi !== null && tyyppi !== 'perusteesta'"
                 class="mt-0 mb-3"
-                :label="$t('tutkinnon-tyyppi')" required>
-              >
+                :label="$t('tutkinnon-tyyppi')"
+                required>
                 <EpRadio
                   v-model="koulutustyyppitoteutus"
                   value="kielitutkinto"
