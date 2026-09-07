@@ -97,9 +97,8 @@
 
           <EpFormGroup
             id="koulutustutkintotyyppi"
-            :label="$t('koulutus-tutkintotyyppi')" required>
-            required
-          >
+            :label="$t('koulutus-tutkintotyyppi')"
+            required>
             <koulutustyyppi-select
               v-model="data.koulutustyyppi"
               :is-editing="true"

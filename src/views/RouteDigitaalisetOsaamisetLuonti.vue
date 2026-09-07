@@ -18,8 +18,8 @@
             <div class="sm:w-5/6 mb-4">
               <EpFormGroup
                 class="mt-0"
-                :label="$t('kayta-pohjana')" required>
-              >
+                :label="$t('kayta-pohjana')"
+                required>
                 <EpRadio
                   v-model="tyyppi"
                   value="perusteesta"

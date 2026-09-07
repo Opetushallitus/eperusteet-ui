@@ -1,6 +1,7 @@
-import { EditointiStore, IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
-import { Aipeopetuksensisalto, LaajaalainenOsaaminenDto } from '@shared/api/eperusteet';
-import * as _ from 'lodash';
+import { computed } from 'vue';
+import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
+import { Aipeopetuksensisalto } from '@shared/api/eperusteet';
+import { requiredOneLang } from '@shared/validators/required';
 import { PerusteStore } from './PerusteStore';
 
 export class AipeLaajaAlaisetOsaamisetStore implements IEditoitava {
@@ -27,13 +28,13 @@ export class AipeLaajaAlaisetOsaamisetStore implements IEditoitava {
     await this.perusteStore.updateNavigation();
   }
 
-  async validator() {
+  public readonly validator = computed(() => {
     return {
       laajaAlaisetOsaamiset: {
         $each: {
-          nimi: { required },
+          nimi: requiredOneLang(),
         },
       },
     };
-  }
+  });
 }

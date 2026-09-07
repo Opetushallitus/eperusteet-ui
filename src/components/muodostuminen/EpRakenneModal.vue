@@ -104,8 +104,8 @@
 
         <EpFormGroup
           v-if="tyyppi ==='osaamisala'"
-          :label="$t('osaamisala')" required>
-        >
+          :label="$t('osaamisala')"
+          required>
           <div class="mb-2">
             <span v-if="selectableOsaamisalat.length === 0">{{ $t('ei-valittavia-osaamisaloja') }} </span>
             <span v-else>{{ $t('valitse-osaamisala') }} </span>
@@ -131,8 +131,8 @@
 
         <EpFormGroup
           v-if="tyyppi ==='tutkintonimike'"
-          :label="$t('tutkintonimike')" required>
-        >
+          :label="$t('tutkintonimike')"
+          required>
           <div class="mb-2">
             <span v-if="selectableOsaamisalat.length === 0">{{ $t('ei-valittavia-tutkintonimikkeita') }} </span>
             <span v-else>{{ $t('valitse-tutkintonimike') }} </span>
@@ -158,8 +158,8 @@
 
         <EpFormGroup
           v-if="tyyppi ==='rakenne-moduuli-paikalliset'"
-          :label="$t('nimi')" required>
-        >
+          :label="$t('nimi')"
+          required>
           <EpRadio
             v-model="nimiValinta"
             class="ml-1"
