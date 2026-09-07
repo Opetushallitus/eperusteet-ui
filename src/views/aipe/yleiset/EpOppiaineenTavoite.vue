@@ -139,11 +139,10 @@
 
     <EpDropdown
       v-if="isEditing"
+      variant="primary"
     >
       <template #button-content>
-        <ep-button variant="primary">
-          {{ $t('lisaa-laaja-alainen-osaaminen') }}
-        </ep-button>
+        {{ $t('lisaa-laaja-alainen-osaaminen') }}
       </template>
       <EpDropdownItem
         v-for="(laaja, index) in laajaAlaisetOsaamisetValinnat"
@@ -190,11 +189,10 @@
 
       <EpDropdown
         v-if="isEditing"
+        variant="primary"
       >
         <template #button-content>
-          <ep-button variant="primary">
-            {{ $t('lisaa-sisaltoalue') }}
-          </ep-button>
+          {{ $t('lisaa-sisaltoalue') }}
         </template>
         <EpDropdownItem
           v-for="(sisaltoalue, index) in sisaltoalueetValinnat"

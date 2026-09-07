@@ -28,18 +28,17 @@
           v-if="lisasisalto.groupedSisalto && lisasisalto.groupedSisalto.length > 0"
           class="lisasisalto-dropdown"
           no-caret
+          variant="link"
         >
           <template #button-content>
-            <ep-button
-              link
-              icon="add"
-              class="navi-button"
-              size="sm"
-            >
+            <span class="navi-button inline-flex items-center">
+              <EpMaterialIcon class="mr-1">
+                add
+              </EpMaterialIcon>
               <span>
                 {{ $t(lisasisalto.groupedLinkkiteksti) }}
               </span>
-            </ep-button>
+            </span>
           </template>
 
           <div

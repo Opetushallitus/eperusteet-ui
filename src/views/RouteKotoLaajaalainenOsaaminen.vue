@@ -91,11 +91,10 @@
           <EpDropdown
             v-if="isEditing"
             class="mb-4"
+            variant="primary"
           >
             <template #button-content>
-              <ep-button variant="primary">
-                {{ $t('lisaa-laaja-alainen-osaaminen') }}
-              </ep-button>
+              {{ $t('lisaa-laaja-alainen-osaaminen') }}
             </template>
             <EpDropdownItem
               v-for="(laajaAlainenKoodi, index) in laajaAlaisetKoodit"
