@@ -108,6 +108,14 @@ export function routeToNode(route: RouteLocationNormalized): NavigationNodeDto |
       type: 'taiteenala',
       id: Number(route.params.taiteenalaId),
     };
+  case 'taiteenosa':
+    return {
+      type: 'taiteenosa',
+      id: Number(route.params.taiteenosaId),
+      meta: {
+        viiteId: Number(route.params.taiteenalaId),
+      },
+    };
   case 'lukio_oppiaine':
     return {
       type: 'oppiaine',
@@ -347,6 +355,14 @@ export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
       name: 'taiteenala',
       params: {
         taiteenalaId: _.toString(node.id),
+      },
+    };
+  case 'taiteenosa':
+    return {
+      name: 'taiteenosa',
+      params: {
+        taiteenalaId: _.toString(node.meta?.viiteId),
+        taiteenosaId: _.toString(node.id),
       },
     };
   case 'oppiaine':
