@@ -9,7 +9,7 @@
         {{ $t('tuo-tutkinnon-osa') }}
       </template>
 
-      <div class="flex">
+      <div class="flex gap-4">
         <EpFormGroup
           class="w-1/2"
           :label="$t('tutkinnon-osan-nimi')"
@@ -108,9 +108,9 @@
                 </ep-button>
               </template>
               <template #header>
-                {{ $t('kaytossa-tutkinnossa') }}
+                <div class="text-sm font-bold">{{ $t('kaytossa-tutkinnossa') }}</div>
               </template>
-              {{ value }}
+              {{ $kaanna(value.nimi) }}
             </EpPopover>
           </template>
         </EpTable>
@@ -158,17 +158,15 @@
       </div>
 
       <template #modal-footer>
-        <div>
-          <ep-button
-            variant="link"
-            @click="close"
-          >
-            {{ $t('peruuta') }}
-          </ep-button>
-          <ep-button @click="save">
-            {{ $t('tuo-valitut-tutkinnon-osat') }}
-          </ep-button>
-        </div>
+        <ep-button
+          variant="link"
+          @click="close"
+        >
+          {{ $t('peruuta') }}
+        </ep-button>
+        <ep-button @click="save">
+          {{ $t('tuo-valitut-tutkinnon-osat') }}
+        </ep-button>
       </template>
     </EpModal>
   </div>
