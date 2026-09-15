@@ -10,6 +10,7 @@
       <template #default="{ data, isEditing, validation }">
         <EpTabs>
           <EpTab :title="$t('perustiedot')">
+
               <div
                 class="mt-2 ml-2 xl:w-10/12"
               >
@@ -256,9 +257,10 @@
                         <h3>{{ $t('korvattavat-perusteet') }}</h3>
                       </template>
                       <EpTable
-                        v-if="korvattavatDiaarinumerot && korvattavatDiaarinumerot.length > 0"
-                        :items="korvattavatDiaarinumerot"
+                        v-if="korvattavatDiaarinumerotItems.length > 0"
+                        :items="korvattavatDiaarinumerotItems"
                         :fields="korvattavatFields"
+                        data-key="diaarinumero"
                         responsive
                         borderless
                         striped
@@ -266,14 +268,14 @@
                         hover
                       >
                         <template #cell(diaarinumero)="{ item }">
-                          {{ item }}
+                          {{ item.diaarinumero }}
                         </template>
                         <template #cell(peruste)="{ item }">
-                          <span v-if="korvattavatPerusteet[item]">
-                            {{ $kaanna(korvattavatPerusteet[item].nimi) }}
+                          <span v-if="korvattavatPerusteet[item.diaarinumero]">
+                            {{ $kaanna(korvattavatPerusteet[item.diaarinumero].nimi) }}
                           </span>
                           <span
-                            v-else-if="korvattavatPerusteet[item] === null"
+                            v-else-if="korvattavatPerusteet[item.diaarinumero] === null"
                             class="font-italic"
                           >
                             {{ $t('ei-eperusteissa') }}
@@ -288,7 +290,7 @@
                             <ep-button
                               variant="link"
                               icon="delete"
-                              @click="poistaKorvattava(item)"
+                              @click="poistaKorvattava(data, item.diaarinumero)"
                             >
                               {{ $t('poista') }}
                             </ep-button>
@@ -307,7 +309,7 @@
                         <ep-button
                           variant="primary"
                           :disabled="!korvattavaDiaarinumero"
-                          @click="lisaaDiaarinumero"
+                          @click="lisaaDiaarinumero(data)"
                         >
                           {{ $t('lisaa-peruste') }}
                         </ep-button>
@@ -823,7 +825,12 @@ const osaamisalat = computed(() => {
 });
 
 const korvattavatDiaarinumerot = computed(() => {
-  return store.value?.data?.korvattavatDiaarinumerot || null;
+  const diaarit = store.value?.data?.korvattavatDiaarinumerot;
+  return _.isArray(diaarit) ? diaarit : [];
+});
+
+const korvattavatDiaarinumerotItems = computed(() => {
+  return _.map(korvattavatDiaarinumerot.value, diaarinumero => ({ diaarinumero }));
 });
 
 const onProjektiChange = async (projektiId: number, perusteId: number) => {
@@ -832,16 +839,17 @@ const onProjektiChange = async (projektiId: number, perusteId: number) => {
   await props.perusteStore.fetchMaaraykset();
 };
 
-// Watch handlers
-watch(koulutusvienninOhjeet, async () => {
-  store.value!.setData({
-    ...store.value!.data,
+watch(koulutusvienninOhjeet, () => {
+  if (!store.value?.data?.value) {
+    return;
+  }
+  store.value.mergeData({
     koulutusvienninOhjeLiitteet: koulutusvienninOhjeet.value,
   });
 }, { deep: true });
 
 watch(korvattavatDiaarinumerot, async (diaarit) => {
-  if (!diaarit) return;
+  if (!diaarit.length) return;
 
   const uudet: any = {};
   for (const diaarinumero of diaarit) {
@@ -1073,8 +1081,8 @@ const perusteenTyypit = computed(() => {
 });
 
 const amosaaYhteinen = computed({
-  get: () => store.value.data.tyyppi === 'amosaayhteinen',
-  set: (value) => store.value.setData({
+  get: () => store.value?.data.tyyppi === 'amosaayhteinen',
+  set: (value) => store.value?.setData({
     ...store.value!.data,
     tyyppi: value ? 'amosaayhteinen' : 'normaali',
 
@@ -1166,24 +1174,22 @@ const poistaLiite = async (item: any) => {
   }
 };
 
-const lisaaDiaarinumero = () => {
-  const dataValue = store.value?.data;
-  store.value!.setData({
-    ...dataValue,
-    korvattavatDiaarinumerot: [
-      ...dataValue?.korvattavatDiaarinumerot || [],
-      korvattavaDiaarinumero.value,
-    ],
-  });
+const lisaaDiaarinumero = (data: any) => {
+  const existing = _.isArray(data?.korvattavatDiaarinumerot)
+    ? data.korvattavatDiaarinumerot
+    : [];
+  data.korvattavatDiaarinumerot = [
+    ...existing,
+    korvattavaDiaarinumero.value,
+  ];
   korvattavaDiaarinumero.value = '';
 };
 
-const poistaKorvattava = (diaarinumero: string) => {
-  const dataValue = store.value?.data;
-  store.value!.setData({
-    ...dataValue,
-    korvattavatDiaarinumerot: _.reject(dataValue?.korvattavatDiaarinumerot, x => x === diaarinumero),
-  });
+const poistaKorvattava = (data: any, diaarinumero: string) => {
+  const existing = _.isArray(data?.korvattavatDiaarinumerot)
+    ? data.korvattavatDiaarinumerot
+    : [];
+  data.korvattavatDiaarinumerot = _.reject(existing, x => x === diaarinumero);
 };
 
 const addKoulutuskoodi = (data: any, koodi: any) => {
