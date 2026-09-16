@@ -89,6 +89,25 @@ export const ColorMap = Object.freeze({
   yhteiset: '#878787',
 });
 
+export function rakenneOsaMatchesQuery(osa: any, query: string, tutkinnonOsatMap: any = {}): boolean {
+  const q = query?.trim();
+  if (!q) {
+    return true;
+  }
+  const nimi = osa?.nimi || tutkinnonOsatMap[osa?._tutkinnonOsaViite]?.nimi;
+  if (nimi && Kielet.search(q, nimi)) {
+    return true;
+  }
+  return (osa?.osat || []).some((child: any) => rakenneOsaMatchesQuery(child, q, tutkinnonOsatMap));
+}
+
+export function isRakenneOsaOpen(osa: any, query: string, tutkinnonOsatMap: any = {}): boolean {
+  if (query?.trim()) {
+    return rakenneOsaMatchesQuery(osa, query, tutkinnonOsatMap);
+  }
+  return osa?.isOpen ?? true;
+}
+
 export function rakenneNodecolor(node, parentMandatory) {
   const isRyhma = !!node.rooli;
 

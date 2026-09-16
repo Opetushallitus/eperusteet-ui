@@ -5,14 +5,16 @@
     @cancel="cancel"
   >
     <template #modal-title>
-      <h2 v-if="muokkaus">
-        {{ $t('muokkaa-ryhmaa') }}: {{ $kaanna(nimi) }}
-      </h2>
-      <h2 v-else>
-        {{ $t('lisaa-ryhma') }}
-      </h2>
+      <div class="flex items-center justify-between w-full">
+        <h2 v-if="muokkaus">
+          {{ $t('muokkaa-ryhmaa') }}: {{ $kaanna(nimi) }}
+        </h2>
+        <h2 v-else>
+          {{ $t('lisaa-ryhma') }}
+        </h2>
 
-      <EpKielivalinta />
+        <EpKielivalinta />
+      </div>
     </template>
 
     <template #modal-footer>
@@ -204,12 +206,12 @@
           <ep-input
             v-if="nimiValinta === 'muu' || tyyppi !=='rakenne-moduuli-paikalliset'"
             v-model="innerModel.nimi"
-            class="mt-1 ml-4"
+            class="pl-5"
             is-editing
           />
           <ep-input
             v-else
-            class="mt-1 ml-4"
+            class="pl-5"
             is-editing
             model-value=""
             :disabled="true"
@@ -287,7 +289,7 @@ import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
 import { Kieli } from '@shared/tyypit';
 import { Kielet } from '@shared/stores/kieli';
-import { ref, computed, watch, inject, useTemplateRef, unref } from 'vue';
+import { ref, computed, watch, inject, unref, nextTick } from 'vue';
 import EpKielivalinta from '@shared/components/EpKielivalinta/EpKielivalinta.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
@@ -313,6 +315,7 @@ const emit = defineEmits(['update:modelValue', 'save', 'remove']);
 
 const nimiValinta = ref<'paikallinen' | 'tutkinnonosato' | 'korkeakoulu' | 'yhteinen' | 'muu' | null>(null);
 const tyyppi = ref<'osaamisala' | 'tutkintonimike' | 'rakenne-moduuli-pakollinen' | 'rakenne-moduuli-valinnainen' | 'rakenne-moduuli-ammatilliset' | 'rakenne-moduuli-yhteiset' | 'rakenne-moduuli-paikalliset' | null>(null);
+const isInitializing = ref(false);
 const tempModel = ref<any>(null);
 const oldMaksimi = ref(1);
 const rakenneModal = ref(null);
@@ -461,6 +464,7 @@ const setDefaultNimi = () => {
 };
 
 const show = (isNew) => {
+  isInitializing.value = true;
   (rakenneModal.value as any).show();
   if (isNew) {
     tyyppi.value = null;
@@ -499,6 +503,10 @@ const show = (isNew) => {
           },
         }),
     });
+
+  nextTick(() => {
+    isInitializing.value = false;
+  });
 };
 
 const save = () => {
@@ -563,6 +571,9 @@ const toggleMaksimi = (toggled) => {
 };
 
 watch(nimiValinta, (newVal, oldVal) => {
+  if (isInitializing.value) {
+    return;
+  }
   nimiChanged(newVal, oldVal);
 });
 
@@ -571,19 +582,16 @@ const nimiChanged = (newVal, oldVal) => {
     return;
   }
 
-  if (nimiValinta.value) {
-    if (nimiValinta.value !== 'muu') {
-      emit('update:modelValue', { ...innerModel.value, nimi: getNimi(nimiValintaTekstit.value[nimiValinta.value]) });
-    }
-    else {
-      emit('update:modelValue', { ...innerModel.value, nimi: null });
-    }
+  if (nimiValinta.value !== 'muu') {
+    emit('update:modelValue', { ...innerModel.value, nimi: getNimi(nimiValintaTekstit.value[nimiValinta.value]) });
+  }
+  else if (oldVal && oldVal !== 'muu') {
+    emit('update:modelValue', { ...innerModel.value, nimi: null });
   }
 };
 
 watch(tyyppi, (newVal, oldVal) => {
-  console.log('tyyppi', newVal, oldVal);
-  if (!newVal) {
+  if (isInitializing.value || !newVal) {
     return;
   }
 
@@ -604,7 +612,7 @@ watch(tyyppi, (newVal, oldVal) => {
   }
   else if (newVal === 'rakenne-moduuli-paikalliset') {
     nimiValinta.value = null;
-    emit('update:modelValue', { ...innerModel.value, nimi: null });
+    emit('update:modelValue', { ...innerModel.value, nimi: null, osaamisala });
   }
   else if (oldVal) {
     emit('update:modelValue', { ...innerModel.value, nimi: null });

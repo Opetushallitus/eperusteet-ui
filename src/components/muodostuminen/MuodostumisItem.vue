@@ -71,20 +71,24 @@
               </EpDropdownItem>
               <EpDropdownDivider />
               <EpDropdownText>
-                <ep-button
-                  icon="add"
-                  variant="outline"
-                  @click="liitaTosa"
-                >
-                  {{ $t('liita-tutkinnon-osa') }}
-                </ep-button>
-                <ep-button
-                  icon="add"
-                  variant="outline"
-                  @click="lisaaRyhma"
-                >
-                  {{ $t('lisaa-ryhma') }}
-                </ep-button>
+                <div class="flex flex-col">
+                  <ep-button
+                    icon="add"
+                    variant="outline"
+                    class="mb-1"
+                    @click="liitaTosa"
+                  >
+                    {{ $t('liita-tutkinnon-osa') }}
+                  </ep-button>
+                  <ep-button
+                    icon="add"
+                    variant="outline"
+                    class="w-full"
+                    @click="lisaaRyhma"
+                  >
+                    {{ $t('lisaa-ryhma') }}
+                  </ep-button>
+                </div>
               </EpDropdownText>
             </template>
           </EpDropdown>
@@ -142,7 +146,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import { ref, computed, watch, onMounted, useTemplateRef } from 'vue';
 import _ from 'lodash';
-import { DefaultRyhma, ryhmaTemplate } from './utils';
+import { DefaultRyhma, ryhmaTemplate, isRakenneOsaOpen } from './utils';
 import EpRakenneModal from '@/components/muodostuminen/EpRakenneModal.vue';
 import TutkinnonosatAddModal from '@/components/muodostuminen/TutkinnonosatAddModal.vue';
 import EpColorIndicator from '@shared/components/EpColorIndicator/EpColorIndicator.vue';
@@ -172,6 +176,10 @@ const props = defineProps({
   pakollinen: {
     type: Boolean,
     default: false,
+  },
+  query: {
+    type: String,
+    default: '',
   },
 });
 
@@ -206,7 +214,7 @@ const hasChildren = computed(() => {
 });
 
 const isOpen = computed(() => {
-  return innerModel.value.isOpen ?? true;
+  return isRakenneOsaOpen(innerModel.value, props.query, props.tutkinnonOsatMap);
 });
 
 const toggleOpen = () => {

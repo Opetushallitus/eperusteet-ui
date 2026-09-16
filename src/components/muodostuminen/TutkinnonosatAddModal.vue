@@ -59,12 +59,6 @@
           {{ $kaanna(item.nimi) }}
         </template>
       </EpTable>
-      <EpBPagination
-        v-model="sivu"
-        :total="items.length"
-        :items-per-page="10"
-        aria-controls="tutkinnonosat"
-      />
     </template>
   </EpModal>
 </template>
@@ -72,16 +66,12 @@
 <script setup lang="ts">
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpModal from '@shared/components/EpModal/EpModal.vue';
-import EpInput from '@shared/components/forms/EpInput.vue';
-import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpTable from '@shared/components/EpTable/EpTable.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import * as _ from 'lodash';
 import { ref, computed, useTemplateRef, inject } from 'vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
-import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
-import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
 
 const props = defineProps({
   tutkinnonosat: {

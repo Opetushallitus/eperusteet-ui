@@ -22,11 +22,12 @@
         :is-editing="isEditing"
         :tutkinnon-osat-map="tutkinnonOsatMap"
         :pakollinen="isPakollinen(node)"
+        :query="query"
         @remove="remove(idx)"
         @copy="copy(idx)"
       />
       <div
-        v-if="node.isOpen || node.isOpen === undefined"
+        v-if="isNodeOpen(node)"
         class="children"
         :class="{muodostumisryhma: !!node.rooli && depth > 0}"
         :style="{ 'padding-left': 30 + 'px' }"
@@ -39,6 +40,7 @@
           :is-editing="isEditing"
           :parent-mandatory="isPakollinen(node)"
           :copy-to-clip-board="copyToClipBoard"
+          :query="query"
         />
       </div>
     </div>
@@ -50,7 +52,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { ref, computed } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import _ from 'lodash';
-import { RooliToTheme, ColorMap } from '@/components/muodostuminen/utils';
+import { RooliToTheme, ColorMap, isRakenneOsaOpen } from '@/components/muodostuminen/utils';
 import MuodostumisItem from './MuodostumisItem.vue';
 import { Kielet } from '@shared/stores/kieli';
 import { $t } from '@shared/utils/globals';
@@ -108,11 +110,13 @@ const props = withDefaults(defineProps<{
   tutkinnonOsatMap: any;
   parentMandatory?: boolean | null;
   copyToClipBoard?: (node: any) => void;
+  query?: string;
 }>(), {
   parentMandatory: null,
   depth: 0,
   isEditing: false,
   copyToClipBoard: () => {},
+  query: '',
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -165,6 +169,10 @@ const model = computed({
     emit('update:modelValue', value);
   },
 });
+
+const isNodeOpen = (node: any) => {
+  return isRakenneOsaOpen(node, props.query, props.tutkinnonOsatMap);
+};
 
 const options = computed(() => {
   return {
