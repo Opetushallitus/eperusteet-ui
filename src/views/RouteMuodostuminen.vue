@@ -97,10 +97,11 @@
                     </div>
                     <MuodostumisNode
                       ref="root"
-                      v-model="filteredRakenneOsatRecursively"
+                      v-model="data.rakenne.osat"
                       :is-editing="isEditing"
                       :tutkinnon-osat-map="tutkinnonOsatMap"
                       :copy-to-clip-board="copy"
+                      :query="query"
                     />
                   </div>
                 </div>
@@ -761,30 +762,6 @@ const osaamisalat = computed(() => {
   });
 });
 
-const filteredRakenneOsatRecursively = computed(() => {
-  const osat = store.value?.data?.rakenne?.osat;
-  if (!osat) {
-    return [];
-  }
-  const q = query.value.trim();
-  if (!q) {
-    return osat;
-  }
-  const filterOsa = (osa: any): any | null => {
-    if ($filterBy('nimi', q)(osa)) {
-      return osa;
-    }
-    const filteredChildren = osa.osat
-      ? _.compact(_.map(osa.osat, filterOsa))
-      : [];
-    if (filteredChildren.length === 0) {
-      return null;
-    }
-    return { ...osa, osat: filteredChildren };
-  };
-  return _.compact(_.map(osat, filterOsa));
-});
-
 const osaamisalatRakenteessa = computed(() => {
   return _.keyBy(_.filter(rakenteenOsat.value, osa => osa.osaamisala && osa.osaamisala.osaamisalakoodiUri), 'osaamisala.osaamisalakoodiUri');
 });
@@ -1046,6 +1023,20 @@ async function tarkistaPeruutusLeikelauta() {
 // Watchers
 watch(browserEvents, (newVal) => {
   onInput(newVal);
+});
+
+watch(query, (q) => {
+  if (q.trim()) {
+    return;
+  }
+  const osat = unref(store.value?.data)?.rakenne?.osat;
+  const openAll = (osa) => {
+    if (osa.osat?.length) {
+      osa.isOpen = true;
+    }
+    _.forEach(osa.osat, openAll);
+  };
+  _.forEach(osat, openAll);
 });
 
 // Lifecycle hooks
