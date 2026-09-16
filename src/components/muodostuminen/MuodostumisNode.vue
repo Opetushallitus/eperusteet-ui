@@ -254,16 +254,16 @@ const copy = (idx: number) => {
 };
 
 const isPakollinen = (node) => {
-  if (props.parentMandatory !== null) {
-    return props.parentMandatory;
-  }
-
   if (node.nimi && _.startsWith(node.nimi[Kielet.getUiKieli.value], $t('rakenne-moduuli-valinnainen'))) {
     return false;
   }
 
   if (node.nimi && node.nimi[Kielet.getUiKieli.value] === $t('rakenne-moduuli-pakollinen')) {
     return true;
+  }
+
+  if (props.parentMandatory !== null) {
+    return props.parentMandatory;
   }
 
   return null;
