@@ -838,6 +838,7 @@ function addUusi(root) {
 }
 
 function addRyhma() {
+  uusi.value = _.cloneDeep(DefaultRyhma);
   eprakennemodalUusiRyhma.value.show(true);
 }
 

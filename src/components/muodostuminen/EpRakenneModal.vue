@@ -108,9 +108,8 @@
           v-if="tyyppi ==='osaamisala'"
           :label="$t('osaamisala')"
           required>
-          <div class="mb-2">
-            <span v-if="selectableOsaamisalat.length === 0">{{ $t('ei-valittavia-osaamisaloja') }} </span>
-            <span v-else>{{ $t('valitse-osaamisala') }} </span>
+          <div class="mb-2" v-if="selectableOsaamisalat.length === 0">
+            <span>{{ $t('ei-valittavia-osaamisaloja') }} </span>
             <span class="ml-1">{{ $t('uusia-osaamisaloja-voit-luoda') }} </span>
             <a
               class="btn-link px-1"
@@ -135,9 +134,8 @@
           v-if="tyyppi ==='tutkintonimike'"
           :label="$t('tutkintonimike')"
           required>
-          <div class="mb-2">
-            <span v-if="selectableOsaamisalat.length === 0">{{ $t('ei-valittavia-tutkintonimikkeita') }} </span>
-            <span v-else>{{ $t('valitse-tutkintonimike') }} </span>
+          <div class="mb-2" v-if="selectableTutkintonimikkeet.length === 0">
+            <span>{{ $t('ei-valittavia-tutkintonimikkeita') }} </span>
             <span class="ml-1">{{ $t('uusia-tutkintonimikkeita-voit-luoda') }} </span>
             <a
               class="px-1"
@@ -470,6 +468,7 @@ const show = (isNew) => {
     tyyppi.value = null;
     innerModel.value.tutkintonimike = null;
     innerModel.value.osaamisala = null;
+    oldMaksimi.value = 1;
   }
   else {
     tyyppi.value = defaultTyyppi.value as any;
@@ -479,30 +478,30 @@ const show = (isNew) => {
     nimiValinta.value = null;
   }
 
-  tempModel.value = _.cloneDeep(innerModel.value);
-  setDefaultNimi();
-
-  emit('update:modelValue',
-    {
-      ...innerModel.value,
-      ...(innerModel.value.tutkintonimike
-        && {
-          tutkintonimike: _.find(selectableTutkintonimikkeet.value, tutkintonimike => innerModel.value.tutkintonimike.uri === tutkintonimike.uri),
-        }),
-      ...(innerModel.value.osaamisala
-        && {
-          osaamisala: _.find(selectableOsaamisalat.value, osaamisala => innerModel.value.osaamisala.osaamisalakoodiUri === osaamisala.osaamisalakoodiUri),
-        }),
-      ...((!innerModel.value.muodostumisSaanto || innerModel.value.muodostumisSaanto === null)
-        && {
-          muodostumisSaanto: {
-            laajuus: {
-              minimi: null,
-              maksimi: null,
-            },
+  const nextModel = {
+    ...innerModel.value,
+    ...(innerModel.value.tutkintonimike
+      && {
+        tutkintonimike: _.find(selectableTutkintonimikkeet.value, tutkintonimike => innerModel.value.tutkintonimike.uri === tutkintonimike.uri),
+      }),
+    ...(innerModel.value.osaamisala
+      && {
+        osaamisala: _.find(selectableOsaamisalat.value, osaamisala => innerModel.value.osaamisala.osaamisalakoodiUri === osaamisala.osaamisalakoodiUri),
+      }),
+    ...((isNew || !innerModel.value.muodostumisSaanto)
+      && {
+        muodostumisSaanto: {
+          laajuus: {
+            minimi: 0,
+            maksimi: null,
           },
-        }),
-    });
+        },
+      }),
+  };
+
+  tempModel.value = _.cloneDeep(nextModel);
+  setDefaultNimi();
+  emit('update:modelValue', nextModel);
 
   nextTick(() => {
     isInitializing.value = false;

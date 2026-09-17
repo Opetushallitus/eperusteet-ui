@@ -186,7 +186,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'remove', 'copy']);
 
 const showDescription = ref(false);
-const uusi = ref(DefaultRyhma);
+const uusi = ref(_.cloneDeep(DefaultRyhma));
 
 const eprakennemodal = useTemplateRef('eprakennemodal');
 const eprakennemodalNew = useTemplateRef('eprakennemodalNew');
@@ -369,7 +369,7 @@ const color = computed(() => {
 });
 
 const tutkinnonOsaColor = computed(() => {
-  if (props.pakollinen) {
+  if (innerModel.value.pakollinen) {
     return ColorMap['pakollinen'];
   }
 
@@ -404,6 +404,7 @@ const addUusi = (root) => {
       ...template,
       ...uusi.value.ryhma,
     }, ...root.osat];
+    uusi.value = _.cloneDeep(DefaultRyhma);
   }
 };
 
