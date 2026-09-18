@@ -72,7 +72,7 @@
             class="w-80 mt-3"
             :class="{ 'kategoria-editing': isEditing, 'dragging': dragging }"
           >
-            <div class="flex">
+            <div class="flex mr-2">
               <ep-material-icon
                 v-if="isEditing"
                 class="order-handle mr-2 flex-shrink-0"
@@ -328,7 +328,7 @@ watch(versionumero, async () => {
   }
 
   .taitotaso-kuvaus {
-    margin-right: 54px;
+    margin-right: 37px;
   }
 }
 </style>

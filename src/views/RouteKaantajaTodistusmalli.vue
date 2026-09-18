@@ -79,8 +79,8 @@
               >
                 <div class="flex">
                   <div class="w-full">
-                    <div class="flex flex-wrap gap-4 mb-2">
-                      <div class="md:w-5/12">
+                    <div class="mb-2 flex items-end gap-2">
+                      <div class="w-5/12 min-w-0">
                         <label>{{ $t('taitotaso') }}</label>
                         <ep-koodisto-select-draggable
                           v-model="taitotaso.taitotaso"
@@ -89,17 +89,16 @@
                           :nayta-arvo="false"
                         />
                       </div>
-                      <div class="md:w-1/2">
+                      <div class="min-w-0 grow">
                         <label>{{ $t('evkn-asteikko') }}</label>
                         <ep-input
                           v-model="taitotaso.asteikko"
                           :is-editing="isEditing"
                         />
                       </div>
-                      <div class="md:w-1/12">
-                        <div>&nbsp;</div>
+                      <div class="mb-1 shrink-0">
                         <ep-button
-                          class="link-style pt-1 mt-2"
+                          class="link-style"
                           variant="link"
                           icon="delete"
                           size="sm"

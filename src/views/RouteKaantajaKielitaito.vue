@@ -78,17 +78,16 @@
               >
                 drag_indicator
               </ep-material-icon>
-              <div class="w-full">
+              <div class="w-full mr-3">
                 <div class="mb-3">
                   <h5>{{ $t('taitotaso') }}</h5>
-                  <div class="flex items-start">
-                    <ep-koodisto-select-draggable
-                      v-model="taitotaso.taitotaso"
-                      :store="arvosanaKoodisto"
-                      :is-editing="isEditing"
-                      :nayta-arvo="false"
-                    />
-                  </div>
+                  <ep-koodisto-select
+                    v-model="taitotaso.taitotaso"
+                    class="w-full"
+                    :store="arvosanaKoodisto"
+                    :is-editing="isEditing"
+                    :nayta-arvo="false"
+                  />
                 </div>
 
                 <div class="mb-3">
@@ -106,7 +105,6 @@
                     v-if="isEditing"
                     variant="link"
                     icon="delete"
-                    class="mr-5"
                     @click="poistaTaitotaso(taitotasoIndex)"
                   >
                     {{ $t('poista-taitotaso') }}
@@ -162,7 +160,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
-import EpKoodistoSelectDraggable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectDraggable.vue';
+import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';

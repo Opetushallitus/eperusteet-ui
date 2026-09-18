@@ -32,7 +32,10 @@
         >
           <template #button-content>
             <span class="navi-button inline-flex items-center">
-              <EpMaterialIcon class="mr-1">
+              <EpMaterialIcon
+                class="mr-1"
+                size="20px"
+              >
                 add
               </EpMaterialIcon>
               <span>
