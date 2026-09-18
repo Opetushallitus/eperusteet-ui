@@ -114,33 +114,13 @@
                             </ep-material-icon>
                             <span>{{ $t('suorituksen-osa') }}</span>
                           </div>
-                          <div class="flex items-start w-full">
-                            <ep-koodisto-select
-                              v-model="osa.suorituksenOsa"
-                              class="w-full"
-                              :store="suorituksenOsaKoodisto"
-                              :is-editing="isEditing"
-                              :nayta-arvo="false"
-                            >
-                              <template #default="{ open }">
-                                <EpInputGroup>
-                                  <ep-input
-                                    :model-value="osa.suorituksenOsa ? $kaanna(osa.suorituksenOsa.nimi) : ''"
-                                    :is-editing="true"
-                                    disabled
-                                  />
-                                  <template #append>
-                                    <ep-button
-                                      variant="primary"
-                                      @click="open"
-                                    >
-                                      {{ $t('hae-koodistosta') }}
-                                    </ep-button>
-                                  </template>
-                                </EpInputGroup>
-                              </template>
-                            </ep-koodisto-select>
-                          </div>
+                          <ep-koodisto-select
+                            v-model="osa.suorituksenOsa"
+                            class="w-full"
+                            :store="suorituksenOsaKoodisto"
+                            :is-editing="isEditing"
+                            :nayta-arvo="false"
+                          />
                         </div>
 
                         <div class="mb-2">
@@ -158,31 +138,34 @@
                               :key="'taitotaso' + taitotasoIndex"
                               class="mb-2"
                             >
-                              <div class="flex">
-                                <div class="w-full">
-                                  <div class="flex items-center mb-2">
-                                    <ep-koodisto-select-draggable
-                                      v-model="taitotaso.taitotaso"
-                                      :store="arvosanaKoodisto"
-                                      :is-editing="isEditing"
-                                      :nayta-arvo="false"
-                                    />
-                                    <ep-button
-                                      variant="link"
-                                      icon="delete"
-                                      size="sm"
-                                      class="ml-2 link-style"
-                                      @click="poistaTaitotaso(tutkintotasoIndex, osaIndex, taitotasoIndex)"
-                                    />
-                                  </div>
-                                  <ep-content
-                                    v-model="taitotaso.kuvaus"
-                                    layout="none"
-                                    :is-editable="isEditing"
-                                    :class="{ 'no-pointer-events': dragging }"
-                                  />
-                                </div>
+                              <div class="mb-2 flex items-center gap-2">
+                                <ep-material-icon
+                                  class="order-handle shrink-0"
+                                  size="18px"
+                                >
+                                  drag_indicator
+                                </ep-material-icon>
+                                <ep-koodisto-select
+                                  v-model="taitotaso.taitotaso"
+                                  class="taitotaso-koodisto-select"
+                                  :store="arvosanaKoodisto"
+                                  :is-editing="isEditing"
+                                  :nayta-arvo="false"
+                                />
+                                <ep-button
+                                  variant="link"
+                                  icon="delete"
+                                  size="sm"
+                                  class="link-style shrink-0"
+                                  @click="poistaTaitotaso(tutkintotasoIndex, osaIndex, taitotasoIndex)"
+                                />
                               </div>
+                              <ep-content
+                                v-model="taitotaso.kuvaus"
+                                layout="none"
+                                :is-editable="isEditing"
+                                :class="{ 'no-pointer-events': dragging }"
+                              />
                             </div>
                           </VueDraggable>
 
@@ -297,11 +280,9 @@ import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { VueDraggable } from 'vue-draggable-plus';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
-import EpKoodistoSelectDraggable from '@shared/components/EpKoodistoSelect/EpKoodistoSelectDraggable.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
-import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 
 const props = defineProps({
   perusteStore: {
@@ -431,8 +412,12 @@ watch(versionumero, async () => {
   }
 }
 
-:deep(.taitotaso-input) {
-  max-width: 150px;
+.taitotaso-koodisto-select {
+  :deep(.middle-input) {
+    flex-grow: 0;
+    width: 200px;
+    max-width: 200px;
+  }
 }
 
 .no-pointer-events {
