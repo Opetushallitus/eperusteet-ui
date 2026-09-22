@@ -59,7 +59,32 @@ yarn gen:api
 
 Poista tämän jälkeen `node_modules`-hakemisto polusta `eperusteet-frontend-utils/vue` ja aja `yarn install` koko projektin juuressa.
 
-Oletuksena generointi käyttää ePerusteiden julkaistua API-kuvausta (URL tai polku annetaan skriptille `buildapi.sh`:n kautta). Voit ohittaa sen asettamalla ympäristömuuttujan **`EPERUSTEET_SPECFILE`** osoittamaan omaan OpenAPI JSON -tiedostoosi tai HTTPS-URL:iin (ks. `eperusteet-frontend-utils/vue/scripts/buildapi.sh`).
+`yarn gen:api` lukee valmiin OpenAPI-kuvauksen. Oletus on master-haaraan julkaistu kuvaus. Paikallinen polku tai HTTPS-URL ohittaa oletuksen:
+
+| Muuttuja | Palvelu | Oletus |
+| --- | --- | --- |
+| `EPERUSTEET_SPECFILE` | eperusteet | `https://raw.githubusercontent.com/Opetushallitus/eperusteet/master/generated/eperusteet.spec.json` |
+| `EPERUSTEET_YLOPS_SPECFILE` | ylops | `https://raw.githubusercontent.com/Opetushallitus/eperusteet-ylops/master/generated/ylops.spec.json` |
+| `EPERUSTEET_AMOSAA_SPECFILE` | amosaa | `https://raw.githubusercontent.com/Opetushallitus/eperusteet-amosaa/master/generated/amosaa.spec.json` |
+
+#### Paikallinen kuvaus: `yarn genspec`
+
+`yarn genspec` tuo backendin tuoreimmat lokaalit rajapintamuutokset lokaaliin käyttöliittymään. Komento generoi TypeScript-rajapinnat paikallisesta OpenAPI-kuvauksesta ja käynnistää sen jälkeen dev-palvelimen.
+
+Argumentti on palvelu: `eperusteet`, `ylops`, `amosaa` tai `all`. Komento ajaa `buildapi.sh -g`, joka suorittaa palveluhakemistossa `mvn verify -Pspringdoc` (tarvitsee JDK:n ja Mavenin), ja käynnistää sitten `yarn dev`.
+
+Lokaalia ajoa varten nämä ympäristömuuttujat on asetettava. `<workspace>` on hakemisto, jossa backend-kloonit ovat sisaruksina. `*_SERVICE_DIR` on Maven-ajoa varten, `*_SPECFILE` osoittaa Mavenin kirjoittamaan OpenAPI-kuvaukseen hakemistossa `target/openapi`.
+
+```bash
+export YLOPS_SERVICE_DIR="<workspace>/eperusteet-ylops/eperusteet-ylops-service"
+export EPERUSTEET_SERVICE_DIR="<workspace>/eperusteet/eperusteet/eperusteet-service"
+export AMOSAA_SERVICE_DIR="<workspace>/eperusteet-amosaa/eperusteet-amosaa-service"
+export EPERUSTEET_SPECFILE="<workspace>/eperusteet/eperusteet/eperusteet-service/target/openapi/eperusteet.spec.json"
+export EPERUSTEET_YLOPS_SPECFILE="<workspace>/eperusteet-ylops/eperusteet-ylops-service/target/openapi/ylops.spec.json"
+export EPERUSTEET_AMOSAA_SPECFILE="<workspace>/eperusteet-amosaa/eperusteet-amosaa-service/target/openapi/amosaa.spec.json"
+
+yarn genspec eperusteet
+```
 
 ### 3.4. Testien ajaminen
 
@@ -117,7 +142,7 @@ yarn preview
 ### 3.6. Kehitysvinkkejä
 
 - Tuotantobuildin polku (`base`): `/eperusteet-service/ui` (`vite.config.js`).
-- `yarn genspec` juuressa generoi API-tyypit paikallisesta backendistä (`buildapi.sh -g`, vaatii ympäristömuuttujan `EPERUSTEET_SERVICE_DIR`) ja käynnistää sen jälkeen dev-palvelimen.
+- `yarn genspec <palvelu>` tuo backendin tuoreimmat lokaalit rajapintamuutokset lokaaliin käyttöliittymään. Ympäristömuuttujat ja argumentit: kohta 3.3.
 
 ### 3.7. Cursor Agent Skills
 
