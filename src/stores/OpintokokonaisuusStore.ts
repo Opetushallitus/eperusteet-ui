@@ -1,7 +1,7 @@
 import { computed } from 'vue';
 import { IEditoitava } from '@shared/components/EpEditointi/EditointiStore';
 import { minLength, required } from '@vuelidate/validators';
-import { allTranslations, translated } from '@shared/validators/required';
+import { allTranslations, requiredOneLang, translated } from '@shared/validators/required';
 import { AbstractPerusteenOsaViiteStore } from '@/stores/AbstractPerusteenOsaViiteStore';
 
 export class OpintokokonaisuusStore extends AbstractPerusteenOsaViiteStore implements IEditoitava {
@@ -23,8 +23,8 @@ export class OpintokokonaisuusStore extends AbstractPerusteenOsaViiteStore imple
       nimiKoodi: {
         nimi: required,
       },
-      kuvaus: allTranslations(julkaisukielet),
-      opetuksenTavoiteOtsikko: translated(julkaisukielet),
+      kuvaus: requiredOneLang(),
+      opetuksenTavoiteOtsikko: requiredOneLang(),
       opetuksenTavoitteet: {
         'min-length': minLength(1),
         required,

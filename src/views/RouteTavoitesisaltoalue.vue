@@ -104,6 +104,8 @@ import EpTavoitesisaltoalueTavoitealueet from '@shared/components/EpTavoitesisal
 import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import EpButton from '@shared/components/EpButton/EpButton.vue';
+import EpInput from '@shared/components/forms/EpInput.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
