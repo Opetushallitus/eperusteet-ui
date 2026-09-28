@@ -167,17 +167,12 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
-import EpContent from '@shared/components/EpContent/EpContent.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
-import EpToggle from '@shared/components/forms/EpToggle.vue';
-import EpSelect from '@shared/components/forms/EpSelect.vue';
-import EpLaajuusInput from '@shared/components/forms/EpLaajuusInput.vue';
 import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
 import EpCollapse from '@shared/components/EpCollapse/EpCollapse.vue';
 import Osaamistavoite from '@shared/components/EpOsaamistavoite/Osaamistavoite.vue';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
-import EpAmmattitaitovaatimukset from '@shared/components/EpAmmattitaitovaatimukset/EpAmmattitaitovaatimukset.vue';
 import EpGeneerinenAsteikko from '@/components/EpGeneerinenAsteikko/EpGeneerinenAsteikko.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { OsaalueStore } from '@/stores/OsaalueStore';
@@ -300,8 +295,7 @@ const lisaaValinnaisetOsaamistavoitteet = () => {
   });
 };
 
-// Watch for changes in osaalueId
-watch(osaalueId, onOsaAlueChange, { immediate: true });
+watch([osaalueId, navigation], onOsaAlueChange, { immediate: true });
 </script>
 
 <style lang="scss" scoped>
