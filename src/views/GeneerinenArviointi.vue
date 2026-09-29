@@ -171,7 +171,7 @@ import EpInput from '@shared/components/forms/EpInput.vue';
 import * as _ from 'lodash';
 import { KayttajaStore } from '@/stores/kayttaja';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
-import { $t, $kaanna, $confirmModal } from '@shared/utils/globals';
+import { $t, $kaanna, $confirmModal, $fail } from '@shared/utils/globals';
 
 const props = defineProps<{
   value: GeneerinenArviointiasteikkoDto;
@@ -273,13 +273,16 @@ const onSave = async () => {
 };
 
 const onPublish = async () => {
-  await $confirmModal?.msgBoxConfirm(
+  const result = await $confirmModal?.msgBoxConfirm(
     $t('julkaistaanko-geneerinen-arviointi-kuvaus') as any, {
       title: $t('julkaistaanko-geneerinen-arviointi') as any,
       okTitle: $t('julkaise') as any,
       cancelTitle: $t('peruuta') as any,
       size: 'lg',
     });
+  if (!result) {
+    return;
+  }
   isEditing.value = false;
   try {
     isLoading.value = true;
@@ -293,13 +296,16 @@ const onPublish = async () => {
 };
 
 const onUnPublish = async () => {
-  await $confirmModal?.msgBoxConfirm(
+  const result = await $confirmModal?.msgBoxConfirm(
     $t('palautetaanko-geneerinen-arviointi-keskeneraiseksi-kuvaus') as any, {
       title: $t('palautetaanko-geneerinen-arviointi-keskeneraiseksi') as any,
       okTitle: $t('palauta-keskeneraiseksi') as any,
       cancelTitle: $t('peruuta') as any,
       size: 'lg',
     });
+  if (!result) {
+    return;
+  }
   isEditing.value = false;
   try {
     isLoading.value = true;
@@ -313,9 +319,23 @@ const onUnPublish = async () => {
 };
 
 const onCopy = async () => {
+  const result = await $confirmModal?.msgBoxConfirm(
+      $t('kopioi-geneerinen-arviointi-kuvaus') as any, {
+        title: $t('kopioi-geneerinen-arviointi') as any,
+        okTitle: $t('kopioi') as any,
+        cancelTitle: $t('peruuta') as any,
+        size: 'lg',
+      });
+  if (!result) {
+    return;
+  }
   try {
     isLoading.value = true;
-    await props.arviointiStore.copy(inner.value!);
+    await props.arviointiStore.add({
+      ...inner.value!,
+      julkaistu: false,
+      id: undefined,
+    });
   }
   finally {
     await props.arviointiStore.fetchGeneeriset();
@@ -328,17 +348,33 @@ const onRemove = async () => {
     return;
   }
 
-  await $confirmModal?.msgBoxConfirm(
+  const result = await $confirmModal?.msgBoxConfirm(
     $t('poistetaanko-geneerinen-arviointi-kuvaus') as any, {
       title: $t('poistetaanko-geneerinen-arviointi') as any,
       okTitle: $t('poista') as any,
       cancelTitle: $t('peruuta') as any,
       size: 'lg',
     });
+  if (!result) {
+    return;
+  }
   isEditing.value = false;
   try {
     isLoading.value = true;
     await props.arviointiStore.remove(inner.value);
+  }
+  catch (err: any) {
+    const syy = err?.response?.data?.syy;
+    const tutkinnonOsat = err?.response?.data?.data;
+    if (syy && !_.isEmpty(tutkinnonOsat)) {
+      const nimet = _.map(_.take(tutkinnonOsat, 3), (tosa: any) => $kaanna(tosa.nimi)).join(', ');
+      const loput = _.size(tutkinnonOsat) - 3;
+      const teksti = loput > 0 ? `${nimet} ${$t('ja-n-muuta', { maara: loput })}` : nimet;
+      $fail($t(syy), teksti);
+    }
+    else {
+      $fail($t('virhe-palvelu-virhe'));
+    }
   }
   finally {
     await props.arviointiStore.fetchGeneeriset();

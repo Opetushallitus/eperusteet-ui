@@ -130,16 +130,11 @@ export class ArviointiStore {
   }
 
   public async remove(value: GeneerinenArviointiasteikkoDto) {
-    try {
-      await GeneerinenArviointiasteikko.removeGeneerinenArviontiasteikko(value.id!);
-      const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
-      if (this.state.geneeriset) {
-        this.state.geneeriset.splice(idx, 1);
-      }
-      $success($t('geneerinen-arviointi-poistettu'));
+    await GeneerinenArviointiasteikko.removeGeneerinenArviontiasteikko(value.id!);
+    const idx = _.findIndex(this.state.geneeriset, g => g.id === value.id);
+    if (this.state.geneeriset) {
+      this.state.geneeriset.splice(idx, 1);
     }
-    catch (err) {
-      $fail($t('virhe-palvelu-virhe'));
-    }
+    $success($t('geneerinen-arviointi-poistettu'));
   }
 }
