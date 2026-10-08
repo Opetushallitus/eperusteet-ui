@@ -224,6 +224,9 @@
             :items="items.data"
             :fields="fields"
             @sort-changed="sortingChanged"
+            :per-page="perPage"
+            :total-rows="total"
+            v-model:current-page="sivu"
           >
             <template
               v-if="hasNimiSlot"
@@ -267,11 +270,6 @@
               </div>
             </template>
           </EpTable>
-          <ep-b-pagination
-            v-model="sivu"
-            :items-per-page="perPage"
-            :total="total"
-          />
         </div>
         <div
           v-else
@@ -286,8 +284,6 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
-import EpMainView from '@shared/components/EpMainView/EpMainView.vue';
-import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
 import EpSearch from '@shared/components/forms/EpSearch.vue';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
