@@ -7,6 +7,8 @@ import { reactive } from 'vue';
 import { computed } from 'vue';
 import { globalStubs } from '@shared/utils/__tests__/stubs';
 import { nextTick } from 'vue';
+import EpTable from '@shared/components/EpTable/EpTable.vue';
+import EpToggle from '@shared/components/forms/EpToggle.vue';
 
 function map<T extends Vue, R>(wrapper: any, fn: (param: any) => R): R[] {
   const result = [] as R[];
@@ -147,5 +149,51 @@ describe('Projektilistaus', () => {
 
     expect(wrapper.html()).toContain('projekti 42');
     expect(wrapper.html()).toContain('oma projekti');
+  });
+
+  test('Ammatillinen yhteinen -suodatin nollaa sivutuksen', async () => {
+    const updateQuery = vi.fn(async () => {});
+    const wrapper = mount(EpPerusteprojektiListaus, {
+      propsData: {
+        provider: {
+          ownProjects: computed(() => []),
+          projects: computed(() => ({
+            sivu: 0,
+            sivukoko: 10,
+            sivuja: 3,
+            kokonaismäärä: 30,
+            data: [{
+              id: 42,
+              nimi: 'projekti 42',
+              tila: 'valmis',
+              peruste: {
+                koulutustyyppi: 'koulutustyyppi_11',
+              },
+            }] as any,
+          })),
+          updateQuery,
+          updateOwnProjects: vi.fn(async () => {}),
+        },
+        newRoute: { name: 'luonti' },
+        editRoute: 'asia',
+        filters: ['amosaayhteinen'],
+      },
+      global: {
+        ...globalStubs,
+      },
+    });
+
+    await nextTick();
+    wrapper.findComponent(EpTable).vm.$emit('update:currentPage', 3);
+    await nextTick();
+    updateQuery.mockClear();
+
+    wrapper.findComponent(EpToggle).vm.$emit('update:modelValue', true);
+    await nextTick();
+
+    expect(updateQuery).toHaveBeenLastCalledWith(expect.objectContaining({
+      sivu: 0,
+      tyyppi: ['AMOSAA_YHTEINEN'],
+    }));
   });
 });
