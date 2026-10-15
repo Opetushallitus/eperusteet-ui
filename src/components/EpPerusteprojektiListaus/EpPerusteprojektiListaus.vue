@@ -422,6 +422,7 @@ watch(() => koulutustyyppi.value, (newKt: string | null) => {
 });
 
 watch(() => amosaaYhteinen.value, () => {
+  query.sivu = 0;
   if (amosaaYhteinen.value) {
     query.tyyppi = ['AMOSAA_YHTEINEN'];
   }
