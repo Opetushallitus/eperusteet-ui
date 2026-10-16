@@ -15,10 +15,11 @@
 
     <div
       v-else
-      class="mt-3">
+      class="mt-3"
+    >
       <div
-        v-for="(tiedote, index) in tiedotteetFiltered"
-        :key="index"
+        v-for="(tiedote) in tiedotteetFiltered"
+        :key="tiedote.id"
         class="tiedote p-2 pl-3"
         @click="avaaTiedote(tiedote)"
       >
@@ -102,7 +103,7 @@ const tiedotteetFiltered = computed(() => {
 });
 
 const avaaTiedote = (tiedote: TiedoteDto) => {
-  eptiedotemodal.value.muokkaa(tiedote);
+  eptiedotemodal.value?.muokkaa(tiedote);
 };
 </script>
 
@@ -147,7 +148,7 @@ const avaaTiedote = (tiedote: TiedoteDto) => {
     }
 
     :deep(.btn) {
-      padding: 0px;
+      padding: 0;
     }
 
   }
