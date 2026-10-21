@@ -1,4 +1,4 @@
-import { reactive, computed, ref, watch } from 'vue';
+import { computed, reactive } from 'vue';
 import { TiedoteDto, Tiedotteet } from '@shared/api/eperusteet';
 import _ from 'lodash';
 import { ITiedotteetProvider } from '@shared/stores/types';
@@ -32,22 +32,23 @@ export class TiedotteetStore implements ITiedotteetProvider {
   }
 
   private async fetchImpl(q: TiedoteQuery) {
-    const res = (await Tiedotteet.findTiedotteetBy(
-      q.sivu,
-      q.sivukoko,
-      q.kieli,
-      q.nimi,
-      q.perusteId,
-      q.perusteeton,
-      q.julkinen,
-      q.yleinen,
-      q.tiedoteJulkaisuPaikka,
-      q.perusteIds,
-      q.koulutusTyyppi,
-      q.jarjestys,
-      q.jarjestysNouseva,
-    )).data as any;
-    return res;
+    return (
+      await Tiedotteet.findTiedotteetBy(
+        q.sivu,
+        q.sivukoko,
+        q.kieli,
+        q.nimi,
+        q.perusteId,
+        q.perusteeton,
+        q.julkinen,
+        q.yleinen,
+        q.tiedoteJulkaisuPaikka,
+        q.perusteIds,
+        q.koulutusTyyppi,
+        q.jarjestys,
+        q.jarjestysNouseva,
+      )
+    ).data as any;
   }
 
   public fetch = debounced(async () => {
@@ -55,22 +56,24 @@ export class TiedotteetStore implements ITiedotteetProvider {
     this.state.tiedotteetPage = await this.fetchImpl(this.options.value);
   });
 
+  public search(query: TiedoteQuery): Promise<Page<TiedoteDto>> {
+    return this.fetchImpl(query);
+  }
+
   public async save(tiedote: TiedoteDto) {
     if (_.isNil(tiedote.id)) {
-      const tallennettu = (await Tiedotteet.addTiedote(tiedote) as any).data;
-      this.state.tiedotteetPage!.data = [tallennettu, ...this.state.tiedotteetPage!.data || []];
+      await Tiedotteet.addTiedote(tiedote);
     }
     else {
-      await Tiedotteet.updateTiedote((tiedote as any).id, tiedote);
-      const tallennettu = (await Tiedotteet.getTiedote((tiedote as any).id, tiedote) as any).data;
-      this.state.tiedotteetPage!.data = _.map(this.state.tiedotteetPage!.data, (listaTiedote) => listaTiedote.id === tallennettu.id ? tallennettu : listaTiedote);
+      await Tiedotteet.updateTiedote(tiedote.id!, tiedote);
     }
+    this.state.tiedotteetPage = await this.fetchImpl(this.options.value);
   }
 
   public async delete(tiedote: TiedoteDto) {
     if (tiedote.id) {
       await Tiedotteet.deleteTiedote(tiedote.id);
-      this.state.tiedotteetPage!.data = _.filter(this.state.tiedotteetPage!.data, (listaTiedote) => listaTiedote.id !== tiedote.id);
+      this.state.tiedotteetPage = await this.fetchImpl(this.options.value);
     }
   }
 }
