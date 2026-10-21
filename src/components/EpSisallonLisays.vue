@@ -152,6 +152,7 @@ import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
 import { KoulutuksenOsaStore } from '@/stores/KoulutuksenOsaStore';
 import { LaajaalainenOsaaminenStore } from '@/stores/LaajaalainenOsaaminenStore';
 import { TavoitesisaltoalueStore } from '@/stores/TavoitesisaltoalueStore';
+import { LukutaitokoulutusTavoitteetJaSisaltoalueetStore } from '@/stores/LukutaitokoulutusTavoitteetJaSisaltoalueetStore';
 import { KotoKielitaitotasoStore } from '@/stores/Koto/KotoKielitaitotasoStore';
 import { KotoOpintoStore } from '@/stores/Koto/KotoOpintoStore';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
@@ -325,6 +326,16 @@ const koulutustyypinLisasisaltoLisays = computed(() => {
       {
         groupedSisalto: [],
         save: tallennaUusiTavoitesisaltoalue,
+        label: {
+          'uusi': 'tavoitteet-ja-sisaltoalueet',
+          'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
+          'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
+        },
+      }],
+    [Koulutustyyppi.lukutaitokoulutus]: [
+      {
+        groupedSisalto: [],
+        save: tallennaUusiLukutaitoTavoitteetJaSisaltoalueet,
         label: {
           'uusi': 'tavoitteet-ja-sisaltoalueet',
           'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
@@ -518,6 +529,18 @@ const tallennaUusiTavoitesisaltoalue = async (otsikko, tekstikappaleIsa) => {
     name: 'tavoitesisaltoalue',
     params: {
       tavoitesisaltoalueId: '' + tallennettu!.id,
+    },
+  });
+};
+
+const tallennaUusiLukutaitoTavoitteetJaSisaltoalueet = async (otsikko, tekstikappaleIsa) => {
+  const tjsStore = new LukutaitokoulutusTavoitteetJaSisaltoalueetStore(peruste.value!.id!, 0);
+  const tallennettu = await tjsStore.create(otsikko, tekstikappaleIsa);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'lukutaitokoulutus_tavoitteetjasisaltoalueet',
+    params: {
+      tavoitteetJaSisaltoalueetId: '' + tallennettu!.id,
     },
   });
 };

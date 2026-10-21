@@ -193,6 +193,11 @@ export function routeToNode(route: RouteLocationNormalized): NavigationNodeDto |
       type: 'kaantajatodistusmalli',
       id: Number(route.params.kaantajatodistusmalliId),
     };
+  case 'lukutaitokoulutus_tavoitteetjasisaltoalueet':
+    return {
+      type: 'lukutaitokoulutus_tavoitteetjasisaltoalueet',
+      id: Number(route.params.tavoitteetJaSisaltoalueetId),
+    };
   case 'peruste-yleisnakyma':
     return null;
   default:
@@ -450,6 +455,13 @@ export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
       name: 'kaantajatodistusmalli',
       params: {
         kaantajatodistusmalliId: _.toString(node.id),
+      },
+    };
+  case 'lukutaitokoulutus_tavoitteetjasisaltoalueet':
+    return {
+      name: 'lukutaitokoulutus_tavoitteetjasisaltoalueet',
+      params: {
+        tavoitteetJaSisaltoalueetId: _.toString(node.id),
       },
     };
   default:
