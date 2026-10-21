@@ -8,7 +8,7 @@
     </template>
     <template #header>
       <div class="flex justify-between">
-        <h1>{{ $t("tiedotteet") }}</h1>
+        <h1>{{ $t('tiedotteet') }}</h1>
         <ep-tiedote-modal
           ref="eptiedotemodal"
           :perusteet="perusteet"
@@ -196,10 +196,6 @@ const tiedotteetFiltered = computed(() => {
         .value(),
     };
   });
-});
-
-computed(() => {
-  return _.map(valitutJulkaisupaikat.value, 'value');
 });
 
 const julkaisupaikatItems = computed(() => {
