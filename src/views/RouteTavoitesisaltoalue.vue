@@ -24,7 +24,7 @@
           >
             <ep-koodisto-select
               v-model="data.nimiKoodi"
-              :store="tavoitesisaltoalueotsikkoKoodisto"
+              :koodisto="Koodistot.TAVOITESISALTOALUEENOTSIKKO"
               :is-editing="isEditing"
               :nayta-arvo="false"
             >
@@ -97,8 +97,8 @@ import EpEditointi from '@shared/components/EpEditointi/EpEditointi.vue';
 import { EditointiStore } from '@shared/components/EpEditointi/EditointiStore';
 import { PerusteStore } from '@/stores/PerusteStore';
 import EpContent from '@shared/components/EpContent/EpContent.vue';
-import { KoodistoSelectStore, getKoodistoSivutettuna } from '@shared/components/EpKoodistoSelect/KoodistoSelectStore';
 import EpKoodistoSelect from '@shared/components/EpKoodistoSelect/EpKoodistoSelect.vue';
+import { Koodistot } from '@shared/utils/koodi';
 import { TavoitesisaltoalueStore } from '@/stores/TavoitesisaltoalueStore';
 import EpTavoitesisaltoalueTavoitealueet from '@shared/components/EpTavoitesisaltoalue/EpTavoitesisaltoalueTavoitealueet.vue';
 import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
@@ -128,14 +128,6 @@ const tavoitesisaltoalueId = computed(() => {
 
 const kasiteHandler = inject('kasiteHandler');
 const kuvaHandler = inject('kuvaHandler');
-
-// Initialize koodisto
-const tavoitesisaltoalueotsikkoKoodisto = new KoodistoSelectStore({
-  koodisto: 'tavoitesisaltoalueenotsikko',
-  async query(query: string, sivu = 0, koodisto: string) {
-    return await getKoodistoSivutettuna(koodisto, query, sivu) as any;
-  },
-});
 
 const fetch = async () => {
   await props.perusteStore.blockUntilInitialized();
