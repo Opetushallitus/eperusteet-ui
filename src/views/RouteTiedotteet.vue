@@ -214,7 +214,7 @@ const julkaisupaikatItems = computed(() => {
 const tableFields = computed(() => createTiedoteTableFields({ headerWidth: '35%' }));
 
 const avaaTiedote = (tiedote: TiedoteDto) => {
-  eptiedotemodalRef.value?.muokkaa(tiedote);
+  eptiedotemodalRef.value?.muokkaa(tiedote.id);
 };
 </script>
 

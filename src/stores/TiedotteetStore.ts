@@ -60,20 +60,26 @@ export class TiedotteetStore implements ITiedotteetProvider {
     return this.fetchImpl(query);
   }
 
+  public async getTiedote(id: number): Promise<TiedoteDto> {
+    return (await Tiedotteet.getTiedote(id)).data;
+  }
+
   public async save(tiedote: TiedoteDto) {
     if (_.isNil(tiedote.id)) {
-      await Tiedotteet.addTiedote(tiedote);
+      const tallennettu = (await Tiedotteet.addTiedote(tiedote)).data;
+      this.state.tiedotteetPage!.data = [tallennettu, ...this.state.tiedotteetPage!.data || []];
     }
     else {
       await Tiedotteet.updateTiedote(tiedote.id!, tiedote);
+      const tallennettu = (await Tiedotteet.getTiedote((tiedote as any).id, tiedote) as any).data;
+      this.state.tiedotteetPage!.data = _.map(this.state.tiedotteetPage!.data, (listaTiedote) => listaTiedote.id === tallennettu.id ? tallennettu : listaTiedote);
     }
-    this.state.tiedotteetPage = await this.fetchImpl(this.options.value);
   }
 
   public async delete(tiedote: TiedoteDto) {
     if (tiedote.id) {
       await Tiedotteet.deleteTiedote(tiedote.id);
-      this.state.tiedotteetPage = await this.fetchImpl(this.options.value);
+      this.state.tiedotteetPage!.data = _.filter(this.state.tiedotteetPage!.data, (listaTiedote) => listaTiedote.id !== tiedote.id);
     }
   }
 }

@@ -103,7 +103,7 @@ const tiedotteetFiltered = computed(() => {
 });
 
 const avaaTiedote = (tiedote: TiedoteDto) => {
-  eptiedotemodal.value?.muokkaa(tiedote);
+  eptiedotemodal.value?.muokkaa(tiedote.id);
 };
 </script>
 
