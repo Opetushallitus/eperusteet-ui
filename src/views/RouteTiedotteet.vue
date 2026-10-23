@@ -86,14 +86,10 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import EpTiedoteModal from '@shared/components/EpTiedoteModal/EpTiedoteModal.vue';
 import { Perusteet, TiedoteDto } from '@shared/api/eperusteet';
 import { TiedotteetStore } from '@/stores/TiedotteetStore';
-import {
-  createTiedoteTableFields,
-  julkaisupaikka,
-  julkaisupaikkaSort,
-} from '@shared/utils/tiedote';
+import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { PerusteKevytDto } from '@shared/generated/eperusteet';
-import { $t } from '@shared/utils/globals';
+import { $kaanna, $sdt, $t } from '@shared/utils/globals';
 import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
 import EpTable from '@shared/components/EpTable/EpTable.vue';
 
@@ -211,7 +207,54 @@ const julkaisupaikatItems = computed(() => {
   ];
 });
 
-const tableFields = computed(() => createTiedoteTableFields({ headerWidth: '35%' }));
+const tableFields = computed(() => {
+  return [
+    {
+      key: 'luotu',
+      label: $t('julkaistu'),
+      sortable: true,
+      formatter: (value: any) => $sdt(value),
+    },
+    {
+      key: 'muokattu',
+      label: $t('muokattu'),
+      sortable: true,
+      formatter: (value: any, _key: any, item: TiedoteDto) => {
+        if (item.luotu !== item.muokattu) {
+          return $sdt(value);
+        }
+        return '';
+      },
+    },
+    {
+      key: 'otsikko',
+      label: $t('tiedotteen-otsikko'),
+      sortable: false,
+      thStyle: { width: '35%', borderBottom: '0px' },
+      formatter: (value: any) => $kaanna(value),
+    },
+    {
+      key: 'julkaisupaikat',
+      label: $t('tiedote-julkaistu'),
+      sortable: false,
+      thStyle: { width: '35%', borderBottom: '0px' },
+      formatter: (value: any, _key: any, item: TiedoteDto) => {
+        return _.join(
+          [
+            ..._.chain(value)
+              .sortBy((julkaisupaikka) => julkaisupaikkaSort[julkaisupaikka])
+              .map((julkaisupaikka) =>
+                $t('tiedote-julkaisupaikka-' + julkaisupaikka),
+              )
+              .value(),
+            ..._.map(item.koulutustyypit, (kt) => $t(kt)),
+          ],
+          ', ',
+        );
+      },
+    },
+  ];
+});
 
 const avaaTiedote = (tiedote: TiedoteDto) => {
   eptiedotemodalRef.value?.muokkaa(tiedote.id);
