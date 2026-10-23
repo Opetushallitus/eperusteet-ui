@@ -89,13 +89,10 @@
           hover
           :items="osaamismerkitFiltered"
           :fields="tableFields"
+          :per-page="perPage"
+          :total-rows="totalRows"
+          v-model:current-page="page"
           @row-clicked="avaaOsaamismerkkiModal"
-        />
-
-        <EpBPagination
-          v-model="page"
-          :total="totalRows"
-          :items-per-page="perPage"
         />
       </div>
       <div
@@ -132,7 +129,7 @@ import { Murupolku } from '@shared/stores/murupolku';
 import { Kielet } from '@shared/stores/kieli';
 import { $kaanna, $t, $sdt, $sd, $fail } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
-import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
+
 import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 const props = defineProps({

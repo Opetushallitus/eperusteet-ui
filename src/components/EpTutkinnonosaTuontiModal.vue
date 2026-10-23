@@ -76,6 +76,9 @@
           striped
           :items="tutkinnonosatWithSelected"
           :fields="tutkinnonosatFields"
+          :per-page="sisaltoSivuKoko"
+          :total-rows="totalRows"
+          v-model:current-page="page"
         >
           <template #cell(nimi)="{ item }">
             <div
@@ -114,13 +117,6 @@
             </EpPopover>
           </template>
         </EpTable>
-        <EpBPagination
-          v-if="totalRows > sisaltoSivuKoko"
-          v-model="page"
-          :total="totalRows"
-          :items-per-page="sisaltoSivuKoko"
-          aria-controls="tuo-tutkinnon-osa"
-        />
       </div>
       <div v-else>
         {{ $t('ei-hakutuloksia') }}
@@ -185,7 +181,7 @@ import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
 import { PerusteDto, TutkinnonOsaViiteKontekstiDto } from '@shared/generated/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna, $sd, $success, $fail } from '@shared/utils/globals';
-import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
+
 import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import EpModal from '@shared/components/EpModal/EpModal.vue';
 import EpPopover from '@shared/components/EpPopover/EpPopover.vue';
