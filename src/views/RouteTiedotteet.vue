@@ -50,6 +50,7 @@
 
     <div v-else>
       <EpTable
+        v-model:current-page="page"
         responsive
         borderless
         striped
@@ -62,7 +63,6 @@
         :fields="tableFields"
         :per-page="perPage"
         :total-rows="totalRows"
-        v-model:current-page="page"
         @sort-changed="sortingChanged"
         @row-clicked="avaaTiedote"
       />
@@ -86,7 +86,6 @@ import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { PerusteKevytDto } from '@shared/generated/eperusteet';
 import { $t, $sdt, $kaanna } from '@shared/utils/globals';
-
 import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 const props = defineProps<{

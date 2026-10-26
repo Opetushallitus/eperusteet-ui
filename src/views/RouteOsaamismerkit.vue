@@ -82,6 +82,7 @@
       <EpSpinner v-if="!osaamismerkitPage" />
       <div v-else-if="totalRows > 0">
         <EpTable
+          v-model:current-page="page"
           responsive
           borderless
           striped
@@ -91,7 +92,6 @@
           :fields="tableFields"
           :per-page="perPage"
           :total-rows="totalRows"
-          v-model:current-page="page"
           @row-clicked="avaaOsaamismerkkiModal"
         />
       </div>
@@ -129,7 +129,6 @@ import { Murupolku } from '@shared/stores/murupolku';
 import { Kielet } from '@shared/stores/kieli';
 import { $kaanna, $t, $sdt, $sd, $fail } from '@shared/utils/globals';
 import EpToggleGroup from '@shared/components/forms/EpToggleGroup.vue';
-
 import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 const props = defineProps({
