@@ -331,6 +331,16 @@ const koulutustyypinLisasisaltoLisays = computed(() => {
           'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
         },
       }],
+    [Koulutustyyppi.lukutaitokoulutus]: [
+      {
+        groupedSisalto: [],
+        save: tallennaUusiTavoitesisaltoalue,
+        label: {
+          'uusi': 'tavoitteet-ja-sisaltoalueet',
+          'lisaa': 'lisaa-tavoite-ja-sisaltoalue',
+          'sijainti': 'tavoite-ja-sisaltoalue-sijainti',
+        },
+      }],
     [Koulutustyyppi.maahanmuuttajienkotoutumiskoulutus]: [
       {
         groupedLinkkiteksti: 'tavoitteet-ja-keskeiset-sisallot',
