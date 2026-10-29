@@ -211,7 +211,6 @@
                           </div>
                         </div>
                       </VueDraggable>
-                      <!-- Not changed: Drag-and-drop list (VueDraggable). EpTable does not support reordering, so this paginator was not changed. -->
                       <ep-b-pagination
                         v-if="tutkinnonOsat && tutkinnonOsat.length > 0"
                         v-model="tutkinnonosatSivu"
@@ -315,7 +314,6 @@
                           </div>
                         </div>
                       </VueDraggable>
-                      <!-- Not changed: Drag-and-drop list (VueDraggable). EpTable does not support reordering, so this paginator was not changed. -->
                       <ep-b-pagination
                         v-if="osaamisalat && osaamisalat.length > 0"
                         v-model="osaamisalatSivu"
@@ -422,7 +420,6 @@
                           </div>
                         </div>
                       </VueDraggable>
-                      <!-- Not changed: Drag-and-drop list (VueDraggable). EpTable does not support reordering, so this paginator was not changed. -->
                       <ep-b-pagination
                         v-if="tutkintonimikkeet && tutkintonimikkeet.length > 0"
                         v-model="tutkintonimikkeetSivu"
