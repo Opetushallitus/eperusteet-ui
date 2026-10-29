@@ -1,8 +1,10 @@
 <template>
   <div class="flex flex-wrap gap-4">
-    <div class="w-1/3">
-      {{ $kaanna(arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko) }}
-    </div>
+    <EpKaanna
+      class="w-1/3"
+      :value="arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko"
+      tag="div"
+    />
     <div class="flex flex-col">
       <template v-if="!isEditing">
         <ul>
@@ -10,7 +12,7 @@
             v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit"
             :key="'kriteeri'+kriteeriIndex"
           >
-            {{ $kaanna(osaamistasonkriteeri.kriteerit[kriteeriIndex]) }}
+            <EpKaanna :value="kriteeri" />
           </li>
         </ul>
       </template>
@@ -64,7 +66,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { $kaanna } from '@shared/utils/globals';
 import * as _ from 'lodash';
 import { VueDraggable } from 'vue-draggable-plus';
 import EpInput from '@shared/components/forms/EpInput.vue';
@@ -72,6 +73,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { $t } from '@shared/utils/globals';
+import EpKaanna from '@shared/components/EpKaanna/EpKaanna.vue';
 
 
 const props = defineProps<{
@@ -87,7 +89,6 @@ const osaamistasonkriteeri = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 });
-
 const lisaaKriteeri = async () => {
   osaamistasonkriteeri.value.kriteerit = [
     ...osaamistasonkriteeri.value.kriteerit,

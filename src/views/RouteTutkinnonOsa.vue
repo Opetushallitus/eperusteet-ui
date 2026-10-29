@@ -101,9 +101,11 @@
                 </div>
               </template>
             </ep-koodisto-select>
-            <div v-else>
-              {{ $kaanna(data.tutkinnonOsa.nimi) }}
-            </div>
+            <EpKaanna
+              v-else
+              :value="data.tutkinnonOsa.nimi"
+              tag="div"
+            />
           </EpFormGroup>
         </div>
 
@@ -203,12 +205,17 @@
                 <div class="font-semibold">
                   {{ $t('arvioinnin-kohde') }}
                 </div>
-                <div>{{ $kaanna(valittuGeneerinen.kohde) }}</div>
+                <EpKaanna
+                  :value="valittuGeneerinen.kohde"
+                  tag="div"
+                />
               </div>
 
-              <div v-if="kriteeritonGeneerinenValittu">
-                {{ $kaanna(valittuGeneerinen.osaamistasot[0].otsikko) }}
-              </div>
+              <EpKaanna
+                v-if="kriteeritonGeneerinenValittu"
+                :value="valittuGeneerinen.osaamistasot[0].otsikko"
+                tag="div"
+              />
 
               <table
                 v-else
@@ -227,14 +234,16 @@
                     v-for="(ot, idx) in valittuGeneerinen.osaamistasot"
                     :key="'ot-' + idx"
                   >
-                    <td>{{ $kaanna(ot.otsikko) }}</td>
+                    <td>
+                      <EpKaanna :value="ot.otsikko" />
+                    </td>
                     <td>
                       <ul class="pl-4">
                         <li
                           v-for="(kriteeri, idx) in ot.kriteerit"
                           :key="idx"
                         >
-                          {{ $kaanna(kriteeri) }}
+                          <EpKaanna :value="kriteeri" />
                         </li>
                       </ul>
                     </td>
@@ -390,6 +399,7 @@ import EpRadio from '@shared/components/forms/EpRadio.vue';
 import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
 import EpInput from '@shared/components/forms/EpInput.vue';
+import EpKaanna from '@shared/components/EpKaanna/EpKaanna.vue';
 
 const props = defineProps<{
   perusteStore: PerusteStore;
