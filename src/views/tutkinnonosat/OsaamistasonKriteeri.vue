@@ -1,11 +1,11 @@
 <template>
-  <div class="flex flex-wrap gap-4">
+  <div class="flex-wrap gap-4">
     <EpKaanna
-      class="w-1/3"
+      class="mb-1"
       :value="arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko"
       tag="div"
     />
-    <div class="flex flex-col">
+    <div class="flex flex-col flex-1">
       <template v-if="!isEditing">
         <ul>
           <li
@@ -28,14 +28,14 @@
             :key="'kriteeri'+kriteeriIndex"
             class="mb-2"
           >
-            <div class="flex">
+            <div class="flex items-center">
               <EpInput
                 v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]"
                 class="w-full"
                 :is-editing="isEditing"
               >
                 <template #left>
-                  <div class="order-handle m-2">
+                  <div class="order-handle m-1">
                     <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   </div>
                 </template>
