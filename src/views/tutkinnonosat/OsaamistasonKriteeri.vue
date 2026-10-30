@@ -1,11 +1,11 @@
 <template>
-  <div class="flex-wrap gap-4">
+  <div class="flex flex-wrap">
     <EpKaanna
-      class="mb-1"
+      class="w-1/4"
       :value="arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko"
       tag="div"
     />
-    <div class="flex flex-col flex-1">
+    <div class="w-3/4 flex flex-col">
       <template v-if="!isEditing">
         <ul>
           <li
