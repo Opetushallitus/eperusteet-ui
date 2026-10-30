@@ -87,6 +87,18 @@
             />
           </EpFormGroup>
 
+          <EpFormGroup
+            v-if="data.kielikasvatus"
+            :label="$t('kielikasvatus-kuvaus-header')"
+            class="mt-4"
+          >
+            <ep-content
+              v-model="data.kielikasvatus"
+              layout="normal"
+              :is-editable="isEditing"
+            />
+          </EpFormGroup>
+
           <template v-if="!data['_oppiaine'] && oppiaineId && (!data.kurssit || data.kurssit.length == 0)">
             <EpFormGroup
               :label="$t('oppimaarat')"
