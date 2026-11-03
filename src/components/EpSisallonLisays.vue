@@ -146,6 +146,7 @@ import { useRouter, useRoute } from 'vue-router';
 import * as _ from 'lodash';
 import EpTekstikappaleLisays from '@shared/components/EpTekstikappaleLisays/EpTekstikappaleLisays.vue';
 import { Koulutustyyppi, KoulutustyyppiToteutus } from '@shared/tyypit';
+import { isTpo2026 } from '@shared/utils/perusteet';
 import { PerusteStore } from '@/stores/PerusteStore';
 import { TekstikappaleStore } from '@/stores/TekstikappaleStore';
 import { OpintokokonaisuusStore } from '@/stores/OpintokokonaisuusStore';
@@ -161,6 +162,7 @@ import { chapterStringSort } from '@shared/utils/NavigationBuilder';
 import { KotoLaajaalainenOsaaminenStore } from '@/stores/Koto/KotoLaajaalainenOsaaminenStore';
 import { OsaamiskokonaisuusStore } from '@/stores/OsaamiskokonaisuusStore';
 import { TaiteenalaStore } from '@/stores/TaiteenalaStore';
+import { TaiteenalaVaiheStore } from '@/stores/TaiteenalaVaiheStore';
 import { PerusopetusOppiaineStore } from '@/stores/PerusopetusOppiaineStore';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { EpDropdown } from '@shared/components/EpDropdown';
@@ -241,6 +243,10 @@ const oppiaineId = computed(() => {
   return route.params?.oppiaineId;
 });
 
+const taiteenalaId = computed(() => {
+  return route.name === 'taiteenala' || route.name === 'taiteenalavaihe' ? route.params?.taiteenalaId : undefined;
+});
+
 const currentLukioOppimaara = computed(() => {
   if (oppiaineId.value) {
     return _.get(_.find(props.naviStore.connected.value, node => node.id === _.toNumber(oppiaineId.value)), 'depth') === 3;
@@ -288,6 +294,15 @@ const koulutustyypinLisasisaltoLisays = computed(() => {
       },
     ],
     [Koulutustyyppi.tpo]: [
+      ...(taiteenalaId.value && isTpo2026(peruste.value) ? [
+        {
+          groupedSisalto: [],
+          call: () => uusiTaiteenalaVaihe(_.toNumber(taiteenalaId.value)),
+          label: {
+            'uusi': 'lisaa-vaihe',
+          },
+        },
+      ] : []),
       {
         groupedSisalto: [],
         call: uusiTaiteenala,
@@ -673,6 +688,19 @@ const uusiTaiteenala = async () => {
     name: 'taiteenala',
     params: {
       taiteenalaId: '' + tallennettu!.id,
+      uusi: 'uusi',
+    },
+  });
+};
+
+const uusiTaiteenalaVaihe = async (taiteenalaViiteId: number) => {
+  const tallennettu = await TaiteenalaVaiheStore.create(taiteenalaViiteId);
+  await props.perusteStore.updateNavigation();
+  await router.push({
+    name: 'taiteenalavaihe',
+    params: {
+      taiteenalaId: '' + taiteenalaViiteId,
+      taiteenalaVaiheId: '' + tallennettu!.id,
       uusi: 'uusi',
     },
   });
