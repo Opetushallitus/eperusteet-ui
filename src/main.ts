@@ -45,6 +45,7 @@ import { createPinia } from 'pinia';
 import Kaannos from '@shared/plugins/kaannos';
 import { createHead } from '@unhead/vue/client';
 import { TaiteenalaStore } from './stores/TaiteenalaStore';
+import { TaiteenalaVaiheStore } from './stores/TaiteenalaVaiheStore';
 import { LukioOppiaineStore } from './stores/LukioOppiaineStore';
 import { registerIconColorSchemeChange } from '@shared/utils/icon';
 import { setPrimeVue } from '@shared/primevue';
@@ -202,6 +203,11 @@ app.use(PerusopetusOppiaineStore, {
 });
 
 app.use(TaiteenalaStore, {
+  perusteStore: stores.perusteStore,
+  router,
+});
+
+app.use(TaiteenalaVaiheStore, {
   perusteStore: stores.perusteStore,
   router,
 });

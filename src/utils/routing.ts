@@ -108,6 +108,11 @@ export function routeToNode(route: RouteLocationNormalized): NavigationNodeDto |
       type: 'taiteenala',
       id: Number(route.params.taiteenalaId),
     };
+  case 'taiteenalavaihe':
+    return {
+      type: 'taiteenalavaihe',
+      id: Number(route.params.taiteenalaVaiheId),
+    };
   case 'lukio_oppiaine':
     return {
       type: 'oppiaine',
@@ -347,6 +352,14 @@ export function nodeToRoute(node: NavigationNodeDto): RouteLocationRaw | null {
       name: 'taiteenala',
       params: {
         taiteenalaId: _.toString(node.id),
+      },
+    };
+  case 'taiteenalavaihe':
+    return {
+      name: 'taiteenalavaihe',
+      params: {
+        taiteenalaId: _.toString(node.meta!.taiteenalaId),
+        taiteenalaVaiheId: _.toString(node.id),
       },
     };
   case 'oppiaine':
