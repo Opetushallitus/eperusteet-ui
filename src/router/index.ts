@@ -52,6 +52,7 @@ import RouteAipeLaajaAlaisetOsaamiset from '@/views/aipe/RouteAipeLaajaAlaisetOs
 import RouteAipeOppiaine from '@/views/aipe/RouteAipeOppiaine.vue';
 import RouteAipeVaihe from '@/views/aipe/RouteAipeVaihe.vue';
 import RouteTaiteenala from '@/views/tpo/RouteTaiteenala.vue';
+import RouteTaiteenalaVaihe from '@/views/tpo/RouteTaiteenalaVaihe.vue';
 import RouteLaajaAlaisetOsaamiset from '@/views/lukio/RouteLaajaAlaisetOsaamiset.vue';
 import RouteModuuli from '@/views/lukio/RouteModuuli.vue';
 import RouteOppiaine from '@/views/lukio/RouteOppiaine.vue';
@@ -476,6 +477,11 @@ const router = createRouter({
         component: RouteTaiteenala,
         props,
       }, {
+        path: 'tpo/taiteenala/:taiteenalaId/vaihe/:taiteenalaVaiheId/:uusi?',
+        name: 'taiteenalavaihe',
+        component: RouteTaiteenalaVaihe,
+        props,
+      }, {
         path: 'lukio/laajaalaisetosaamiset',
         name: 'lukio_laajaAlaisetOsaamiset',
         component: RouteLaajaAlaisetOsaamiset,
@@ -675,6 +681,21 @@ window.addEventListener('beforeunload', e => {
     // Vanhemmat selainversiot vaativat erillisen varmistustekstin
     e.returnValue = Kielet.kaannaOlioTaiTeksti('poistumisen-varmistusteksti');
   }
+});
+
+router.beforeEach((to, from, next) => {
+  // Empty optional params from URL parsing break router-link exact-active matching
+  if (to.name && _.some(to.params, param => param === '')) {
+    next({
+      name: to.name,
+      params: _.omitBy(to.params, param => param === ''),
+      query: to.query,
+      hash: to.hash,
+      replace: true,
+    });
+    return;
+  }
+  next();
 });
 
 router.beforeEach((to, from, next) => {
