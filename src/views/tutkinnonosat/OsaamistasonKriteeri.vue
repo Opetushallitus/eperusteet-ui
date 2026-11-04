@@ -1,16 +1,18 @@
 <template>
-  <div class="flex flex-wrap gap-4">
-    <div class="w-1/3">
-      {{ $kaanna(arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko) }}
-    </div>
-    <div class="flex flex-col">
+  <div class="flex flex-wrap">
+    <EpKaanna
+      class="w-1/4"
+      :value="arviointiasteikko.osaamistasot[osaamistasonkriteeri._osaamistaso].otsikko"
+      tag="div"
+    />
+    <div class="w-3/4 flex flex-col">
       <template v-if="!isEditing">
         <ul>
           <li
             v-for="(kriteeri, kriteeriIndex) in osaamistasonkriteeri.kriteerit"
             :key="'kriteeri'+kriteeriIndex"
           >
-            {{ $kaanna(osaamistasonkriteeri.kriteerit[kriteeriIndex]) }}
+            <EpKaanna :value="kriteeri" />
           </li>
         </ul>
       </template>
@@ -26,14 +28,14 @@
             :key="'kriteeri'+kriteeriIndex"
             class="mb-2"
           >
-            <div class="flex">
+            <div class="flex items-center">
               <EpInput
                 v-model="osaamistasonkriteeri.kriteerit[kriteeriIndex]"
                 class="w-full"
                 :is-editing="isEditing"
               >
                 <template #left>
-                  <div class="order-handle m-2">
+                  <div class="order-handle m-1">
                     <EpMaterialIcon>drag_indicator</EpMaterialIcon>
                   </div>
                 </template>
@@ -64,7 +66,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { $kaanna } from '@shared/utils/globals';
 import * as _ from 'lodash';
 import { VueDraggable } from 'vue-draggable-plus';
 import EpInput from '@shared/components/forms/EpInput.vue';
@@ -72,6 +73,7 @@ import EpButton from '@shared/components/EpButton/EpButton.vue';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { DEFAULT_DRAGGABLE_PROPERTIES } from '@shared/utils/defaults';
 import { $t } from '@shared/utils/globals';
+import EpKaanna from '@shared/components/EpKaanna/EpKaanna.vue';
 
 
 const props = defineProps<{
@@ -87,7 +89,6 @@ const osaamistasonkriteeri = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 });
-
 const lisaaKriteeri = async () => {
   osaamistasonkriteeri.value.kriteerit = [
     ...osaamistasonkriteeri.value.kriteerit,

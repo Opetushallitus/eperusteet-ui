@@ -43,6 +43,10 @@ const koulutustyyppiLisasisalto = {
     otsikko: 'tavoitesisaltoalueita',
     tietue: 'tavoitesisaltoalue',
   },
+  'koulutustyyppi_31': {
+    otsikko: 'tavoitesisaltoalueita',
+    tietue: 'tavoitesisaltoalue',
+  },
   'koulutustyyppi_35': {
     otsikko: 'tavoitesisaltoalueita',
     tietue: 'tavoitesisaltoalue',

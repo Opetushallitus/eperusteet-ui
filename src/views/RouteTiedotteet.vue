@@ -50,6 +50,7 @@
 
     <div v-else>
       <EpTable
+        v-model:current-page="page"
         responsive
         borderless
         striped
@@ -60,15 +61,10 @@
         :sort-desc="sort.sortDesc"
         :items="tiedotteetFiltered"
         :fields="tableFields"
+        :per-page="perPage"
+        :total-rows="totalRows"
         @sort-changed="sortingChanged"
         @row-clicked="avaaTiedote"
-      />
-
-      <EpBPagination
-        v-model="page"
-        :total="totalRows"
-        :items-per-page="perPage"
-        aria-controls="tiedotteet"
       />
     </div>
   </ep-main-view>
@@ -89,8 +85,7 @@ import { TiedotteetStore } from '@/stores/TiedotteetStore';
 import { julkaisupaikka, julkaisupaikkaSort } from '@shared/utils/tiedote';
 import EpSpinner from '@shared/components/EpSpinner/EpSpinner.vue';
 import { PerusteKevytDto } from '@shared/generated/eperusteet';
-import { $kaanna, $sdt, $t } from '@shared/utils/globals';
-import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
+import { $t, $sdt, $kaanna } from '@shared/utils/globals';
 import EpTable from '@shared/components/EpTable/EpTable.vue';
 
 interface TiedoteSort {

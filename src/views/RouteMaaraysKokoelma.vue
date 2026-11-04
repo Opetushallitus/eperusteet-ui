@@ -110,6 +110,7 @@
 
       <EpTable
         v-else
+        v-model:current-page="sivu"
         class="mt-3"
         responsive
         borderless
@@ -121,6 +122,8 @@
         :sort-desc="sort.sortDesc"
         :items="maaraykset"
         :fields="tableFields"
+        :per-page="perPage"
+        :total-rows="maarayksetCount"
         @sort-changed="sortingChanged"
       >
         <template #cell(nimi)="{ item }">
@@ -129,12 +132,6 @@
           </router-link>
         </template>
       </EpTable>
-
-      <ep-b-pagination
-        v-model="sivu"
-        :items-per-page="perPage"
-        :total="maarayksetCount"
-      />
     </div>
   </ep-main-view>
 </template>
@@ -151,7 +148,6 @@ import { MaaraysDtoTyyppiEnum } from '@shared/api/eperusteet';
 import EpButton from '@shared/components/EpButton/EpButton.vue';
 import { Murupolku } from '@shared/stores/murupolku';
 import EpMultiSelect from '@shared/components/forms/EpMultiSelect.vue';
-import EpBPagination from '@shared/components/EpBPagination/EpBPagination.vue';
 import EpTable from '@shared/components/EpTable/EpTable.vue';
 import EpToggle from '@shared/components/forms/EpToggle.vue';
 import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';

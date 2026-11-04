@@ -257,12 +257,6 @@
                   </router-link>
                 </template>
 
-                <template #lukutaitokoulutus_tavoitteetjasisaltoalueet="{ item }">
-                  <router-link :to="{ name: 'lukutaitokoulutus_tavoitteetjasisaltoalueet', params: { tavoitteetJaSisaltoalueetId: item.id } }">
-                    {{ $kaanna(item.label) || $t('nimeton-tavoitteet-ja-sisaltoalueet') }}
-                  </router-link>
-                </template>
-
                 <template #osaamiskokonaisuus_paa_alue="{ item }">
                   <router-link :to="{ name: 'osaamiskokonaisuus_paa_alue', params: { osaamiskokonaisuusPaaAlueId: item.id } }">
                     {{ $kaanna(item.label) || $t('nimeton-osaamiskokonaisuus_paa_alue') }}

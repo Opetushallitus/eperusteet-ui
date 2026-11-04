@@ -69,7 +69,6 @@ import RouteKaantajaKielitaito from '@/views/RouteKaantajaKielitaito.vue';
 import RouteKaantajaTaitotasokuvaus from '@/views/RouteKaantajaTaitotasokuvaus.vue';
 import RouteKaantajaAihealue from '@/views/RouteKaantajaAihealue.vue';
 import RouteKaantajaTodistusmalli from '@/views/RouteKaantajaTodistusmalli.vue';
-import RouteLukutaitokoulutusTavoitteetJaSisaltoalueet from '@/views/RouteLukutaitokoulutusTavoitteetJaSisaltoalueet.vue';
 import { changeLang } from '@shared/utils/router';
 import { stores } from '@/stores';
 import { asetaValmiiksi, avaaPeruste, kooditaPeruste, nollaaJulkaisuTila, pakotaJulkaisu, vaihdaPerusteTilaConfirm } from '@/utils/varmistusmetodit';
@@ -555,11 +554,6 @@ const router = createRouter({
         path: 'kaantajatodistusmalli/:kaantajatodistusmalliId',
         name: 'kaantajatodistusmalli',
         component: RouteKaantajaTodistusmalli,
-        props,
-      }, {
-        path: 'lukutaitokoulutus_tavoitteetjasisaltoalueet/:tavoitteetJaSisaltoalueetId',
-        name: 'lukutaitokoulutus_tavoitteetjasisaltoalueet',
-        component: RouteLukutaitokoulutusTavoitteetJaSisaltoalueet,
         props,
       },
       ],
