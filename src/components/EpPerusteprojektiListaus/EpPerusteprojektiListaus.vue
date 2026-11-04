@@ -135,6 +135,7 @@
             <EpSearch
               v-model="query.nimi"
               :placeholder="$t('etsi-perusteprojektia')"
+              @update:model-value="query.sivu = 0"
             />
           </div>
           <div
@@ -385,12 +386,14 @@ const onQueryChange = async (newQuery: PerusteQuery) => {
 };
 
 watch(() => tila.value, (newTila: string[]) => {
+  query.sivu = 0;
   query.tila = newTila.length > 0
     ? newTila
     : (props.isPohja ? ['LAADINTA', 'VALMIS', 'POISTETTU'] : ['LAADINTA', 'JULKAISTU', 'POISTETTU']);
 });
 
 watch(() => voimassaolo.value, (newTila: string | null) => {
+  query.sivu = 0;
   const defaults = {
     voimassaolo: false,
     siirtyma: false,
@@ -418,6 +421,7 @@ watch(() => voimassaolo.value, (newTila: string | null) => {
 });
 
 watch(() => koulutustyyppi.value, (newKt: string | null) => {
+  query.sivu = 0;
   query.koulutustyyppi = newKt ? [newKt] : undefined;
 });
 
@@ -432,6 +436,7 @@ watch(() => amosaaYhteinen.value, () => {
 });
 
 watch(() => peruste.value, (newPeruste: PerusteKevytDto | null) => {
+  query.sivu = 0;
   query.perusteet = newPeruste?.id ? [newPeruste.id] : [];
 });
 
