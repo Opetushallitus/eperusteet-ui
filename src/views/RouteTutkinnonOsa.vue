@@ -553,7 +553,7 @@ watch(tutkinnonOsaId, async (id, oldId) => {
 
 const fetch = async () => {
   await props.perusteStore.blockUntilInitialized();
-  const editStore = new TutkinnonOsaEditStore(perusteId.value!, !isNew.value ? tutkinnonOsaId.value : undefined, null, versionumero.value);
+  const editStore = new TutkinnonOsaEditStore(perusteId.value!, !isNew.value ? tutkinnonOsaId.value : undefined, versionumero.value);
   store.value = new EditointiStore(editStore);
 };
 
