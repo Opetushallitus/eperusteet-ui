@@ -94,6 +94,12 @@ export function routeToNode(route: RouteLocationNormalized): NavigationNodeDto |
         id: Number(route.params.oppiaineId),
       };
     }
+    if (route.query.parentId) {
+      return {
+        type: 'aipeoppiaine',
+        id: Number(route.query.parentId),
+      };
+    }
     return {
       type: 'aipevaihe',
       id: Number(route.params.vaiheId),
