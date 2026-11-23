@@ -75,7 +75,7 @@ export class AipeKurssiStore implements IEditoitava {
     if (this.kurssiId) {
       await Aipeopetuksensisalto.removeAipeKurssi(this.perusteId, this.vaiheId, this.oppiaineId, this.kurssiId);
       await this.perusteStore.updateNavigation();
-      AipeKurssiStore.config.router.push({ name: 'aipeoppiaine', params: { oppiaineID: this.oppiaineId } });
+      AipeKurssiStore.config.router.push({ name: 'aipeoppiaine', params: { oppiaineId: this.oppiaineId } });
     }
   }
 
