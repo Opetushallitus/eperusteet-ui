@@ -461,11 +461,6 @@ const router = createRouter({
         component: RouteAipeOppiaine,
         props,
       }, {
-        path: 'aipe/vaihe/:vaiheId/oppiaine/:parentId',
-        name: 'aipeoppimaara',
-        component: RouteAipeOppiaine,
-        props,
-      }, {
         path: 'aipe/vaihe/:vaiheId/oppiaine/:oppiaineId/kurssi/:kurssiId?',
         name: 'aipekurssi',
         component: RouteAipeKurssi,

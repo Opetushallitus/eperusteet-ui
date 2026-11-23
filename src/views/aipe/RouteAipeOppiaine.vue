@@ -330,7 +330,11 @@ const tavoitteetDragOptions = computed(() => {
 });
 
 const lisaaOppimaara = () => {
-  router.push({ name: 'aipeoppimaara', params: { vaiheId: props.vaiheId, parentId: props.oppiaineId } });
+  router.push({
+    name: 'aipeoppiaine',
+    params: { vaiheId: props.vaiheId },
+    query: { parentId: props.oppiaineId },
+  });
 };
 
 const lisaaKurssi = () => {
@@ -368,7 +372,7 @@ const oppiaineChange = async () => {
   store.value = new EditointiStore(storeInstance);
 };
 
-watch(() => props.oppiaineId, async () => {
+watch(() => [props.oppiaineId, props.parentId], async () => {
   await oppiaineChange();
 }, { immediate: true });
 
