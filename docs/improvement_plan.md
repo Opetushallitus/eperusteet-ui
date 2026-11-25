@@ -2,7 +2,7 @@
 
 Review date: 2026-06-29
 Reviewer: Code review (code-quality + code-reviewer skills)
-Last updated: 2026-06-29 — §B, §D, §E, §G, §H addressed; **Part 2 (application repo) added**
+Last updated: 2026-11-25 — P2.3 marked done: stale `src/registerServiceWorker.ts.old` removed.
 
 This plan now covers two code areas:
 
@@ -289,9 +289,9 @@ Also: `RoutePerusteenTiedot.vue:1165` (`console.log(err)`), `router/index.ts:659
 ```
 The user sees a toast but the error is only `console.log`-ed. Route caught errors through a shared logging/telemetry path (or at least `console.error`) so failures are diagnosable in production. Audit other `catch` blocks for the same pattern.
 
-## P2.3 Stale committed file  **[Cleanup]**
+## P2.3 Stale committed file  **[Cleanup — Done]**
 
-`src/registerServiceWorker.ts.old` is a dead `.old` file checked into the repo (it also accounts for the only `eslint-disable` / extra `console.log` hits). Delete it — version history already preserves it.
+Removed the unused `src/registerServiceWorker.ts.old` file. Version history preserves it.
 
 ## P2.4 Widespread `any`  **[Improvement — V-2]**
 
