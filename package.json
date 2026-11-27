@@ -59,17 +59,13 @@
     "node": "^24"
   },
   "//": {
-    "qs": "CVE-2026-110816; app, shared API clients, url.",
-    "source-map-js": "CVE-2026-93749; Vue compiler, PostCSS/Vite, Sass, Tailwind, vue-i18n.",
-    "uuid": "CVE-2026-41907; app, ExcelJS. Major override; retest exports when changing.",
-    "brace-expansion@npm:^1.1.7": "Multiple CVEs; minimatch 3 via ESLint and ExcelJS.",
-    "brace-expansion@npm:^2.0.1": "Multiple CVEs; minimatch 5 via ExcelJS/archiver/readdir-glob."
+    "qs": "CVE-2026-110816; transitive from url dependency.",
+    "uuid": "CVE-2026-41907; transitive from ExcelJS. Major override.",
+    "brace-expansion@npm:^2.0.1": "Multiple CVEs; transitive Minimatch 5 via ExcelJS."
   },
   "resolutions": {
     "qs": "6.17.1",
-    "source-map-js": "1.2.3",
     "uuid": "14.0.3",
-    "brace-expansion@npm:^1.1.7": "1.1.22",
     "brace-expansion@npm:^2.0.1": "2.1.8"
   },
   "packageManager": "yarn@4.13.0",
