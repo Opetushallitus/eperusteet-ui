@@ -393,6 +393,26 @@ const koulutustyypinLisasisaltoLisays = computed(() => {
         },
       },
     ],
+    [Koulutustyyppi.telmavalmentava]: [
+      {
+        groupedSisalto: [],
+        save: tallennaUusiKoulutuksenOsa,
+        label: {
+          'uusi': 'uusi-koulutuksenosa',
+          'lisaa': 'lisaa-koulutuksenosa',
+          'sijainti': 'koulutuksen-osan-sijainti',
+        },
+      },
+      {
+        groupedSisalto: [],
+        save: tallennaUusiLaajaAlainenOsaaminen,
+        label: {
+          'uusi': 'uusi-laaja-alainen-osaaminen',
+          'lisaa': 'lisaa-laaja-alainen-osaaminen-perusteen-osa',
+          'sijainti': 'laaja-alaisen-osaamisen-sijainti',
+        },
+      },
+    ],
   };
 });
 

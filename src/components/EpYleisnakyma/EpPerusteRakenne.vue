@@ -55,6 +55,10 @@ const koulutustyyppiLisasisalto = {
     otsikko: 'koulutuksenosaa',
     tietue: 'koulutuksenosa',
   },
+  'koulutustyyppi_32': {
+    otsikko: 'koulutuksenosaa',
+    tietue: 'koulutuksenosa',
+  },
 };
 
 const navigation = computed(() => {

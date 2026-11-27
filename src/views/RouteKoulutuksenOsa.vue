@@ -110,7 +110,7 @@
                 type="number"
                 :min="data.laajuusMinimi"
               />
-              <span class="ml-2">{{ $t('viikkoa') }}</span>
+              <span class="ml-2">{{ $t(koulutuksenOsaLaajuusYksikko(koulutustyyppi)) }}</span>
             </div>
             <p
               v-else-if="!isEditing"
@@ -173,7 +173,7 @@
       <div class="flex flex-wrap gap-4">
         <div class="md:w-5/6">
           <h3 class="mb-4">
-            {{ $t('tavoitteet') }}
+            {{ $t(koulutuksenOsaTavoitteetOtsikko(koulutustyyppi)) }}
           </h3>
           <EpFormGroup :label="$t('opiskelija')">
             <template v-if="isEditing">
@@ -333,6 +333,7 @@ import {
 } from '@shared/api/eperusteet';
 import EpMaterialIcon from '@shared/components/EpMaterialIcon/EpMaterialIcon.vue';
 import { $t, $kaanna } from '@shared/utils/globals';
+import { koulutuksenOsaLaajuusYksikko, koulutuksenOsaTavoitteetOtsikko } from '@shared/utils/perusteet';
 import EpRadio from '@shared/components/forms/EpRadio.vue';
 import EpFormGroup from '@shared/components/forms/EpFormGroup.vue';
 import EpInputGroup from '@shared/components/EpInputGroup/EpInputGroup.vue';
@@ -472,6 +473,8 @@ watch(koulutuksenosaId, async (id, oldId) => {
 watch(versionumero, async () => {
   await fetch();
 });
+const koulutustyyppi = computed(() => props.perusteStore.peruste.value?.koulutustyyppi);
+
 </script>
 
 <style scoped lang="scss">
